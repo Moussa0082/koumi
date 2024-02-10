@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:koumi_app/screens/RegisterScreen.dart';
+import 'package:koumi_app/widgets/AnimatedBackground.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -38,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         
         children: [
-          // AnimatedBackgroun(),
+        //  const  AnimatedBackground(),
         const SizedBox(height:30, ),
           Center(child: Image.asset('assets/images/logo.png', height: 350, width: 250,))
         ],
