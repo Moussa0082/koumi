@@ -2,6 +2,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:koumi_app/screens/RegisterScreen.dart';
 import 'package:koumi_app/widgets/AnimatedBackground.dart';
 
@@ -20,15 +21,15 @@ class _SplashScreenState extends State<SplashScreen> {
     // TODO: implement initState
     super.initState();
 
-    // Timer(
-    //  const  Duration(seconds:2), 
-    //   () =>
-    //   Navigator.of(context).pushReplacement(
-    //   MaterialPageRoute(
-    //   builder: (_) => const RegisterScreen()      
-    //   ),
-    //   ),
-    //  );
+    Timer(
+     const  Duration(seconds:2), 
+      () =>
+      Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+      builder: (_) => const RegisterScreen()      
+      ),
+      ),
+     );
   }
 
   @override
@@ -39,9 +40,13 @@ class _SplashScreenState extends State<SplashScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         
         children: [
-        //  const  AnimatedBackground(),
-        const SizedBox(height:30, ),
-          Center(child: Image.asset('assets/images/logo.png', height: 350, width: 250,))
+         const  AnimatedBackground(),
+        const SizedBox(height:10),
+          Center(child: Image.asset('assets/images/logo.png', height: 350, width: 250,)),
+         CircularProgressIndicator(
+          backgroundColor: (Colors.white),
+          color: (Colors.orange),
+         ),
         ],
       ),
     );
