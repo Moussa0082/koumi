@@ -27,7 +27,7 @@ class Carrousel extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Container(
-                // width: MediaQuery.of(context).size.width*0.9,
+                width: MediaQuery.of(context).size.width * 1,
                 // height: 200,
                 decoration: const BoxDecoration(
                   color: Color.fromARGB(255, 228, 225, 225),
@@ -77,9 +77,6 @@ class Carrousel extends StatelessWidget {
                 );
               }).toList(),
             ),
-          ),
-          const SizedBox(
-            height: 10,
           ),
         ],
       ),

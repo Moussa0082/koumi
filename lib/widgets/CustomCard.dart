@@ -5,50 +5,36 @@ import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/MagasinScreen.dart';
 import 'package:koumi_app/screens/Meteo.dart';
 import 'package:koumi_app/screens/Transport.dart';
-import 'package:koumi_app/widgets/Carrousel.dart';
-import 'package:koumi_app/widgets/CustomAppBar.dart';
 
-class Accueil extends StatefulWidget {
-  const Accueil({super.key});
+class CustomCard extends StatefulWidget {
+  const CustomCard({super.key});
 
   @override
-  State<Accueil> createState() => _AccueilState();
+  State<CustomCard> createState() => _CustomCardState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _AccueilState extends State<Accueil> {
+class _CustomCardState extends State<CustomCard> {
+  late Future<Map<String, dynamic>> future;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const CustomAppBar(),
-      body: ListView(
-        children: [
-          SizedBox(
-            height: 200,
-            child: Carrousel()),
-          SizedBox(height: 20,),
-
-          SizedBox(
-            height: double.maxFinite,
-            child: GridView.count(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        crossAxisCount: 3,
-                        children: [
-            _buildAccueilCard("Conseils", "conseil.png", 1),
-            _buildAccueilCard("Intrants", "intrant.png", 2),
-            _buildAccueilCard("Commandes", "commande.png", 3),
-            _buildAccueilCard("Magasin", "magasin.png", 4),
-            _buildAccueilCard("Meteo", "meteo.png", 5),
-            _buildAccueilCard("Transports", "transport.png", 6),
-            // _buildAccueilCard("Statistique", "statistique_logo.png", 4)
-                        ],
-                      ),
-          )
-        ],
-      ),
+    return Expanded(
+      child: GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 3,
+            children: [
+      _buildAccueilCard("Conseils", "conseil.png", 1),
+      _buildAccueilCard("Intrants", "intrant.png", 2),
+      _buildAccueilCard("Commandes", "commande.png", 3),
+      _buildAccueilCard("Magasin", "magasin.png", 4),
+      _buildAccueilCard("Meteo", "meteo.png", 5),
+      _buildAccueilCard("Transports", "transport.png", 6),
+      // _buildAccueilCard("Statistique", "statistique_logo.png", 4)
+            ],
+          ),
     );
   }
 
@@ -85,7 +71,8 @@ class _AccueilState extends State<Accueil> {
                       builder: (context) => const ConseilScreen()));
             }
           },
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(28),
+          highlightColor: d_colorOr,
           child: Card(
             color: Colors.white,
             elevation: 2,
@@ -105,7 +92,7 @@ class _AccueilState extends State<Accueil> {
                   ),
                 ),
                 const SizedBox(
-                  height: 10,
+                  height: 5,
                 ),
                 Text(
                   titre,
