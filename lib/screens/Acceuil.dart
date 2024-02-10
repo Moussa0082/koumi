@@ -22,30 +22,30 @@ class _AccueilState extends State<Accueil> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
       appBar: const CustomAppBar(),
       body: ListView(
         children: [
-          SizedBox(
-            height: 200,
-            child: Carrousel()),
-          SizedBox(height: 20,),
-
+          SizedBox(height: 200, child: Carrousel()),
+          const SizedBox(
+            height: 40,
+          ),
           SizedBox(
             height: double.maxFinite,
             child: GridView.count(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        crossAxisCount: 3,
-                        children: [
-            _buildAccueilCard("Conseils", "conseil.png", 1),
-            _buildAccueilCard("Intrants", "intrant.png", 2),
-            _buildAccueilCard("Commandes", "commande.png", 3),
-            _buildAccueilCard("Magasin", "magasin.png", 4),
-            _buildAccueilCard("Meteo", "meteo.png", 5),
-            _buildAccueilCard("Transports", "transport.png", 6),
-            // _buildAccueilCard("Statistique", "statistique_logo.png", 4)
-                        ],
-                      ),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 3,
+              children: [
+                _buildAccueilCard("Conseils", "conseil.png", 1),
+                _buildAccueilCard("Intrants", "intrant.png", 2),
+                _buildAccueilCard("Commandes", "commande.png", 3),
+                _buildAccueilCard("Magasin", "magasin.png", 4),
+                _buildAccueilCard("Meteo", "meteo.png", 5),
+                _buildAccueilCard("Transports", "transport.png", 6),
+                // _buildAccueilCard("Statistique", "statistique_logo.png", 4)
+              ],
+            ),
           )
         ],
       ),
@@ -54,7 +54,7 @@ class _AccueilState extends State<Accueil> {
 
   Widget _buildAccueilCard(String titre, String imgLocation, int index) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       child: InkWell(
           onTap: () {
             if (index == 6) {
@@ -86,31 +86,36 @@ class _AccueilState extends State<Accueil> {
             }
           },
           borderRadius: BorderRadius.circular(20),
-          child: Card(
-            color: Colors.white,
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(28),
+          child: Container(
+            width: 150,
+            height: 150,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.white,
+              boxShadow: const [
+                BoxShadow(
+                    offset: Offset(0.0, 0.0),
+                    blurRadius: 5.0,
+                    color: Color.fromRGBO(0, 0, 0, 0.38))
+              ],
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: MediaQuery.of(context).size.width *
-                      0.20, // Set width to 80% of the screen width
+                  width: MediaQuery.of(context).size.width * 0.28,
                   child: Image.asset(
                     "assets/images/$imgLocation",
                     fit: BoxFit
                         .cover, // You can adjust the BoxFit based on your needs
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 Text(
                   titre,
                   style: const TextStyle(
                     fontSize: 17,
+                    overflow: TextOverflow.ellipsis,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
