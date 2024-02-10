@@ -28,7 +28,7 @@ class _AccueilState extends State<Accueil> {
         children: [
           SizedBox(height: 200, child: Carrousel()),
           const SizedBox(
-            height: 40,
+            height: 35,
           ),
           SizedBox(
             height: double.maxFinite,
@@ -37,8 +37,8 @@ class _AccueilState extends State<Accueil> {
               physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: 3,
               children: [
-                _buildAccueilCard("Conseils", "conseil.png", 1),
-                _buildAccueilCard("Intrants", "intrant.png", 2),
+                _buildAccueilCard("Intrants", "intrant.png", 1),
+                _buildAccueilCard("Conseils", "conseil.png", 2),
                 _buildAccueilCard("Commandes", "commande.png", 3),
                 _buildAccueilCard("Magasin", "magasin.png", 4),
                 _buildAccueilCard("Meteo", "meteo.png", 5),
@@ -77,12 +77,12 @@ class _AccueilState extends State<Accueil> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const IntrantScreen()));
+                      builder: (context) => const ConseilScreen()));
             } else if (index == 1) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const ConseilScreen()));
+                      builder: (context) => const IntrantScreen()));
             }
           },
           borderRadius: BorderRadius.circular(20),
@@ -94,9 +94,9 @@ class _AccueilState extends State<Accueil> {
               color: Colors.white,
               boxShadow: const [
                 BoxShadow(
-                    offset: Offset(0.0, 0.0),
-                    blurRadius: 5.0,
-                    color: Color.fromRGBO(0, 0, 0, 0.38))
+                  blurRadius: 5.0,
+                  color: Color.fromRGBO(0, 0, 0, 0.25), // Opacité de 10%
+                ),
               ],
             ),
             child: Column(
