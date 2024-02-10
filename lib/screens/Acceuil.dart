@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:koumi_app/screens/ActeurScreen.dart';
+import 'package:koumi_app/screens/AlerteScreen.dart';
 import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
+import 'package:koumi_app/screens/Location.dart';
 import 'package:koumi_app/screens/MagasinScreen.dart';
 import 'package:koumi_app/screens/Meteo.dart';
 import 'package:koumi_app/screens/Transport.dart';
@@ -31,7 +34,7 @@ class _AccueilState extends State<Accueil> {
             height: 35,
           ),
           SizedBox(
-            height: double.maxFinite,
+            // height: double.maxFinite,
             child: GridView.count(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -43,6 +46,10 @@ class _AccueilState extends State<Accueil> {
                 _buildAccueilCard("Magasin", "magasin.png", 4),
                 _buildAccueilCard("Meteo", "meteo.png", 5),
                 _buildAccueilCard("Transports", "transport.png", 6),
+                _buildAccueilCard("Locations", "location.png", 7),
+
+                _buildAccueilCard("Alertes", "alerte.png", 8),
+                _buildAccueilCard("Acteurs", "acteur.png", 9),
                 // _buildAccueilCard("Statistique", "statistique_logo.png", 4)
               ],
             ),
@@ -57,7 +64,20 @@ class _AccueilState extends State<Accueil> {
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       child: InkWell(
           onTap: () {
-            if (index == 6) {
+            if (index == 9) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ActeurScreen()));
+            } else if (index == 8) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const AlerteScreen()));
+            } else if (index == 7) {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const Location()));
+            } else if (index == 6) {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const Transport()));
             } else if (index == 5) {
@@ -86,40 +106,43 @@ class _AccueilState extends State<Accueil> {
             }
           },
           borderRadius: BorderRadius.circular(20),
-          child: Container(
-            width: 150,
-            height: 150,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.white,
-              boxShadow: const [
-                BoxShadow(
-                  blurRadius: 5.0,
-                  color: Color.fromRGBO(0, 0, 0, 0.25), // Opacité de 10%
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.28,
-                  child: Image.asset(
-                    "assets/images/$imgLocation",
-                    fit: BoxFit
-                        .cover, // You can adjust the BoxFit based on your needs
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white,
+                boxShadow: const [
+                  BoxShadow(
+                    blurRadius: 5.0,
+                    color: Color.fromRGBO(0, 0, 0, 0.25), // Opacité de 10%
                   ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  titre,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    overflow: TextOverflow.ellipsis,
-                    fontWeight: FontWeight.bold,
+                ],
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.28,
+                    child: Image.asset(
+                      "assets/images/$imgLocation",
+                      fit: BoxFit
+                          .cover, // You can adjust the BoxFit based on your needs
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  Text(
+                    titre,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      overflow: TextOverflow.ellipsis,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
           )),
     );
