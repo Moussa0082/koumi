@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/RegisterNextScreen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -53,7 +54,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                      const SizedBox(width: 4,),
                      GestureDetector(
                       onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> const RegisterNextScreen()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> const LoginScreen()));
                       },
                       child: const Text("Se connecter", 
                       style: TextStyle(color: Colors.blue, 

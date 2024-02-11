@@ -6,12 +6,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:koumi_app/screens/RegisterScreen.dart';
 import 'package:koumi_app/widgets/AnimatedBackground.dart';
 
+import 'package:koumi_app/widgets/BottomNavigationPage.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
+const d_colorPage = Color.fromRGBO(255, 255, 255, 1);
 
 class _SplashScreenState extends State<SplashScreen> {
 
@@ -26,6 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
       () =>
       Navigator.of(context).pushReplacement(
       MaterialPageRoute(
+
       builder: (_) => const RegisterScreen()      
       ),
       ),
@@ -35,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
+      backgroundColor: d_colorPage,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         
