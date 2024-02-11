@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:koumi_app/screens/RegisterEndScreen.dart';
+import 'package:koumi_app/screens/RegisterNextScreen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -47,9 +47,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                    child: Row(
                      mainAxisAlignment: MainAxisAlignment.center,
                    children: [
-                    const  Text("J'ai déjà un compte .", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),),
+                    const  Text("J'ai déjà un compte .",
+                     style: TextStyle(color: Colors.white, fontSize: 18, 
+                     fontWeight: FontWeight.bold),),
                      const SizedBox(width: 4,),
-                     GestureDetector(child: const Text("Se connecter", style: TextStyle(color: Colors.blue, fontSize: 18, fontWeight: FontWeight.bold) , )),
+                     GestureDetector(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> const RegisterNextScreen()));
+                      },
+                      child: const Text("Se connecter", 
+                      style: TextStyle(color: Colors.blue, 
+                      fontSize: 18, 
+                      fontWeight: FontWeight.bold) ,
+                       ),
+                       ),
                     ],
                  ),
                  
@@ -187,7 +198,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: ElevatedButton(
               onPressed: () {
                 // Handle button press action here
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterEndScreen() ));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterNextScreen() ));
               },
               child:  Text(
                 " Suivant ",
