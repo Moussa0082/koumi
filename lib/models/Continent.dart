@@ -8,7 +8,7 @@ class Continent {
   final bool statutContinent;
   final String? dateAjout;
   final String? dateModif;
-
+  
   Continent({
     this.idContinent,
     required this.codeContinent,

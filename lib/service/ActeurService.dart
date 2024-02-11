@@ -75,14 +75,13 @@ class ActeurService extends ChangeNotifier {
             'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
       }
     } catch (e) {
-        throw Exception(
+      throw Exception(
           'Une erreur s\'est produite lors de l\'ajout de acteur : $e');
     }
   }
 
-
-   static Future<void> updateActeur({
-    required String  idActeur,
+  static Future<void> updateActeur({
+    required String idActeur,
     required String nomActeur,
     required String adresseActeur,
     required String telephoneActeur,
@@ -100,7 +99,8 @@ class ActeurService extends ChangeNotifier {
     required String maillonActeur,
   }) async {
     try {
-      var requete = http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idActeur'));
+      var requete =
+          http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idActeur'));
 
       if (photoSiegeActeur != null) {
         requete.files.add(http.MultipartFile(
@@ -117,6 +117,7 @@ class ActeurService extends ChangeNotifier {
       }
 
       requete.fields['acteur'] = jsonEncode({
+        'idActeur' : idActeur,
         'nomActeur': nomActeur,
         'adresseActeur': adresseActeur,
         'telephoneActeur': telephoneActeur,
@@ -152,8 +153,7 @@ class ActeurService extends ChangeNotifier {
 
   Future<List<Acteur>> fetchActeur() async {
     try {
-      final response = await http
-          .get(Uri.parse('$baseUrl/read'));
+      final response = await http.get(Uri.parse('$baseUrl/read'));
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Fetching data");
@@ -173,8 +173,7 @@ class ActeurService extends ChangeNotifier {
   }
 
   Future deleteActeur(String idActeur) async {
-    final response =
-        await http.delete(Uri.parse('$baseUrl/delete/$idActeur'));
+    final response = await http.delete(Uri.parse('$baseUrl/delete/$idActeur'));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
@@ -184,6 +183,106 @@ class ActeurService extends ChangeNotifier {
     }
   }
 
+  Future activerActeur(String idActeur) async {
+    final response = await http.delete(Uri.parse('$baseUrl/enable/$idActeur'));
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      applyChange();
+    } else {
+      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+    }
+  }
+
+  Future desactiverActeur(String idActeur) async {
+    final response = await http.delete(Uri.parse('$baseUrl/disable/$idActeur'));
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      applyChange();
+    } else {
+      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+    }
+  }
+
+  Future<Acteur> addTypesToActeur(String idActeur, List<TypeActeur> typeActeurs) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/addTypesToActeur/$idActeur'),
+      body: json.encode(typeActeurs.map((type) => type.toJson()).toList()),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      return Acteur.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Impossibke d\'ajouter un type ');
+    }
+  }
+
+  Future<void> sendMailToAllUser(
+      String email, String subject, String message) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/send-email-to-all-user'),
+      body:
+          json.encode({'email': email, 'subject': subject, 'message': message}),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Impossible envoyé le message ${response.statusCode}');
+    }
+  }
+
+  Future<void> sendMailToAllUserChoose(
+      String email, String subject, String message, String libelle) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/send-email-to-all-choose'),
+      body: json.encode({
+        'email': email,
+        'subject': subject,
+        'message': message,
+        'libelle': libelle
+      }),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Impossible envoyé le message ${response.statusCode}');
+    }
+  }
+
+  Future<void> sendMailToAllUserCheckedChoose(String email, String subject,
+      String message, List<String> libelles) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/send-email-to-all-checked-choose'),
+      body: json.encode({
+        'email': email,
+        'subject': subject,
+        'message': message,
+        'libelles': libelles
+      }),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+   if (response.statusCode != 200) {
+      throw Exception('Impossible envoyé le message ${response.statusCode}');
+    }
+  }
+
+  Future<void> sendMessageToActeurByTypeActeur(
+      String message, List<String> libelles) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/sendMessageWathsappToActeurByTypeActeur'),
+      body: json.encode({'message': message, 'libelles': libelles}),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Impossible envoyé le message ${response.statusCode}');
+    }
+  }
+
+  
   void applyChange() {
     notifyListeners();
   }
