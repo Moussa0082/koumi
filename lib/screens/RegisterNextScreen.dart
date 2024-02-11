@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/screens/RegisterEndScreen.dart';
+import 'package:koumi_app/screens/RegisterScreen.dart';
 
-class RegisterEndScreen extends StatefulWidget {
-  const RegisterEndScreen({super.key});
+class RegisterNextScreen extends StatefulWidget {
+  const RegisterNextScreen({super.key});
 
   @override
-  State<RegisterEndScreen> createState() => _RegisterEndScreenState();
+  State<RegisterNextScreen> createState() => _RegisterNextScreenState();
 }
 
-class _RegisterEndScreenState extends State<RegisterEndScreen> {
+class _RegisterNextScreenState extends State<RegisterNextScreen> {
 
 
 
-  String password = "";
-  String confirmPassword = "";
+  String maillon = "";
   
-  String filiere = "";
+  String telephone = "";
+  String adresse = "";
+  String localisation = "";
   bool _obscureText = true;
 
    List<String> options = ["Option 1", "Option 2", "Option 3"];
@@ -23,9 +25,11 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
   // Valeur par défaut
   String selectedOption = "Option 1";
 
-  TextEditingController filiereController = TextEditingController();
+  TextEditingController localisationController = TextEditingController();
+  TextEditingController maillonController = TextEditingController();
+  TextEditingController whatsAppController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
-  TextEditingController confirmPasswordController = TextEditingController();
+  TextEditingController adresseController = TextEditingController();
 
 
   @override
@@ -89,142 +93,150 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                Form(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                const SizedBox(height: 10,),
-                
-                      Padding(
+                // debut fullname 
+                Padding(
                   padding: const EdgeInsets.only(left:10.0),
-                  child: Text("Filiere", style: TextStyle(color: (Colors.black), fontSize: 18),),
+                  child: Text("Adresse  *", style: TextStyle(color: (Colors.black), fontSize: 18),),
                 ),
                 TextFormField(
-                    controller: filiereController,
+                    controller: adresseController,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15)),
-                        labelText: "Filiere",
-                        hintText: "Votre filiere ",
+                        labelText: "Votre adresse",
+                        hintText: "Entrez votre adresse de residence",
                         
                         ),
                     keyboardType: TextInputType.text,
                     validator: (val) {
                       if (val == null || val.isEmpty) {
-                        return "Veillez entrez votre filiere";
+                        return "Veillez entrez votre adresse de residence";
                       } else {
                         return null;
                       }
                     },
-                    onSaved: (val) => filiere = val!,
+                    onSaved: (val) => adresse = val!,
                   ),
-                  // fin  filiere
-                   const SizedBox(height: 10,),
-                  // debut mot de passe
-                   Padding(
+                  // fin  adresse fullname
+  
+                      const SizedBox(height: 10,),
+                //Email debut 
+                Padding(
                   padding: const EdgeInsets.only(left:10.0),
-                  child: Text("Mot de passe", style: TextStyle(color: (Colors.black), fontSize: 18),),
+                  child: Text("Maillon ", style: TextStyle(color: (Colors.black), fontSize: 18),),
                 ),
-                // debut  mot de pass
-                  TextFormField(
-                    controller: passwordController,
+                TextFormField(
+                    controller: maillonController,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15)),
-                        labelText: "Nouveau mot de passe",
-                        hintText: "Entrez votre nouveau mot de passe",
-                        suffixIcon: IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _obscureText =
-                                  !_obscureText; // Inverser l'état du texte masqué
-                            });
-                          },
-                          icon: Icon(
-                            _obscureText
-                                ? Icons.visibility_off
-                                : Icons
-                                    .visibility, // Choisir l'icône basée sur l'état du texte masqué
-                            color: Colors.grey,
-                          ),
-                        ),
-                        // icon: const Icon(
-                        //   Icons.lock_outline,
-                        //   color: Color(0xFF9A6ABB),
-                        //   size: 20,
-                        // )
+                        labelText: "Maillon",
+                        hintText: "Entrez votre maillon",
+                       
                         ),
                     keyboardType: TextInputType.text,
-                    obscureText: _obscureText,
                     validator: (val) {
                       if (val == null || val.isEmpty) {
-                        return "Veillez entrez votre nouveau mot de passe";
-                      }
-                      if (val.length < 4) {
-                        return 'Le mot de passe doit contenir au moins 4 caractères';
+                        return "Veillez entrez votre maillon";
                       } else {
                         return null;
                       }
                     },
-                    onSaved: (val) => password = val!,
+                    onSaved: (val) => maillon = val!,
                   ),
-                  // fin mot de pass 
+                  // fin  adresse email
+                      const SizedBox(height: 10,),
 
-      // confirm password 
-       const SizedBox(height: 10,),
-                  // debut mot de passe
-                   Padding(
+                      Padding(
                   padding: const EdgeInsets.only(left:10.0),
-                  child: Text("Mot de passe", style: TextStyle(color: (Colors.black), fontSize: 18),),
+                  child: Text("Localisation", style: TextStyle(color: (Colors.black), fontSize: 18),),
                 ),
-                // debut  mot de pass
-                  TextFormField(
-                    controller: confirmPasswordController,
+                TextFormField(
+                    controller: localisationController,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15)),
-                        labelText: "Confirmer mot de passe",
-                        hintText: "Entrez votre confirmer votre mot de passe",
-                        suffixIcon: IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _obscureText =
-                                  !_obscureText; // Inverser l'état du texte masqué
-                            });
-                          },
-                          icon: Icon(
-                            _obscureText
-                                ? Icons.visibility_off
-                                : Icons
-                                    .visibility, // Choisir l'icône basée sur l'état du texte masqué
-                            color: Colors.grey,
-                          ),
-                        ),
-                        // icon: const Icon(
-                        //   Icons.lock_outline,
-                        //   color: Color(0xFF9A6ABB),
-                        //   size: 20,
-                        // )
+                        labelText: "Localisation",
+                        hintText: "Votre localisation ",
+                        
                         ),
                     keyboardType: TextInputType.text,
-                    obscureText: _obscureText,
                     validator: (val) {
                       if (val == null || val.isEmpty) {
-                        return "Veillez entrez votre  mot de passe à nouveau";
-                      }
-                      if (val.length < 4) {
-                        return 'Le mot de passe doit contenir au moins 4 caractères';
+                        return "Veillez entrez votre localisation";
                       } else {
                         return null;
                       }
                     },
-                    onSaved: (val) => password = val!,
+                    onSaved: (val) => localisation = val!,
                   ),
-                  // fin mot de pass
-      // fin confirm password 
-      const SizedBox(height: 10,),
+                  // fin  localisation 
+                  const SizedBox(height: 10,),
+
+                  // debut whatsApp acteur 
+                  
+                      Padding(
+                  padding: const EdgeInsets.only(left:10.0),
+                  child: Text("Numéro WhtasApp", style: TextStyle(color: (Colors.black), fontSize: 18),),
+                ),
+                TextFormField(
+                    controller: localisationController,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15)),
+                        labelText: "Numero whatsApp",
+                        hintText: "Votre numéro whtas app ",
+                        
+                        ),
+                    keyboardType: TextInputType.text,
+                    validator: (val) {
+                      if (val == null || val.isEmpty) {
+                        return "Veillez entrez votre numéro whats app";
+                      } else {
+                        return null;
+                      }
+                    },
+                    onSaved: (val) => localisation = val!,
+                  ),
+                  // fin whatsApp acteur 
+      
+                       Padding(
+                  padding: const EdgeInsets.only(left:10.0),
+                  child: Text("Pays *", style: TextStyle(color: (Colors.black), fontSize: 18),),
+                ),
+
+                //  selcet le niveau 3 pays 
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: DropdownButton<String>(
+                menuMaxHeight: 90,
+              isExpanded: true,
+              value: selectedOption,
+              items: options.map((option) {
+                      return  DropdownMenuItem(
+                        value: option,
+                        child: Text(option),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedOption = value!;
+                      });
+                },
+              
+               ),
+            ),
+                //end select  
+              const  SizedBox(height: 10,),
+
                   Center(
                     child: ElevatedButton(
               onPressed: () {
                 // Handle button press action here
+                Navigator.push(context, MaterialPageRoute(builder: (context)=> const RegisterEndScreen()));
               },
               child: Text(
-                " Enregister ",
+                " Suivant ",
                 style: TextStyle(
                   fontSize: 20,
                   color: Colors.white,
