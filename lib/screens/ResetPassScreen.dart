@@ -1,33 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:koumi_app/screens/RegisterEndScreen.dart';
+import 'package:koumi_app/screens/LoginScreen.dart';
 
-class RegisterEndScreen extends StatefulWidget {
-  const RegisterEndScreen({super.key});
+class ResetPassScreen extends StatefulWidget {
+  const ResetPassScreen({super.key});
 
   @override
-  State<RegisterEndScreen> createState() => _RegisterEndScreenState();
+  State<ResetPassScreen> createState() => _ResetPassScreenState();
 }
 
-class _RegisterEndScreenState extends State<RegisterEndScreen> {
-
-
-
-  String password = "";
-  String confirmPassword = "";
+class _ResetPassScreenState extends State<ResetPassScreen> {
   
-  String filiere = "";
-  bool _obscureText = true;
+  String password = "";
+   bool _obscureText = true;
+   String confirmPassword = "";
 
-   List<String> options = ["Option 1", "Option 2", "Option 3"];
 
-  // Valeur par défaut
-  String selectedOption = "Option 1";
-
-  TextEditingController filiereController = TextEditingController();
-    TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
-
-
+  TextEditingController passwordController = TextEditingController();
+   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,68 +27,34 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-                  SizedBox(height: 15,),
-              Row(
-               mainAxisAlignment: MainAxisAlignment.start,
-               children: [
-                 IconButton(
-               onPressed: () {
-                 // Fonction de retour
-                 Navigator.pop(context);
-               },
-               icon: Icon(
-                 Icons.arrow_back,
-                 color: Colors.black,
-                 size: 30,
-               ),
-               iconSize: 30,
-               splashRadius: 20,
-               padding: EdgeInsets.zero,
-               constraints: BoxConstraints(minWidth: 40, minHeight: 40),
-                            ),
-               ],
-              ),
-            Center(child: Image.asset('assets/images/logo-pr.png')),
-           const SizedBox(height: 5,),
-            Text("Completer votre profil", style: TextStyle(
-              fontSize: 22, 
-              fontWeight: FontWeight.bold,
-        
-              ),
-              ),
+              Align(
+              alignment: Alignment.topLeft,
+              child:  IconButton(
+             onPressed: () {
+               // Fonction de retour
+               Navigator.pop(context);
+             },
+             icon: Icon(
+               Icons.arrow_back,
+               color: Colors.black,
+               size: 30,
+             ),
+             iconSize: 30,
+             splashRadius: 20,
+             padding: EdgeInsets.zero,
+             constraints: BoxConstraints(minWidth: 40, minHeight: 40),
+                        ),
+            ),
+            Center(child: Image.asset('assets/images/fg-pass.png')),
+            // connexion
+               const Text(" Saisisser votre nouveau mot de passe  ", style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold , color: Color(0xFFF2B6706)),),
              Form(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
             children: [
              const SizedBox(height: 10,),
-              
-                    Padding(
-                padding: const EdgeInsets.only(left:10.0),
-                child: Text("Filiere", style: TextStyle(color: (Colors.black), fontSize: 18),),
-              ),
-              TextFormField(
-                  controller: filiereController,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                      labelText: "Filiere",
-                      hintText: "Votre filiere ",
-                      
-                      ),
-                  keyboardType: TextInputType.text,
-                  validator: (val) {
-                    if (val == null || val.isEmpty) {
-                      return "Veillez entrez votre filiere";
-                    } else {
-                      return null;
-                    }
-                  },
-                  onSaved: (val) => filiere = val!,
-                ),
-                // fin  filiere
-                 const SizedBox(height: 10,),
-                // debut mot de passe
+              // debut mot de passe
                  Padding(
                 padding: const EdgeInsets.only(left:10.0),
-                child: Text("Mot de passe", style: TextStyle(color: (Colors.black), fontSize: 18),),
+                child: Text("Nouveau mot de passe", style: TextStyle(color: (Colors.black), fontSize: 18),),
               ),
               // debut  mot de pass
                 TextFormField(
@@ -129,7 +85,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                       //   size: 20,
                       // )
                       ),
-                  keyboardType: TextInputType.text,
+                  keyboardType: TextInputType.phone,
                   obscureText: _obscureText,
                   validator: (val) {
                     if (val == null || val.isEmpty) {
@@ -150,7 +106,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                 // debut mot de passe
                  Padding(
                 padding: const EdgeInsets.only(left:10.0),
-                child: Text("Mot de passe", style: TextStyle(color: (Colors.black), fontSize: 18),),
+                child: Text("Confirm mot de passe", style: TextStyle(color: (Colors.black), fontSize: 18),),
               ),
               // debut  mot de pass
                 TextFormField(
@@ -177,7 +133,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                       ),
                       
                       ),
-                  keyboardType: TextInputType.text,
+                  keyboardType: TextInputType.phone,
                   obscureText: _obscureText,
                   validator: (val) {
                     if (val == null || val.isEmpty) {
@@ -191,17 +147,21 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                   },
                   onSaved: (val) => password = val!,
                 ),
-                // fin mot de pass
-              // fin confirm password 
-              const SizedBox(height: 10,),
+              // fin confirm password            
+            ],
+            ),
+          ),
+        
+             const SizedBox(height: 15,),
                 Center(
                   child: ElevatedButton(
             onPressed: () {
               // Handle button press action here
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen() ));
             },
-            child: Text(
-              " Enregister ",
-              style: TextStyle(
+            child:  Text(
+              " Modifier ",
+              style:  TextStyle(
                 fontSize: 20,
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -215,16 +175,12 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
               minimumSize: Size(250, 40),
             ),
           ),
-               ),
-        
-            ],
-             )),
-          
-            ],
-          ),
-          
-        ),
-      ),
+           ),
+            ]
+                ),
+              )
+    )
     );
   }
+
 }

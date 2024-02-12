@@ -4,6 +4,7 @@ import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:provider/provider.dart';
 
+
 void main() {
 runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => BottomNavigationService())
@@ -20,8 +21,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        
+      theme: ThemeData( 
+
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),

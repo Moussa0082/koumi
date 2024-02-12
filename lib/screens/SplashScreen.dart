@@ -4,6 +4,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:koumi_app/screens/RegisterScreen.dart';
+import 'package:koumi_app/widgets/AnimatedBackground.dart';
+
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 
 import 'package:koumi_app/widgets/AnimatedBackground.dart';
@@ -29,8 +31,9 @@ class _SplashScreenState extends State<SplashScreen> {
       () =>
       Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-      builder: (_) => const BottomNavigationPage()      
-      // builder: (_) => const RegisterScreen()      
+
+      builder: (_) => const RegisterScreen()      
+
       ),
       ),
      );
