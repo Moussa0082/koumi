@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:koumi_app/screens/CodeConfirmScreen.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 
 class ForgetPassScreen extends StatefulWidget {
@@ -91,7 +92,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen> {
                   child: ElevatedButton(
             onPressed: () {
               // Handle button press action here
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const BottomNavigationPage() ));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const CodeConfirmScreen() ));
             },
             child:  Text(
               " Envoyer ",
