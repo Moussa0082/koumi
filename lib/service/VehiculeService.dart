@@ -88,7 +88,7 @@ Future<void> updateVehicule({
 
   Future<void> activerVehicule(String idVehicule) async {
     final response =
-        await http.delete(Uri.parse("$baseUrl/enable/$idVehicule"));
+        await http.post(Uri.parse("$baseUrl/enable/$idVehicule"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -100,7 +100,7 @@ Future<void> updateVehicule({
 
   Future<void> desactiverVehicule(String idVehicule) async {
     final response =
-        await http.delete(Uri.parse("$baseUrl/disable/$idVehicule"));
+        await http.post(Uri.parse("$baseUrl/disable/$idVehicule"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());

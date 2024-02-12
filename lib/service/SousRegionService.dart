@@ -96,7 +96,7 @@ class SousRegionService extends ChangeNotifier {
 
   Future<void> activerSousRegion(String idSousRegion) async {
     final response =
-        await http.delete(Uri.parse("$baseUrl/activer/$idSousRegion"));
+        await http.post(Uri.parse("$baseUrl/activer/$idSousRegion"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -108,7 +108,7 @@ class SousRegionService extends ChangeNotifier {
 
   Future<void> desactiverSousRegion(String idSousRegion) async {
     final response =
-        await http.delete(Uri.parse("$baseUrl/desactiver/$idSousRegion"));
+        await http.post(Uri.parse("$baseUrl/desactiver/$idSousRegion"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());

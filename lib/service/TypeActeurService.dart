@@ -79,7 +79,7 @@ class ActeurService extends ChangeNotifier{
 
   Future<void> activerTypeActeur(String idTypeActeur) async {
     final response =
-        await http.delete(Uri.parse("$baseUrl/activer/$idTypeActeur"));
+        await http.post(Uri.parse("$baseUrl/activer/$idTypeActeur"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -91,7 +91,7 @@ class ActeurService extends ChangeNotifier{
 
   Future<void> desactiverTypeActeur(String idTypeActeur) async {
     final response =
-        await http.delete(Uri.parse("$baseUrl/desactiver/$idTypeActeur"));
+        await http.post(Uri.parse("$baseUrl/desactiver/$idTypeActeur"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());

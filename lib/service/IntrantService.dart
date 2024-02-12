@@ -117,7 +117,7 @@ class IntrantService extends ChangeNotifier {
     }
   }
 
-   Future<List<Intrant>> fetchIntrantByActeur(String idActeur) async {
+    Future<List<Intrant>> fetchIntrantByActeur(String idActeur) async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/listeIntrantByActeur/$idActeur'));
 
