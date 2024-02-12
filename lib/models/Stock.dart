@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:koumi_app/models/Acteur.dart';
@@ -8,18 +9,18 @@ import 'package:koumi_app/models/Unite.dart';
 import 'package:koumi_app/models/ZoneProduction.dart';
 
 class Stock {
-  final String idStock;
+  final String? idStock;
   final String codeStock;
   final String nomProduit;
   final String formeProduit;
-  final DateTime dateProduction;
+  final String dateProduction;
   final int quantiteStock;
   final String typeProduit;
   final String descriptionStock;
   final String photo;
   final ZoneProduction zoneProduction;
-  final DateTime dateAjout;
-  final DateTime dateModif;
+  final String dateAjout;
+  final String dateModif;
   final String personneModif;
   final bool statutSotck;
   final Speculation speculation;
@@ -28,7 +29,7 @@ class Stock {
   final Acteur acteur;
   final Commande commande;
   Stock({
-    required this.idStock,
+    this.idStock,
     required this.codeStock,
     required this.nomProduit,
     required this.formeProduit,
@@ -54,14 +55,14 @@ class Stock {
     String? codeStock,
     String? nomProduit,
     String? formeProduit,
-    DateTime? dateProduction,
+    String? dateProduction,
     int? quantiteStock,
     String? typeProduit,
     String? descriptionStock,
     String? photo,
     ZoneProduction? zoneProduction,
-    DateTime? dateAjout,
-    DateTime? dateModif,
+    String? dateAjout,
+    String? dateModif,
     String? personneModif,
     bool? statutSotck,
     Speculation? speculation,
@@ -99,14 +100,14 @@ class Stock {
       'codeStock': codeStock,
       'nomProduit': nomProduit,
       'formeProduit': formeProduit,
-      'dateProduction': dateProduction.millisecondsSinceEpoch,
+      'dateProduction': dateProduction,
       'quantiteStock': quantiteStock,
       'typeProduit': typeProduit,
       'descriptionStock': descriptionStock,
       'photo': photo,
       'zoneProduction': zoneProduction.toMap(),
-      'dateAjout': dateAjout.millisecondsSinceEpoch,
-      'dateModif': dateModif.millisecondsSinceEpoch,
+      'dateAjout': dateAjout,
+      'dateModif': dateModif,
       'personneModif': personneModif,
       'statutSotck': statutSotck,
       'speculation': speculation.toMap(),
@@ -119,18 +120,18 @@ class Stock {
 
   factory Stock.fromMap(Map<String, dynamic> map) {
     return Stock(
-      idStock: map['idStock'] as String,
+      idStock: map['idStock'] != null ? map['idStock'] as String : null,
       codeStock: map['codeStock'] as String,
       nomProduit: map['nomProduit'] as String,
       formeProduit: map['formeProduit'] as String,
-      dateProduction: DateTime.fromMillisecondsSinceEpoch(map['dateProduction'] as int),
+      dateProduction: map['dateProduction'] as String,
       quantiteStock: map['quantiteStock'] as int,
       typeProduit: map['typeProduit'] as String,
       descriptionStock: map['descriptionStock'] as String,
       photo: map['photo'] as String,
       zoneProduction: ZoneProduction.fromMap(map['zoneProduction'] as Map<String,dynamic>),
-      dateAjout: DateTime.fromMillisecondsSinceEpoch(map['dateAjout'] as int),
-      dateModif: DateTime.fromMillisecondsSinceEpoch(map['dateModif'] as int),
+      dateAjout: map['dateAjout'] as String,
+      dateModif: map['dateModif'] as String,
       personneModif: map['personneModif'] as String,
       statutSotck: map['statutSotck'] as bool,
       speculation: Speculation.fromMap(map['speculation'] as Map<String,dynamic>),

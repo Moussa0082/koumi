@@ -74,7 +74,7 @@ class IntrantService extends ChangeNotifier {
       requete.fields['intrant'] = jsonEncode({
         'idIntrant' : idIntrant,
         'nomIntrant': nomIntrant,
-        'quantiteIntrant': quantiteIntrant,
+        'quantiteIntrant': int.tryParse(quantiteIntrant),
         'descriptionIntrant': descriptionIntrant,
         'photoIntrant': "",
         'acteur': acteur.toMap()
@@ -150,7 +150,7 @@ class IntrantService extends ChangeNotifier {
   }
 
   Future activerIntrant(String idActeur) async {
-    final response = await http.delete(Uri.parse('$baseUrl/activer/$idActeur'));
+    final response = await http.post(Uri.parse('$baseUrl/activer/$idActeur'));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
@@ -161,7 +161,7 @@ class IntrantService extends ChangeNotifier {
   }
 
   Future desactiverIntrant(String idIntrant) async {
-    final response = await http.delete(Uri.parse('$baseUrl/desactiver/$idIntrant'));
+    final response = await http.post(Uri.parse('$baseUrl/desactiver/$idIntrant'));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
