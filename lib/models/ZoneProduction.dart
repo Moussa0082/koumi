@@ -7,42 +7,42 @@ class ZoneProduction {
   final String? idZoneProduction;
   final String codeZone;
   final String nomZoneProduction;
-  final bool statutZoneProduction;
+  final String? personneModif;
   final String? latitude;
   final String? longitude;
   final String? photoZone;
   final String? dateAjout;
   final String? dateModif;
-  final String personneAjout;
   final bool statutZone;
   final Acteur acteur;
+
   
   ZoneProduction({
     this.idZoneProduction,
     required this.codeZone,
     required this.nomZoneProduction,
-    required this.statutZoneProduction,
+    this.personneModif,
     this.latitude,
     this.longitude,
     this.photoZone,
     this.dateAjout,
     this.dateModif,
-    required this.personneAjout,
     required this.statutZone,
     required this.acteur,
   });
+
+ 
 
   ZoneProduction copyWith({
     String? idZoneProduction,
     String? codeZone,
     String? nomZoneProduction,
-    bool? statutZoneProduction,
+    String? personneModif,
     String? latitude,
     String? longitude,
     String? photoZone,
     String? dateAjout,
     String? dateModif,
-    String? personneAjout,
     bool? statutZone,
     Acteur? acteur,
   }) {
@@ -50,13 +50,12 @@ class ZoneProduction {
       idZoneProduction: idZoneProduction ?? this.idZoneProduction,
       codeZone: codeZone ?? this.codeZone,
       nomZoneProduction: nomZoneProduction ?? this.nomZoneProduction,
-      statutZoneProduction: statutZoneProduction ?? this.statutZoneProduction,
+      personneModif: personneModif ?? this.personneModif,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       photoZone: photoZone ?? this.photoZone,
       dateAjout: dateAjout ?? this.dateAjout,
       dateModif: dateModif ?? this.dateModif,
-      personneAjout: personneAjout ?? this.personneAjout,
       statutZone: statutZone ?? this.statutZone,
       acteur: acteur ?? this.acteur,
     );
@@ -67,13 +66,12 @@ class ZoneProduction {
       'idZoneProduction': idZoneProduction,
       'codeZone': codeZone,
       'nomZoneProduction': nomZoneProduction,
-      'statutZoneProduction': statutZoneProduction,
+      'personneModif': personneModif,
       'latitude': latitude,
       'longitude': longitude,
       'photoZone': photoZone,
       'dateAjout': dateAjout,
       'dateModif': dateModif,
-      'personneAjout': personneAjout,
       'statutZone': statutZone,
       'acteur': acteur.toMap(),
     };
@@ -84,13 +82,12 @@ class ZoneProduction {
       idZoneProduction: map['idZoneProduction'] != null ? map['idZoneProduction'] as String : null,
       codeZone: map['codeZone'] as String,
       nomZoneProduction: map['nomZoneProduction'] as String,
-      statutZoneProduction: map['statutZoneProduction'] as bool,
+      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       latitude: map['latitude'] != null ? map['latitude'] as String : null,
       longitude: map['longitude'] != null ? map['longitude'] as String : null,
       photoZone: map['photoZone'] != null ? map['photoZone'] as String : null,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
-      personneAjout: map['personneAjout'] as String,
       statutZone: map['statutZone'] as bool,
       acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
     );
@@ -102,7 +99,7 @@ class ZoneProduction {
 
   @override
   String toString() {
-    return 'ZoneProduction(idZoneProduction: $idZoneProduction, codeZone: $codeZone, nomZoneProduction: $nomZoneProduction, statutZoneProduction: $statutZoneProduction, latitude: $latitude, longitude: $longitude, photoZone: $photoZone, dateAjout: $dateAjout, dateModif: $dateModif, personneAjout: $personneAjout, statutZone: $statutZone, acteur: $acteur)';
+    return 'ZoneProduction(idZoneProduction: $idZoneProduction, codeZone: $codeZone, nomZoneProduction: $nomZoneProduction, personneModif: $personneModif, latitude: $latitude, longitude: $longitude, photoZone: $photoZone, dateAjout: $dateAjout, dateModif: $dateModif, statutZone: $statutZone, acteur: $acteur)';
   }
 
   @override
@@ -113,13 +110,12 @@ class ZoneProduction {
       other.idZoneProduction == idZoneProduction &&
       other.codeZone == codeZone &&
       other.nomZoneProduction == nomZoneProduction &&
-      other.statutZoneProduction == statutZoneProduction &&
+      other.personneModif == personneModif &&
       other.latitude == latitude &&
       other.longitude == longitude &&
       other.photoZone == photoZone &&
       other.dateAjout == dateAjout &&
       other.dateModif == dateModif &&
-      other.personneAjout == personneAjout &&
       other.statutZone == statutZone &&
       other.acteur == acteur;
   }
@@ -129,13 +125,12 @@ class ZoneProduction {
     return idZoneProduction.hashCode ^
       codeZone.hashCode ^
       nomZoneProduction.hashCode ^
-      statutZoneProduction.hashCode ^
+      personneModif.hashCode ^
       latitude.hashCode ^
       longitude.hashCode ^
       photoZone.hashCode ^
       dateAjout.hashCode ^
       dateModif.hashCode ^
-      personneAjout.hashCode ^
       statutZone.hashCode ^
       acteur.hashCode;
   }

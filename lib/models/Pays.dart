@@ -11,7 +11,7 @@ class Pays {
   final String? dateAjout;
   final String? dateModif;
   final SousRegion sousRegion;
-
+  
   Pays({
     this.idPays,
     required this.codePays,

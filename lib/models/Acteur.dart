@@ -6,15 +6,15 @@ import 'package:koumi_app/models/TypeActeur.dart';
 
 class Acteur {
     final String? idActeur;
-    final String resetToken;
-    final String tokenCreationDate;
+    final String? resetToken;
+    final String? tokenCreationDate;
     final String codeActeur;
     final String nomActeur;
     final String adresseActeur;
     final String telephoneActeur;
     final String whatsAppActeur;
-    final String latitude;
-    final String longitude;
+    final String? latitude;
+    final String? longitude;
     final String? photoSiegeActeur;
     final String? logoActeur;
     final String niveau3PaysActeur;

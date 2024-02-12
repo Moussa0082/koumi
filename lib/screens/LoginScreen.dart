@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
 import 'package:koumi_app/screens/ForgetPassScreen.dart';
 import 'package:koumi_app/screens/RegisterScreen.dart';
@@ -25,6 +29,149 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   // TextEditingController Controller = TextEditingController();
+
+
+
+    //  login methode start 
+    Future<void> loginUser() async {
+    final String emailActeur = emailController.text;
+    final String password = passwordController.text;
+    const String baseUrl = 'http://10.0.2.2:9000/acteur/login';
+
+    // UtilisateurProvider utilisateurProvider =
+    //     Provider.of<UtilisateurProvider>(context, listen: false);
+
+    if (emailActeur.isEmpty || password.isEmpty) {
+      const String errorMessage = "Veuillez remplir tous les champs ";
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Center(child: Text('Erreur')),
+            content: const Text(errorMessage),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    final Uri apiUrl = Uri.parse('$baseUrl?emailActeur=$emailActeur&password=$password');
+
+    try {
+      final response = await http.get(
+        apiUrl,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Center(child: Text('Connexion en cours')),
+              content: CircularProgressIndicator(
+                color: Color(0xFFF83793),
+                // radius: 22,
+              ),
+              actions: <Widget>[
+                // Pas besoin de bouton ici
+              ],
+            );
+          },
+        );
+
+        await Future.delayed(Duration(milliseconds: 500));
+
+        Navigator.of(context).pop();
+        final responseBody = json.decode(utf8.decode(response.bodyBytes));
+        emailController.clear();
+        passwordController.clear();
+
+        // Sauvegarder les données de l'utilisateur dans shared preferences
+        // SharedPreferences prefs = await SharedPreferences.getInstance();
+        // prefs.setString('email', email);
+        // prefs.setString('passWord', passWord);
+
+        // Utilisateur utilisateur = Utilisateur(
+        //   nom: responseBody['nom'],
+        //   prenom: responseBody['prenom'],
+        //   image: responseBody['image'],
+        //   email: email,
+        //   role: responseBody['role'],
+        //   phone: responseBody['phone'],
+        //   passWord: passWord,
+        //   idUtilisateur: responseBody['idUtilisateur'],
+        // );
+
+        // utilisateurProvider.setUtilisateur(utilisateur);
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const BottomNavigationPage()));
+      } else {
+      // Traitement en cas d'échec
+  final responseBody = json.decode(utf8.decode(response.bodyBytes));
+  final errorMessage = responseBody['message'];
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Center(child: Text('Connexion échouée !')),
+        content: Text(
+          errorMessage, // Utiliser le message d'erreur du backend
+          textAlign: TextAlign.justify,
+          style: TextStyle(color: Colors.black, fontSize: 20),
+        ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (e) {
+    // Gérer les exceptionn
+   debugPrint(e.toString());
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Center(child: Text('Erreur')),
+        content: Text(
+          "Une erreur s'est produite veuillez réessayer", // Afficher l'exception
+          textAlign: TextAlign.justify,
+          style: TextStyle(color: Colors.black, fontSize: 20),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      );
+        },
+      );
+    }
+  }
+
+    // login methode end 
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +306,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: ElevatedButton(
               onPressed: () {
                 // Handle button press action here
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const BottomNavigationPage() ));
+                loginUser();
               },
               child:  Text(
                 " Se connecter ",

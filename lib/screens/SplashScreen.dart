@@ -8,6 +8,8 @@ import 'package:koumi_app/widgets/AnimatedBackground.dart';
 
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 
+import 'package:koumi_app/widgets/AnimatedBackground.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -31,6 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
       MaterialPageRoute(
 
       builder: (_) => const RegisterScreen()      
+
       ),
       ),
      );
