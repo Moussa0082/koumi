@@ -6,6 +6,8 @@ class ActeurProvider with ChangeNotifier {
   Acteur? get acteur => _acteur;
 
   void setActeur(Acteur newActeur) {
+    _acteur = newActeur;
+    debugPrint(" provider ${newActeur.toString()}");
     notifyListeners();
   }
 }

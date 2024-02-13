@@ -34,11 +34,11 @@ class _AccueilState extends State<Accueil> {
             height: 35,
           ),
           SizedBox(
-            // height: double.maxFinite,
             child: GridView.count(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: 3,
+              
               children: [
                 _buildAccueilCard("Intrants", "intrant.png", 1),
                 _buildAccueilCard("Conseils", "conseil.png", 2),
@@ -53,6 +53,9 @@ class _AccueilState extends State<Accueil> {
                 // _buildAccueilCard("Statistique", "statistique_logo.png", 4)
               ],
             ),
+          ),
+          const SizedBox(
+            height: 20,
           )
         ],
       ),

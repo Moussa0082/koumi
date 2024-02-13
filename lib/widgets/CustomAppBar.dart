@@ -1,6 +1,11 @@
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
+import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:profile_photo/profile_photo.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key});
@@ -15,8 +20,11 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _CustomAppBarState extends State<CustomAppBar> {
+  late Acteur acteur;
+
   @override
   void initState() {
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     super.initState();
   }
 
@@ -25,38 +33,63 @@ class _CustomAppBarState extends State<CustomAppBar> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 25),
       child: Padding(
-          padding: const EdgeInsets.all(5.0),
-          child: ListTile(
-            leading: ProfilePhoto(
-              totalWidth: 50,
-              cornerRadius: 50,
-              color: Colors.black,
-              image: const AssetImage('assets/images/profil.jpg'),
-            ),
-            title: const Text(
-              "Ibrahim sy",
-              style: TextStyle(
-                  color: d_colorGreen,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800),
-            ),
-            subtitle: const Text(
-              "Administrateur",
-              style: TextStyle(
-                  color: d_colorOr, fontSize: 18, fontWeight: FontWeight.w400),
-            ),
-            trailing: badges.Badge(
-              position: badges.BadgePosition.topEnd(top: -2, end: -2),
-              badgeContent: const Text(
-                "3",
-                style: TextStyle(color: Colors.white),
+        padding: const EdgeInsets.all(5.0),
+        child: Consumer<ActeurProvider>(
+          builder: (context, acteurProvider, child) {
+            final ac = acteurProvider.acteur;
+            debugPrint("appBar ${ac.toString()}");
+            if (ac == null) {
+              return CircularProgressIndicator();
+            }
+
+            List<TypeActeur> typeActeurData = ac.typeActeur;
+            List<String> typeActeurList = typeActeurData
+                .map((data) => data.libelle)
+                .toList();
+
+            return ListTile(
+              leading: ac.logoActeur == null || ac.logoActeur!.isEmpty
+                  ? ProfilePhoto(
+                      totalWidth: 50,
+                      cornerRadius: 50,
+                      color: Colors.black,
+                      image: const AssetImage('assets/images/profil.jpg'),
+                    )
+                  : ProfilePhoto(
+                      totalWidth: 50,
+                      cornerRadius: 50,
+                      color: Colors.black,
+                      image: NetworkImage("http:10.0.2.2/${ac.logoActeur}"),
+                    ),
+              title: Text(
+                ac.nomActeur.toUpperCase(),
+                style: TextStyle(
+                    color: d_colorGreen,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800),
               ),
-              child: const Icon(
-                Icons.notifications_none_outlined,
-                size: 40,
+              subtitle: Text(
+                typeActeurList.toString(),
+                style: TextStyle(
+                    color: d_colorOr,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400),
               ),
-            ),
-          )),
+              trailing: badges.Badge(
+                position: badges.BadgePosition.topEnd(top: -2, end: -2),
+                badgeContent: const Text(
+                  "3",
+                  style: TextStyle(color: Colors.white),
+                ),
+                child: const Icon(
+                  Icons.notifications_none_outlined,
+                  size: 40,
+                ),
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 }

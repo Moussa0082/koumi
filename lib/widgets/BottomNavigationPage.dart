@@ -15,6 +15,7 @@ class BottomNavigationPage extends StatefulWidget {
 
 const d_color = Color.fromRGBO(254, 243, 231, 1);
 const d_colorPage = Color.fromRGBO(255, 255, 255, 1);
+const d_colorOr = Color.fromRGBO(254, 243, 231, 1);
 
 class _BottomNavigationPageState extends State<BottomNavigationPage> {
   int activePageIndex = 0;
@@ -45,12 +46,13 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        final isFirstRouteInCurrentTab =
-            !await _navigatorKeys[activePageIndex].currentState!.maybePop();
-        return isFirstRouteInCurrentTab;
-      },
+    return PopScope(
+      // onWillPop: () async {
+      //   final isFirstRouteInCurrentTab =
+      //       !await _navigatorKeys[activePageIndex].currentState!.maybePop();
+      //   return isFirstRouteInCurrentTab;
+      // },
+                    canPop: false,
       child: Scaffold(
         backgroundColor: d_colorPage,
         appBar: AppBar(
@@ -83,7 +85,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
             ),
             BottomNavigationBarItem(
               backgroundColor: d_color,
-              icon: Icon(Icons.category),
+              icon: Icon(Icons.agriculture),
               label: "Produit",
             ),
             BottomNavigationBarItem(

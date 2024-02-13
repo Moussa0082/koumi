@@ -52,16 +52,16 @@ class TypeActeur {
 
   factory TypeActeur.fromMap(Map<String, dynamic> map) {
     return TypeActeur(
-      idTypeActeur: map['idTypeActeur'] != null ? map['idTypeActeur'] as String : null,
-      libelle: map['libelle'] as String,
-      codeTypeActeur: map['codeTypeActeur'] as String,
-      statutTypeActeur: map['statutTypeActeur'] as bool,
-      descriptionTypeActeur: map['descriptionTypeActeur'] as String,
-      dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
-      dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
+      idTypeActeur: map['idTypeActeur'],
+      libelle: map['libelle'],
+      codeTypeActeur: map['codeTypeActeur'],
+      statutTypeActeur: map['statutTypeActeur'],
+      descriptionTypeActeur: map['descriptionTypeActeur'],
+      dateAjout: map['dateAjout'],
+      dateModif:
+          map['dateModif'] ,
     );
   }
-
   String toJson() => json.encode(toMap());
 
   factory TypeActeur.fromJson(String source) => TypeActeur.fromMap(json.decode(source) as Map<String, dynamic>);
