@@ -14,11 +14,20 @@ class _ForgetPassScreenState extends State<ForgetPassScreen> {
 
      
   String email = "";
+  String whatsApp = "";
   
 
 
   TextEditingController emailController = TextEditingController();
-  // TextEditingController Controller = TextEditingController();
+  TextEditingController whatsAppController = TextEditingController();
+   bool isVisible = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    isVisible = ! isVisible;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,39 +62,63 @@ class _ForgetPassScreenState extends State<ForgetPassScreen> {
              Form(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
             children: [
              const SizedBox(height: 10,),
-              // debut fullname 
+              // debut email ou whats app  
               Padding(
                 padding: const EdgeInsets.only(left:10.0),
-                child: Text("Email *", style: TextStyle(color:  (Colors.black), fontSize: 18),),
+                child: Text( isVisible ? " Email *" : "Whats App *" , style: TextStyle(color:  (Colors.black), fontSize: 18),),
               ),
-              TextFormField(
-                  controller: emailController,
+
+              Visibility(
+                visible: isVisible , 
+                child: 
+                 TextFormField(
+                controller: emailController,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    labelText: "Email",
+                    hintText: "Entrez votre adresse email",
+                    ),
+                keyboardType: TextInputType.text,
+                validator: (val) {
+                  if (val == null || val.isEmpty) {
+                    return "Veillez entrez votre adresse email";
+                  } else {
+                    return null;
+                  }
+                },
+                onSaved: (val) => email = val!,
+                ) ,
+                replacement: SizedBox.shrink(child: 
+               TextFormField(
+                  controller: whatsAppController,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15)),
-                      labelText: "Adresse email",
-                      hintText: "Entrez votre adresse email",
-                      // icon: const Icon(
-                      //   Icons.mail,
-                      //   color: Color(0xFFF2B6706),
-                      //   size: 20,
-                      // )
+                      labelText: "Numéro WhatsApp",
+                      hintText: "Entrez votre numéro whats app",
                       ),
-                  keyboardType: TextInputType.text,
+                  keyboardType: TextInputType.phone,
                   validator: (val) {
                     if (val == null || val.isEmpty) {
-                      return "Veillez entrez votre adresse email";
+                      return "Veillez entrez votre numéro whats app";
                     } else {
                       return null;
                     }
                   },
-                  onSaved: (val) => email = val!,
-                ),
-                // fin  adresse email
-            
+                  onSaved: (val) => whatsApp = val!,
+                ),),
+          ),
+              
             ],
             ),
           ),
+
+            TextButton(onPressed: (){
+                  setState(() {
+                    isVisible = !isVisible;
+                  });
+            }, child: Text(isVisible ? "Envoyer le code par whats app" : "Envoyer le code par mail", style: TextStyle(fontSize: 16),)),
         
              const SizedBox(height: 15,),
                 Center(

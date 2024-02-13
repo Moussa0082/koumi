@@ -79,9 +79,9 @@ class _LoginScreenState extends State<LoginScreen> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: const Center(child: Text('Connexion en cours')),
-              content: CircularProgressIndicator(
-                color: Color(0xFFF83793),
-                // radius: 22,
+              content: CupertinoActivityIndicator(
+               color: (Colors.orange),
+                radius: 22,
               ),
               actions: <Widget>[
                 // Pas besoin de bouton ici
@@ -90,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
           },
         );
 
-        await Future.delayed(Duration(milliseconds: 500));
+        await Future.delayed(Duration(milliseconds: 1000));
 
         Navigator.of(context).pop();
         final responseBody = json.decode(utf8.decode(response.bodyBytes));

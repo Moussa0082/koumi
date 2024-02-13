@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_pin_code_widget/flutter_pin_code_widget.dart';
 import 'package:koumi_app/screens/ResetPassScreen.dart';
@@ -15,6 +17,35 @@ class _CodeConfirmScreenState extends State<CodeConfirmScreen> {
      
   String email = "";
   String _pin = "";
+
+   int _time = 120;
+late Timer timere;
+
+void startTimer() {
+  timere = Timer.periodic(const Duration(seconds: 1), (timer) {
+    setState(() {
+      if (_time > 0) {
+        _time--;
+      } else {
+        timere.cancel();
+      }
+    });
+  });
+}
+
+String get timerText {
+  int minutes = _time ~/ 60;
+  int seconds = _time % 60;
+  return '$minutes:${seconds.toString().padLeft(2, '0')}';
+}
+
+
+    @override
+  void initState() {
+   startTimer();
+    super.initState();
+    
+  }
   
 
 
@@ -22,144 +53,188 @@ class _CodeConfirmScreenState extends State<CodeConfirmScreen> {
   // TextEditingController Controller = TextEditingController();
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
-      body: Expanded(
-        child: Column(
-          children: [
-            SizedBox(height: 20,),
-            // Back button
-            Align(
-              alignment: Alignment.topLeft,
-              child: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
-                  size: 30,
-                ),
-                iconSize: 30,
-                splashRadius: 20,
-                padding: EdgeInsets.zero,
-                constraints: BoxConstraints(minWidth: 40, minHeight: 40),
-              ),
-            ),
-              
-            // Center image
-            Center(child: Image.asset('assets/images/fg-pass.png')),
-              
-            // "Mot de passe oublié" text
-            const Text(
-              " Veuillez saisir votre code de confirmation ",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFFF2B6706),
-              ),
-            ),
-              
-            // Code section
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.only(left: 10.0),
-              child: Text(
-                "Code *",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-              
-            // OTP entry field
-            const SizedBox(height: 15),
-            Row(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Color(0xfff7f6fb),
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 24, horizontal: 32),
+            child: Column(
               children: [
-                // code pin start 
-            Padding(
-              padding: const EdgeInsets.only(left:40.0),
-              child: SizedBox(
-                height: 68,
-                width: 240,
-                child: Center(
-                  child: PinCodeWidget(
-                    buttonColor: Colors.black,
-                    borderSide: BorderSide(width: 4,),
-                    numbersStyle: TextStyle(color: Colors.black,),
-                    minPinLength: 4,
-                    maxPinLength: 25,
-                    onChangedPin: (pin) {
-                      // check the PIN length and check different PINs with 4,5.. length.
-                    },
-                    onEnter: (pin, _) {
-                      // callback user pressed enter
-                    },
-                    centerBottomWidget: IconButton(
-                      icon: const Icon(
-                        Icons.fingerprint,
-                        size: 10,
-                      ),
-                      onPressed: () {},
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Icon(
+                      Icons.arrow_back,
+                      size: 32,
+                      color: Colors.black54,
                     ),
                   ),
                 ),
-              ),
-            ),
-              
-              ],
-            ),
-          
-           
-            // Send button
-            const SizedBox(height: 15),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  // Handle button press action here
-                  // Example:
-                  if (_pin.length == 6) {
-                    // Perform OTP verification using provided backend logic
-                    // You'll need to implement your own verification logic
-                    print("Verifying OTP: $_pin");
-                    // If successful, navigate to reset password screen
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ResetPassScreen()),
-                    );
-                  } else {
-                    // Show error message if OTP is incomplete
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Please enter a valid 6-digit OTP"),
-                      ),
-                    );
-                  }
-                },
-                child: Text(
-                  " Envoyer ",
+                SizedBox(
+                  height: 18,
+                ),
+                Container(
+                  width: 200,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.deepPurple.shade50,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Image.asset(
+                    'assets/images/logo-pr.png',
+                  ),
+                ),
+                SizedBox(
+                  height: 18,
+                ),
+                Text(
+                  'Verification',
                   style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF8A00), // Orange color code
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  minimumSize: Size(250, 40),
+                SizedBox(
+                  height: 8,
                 ),
-              ),
+                Text(
+                  "Entrer le code envoyer à votre email",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black38,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(
+                  height: 24,
+                ),
+                Container(
+                  padding: EdgeInsets.all(26),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(child: _textFieldOTP(first: true, last: false)),
+                          Expanded(child: _textFieldOTP(first: false, last: false)),
+                          Expanded(child: _textFieldOTP(first: false, last: false)),
+                          Expanded(child: _textFieldOTP(first: false, last: true)),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 22,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          style: ButtonStyle(
+                            foregroundColor:
+                                MaterialStateProperty.all<Color>(Colors.white),
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(Colors.orange),
+                            shape:
+                                MaterialStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24.0),
+                              ),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(14.0),
+                            child: Text(
+                              'Verifier',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+               
+                
+                 Center(child: Text("Expire dans " + "$timerText", style: TextStyle(fontSize: 15),)), 
+                 SizedBox(width: 10,),
+               
+            
+                 Text(
+                  "Vous n'avez pas reçu code?",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black38,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                Text(
+                  "Envoyer à nouveau",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
-      }
+  }
+
+  Widget _textFieldOTP({required bool first, last}) {
+    return Padding(
+      padding: const EdgeInsets.all(6.0),
+      child: Container(
+        height: 70,
+        child: AspectRatio(
+          aspectRatio: 1.0,
+          child: TextField(
+            autofocus: true,
+            onChanged: (value) {
+              if (value.length == 1 && last == false) {
+                FocusScope.of(context).nextFocus();
+              }
+              if (value.length == 0 && first == false) {
+                FocusScope.of(context).previousFocus();
+              }
+            },
+            showCursor: false,
+            readOnly: false,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            keyboardType: TextInputType.number,
+            maxLength: 1,
+            decoration: InputDecoration(
+              counter: Offstage(),
+              enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(width: 2, color: Colors.black12),
+                  borderRadius: BorderRadius.circular(12)),
+              focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(width: 2, color: Colors.orange),
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
 
 }
