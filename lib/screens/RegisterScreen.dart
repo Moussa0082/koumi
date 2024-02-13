@@ -1,9 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:koumi_app/models/TypeActeur.dart';
+// import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/RegisterNextScreen.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+
+   
+   RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -11,22 +19,32 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
 
-  String fullname = "";
-  String password = "";
+  String nomActeur = "";
   String telephone = "";
-  String lastName = "";
   String email = "";
-  bool _obscureText = true;
+  String? typeValue;
+  late TypeActeur monTypeActeur;
+  late Future _mesTypeActeur;
 
-   List<String> options = ["Option 1", "Option 2", "Option 3"];
+
+  List<String> options = ["Option 1", "Option 2", "Option 3"];
 
   // Valeur par défaut
   String selectedOption = "Option 1";
 
-  TextEditingController fullNameController = TextEditingController();
+  TextEditingController nomActeurController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController telephoneController = TextEditingController();
-  // TextEditingController Controller = TextEditingController();
+  TextEditingController typeActeurController = TextEditingController();
+
+   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _mesTypeActeur  =
+        http.get(Uri.parse('http://10.0.2.2:9000/typeActeur/read'));
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,17 +97,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Text("Nom Complet *", style: TextStyle(color:  (Colors.black), fontSize: 18),),
                 ),
                 TextFormField(
-                    controller: emailController,
+                    controller: nomActeurController,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15)),
                         labelText: "Nom Complet",
                         hintText: "Entrez votre prenom et nom",
-                        // icon: const Icon(
-                        //   Icons.mail,
-                        //   color: Color(0xFFF2B6706),
-                        //   size: 20,
-                        // )
+                       
                         ),
                     keyboardType: TextInputType.text,
                     validator: (val) {
@@ -99,7 +113,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return null;
                       }
                     },
-                    onSaved: (val) => fullname = val!,
+                    onSaved: (val) => nomActeur = val!,
                   ),
                   // fin  adresse fullname
   
@@ -110,7 +124,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Text("Email *", style: TextStyle(color:  (Colors.black), fontSize: 18),),
                 ),
                 TextFormField(
-                    controller: emailController,
+                    controller: nomActeurController,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15)),
@@ -146,11 +160,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             borderRadius: BorderRadius.circular(15)),
                         labelText: "Téléphone",
                         hintText: " (+223) XX XX XX XX ",
-                        // icon: const Icon(
-                        //   Icons.mail,
-                        //   color: Color(0xFFF2B6706),
-                        //   size: 20,
-                        // )
+                       
                         ),
                     keyboardType: TextInputType.phone,
                     validator: (val) {
@@ -172,25 +182,62 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 5),
 
                 //  selcet type acteur 
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: DropdownButton<String>(
-                menuMaxHeight: 90,
-              isExpanded: true,
-              value: selectedOption,
-              items: options.map((option) {
-                      return  DropdownMenuItem(
-                        value: option,
-                        child: Text(option),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedOption = value!;
-                      });
-                },
+                 
+            Container(
+              height:70,
+              width:double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child:SizedBox(
+                  child: FutureBuilder(
+                                      future: _mesTypeActeur,
+                                      builder: (_, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return DropdownButton(
+                                            dropdownColor: Colors.orange,
+                                              items: [], onChanged: (value) {}
               
-               ),
+                                          );
+                                        }
+                                        if (snapshot.hasError) {
+                                          return Text("${snapshot.error}");
+                                        }
+                                        if (snapshot.hasData) {
+                                          //debugPrint(snapshot.data.body.toString());
+                                          final  reponse  =
+                                          json.decode((snapshot.data.body))
+                                          as List;
+                                          final mesType = reponse
+                                              .map((e) => TypeActeur.fromMap(e))
+                                              .toList();
+                                          //debugPrint(mesCategories.length.toString());
+                                          return DropdownButton(
+                                              items: mesType
+                                                  .map((e) => DropdownMenuItem(
+                                                child: Text(e.libelle, style:TextStyle(fontWeight: FontWeight.bold)),
+                                                value: e.idTypeActeur,
+                                              ))
+                                                  .toList(),
+                                              value: typeValue,
+                                              onChanged: (newValue) {
+                                                setState(() {
+                                                  typeValue = newValue;
+                                                  monTypeActeur = mesType
+                                                      .firstWhere((element) =>
+                                                  element.idTypeActeur ==
+                                                      newValue);
+                                                  debugPrint(
+                                                      monTypeActeur.idTypeActeur.toString());
+                                                });
+                                              });
+                                        }
+                                        return DropdownButton(
+                                            items: const [], onChanged: (value) {});
+                                      },
+                                    )
+                ),
+              ),
             ),
                 //end select type acteur 
      const  SizedBox(height: 10,),
@@ -198,9 +245,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Center(
                     child: ElevatedButton(
               onPressed: () {
+
                 // Handle button press action here
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterNextScreen() ));
-              },
+                // if (widget.typeActeur != null) {
+                Navigator.push(context, MaterialPageRoute(builder: (context) =>  
+                RegisterNextScreen(nomActeur: nomActeur, email: email,
+                 telephone: telephone, libelle:monTypeActeur.libelle) ));
+              //  } 
+               },
               child:  Text(
                 " Suivant ",
                 style:  TextStyle(

@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/screens/RegisterEndScreen.dart';
-import 'package:koumi_app/screens/RegisterScreen.dart';
 
 class RegisterNextScreen extends StatefulWidget {
-  const RegisterNextScreen({super.key});
+
+  String nomActeur, email,telephone;
+    // final TypeActeur typeActeur;
+    String libelle;
+
+
+   RegisterNextScreen({super.key, required this.nomActeur, required this.email, required this.telephone, required this.libelle});
 
   @override
   State<RegisterNextScreen> createState() => _RegisterNextScreenState();
@@ -30,6 +36,15 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
   TextEditingController whatsAppController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
   TextEditingController adresseController = TextEditingController();
+
+
+    @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    debugPrint("Nom complet : " + widget.nomActeur + 
+    "telephone : " + widget.telephone + " Email :" + widget.email + "Type Acteur :" + widget.libelle );
+  }
 
 
   @override

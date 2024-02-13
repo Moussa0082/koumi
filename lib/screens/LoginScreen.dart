@@ -342,7 +342,7 @@ class _LoginScreenState extends State<LoginScreen> {
                      const SizedBox(width: 4,),
                      GestureDetector(
                       onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> const RegisterScreen()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>  RegisterScreen()));
                       },
                       child: const Text("M'inscrire", 
                       style: TextStyle(color: Colors.blue, 
