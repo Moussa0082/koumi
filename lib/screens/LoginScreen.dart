@@ -8,6 +8,7 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/ForgetPassScreen.dart';
 import 'package:koumi_app/screens/RegisterScreen.dart';
+import 'package:koumi_app/widgets/BottomNavBarAdmin.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -131,12 +132,25 @@ class _LoginScreenState extends State<LoginScreen> {
           typeActeur: typeActeurList,
           password: password,
         );
-
+ 
         acteurProvider.setActeur(acteur);
-        Navigator.pushReplacement(
+
+       final List<String> type =
+            acteur.typeActeur.map((e) => e.libelle).toList();
+        if (type.contains('admin') || type.contains('Admin')) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
+          );
+        } else {
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => const BottomNavigationPage()));
+                builder: (context) => const BottomNavigationPage()),
+          );
+        }
+
+       
       } else {
         // Traitement en cas d'échec
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
@@ -205,7 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    checkUserSession();
+    //  checkUserSession();
     super.initState();
   }
   // login methode end

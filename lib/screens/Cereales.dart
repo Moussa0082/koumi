@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Stock.dart';
-import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/service/StockService.dart';
 import 'package:provider/provider.dart';
 
@@ -52,19 +51,24 @@ class _CerealesState extends State<Cereales> {
                   stockList = snapshot.data!;
                   debugPrint(stockList.toString());
                   return SizedBox(
+                    // height: 800,
                     child: GridView.count(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        crossAxisCount: 2,
-                        children: stockList
-                            .map((stock) => _buildAcceuilCard(
-                                  stock.nomProduit,
-                                  stock.prix,
-                                  stock.quantiteStock,
-                                  stock,
-                                  stock.photo!,
-                                ))
-                            .toList()),
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: 2,
+                      children: stockList
+                          .map(
+                            (stock) => _buildAcceuilCard(
+                              stock.nomProduit,
+                              stock.prix,
+                              stock.quantiteStock,
+                              stock,
+                              stock.photo!,
+                              context,
+                            ),
+                          )
+                          .toList(),
+                    ),
                   );
                 }
               });
@@ -89,112 +93,119 @@ class _CerealesState extends State<Cereales> {
     return true;
   }
 
-  Widget _buildAcceuilCard(String nomProduit, int prix, double quantite,
-      Stock stock, String imgLocation) {
+  Widget _buildAcceuilCard(
+    String nomProduit,
+    int prix,
+    double quantite,
+    Stock stock,
+    String imgLocation,
+    BuildContext context,
+  ) {
     return Padding(
-        padding: const EdgeInsets.all(5.0),
-        child: Card(
-            margin: const EdgeInsets.all(10.0),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            elevation: 5.0,
-            child: Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.28,
-                        child: isValidImageUrl("http:10.0.2.2/$imgLocation")
-                            ? Expanded(
-                                child: Image.network(
-                                  "http:10.0.2.2/$imgLocation",
-                                  fit: BoxFit.cover,
-                                ),
-                              )
-                            : Expanded(
-                                child: Image.asset(
-                                  "assets/images/pomme.png",
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
+      padding: const EdgeInsets.all(5.0),
+      child: Card(
+        semanticContainer: true,
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        margin: const EdgeInsets.all(10.0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        elevation: 5.0,
+        child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.28,
+                child: isValidImageUrl("http:10.0.2.2/$imgLocation")
+                    ? Expanded(
+                        child: Image.network(
+                          "http:10.0.2.2/$imgLocation",
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Expanded(
+                        child: Image.asset(
+                          "assets/images/pomme.png",
+                          fit: BoxFit.cover,
+                        ),
                       ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                nomProduit,
+                style: const TextStyle(
+                  fontSize: 17,
+                  overflow: TextOverflow.ellipsis,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Prix",
+                    style: TextStyle(
+                      fontSize: 17,
+                      overflow: TextOverflow.ellipsis,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    "$prix FCFA",
+                    style: const TextStyle(
+                      fontSize: 17,
+                      overflow: TextOverflow.ellipsis,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 5),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Quantité",
+                    style: TextStyle(
+                      fontSize: 17,
+                      overflow: TextOverflow.ellipsis,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    quantite.toString(),
+                    style: const TextStyle(
+                      fontSize: 17,
+                      overflow: TextOverflow.ellipsis,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
 
-                      const Divider(height: 5, color: Colors.white30),
-                      // const SizedBox(height: 8),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            nomProduit,
-                            style: const TextStyle(
-                              fontSize: 17,
-                              overflow: TextOverflow.ellipsis,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                "Prix",
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  overflow: TextOverflow.ellipsis,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                "$prix FCFA",
-                                style: const TextStyle(
-                                  fontSize: 17,
-                                  overflow: TextOverflow.ellipsis,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 5),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                "Quantité",
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  overflow: TextOverflow.ellipsis,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                quantite.toString(),
-                                style: const TextStyle(
-                                  fontSize: 17,
-                                  overflow: TextOverflow.ellipsis,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          DetailProduits(stock: stock)));
-                            },
-                            child: const Text("Voir"),
-                          ),
-                        ],
-                      ),
-                    ]))));
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.end,
+              //   children: [
+              //     ElevatedButton(
+              //       onPressed: () {
+              //         Navigator.push(
+              //           context,
+              //           MaterialPageRoute(
+              //             builder: (context) => DetailProduits(stock: stock),
+              //           ),
+              //         );
+              //       },
+              //       child: const Text("Voir"),
+              //     ),
+              //   ],
+              // ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

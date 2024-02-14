@@ -43,10 +43,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
             }
 
             List<TypeActeur> typeActeurData = ac.typeActeur;
-            List<String> typeActeurList = typeActeurData
-                .map((data) => data.libelle)
-                .toList();
-
+            List<String> typeActeurList =
+                typeActeurData.map((data) => data.libelle).toList();
+            String type = typeActeurList.toString();
             return ListTile(
               leading: ac.logoActeur == null || ac.logoActeur!.isEmpty
                   ? ProfilePhoto(
@@ -69,7 +68,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     fontWeight: FontWeight.w800),
               ),
               subtitle: Text(
-                typeActeurList.toString(),
+                type,
                 style: TextStyle(
                     color: d_colorOr,
                     fontSize: 18,
