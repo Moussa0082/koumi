@@ -15,6 +15,7 @@ class StockService extends ChangeNotifier {
   static const String baseUrl = 'http://10.0.2.2:9000/Stock';
 
   List<Stock> stockList = [];
+  List<dynamic> stockListe = [];
   // addStock
 
   static Future<void> creerStock({
@@ -137,27 +138,32 @@ class StockService extends ChangeNotifier {
     if (response.statusCode == 200) {
       return Stock.fromJson(json.decode(response.body));
     } else {
-      throw Exception('Impossible de mettre à jour la quantite : ${response.statusCode}');
+      throw Exception(
+          'Impossible de mettre à jour la quantite : ${response.statusCode}');
     }
   }
 
   Future<List<Stock>> fetchStock() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/getAllStocks'));
+      final response =
+          await http.get(Uri.parse('http://10.0.2.2:9000/Stock/getAllStocks'));
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("Fetching data");
-        List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+        debugPrint("Fetching data for: ${response.statusCode}");
+
+        List<dynamic> body = jsonDecode(response.body);
+        debugPrint("response body ${body.toString()}");
         stockList = body.map((e) => Stock.fromMap(e)).toList();
-        debugPrint(stockList.toString());
+        debugPrint("stockList ${stockList.toString()}");
         return stockList;
       } else {
-        stockList = [];
         print(
             'Échec de la requête avec le code d\'état: ${response.statusCode}');
-        throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+        throw Exception(jsonDecode(response.body)["message"]);
       }
     } catch (e) {
+      print(
+          'Une erreur s\'est produite lors de la récupération des stocks: $e');
       throw Exception(e.toString());
     }
   }
@@ -186,8 +192,8 @@ class StockService extends ChangeNotifier {
 
   Future<List<Stock>> fetchStockByMagasin(String idMagasin) async {
     try {
-      final response =
-          await http.get(Uri.parse('$baseUrl/getAllStocksByIdMagasin/$idMagasin'));
+      final response = await http
+          .get(Uri.parse('$baseUrl/getAllStocksByIdMagasin/$idMagasin'));
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Fetching data");
@@ -207,7 +213,8 @@ class StockService extends ChangeNotifier {
   }
 
   Future deleteStock(String idStock) async {
-    final response = await http.delete(Uri.parse('$baseUrl/deleteStocks/$idStock'));
+    final response =
+        await http.delete(Uri.parse('$baseUrl/deleteStocks/$idStock'));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
@@ -229,8 +236,7 @@ class StockService extends ChangeNotifier {
   }
 
   Future desactiverStock(String idStock) async {
-    final response =
-        await http.post(Uri.parse('$baseUrl/desactiver/$idStock'));
+    final response = await http.post(Uri.parse('$baseUrl/desactiver/$idStock'));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();

@@ -7,7 +7,7 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:path/path.dart';
 
-class ConseilService extends ChangeNotifier {
+class ZoneProductionService extends ChangeNotifier {
   static const String baseUrl = 'http://10.0.2.2:9000/ZoneProduction';
 
   List<ZoneProduction> zoneList = [];

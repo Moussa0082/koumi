@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:koumi_app/screens/ActeurScreen.dart';
 import 'package:koumi_app/screens/AlerteScreen.dart';
 import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
@@ -7,6 +6,7 @@ import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart';
 import 'package:koumi_app/screens/MagasinScreen.dart';
 import 'package:koumi_app/screens/Meteo.dart';
+import 'package:koumi_app/screens/ProduitActeur.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
@@ -38,7 +38,6 @@ class _AccueilState extends State<Accueil> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: 3,
-              
               children: [
                 _buildAccueilCard("Intrants", "intrant.png", 1),
                 _buildAccueilCard("Conseils", "conseil.png", 2),
@@ -49,7 +48,7 @@ class _AccueilState extends State<Accueil> {
                 _buildAccueilCard("Locations", "location.png", 7),
 
                 _buildAccueilCard("Alertes", "alerte.png", 8),
-                _buildAccueilCard("Acteurs", "acteur.png", 9),
+                _buildAccueilCard("Mes Produits", "produit.png", 9),
                 // _buildAccueilCard("Statistique", "statistique_logo.png", 4)
               ],
             ),
@@ -71,7 +70,7 @@ class _AccueilState extends State<Accueil> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const ActeurScreen()));
+                      builder: (context) => const ProduitActeur()));
             } else if (index == 8) {
               Navigator.push(
                   context,

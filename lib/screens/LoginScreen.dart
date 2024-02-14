@@ -79,11 +79,10 @@ class _LoginScreenState extends State<LoginScreen> {
           builder: (BuildContext context) {
             return const AlertDialog(
               title: Center(child: Text('Connexion en cours')),
-              content:  CupertinoActivityIndicator(
-                 color: Colors.orange,
+              content: CupertinoActivityIndicator(
+                color: Colors.orange,
                 radius: 22,
               ),
-
               actions: <Widget>[
                 // Pas besoin de bouton ici
               ],

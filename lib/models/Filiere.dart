@@ -4,7 +4,7 @@ import 'package:koumi_app/models/Acteur.dart';
 
 class Filiere {
   final String? idFiliere;
-  final String codeFiliere;
+  final String? codeFiliere;
   final String libelleFiliere;
   final String descriptionFiliere;
   final bool statutFiliere;

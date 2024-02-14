@@ -37,7 +37,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
         child: Consumer<ActeurProvider>(
           builder: (context, acteurProvider, child) {
             final ac = acteurProvider.acteur;
-            debugPrint("appBar ${ac.toString()}");
+            // debugPrint("appBar ${ac.toString()}");
             if (ac == null) {
               return CircularProgressIndicator();
             }

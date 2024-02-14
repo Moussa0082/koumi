@@ -1,17 +1,17 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:koumi_app/models/Acteur.dart';
 
 class Unite {
-  final String? idUnite;
-  final String codeUnite;
+   String? idUnite;
+  final String? codeUnite;
   final String nomUnite;
-  final String? dateAjout;
-  final String? dateModif;
+   String? dateAjout;
+   String? dateModif;
   final bool statutUnite;
-  final String personneModif;
+   String? personneModif;
   final Acteur acteur;
-
   Unite({
     this.idUnite,
     required this.codeUnite,
@@ -19,9 +19,11 @@ class Unite {
     this.dateAjout,
     this.dateModif,
     required this.statutUnite,
-    required this.personneModif,
+    this.personneModif,
     required this.acteur,
   });
+
+ 
 
   Unite copyWith({
     String? idUnite,
@@ -66,7 +68,7 @@ class Unite {
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
       statutUnite: map['statutUnite'] as bool,
-      personneModif: map['personneModif'] as String,
+      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
     );
   }

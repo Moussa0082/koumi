@@ -52,7 +52,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
       //       !await _navigatorKeys[activePageIndex].currentState!.maybePop();
       //   return isFirstRouteInCurrentTab;
       // },
-                    canPop: false,
+      canPop: true,
       child: Scaffold(
         backgroundColor: d_colorPage,
         appBar: AppBar(

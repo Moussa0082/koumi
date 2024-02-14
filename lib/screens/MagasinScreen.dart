@@ -8,7 +8,7 @@ class MagasinScreen extends StatefulWidget {
 }
 
 class _MagasinScreenState extends State<MagasinScreen> {
-  @override
+  @override 
   Widget build(BuildContext context) {
     return Container(
       child: Text("Magasin"),

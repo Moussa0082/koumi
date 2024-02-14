@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
+import 'package:koumi_app/service/StockService.dart';
+import 'package:provider/provider.dart';
 
 class Cereales extends StatefulWidget {
   const Cereales({super.key});
@@ -10,68 +12,133 @@ class Cereales extends StatefulWidget {
 }
 
 class _CerealesState extends State<Cereales> {
+  List<Stock> stockList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // FstockList = getStock();
+    // debugPrint(FstockList.toString());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Mes produits"),
-      ),
+      // appBar: AppBar(
+      //   title: const Text("Mes produits"),
+      // ),
       body: ListView(children: [
-        SizedBox(
-          child: GridView.count(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            children: [
-              // _buildAcceuilCard();
-              ],
-          ),
-        )
+        Consumer<StockService>(builder: (context, stockService, child) {
+          return FutureBuilder(
+              future: stockService.fetchStock(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                if (snapshot.hasError) {
+                  debugPrint(snapshot.error.toString());
+                  return Center(
+                    child: Text(snapshot.error.toString()),
+                  );
+                }
+
+                if (!snapshot.hasData) {
+                  return const Center(child: Text("Aucun produit trouvé"));
+                } else {
+                  stockList = snapshot.data!;
+                  debugPrint(stockList.toString());
+                  return SizedBox(
+                    child: GridView.count(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: 2,
+                        children: stockList
+                            .map((stock) => _buildAcceuilCard(
+                                  stock.nomProduit,
+                                  stock.prix,
+                                  stock.quantiteStock,
+                                  stock,
+                                  stock.photo!,
+                                ))
+                            .toList()),
+                  );
+                }
+              });
+        })
       ]),
     );
   }
 
-  Widget _buildAcceuilCard(String imgLocation, String nomProduit, String prix,
-      String quantite, Stock stock) {
+  bool isValidImageUrl(String url) {
+    // Vérifie si l'URL commence par http:// ou https://
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      return false;
+    }
+
+    // Vérifie s'il y a un hôte spécifié dans l'URL
+    Uri? uri = Uri.tryParse(url);
+    if (uri == null || uri.host.isEmpty) {
+      return false;
+    }
+
+    // Si l'URL a passé toutes les vérifications, elle est considérée comme valide
+    return true;
+  }
+
+  Widget _buildAcceuilCard(String nomProduit, int prix, double quantite,
+      Stock stock, String imgLocation) {
     return Padding(
         padding: const EdgeInsets.all(5.0),
         child: Card(
-            margin: const EdgeInsets.all(20.0),
+            margin: const EdgeInsets.all(10.0),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),
             ),
             elevation: 5.0,
             child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.all(5.0),
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(
                         width: MediaQuery.of(context).size.width * 0.28,
-                        child: Image.asset(
-                          "assets/images/$imgLocation",
-                          fit: BoxFit.cover,
-                        ),
+                        child: isValidImageUrl("http:10.0.2.2/$imgLocation")
+                            ? Expanded(
+                                child: Image.network(
+                                  "http:10.0.2.2/$imgLocation",
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : Expanded(
+                                child: Image.asset(
+                                  "assets/images/pomme.png",
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                       ),
-                      const SizedBox(height: 10),
-                      const Divider(height: 10, color: Colors.white30),
-                      const SizedBox(height: 8),
-                       Column(
+
+                      const Divider(height: 5, color: Colors.white30),
+                      // const SizedBox(height: 8),
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             nomProduit,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 17,
                               overflow: TextOverflow.ellipsis,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
+                              const Text(
                                 "Prix",
                                 style: TextStyle(
                                   fontSize: 17,
@@ -80,8 +147,8 @@ class _CerealesState extends State<Cereales> {
                                 ),
                               ),
                               Text(
-                                "${prix} FCFA",
-                                style: TextStyle(
+                                "$prix FCFA",
+                                style: const TextStyle(
                                   fontSize: 17,
                                   overflow: TextOverflow.ellipsis,
                                   fontWeight: FontWeight.bold,
@@ -89,11 +156,11 @@ class _CerealesState extends State<Cereales> {
                               ),
                             ],
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 5),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
+                              const Text(
                                 "Quantité",
                                 style: TextStyle(
                                   fontSize: 17,
@@ -102,8 +169,8 @@ class _CerealesState extends State<Cereales> {
                                 ),
                               ),
                               Text(
-                                quantite,
-                                style: TextStyle(
+                                quantite.toString(),
+                                style: const TextStyle(
                                   fontSize: 17,
                                   overflow: TextOverflow.ellipsis,
                                   fontWeight: FontWeight.bold,
