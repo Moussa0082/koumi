@@ -10,7 +10,7 @@ class Pays {
   final bool statutPays;
   final String? dateAjout;
   final String? dateModif;
-  final SousRegion sousRegion;
+  final SousRegion? sousRegion;
   
   Pays({
     this.idPays,
@@ -20,7 +20,7 @@ class Pays {
     required this.statutPays,
     this.dateAjout,
     this.dateModif,
-    required this.sousRegion,
+   this.sousRegion,
   });
 
   Pays copyWith({
@@ -54,22 +54,35 @@ class Pays {
       'statutPays': statutPays,
       'dateAjout': dateAjout,
       'dateModif': dateModif,
-      'sousRegion': sousRegion.toMap(),
+      'sousRegion': sousRegion?.toMap(),
     };
   }
 
+  // factory Pays.fromMap(Map<String, dynamic> map) {
+  //   return Pays(
+  //     idPays: map['idPays'] != null ? map['idPays'] as String : null,
+  //     codePays: map['codePays'] as String,
+  //     nomPays: map['nomPays'] as String,
+  //     descriptionPays: map['descriptionPays'] as String,
+  //     statutPays: map['statutPays'] as bool,
+  //     dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
+  //     dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
+  //     sousRegion: SousRegion.fromMap(map['sousRegion'] as Map<String,dynamic>),
+  //   );
+  // }
   factory Pays.fromMap(Map<String, dynamic> map) {
-    return Pays(
-      idPays: map['idPays'] != null ? map['idPays'] as String : null,
-      codePays: map['codePays'] as String,
-      nomPays: map['nomPays'] as String,
-      descriptionPays: map['descriptionPays'] as String,
-      statutPays: map['statutPays'] as bool,
-      dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
-      dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
-      sousRegion: SousRegion.fromMap(map['sousRegion'] as Map<String,dynamic>),
-    );
-  }
+  return Pays(
+    idPays: map['idPays'] != null ? map['idPays'] as String : null,
+    codePays: map['codePays'] as String,
+    nomPays: map['nomPays'] as String,
+    descriptionPays: map['descriptionPays'] as String,
+    statutPays: map['statutPays'] as bool,
+    dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
+    dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
+    sousRegion: map['sousRegion'] != null ? SousRegion.fromMap(map['sousRegion'] as Map<String, dynamic>) : null,
+  );
+}
+
 
   String toJson() => json.encode(toMap());
 

@@ -1,8 +1,27 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:koumi_app/models/Acteur.dart';
+
+
+
+import 'package:koumi_app/models/Pays.dart';
+import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/screens/RegisterEndScreen.dart';
+import 'package:koumi_app/service/ActeurService.dart';
+import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 
 class RegisterEndScreen extends StatefulWidget {
-  const RegisterEndScreen({super.key});
+
+    String nomActeur, email,telephone, adresse , maillon , localistaion, numeroWhatsApp , pays;
+   late TypeActeur typeActeur;
+
+   RegisterEndScreen({
+   super.key, required this.nomActeur, 
+   required this.email, required this.telephone, 
+   required this.typeActeur, required this.adresse, 
+   required this.maillon, required this.numeroWhatsApp,
+   required this.localistaion, required this.pays});
 
   @override
   State<RegisterEndScreen> createState() => _RegisterEndScreenState();
@@ -18,14 +37,29 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
   String filiere = "";
   bool _obscureText = true;
 
-   List<String> options = ["Option 1", "Option 2", "Option 3"];
+  String? image1Src;
+  String? image2Src;
+  File? image1;
+  File? image2;
 
-  // Valeur par défaut
-  String selectedOption = "Option 1";
+
+
+
 
   TextEditingController filiereController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
+
+    @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    debugPrint("Adresse : " + widget.adresse + " Maillon : " + widget.maillon + 
+    " Localisation :  " + widget.localistaion + " Whats app : " + widget.numeroWhatsApp + "Email :" + widget.email
+    );
+    
+
+  }
 
 
   @override
@@ -123,11 +157,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                           color: Colors.grey,
                         ),
                       ),
-                      // icon: const Icon(
-                      //   Icons.lock_outline,
-                      //   color: Color(0xFF9A6ABB),
-                      //   size: 20,
-                      // )
+                     
                       ),
                   keyboardType: TextInputType.text,
                   obscureText: _obscureText,
@@ -196,8 +226,89 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
               const SizedBox(height: 10,),
                 Center(
                   child: ElevatedButton(
-            onPressed: () {
+            onPressed: ()  async{
               // Handle button press action here
+  final nomActeur = widget.nomActeur;
+  final emailActeur = widget.email;
+  final adresse = widget.adresse;
+  final telephone = widget.telephone;
+  final whatsAppActeur = widget.numeroWhatsApp;
+  final maillon = widget.maillon;
+  final localisation = widget.localistaion;
+  final  typeActeur = widget.typeActeur;
+  final pays = widget.pays;
+  final filiere = filiereController.text;
+  final password = passwordController.text;
+  
+  // utilisateur = utilisateur;
+  
+      // if(_formKey.currentState!.validate()){
+
+  // Utilize your backend service to send the request
+  ActeurService acteurService = ActeurService();
+  try {
+    if(image1 != null && image2 != null){
+      
+      await ActeurService.creerActeur(
+      logoActeur: image1 as File,
+      photoSiegeActeur: image2 as File,
+      nomActeur: nomActeur,
+      adresseActeur: adresse,
+      telephoneActeur: telephone,
+      whatsAppActeur: whatsAppActeur,
+      niveau3PaysActeur: pays,
+      localiteActeur: localisation,
+      emailActeur: emailActeur,
+      filiereActeur: filiere,
+      typeActeur:[typeActeur],
+      password: password,
+      maillonActeur: maillon,
+    );
+    }else{
+      await ActeurService.creerActeur(
+      nomActeur: nomActeur,
+      adresseActeur: adresse,
+      telephoneActeur: telephone,
+      whatsAppActeur: whatsAppActeur,
+      niveau3PaysActeur: pays,
+      localiteActeur: localisation,
+      emailActeur: emailActeur,
+      filiereActeur: filiere,
+      typeActeur:[typeActeur],
+      password: password,
+      maillonActeur: maillon,
+    );
+    }
+
+    // Do something with the updated demand if needed
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const BottomNavigationPage()),
+    );
+    // print("Demande envoyée avec succès: ${updatedDemande.toString()}");
+    debugPrint("yes ");
+    // Navigate to the next page if necessary
+    // BuildContext context = this.context;
+  } catch (error) {
+    // Handle any exceptions that might occur during the request
+    final String errorMessage = error.toString();
+    debugPrint("no " + errorMessage);
+     showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text("Erreur lors de l'inscription"),
+      content: Text(errorMessage),
+      actions: [
+        TextButton(
+          child: Text("OK"),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ],
+    ),
+  );
+    // print("Erreur: $error");
+  }
+                            // }
             },
             child: Text(
               " Enregister ",

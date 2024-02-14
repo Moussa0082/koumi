@@ -26,10 +26,14 @@ class ActeurService extends ChangeNotifier {
     required List<TypeActeur> typeActeur,
     File? photoSiegeActeur,
     File? logoActeur,
-    required String passWord,
+    required String password,
     required String maillonActeur,
   }) async {
     try {
+
+    //    // Convertir chaque TypeActeur en un objet JSON et les ajouter à une liste JSON
+    // List<String> typeActeurJsonList = typeActeur.map((typeActeur) => typeActeur.toJson()).toList();
+
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
 
       if (photoSiegeActeur != null) {
@@ -57,13 +61,13 @@ class ActeurService extends ChangeNotifier {
         'localiteActeur': localiteActeur,
         'emailActeur': emailActeur,
         'filiereActeur': filiereActeur,
-        'typeActeur': typeActeur.toList(),
+        'typeActeur': typeActeur.map((e) => e.toMap()).toList(), // Convertir chaque objet TypeActeur en map
         'photoSiegeActeur': "",
         'logoActeur': "",
-        'passWord': passWord,
+        'password': password,
         'maillonActeur': maillonActeur,
       });
-
+ 
       var response = await requete.send();
       var responsed = await http.Response.fromStream(response);
 
@@ -95,7 +99,7 @@ class ActeurService extends ChangeNotifier {
     required List<TypeActeur> typeActeur,
     File? photoSiegeActeur,
     File? logoActeur,
-    required String passWord,
+    required String password,
     required String maillonActeur,
   }) async {
     try {
@@ -131,7 +135,7 @@ class ActeurService extends ChangeNotifier {
         'typeActeur': typeActeur.toList(),
         'photoSiegeActeur': "",
         'logoActeur': "",
-        'passWord': passWord,
+        'password': password,
         'maillonActeur': maillonActeur,
       });
 

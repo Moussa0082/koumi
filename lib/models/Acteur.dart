@@ -79,7 +79,7 @@ class Acteur {
     String? emailActeur,
     String? filiereActeur,
     bool? statutActeur,
-    List<TypeActeur>? typeActeur,
+    required List<TypeActeur> typeActeur,
     String? maillonActeur,
   }) {
     return Acteur(
@@ -104,7 +104,7 @@ class Acteur {
       emailActeur: emailActeur ?? this.emailActeur,
       filiereActeur: filiereActeur ?? this.filiereActeur,
       statutActeur: statutActeur ?? this.statutActeur,
-      typeActeur: typeActeur ?? this.typeActeur,
+      typeActeur: typeActeur,
       maillonActeur: maillonActeur ?? this.maillonActeur,
     );
   }

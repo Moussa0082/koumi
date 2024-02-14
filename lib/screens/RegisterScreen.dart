@@ -27,11 +27,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   late Future _mesTypeActeur;
 
 
-  List<String> options = ["Option 1", "Option 2", "Option 3"];
-
-  // Valeur par défaut
-  String selectedOption = "Option 1";
-
   TextEditingController nomActeurController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController telephoneController = TextEditingController();
@@ -124,17 +119,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Text("Email *", style: TextStyle(color:  (Colors.black), fontSize: 18),),
                 ),
                 TextFormField(
-                    controller: nomActeurController,
+                    controller: emailController,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15)),
                         labelText: "Email",
                         hintText: "Entrez votre email",
-                        // icon: const Icon(
-                        //   Icons.mail,
-                        //   color: Color(0xFFF2B6706),
-                        //   size: 20,
-                        // )
+                        
                         ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (val) {
@@ -245,13 +236,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Center(
                     child: ElevatedButton(
               onPressed: () {
-
-                // Handle button press action here
-                // if (widget.typeActeur != null) {
+                
                 Navigator.push(context, MaterialPageRoute(builder: (context) =>  
-                RegisterNextScreen(nomActeur: nomActeur, email: email,
-                 telephone: telephone, libelle:monTypeActeur.libelle) ));
-              //  } 
+                RegisterNextScreen(nomActeur: nomActeurController.text, email: emailController.text,
+                 telephone: telephoneController.text, typeActeur: monTypeActeur,) ));
+              
                },
               child:  Text(
                 " Suivant ",

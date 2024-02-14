@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/screens/RegisterEndScreen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class RegisterNextScreen extends StatefulWidget {
 
   String nomActeur, email,telephone;
-    // final TypeActeur typeActeur;
-    String libelle;
+  late TypeActeur typeActeur;
+    
+     
 
 
-   RegisterNextScreen({super.key, required this.nomActeur, required this.email, required this.telephone, required this.libelle});
+   RegisterNextScreen({super.key, required this.nomActeur, required this.email, required this.telephone,  required this.typeActeur});
 
   @override
   State<RegisterNextScreen> createState() => _RegisterNextScreenState();
@@ -26,7 +30,9 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
   String localisation = "";
   bool _obscureText = true;
 
-   List<String> options = ["Option 1", "Option 2", "Option 3"];
+  String? paysValue;
+  late Pays monPays;
+  late Future _mesPays;
 
   // Valeur par défaut
   String selectedOption = "Option 1";
@@ -34,7 +40,7 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
   TextEditingController localisationController = TextEditingController();
   TextEditingController maillonController = TextEditingController();
   TextEditingController whatsAppController = TextEditingController();
-    TextEditingController passwordController = TextEditingController();
+    TextEditingController paysController = TextEditingController();
   TextEditingController adresseController = TextEditingController();
 
 
@@ -43,7 +49,9 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
     // TODO: implement initState
     super.initState();
     debugPrint("Nom complet : " + widget.nomActeur + 
-    "telephone : " + widget.telephone + " Email :" + widget.email + "Type Acteur :" + widget.libelle );
+    "telephone : " + widget.telephone + " Email :" + widget.email +  "type " + widget.typeActeur.libelle );
+      _mesPays  =
+        http.get(Uri.parse('http://10.0.2.2:9000/pays/read'));
   }
 
 
@@ -184,7 +192,7 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                 child: Text("Numéro WhtasApp", style: TextStyle(color: (Colors.black), fontSize: 18),),
               ),
               TextFormField(
-                  controller: localisationController,
+                  controller: whatsAppController,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15)),
@@ -210,26 +218,62 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
               ),
              
               //  selcet le niveau 3 pays 
-                         Padding(
-                           padding: const EdgeInsets.all(8.0),
-                           child: DropdownButton<String>(
-              menuMaxHeight: 90,
-                           isExpanded: true,
-                           value: selectedOption,
-                           items: options.map((option) {
-                    return  DropdownMenuItem(
-                      value: option,
-                      child: Text(option),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedOption = value!;
-                    });
-              },
-                           
-             ),
-                         ),
+                       Container(
+              height:70,
+              width:double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child:SizedBox(
+                  child: FutureBuilder(
+                                      future: _mesPays,
+                                      builder: (_, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return DropdownButton(
+                                            dropdownColor: Colors.orange,
+                                              items: [], onChanged: (value) {}
+              
+                                          );
+                                        }
+                                        if (snapshot.hasError) {
+                                          return Text("${snapshot.error}");
+                                        }
+                                        if (snapshot.hasData) {
+                                          //debugPrint(snapshot.data.body.toString());
+                                          final  reponse  =
+                                          json.decode((snapshot.data.body))
+                                          as List;
+                                          final mesPays = reponse
+                                              .map((e) =>Pays.fromMap(e))
+                                              .toList();
+                                          //debugPrint(mesCategories.length.toString());
+                                          return DropdownButton(
+                                              items: mesPays
+                                                  .map((e) => DropdownMenuItem(
+                                                child: Text(e.nomPays, style:TextStyle(fontWeight: FontWeight.bold)),
+                                                value: e.idPays,
+                                              ),)
+                                                  .toList(),
+                                              value: paysValue,
+                                              onChanged: (newValue) {
+                                                setState(() {
+                                                  paysValue = newValue;
+                                                  monPays = mesPays
+                                                      .firstWhere((element) =>
+                                                  element.idPays ==
+                                                      newValue);
+                                                  debugPrint(
+                                                      monPays.idPays.toString());
+                                                });
+                                              });
+                                        }
+                                        return DropdownButton(
+                                            items: const [], onChanged: (value) {});
+                                      },
+                                    )
+                ),
+              ),
+            ),
               //end select  
                            const  SizedBox(height: 10,),
              
@@ -237,9 +281,14 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                   child: ElevatedButton(
                            onPressed: () {
               // Handle button press action here
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> const RegisterEndScreen()));
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>  RegisterEndScreen(
+                nomActeur: widget.nomActeur, email: widget.email, telephone: widget.telephone, 
+                typeActeur: widget.typeActeur, adresse:adresseController.text, maillon:maillonController.text,
+                numeroWhatsApp: whatsAppController.text, localistaion: localisationController.text,
+                 pays: paysController.text,
+                )));
                            },
-                           child: Text(
+           child: Text(
               " Suivant ",
               style: TextStyle(
                 fontSize: 20,
