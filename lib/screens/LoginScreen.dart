@@ -219,7 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    //  checkUserSession();
+     checkUserSession();
     super.initState();
   }
   // login methode end

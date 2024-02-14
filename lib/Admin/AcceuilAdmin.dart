@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:koumi_app/Admin/ActeurScreen.dart';
 import 'package:koumi_app/Admin/AlerteScreen.dart';
+import 'package:koumi_app/Admin/CategoriePage.dart';
+import 'package:koumi_app/Admin/FiliereScreen.dart';
 import 'package:koumi_app/Admin/ProduitPage.dart';
 import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
@@ -7,6 +10,7 @@ import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart';
 import 'package:koumi_app/screens/MagasinScreen.dart';
 import 'package:koumi_app/screens/Meteo.dart';
+import 'package:koumi_app/screens/ProduitActeur.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
@@ -49,6 +53,9 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
 
                 _buildAccueilCard("Alertes", "alerte.png", 8),
                 _buildAccueilCard("Mes Produits", "produit.png", 9),
+                _buildAccueilCard("Filières", "filiere.png", 10),
+                _buildAccueilCard("Catégorie", "cat.png", 11),
+                _buildAccueilCard("Acteurs", "acteur.png", 12),
                 // _buildAccueilCard("Statistique", "statistique_logo.png", 4)
               ],
             ),
@@ -66,11 +73,26 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       child: InkWell(
           onTap: () {
-            if (index == 9) {
+             if (index == 11) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const ProduitPage()));
+                      builder: (context) => const ActeurScreen()));
+            }
+             else if (index == 11) {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const CategoriPage()));
+            }
+            else if (index == 10) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const FiliereScreen()));
+            }
+            
+            else if (index == 9) {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const ProduitActeur()));
             } else if (index == 8) {
               Navigator.push(
                   context,
