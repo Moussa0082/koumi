@@ -63,7 +63,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                 ? IconButton(
                     onPressed: () async {
                       setState(() {
-                        isEditing = false; // Désactiver le mode édition
+                        isEditing = false; 
                       });
                       await ParametreGenerauxService()
                           .updateParametre(
@@ -82,7 +82,13 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                               libelleNiveau2Pays: param.libelleNiveau2Pays,
                               libelleNiveau3Pays: param.libelleNiveau3Pays,
                               localiteStructure: param.localiteStructure)
-                          .then((value) => {print("Modifier avec succèss")})
+                          .then((value) => 
+                          {
+                            print("Modifier avec succèss"),
+                            Provider.of<ParametreGenerauxService>(context,
+                                        listen: false)
+                                    .applyChange(),
+                            })
                           .catchError((onError) => {print(onError.toString())});
                     },
                     icon: const Icon(Icons.save),
