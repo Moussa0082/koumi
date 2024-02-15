@@ -3,6 +3,8 @@ import 'package:koumi_app/Admin/AcceuilAdmin.dart';
 import 'package:koumi_app/Admin/PanierA.dart';
 import 'package:koumi_app/Admin/ProduitA.dart';
 import 'package:koumi_app/Admin/ProfilA.dart';
+import 'package:koumi_app/screens/Panier.dart';
+import 'package:koumi_app/screens/Produit.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:provider/provider.dart';
 
@@ -28,8 +30,8 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
   ];
   List pages = <Widget>[
     const AcceuilAdmin(),
-    const ProduitA(),
-    const PanierA(),
+    const Produit(),
+    const Panier(),
     const ProfilA()
   ];
 
@@ -47,12 +49,11 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-    onWillPop: () async {
-    final isFirstRouteInCurrentTab =
-        !await _navigatorKeys[activePageIndex].currentState!.maybePop();
-    return isFirstRouteInCurrentTab;
-  },
-
+      onWillPop: () async {
+        final isFirstRouteInCurrentTab =
+            !await _navigatorKeys[activePageIndex].currentState!.maybePop();
+        return isFirstRouteInCurrentTab;
+      },
       child: Scaffold(
         backgroundColor: d_colorPage,
         appBar: AppBar(

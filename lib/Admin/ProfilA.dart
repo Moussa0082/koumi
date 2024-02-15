@@ -61,9 +61,9 @@ class _ProfilAState extends State<ProfilA> {
                         }
 
                         List<TypeActeur> typeActeurData = ac.typeActeur;
-                        List<String> typeActeurList =
-                            typeActeurData.map((data) => data.libelle).toList();
-                        String type = typeActeurList.toString();
+                        String type = typeActeurData
+                            .map((data) => data.libelle)
+                            .join(', ');
                         return Column(
                           children: [
                             ListTile(

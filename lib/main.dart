@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/SplashScreen.dart';
+import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/StockService.dart';
 import 'package:koumi_app/service/TypeActeurService.dart';
@@ -11,6 +13,7 @@ import 'package:provider/provider.dart';
 void main() {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => ActeurService()),
+    ChangeNotifierProvider(create: (context) => TypeActeurService()),
     ChangeNotifierProvider(create: (context) => ActeurProvider()),
     ChangeNotifierProvider(create: (context) => StockService()),
     ChangeNotifierProvider(create: (context) => ZoneProductionService()),

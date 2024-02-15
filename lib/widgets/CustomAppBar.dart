@@ -42,10 +42,13 @@ class _CustomAppBarState extends State<CustomAppBar> {
               return CircularProgressIndicator();
             }
 
-            List<TypeActeur> typeActeurData = ac.typeActeur;
-            List<String> typeActeurList =
-                typeActeurData.map((data) => data.libelle).toList();
-            String type = typeActeurList.toString();
+            // List<TypeActeur> typeActeurData = ac.typeActeur;
+            // List<String> typeActeurList =
+            //     typeActeurData.map((data) => data.libelle).toList();
+            // String type = typeActeurList.toString();
+
+             List<TypeActeur> typeActeurData = ac.typeActeur;
+            String type = typeActeurData.map((data) => data.libelle).join(', ');
             return ListTile(
               leading: ac.logoActeur == null || ac.logoActeur!.isEmpty
                   ? ProfilePhoto(
