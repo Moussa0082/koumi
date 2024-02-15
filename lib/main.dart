@@ -4,6 +4,7 @@ import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/SplashScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
+import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:koumi_app/service/StockService.dart';
 import 'package:koumi_app/service/TypeActeurService.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
@@ -16,6 +17,7 @@ void main() {
     ChangeNotifierProvider(create: (context) => TypeActeurService()),
     ChangeNotifierProvider(create: (context) => ActeurProvider()),
     ChangeNotifierProvider(create: (context) => StockService()),
+    ChangeNotifierProvider(create: (context) => ParametreGenerauxService()),
     ChangeNotifierProvider(create: (context) => ZoneProductionService()),
     ChangeNotifierProvider(create: (context) => BottomNavigationService())
   ], child: const MyApp()));

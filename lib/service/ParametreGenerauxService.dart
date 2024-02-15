@@ -94,7 +94,7 @@ Future<void> updateParametre({
   }) async {
 
     try{
-      var requete = http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idParametreGeneraux'));
+      var requete = http.MultipartRequest('PUT', Uri.parse('http://10.0.2.2:9000/parametreGeneraux/update/$idParametreGeneraux'));
 
     if (logoSysteme != null) {
       requete.files.add(http.MultipartFile(
@@ -104,8 +104,8 @@ Future<void> updateParametre({
           filename: basename(logoSysteme.path)));
     }
 
-requete.fields['param'] = jsonEncode({
-      'idParametreGeneraux': null,
+requete.fields['parametreGeneral'] = jsonEncode({
+      'idParametreGeneraux': idParametreGeneraux,
       'sigleStructure': sigleStructure,
       'nomStructure': nomStructure ,
       'sigleSysteme': sigleSysteme,
@@ -135,7 +135,7 @@ requete.fields['param'] = jsonEncode({
       }
     } catch (e) {
       throw Exception(
-          'Une erreur s\'est produite lors de la modification de acteur : $e');
+          'Une erreur s\'est produite lors de la modification : $e');
     }
     }
   
