@@ -55,52 +55,54 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
           "Parametre généraux",
           style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
+        actions: [
+          isEditing
+              ? IconButton(
+                  onPressed: () async {
+                    setState(() {
+                      isEditing = false;
+                    });
+                    await ParametreGenerauxService()
+                        .updateParametre(
+                            idParametreGeneraux: param.idParametreGeneraux!,
+                            sigleStructure: param.sigleStructure,
+                            nomStructure: param.nomStructure,
+                            sigleSysteme: param.sigleSysteme,
+                            nomSysteme: param.nomSysteme,
+                            descriptionSysteme: param.descriptionSysteme,
+                            sloganSysteme: param.sloganSysteme,
+                            adresseStructure: param.adresseStructure,
+                            emailStructure: param.emailStructure,
+                            telephoneStructure: param.telephoneStructure,
+                            whattsAppStructure: param.whattsAppStructure,
+                            libelleNiveau1Pays: param.libelleNiveau1Pays,
+                            libelleNiveau2Pays: param.libelleNiveau2Pays,
+                            libelleNiveau3Pays: param.libelleNiveau3Pays,
+                            localiteStructure: param.localiteStructure)
+                        .then((value) => {
+                              print("Modifier avec succèss"),
+                              Provider.of<ParametreGenerauxService>(context,
+                                      listen: false)
+                                  .applyChange(),
+                            })
+                        .catchError((onError) => {print(onError.toString())});
+                  },
+                  icon: const Icon(Icons.save),
+                )
+              : IconButton(
+                  onPressed: () {
+                    setState(() {
+                      isEditing = true; // Activer le mode édition
+                    });
+                  },
+                  icon: const Icon(Icons.edit),
+                ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            isEditing
-                ? IconButton(
-                    onPressed: () async {
-                      setState(() {
-                        isEditing = false; 
-                      });
-                      await ParametreGenerauxService()
-                          .updateParametre(
-                              idParametreGeneraux: param.idParametreGeneraux!,
-                              sigleStructure: param.sigleStructure,
-                              nomStructure: param.nomStructure,
-                              sigleSysteme: param.sigleSysteme,
-                              nomSysteme: param.nomSysteme,
-                              descriptionSysteme: param.descriptionSysteme,
-                              sloganSysteme: param.sloganSysteme,
-                              adresseStructure: param.adresseStructure,
-                              emailStructure: param.emailStructure,
-                              telephoneStructure: param.telephoneStructure,
-                              whattsAppStructure: param.whattsAppStructure,
-                              libelleNiveau1Pays: param.libelleNiveau1Pays,
-                              libelleNiveau2Pays: param.libelleNiveau2Pays,
-                              libelleNiveau3Pays: param.libelleNiveau3Pays,
-                              localiteStructure: param.localiteStructure)
-                          .then((value) => 
-                          {
-                            print("Modifier avec succèss"),
-                            Provider.of<ParametreGenerauxService>(context,
-                                        listen: false)
-                                    .applyChange(),
-                            })
-                          .catchError((onError) => {print(onError.toString())});
-                    },
-                    icon: const Icon(Icons.save),
-                  )
-                : IconButton(
-                    onPressed: () {
-                      setState(() {
-                        isEditing = true; // Activer le mode édition
-                      });
-                    },
-                    icon: const Icon(Icons.edit),
-                  ),
+            
             Consumer<ParametreGenerauxService>(
               builder: (context, paramService, child) {
                 return FutureBuilder(
