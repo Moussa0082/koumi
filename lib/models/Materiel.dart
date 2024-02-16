@@ -12,7 +12,7 @@ class Materiel {
   final String description;
   final String? photoMateriel;
   final String localisation;
-  final String personneModif;
+  final String? personneModif;
   final bool statut;
   final bool statutCommande;
   final String? dateAjout;

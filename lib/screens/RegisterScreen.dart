@@ -239,7 +239,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 
                 Navigator.push(context, MaterialPageRoute(builder: (context) =>  
                 RegisterNextScreen(nomActeur: nomActeurController.text, email: emailController.text,
-                 telephone: telephoneController.text, typeActeur: monTypeActeur,) ));
+                 telephone: telephoneController.text, typeActeur: [monTypeActeur],) ));
               
                },
               child:  Text(
@@ -272,5 +272,4 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
-
 

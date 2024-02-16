@@ -7,6 +7,7 @@ import 'package:koumi_app/models/Acteur.dart';
 
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/RegisterEndScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
@@ -14,7 +15,8 @@ import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 class RegisterEndScreen extends StatefulWidget {
 
     String nomActeur, email,telephone, adresse , maillon , localistaion, numeroWhatsApp , pays;
-   late TypeActeur typeActeur;
+   late List<TypeActeur> typeActeur;
+  //  late List<TypeActeur> idTypeActeur;
 
    RegisterEndScreen({
    super.key, required this.nomActeur, 
@@ -29,7 +31,8 @@ class RegisterEndScreen extends StatefulWidget {
 
 class _RegisterEndScreenState extends State<RegisterEndScreen> {
 
-
+ bool isLoading = false;
+   
 
   String password = "";
   String confirmPassword = "";
@@ -42,10 +45,6 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
   File? image1;
   File? image2;
 
-
-
-
-
   TextEditingController filiereController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
@@ -54,11 +53,11 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    debugPrint("Adresse : " + widget.adresse + " Maillon : " + widget.maillon + 
+    debugPrint("Adresse : " + widget.adresse + " Maillon : " + widget.maillon + " Type : ${widget.typeActeur}"+
     " Localisation :  " + widget.localistaion + " Whats app : " + widget.numeroWhatsApp + "Email :" + widget.email
+  
     );
     
-
   }
 
 
@@ -222,11 +221,18 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                   onSaved: (val) => password = val!,
                 ),
                 // fin mot de pass
+
               // fin confirm password 
+
               const SizedBox(height: 10,),
                 Center(
                   child: ElevatedButton(
-            onPressed: ()  async{
+            onPressed: isLoading
+      ? null // Désactiver le bouton lorsque le chargement est en cours
+      : () async {
+        setState(() {
+          isLoading = true; // Afficher le CircularProgressIndicator
+        });
               // Handle button press action here
   final nomActeur = widget.nomActeur;
   final emailActeur = widget.email;
@@ -246,68 +252,77 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
 
   // Utilize your backend service to send the request
   ActeurService acteurService = ActeurService();
-  try {
-    if(image1 != null && image2 != null){
-      
-      await ActeurService.creerActeur(
-      logoActeur: image1 as File,
-      photoSiegeActeur: image2 as File,
-      nomActeur: nomActeur,
-      adresseActeur: adresse,
-      telephoneActeur: telephone,
-      whatsAppActeur: whatsAppActeur,
-      niveau3PaysActeur: pays,
-      localiteActeur: localisation,
-      emailActeur: emailActeur,
-      filiereActeur: filiere,
-      typeActeur:[typeActeur],
-      password: password,
-      maillonActeur: maillon,
-    );
-    }else{
-      await ActeurService.creerActeur(
-      nomActeur: nomActeur,
-      adresseActeur: adresse,
-      telephoneActeur: telephone,
-      whatsAppActeur: whatsAppActeur,
-      niveau3PaysActeur: pays,
-      localiteActeur: localisation,
-      emailActeur: emailActeur,
-      filiereActeur: filiere,
-      typeActeur:[typeActeur],
-      password: password,
-      maillonActeur: maillon,
-    );
-    }
+   // Si widget.typeActeur est bien une liste de TypeActeur
 
-    // Do something with the updated demand if needed
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const BottomNavigationPage()),
-    );
-    // print("Demande envoyée avec succès: ${updatedDemande.toString()}");
-    debugPrint("yes ");
-    // Navigate to the next page if necessary
-    // BuildContext context = this.context;
-  } catch (error) {
-    // Handle any exceptions that might occur during the request
-    final String errorMessage = error.toString();
-    debugPrint("no " + errorMessage);
-     showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text("Erreur lors de l'inscription"),
-      content: Text(errorMessage),
-      actions: [
-        TextButton(
-          child: Text("OK"),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ],
-    ),
+try {
+
+          // String type = typeActeurList.toString();
+  if(image1 != null && image2 != null){
+    
+    await acteurService.creerActeur(
+    logoActeur: image1 as File,
+    photoSiegeActeur: image2 as File,
+    nomActeur: nomActeur,
+    adresseActeur: adresse,
+    telephoneActeur: telephone,
+    whatsAppActeur: whatsAppActeur,
+    niveau3PaysActeur: pays,
+    localiteActeur: localisation,
+    emailActeur: emailActeur,
+    filiereActeur: filiere,
+    typeActeur: widget.typeActeur, // Convertir les IDs en chaînes de caractères
+    password: password,
+    maillonActeur: maillon,
   );
-    // print("Erreur: $error");
+  }else{
+    await acteurService.creerActeur(
+    nomActeur: nomActeur,
+    adresseActeur: adresse,
+    telephoneActeur: telephone,
+    whatsAppActeur: whatsAppActeur,
+    niveau3PaysActeur: pays,
+    localiteActeur: localisation,
+    emailActeur: emailActeur,
+    filiereActeur: filiere,
+    typeActeur: typeActeur,
+    password: password,
+    maillonActeur: maillon,
+  );
   }
+
+  // Do something with the updated demand if needed
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const LoginScreen()),
+  );
+  // print("Demande envoyée avec succès: ${updatedDemande.toString()}");
+  debugPrint("yes ");
+  // Navigate to the next page if necessary
+  // BuildContext context = this.context;
+} catch (error) {
+  // Handle any exceptions that might occur during the request
+  final String errorMessage = error.toString();
+  debugPrint("no " + errorMessage);
+   showDialog(
+  context: context,
+  builder: (context) => AlertDialog(
+    title: Text("Erreur lors de l'inscription"),
+    content: Text(errorMessage),
+    actions: [
+      TextButton(
+        child: Text("OK"),
+        onPressed: () => Navigator.pop(context),
+      ),
+    ],
+  ),
+);
+  // print("Erreur: $error");
+} finally {
+          // Après la requête (réussie ou non), masquez le CircularProgressIndicator
+          setState(() {
+            isLoading = false;
+          });
+        }
                             // }
             },
             child: Text(

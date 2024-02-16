@@ -12,7 +12,7 @@ class ActeurService extends ChangeNotifier {
 
   List<Acteur> acteurList = [];
 
-  static Future<void> creerActeur({
+   Future<void> creerActeur({
     required String nomActeur,
     required String adresseActeur,
     required String telephoneActeur,
@@ -23,7 +23,7 @@ class ActeurService extends ChangeNotifier {
     required String localiteActeur,
     required String emailActeur,
     required String filiereActeur,
-    required List<TypeActeur> typeActeur,
+     List<TypeActeur>? typeActeur ,
     File? photoSiegeActeur,
     File? logoActeur,
     required String password,
@@ -49,7 +49,7 @@ class ActeurService extends ChangeNotifier {
             logoActeur.readAsBytes().asStream(), logoActeur.lengthSync(),
             filename: basename(logoActeur.path)));
       }
-
+ 
       requete.fields['acteur'] = jsonEncode({
         'nomActeur': nomActeur,
         'adresseActeur': adresseActeur,
@@ -61,7 +61,7 @@ class ActeurService extends ChangeNotifier {
         'localiteActeur': localiteActeur,
         'emailActeur': emailActeur,
         'filiereActeur': filiereActeur,
-        'typeActeur': typeActeur.map((e) => e.toMap()).toList(), // Convertir chaque objet TypeActeur en map
+        'typeActeur': typeActeur, // Convertir chaque objet TypeActeur en map
         'photoSiegeActeur': "",
         'logoActeur': "",
         'password': password,
@@ -75,8 +75,9 @@ class ActeurService extends ChangeNotifier {
         final donneesResponse = json.decode(responsed.body);
         debugPrint('acteur service ${donneesResponse.toString()}');
       } else {
+            final errorMessage = json.decode(utf8.decode(responsed.bodyBytes))['message'];
         throw Exception(
-            'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
+            ' ${errorMessage}' );
       }
     } catch (e) {
       throw Exception(

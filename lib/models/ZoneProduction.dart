@@ -4,15 +4,15 @@ import 'dart:convert';
 import 'package:koumi_app/models/Acteur.dart';
 
 class ZoneProduction {
-  final String? idZoneProduction;
-  final String codeZone;
+   String? idZoneProduction;
+  final String? codeZone;
   final String nomZoneProduction;
-  final String? personneModif;
-  final String? latitude;
-  final String? longitude;
-  final String? photoZone;
-  final String? dateAjout;
-  final String? dateModif;
+   String? personneModif;
+   String? latitude;
+   String? longitude;
+   String? photoZone;
+   String? dateAjout;
+   String? dateModif;
   final bool statutZone;
   final Acteur acteur;
 

@@ -8,7 +8,7 @@ import 'dart:convert';
 class RegisterNextScreen extends StatefulWidget {
 
   String nomActeur, email,telephone;
-  late TypeActeur typeActeur;
+  late List<TypeActeur> typeActeur;
     
      
 
@@ -48,9 +48,14 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    debugPrint("Nom complet : " + widget.nomActeur + 
-    "telephone : " + widget.telephone + " Email :" + widget.email +  "type " + widget.typeActeur.libelle );
-      _mesPays  =
+    String typeActeurNames = '';
+for (TypeActeur typeActeur in widget.typeActeur) {
+  typeActeurNames += typeActeur.libelle + ', ';
+}
+
+debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}, Email : ${widget.email}, Types d'acteurs : $typeActeurNames");
+ 
+  _mesPays  =
         http.get(Uri.parse('http://10.0.2.2:9000/pays/read'));
   }
 

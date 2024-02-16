@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:koumi_app/screens/AlerteScreen.dart';
+import 'package:koumi_app/Admin/AlerteScreen.dart';
+import 'package:koumi_app/Admin/ProduitPage.dart';
 import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart';
 import 'package:koumi_app/screens/MagasinScreen.dart';
 import 'package:koumi_app/screens/Meteo.dart';
-import 'package:koumi_app/screens/ProduitActeur.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
 
-class Accueil extends StatefulWidget {
-  const Accueil({super.key});
+class AcceuilAdmin extends StatefulWidget {
+  const AcceuilAdmin({super.key});
 
   @override
-  State<Accueil> createState() => _AccueilState();
+  State<AcceuilAdmin> createState() => _AcceuilAdminState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _AccueilState extends State<Accueil> {
+class _AcceuilAdminState extends State<AcceuilAdmin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,7 +70,7 @@ class _AccueilState extends State<Accueil> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const ProduitActeur()));
+                      builder: (context) => const ProduitPage()));
             } else if (index == 8) {
               Navigator.push(
                   context,

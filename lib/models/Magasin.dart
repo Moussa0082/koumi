@@ -3,19 +3,19 @@ import 'dart:convert';
 import 'package:koumi_app/models/Acteur.dart';
 
 class Magasin {
-  final String idMagasin;
-  final String codeMagasin;
+   String? idMagasin;
+  final String? codeMagasin;
   final String nomMagasin;
   final String niveau3PaysMagasin;
-  final String latitude;
-  final String longitude;
+   String? latitude;
+   String? longitude;
   final String localiteMagasin;
   final String contactMagasin;
-  final String? personneModif;
+   String? personneModif;
   final bool statutMagasin;
-  final String? dateAjout;
-  final String? dateModif;
-  final String? photo;
+   String? dateAjout;
+   String? dateModif;
+   String? photo;
   final Acteur acteur;
 
   Magasin({

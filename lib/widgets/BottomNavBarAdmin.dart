@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:koumi_app/screens/Acceuil.dart';
-import 'package:koumi_app/screens/Panier.dart';
-import 'package:koumi_app/screens/Produit.dart';
-import 'package:koumi_app/screens/Profil.dart';
+import 'package:koumi_app/Admin/AcceuilAdmin.dart';
+import 'package:koumi_app/Admin/PanierA.dart';
+import 'package:koumi_app/Admin/ProduitA.dart';
+import 'package:koumi_app/Admin/ProfilA.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:provider/provider.dart';
 
-class BottomNavigationPage extends StatefulWidget {
-  const BottomNavigationPage({super.key});
+class BottomNavBarAdmin extends StatefulWidget {
+  const BottomNavBarAdmin({super.key});
 
   @override
-  State<BottomNavigationPage> createState() => _BottomNavigationPageState();
+  State<BottomNavBarAdmin> createState() => _BottomNavBarAdminState();
 }
 
 const d_color = Color.fromRGBO(254, 243, 231, 1);
 const d_colorPage = Color.fromRGBO(255, 255, 255, 1);
 const d_colorOr = Color.fromRGBO(254, 243, 231, 1);
 
-class _BottomNavigationPageState extends State<BottomNavigationPage> {
+class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
   int activePageIndex = 0;
 
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
@@ -27,10 +27,10 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
     GlobalKey<NavigatorState>(),
   ];
   List pages = <Widget>[
-    const Accueil(),
-    const Produit(),
-    const Panier(),
-    const Profil()
+    const AcceuilAdmin(),
+    const ProduitA(),
+    const PanierA(),
+    const ProfilA()
   ];
 
   void _changeActivePageValue(int index) {
@@ -46,13 +46,13 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      // onWillPop: () async {
-      //   final isFirstRouteInCurrentTab =
-      //       !await _navigatorKeys[activePageIndex].currentState!.maybePop();
-      //   return isFirstRouteInCurrentTab;
-      // },
-      canPop: true,
+    return WillPopScope(
+    onWillPop: () async {
+    final isFirstRouteInCurrentTab =
+        !await _navigatorKeys[activePageIndex].currentState!.maybePop();
+    return isFirstRouteInCurrentTab;
+  },
+
       child: Scaffold(
         backgroundColor: d_colorPage,
         appBar: AppBar(
@@ -115,10 +115,10 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
     return {
       '/': (context) {
         return [
-          const Accueil(),
-          const Produit(),
-          const Panier(),
-          const Profil()
+          const AcceuilAdmin(),
+          const ProduitA(),
+          const PanierA(),
+          const ProfilA()
         ].elementAt(index);
       },
     };
