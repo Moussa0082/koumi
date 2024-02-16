@@ -12,10 +12,12 @@ class MagasinScreen extends StatefulWidget {
 }
 class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateMixin {
   TabController? _tabController;
+    late TextEditingController _searchController;
+
   List<String> regions = [];
   List<String> idNiveau1Pays = [];
    String selectedRegionId = ''; // Ajoutez une variable pour stocker l'ID de la région sélectionnée
-
+  
   Map<String, List<Map<String, dynamic>>> magasinsParRegion = {};
 
   List<Map<String, dynamic>> regionsData = [];
@@ -79,11 +81,19 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
   @override
   void initState() {
     super.initState();
+     _searchController = TextEditingController();
      if (idNiveau1Pays.isNotEmpty) {
       selectedRegionId = idNiveau1Pays[_tabController!.index];
     }
     fetchRegions();
   }
+
+     @override
+  void dispose() {
+    _searchController.dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -98,11 +108,49 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
               tabs: regions.map((region) => Tab(text: region)).toList(),
             ),
           ),
-          body: TabBarView(
-            controller: _tabController, // Ajoutez le contrôleur TabBarView
-            children: idNiveau1Pays.map((region) {
-              return buildGridView(region);
-            }).toList(),
+          body: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                const SizedBox(height:10),
+                 SizedBox(
+                     height:40,
+                   child: Container(
+                     padding: EdgeInsets.only(left: 5),
+                     decoration: BoxDecoration(
+                       color: Color.fromARGB(255, 245, 212, 169),
+                       borderRadius: BorderRadius.circular(30),
+                                    
+                     ),
+                     child: TextField(
+                      controller: _searchController,
+                       onChanged: (value) {
+                              setState(() {
+                                // Le changement de texte déclenche la reconstruction du widget
+                              });
+                            },
+                       decoration: InputDecoration(
+                         hintText: 'Rechercher',
+                         contentPadding: EdgeInsets.all(10),
+                         border: InputBorder.none,
+                       ),
+                     ),
+                   ),
+                 ),
+                const SizedBox(height:10),
+                // const SizedBox(height:10),
+                Flexible(
+                  child: GestureDetector(
+                    child: TabBarView(
+                      controller: _tabController, // Ajoutez le contrôleur TabBarView
+                      children: idNiveau1Pays.map((region) {
+                        return buildGridView(region);
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -119,39 +167,124 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
           color: (Colors.orange),
       ),
     );
-  } else {
+  } 
+  // else if(magasinsParRegion[id] != null) {
+  //   //  List<Banque> banques = snapshot.data!
+  //   //                       .where((banque) => banque.nom
+  //   //                           .toLowerCase()
+  //   //                           .contains(_searchController.text.toLowerCase()))
+  //   //                       .toList();
+  //   return GridView.builder(
+  //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+  //       crossAxisCount: 2,
+  //       mainAxisSpacing: 10,
+  //       crossAxisSpacing: 10,
+  //     ),
+  //     itemCount: magasins?.length ?? 0,
+  //     itemBuilder: (context, index) {
+  //       return Container(
+  //         // height:,
+  //         child: SizedBox(
+  //           height: null,
+  //           child: Card(
+  //             child: Column(
+  //               children: [
+  //                 Stack(
+  //                   children: [
+  //                     Container(
+  //                      child: Image.asset('assets/images/rectangle.png'),
+  //                     ),
+  //                     Container(  
+  //                       child: 
+  //                 Image.network(
+  //                   magasins?[index]['photo'] ?? 'assets/images/magasin.png',
+  //                   width: double.infinity,
+  //                   height: null,
+  //                   fit: BoxFit.cover,
+  //                   errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+  //                     return Image.asset(
+  //                       'assets/images/magasin.png',
+  //                       width: double.infinity,
+  //                       height: 150,
+  //                       fit: BoxFit.cover,
+  //                     );
+  //                   },
+  //                 ),
+  //                     ),
+                      
+  //                   ],
+  //                 ),
+  //                 // SizedBox(height: 10),
+  //                 Text(
+  //                   magasins?[index]['nomMagasin'] ?? 'Pas de nom definis',
+  //                   textAlign: TextAlign.center,
+  //                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+   else {
+     // Filtrer les magasins en fonction du texte de recherche
+    List<Map<String, dynamic>> filteredMagasins = magasins!.where((magasin) {
+      String nomMagasin = magasin['nomMagasin']!.toString().toLowerCase();
+      String searchText = _searchController.text.toLowerCase();
+      return nomMagasin.contains(searchText);
+    }).toList();
+
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 10,
         crossAxisSpacing: 10,
       ),
-      itemCount: magasins?.length ?? 0,
+      itemCount: filteredMagasins?.length ?? 0,
       itemBuilder: (context, index) {
-        return Card(
-          child: Column(
-            children: [
-              Image.network(
-                magasins?[index]['photo'] ?? 'assets/images/transport.png',
-                width: double.infinity,
-                height: 150,
-                fit: BoxFit.cover,
-                errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                  return Image.asset(
-                    'assets/images/produit.png',
+        return Container(
+          // height:,
+          child: SizedBox(
+            height: null,
+            child: Card(
+              child: Column(
+                children: [
+                  Stack(
+                    children: [
+                      Container(
+                       child: Image.asset('assets/images/rectangle.png'),
+                      ),
+                      Container(  
+                        child: 
+                  Image.network(
+                    filteredMagasins?[index]['photo'] ?? 'assets/images/magasin.png',
                     width: double.infinity,
-                    height: 150,
+                    height: null,
                     fit: BoxFit.cover,
-                  );
-                },
+                    errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                      return Image.asset(
+                        'assets/images/magasin.png',
+                        width: double.infinity,
+                        height: 150,
+                        fit: BoxFit.cover,
+                      );
+                    },
+                  ),
+                      ),
+                      
+                    ],
+                  ),
+                  // SizedBox(height: 10),
+                  Text(
+                    filteredMagasins?[index]['nomMagasin'] ?? 'Pas de nom definis',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
-              SizedBox(height: 10),
-              Text(
-                magasins?[index]['nomMagasin'] ?? 'Pas de nom definis',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ],
+            ),
           ),
         );
       },
@@ -159,3 +292,4 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
   }
   }
 }
+
