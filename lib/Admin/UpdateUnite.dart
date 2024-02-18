@@ -1,72 +1,61 @@
 import 'package:flutter/material.dart';
-import 'package:koumi_app/models/TypeActeur.dart';
-import 'package:koumi_app/service/TypeActeurService.dart';
+import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Unite.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/service/UniteService.dart';
 import 'package:provider/provider.dart';
 
-class UpdateTypeActeur extends StatefulWidget {
-  final TypeActeur typeActeur;
-  const UpdateTypeActeur({super.key, required this.typeActeur});
+class UpdateUnite extends StatefulWidget {
+  final Unite unite;
+  const UpdateUnite({super.key, required this.unite});
 
   @override
-  State<UpdateTypeActeur> createState() => _UpdateTypeActeurState();
+  State<UpdateUnite> createState() => _UpdateUniteState();
 }
 
-class _UpdateTypeActeurState extends State<UpdateTypeActeur> {
-  List<TypeActeur> typeList = [];
-  late TypeActeur type;
+const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
+const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
+
+class _UpdateUniteState extends State<UpdateUnite> {
+  List<Unite> uniteList = [];
+  late Acteur acteur;
   final formkey = GlobalKey<FormState>();
   TextEditingController libelleController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
 
   @override
   void initState() {
-    type = widget.typeActeur;
-    libelleController.text = type.libelle;
-    descriptionController.text = type.descriptionTypeActeur;
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+
+    libelleController.text = widget.unite.nomUnite;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Image.asset(
-                "assets/images/type.png",
-                width: 80,
-                height: 80,
+          const Center(
+            child: Text(
+              "Mofifier unite ",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+                fontSize: 18,
               ),
-              const SizedBox(width: 5),
-              const Text(
-                "Modification",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  fontSize: 18,
-                ),
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.visible,
+            ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 5),
           Form(
             key: formkey,
             child: Column(
               children: [
                 const SizedBox(
                   height: 10,
-                ),
-                const Text(
-                  'Libellé',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8),
@@ -79,8 +68,8 @@ class _UpdateTypeActeurState extends State<UpdateTypeActeur> {
                     },
                     controller: libelleController,
                     decoration: InputDecoration(
-                      hintText: "Libellé",
-                       contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                      hintText: "Nom unité",
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -88,33 +77,6 @@ class _UpdateTypeActeurState extends State<UpdateTypeActeur> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  'Description',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: TextFormField(
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Veuillez remplir les champs";
-                      }
-                      return null;
-                    },
-                    controller: descriptionController,
-                    decoration: InputDecoration(
-                      hintText: "Description",
-                       contentPadding: const EdgeInsets.symmetric(vertical: 15),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -122,20 +84,19 @@ class _UpdateTypeActeurState extends State<UpdateTypeActeur> {
                       child: ElevatedButton.icon(
                         onPressed: () async {
                           final String libelle = libelleController.text;
-                          final String desc = descriptionController.text;
                           if (formkey.currentState!.validate()) {
                             try {
-                              await TypeActeurService()
-                                  .updateTypeActeur(
-                                      idTypeActeur: type.idTypeActeur!,
-                                      libelle: libelle,
-                                      descriptionTypeActeur: desc)
+                              await UniteService()
+                                  .updateUnite(
+                                      idUnite: widget.unite.idUnite!,
+                                      nomUnite: libelle,
+                                      acteur: acteur,
+                                      personneModif: acteur.nomActeur)
                                   .then((value) => {
-                                        Provider.of<TypeActeurService>(context,
+                                        Provider.of<UniteService>(context,
                                                 listen: false)
                                             .applyChange(),
                                         libelleController.clear(),
-                                        descriptionController.clear(),
                                         Navigator.of(context).pop()
                                       });
                             } catch (e) {
@@ -144,8 +105,6 @@ class _UpdateTypeActeurState extends State<UpdateTypeActeur> {
                                 SnackBar(
                                   content: Row(
                                     children: [
-                                     
-                                      const SizedBox(width: 10),
                                       Text(
                                           "Une erreur s'est produit : $errorMessage"),
                                     ],
@@ -161,11 +120,11 @@ class _UpdateTypeActeurState extends State<UpdateTypeActeur> {
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                         ),
                         icon: const Icon(
-                          Icons.edit,
+                          Icons.add,
                           color: Colors.white,
                         ),
                         label: const Text(
-                          "Modifier",
+                          "Modifer",
                           style: TextStyle(
                             fontSize: 20,
                             color: Colors.white,

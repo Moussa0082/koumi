@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/ParametreGProvider.dart';
 import 'package:koumi_app/screens/SplashScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:koumi_app/service/StockService.dart';
 import 'package:koumi_app/service/TypeActeurService.dart';
+import 'package:koumi_app/service/UniteService.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +20,8 @@ void main() {
     ChangeNotifierProvider(create: (context) => ActeurProvider()),
     ChangeNotifierProvider(create: (context) => StockService()),
     ChangeNotifierProvider(create: (context) => ParametreGenerauxService()),
+    ChangeNotifierProvider(create: (context) => ParametreGProvider()),
+    ChangeNotifierProvider(create: (context) => UniteService()),
     ChangeNotifierProvider(create: (context) => ZoneProductionService()),
     ChangeNotifierProvider(create: (context) => BottomNavigationService())
   ], child: const MyApp()));

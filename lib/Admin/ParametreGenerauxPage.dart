@@ -1,6 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
+import 'package:koumi_app/providers/ParametreGProvider.dart';
 import 'package:koumi_app/service/ParametreGenerauxService.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class ParametreGenerauxPage extends StatefulWidget {
@@ -31,11 +37,90 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
   TextEditingController localiteStructureController = TextEditingController();
   bool isEditing = false;
   late ParametreGeneraux param;
+  String? imageSrc;
+  File? photo;
+
+  late ParametreGProvider parProvider;
+
+  Future<File> saveImagePermanently(String imagePath) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final name = path.basename(imagePath);
+    final image = File('${directory.path}/$name');
+    return image;
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final image = await getImage(source);
+    if (image != null) {
+      setState(() {
+        photo = image;
+        imageSrc = image.path;
+      });
+    }
+  }
+
+  Future<File?> getImage(ImageSource source) async {
+    final image = await ImagePicker().pickImage(source: source);
+    if (image == null) return null;
+
+    return File(image.path);
+  }
+
+  Future<void> _showImageSourceDialog() async {
+    final BuildContext context = this.context;
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: 150,
+          child: AlertDialog(
+            title: const Text('Choisir une source'),
+            content: Wrap(
+              alignment: WrapAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context); // Fermer le dialogue
+                    _pickImage(ImageSource.camera);
+                  },
+                  child: const Column(
+                    children: [
+                      Icon(Icons.camera_alt, size: 40),
+                      Text('Camera'),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 40),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context); // Fermer le dialogue
+                    _pickImage(ImageSource.gallery);
+                  },
+                  child: const Column(
+                    children: [
+                      Icon(Icons.image, size: 40),
+                      Text('Galerie photo'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   void toggleEditing() {
     setState(() {
       isEditing = !isEditing; // Inverse l'état d'édition
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    parProvider = Provider.of<ParametreGProvider>(context, listen: false);
   }
 
   @override
@@ -62,30 +147,62 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                     setState(() {
                       isEditing = false;
                     });
-                    await ParametreGenerauxService()
-                        .updateParametre(
-                            idParametreGeneraux: param.idParametreGeneraux!,
-                            sigleStructure: param.sigleStructure,
-                            nomStructure: param.nomStructure,
-                            sigleSysteme: param.sigleSysteme,
-                            nomSysteme: param.nomSysteme,
-                            descriptionSysteme: param.descriptionSysteme,
-                            sloganSysteme: param.sloganSysteme,
-                            adresseStructure: param.adresseStructure,
-                            emailStructure: param.emailStructure,
-                            telephoneStructure: param.telephoneStructure,
-                            whattsAppStructure: param.whattsAppStructure,
-                            libelleNiveau1Pays: param.libelleNiveau1Pays,
-                            libelleNiveau2Pays: param.libelleNiveau2Pays,
-                            libelleNiveau3Pays: param.libelleNiveau3Pays,
-                            localiteStructure: param.localiteStructure)
-                        .then((value) => {
-                              print("Modifier avec succèss"),
-                              Provider.of<ParametreGenerauxService>(context,
-                                      listen: false)
-                                  .applyChange(),
-                            })
-                        .catchError((onError) => {print(onError.toString())});
+                    try {
+                      if (photo == null) {
+                        await ParametreGenerauxService()
+                            .updateParametre(
+                                idParametreGeneraux: param.idParametreGeneraux!,
+                                sigleStructure: param.sigleStructure,
+                                nomStructure: param.nomStructure,
+                                sigleSysteme: param.sigleSysteme,
+                                nomSysteme: param.nomSysteme,
+                                descriptionSysteme: param.descriptionSysteme,
+                                sloganSysteme: param.sloganSysteme,
+                                adresseStructure: param.adresseStructure,
+                                emailStructure: param.emailStructure,
+                                telephoneStructure: param.telephoneStructure,
+                                whattsAppStructure: param.whattsAppStructure,
+                                libelleNiveau1Pays: param.libelleNiveau1Pays,
+                                libelleNiveau2Pays: param.libelleNiveau2Pays,
+                                libelleNiveau3Pays: param.libelleNiveau3Pays,
+                                localiteStructure: param.localiteStructure)
+                            .then((value) => {
+                                  print("Modifier avec succèss"),
+                                  Provider.of<ParametreGenerauxService>(context,
+                                          listen: false)
+                                      .applyChange(),
+                                })
+                            .catchError(
+                                (onError) => {print(onError.toString())});
+                      } else {
+                        await ParametreGenerauxService()
+                            .updateParametre(
+                                idParametreGeneraux: param.idParametreGeneraux!,
+                                sigleStructure: param.sigleStructure,
+                                nomStructure: param.nomStructure,
+                                sigleSysteme: param.sigleSysteme,
+                                nomSysteme: param.nomSysteme,
+                                logoSysteme: photo,
+                                descriptionSysteme: param.descriptionSysteme,
+                                sloganSysteme: param.sloganSysteme,
+                                adresseStructure: param.adresseStructure,
+                                emailStructure: param.emailStructure,
+                                telephoneStructure: param.telephoneStructure,
+                                whattsAppStructure: param.whattsAppStructure,
+                                libelleNiveau1Pays: param.libelleNiveau1Pays,
+                                libelleNiveau2Pays: param.libelleNiveau2Pays,
+                                libelleNiveau3Pays: param.libelleNiveau3Pays,
+                                localiteStructure: param.localiteStructure)
+                            .then((value) => {
+                                  print("Modifier avec succèss"),
+                                  Provider.of<ParametreGenerauxService>(context,
+                                          listen: false)
+                                      .applyChange(),
+                                })
+                            .catchError(
+                                (onError) => {print(onError.toString())});
+                      }
+                    } catch (e) {}
                   },
                   icon: const Icon(Icons.save),
                 )
@@ -102,7 +219,6 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            
             Consumer<ParametreGenerauxService>(
               builder: (context, paramService, child) {
                 return FutureBuilder(
@@ -129,7 +245,8 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                     } else {
                       paramList = snapshot.data!;
                       param = paramList[0];
-
+                      // parProvider.setParametre(param);
+                      //  parProvider.setParametreList(paramList);
                       return Column(
                         children: [
                           Padding(
@@ -140,7 +257,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                   MediaQuery.of(context).size.width * 0.05,
                             ),
                             child: Container(
-                              height: isEditing ? 250 : 200,
+                              height: isEditing ? 290 : 200,
                               width: MediaQuery.of(context).size.width * 0.9,
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -157,26 +274,71 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                               child: Column(
                                 children: [
                                   ListTile(
-                                    leading: param.logoSysteme!.isEmpty ||
-                                            param.logoSysteme == null
-                                        ? SizedBox(
-                                            width: 110,
-                                            height: 150,
-                                            child: Image.asset(
-                                              "assets/images/type.png",
-                                              scale: 1,
-                                              fit: BoxFit.fill,
-                                            ),
-                                          )
-                                        : SizedBox(
-                                            width: 110,
-                                            height: 150,
-                                            child: Image.network(
-                                              "http://10.0.2.2/${param.logoSysteme!}",
-                                              scale: 1,
-                                              fit: BoxFit.fill,
-                                            ),
-                                          ),
+                                    leading: isEditing
+                                        ? param.logoSysteme!.isEmpty ||
+                                                param.logoSysteme == null
+                                            ? SizedBox(
+                                                width: 110,
+                                                height: 150,
+                                                child: Expanded(
+                                                  child: Image.asset(
+                                                    "assets/images/type.png",
+                                                    scale: 1,
+                                                    fit: BoxFit.fill,
+                                                  ),
+                                                ),
+                                              )
+                                            : SizedBox(
+                                                width: 150,
+                                                height: 80,
+                                                child: Column(
+                                                  children: [
+                                                    Flexible(
+                                                      child: Image.network(
+                                                        "http://10.0.2.2/${param.logoSysteme!}",
+                                                        scale: 1,
+                                                        width: 150,
+                                                        height: 80,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      height:
+                                                          50, // ou une autre valeur selon vos besoins
+                                                      child: TextButton(
+                                                        onPressed:
+                                                            _showImageSourceDialog,
+                                                        child: const Text(
+                                                          'Modifier',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  d_colorGreen),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                        : param.logoSysteme!.isEmpty ||
+                                                param.logoSysteme == null
+                                            ? SizedBox(
+                                                width: 110,
+                                                height: 150,
+                                                child: Image.asset(
+                                                  "assets/images/type.png",
+                                                  scale: 1,
+                                                  fit: BoxFit.fill,
+                                                ),
+                                              )
+                                            : SizedBox(
+                                                width: 110,
+                                                height: 150,
+                                                child: Image.network(
+                                                  "http://10.0.2.2/${param.logoSysteme!}",
+                                                  scale: 1,
+                                                  fit: BoxFit.fill,
+                                                ),
+                                              ),
                                     title: isEditing
                                         ? TextFormField(
                                             initialValue: param.nomSysteme,

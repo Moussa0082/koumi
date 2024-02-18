@@ -30,7 +30,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
   ];
   List pages = <Widget>[
     const AcceuilAdmin(),
-    const Produit(),
+    const ProduitA(),
     const Panier(),
     const ProfilA()
   ];
@@ -118,7 +118,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
         return [
           const AcceuilAdmin(),
           const ProduitA(),
-          const PanierA(),
+          const Panier(),
           const ProfilA()
         ].elementAt(index);
       },

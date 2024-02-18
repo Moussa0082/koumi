@@ -9,6 +9,21 @@ class ParametreGenerauxService extends ChangeNotifier {
   static const String baseUrl = 'http://10.0.2.2:9000/parametreGeneraux';
 
   List<ParametreGeneraux> parametreList = [];
+  List<ParametreGeneraux> _parametreList = [];
+  ParametreGeneraux? _parametre;
+
+  List<ParametreGeneraux> get parametreListe => _parametreList;
+  ParametreGeneraux? get param => _parametre;
+
+  void setParametreList(List<ParametreGeneraux> list) {
+    _parametreList = list;
+    notifyListeners();
+  }
+
+  void setParametre(ParametreGeneraux newParametre) {
+    _parametre = newParametre;
+    notifyListeners();
+  }
 
   Future<void> addParametre({
     required String sigleStructure,
@@ -17,7 +32,7 @@ class ParametreGenerauxService extends ChangeNotifier {
     required String nomSysteme,
     required String descriptionSysteme,
     required String sloganSysteme,
-    File? logoSysteme ,
+    File? logoSysteme,
     required String adresseStructure,
     required String emailStructure,
     required String telephoneStructure,
@@ -27,35 +42,32 @@ class ParametreGenerauxService extends ChangeNotifier {
     required String libelleNiveau3Pays,
     required String localiteStructure,
   }) async {
-
-    try{
+    try {
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
 
-    if (logoSysteme != null) {
-      requete.files.add(http.MultipartFile(
-          'image',
-          logoSysteme.readAsBytes().asStream(),
-          logoSysteme.lengthSync(),
-          filename: basename(logoSysteme.path)));
-    }
+      if (logoSysteme != null) {
+        requete.files.add(http.MultipartFile('image',
+            logoSysteme.readAsBytes().asStream(), logoSysteme.lengthSync(),
+            filename: basename(logoSysteme.path)));
+      }
 
-requete.fields['param'] = jsonEncode({
-      'idParametreGeneraux': null,
-      'sigleStructure': sigleStructure,
-      'nomStructure': nomStructure ,
-      'sigleSysteme': sigleSysteme,
-      'nomSysteme': nomSysteme,
-      'descriptionSysteme':descriptionSysteme ,
-      'sloganSysteme': sloganSysteme,
-      'logoSysteme': "",
-      'adresseStructure': adresseStructure ,
-      'emailStructure': emailStructure,
-      'telephoneStructure':telephoneStructure ,
-      'whattsAppStructure': whattsAppStructure,
-      'libelleNiveau1Pays': libelleNiveau1Pays,
-      'libelleNiveau2Pays': libelleNiveau2Pays,
-      'libelleNiveau3Pays': libelleNiveau3Pays,
-      'localiteStructure': localiteStructure,
+      requete.fields['param'] = jsonEncode({
+        'idParametreGeneraux': null,
+        'sigleStructure': sigleStructure,
+        'nomStructure': nomStructure,
+        'sigleSysteme': sigleSysteme,
+        'nomSysteme': nomSysteme,
+        'descriptionSysteme': descriptionSysteme,
+        'sloganSysteme': sloganSysteme,
+        'logoSysteme': "",
+        'adresseStructure': adresseStructure,
+        'emailStructure': emailStructure,
+        'telephoneStructure': telephoneStructure,
+        'whattsAppStructure': whattsAppStructure,
+        'libelleNiveau1Pays': libelleNiveau1Pays,
+        'libelleNiveau2Pays': libelleNiveau2Pays,
+        'libelleNiveau3Pays': libelleNiveau3Pays,
+        'localiteStructure': localiteStructure,
       });
 
       var response = await requete.send();
@@ -72,17 +84,17 @@ requete.fields['param'] = jsonEncode({
       throw Exception(
           'Une erreur s\'est produite lors de l\'ajout de acteur : $e');
     }
-    }
+  }
 
-Future<void> updateParametre({
-  required String idParametreGeneraux,
+  Future<void> updateParametre({
+    required String idParametreGeneraux,
     required String sigleStructure,
     required String nomStructure,
     required String sigleSysteme,
     required String nomSysteme,
     required String descriptionSysteme,
     required String sloganSysteme,
-    File? logoSysteme ,
+    File? logoSysteme,
     required String adresseStructure,
     required String emailStructure,
     required String telephoneStructure,
@@ -92,35 +104,35 @@ Future<void> updateParametre({
     required String libelleNiveau3Pays,
     required String localiteStructure,
   }) async {
+    try {
+      var requete = http.MultipartRequest(
+          'PUT',
+          Uri.parse(
+              'http://10.0.2.2:9000/parametreGeneraux/update/$idParametreGeneraux'));
 
-    try{
-      var requete = http.MultipartRequest('PUT', Uri.parse('http://10.0.2.2:9000/parametreGeneraux/update/$idParametreGeneraux'));
+      if (logoSysteme != null) {
+        requete.files.add(http.MultipartFile('image',
+            logoSysteme.readAsBytes().asStream(), logoSysteme.lengthSync(),
+            filename: basename(logoSysteme.path)));
+      }
 
-    if (logoSysteme != null) {
-      requete.files.add(http.MultipartFile(
-          'image',
-          logoSysteme.readAsBytes().asStream(),
-          logoSysteme.lengthSync(),
-          filename: basename(logoSysteme.path)));
-    }
-
-requete.fields['parametreGeneral'] = jsonEncode({
-      'idParametreGeneraux': idParametreGeneraux,
-      'sigleStructure': sigleStructure,
-      'nomStructure': nomStructure ,
-      'sigleSysteme': sigleSysteme,
-      'nomSysteme': nomSysteme,
-      'descriptionSysteme':descriptionSysteme ,
-      'sloganSysteme': sloganSysteme,
-      'logoSysteme': "",
-      'adresseStructure': adresseStructure ,
-      'emailStructure': emailStructure,
-      'telephoneStructure':telephoneStructure ,
-      'whattsAppStructure': whattsAppStructure,
-      'libelleNiveau1Pays': libelleNiveau1Pays,
-      'libelleNiveau2Pays': libelleNiveau2Pays,
-      'libelleNiveau3Pays': libelleNiveau3Pays,
-      'localiteStructure': localiteStructure,
+      requete.fields['parametreGeneral'] = jsonEncode({
+        'idParametreGeneraux': idParametreGeneraux,
+        'sigleStructure': sigleStructure,
+        'nomStructure': nomStructure,
+        'sigleSysteme': sigleSysteme,
+        'nomSysteme': nomSysteme,
+        'descriptionSysteme': descriptionSysteme,
+        'sloganSysteme': sloganSysteme,
+        'logoSysteme': "",
+        'adresseStructure': adresseStructure,
+        'emailStructure': emailStructure,
+        'telephoneStructure': telephoneStructure,
+        'whattsAppStructure': whattsAppStructure,
+        'libelleNiveau1Pays': libelleNiveau1Pays,
+        'libelleNiveau2Pays': libelleNiveau2Pays,
+        'libelleNiveau3Pays': libelleNiveau3Pays,
+        'localiteStructure': localiteStructure,
       });
 
       var response = await requete.send();
@@ -137,15 +149,15 @@ requete.fields['parametreGeneral'] = jsonEncode({
       throw Exception(
           'Une erreur s\'est produite lors de la modification : $e');
     }
-    }
-  
+  }
 
   Future<List<ParametreGeneraux>> fetchParametre() async {
     final response = await http.get(Uri.parse('$baseUrl/read'));
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-      parametreList = body.map((item) => ParametreGeneraux.fromMap(item)).toList();
+      parametreList =
+          body.map((item) => ParametreGeneraux.fromMap(item)).toList();
       debugPrint(response.body);
       return parametreList;
     } else {
@@ -160,7 +172,8 @@ requete.fields['parametreGeneral'] = jsonEncode({
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-      parametreList = body.map((item) => ParametreGeneraux.fromMap(item)).toList();
+      parametreList =
+          body.map((item) => ParametreGeneraux.fromMap(item)).toList();
       debugPrint(response.body);
       return parametreList;
     } else {

@@ -24,30 +24,41 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
     return Scaffold(
         backgroundColor: const Color.fromARGB(255, 250, 250, 250),
         appBar: AppBar(
-          centerTitle: true,
-          toolbarHeight: 100,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-          title: const Text(
-            "Type acteur",
-            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
-          ),
-        ),
+            centerTitle: true,
+            toolbarHeight: 100,
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+            title: const Text(
+              "Type acteur",
+              style:
+                  TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+            ),
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    _showDialog();
+                  },
+                  icon: const Icon(
+                    Icons.add_circle_outline,
+                    color: d_colorGreen,
+                    size: 25,
+                  ))
+            ]),
         body: SingleChildScrollView(
           child: Column(
             children: [
-              Container(
-                  alignment: Alignment.topRight,
-                  child: TextButton(
-                      onPressed: () {
-                        _showDialog();
-                      },
-                      child: const Text("+ Ajouter un type d'acteur",
-                          style:
-                              TextStyle(fontSize: 16, color: d_colorGreen)))),
+              // Container(
+              //     alignment: Alignment.topRight,
+              //     child: TextButton(
+              //         onPressed: () {
+              //           _showDialog();
+              //         },
+              //         child: const Text("+ Ajouter un type d'acteur",
+              //             style:
+              //                 TextStyle(fontSize: 16, color: d_colorGreen)))),
               Consumer<TypeActeurService>(
                 builder: (context, typeService, child) {
                   return FutureBuilder(
@@ -439,7 +450,7 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              // const SizedBox(height: 10),
               Form(
                 key: formkey,
                 child: Column(
@@ -466,7 +477,8 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                         controller: libelleController,
                         decoration: InputDecoration(
                           hintText: "Libellé",
-                          prefixIcon: const Icon(Icons.category),
+                          contentPadding:
+                              const EdgeInsets.symmetric(vertical: 10),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -493,7 +505,8 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                         controller: descriptionController,
                         decoration: InputDecoration(
                           hintText: "Description",
-                          prefixIcon: const Icon(Icons.description),
+                          contentPadding:
+                              const EdgeInsets.symmetric(vertical: 15),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
