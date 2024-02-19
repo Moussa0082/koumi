@@ -3,24 +3,24 @@ import 'dart:convert';
 import 'package:koumi_app/models/Pays.dart';
 
 class Niveau1Pays {
-  final String idNiveau1Pays;
-  final String codeN1;
-  final String nomN1;
-  final String descriptionN1;
-  final bool statutN1;
-  final String dateAjout;
-  final String dateModif;
-  final Pays pays;
+  final String? idNiveau1Pays;
+  final String? codeN1;
+  final String? nomN1;
+  final String? descriptionN1;
+  final bool? statutN1;
+  final String? dateAjout;
+  final String? dateModif;
+  final Pays? pays;
 
   Niveau1Pays({
-    required this.idNiveau1Pays,
-    required this.codeN1,
-    required this.nomN1,
-    required this.descriptionN1,
-    required this.statutN1,
-    required this.dateAjout,
-    required this.dateModif,
-    required this.pays,
+   this.idNiveau1Pays,
+   this.codeN1,
+   this.nomN1,
+   this.descriptionN1,
+   this.statutN1,
+   this.dateAjout,
+   this.dateModif,
+   this.pays,
   });
 
   
@@ -56,7 +56,7 @@ class Niveau1Pays {
       'statutN1': statutN1,
       'dateAjout': dateAjout,
       'dateModif': dateModif,
-      'pays': pays.toMap(),
+      'pays': pays?.toMap(),
     };
   }
 

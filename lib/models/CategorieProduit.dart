@@ -7,25 +7,25 @@ class CategorieProduit {
   final String? idCategorieProduit;
    String? codeCategorie;
   final String libelleCategorie;
-  final String descriptionCategorie;
-  final bool statutCategorie;
+  final String? descriptionCategorie;
+  final bool? statutCategorie;
   final String? dateAjout;
   final String? personneModif;
   final String? dateModif;
-  final Filiere filiere;
-  final Acteur acteur;
+  final Filiere? filiere;
+  final Acteur? acteur;
 
   CategorieProduit({
     this.idCategorieProduit,
-    required this.codeCategorie,
+     this.codeCategorie,
     required this.libelleCategorie,
-    required this.descriptionCategorie,
-    required this.statutCategorie,
+     this.descriptionCategorie,
+     this.statutCategorie,
     this.dateAjout,
     this.personneModif,
     this.dateModif,
-    required this.filiere,
-    required this.acteur,
+     this.filiere,
+     this.acteur,
   });
 
   CategorieProduit copyWith({
@@ -64,8 +64,8 @@ class CategorieProduit {
       'dateAjout': dateAjout,
       'personneModif': personneModif,
       'dateModif': dateModif,
-      'filiere': filiere.toMap(),
-      'acteur': acteur.toMap(),
+      'filiere': filiere?.toMap(),
+      'acteur': acteur?.toMap(),
     };
   }
 

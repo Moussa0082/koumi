@@ -13,45 +13,45 @@ import 'package:koumi_app/models/ZoneProduction.dart';
 class Stock {
   String? idStock;
   final String? codeStock;
-  final String nomProduit;
-   String formeProduit;
+  final String? nomProduit;
+   String? formeProduit;
   final String? dateProduction;
-  final double quantiteStock;
-  final int prix;
-  final String typeProduit;
-  final String descriptionStock;
+  final double? quantiteStock;
+  final int? prix;
+  final String? typeProduit;
+  final String? descriptionStock;
    String? photo;
-  final ZoneProduction zoneProduction;
+  final ZoneProduction? zoneProduction;
   final String? dateAjout;
   final String? dateModif;
    String? personneModif;
-  final bool statutSotck;
-  final Speculation speculation;
-  final Unite unite;
-  final Magasin magasin;
-  final Acteur acteur;
+  final bool? statutSotck;
+  final Speculation? speculation;
+  final Unite? unite;
+  final Magasin? magasin;
+  final Acteur? acteur;
   final List<Commande>? commande;
 
   Stock({
     this.idStock,
     this.codeStock,
-    required this.nomProduit,
-    required this.formeProduit,
+     this.nomProduit,
+     this.formeProduit,
     this.dateProduction,
-    required this.quantiteStock,
-    required this.prix,
-    required this.typeProduit,
-    required this.descriptionStock,
+     this.quantiteStock,
+     this.prix,
+     this.typeProduit,
+     this.descriptionStock,
     this.photo,
-    required this.zoneProduction,
+     this.zoneProduction,
     this.dateAjout,
     this.dateModif,
     this.personneModif,
-    required this.statutSotck,
-    required this.speculation,
-    required this.unite,
-    required this.magasin,
-    required this.acteur,
+     this.statutSotck,
+     this.speculation,
+     this.unite,
+     this.magasin,
+     this.acteur,
     this.commande,
   });
 
@@ -71,15 +71,15 @@ class Stock {
       'typeProduit': typeProduit,
       'descriptionStock': descriptionStock,
       'photo': photo,
-      'zoneProduction': zoneProduction.toMap(),
+      'zoneProduction': zoneProduction?.toMap(),
       'dateAjout': dateAjout,
       'dateModif': dateModif,
       'personneModif': personneModif,
       'statutSotck': statutSotck,
-      'speculation': speculation.toMap(),
-      'unite': unite.toMap(),
-      'magasin': magasin.toMap(),
-      'acteur': acteur.toMap(),
+      'speculation': speculation?.toMap(),
+      'unite': unite?.toMap(),
+      'magasin': magasin?.toMap(),
+      'acteur': acteur?.toMap(),
       'commande': commande!.map((x) => x?.toMap()).toList(),
     };
   }

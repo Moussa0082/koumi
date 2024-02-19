@@ -5,34 +5,34 @@ import 'package:koumi_app/models/Acteur.dart';
 class Magasin {
    String? idMagasin;
   final String? codeMagasin;
-  final String nomMagasin;
-  final String niveau3PaysMagasin;
+  final String? nomMagasin;
+  final String? niveau3PaysMagasin;
    String? latitude;
    String? longitude;
-  final String localiteMagasin;
-  final String contactMagasin;
+  final String? localiteMagasin;
+  final String? contactMagasin;
    String? personneModif;
-  final bool statutMagasin;
+  final bool? statutMagasin;
    String? dateAjout;
    String? dateModif;
    String? photo;
-  final Acteur acteur;
+  final Acteur? acteur;
 
   Magasin({
-    required this.idMagasin,
-    required this.codeMagasin,
-    required this.nomMagasin,
-    required this.niveau3PaysMagasin,
-    required this.latitude,
-    required this.longitude,
-    required this.localiteMagasin,
-    required this.contactMagasin,
+     this.idMagasin,
+     this.codeMagasin,
+     this.nomMagasin,
+     this.niveau3PaysMagasin,
+     this.latitude,
+     this.longitude,
+     this.localiteMagasin,
+     this.contactMagasin,
     this.personneModif,
-    required this.statutMagasin,
+     this.statutMagasin,
     this.dateAjout,
     this.dateModif,
     this.photo,
-    required this.acteur,
+     this.acteur,
   });
 
   Magasin copyWith({
@@ -84,7 +84,7 @@ class Magasin {
       'dateAjout': dateAjout,
       'dateModif': dateModif,
       'photo': photo,
-      'acteur': acteur.toMap(),
+      'acteur': acteur?.toMap(),
     };
   }
 

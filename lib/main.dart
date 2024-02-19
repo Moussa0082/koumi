@@ -7,7 +7,7 @@ import 'package:koumi_app/service/TypeActeurService.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:provider/provider.dart';
-
+ 
 void main() {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => ActeurService()),
@@ -17,6 +17,8 @@ void main() {
     ChangeNotifierProvider(create: (context) => BottomNavigationService())
   ], child: const MyApp()));
 }
+
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
