@@ -12,7 +12,7 @@ class ZoneProductionService extends ChangeNotifier {
 
   List<ZoneProduction> zoneList = [];
 
-  static Future<void> creerZone({
+  Future<void> addZone({
     required String nomZoneProduction,
     required String latitude,
     required String longitude,
@@ -20,22 +20,22 @@ class ZoneProductionService extends ChangeNotifier {
     required Acteur acteur,
   }) async {
     try {
-      var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/addZoneProduction'));
+      var requete = http.MultipartRequest(
+          'POST', Uri.parse('$baseUrl/addZoneProduction'));
 
       if (photoZone != null) {
         requete.files.add(http.MultipartFile(
-            'image',
-            photoZone.readAsBytes().asStream(),
-            photoZone.lengthSync(),
+            'image', photoZone.readAsBytes().asStream(), photoZone.lengthSync(),
             filename: basename(photoZone.path)));
       }
 
-      
       requete.fields['zone'] = jsonEncode({
+        'idZoneProduction':null,
         'nomZoneProduction': nomZoneProduction,
         'latitude': latitude,
         'longitude': longitude,
-        'photoZone': ""
+        'photoZone': "",
+       'acteur': acteur.toMap()
       });
 
       var response = await requete.send();
@@ -43,10 +43,10 @@ class ZoneProductionService extends ChangeNotifier {
 
       if (response.statusCode == 200 || responsed.statusCode == 201) {
         final donneesResponse = json.decode(responsed.body);
-        debugPrint('acteur service ${donneesResponse.toString()}');
+        debugPrint(' service ${donneesResponse.toString()}');
       } else {
         throw Exception(
-            'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
+            'Échec de la requête avec le code d\'état : ${responsed.statusCode } ');
       }
     } catch (e) {
       throw Exception(
@@ -54,13 +54,13 @@ class ZoneProductionService extends ChangeNotifier {
     }
   }
 
-static Future<void> updateZone({
+   Future<void> updateZone({
     required String idZoneProduction,
     required String nomZoneProduction,
     required String latitude,
     required String longitude,
+    required String personneModif,
     File? photoZone,
-    required Acteur acteur,
   }) async {
     try {
       var requete = http.MultipartRequest(
@@ -73,11 +73,12 @@ static Future<void> updateZone({
       }
 
       requete.fields['zone'] = jsonEncode({
-        'idZoneProduction' : idZoneProduction,
+        'idZoneProduction': idZoneProduction,
         'nomZoneProduction': nomZoneProduction,
         'latitude': latitude,
         'longitude': longitude,
-        'photoZone': ""
+        'photoZone': "",
+        'personneModif': personneModif
       });
 
       var response = await requete.send();
@@ -98,8 +99,7 @@ static Future<void> updateZone({
 
   Future<List<ZoneProduction>> fetchZone() async {
     try {
-      final response =
-          await http.get(Uri.parse('$baseUrl/getAllZone'));
+      final response = await http.get(Uri.parse('$baseUrl/getAllZone'));
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Fetching data");
@@ -119,7 +119,8 @@ static Future<void> updateZone({
   }
 
   Future deleteZone(String idZone) async {
-    final response = await http.delete(Uri.parse('$baseUrl/deleteZones/$idZone'));
+    final response =
+        await http.delete(Uri.parse('$baseUrl/deleteZones/$idZone'));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
@@ -130,7 +131,7 @@ static Future<void> updateZone({
   }
 
   Future activerZone(String idZone) async {
-    final response = await http.delete(Uri.parse('$baseUrl/activer/$idZone'));
+    final response = await http.put(Uri.parse('$baseUrl/activer/$idZone'));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
@@ -141,8 +142,7 @@ static Future<void> updateZone({
   }
 
   Future desactiverZone(String idZone) async {
-    final response =
-        await http.delete(Uri.parse('$baseUrl/desactiver/$idZone'));
+    final response = await http.put(Uri.parse('$baseUrl/desactiver/$idZone'));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();

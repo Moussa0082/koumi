@@ -81,7 +81,7 @@ class ContinentService extends ChangeNotifier {
 
   Future<void> activerContinent(String idContinent) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/enable/$idContinent"));
+        await http.put(Uri.parse("$baseUrl/activer/$idContinent"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -93,7 +93,7 @@ class ContinentService extends ChangeNotifier {
 
   Future<void> desactiverContinent(String idContinent) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/disable/$idContinent"));
+        await http.put(Uri.parse("$baseUrl/desactiver/$idContinent"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
 

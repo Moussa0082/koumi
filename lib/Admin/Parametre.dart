@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:koumi_app/Admin/ContinentPage.dart';
 import 'package:koumi_app/Admin/PaysPage.dart';
 import 'package:koumi_app/Admin/UnitePage.dart';
+import 'package:koumi_app/Admin/Zone.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:provider/provider.dart';
@@ -190,7 +191,7 @@ class _ParametreState extends State<Parametre> {
                     getList(
                         "zone.png",
                         'Zone de production',
-                        const PaysPage(),
+                        const Zone(),
                         const Icon(
                           Icons.chevron_right_sharp,
                           size: 30,
@@ -203,7 +204,7 @@ class _ParametreState extends State<Parametre> {
                       endIndent: 0,
                     ),
                     getList(
-                        "zone.png",
+                        "unite.png",
                         'Unite de mésure',
                         const UnitePage(),
                         const Icon(
