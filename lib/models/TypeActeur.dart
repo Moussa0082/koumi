@@ -62,7 +62,19 @@ class TypeActeur {
     );
   }
 
-  String toJson() => json.encode(toMap());
+  // String toJson() => json.encode(toMap());
+  Map<String, dynamic> toJson() {
+    return {
+      'libelle': libelle,
+      'codeTypeActeur': codeTypeActeur,
+      'statutTypeActeur': statutTypeActeur,
+      'descriptionTypeActeur': descriptionTypeActeur,
+      // Add other properties if needed
+      if (idTypeActeur != null) 'idTypeActeur': idTypeActeur,
+      if (dateAjout != null) 'dateAjout': dateAjout,
+      if (dateModif != null) 'dateModif': dateModif,
+    };
+  }
 
   factory TypeActeur.fromJson(String source) => TypeActeur.fromMap(json.decode(source) as Map<String, dynamic>);
 

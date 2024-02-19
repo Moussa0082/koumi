@@ -174,69 +174,83 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 //  selcet type acteur 
                  
-            Container(
-              height:70,
-              width:double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child:SizedBox(
-                  child: FutureBuilder(
-                                      future: _mesTypeActeur,
-                                      builder: (_, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return DropdownButton(
-                                            dropdownColor: Colors.orange,
-                                              items: [], onChanged: (value) {}
-              
-                                          );
-                                        }
-                                        if (snapshot.hasError) {
-                                          return Text("${snapshot.error}");
-                                        }
-                                        if (snapshot.hasData) {
-                                          //debugPrint(snapshot.data.body.toString());
-                                          final  reponse  =
-                                          json.decode((snapshot.data.body))
-                                          as List;
-                                          final mesType = reponse
-                                              .map((e) => TypeActeur.fromMap(e))
-                                              .toList();
-                                          //debugPrint(mesCategories.length.toString());
-                                          return DropdownButton(
-                                              items: mesType
-                                                  .map((e) => DropdownMenuItem(
-                                                child: Text(e.libelle, style:TextStyle(fontWeight: FontWeight.bold)),
-                                                value: e.idTypeActeur,
-                                              ))
-                                                  .toList(),
-                                              value: typeValue,
-                                              onChanged: (newValue) {
-                                                setState(() {
-                                                  typeValue = newValue;
-                                                  monTypeActeur = mesType
-                                                      .firstWhere((element) =>
-                                                  element.idTypeActeur ==
-                                                      newValue);
-                                                  debugPrint(
-                                                      monTypeActeur.idTypeActeur.toString());
-                                                });
-                                              });
-                                        }
-                                        return DropdownButton(
-                                            items: const [], onChanged: (value) {});
-                                      },
-                                    )
-                ),
-              ),
-            ),
+           Container(
+  height: 70,
+  width: double.infinity,
+  child: Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: FutureBuilder(
+      future: _mesTypeActeur,
+      builder: (_, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator(); // Afficher un indicateur de chargement en attendant la fin du chargement
+        }
+        if (snapshot.hasError) {
+          return Text("${snapshot.error}");
+        }
+        if (snapshot.hasData) {
+          final reponse = json.decode((snapshot.data.body)) as List;
+          final mesType = reponse
+              .map((e) => TypeActeur.fromMap(e))
+              .where((typeActeur) =>
+                  typeActeur.statutTypeActeur == true &&
+                  typeActeur.libelle != 'Admin') // Filtrer les types d'acteurs actifs et différents de l'administrateur
+              .toList();
+
+          List<DropdownMenuItem<String>> dropdownItems = [];
+
+          if (mesType.isNotEmpty) {
+            dropdownItems = mesType
+                .map((e) => DropdownMenuItem(
+                      child: Text(
+                        e.libelle,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      value: e.idTypeActeur,
+                    ))
+                .toList();
+          } else {
+            dropdownItems.add(DropdownMenuItem(
+              child: Text('Aucun type d\'acteur disponible'),
+              value: null,
+            ));
+          }
+
+          return DropdownButton(
+            items: dropdownItems,
+            value: typeValue,
+            onChanged: (newValue) {
+              setState(() {
+                typeValue = newValue;
+                if (newValue != null) {
+                  monTypeActeur = mesType.firstWhere(
+                      (element) => element.idTypeActeur == newValue);
+                  debugPrint(monTypeActeur.idTypeActeur.toString());
+                } else {
+                  // Gérer le cas où aucun type n'est sélectionné
+                }
+              });
+            },
+          );
+        }
+        return Text('Aucune donnée disponible');
+      },
+    ),
+  ),
+),
+
                 //end select type acteur 
      const  SizedBox(height: 10,),
 
                   Center(
                     child: ElevatedButton(
               onPressed: () {
-                
+                final nomActeur = nomActeurController.text;
+                final email = emailController.text;
+                final telephone = telephoneController.text;
+                 if(nomActeur.isEmpty || email.isEmpty ||  telephone.isEmpty ){
+                       "Veuiller remplir tous les champs";
+                 }
                 Navigator.push(context, MaterialPageRoute(builder: (context) =>  
                 RegisterNextScreen(nomActeur: nomActeurController.text, email: emailController.text,
                  telephone: telephoneController.text, typeActeur: [monTypeActeur],) ));
