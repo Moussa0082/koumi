@@ -59,6 +59,7 @@ dependencies:
   http: ^1.2.0
   shared_preferences: ^2.2.2
   modal_bottom_sheet: ^2.1.2
+  country_flags: ^2.2.0
 
 dev_dependencies:
   flutter_test:

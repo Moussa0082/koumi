@@ -101,7 +101,7 @@ class PaysService extends ChangeNotifier {
 
   Future<void> activerPays(String idPays) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/activer/$idPays"));
+        await http.put(Uri.parse("$baseUrl/activer/$idPays"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -113,7 +113,7 @@ class PaysService extends ChangeNotifier {
 
   Future<void> desactiverPays(String idPays) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/desactiver/$idPays"));
+        await http.put(Uri.parse("$baseUrl/desactiver/$idPays"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
 

@@ -44,7 +44,7 @@ class ContinentService extends ChangeNotifier {
 
     final response = await http.put(Uri.parse("$baseUrl/update/$idContinent"),
         headers: {'Content-Type': 'application/json'}, body: addcontinents);
-    debugPrint(addcontinents.toString());
+    // debugPrint(addcontinents.toString());
     if (response.statusCode == 200 || response.statusCode == 201) {
       debugPrint(response.body);
     } else {

@@ -176,7 +176,7 @@ class _ParametreState extends State<Parametre> {
                     getList(
                         "pays.png",
                         'Pays',
-                        const PaysPage(),
+                         const Zone(),
                         const Icon(
                           Icons.chevron_right_sharp,
                           size: 30,

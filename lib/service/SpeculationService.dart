@@ -8,7 +8,7 @@ import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/Speculation.dart';
 
-class PaysService extends ChangeNotifier {
+class SpeculationService extends ChangeNotifier {
   static const String baseUrl = 'http://10.0.2.2:9000/Speculation';
 
   List<Speculation> speculationList = [];

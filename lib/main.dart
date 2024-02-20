@@ -6,6 +6,8 @@ import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/ContinentService.dart';
 import 'package:koumi_app/service/ParametreGenerauxService.dart';
+import 'package:koumi_app/service/PaysService.dart';
+import 'package:koumi_app/service/SousRegionService.dart';
 import 'package:koumi_app/service/StockService.dart';
 import 'package:koumi_app/service/TypeActeurService.dart';
 import 'package:koumi_app/service/UniteService.dart';
@@ -23,7 +25,9 @@ void main() {
     ChangeNotifierProvider(create: (context) => ParametreGProvider()),
     ChangeNotifierProvider(create: (context) => UniteService()),
     ChangeNotifierProvider(create: (context) => ZoneProductionService()),
+    ChangeNotifierProvider(create: (context) => PaysService()),
     ChangeNotifierProvider(create: (context) => ContinentService()),
+    ChangeNotifierProvider(create: (context) => SousRegionService()),
     ChangeNotifierProvider(create: (context) => BottomNavigationService())
   ], child: const MyApp()));
 }

@@ -1,32 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:koumi_app/models/Continent.dart';
-import 'package:koumi_app/service/ContinentService.dart';
+import 'package:koumi_app/models/Pays.dart';
+import 'package:koumi_app/models/SousRegion.dart';
+import 'package:koumi_app/service/PaysService.dart';
 import 'package:provider/provider.dart';
 
-class UpdateContinents extends StatefulWidget {
-  final Continent continent;
-  const UpdateContinents({super.key, required this.continent});
+class UpdatesPays extends StatefulWidget {
+  final Pays pays;
+  const UpdatesPays({super.key, required this.pays});
 
   @override
-  State<UpdateContinents> createState() => _UpdateContinentsState();
+  State<UpdatesPays> createState() => _UpdatesPaysState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _UpdateContinentsState extends State<UpdateContinents> {
-  List<Continent> continentList = [];
+class _UpdatesPaysState extends State<UpdatesPays> {
   final formkey = GlobalKey<FormState>();
   TextEditingController libelleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  late Continent cont;
+  late SousRegion sousRegion;
+  late Pays payss;
 
   @override
   void initState() {
-    cont = widget.continent;
-    libelleController.text = cont.nomContinent;
-    descriptionController.text = cont.descriptionContinent;
     super.initState();
+    payss = widget.pays;
+
+    libelleController.text = payss.nomPays;
+    descriptionController.text = payss.descriptionPays;
+    sousRegion = payss.sousRegion;
   }
 
   @override
@@ -36,40 +39,25 @@ class _UpdateContinentsState extends State<UpdateContinents> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Image.asset(
-                "assets/images/continent.png",
-                width: 50,
-                height: 50,
+          const Center(
+            child: Text(
+              "Modifier pays",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+                fontSize: 18,
               ),
-              const SizedBox(width: 5),
-              const Text(
-                "Modification",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  fontSize: 18,
-                ),
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.visible,
-              ),
-            ],
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-          // const SizedBox(height: 10),
+          const SizedBox(height: 5),
           Form(
             key: formkey,
             child: Column(
               children: [
                 const SizedBox(
-                  height: 5,
-                ),
-                const Text(
-                  'Nom continent',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                  ),
+                  height: 10,
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8),
@@ -82,22 +70,17 @@ class _UpdateContinentsState extends State<UpdateContinents> {
                     },
                     controller: libelleController,
                     decoration: InputDecoration(
-                      hintText: "Nom continent",
+                      hintText: "Nom de sous région",
                       contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 10),
+                          vertical: 10, horizontal: 15),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Description',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                  ),
+                const SizedBox(
+                  height: 10,
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8),
@@ -112,33 +95,38 @@ class _UpdateContinentsState extends State<UpdateContinents> {
                     decoration: InputDecoration(
                       hintText: "Description",
                       contentPadding: const EdgeInsets.symmetric(
-                          vertical: 15, horizontal: 10),
+                          vertical: 10, horizontal: 15),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Expanded(
-                      child: ElevatedButton(
+                      child: ElevatedButton.icon(
                         onPressed: () async {
                           final String libelle = libelleController.text;
-                          final String desc = descriptionController.text;
+                          final String description = descriptionController.text;
                           if (formkey.currentState!.validate()) {
                             try {
-                              await ContinentService()
-                                  .updateContinent(
-                                      idContinent: cont.idContinent!,
-                                      nomContinent: libelle,
-                                      descriptionContinent: desc)
+                              await PaysService()
+                                  .updatePays(
+                                    idPays: payss.idPays!,
+                                      nomPays: libelle,
+                                      descriptionPays: description,
+                                      sousRegion: sousRegion)
                                   .then((value) => {
-                                        Provider.of<ContinentService>(context,
+                                        Provider.of<PaysService>(context,
                                                 listen: false)
                                             .applyChange(),
+                                        Provider.of<PaysService>(context,
+                                                listen: false)
+                                            .applyChange(),
+                                       
                                         libelleController.clear(),
                                         descriptionController.clear(),
                                         Navigator.of(context).pop()
@@ -146,14 +134,13 @@ class _UpdateContinentsState extends State<UpdateContinents> {
                             } catch (e) {
                               final String errorMessage = e.toString();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                   content: Row(
                                     children: [
-                                      Text(
-                                          "Une erreur s'est produit : $errorMessage"),
+                                      Text("Une erreur s'est produit"),
                                     ],
                                   ),
-                                  duration: const Duration(seconds: 5),
+                                  duration: Duration(seconds: 5),
                                 ),
                               );
                             }
@@ -163,8 +150,12 @@ class _UpdateContinentsState extends State<UpdateContinents> {
                           backgroundColor: Colors.green,
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                         ),
-                        child: const Text(
-                          "Modifier",
+                        icon: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          "Ajouter",
                           style: TextStyle(
                             fontSize: 20,
                             color: Colors.white,
@@ -177,7 +168,7 @@ class _UpdateContinentsState extends State<UpdateContinents> {
                       width: 5,
                     ),
                     Expanded(
-                      child: ElevatedButton(
+                      child: ElevatedButton.icon(
                         onPressed: () {
                           Navigator.of(context)
                               .pop(); // Ferme la boîte de dialogue
@@ -186,7 +177,11 @@ class _UpdateContinentsState extends State<UpdateContinents> {
                           backgroundColor: Colors.red,
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                         ),
-                        child: const Text(
+                        icon: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
                           "Annuler",
                           style: TextStyle(
                             fontSize: 20,
