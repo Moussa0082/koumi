@@ -5,6 +5,8 @@ import 'package:koumi_app/screens/RegisterEndScreen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:shimmer/shimmer.dart';
+
 class RegisterNextScreen extends StatefulWidget {
 
   String nomActeur, email,telephone;
@@ -232,14 +234,24 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
                   child: FutureBuilder(
                                       future: _mesPays,
                                       builder: (_, snapshot) {
+                                                  List<DropdownMenuItem<String>> dropdownItems = [];
                                         if (snapshot.connectionState ==
                                             ConnectionState.waiting) {
-                                          return DropdownButton(
-                                            dropdownColor: Colors.orange,
-                                              items: [], onChanged: (value) {}
-              
+                                          return Shimmer.fromColors(
+                                                  baseColor: const Color.fromARGB(185, 224, 224, 224)!,
+                                            highlightColor: Colors.grey[100]!,
+                                            child: DropdownButton(
+                                              dropdownColor: Colors.orange,
+                                                items: [], onChanged: (value) {}
+                                                          
+                                            ),
                                           );
-                                        }
+                                        }else {
+                              dropdownItems.add(DropdownMenuItem(
+                                child: Text('Aucun pays disponible'),
+                                value: null,
+                              ));
+                            }
                                         if (snapshot.hasError) {
                                           return Text("${snapshot.error}");
                                         }
@@ -250,6 +262,7 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
                                           as List;
                                           final mesPays = reponse
                                               .map((e) =>Pays.fromMap(e))
+                                              .where((e)=> e.statutPays == true)
                                               .toList();
                                           //debugPrint(mesCategories.length.toString());
                                           return DropdownButton(
@@ -259,6 +272,7 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
                                                 value: e.idPays,
                                               ),)
                                                   .toList(),
+                                              
                                               value: paysValue,
                                               onChanged: (newValue) {
                                                 setState(() {

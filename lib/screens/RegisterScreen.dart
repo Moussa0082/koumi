@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/RegisterNextScreen.dart';
+import 'package:shimmer/shimmer.dart';
 
 class RegisterScreen extends StatefulWidget {
 
@@ -183,8 +184,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
       future: _mesTypeActeur,
       builder: (_, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // Afficher un indicateur de chargement en attendant la fin du chargement
-        }
+           return Shimmer.fromColors(
+                                   baseColor: Colors.grey[300]!,
+                                   highlightColor: Colors.grey[100]!,
+                                   child: DropdownButton(
+                                   dropdownColor: Colors.orange,
+                                   items: [], onChanged: (value) {}              
+                                            ),
+                                          );
+                                        }
         if (snapshot.hasError) {
           return Text("${snapshot.error}");
         }

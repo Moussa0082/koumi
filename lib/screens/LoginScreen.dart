@@ -342,55 +342,60 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 10),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          SizedBox(
-                            width: 50,
-                            height: 30,
-                            child: FittedBox(
-                              fit: BoxFit.contain,
-                              child: Switch(
-                                value: light,
-                                activeColor: Colors.orange,
-                                onChanged: (bool value) {
-                                  // This is called when the user toggles the switch.
-                                  setState(() {
-                                    light = value;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          const Text(
-                            "Se souvenir de moi",
-                            style: TextStyle(
-                              fontSize: 15,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Align(
-                              alignment: Alignment.centerRight,
-                              child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const ForgetPassScreen()));
-                                  },
-                                  child: const Text(
-                                    "Mot de passe oublier ",
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        decoration: TextDecoration.underline,
-                                        color: Colors.blue),
-                                  ))),
-                        ],
+                      child: Expanded(
+                        child:Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    Row(
+      children: [
+        SizedBox(
+          width: 50,
+          height: 30,
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: Switch(
+              value: light,
+              activeColor: Colors.orange,
+              onChanged: (bool value) {
+                setState(() {
+                  light = value;
+                });
+              },
+            ),
+          ),
+        ),
+        const SizedBox(
+          width: 5,
+        ),
+        const Text(
+          "Se souvenir de moi",
+          style: TextStyle(
+            fontSize: 15,
+          ),
+        ),
+      ],
+    ),
+    GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ForgetPassScreen(),
+          ),
+        );
+      },
+      child: const Text(
+        "Mot de passe oublié ",
+        style: TextStyle(
+          fontSize: 15,
+          decoration: TextDecoration.underline,
+          color: Colors.blue,
+        ),
+      ),
+    ),
+  ],
+),
+
                       ),
                     ),
                     const SizedBox(

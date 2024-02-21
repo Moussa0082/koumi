@@ -1,8 +1,14 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
+import 'package:koumi_app/service/ActeurService.dart';
 
 class ResetPassScreen extends StatefulWidget {
-  const ResetPassScreen({super.key});
+   final bool? isVisible;
+   final String? emailActeur;
+   final String? whatsAppActeur;
+   ResetPassScreen({super.key, this.isVisible, this.emailActeur, this.whatsAppActeur});
 
   @override
   State<ResetPassScreen> createState() => _ResetPassScreenState();
@@ -15,9 +21,155 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
    String confirmPassword = "";
 
 
+
   TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
    
+
+
+
+                    // Fonction pour afficher la boîte de dialogue de chargement
+void showLoadingDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Empêche de fermer la boîte de dialogue en cliquant en dehors
+    builder: (BuildContext context) {
+      return const AlertDialog(
+        title:  Center(child: Text('Envoi en cours')),
+        content: CupertinoActivityIndicator(
+          color: Colors.orange,
+          radius: 22,
+        ),
+        actions: <Widget>[
+          // Pas besoin de bouton ici
+        ],
+      );
+    },
+  );
+}
+
+// Fonction pour fermer la boîte de dialogue de chargement
+void hideLoadingDialog(BuildContext context) {
+  Navigator.of(context).pop(); // Ferme la boîte de dialogue
+}
+
+   // Fonction pour vérifier la connectivité réseau
+   Future<bool> checkInternetConnectivity() async {
+  var connectivityResult = await Connectivity().checkConnectivity();
+  return connectivityResult != ConnectivityResult.none;
+   }
+
+// Fonction pour afficher un message d'erreur si la connexion Internet n'est pas disponible
+      void showNoInternetDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Erreur de connexion'),
+        content: const Text('Veuillez vérifier votre connexion Internet et réessayer.'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+   // Fonction pour gérer le bouton Envoyer
+void handleSendButton(BuildContext context) async {
+  bool isConnected = await checkInternetConnectivity();
+  if (!isConnected) {
+    showNoInternetDialog(context);
+    return;
+  }
+
+  // Si la connexion Internet est disponible, poursuivez avec l'envoi du code
+  // Affichez la boîte de dialogue de chargement
+  showLoadingDialog(context);
+
+  try {
+    
+
+            
+    if (widget.isVisible!) {
+      debugPrint("Code envoyé par mail");
+     await ActeurService.resetPasswordEmail(widget.emailActeur!, passwordController.text);
+
+    hideLoadingDialog(context);
+        // Gérez le cas où l'email ou le mot de passe est vide.
+        showDialog(
+          context:  context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Center(child: Text('Erreur')),
+              content:const  Text("Mot de passe modifier avec succès"),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen() ));
+                  },
+                  child:const  Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+    } else {
+             await ActeurService.resetPasswordWhatsApp(widget.whatsAppActeur!, passwordController.text);
+      debugPrint("Code envoyé par whats app");
+    hideLoadingDialog(context);
+         showDialog(
+          context:  context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Center(child: Text('Succès')),
+              content:const  Text("Mot  de passe modifier avec succès"),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen() ));
+                  },
+                  child:const  Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+    }
+
+    // Fermez la boîte de dialogue de chargement après l'envoi du code
+  } catch (e) {
+    // En cas d'erreur, fermez également la boîte de dialogue de chargement
+    hideLoadingDialog(context);
+       showDialog(
+          context:  context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Center(child: Text('Erreur')),
+              content:  Text("Erreur : $e"),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child:const  Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+    // Gérez l'erreur ici
+  }
+}
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -155,9 +307,36 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
              const SizedBox(height: 15,),
                 Center(
                   child: ElevatedButton(
-            onPressed: () {
+            onPressed: () async{
               // Handle button press action here
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen() ));
+              final password = passwordController.text;
+              final confirmPassword = confirmPasswordController.text;
+              if (password != confirmPassword) {
+
+      // Gérez le cas où l'email ou le mot de passe est vide.
+       const String errorMessage = "Les mot de passe ne correspondent pas ";
+        // Gérez le cas où l'email ou le mot de passe est vide.
+        showDialog(
+          context:  context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Center(child: Text('Erreur')),
+              content:const  Text(errorMessage),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child:const  Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      return;
+    }
+    handleSendButton(context);
+             
             },
             child:  Text(
               " Modifier ",
