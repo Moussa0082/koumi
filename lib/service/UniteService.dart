@@ -1,11 +1,11 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Unite.dart';
-import 'package:path/path.dart';
 
-class PaysService extends ChangeNotifier {
+class UniteService extends ChangeNotifier {
   static const String baseUrl = 'http://10.0.2.2:9000/Unite';
 
   List<Unite> uniteList = [];
@@ -14,11 +14,8 @@ class PaysService extends ChangeNotifier {
     required String nomUnite,
     required Acteur acteur,
   }) async {
-    var addUnites = jsonEncode({
-      'idUnite': null,
-      'nomUnite': nomUnite,
-      'acteur': acteur.toMap()
-    });
+    var addUnites = jsonEncode(
+        {'idUnite': null, 'nomUnite': nomUnite, 'acteur': acteur.toMap()});
 
     final response = await http.post(Uri.parse("$baseUrl/addUnite"),
         headers: {'Content-Type': 'application/json'}, body: addUnites);
@@ -31,15 +28,19 @@ class PaysService extends ChangeNotifier {
   }
 
   Future<void> updateUnite({
-  required String idUnite,
+    required String idUnite,
     required String nomUnite,
     required String personneModif,
     required Acteur acteur,
   }) async {
-    var addUnites = jsonEncode(
-        {'idUnite': idUnite, 'nomUnite': nomUnite, 'personneModif': personneModif, 'acteur': acteur.toMap()});
+    var addUnites = jsonEncode({
+      'idUnite': idUnite,
+      'nomUnite': nomUnite,
+      'personneModif': personneModif,
+      'acteur': acteur.toMap()
+    });
 
-    final response = await http.put(Uri.parse("$baseUrl/addUnite"),
+    final response = await http.put(Uri.parse("$baseUrl/updateUnite/$idUnite"),
         headers: {'Content-Type': 'application/json'}, body: addUnites);
     debugPrint(addUnites.toString());
     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -52,7 +53,7 @@ class PaysService extends ChangeNotifier {
   Future<List<Unite>> fetchUnite() async {
     final response = await http.get(Uri.parse('$baseUrl/getAllUnite'));
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
       uniteList = body.map((item) => Unite.fromMap(item)).toList();
       debugPrint(response.body);
@@ -63,8 +64,6 @@ class PaysService extends ChangeNotifier {
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }
-
-
 
   Future<void> deleteUnite(String idUnite) async {
     final response = await http.delete(Uri.parse("$baseUrl/delete/$idUnite"));
@@ -78,7 +77,7 @@ class PaysService extends ChangeNotifier {
   }
 
   Future<void> activerUnite(String idUnite) async {
-    final response = await http.post(Uri.parse("$baseUrl/activer/$idUnite"));
+    final response = await http.put(Uri.parse("$baseUrl/activer/$idUnite"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -89,8 +88,7 @@ class PaysService extends ChangeNotifier {
   }
 
   Future<void> desactiverUnite(String idUnite) async {
-    final response =
-        await http.post(Uri.parse("$baseUrl/desactiver/$idUnite"));
+    final response = await http.put(Uri.parse("$baseUrl/desactiver/$idUnite"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
 

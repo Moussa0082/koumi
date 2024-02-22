@@ -1,4 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:koumi_app/screens/CodeConfirmScreen.dart';
@@ -16,11 +17,31 @@ class _ForgetPassScreenState extends State<ForgetPassScreen> with AutomaticKeepA
      // Override wantKeepAlive to return true
   @override
   bool get wantKeepAlive => true;
+ 
+        final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
      
   String email = "";
   String whatsApp = "";
   
+             String _errorMessage = "";
+
+             void validateEmail(String val) {
+    if (val.isEmpty) {
+      setState(() {
+        _errorMessage = "Email ne doit pas être vide";
+      });
+    } else if (!EmailValidator.validate(val, true)) {
+      setState(() {
+        _errorMessage = "Email non valide";
+      });
+    } else {
+      setState(() {
+        _errorMessage = "";
+      });
+    }
+  }
+
                    // Fonction pour afficher la boîte de dialogue de chargement
 void showLoadingDialog(BuildContext context) {
   showDialog(
@@ -28,7 +49,7 @@ void showLoadingDialog(BuildContext context) {
     barrierDismissible: false, // Empêche de fermer la boîte de dialogue en cliquant en dehors
     builder: (BuildContext context) {
       return const AlertDialog(
-        title:  Center(child: Text('Envoi en cours')),
+        title:  Center(child: Text('Traitement en cours')),
         content: CupertinoActivityIndicator(
           color: Colors.orange,
           radius: 22,
@@ -89,26 +110,76 @@ void handleSendButton(BuildContext context) async {
     ActeurService acteurService = ActeurService();
     final emailActeur = emailController.text;
     final whatsAppActeur = whatsAppController.text;
-    // if(){
-
-    // }
+  
 
     if (isVisible) {
       await ActeurService.sendOtpCodeEmail(emailActeur,context);
       debugPrint("Code envoyé par mail");
     hideLoadingDialog(context);
+     showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Succès'),
+        content: const Text("Code envoyé par à email avec succès" ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
       Navigator.push(context, MaterialPageRoute(builder: (context) => CodeConfirmScreen(isVisible:isVisible, emailActeur: emailController.text, whatsAppActeur: whatsAppController.text)));
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
     } else {
       await ActeurService.sendOtpCodeWhatsApp(whatsAppActeur,context);
       debugPrint("Code envoyé par whats app");
     hideLoadingDialog(context);
-      Navigator.push(context, MaterialPageRoute(builder: (context) => CodeConfirmScreen(isVisible:isVisible, emailActeur: emailController.text,whatsAppActeur: whatsAppController.text)));
+     showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Succès'),
+        content: const Text("Code envoyé par à votre numéro whtas app avec succès" ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+      Navigator.push(context, MaterialPageRoute(builder: (context) => CodeConfirmScreen(isVisible:isVisible, emailActeur: emailController.text, whatsAppActeur: whatsAppController.text)));
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
     }
 
     // Fermez la boîte de dialogue de chargement après l'envoi du code
   } catch (e) {
     // En cas d'erreur, fermez également la boîte de dialogue de chargement
     hideLoadingDialog(context);
+      showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Erreur'),
+        content: const Text("Une erreur s'est produite veuillez réessayer" ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+      Navigator.push(context, MaterialPageRoute(builder: (context) => CodeConfirmScreen(isVisible:isVisible, emailActeur: emailController.text, whatsAppActeur: whatsAppController.text)));
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
     // Gérez l'erreur ici
   }
 }
@@ -157,7 +228,10 @@ void handleSendButton(BuildContext context) async {
             Center(child: Image.asset('assets/images/fg-pass.png')),
             // connexion
                const Text(" Mot de passe oublier  ", style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold , color: Color(0xFFF2B6706)),),
-             Form(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+             Form(
+              
+              key:_formKey,
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start,
             children: [
              const SizedBox(height: 10,),
               // debut email ou whats app  
@@ -166,23 +240,36 @@ void handleSendButton(BuildContext context) async {
                 child: Text( isVisible ? " Email *" : "Whats App *" , style: TextStyle(color:  (Colors.black), fontSize: 18),),
               ),
 
+             Padding(
+                  padding: EdgeInsets.all( 2),
+                  child: Center(
+                    child: Text( isVisible ?_errorMessage : ""),
+                  ),
+                ),
           Visibility(
   visible: isVisible, 
   child: TextFormField(
     controller: emailController,
     decoration: InputDecoration(
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-      labelText: "Email",
+      // labelText: "Email",
       hintText: "Entrez votre adresse email",
     ),
     keyboardType: TextInputType.text,
     validator: (val) {
       if (val == null || val.isEmpty) {
         return "Veillez entrez votre adresse email";
-      } else {
+      } else if(_errorMessage == "Email non valide" && isVisible == false){
+        return "Veillez entrez une adresse email valide";
+
+      }
+       else {
         return null;
       }
     },
+     onChanged: (val) {
+                        validateEmail(val);
+                      },
     onSaved: (val) => email = val!,
   ),
 ),
@@ -192,14 +279,17 @@ Visibility(
     controller: whatsAppController,
     decoration: InputDecoration(
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-      labelText: "Numéro WhatsApp",
+      // labelText: "Numéro WhatsApp",
       hintText: "Entrez votre numéro WhatsApp",
     ),
     keyboardType: TextInputType.phone,
     validator: (val) {
       if (val == null || val.isEmpty) {
         return "Veillez entrez votre numéro WhatsApp";
-      } else {
+      } else if(val.length<8){
+        return "Veillez entrez au moins 8 chiffres";
+      }
+      else {
         return null;
       }
     },
@@ -229,8 +319,10 @@ Visibility(
                 Center(
                   child: ElevatedButton(
             onPressed: ()  {
+              if(_formKey.currentState!.validate()){
 
               handleSendButton(context);
+              }
             },
             child:  Text(
               " Envoyer ",

@@ -1,6 +1,9 @@
 import 'dart:io';
+import 'package:path/path.dart';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
 
 
@@ -8,18 +11,22 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
+import 'package:koumi_app/screens/LoginSuccessScreen.dart';
 import 'package:koumi_app/screens/RegisterEndScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
+import 'package:path_provider/path_provider.dart';
 
 class RegisterEndScreen extends StatefulWidget {
 
     String nomActeur, email,telephone, adresse , maillon , localistaion, numeroWhatsApp , pays;
+    File? image1;
    late List<TypeActeur> typeActeur;
   //  late List<TypeActeur> idTypeActeur;
 
    RegisterEndScreen({
    super.key, required this.nomActeur, 
+   this.image1,
    required this.email, required this.telephone, 
    required this.typeActeur, required this.adresse, 
    required this.maillon, required this.numeroWhatsApp,
@@ -33,6 +40,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
 
  bool isLoading = false;
    
+        final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String password = "";
   String confirmPassword = "";
@@ -40,14 +48,108 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
   String filiere = "";
   bool _obscureText = true;
 
-  String? image1Src;
+  
   String? image2Src;
-  File? image1;
   File? image2;
+
+        Future<File> saveImagePermanently(String imagePath) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final name = basename(imagePath);
+    final image = File('${directory.path}/$name');
+
+    return File(imagePath).copy(image.path);
+  }
+
+   Future<File?> getImage(ImageSource source) async {
+  final image = await ImagePicker().pickImage(source: source);
+  if (image == null) return null;
+
+  return File(image.path);
+}
+
+Future<void> _pickImage(ImageSource source) async {
+  final image = await getImage(source);
+  if (image != null) {
+    setState(() {
+      this.image2 = image;
+      image2Src = image.path;
+    });
+  }
+}
+ 
+   Future<void> _showImageSourceDialog() async {
+  final BuildContext context = this.context;
+  return showDialog<void>(
+    context: context,
+    builder: (BuildContext context) {
+      return SizedBox(
+        height: 150,
+        child: AlertDialog(
+          title: Text("Photo d'identité"),
+          content: Wrap(
+            alignment: WrapAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context); // Fermer le dialogue
+                  _pickImage(ImageSource.camera);
+                },
+                child: Column(
+                  children: [
+                    Icon(Icons.camera_alt, size: 40),
+                    Text('Camera'),
+                  ],
+                ),
+              ),
+              const SizedBox(width:40),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context); // Fermer le dialogue
+                  _pickImage(ImageSource.gallery);
+                },
+                child: Column(
+                  children: [
+                    Icon(Icons.image, size: 40),
+                    Text('Galerie photo'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
 
   TextEditingController filiereController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
+
+                       // Fonction pour afficher la boîte de dialogue de chargement
+void showLoadingDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Empêche de fermer la boîte de dialogue en cliquant en dehors
+    builder: (BuildContext context) {
+      return const AlertDialog(
+        title:  Center(child: Text('Envoi en cours')),
+        content: CupertinoActivityIndicator(
+          color: Colors.orange,
+          radius: 22,
+        ),
+        actions: <Widget>[
+          // Pas besoin de bouton ici
+        ],
+      );
+    },
+  );
+}
+
+// Fonction pour fermer la boîte de dialogue de chargement
+void hideLoadingDialog(BuildContext context) {
+  Navigator.of(context).pop(); // Ferme la boîte de dialogue
+}
 
     @override
   void initState() {
@@ -91,15 +193,41 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                             ),
                ],
               ),
-            Center(child: Image.asset('assets/images/logo-pr.png')),
+                       Row(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [
+    Container(
+      height:100,
+      width: 200, // Spécifiez une largeur fixe pour le conteneur
+      child: (image2 == null) ?
+        Center(child: Image.asset('assets/images/logo-pr.png')) :
+        SizedBox(
+          height: 50,
+          child: Image.file(
+            image2!,
+            height:100,
+            width: 200,
+            fit: BoxFit.cover,
+          ),
+        ),
+    ),
+  ],
+),
            const SizedBox(height: 5,),
-            Text("Completer votre profil", style: TextStyle(
-              fontSize: 22, 
-              fontWeight: FontWeight.bold,
-        
-              ),
-              ),
-             Form(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+            GestureDetector(
+              onTap: (){
+                _showImageSourceDialog();
+              },
+              child: Text("Choisir la photo du siège", style: TextStyle(
+                fontSize: 22, 
+                fontWeight: FontWeight.bold,
+                      
+                ),
+                ),
+            ),
+             Form(
+               key:_formKey,
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start,
             children: [
              const SizedBox(height: 10,),
               
@@ -162,11 +290,15 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                   obscureText: _obscureText,
                   validator: (val) {
                     if (val == null || val.isEmpty) {
-                      return "Veillez entrez votre nouveau mot de passe";
+                      return "Veillez entrez votre  mot de passe ";
                     }
                     if (val.length < 4) {
                       return 'Le mot de passe doit contenir au moins 4 caractères';
-                    } else {
+                    } 
+                    else if (val.length > 4) {
+                      return 'Le mot de passe ne doit pas 4 caractères';
+                    } 
+                     else {
                       return null;
                     }
                   },
@@ -179,7 +311,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                 // debut mot de passe
                  Padding(
                 padding: const EdgeInsets.only(left:10.0),
-                child: Text("Mot de passe", style: TextStyle(color: (Colors.black), fontSize: 18),),
+                child: Text("Confirm mot de passe", style: TextStyle(color: (Colors.black), fontSize: 18),),
               ),
               // debut  mot de pass
                 TextFormField(
@@ -187,7 +319,6 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15)),
-                      labelText: "Confirmer mot de passe",
                       hintText: "Entrez votre confirmer votre mot de passe",
                       suffixIcon: IconButton(
                         onPressed: () {
@@ -214,7 +345,11 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                     }
                     if (val.length < 4) {
                       return 'Le mot de passe doit contenir au moins 4 caractères';
-                    } else {
+                    } 
+                    else if (val.length > 4) {
+                      return 'Le mot de passe ne doit pas 4 caractères';
+                    } 
+                    else {
                       return null;
                     }
                   },
@@ -227,13 +362,18 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
               const SizedBox(height: 10,),
                 Center(
                   child: ElevatedButton(
-            onPressed: isLoading
-      ? null // Désactiver le bouton lorsque le chargement est en cours
-      : () async {
-        setState(() {
-          isLoading = true; // Afficher le CircularProgressIndicator
-        });
-              // Handle button press action here
+
+            onPressed: 
+            
+      //       isLoading
+      // ? null // Désactiver le bouton lorsque le chargement est en cours
+      // :
+       () async {
+        // setState(() {
+        //   isLoading = true; // Afficher le CircularProgressIndicator
+        // });
+        if(_formKey.currentState!.validate()){
+
   final nomActeur = widget.nomActeur;
   final emailActeur = widget.email;
   final adresse = widget.adresse;
@@ -245,22 +385,43 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
   final pays = widget.pays;
   final filiere = filiereController.text;
   final password = passwordController.text;
+  final confirmPassword = confirmPasswordController.text;
   
-  // utilisateur = utilisateur;
-  
-      // if(_formKey.currentState!.validate()){
+                  if (password != confirmPassword) {
 
+      // Gérez le cas où l'email ou le mot de passe est vide.
+       const String errorMessage = "Les mot de passe ne correspondent pas ";
+        // Gérez le cas où l'email ou le mot de passe est vide.
+        showDialog(
+          context:  context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Center(child: Text('Erreur', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),)),
+              content:const  Text(errorMessage),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child:const  Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      return;
+    }
   // Utilize your backend service to send the request
   ActeurService acteurService = ActeurService();
    // Si widget.typeActeur est bien une liste de TypeActeur
-
+   showLoadingDialog(context);
 try {
 
           // String type = typeActeurList.toString();
-  if(image1 != null && image2 != null){
+  if(widget.image1 != null && image2 != null){
     
     await acteurService.creerActeur(
-    logoActeur: image1 as File,
+    logoActeur: widget.image1 as File,
     photoSiegeActeur: image2 as File,
     nomActeur: nomActeur,
     adresseActeur: adresse,
@@ -274,6 +435,27 @@ try {
     password: password,
     maillonActeur: maillon,
   );
+  hideLoadingDialog(context);
+   showDialog(
+          context:  context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Center(child: Text('Erreur')),
+              content:const  Text("Inscription réussi avec succès"),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+ Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const LoginSuccessScreen()),
+  );                  },
+                  child:const  Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
   }else{
     await acteurService.creerActeur(
     nomActeur: nomActeur,
@@ -288,17 +470,33 @@ try {
     password: password,
     maillonActeur: maillon,
   );
-  }
-
-  // Do something with the updated demand if needed
-  Navigator.push(
+  hideLoadingDialog(context);
+   showDialog(
+          context:  context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Center(child: Text('Succès')),
+              content:const  Text("Inscription réussi avec succès"),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+ Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => const LoginScreen()),
-  );
+    MaterialPageRoute(builder: (context) => const LoginSuccessScreen()),
+  );                  },
+                  child:const  Text('OK'),
+                  
+                ),
+              ],
+            );
+          },
+        );
+  }
+ 
   // print("Demande envoyée avec succès: ${updatedDemande.toString()}");
   debugPrint("yes ");
   // Navigate to the next page if necessary
-  // BuildContext context = this.context;
 } catch (error) {
   // Handle any exceptions that might occur during the request
   final String errorMessage = error.toString();
@@ -317,13 +515,9 @@ try {
   ),
 );
   // print("Erreur: $error");
-} finally {
-          // Après la requête (réussie ou non), masquez le CircularProgressIndicator
-          setState(() {
-            isLoading = false;
-          });
-        }
-                            // }
+} 
+   }
+              // Handle button press action here
             },
             child: Text(
               " Enregister ",

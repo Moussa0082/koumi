@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 // import 'package:koumi_app/models/TypeActeur.dart';
@@ -26,12 +27,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? typeValue;
   late TypeActeur monTypeActeur;
   late Future _mesTypeActeur;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+    String _errorMessage = "";
 
   TextEditingController nomActeurController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController telephoneController = TextEditingController();
   TextEditingController typeActeurController = TextEditingController();
+
+   void validateEmail(String val) {
+    if (val.isEmpty) {
+      setState(() {
+        _errorMessage = "Email ne doit pas être vide";
+      });
+    } else if (!EmailValidator.validate(val, true)) {
+      setState(() {
+        _errorMessage = "Email non valide";
+      });
+    } else {
+      setState(() {
+        _errorMessage = "";
+      });
+    }
+  }
+
 
    @override
   void initState() {
@@ -39,7 +59,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.initState();
     _mesTypeActeur  =
         http.get(Uri.parse('http://10.0.2.2:9000/typeActeur/read'));
-
+    
   }
 
   @override
@@ -84,7 +104,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                ),
                const SizedBox(height: 10,),
                  const Text("Inscription", style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold , color: Color(0xFFF2B6706)),),
-               Form(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+               Form(
+                key:_formKey,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                const SizedBox(height: 10,),
                 // debut fullname 
@@ -97,7 +119,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15)),
-                        labelText: "Nom Complet",
+                        // labelText: "Nom Complet",
                         hintText: "Entrez votre prenom et nom",
                        
                         ),
@@ -119,12 +141,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   padding: const EdgeInsets.only(left:10.0),
                   child: Text("Email *", style: TextStyle(color:  (Colors.black), fontSize: 18),),
                 ),
+                Center(
+                  child: Text(_errorMessage),
+                ),
                 TextFormField(
                     controller: emailController,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15)),
-                        labelText: "Email",
+                        // labelText: "Email",
                         hintText: "Entrez votre email",
                         
                         ),
@@ -132,10 +157,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     validator: (val) {
                       if (val == null || val.isEmpty) {
                         return "Veillez entrez votre email";
-                      } else {
+                      } else if(_errorMessage == "Email non valide"){
+                        return "Veillez entrez une email valide";
+                      }
+                      else {
                         return null;
                       }
                     },
+                    onChanged: (val) {
+                        validateEmail(val);
+                      },
                     onSaved: (val) => email = val!,
                   ),
                   // fin  adresse email
@@ -150,15 +181,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15)),
-                        labelText: "Téléphone",
+                        // labelText: "Téléphone",
                         hintText: " (+223) XX XX XX XX ",
                        
                         ),
                     keyboardType: TextInputType.phone,
                     validator: (val) {
-                      if (val == null || val.isEmpty) {
+                      if (val == null || val.isEmpty ) {
                         return "Veillez entrez votre numéro de téléphone";
-                      } else {
+                      } 
+                      else if (val.length< 8) {
+                        return "Veillez entrez 8 au moins chiffres";
+                      } 
+                      else if (val.length> 11) {
+                        return "Le numéro ne doit pas depasser 11 chiffres";
+                      } 
+                      else {
                         return null;
                       }
                     },
@@ -210,6 +248,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           if (mesType.isNotEmpty) {
             dropdownItems = mesType
                 .map((e) => DropdownMenuItem(
+                  alignment:AlignmentDirectional.center,
                       child: Text(
                         e.libelle,
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -223,8 +262,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               value: null,
             ));
           }
-
+    // bool typeSelected = false;
           return DropdownButton(
+            alignment: AlignmentDirectional.center,
             items: dropdownItems,
             value: typeValue,
             onChanged: (newValue) {
@@ -234,8 +274,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   monTypeActeur = mesType.firstWhere(
                       (element) => element.idTypeActeur == newValue);
                   debugPrint(monTypeActeur.idTypeActeur.toString());
+                  // typeSelected = true;
                 } else {
+                  // typeSelected = false;
                   // Gérer le cas où aucun type n'est sélectionné
+                  // if (!typeSelected) {
+                  //   Text(
+                  //     "Veuillez choisir un type d'acteur",
+                  //     style: TextStyle(color: Colors.red),
+                  //   );
+                  // }
                 }
               });
             },
@@ -253,16 +301,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Center(
                     child: ElevatedButton(
               onPressed: () {
-                final nomActeur = nomActeurController.text;
-                final email = emailController.text;
-                final telephone = telephoneController.text;
-                 if(nomActeur.isEmpty || email.isEmpty ||  telephone.isEmpty ){
-                       "Veuiller remplir tous les champs";
-                 }
+                if(_formKey.currentState!.validate()){
+                 
                 Navigator.push(context, MaterialPageRoute(builder: (context) =>  
                 RegisterNextScreen(nomActeur: nomActeurController.text, email: emailController.text,
                  telephone: telephoneController.text, typeActeur: [monTypeActeur],) ));
               
+                }
                },
               child:  Text(
                 " Suivant ",
@@ -293,5 +338,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
+
+
+   
+
 }
 

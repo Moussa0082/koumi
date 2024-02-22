@@ -61,7 +61,9 @@ dependencies:
   http: ^1.2.0
   connectivity_plus: ^5.0.2
   shimmer: ^3.0.0
+  email_validator: ^2.1.17
   shared_preferences: ^2.2.2
+  modal_bottom_sheet: ^2.1.2
 
 dev_dependencies:
   flutter_test:

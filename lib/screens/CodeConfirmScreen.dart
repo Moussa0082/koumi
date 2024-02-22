@@ -99,19 +99,69 @@ void hideLoadingDialog(BuildContext context) {
       await ActeurService.verifyOtpCodeEmail(widget.emailActeur!, pinCode, context);
       debugPrint("Code virifier par mail");
     hideLoadingDialog(context);
-      Navigator.push(context, MaterialPageRoute(builder: (context) => CodeConfirmScreen(isVisible:widget.isVisible!, emailActeur: widget.emailActeur!, whatsAppActeur: widget.whatsAppActeur!)));
+     showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Succès'),
+        content: const Text('Code envoyer par email verifier avec succès.'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPassScreen(isVisible:widget.isVisible!, emailActeur: widget.emailActeur!, whatsAppActeur: widget.whatsAppActeur!)));
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
     } else {
       await ActeurService.verifyOtpCodeWhatsApp(widget.whatsAppActeur!, pinCode, context);
       debugPrint("Code verifier par whats app");
     hideLoadingDialog(context);
-      Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPassScreen(isVisible:widget.isVisible!, emailActeur: widget.emailActeur!,whatsAppActeur: widget.whatsAppActeur!)));
-    }
+     showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Succès'),
+        content: const Text('Code envoyer par whats app verifier avec succès.'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPassScreen(isVisible:widget.isVisible!, emailActeur: widget.emailActeur!, whatsAppActeur: widget.whatsAppActeur!)));
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
+  );    }
 
     // Fermez la boîte de dialogue de chargement après l'envoi du code
   } catch (e) {
     // En cas d'erreur, fermez également la boîte de dialogue de chargement
     hideLoadingDialog(context);
     // Gérez l'erreur ici
+         showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Erreur '),
+        content: const Text('Une erreur s\'est  produit veuillez réessayer.'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
   }
  }
   
@@ -255,7 +305,7 @@ String get timerText {
                 //  ),
                 // );
                 //   }
-                handleSendButton(context);
+                // handleSendButton(context);
                   printPinCode();
     
                        },

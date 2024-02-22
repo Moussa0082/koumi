@@ -1,25 +1,25 @@
 import 'dart:convert';
 
 class ParametreGeneraux {
-  final String? idParametreGeneraux;
-  final String sigleStructure;
-  final String nomStructure;
-  final String sigleSysteme;
-  final String nomSysteme;
-  final String descriptionSysteme;
-  final String sloganSysteme;
-  final String? logoSysteme;
-  final String adresseStructure;
-  final String emailStructure;
-  final String telephoneStructure;
-  final String whattsAppStructure;
-  final String libelleNiveau1Pays;
-  final String libelleNiveau2Pays;
-  final String libelleNiveau3Pays;
-  final String codeNiveauStructure;
-  final String localiteStructure;
-  final String? dateAjout;
-  final String? dateModif;
+   String? idParametreGeneraux;
+   String sigleStructure;
+   String nomStructure;
+   String sigleSysteme;
+   String nomSysteme;
+   String descriptionSysteme;
+   String sloganSysteme;
+   String? logoSysteme;
+   String adresseStructure;
+   String emailStructure;
+   String telephoneStructure;
+   String whattsAppStructure;
+   String libelleNiveau1Pays;
+   String libelleNiveau2Pays;
+   String libelleNiveau3Pays;
+   String codeNiveauStructure;
+   String localiteStructure;
+   String? dateAjout;
+   String? dateModif;
   
   ParametreGeneraux({
     this.idParametreGeneraux,

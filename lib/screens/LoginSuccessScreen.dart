@@ -21,7 +21,7 @@ class _LoginSuccessScreenState extends State<LoginSuccessScreen> {
   void initState() {
     super.initState();
      Timer(
-     const  Duration(seconds:5), 
+     const  Duration(seconds:10), 
       () =>
       Navigator.of(context).pushReplacement(
       MaterialPageRoute(

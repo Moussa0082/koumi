@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -25,15 +26,61 @@ class _LoginScreenState extends State<LoginScreen> {
   String email = "";
   bool _obscureText = true;
   bool light = true;
+  String _errorMessage = "";
   // late Acteur acteur;
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   // TextEditingController Controller = TextEditingController();
+  void validateEmail(String val) {
+    if (val.isEmpty) {
+      setState(() {
+        _errorMessage = "Email ne doit pas être vide";
+      });
+    } else if (!EmailValidator.validate(val, true)) {
+      setState(() {
+        _errorMessage = "Email non valide";
+      });
+    } else {
+      setState(() {
+        _errorMessage = "";
+      });
+    }
+  }
+   
+                       // Fonction pour afficher la boîte de dialogue de chargement
+void showLoadingDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Empêche de fermer la boîte de dialogue en cliquant en dehors
+    builder: (BuildContext context) {
+      return const AlertDialog(
+        title:  Center(child: Text('Traitement en cours')),
+        content: CupertinoActivityIndicator(
+          color: Colors.orange,
+          radius: 22,
+        ),
+        actions: <Widget>[
+          // Pas besoin de bouton ici
+        ],
+      );
+    },
+  );
+}
 
+// Fonction pour fermer la boîte de dialogue de chargement
+void hideLoadingDialog(BuildContext context) {
+  Navigator.of(context).pop(); // Ferme la boîte de dialogue
+}
+
+    
   //  login methode start
   Future<void> loginUser() async {
+
+       showLoadingDialog(context);
+
     final String emailActeur = emailController.text;
     final String password = passwordController.text;
     const String baseUrl = 'http://10.0.2.2:9000/acteur/login';
@@ -74,30 +121,14 @@ class _LoginScreenState extends State<LoginScreen> {
         },
       );
 
+   
       if (response.statusCode == 200) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Center(child: Text('Connexion en cours')),
-              content: CupertinoActivityIndicator(
-               color: (Colors.orange),
-                radius: 22,
-              ),
-              actions: <Widget>[
-                // Pas besoin de bouton ici
-              ],
-            );
-          },
-        );
 
-        await Future.delayed(Duration(milliseconds: 1000));
 
-        Navigator.of(context).pop();
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
         emailController.clear();
         passwordController.clear();
-
+       hideLoadingDialog(context);
         // Sauvegarder les données de l'utilisateur dans shared preferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('emailActeur', emailActeur);
@@ -134,6 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
  
         acteurProvider.setActeur(acteur);
+        
 
        final List<String> type =
             acteur.typeActeur.map((e) => e.libelle).toList();
@@ -155,6 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // Traitement en cas d'échec
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
         final errorMessage = responseBody['message'];
+       hideLoadingDialog(context);
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -249,13 +282,20 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: Color(0xfff2b6706)),
                 ),
                 Form(
+                  key:_formKey,
                     child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(
                       height: 10,
                     ),
-                    // debut fullname
+                    // debut email
+                    Padding(
+                  padding: EdgeInsets.all( 10),
+                  child: Center(
+                    child: Text(_errorMessage),
+                  ),
+                ),
                     const Padding(
                       padding: EdgeInsets.only(left: 10.0),
                       child: Text(
@@ -270,11 +310,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(15)),
                         // labelText: "Adresse email",
                         hintText: "Entrez votre adresse email",
-                        // icon: const Icon(
-                        //   Icons.mail,
-                        //   color: Color(0xFFF2B6706),
-                        //   size: 20,
-                        // )
+                       
                       ),
                       keyboardType: TextInputType.text,
                       validator: (val) {
@@ -283,6 +319,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         } else {
                           return null;
                         }
+                      },
+                      onChanged: (val) {
+                        validateEmail(val);
                       },
                       onSaved: (val) => email = val!,
                     ),
@@ -377,10 +416,11 @@ class _LoginScreenState extends State<LoginScreen> {
     ),
     GestureDetector(
       onTap: () {
+        print("ho");
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const ForgetPassScreen(),
+            builder: (context) =>  ForgetPassScreen(),
           ),
         );
       },
@@ -404,8 +444,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     Center(
                       child: ElevatedButton(
                         onPressed: () {
+                          if(_formKey.currentState!.validate()){
                           // Handle button press action here
                           loginUser();
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor:

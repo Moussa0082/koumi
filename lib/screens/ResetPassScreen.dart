@@ -21,12 +21,10 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
    String confirmPassword = "";
 
 
+        final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-   
-
-
 
                     // Fonction pour afficher la boîte de dialogue de chargement
 void showLoadingDialog(BuildContext context) {
@@ -106,7 +104,7 @@ void handleSendButton(BuildContext context) async {
           context:  context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Center(child: Text('Erreur')),
+              title: const Center(child: Text('Succès')),
               content:const  Text("Mot de passe modifier avec succès"),
               actions: <Widget>[
                 TextButton(
@@ -200,7 +198,9 @@ void handleSendButton(BuildContext context) async {
             Center(child: Image.asset('assets/images/fg-pass.png')),
             // connexion
                const Text(" Saisisser votre nouveau mot de passe  ", style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold , color: Color(0xFFF2B6706)),),
-             Form(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+             Form(
+              key:_formKey,
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start,
             children: [
              const SizedBox(height: 10,),
               // debut mot de passe
@@ -308,11 +308,13 @@ void handleSendButton(BuildContext context) async {
                 Center(
                   child: ElevatedButton(
             onPressed: () async{
+              if(_formKey.currentState!.validate()){
+
               // Handle button press action here
               final password = passwordController.text;
               final confirmPassword = confirmPasswordController.text;
               if (password != confirmPassword) {
-
+ 
       // Gérez le cas où l'email ou le mot de passe est vide.
        const String errorMessage = "Les mot de passe ne correspondent pas ";
         // Gérez le cas où l'email ou le mot de passe est vide.
@@ -336,6 +338,7 @@ void handleSendButton(BuildContext context) async {
       return;
     }
     handleSendButton(context);
+              }
              
             },
             child:  Text(

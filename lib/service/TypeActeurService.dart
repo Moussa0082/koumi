@@ -6,8 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:path/path.dart';
 
-class ActeurService extends ChangeNotifier{
-
+class TypeActeurService extends ChangeNotifier {
   static const String baseUrl = 'http://10.0.2.2:9000/typeActeur';
 
   List<TypeActeur> typeList = [];
@@ -16,8 +15,10 @@ class ActeurService extends ChangeNotifier{
     required String libelle,
     required String descriptionTypeActeur,
   }) async {
-    var addType =
-        jsonEncode({'idTypeActeur': null, 'libelle': libelle, 'descriptionTypeActeur': descriptionTypeActeur
+    var addType = jsonEncode({
+      'idTypeActeur': null,
+      'libelle': libelle,
+      'descriptionTypeActeur': descriptionTypeActeur
     });
 
     final response = await http.post(Uri.parse("$baseUrl/create"),
@@ -30,7 +31,7 @@ class ActeurService extends ChangeNotifier{
     }
   }
 
-   Future<void> updateTypeActeur({
+  Future<void> updateTypeActeur({
     required String idTypeActeur,
     required String libelle,
     required String descriptionTypeActeur,
@@ -55,6 +56,7 @@ class ActeurService extends ChangeNotifier{
     final response = await http.get(Uri.parse('$baseUrl/read'));
 
     if (response.statusCode == 200) {
+      Duration(seconds: 5);
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
       typeList = body.map((item) => TypeActeur.fromMap(item)).toList();
       debugPrint(response.body);
@@ -67,7 +69,8 @@ class ActeurService extends ChangeNotifier{
   }
 
   Future<void> deleteTypeActeur(String idTypeActeur) async {
-    final response = await http.delete(Uri.parse("$baseUrl/delete/$idTypeActeur"));
+    final response =
+        await http.delete(Uri.parse("$baseUrl/delete/$idTypeActeur"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -79,7 +82,7 @@ class ActeurService extends ChangeNotifier{
 
   Future<void> activerTypeActeur(String idTypeActeur) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/activer/$idTypeActeur"));
+        await http.put(Uri.parse("$baseUrl/activer/$idTypeActeur"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -91,7 +94,7 @@ class ActeurService extends ChangeNotifier{
 
   Future<void> desactiverTypeActeur(String idTypeActeur) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/desactiver/$idTypeActeur"));
+        await http.put(Uri.parse("$baseUrl/desactiver/$idTypeActeur"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
