@@ -8,7 +8,7 @@ import 'package:path/path.dart';
 
 class SousRegionService extends ChangeNotifier {
 
-  static const String baseUrl = 'http://10.0.2.2:9000/sousRegion';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/sousRegion';
 
   List<SousRegion> sousRegionList = [];
 

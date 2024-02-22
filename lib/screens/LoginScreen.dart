@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> loginUser() async {
     final String emailActeur = emailController.text;
     final String password = passwordController.text;
-    const String baseUrl = 'http://10.0.2.2:9000/acteur/login';
+    const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
     ActeurProvider acteurProvider =
         Provider.of<ActeurProvider>(context, listen: false);
@@ -219,7 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-     checkUserSession();
+      checkUserSession();
     super.initState();
   }
   // login methode end

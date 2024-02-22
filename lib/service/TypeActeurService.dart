@@ -7,7 +7,7 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:path/path.dart';
 
 class TypeActeurService extends ChangeNotifier {
-  static const String baseUrl = 'http://10.0.2.2:9000/typeActeur';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/typeActeur';
 
   List<TypeActeur> typeList = [];
 

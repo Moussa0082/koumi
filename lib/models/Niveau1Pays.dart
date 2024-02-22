@@ -3,23 +3,23 @@ import 'dart:convert';
 import 'package:koumi_app/models/Pays.dart';
 
 class Niveau1Pays {
-  final String idNiveau1Pays;
+  final String? idNiveau1Pays;
   final String codeN1;
   final String nomN1;
   final String descriptionN1;
   final bool statutN1;
-  final String dateAjout;
-  final String dateModif;
+  final String? dateAjout;
+  final String? dateModif;
   final Pays pays;
 
   Niveau1Pays({
-    required this.idNiveau1Pays,
+    this.idNiveau1Pays,
     required this.codeN1,
     required this.nomN1,
     required this.descriptionN1,
     required this.statutN1,
-    required this.dateAjout,
-    required this.dateModif,
+    this.dateAjout,
+    this.dateModif,
     required this.pays,
   });
 
@@ -62,13 +62,13 @@ class Niveau1Pays {
 
   factory Niveau1Pays.fromMap(Map<String, dynamic> map) {
     return Niveau1Pays(
-      idNiveau1Pays: map['idNiveau1Pays'] as String,
+      idNiveau1Pays: map['idNiveau1Pays'] != null ? map['idNiveau1Pays'] as String : null,
       codeN1: map['codeN1'] as String,
       nomN1: map['nomN1'] as String,
       descriptionN1: map['descriptionN1'] as String,
       statutN1: map['statutN1'] as bool,
-      dateAjout: map['dateAjout'] as String,
-      dateModif: map['dateModif'] as String,
+      dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
+      dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
       pays: Pays.fromMap(map['pays'] as Map<String,dynamic>),
     );
   }

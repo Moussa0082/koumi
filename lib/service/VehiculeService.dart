@@ -8,7 +8,7 @@ import 'package:koumi_app/models/Vehicule.dart';
 import 'package:path/path.dart';
 
 class VehiculeService extends ChangeNotifier {
-  static const String baseUrl = 'http://10.0.2.2:9000/vehicule';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/vehicule';
 
   List<Vehicule> vehiculeList = [];
 

@@ -3,7 +3,7 @@ import 'package:koumi_app/Admin/ActeurScreen.dart';
 import 'package:koumi_app/Admin/AlerteScreen.dart';
 import 'package:koumi_app/Admin/CategoriePage.dart';
 import 'package:koumi_app/Admin/FiliereScreen.dart';
-import 'package:koumi_app/Admin/ProduitPage.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
@@ -12,8 +12,10 @@ import 'package:koumi_app/screens/MagasinScreen.dart';
 import 'package:koumi_app/screens/Meteo.dart';
 import 'package:koumi_app/screens/ProduitActeur.dart';
 import 'package:koumi_app/screens/Transport.dart';
+import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
+import 'package:provider/provider.dart';
 
 class AcceuilAdmin extends StatefulWidget {
   const AcceuilAdmin({super.key});
@@ -28,6 +30,16 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 class _AcceuilAdminState extends State<AcceuilAdmin> {
   @override
   Widget build(BuildContext context) {
+    final parametreProvider =
+        Provider.of<ParametreGenerauxProvider>(context, listen: false);
+
+    ParametreGenerauxService().fetchParametre().then((parametreList) {
+      parametreProvider.setParametreList(parametreList);
+    }).catchError((error) {
+      // Gestion des erreurs
+      print('Erreur lors du chargement des données : $error');
+    });
+
     return Scaffold(
       backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
       appBar: const CustomAppBar(),
@@ -73,26 +85,26 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       child: InkWell(
           onTap: () {
-             if (index == 11) {
+            if (index == 12) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => const ActeurScreen()));
-            }
-             else if (index == 11) {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const CategoriPage()));
-            }
-            else if (index == 10) {
+            } else if (index == 11) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const CategoriPage()));
+            } else if (index == 10) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => const FiliereScreen()));
-            }
-            
-            else if (index == 9) {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const ProduitActeur()));
+            } else if (index == 9) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ProduitActeur()));
             } else if (index == 8) {
               Navigator.push(
                   context,

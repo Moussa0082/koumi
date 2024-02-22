@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:koumi_app/Admin/FiliereScreen.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGProvider.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/SplashScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
+import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/ContinentService.dart';
+import 'package:koumi_app/service/FiliereService.dart';
+import 'package:koumi_app/service/Niveau1Service.dart';
+import 'package:koumi_app/service/Niveau2Service.dart';
+import 'package:koumi_app/service/Niveau3Service.dart';
 import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:koumi_app/service/PaysService.dart';
 import 'package:koumi_app/service/SousRegionService.dart';
+import 'package:koumi_app/service/SpeculationService.dart';
 import 'package:koumi_app/service/StockService.dart';
 import 'package:koumi_app/service/TypeActeurService.dart';
 import 'package:koumi_app/service/UniteService.dart';
@@ -22,12 +29,18 @@ void main() {
     ChangeNotifierProvider(create: (context) => ActeurProvider()),
     ChangeNotifierProvider(create: (context) => StockService()),
     ChangeNotifierProvider(create: (context) => ParametreGenerauxService()),
-    ChangeNotifierProvider(create: (context) => ParametreGProvider()),
+    ChangeNotifierProvider(create: (context) => ParametreGenerauxProvider()),
     ChangeNotifierProvider(create: (context) => UniteService()),
     ChangeNotifierProvider(create: (context) => ZoneProductionService()),
     ChangeNotifierProvider(create: (context) => PaysService()),
     ChangeNotifierProvider(create: (context) => ContinentService()),
+    ChangeNotifierProvider(create: (context) => CategorieService()),
+    ChangeNotifierProvider(create: (context) => SpeculationService()),
     ChangeNotifierProvider(create: (context) => SousRegionService()),
+    ChangeNotifierProvider(create: (context) => Niveau1Service()),
+    ChangeNotifierProvider(create: (context) => Niveau2Service()),
+    ChangeNotifierProvider(create: (context) => FiliereService()),
+    ChangeNotifierProvider(create: (context) => Niveau3Service()),
     ChangeNotifierProvider(create: (context) => BottomNavigationService())
   ], child: const MyApp()));
 }

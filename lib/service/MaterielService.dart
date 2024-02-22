@@ -10,7 +10,7 @@ import 'package:path/path.dart';
 
 
 class MaterielService extends ChangeNotifier {
-  static const String baseUrl = 'http://10.0.2.2:9000/Materiel';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Materiel';
 
   List<Materiel> materielList = [];
 

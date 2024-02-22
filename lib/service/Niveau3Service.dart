@@ -5,7 +5,7 @@ import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 
 class Niveau3Service extends ChangeNotifier {
-  static const String baseUrl = 'http://10.0.2.2:9000/niveau3Pays';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/niveau3Pays';
 
   List<Niveau3Pays> niveauList = [];
 
@@ -99,7 +99,7 @@ class Niveau3Service extends ChangeNotifier {
 
   Future<void> activerNiveau3(String idNiveau3Pays) async {
     final response =
-        await http.delete(Uri.parse("$baseUrl/activer/$idNiveau3Pays"));
+        await http.put(Uri.parse("$baseUrl/activer/$idNiveau3Pays"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -111,7 +111,7 @@ class Niveau3Service extends ChangeNotifier {
 
   Future<void> desactiverNiveau3Pays(String idNiveau3Pays) async {
     final response =
-        await http.delete(Uri.parse("$baseUrl/desactiver/$idNiveau3Pays"));
+        await http.put(Uri.parse("$baseUrl/desactiver/$idNiveau3Pays"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
 

@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'package:koumi_app/models/Niveau2Pays.dart';
 
 class Niveau3Pays {
-  final String idNiveau3Pays;
+  final String? idNiveau3Pays;
   final String codeN3;
   final String nomN3;
   final String descriptionN3;
   final bool statutN3;
-  final String dateAjout;
-  final String dateModif;
+  final String? dateAjout;
+  final String? dateModif;
   final Niveau2Pays niveau2Pays;
   Niveau3Pays({
     required this.idNiveau3Pays,

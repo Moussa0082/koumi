@@ -1,138 +1,134 @@
-import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
-import 'package:koumi_app/Admin/UpdatesPays.dart';
-import 'package:koumi_app/models/Pays.dart';
-import 'package:koumi_app/models/SousRegion.dart';
-import 'package:koumi_app/service/PaysService.dart';
+import 'package:koumi_app/Admin/UpdatesSpeculation.dart';
+import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/CategorieProduit.dart';
+import 'package:koumi_app/models/Speculation.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/service/SpeculationService.dart';
 import 'package:provider/provider.dart';
 
-class PaysPage extends StatefulWidget {
-  final SousRegion sousRegions;
-  const PaysPage({super.key, required this.sousRegions});
+class SpeculationPage extends StatefulWidget {
+  final CategorieProduit categorieProduit;
+  const SpeculationPage({super.key, required this.categorieProduit});
 
   @override
-  State<PaysPage> createState() => _PaysPageState();
+  State<SpeculationPage> createState() => _SpeculationPageState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _PaysPageState extends State<PaysPage> {
+class _SpeculationPageState extends State<SpeculationPage> {
+  late CategorieProduit cat;
+  late Acteur acteur;
   final formkey = GlobalKey<FormState>();
   TextEditingController libelleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  late SousRegion sousRegion;
-  List<Pays> paysList = [];
-  late Future<List<Pays>> _liste;
-  bool isLoading = false;
+  List<Speculation> speculationList = [];
+  late Future<List<Speculation>> _liste;
 
-  Future<List<Pays>> getSousPaysListe() async {
-    setState(() {
-      isLoading = true;
-    });
-    return await PaysService().fetchPaysBySousRegion(sousRegion.idSousRegion!);
+  Future<List<Speculation>> getCatListe(String id) async {
+    return await SpeculationService().fetchSpeculationByCategorie(id);
   }
 
   @override
   void initState() {
-    sousRegion = widget.sousRegions;
-    _liste = getSousPaysListe();
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    cat = widget.categorieProduit;
+    _liste = getCatListe(cat.idCategorieProduit!);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 250, 250, 250),
-      appBar: AppBar(
-        centerTitle: true,
-        toolbarHeight: 100,
-        leading: IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-        title: const Text(
-          "Pays",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+        appBar: AppBar(
+          centerTitle: true,
+          toolbarHeight: 100,
+          leading: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+          title: const Text(
+            "Spéculation",
+            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                _showDialog();
+              },
+              icon: const Icon(
+                Icons.add_circle_outline,
+                color: d_colorGreen,
+                size: 25,
+              ),
+            )
+          ],
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              _showDialog();
-            },
-            icon: const Icon(
-              Icons.add_circle_outline,
-              color: d_colorGreen,
-              size: 25,
-            ),
-          )
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Consumer<PaysService>(
-              builder: (context, paysService, child) {
-                return FutureBuilder(
-                    future: _liste,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.orange,
-                          ),
-                        );
-                      }
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Consumer<SpeculationService>(
+                builder: (context, speculationService, child) {
+                  return FutureBuilder(
+                      future: _liste,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.orange,
+                            ),
+                          );
+                        }
 
-                      if (!snapshot.hasData) {
-                        return const Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Center(child: Text("Aucun pays trouvé")),
-                        );
-                      } else {
-                        paysList = snapshot.data!;
+                        if (!snapshot.hasData) {
+                          return const Padding(
+                            padding: EdgeInsets.all(10),
+                            child:
+                                Center(child: Text("Aucun catégorie trouvé")),
+                          );
+                        } else {
+                          speculationList = snapshot.data!;
 
-                        return Column(
-                            children: paysList
-                                .map((e) => Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 15),
-                                      child: Container(
-                                        height: 120,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.9,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color:
-                                                  Colors.grey.withOpacity(0.2),
-                                              offset: const Offset(0, 2),
-                                              blurRadius: 5,
-                                              spreadRadius: 2,
-                                            ),
-                                          ],
-                                        ),
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            // Navigator.push(
-                                            //     context,
-                                            //     MaterialPageRoute(
-                                            //         builder: (context) =>
-                                            //             PaysPage(
-                                            //               sousRegions: e,
-                                            //             )));
-                                          },
+                          return Column(
+                              children: speculationList
+                                  .map((e) => Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 10, horizontal: 15),
+                                        child: Container(
+                                          height: 120,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.9,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.grey
+                                                    .withOpacity(0.2),
+                                                offset: const Offset(0, 2),
+                                                blurRadius: 5,
+                                                spreadRadius: 2,
+                                              ),
+                                            ],
+                                          ),
                                           child: Column(
                                             children: [
                                               ListTile(
-                                                  leading: getFlag(e.nomPays),
+                                                  leading: _getIconForFiliere(e
+                                                      .categorieProduit
+                                                      .filiere
+                                                      .libelleFiliere),
                                                   title: Text(
-                                                      e.nomPays.toUpperCase(),
+                                                      e.nomSpeculation
+                                                          .toUpperCase(),
                                                       style: const TextStyle(
                                                         color: Colors.black,
                                                         fontSize: 20,
@@ -140,7 +136,7 @@ class _PaysPageState extends State<PaysPage> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      e.descriptionPays,
+                                                      e.descriptionSpeculation,
                                                       style: const TextStyle(
                                                         color: Colors.black87,
                                                         fontSize: 17,
@@ -148,36 +144,7 @@ class _PaysPageState extends State<PaysPage> {
                                                             FontWeight.w500,
                                                         fontStyle:
                                                             FontStyle.italic,
-                                                      )
-                                                      )
-                                                      ),
-                                              // const Padding(
-                                              //   padding: EdgeInsets.symmetric(
-                                              //       horizontal: 15),
-                                              //   child: Row(
-                                              //     mainAxisAlignment:
-                                              //         MainAxisAlignment
-                                              //             .spaceBetween,
-                                              //     children: [
-                                              //       Text("Nombres pays :",
-                                              //           style: TextStyle(
-                                              //             color: Colors.black87,
-                                              //             fontSize: 17,
-                                              //             fontWeight:
-                                              //                 FontWeight.w500,
-                                              //             fontStyle:
-                                              //                 FontStyle.italic,
-                                              //           )),
-                                              //       Text("10",
-                                              //           style: TextStyle(
-                                              //             color: Colors.black87,
-                                              //             fontSize: 18,
-                                              //             fontWeight:
-                                              //                 FontWeight.w800,
-                                              //           ))
-                                              //     ],
-                                              //   ),
-                                              // ),
+                                                      ))),
                                               Container(
                                                 alignment:
                                                     Alignment.bottomRight,
@@ -189,7 +156,8 @@ class _PaysPageState extends State<PaysPage> {
                                                       MainAxisAlignment
                                                           .spaceBetween,
                                                   children: [
-                                                    _buildEtat(e.statutPays),
+                                                    _buildEtat(
+                                                        e.statutSpeculation),
                                                     PopupMenuButton<String>(
                                                       padding: EdgeInsets.zero,
                                                       itemBuilder: (context) =>
@@ -213,15 +181,15 @@ class _PaysPageState extends State<PaysPage> {
                                                               ),
                                                             ),
                                                             onTap: () async {
-                                                              await PaysService()
-                                                                  .activerPays(
-                                                                      e.idPays!)
+                                                              await SpeculationService()
+                                                                  .activerSpeculation(e
+                                                                      .idSpeculation!)
                                                                   .then(
                                                                       (value) =>
                                                                           {
-                                                                            Provider.of<PaysService>(context, listen: false).applyChange(),
+                                                                            Provider.of<SpeculationService>(context, listen: false).applyChange(),
                                                                             setState(() {
-                                                                              _liste = PaysService().fetchPaysBySousRegion(sousRegion.idSousRegion!);
+                                                                              _liste = getCatListe(cat.idCategorieProduit!);
                                                                             }),
                                                                             Navigator.of(context).pop(),
                                                                             ScaffoldMessenger.of(context).showSnackBar(
@@ -273,15 +241,15 @@ class _PaysPageState extends State<PaysPage> {
                                                               ),
                                                             ),
                                                             onTap: () async {
-                                                              await PaysService()
-                                                                  .desactiverPays(
-                                                                      e.idPays!)
+                                                              await SpeculationService()
+                                                                  .desactiverSpeculation(e
+                                                                      .idSpeculation!)
                                                                   .then(
                                                                       (value) =>
                                                                           {
-                                                                            Provider.of<PaysService>(context, listen: false).applyChange(),
+                                                                            Provider.of<SpeculationService>(context, listen: false).applyChange(),
                                                                             setState(() {
-                                                                              _liste = PaysService().fetchPaysBySousRegion(sousRegion.idSousRegion!);
+                                                                              _liste = getCatListe(cat.idCategorieProduit!);
                                                                             }),
                                                                             Navigator.of(context).pop(),
                                                                           })
@@ -346,38 +314,39 @@ class _PaysPageState extends State<PaysPage> {
                                                                 builder: (BuildContext
                                                                         context) =>
                                                                     AlertDialog(
-                                                                  backgroundColor:
-                                                                      Colors
-                                                                          .white,
-                                                                  shape:
-                                                                      RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            16),
-                                                                  ),
-                                                                  content:  UpdatesPays(pays:e)
-                                                                ),
+                                                                        backgroundColor:
+                                                                            Colors
+                                                                                .white,
+                                                                        shape:
+                                                                            RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(16),
+                                                                        ),
+                                                                        content:
+                                                                            UpdatesSpeculation(
+                                                                          speculation:
+                                                                              e,
+                                                                        )),
                                                               );
 
-                                                              // Si les détails sont modifiés, appliquer les changements
+                                                              setState(() {
+                                                                _liste =
+                                                                    getCatListe(
+                                                                        cat.idCategorieProduit!);
+                                                              });
                                                               if (updatedSousRegion !=
                                                                   null) {
-                                                                Provider.of<PaysService>(
+                                                                Provider.of<SpeculationService>(
                                                                         context,
                                                                         listen:
                                                                             false)
                                                                     .applyChange();
-                                                                setState(() {
-                                                                  _liste =
-                                                                      updatedSousRegion;
-                                                                });
-                                                                // Mettre à jour la liste des sous-régions
-                                                                setState(() {
-                                                                  _liste = PaysService()
-                                                                      .fetchPaysBySousRegion(
-                                                                          sousRegion
-                                                                              .idSousRegion!);
-                                                                });
+                                                                // setState(() {
+                                                                //   _liste = SpeculationService()
+                                                                //       .fetchCategorieByFiliere(
+                                                                //           filiere
+                                                                //               .idFiliere!);
+                                                                // });
                                                               }
                                                             },
                                                           ),
@@ -399,15 +368,15 @@ class _PaysPageState extends State<PaysPage> {
                                                               ),
                                                             ),
                                                             onTap: () async {
-                                                              await PaysService()
-                                                                  .deletePays(
-                                                                      e.idPays!)
+                                                              await SpeculationService()
+                                                                  .deleteSpeculation(e
+                                                                      .idSpeculation!)
                                                                   .then(
                                                                       (value) =>
                                                                           {
-                                                                            Provider.of<PaysService>(context, listen: false).applyChange(),
+                                                                            Provider.of<SpeculationService>(context, listen: false).applyChange(),
                                                                             setState(() {
-                                                                              _liste = PaysService().fetchPaysBySousRegion(sousRegion.idSousRegion!);
+                                                                              _liste = getCatListe(cat.idCategorieProduit!);
                                                                             }),
                                                                             Navigator.of(context).pop(),
                                                                           })
@@ -436,17 +405,15 @@ class _PaysPageState extends State<PaysPage> {
                                             ],
                                           ),
                                         ),
-                                      ),
-                                    ))
-                                .toList());
-                      }
-                    });
-              },
-            ),
-          ],
-        ),
-      ),
-    );
+                                      ))
+                                  .toList());
+                        }
+                      });
+                },
+              ),
+            ],
+          ),
+        ));
   }
 
   void _showDialog() {
@@ -464,7 +431,7 @@ class _PaysPageState extends State<PaysPage> {
             children: [
               const Center(
                 child: Text(
-                  "Ajouter un pays",
+                  "Ajouter une spéculation",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
@@ -493,7 +460,7 @@ class _PaysPageState extends State<PaysPage> {
                         },
                         controller: libelleController,
                         decoration: InputDecoration(
-                          hintText: "Nom de sous région",
+                          hintText: "Nom de la spéculation",
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 10, horizontal: 15),
                           border: OutlineInputBorder(
@@ -537,22 +504,20 @@ class _PaysPageState extends State<PaysPage> {
                                   descriptionController.text;
                               if (formkey.currentState!.validate()) {
                                 try {
-                                  await PaysService()
-                                      .addPays(
-                                          nomPays: libelle,
-                                          descriptionPays: description,
-                                          sousRegion: sousRegion)
+                                  await SpeculationService()
+                                      .addSpeculation(
+                                          nomSpeculation: libelle,
+                                          descriptionSpeculation: description,
+                                          categorieProduit: cat,
+                                          acteur: acteur)
                                       .then((value) => {
-                                            Provider.of<PaysService>(context,
-                                                    listen: false)
-                                                .applyChange(),
-                                            Provider.of<PaysService>(context,
+                                            Provider.of<SpeculationService>(
+                                                    context,
                                                     listen: false)
                                                 .applyChange(),
                                             setState(() {
-                                              _liste = PaysService()
-                                                  .fetchPaysBySousRegion(
-                                                      sousRegion.idSousRegion!);
+                                              _liste = getCatListe(
+                                                  cat.idCategorieProduit!);
                                             }),
                                             libelleController.clear(),
                                             descriptionController.clear(),
@@ -564,7 +529,7 @@ class _PaysPageState extends State<PaysPage> {
                                     const SnackBar(
                                       content: Row(
                                         children: [
-                                          Text("Une erreur s'est produit"),
+                                          Text("Une erreur s'est produite"),
                                         ],
                                       ),
                                       duration: Duration(seconds: 5),
@@ -632,6 +597,51 @@ class _PaysPageState extends State<PaysPage> {
     );
   }
 
+  Widget _getIconForFiliere(String libelle) {
+    switch (libelle.toLowerCase()) {
+      case 'céréale':
+      case 'céréales':
+      case 'cereale':
+      case 'cereales':
+        return Image.asset(
+          "assets/images/cereale.png",
+          width: 80,
+          height: 80,
+        );
+      case 'fruits':
+      case 'fruit':
+        return Image.asset(
+          "assets/images/fruits.png",
+          width: 80,
+          height: 80,
+        );
+      case 'bétails':
+      case 'bétail':
+      case 'betails':
+      case 'betail':
+        return Image.asset(
+          "assets/images/betail.png",
+          width: 80,
+          height: 80,
+        );
+      case 'légumes':
+      case 'légume':
+      case 'legumes':
+      case 'legume':
+        return Image.asset(
+          "assets/images/legumes.png",
+          width: 80,
+          height: 80,
+        );
+      default:
+        return Image.asset(
+          "assets/images/default.png",
+          width: 80,
+          height: 80,
+        );
+    }
+  }
+
   Widget _buildEtat(bool isState) {
     return Container(
       width: 15,
@@ -641,229 +651,5 @@ class _PaysPageState extends State<PaysPage> {
         color: isState ? Colors.green : Colors.red,
       ),
     );
-  }
-
-  Map<String, String> countries = {
-    "afghanistan": "AF",
-    "albanie": "AL",
-    "algérie": "DZ",
-    "andorre": "AD",
-    "angola": "AO",
-    "antigua-et-barbuda": "AG",
-    "argentine": "AR",
-    "arménie": "AM",
-    "australie": "AU",
-    "autriche": "AT",
-    "azerbaïdjan": "AZ",
-    "bahamas": "BS",
-    "bahreïn": "BH",
-    "bangladesh": "BD",
-    "barbade": "BB",
-    "biélorussie": "BY",
-    "belgique": "BE",
-    "belize": "BZ",
-    "bénin": "BJ",
-    "bhoutan": "BT",
-    "bolivie": "BO",
-    "bosnie-herzégovine": "BA",
-    "botswana": "BW",
-    "brésil": "BR",
-    "brunei": "BN",
-    "bulgarie": "BG",
-    "burkina faso": "BF",
-    "burundi": "BI",
-    "cambodge": "KH",
-    "cameroun": "CM",
-    "canada": "CA",
-    "cap-vert": "CV",
-    "république centrafricaine": "CF",
-    "tchad": "TD",
-    "chili": "CL",
-    "chine": "CN",
-    "colombie": "CO",
-    "comores": "KM",
-    "congo (brazzaville)": "CG",
-    "congo (kinshasa)": "CD",
-    "costa rica": "CR",
-    "côte d'ivoire": "CI",
-    "croatie": "HR",
-    "cuba": "CU",
-    "chypre": "CY",
-    "république tchèque": "CZ",
-    "danemark": "DK",
-    "djibouti": "DJ",
-    "dominique": "DM",
-    "république dominicaine": "DO",
-    "équateur": "EC",
-    "égypte": "EG",
-    "el salvador": "SV",
-    "guinée équatoriale": "GQ",
-    "érythrée": "ER",
-    "estonie": "EE",
-    "éthiopie": "ET",
-    "fidji": "FJ",
-    "finlande": "FI",
-    "france": "FR",
-    "gabon": "GA",
-    "gambie": "GM",
-    "géorgie": "GE",
-    "allemagne": "DE",
-    "ghana": "GH",
-    "grèce": "GR",
-    "grenade": "GD",
-    "guatemala": "GT",
-    "guinée": "GN",
-    "guinée-bissau": "GW",
-    "guyana": "GY",
-    "haïti": "HT",
-    "honduras": "HN",
-    "hongrie": "HU",
-    "islande": "IS",
-    "inde": "IN",
-    "indonésie": "ID",
-    "iran": "IR",
-    "irak": "IQ",
-    "irlande": "IE",
-    "israël": "IL",
-    "italie": "IT",
-    "jamaïque": "JM",
-    "japon": "JP",
-    "jordanie": "JO",
-    "kazakhstan": "KZ",
-    "kenya": "KE",
-    "kiribati": "KI",
-    "corée du nord": "KP",
-    "corée du sud": "KR",
-    "koweït": "KW",
-    "kirghizistan": "KG",
-    "laos": "LA",
-    "lettonie": "LV",
-    "liban": "LB",
-    "lesotho": "LS",
-    "libéria": "LR",
-    "libye": "LY",
-    "liechtenstein": "LI",
-    "lituanie": "LT",
-    "luxembourg": "LU",
-    "macédoine": "MK",
-    "madagascar": "MG",
-    "malawi": "MW",
-    "malaisie": "MY",
-    "maldives": "MV",
-    "mali": "ML",
-    "malte": "MT",
-    "îles marshall": "MH",
-    "mauritanie": "MR",
-    "maurice": "MU",
-    "mexique": "MX",
-    "micronésie": "FM",
-    "moldavie": "MD",
-    "monaco": "MC",
-    "mongolie": "MN",
-    "monténégro": "ME",
-    "maroc": "MA",
-    "mozambique": "MZ",
-    "birmanie": "MM",
-    "namibie": "NA",
-    "nauru": "NR",
-    "népal": "NP",
-    "pays-bas": "NL",
-    "nouvelle-zélande": "NZ",
-    "nicaragua": "NI",
-    "niger": "NE",
-    "nigeria": "NG",
-    "niué": "NU",
-    "norvège": "NO",
-    "oman": "OM",
-    "pakistan": "PK",
-    "palaos": "PW",
-    "palestine": "PS",
-    "panama": "PA",
-    "papouasie-nouvelle-guinée": "PG",
-    "paraguay": "PY",
-    "pérou": "PE",
-    "philippines": "PH",
-    "pologne": "PL",
-    "portugal": "PT",
-    "qatar": "QA",
-    "roumanie": "RO",
-    "russie": "RU",
-    "rwanda": "RW",
-    "saint-kitts-et-nevis": "KN",
-    "sainte-lucie": "LC",
-    "saint-vincent-et-les-grenadines": "VC",
-    "samoa": "WS",
-    "saint-marin": "SM",
-    "sao tomé-et-principe": "ST",
-    "arabie saoudite": "SA",
-    "sénégal": "SN",
-    "serbie": "RS",
-    "seychelles": "SC",
-    "sierra leone": "SL",
-    "singapour": "SG",
-    "slovaquie": "SK",
-    "slovénie": "SI",
-    "salomon": "SB",
-    "somalie": "SO",
-    "afrique du sud": "ZA",
-    "soudan du sud": "SS",
-    "espagne": "ES",
-    "sri lanka": "LK",
-    "soudan": "SD",
-    "suriname": "SR",
-    "swaziland": "SZ",
-    "suède": "SE",
-    "suisse": "CH",
-    "syrie": "SY",
-    "tadjikistan": "TJ",
-    "tanzanie": "TZ",
-    "thaïlande": "TH",
-    "timor oriental": "TL",
-    "togo": "TG",
-    "tonga": "TO",
-    "trinité-et-tobago": "TT",
-    "tunisie": "TN",
-    "turquie": "TR",
-    "turkménistan": "TM",
-    "tuvalu": "TV",
-    "ouganda": "UG",
-    "ukraine": "UA",
-    "émirats arabes unis": "AE",
-    "royaume-uni": "GB",
-    "états-unis": "US",
-    "uruguay": "UY",
-    "ouzbékistan": "UZ",
-    "vanuatu": "VU",
-    "vatican": "VA",
-    "vénézuéla": "VE",
-    "vietnam": "VN",
-    "yémen": "YE",
-    "zambie": "ZM",
-    "zimbabwe": "ZW",
-  };
-
-  Widget getFlag(String pays) {
-    String code = '';
-    String p = pays.toLowerCase();
-    countries.forEach((key, value) {
-      if (p == key) {
-        // setState(() {
-
-        // });
-        code = value;
-      }
-    });
-    return code.isEmpty
-        ? Image.asset(
-            "assets/images/sous.png",
-            width: 50,
-            height: 50,
-          )
-        : CountryFlag.fromCountryCode(
-            code,
-            height: 48,
-            width: 62,
-            borderRadius: 8,
-          );
   }
 }

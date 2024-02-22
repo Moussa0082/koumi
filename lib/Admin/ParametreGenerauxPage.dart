@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
-import 'package:koumi_app/providers/ParametreGProvider.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -40,7 +40,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
   String? imageSrc;
   File? photo;
 
-  late ParametreGProvider parProvider;
+  late ParametreGenerauxProvider parProvider;
 
   Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
@@ -120,7 +120,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
   @override
   void initState() {
     super.initState();
-    parProvider = Provider.of<ParametreGProvider>(context, listen: false);
+    parProvider = Provider.of<ParametreGenerauxProvider>(context, listen: false);
   }
 
   @override

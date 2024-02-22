@@ -1,28 +1,29 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:koumi_app/models/Niveau1Pays.dart';
 
 class Niveau2Pays {
-  final String idNiveau2Pays;
+  final String? idNiveau2Pays;
   final String codeN2;
   final String nomN2;
   final String descriptionN2;
   final bool statutN2;
-  final String dateAjout;
-  final String dateModif;
-  final Niveau1Pays niveau1Pays;
-
+  final String? dateAjout;
+  final String? dateModif;
+  final Niveau1Pays? niveau1Pays;
   Niveau2Pays({
-    required this.idNiveau2Pays,
+    this.idNiveau2Pays,
     required this.codeN2,
     required this.nomN2,
     required this.descriptionN2,
     required this.statutN2,
-    required this.dateAjout,
-    required this.dateModif,
-    required this.niveau1Pays,
+    this.dateAjout,
+    this.dateModif,
+    this.niveau1Pays,
   });
- 
+
+  
 
   Niveau2Pays copyWith({
     String? idNiveau2Pays,
@@ -55,20 +56,20 @@ class Niveau2Pays {
       'statutN2': statutN2,
       'dateAjout': dateAjout,
       'dateModif': dateModif,
-      'niveau1Pays': niveau1Pays.toMap(),
+      'niveau1Pays': niveau1Pays?.toMap(),
     };
   }
 
   factory Niveau2Pays.fromMap(Map<String, dynamic> map) {
     return Niveau2Pays(
-      idNiveau2Pays: map['idNiveau2Pays'] as String,
+      idNiveau2Pays: map['idNiveau2Pays'] != null ? map['idNiveau2Pays'] as String : null,
       codeN2: map['codeN2'] as String,
       nomN2: map['nomN2'] as String,
       descriptionN2: map['descriptionN2'] as String,
       statutN2: map['statutN2'] as bool,
-      dateAjout: map['dateAjout'] as String,
-      dateModif: map['dateModif'] as String,
-      niveau1Pays: Niveau1Pays.fromMap(map['niveau1Pays'] as Map<String,dynamic>),
+      dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
+      dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
+      niveau1Pays: map['niveau1Pays'] != null ? Niveau1Pays.fromMap(map['niveau1Pays'] as Map<String,dynamic>) : null,
     );
   }
 
