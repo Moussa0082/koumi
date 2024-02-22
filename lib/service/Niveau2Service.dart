@@ -6,7 +6,8 @@ import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/models/Niveau2Pays.dart';
 
 class Niveau2Service extends ChangeNotifier {
-  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/niveau2Pays';
+  static const String baseUrl = 'https://koumi.ml/api-koumi/niveau2Pays';
+  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/niveau2Pays';
 
   List<Niveau2Pays> niveauList = [];
 

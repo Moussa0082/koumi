@@ -8,7 +8,8 @@ import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:path/path.dart';
 
 class ZoneProductionService extends ChangeNotifier {
-  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/ZoneProduction';
+  static const String baseUrl = 'https://koumi.ml/api-koumi/ZoneProduction';
+  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/ZoneProduction';
 
   List<ZoneProduction> zoneList = [];
 

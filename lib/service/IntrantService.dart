@@ -8,7 +8,7 @@ import 'package:path/path.dart';
 
 
 class IntrantService extends ChangeNotifier {
-  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/intrant';
+  static const String baseUrl = 'https://koumi.ml/api-koumi/intrant';
 
   List<Intrant> intrantList = [];
 
