@@ -251,7 +251,7 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
                       ],
                     ),
                     Text(
-                      filteredMagasins[index]['nomMagasin'] ?? 'Pas de nom défini',
+                      filteredMagasins[index]['nomMagasin'].toString().toUpperCase() ?? 'Pas de nom défini',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
