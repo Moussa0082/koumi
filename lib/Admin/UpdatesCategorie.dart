@@ -28,7 +28,7 @@ late Acteur acteur;
         acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     cat = widget.categorieProduit;
     libelleController.text = cat.libelleCategorie;
-    descriptionController.text = cat.descriptionCategorie;
+    descriptionController.text = cat.descriptionCategorie!;
   }
 
   @override

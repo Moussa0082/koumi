@@ -28,13 +28,13 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     Timer(
-     const  Duration(seconds:2), 
+     const  Duration(seconds:5), 
       () =>
       Navigator.of(context).pushReplacement(
       MaterialPageRoute(
 
-      builder: (_) => const LoginScreen()      
-      // builder: (_) => const RegisterScreen()      
+      builder: (_) =>  LoginScreen()      
+
 
       ),
       ),
@@ -53,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
         const SizedBox(height:10),
           Center(child: Image.asset('assets/images/logo.png', height: 350, width: 250,)),
          CircularProgressIndicator(
-          backgroundColor: (Colors.white),
+          backgroundColor: (Color.fromARGB(255, 245, 212, 169)),
           color: (Colors.orange),
          ),
         ],

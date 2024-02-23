@@ -124,7 +124,7 @@ class _SpeculationPageState extends State<SpeculationPage> {
                                               ListTile(
                                                   leading: _getIconForFiliere(e
                                                       .categorieProduit
-                                                      .filiere
+                                                      .filiere!
                                                       .libelleFiliere),
                                                   title: Text(
                                                       e.nomSpeculation

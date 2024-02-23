@@ -8,7 +8,7 @@ class Campagne {
   final String codeCampagne;
   final String nomCampagne;
   final String description;
-  final String personneModif;
+  final String? personneModif;
   final bool statutCampagne;
   final String? dateAjout;
   final String? dateModif;

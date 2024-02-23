@@ -123,7 +123,7 @@ class _AddCategorieState extends State<AddCategorie> {
                                             children: [
                                               ListTile(
                                                   leading: _getIconForFiliere(
-                                                      e.filiere.libelleFiliere),
+                                                      e.filiere!.libelleFiliere),
                                                   title: Text(
                                                       e.libelleCategorie
                                                           .toUpperCase(),
@@ -134,7 +134,7 @@ class _AddCategorieState extends State<AddCategorie> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      e.descriptionCategorie,
+                                                      e.descriptionCategorie!,
                                                       style: const TextStyle(
                                                         color: Colors.black87,
                                                         fontSize: 17,
@@ -182,7 +182,7 @@ class _AddCategorieState extends State<AddCategorie> {
                                                           .spaceBetween,
                                                   children: [
                                                     _buildEtat(
-                                                        e.statutCategorie),
+                                                        e.statutCategorie!),
                                                     PopupMenuButton<String>(
                                                       padding: EdgeInsets.zero,
                                                       itemBuilder: (context) =>

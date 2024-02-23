@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 class TypeActeur {
@@ -9,7 +8,6 @@ class TypeActeur {
   final String descriptionTypeActeur;
   final String? dateAjout;
   final String? dateModif;
-  final String? personneModif;
   TypeActeur({
     this.idTypeActeur,
     required this.libelle,
@@ -18,9 +16,7 @@ class TypeActeur {
     required this.descriptionTypeActeur,
     this.dateAjout,
     this.dateModif,
-    this.personneModif,
   });
-  
 
   TypeActeur copyWith({
     String? idTypeActeur,
@@ -30,7 +26,6 @@ class TypeActeur {
     String? descriptionTypeActeur,
     String? dateAjout,
     String? dateModif,
-    String? personneModif,
   }) {
     return TypeActeur(
       idTypeActeur: idTypeActeur ?? this.idTypeActeur,
@@ -40,7 +35,6 @@ class TypeActeur {
       descriptionTypeActeur: descriptionTypeActeur ?? this.descriptionTypeActeur,
       dateAjout: dateAjout ?? this.dateAjout,
       dateModif: dateModif ?? this.dateModif,
-      personneModif: personneModif ?? this.personneModif,
     );
   }
 
@@ -53,7 +47,6 @@ class TypeActeur {
       'descriptionTypeActeur': descriptionTypeActeur,
       'dateAjout': dateAjout,
       'dateModif': dateModif,
-      'personneModif': personneModif,
     };
   }
 
@@ -66,17 +59,28 @@ class TypeActeur {
       descriptionTypeActeur: map['descriptionTypeActeur'] as String,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
-      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
     );
   }
 
-  String toJson() => json.encode(toMap());
+  // String toJson() => json.encode(toMap());
+  Map<String, dynamic> toJson() {
+    return {
+      'libelle': libelle,
+      'codeTypeActeur': codeTypeActeur,
+      'statutTypeActeur': statutTypeActeur,
+      'descriptionTypeActeur': descriptionTypeActeur,
+      // Add other properties if needed
+      if (idTypeActeur != null) 'idTypeActeur': idTypeActeur,
+      if (dateAjout != null) 'dateAjout': dateAjout,
+      if (dateModif != null) 'dateModif': dateModif,
+    };
+  }
 
   factory TypeActeur.fromJson(String source) => TypeActeur.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
-    return 'TypeActeur(idTypeActeur: $idTypeActeur, libelle: $libelle, codeTypeActeur: $codeTypeActeur, statutTypeActeur: $statutTypeActeur, descriptionTypeActeur: $descriptionTypeActeur, dateAjout: $dateAjout, dateModif: $dateModif, personneModif: $personneModif)';
+    return 'TypeActeur(idTypeActeur: $idTypeActeur, libelle: $libelle, codeTypeActeur: $codeTypeActeur, statutTypeActeur: $statutTypeActeur, descriptionTypeActeur: $descriptionTypeActeur, dateAjout: $dateAjout, dateModif: $dateModif)';
   }
 
   @override
@@ -90,8 +94,7 @@ class TypeActeur {
       other.statutTypeActeur == statutTypeActeur &&
       other.descriptionTypeActeur == descriptionTypeActeur &&
       other.dateAjout == dateAjout &&
-      other.dateModif == dateModif &&
-      other.personneModif == personneModif;
+      other.dateModif == dateModif;
   }
 
   @override
@@ -102,7 +105,6 @@ class TypeActeur {
       statutTypeActeur.hashCode ^
       descriptionTypeActeur.hashCode ^
       dateAjout.hashCode ^
-      dateModif.hashCode ^
-      personneModif.hashCode;
+      dateModif.hashCode;
   }
 }

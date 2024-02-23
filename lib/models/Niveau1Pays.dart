@@ -56,7 +56,7 @@ class Niveau1Pays {
       'statutN1': statutN1,
       'dateAjout': dateAjout,
       'dateModif': dateModif,
-      'pays': pays.toMap(),
+      'pays': pays?.toMap(),
     };
   }
 

@@ -36,8 +36,8 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> loginUser() async {
     final String emailActeur = emailController.text;
     final String password = passwordController.text;
-    const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
-    // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
+    // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
+    const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
     ActeurProvider acteurProvider =
         Provider.of<ActeurProvider>(context, listen: false);
@@ -133,10 +133,10 @@ class _LoginScreenState extends State<LoginScreen> {
           typeActeur: typeActeurList,
           password: password,
         );
- 
+
         acteurProvider.setActeur(acteur);
 
-       final List<String> type =
+        final List<String> type =
             acteur.typeActeur.map((e) => e.libelle).toList();
         if (type.contains('admin') || type.contains('Admin')) {
           Navigator.pushReplacement(
@@ -150,8 +150,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 builder: (context) => const BottomNavigationPage()),
           );
         }
-
-       
       } else {
         // Traitement en cas d'échec
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
@@ -220,7 +218,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-      checkUserSession();
+    // checkUserSession();
     super.initState();
   }
   // login methode end
@@ -450,7 +448,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            const RegisterScreen()));
+                                            RegisterScreen()));
                               },
                               child: const Text(
                                 "M'inscrire",

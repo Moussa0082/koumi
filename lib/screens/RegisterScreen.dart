@@ -1,9 +1,19 @@
+import 'dart:convert';
+
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:koumi_app/models/TypeActeur.dart';
+// import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/RegisterNextScreen.dart';
+import 'package:shimmer/shimmer.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+
+   
+   RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -11,22 +21,46 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
 
-  String fullname = "";
-  String password = "";
+  String nomActeur = "";
   String telephone = "";
-  String lastName = "";
   String email = "";
-  bool _obscureText = true;
+  String? typeValue;
+  late TypeActeur monTypeActeur;
+  late Future _mesTypeActeur;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-   List<String> options = ["Option 1", "Option 2", "Option 3"];
+    String _errorMessage = "";
 
-  // Valeur par défaut
-  String selectedOption = "Option 1";
-
-  TextEditingController fullNameController = TextEditingController();
+  TextEditingController nomActeurController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController telephoneController = TextEditingController();
-  // TextEditingController Controller = TextEditingController();
+  TextEditingController typeActeurController = TextEditingController();
+
+   void validateEmail(String val) {
+    if (val.isEmpty) {
+      setState(() {
+        _errorMessage = "Email ne doit pas être vide";
+      });
+    } else if (!EmailValidator.validate(val, true)) {
+      setState(() {
+        _errorMessage = "Email non valide";
+      });
+    } else {
+      setState(() {
+        _errorMessage = "";
+      });
+    }
+  }
+
+
+   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _mesTypeActeur  =
+        http.get(Uri.parse('http://10.0.2.2:9000/typeActeur/read'));
+    
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +104,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                ),
                const SizedBox(height: 10,),
                  const Text("Inscription", style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold , color: Color(0xFFF2B6706)),),
-               Form(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+               Form(
+                key:_formKey,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                const SizedBox(height: 10,),
                 // debut fullname 
@@ -79,17 +115,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Text("Nom Complet *", style: TextStyle(color:  (Colors.black), fontSize: 18),),
                 ),
                 TextFormField(
-                    controller: emailController,
+                    controller: nomActeurController,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15)),
-                        labelText: "Nom Complet",
+                        // labelText: "Nom Complet",
                         hintText: "Entrez votre prenom et nom",
-                        // icon: const Icon(
-                        //   Icons.mail,
-                        //   color: Color(0xFFF2B6706),
-                        //   size: 20,
-                        // )
+                       
                         ),
                     keyboardType: TextInputType.text,
                     validator: (val) {
@@ -99,7 +131,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return null;
                       }
                     },
-                    onSaved: (val) => fullname = val!,
+                    onSaved: (val) => nomActeur = val!,
                   ),
                   // fin  adresse fullname
   
@@ -109,27 +141,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   padding: const EdgeInsets.only(left:10.0),
                   child: Text("Email *", style: TextStyle(color:  (Colors.black), fontSize: 18),),
                 ),
+                Center(
+                  child: Text(_errorMessage),
+                ),
                 TextFormField(
                     controller: emailController,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15)),
-                        labelText: "Email",
+                        // labelText: "Email",
                         hintText: "Entrez votre email",
-                        // icon: const Icon(
-                        //   Icons.mail,
-                        //   color: Color(0xFFF2B6706),
-                        //   size: 20,
-                        // )
+                        
                         ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (val) {
                       if (val == null || val.isEmpty) {
                         return "Veillez entrez votre email";
-                      } else {
+                      } else if(_errorMessage == "Email non valide"){
+                        return "Veillez entrez une email valide";
+                      }
+                      else {
                         return null;
                       }
                     },
+                    onChanged: (val) {
+                        validateEmail(val);
+                      },
                     onSaved: (val) => email = val!,
                   ),
                   // fin  adresse email
@@ -144,19 +181,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15)),
-                        labelText: "Téléphone",
+                        // labelText: "Téléphone",
                         hintText: " (+223) XX XX XX XX ",
-                        // icon: const Icon(
-                        //   Icons.mail,
-                        //   color: Color(0xFFF2B6706),
-                        //   size: 20,
-                        // )
+                       
                         ),
                     keyboardType: TextInputType.phone,
                     validator: (val) {
-                      if (val == null || val.isEmpty) {
+                      if (val == null || val.isEmpty ) {
                         return "Veillez entrez votre numéro de téléphone";
-                      } else {
+                      } 
+                      else if (val.length< 8) {
+                        return "Veillez entrez 8 au moins chiffres";
+                      } 
+                      else if (val.length> 11) {
+                        return "Le numéro ne doit pas depasser 11 chiffres";
+                      } 
+                      else {
                         return null;
                       }
                     },
@@ -172,35 +212,103 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 5),
 
                 //  selcet type acteur 
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: DropdownButton<String>(
-                menuMaxHeight: 90,
-              isExpanded: true,
-              value: selectedOption,
-              items: options.map((option) {
-                      return  DropdownMenuItem(
-                        value: option,
-                        child: Text(option),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedOption = value!;
-                      });
-                },
-              
-               ),
-            ),
+                 
+           Container(
+  height: 70,
+  width: double.infinity,
+  child: Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: FutureBuilder(
+      future: _mesTypeActeur,
+      builder: (_, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+           return Shimmer.fromColors(
+                                   baseColor: Colors.grey[300]!,
+                                   highlightColor: Colors.grey[100]!,
+                                   child: DropdownButton(
+                                   dropdownColor: Colors.orange,
+                                   items: [], onChanged: (value) {}              
+                                            ),
+                                          );
+                                        }
+        if (snapshot.hasError) {
+          return Text("${snapshot.error}");
+        }
+        if (snapshot.hasData) {
+          final reponse = json.decode((snapshot.data.body)) as List;
+          final mesType = reponse
+              .map((e) => TypeActeur.fromMap(e))
+              .where((typeActeur) =>
+                  typeActeur.statutTypeActeur == true &&
+                  typeActeur.libelle != 'Admin') // Filtrer les types d'acteurs actifs et différents de l'administrateur
+              .toList();
+
+          List<DropdownMenuItem<String>> dropdownItems = [];
+
+          if (mesType.isNotEmpty) {
+            dropdownItems = mesType
+                .map((e) => DropdownMenuItem(
+                  alignment:AlignmentDirectional.center,
+                      child: Text(
+                        e.libelle,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      value: e.idTypeActeur,
+                    ))
+                .toList();
+          } else {
+            dropdownItems.add(DropdownMenuItem(
+              child: Text('Aucun type d\'acteur disponible'),
+              value: null,
+            ));
+          }
+    // bool typeSelected = false;
+          return DropdownButton(
+            alignment: AlignmentDirectional.center,
+            items: dropdownItems,
+            value: typeValue,
+            onChanged: (newValue) {
+              setState(() {
+                typeValue = newValue;
+                if (newValue != null) {
+                  monTypeActeur = mesType.firstWhere(
+                      (element) => element.idTypeActeur == newValue);
+                  debugPrint(monTypeActeur.idTypeActeur.toString());
+                  // typeSelected = true;
+                } else {
+                  // typeSelected = false;
+                  // Gérer le cas où aucun type n'est sélectionné
+                  // if (!typeSelected) {
+                  //   Text(
+                  //     "Veuillez choisir un type d'acteur",
+                  //     style: TextStyle(color: Colors.red),
+                  //   );
+                  // }
+                }
+              });
+            },
+          );
+        }
+        return Text('Aucune donnée disponible');
+      },
+    ),
+  ),
+),
+
                 //end select type acteur 
      const  SizedBox(height: 10,),
 
                   Center(
                     child: ElevatedButton(
               onPressed: () {
-                // Handle button press action here
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterNextScreen() ));
-              },
+                if(_formKey.currentState!.validate()){
+                 
+                Navigator.push(context, MaterialPageRoute(builder: (context) =>  
+                RegisterNextScreen(nomActeur: nomActeurController.text, email: emailController.text,
+                 telephone: telephoneController.text, typeActeur: [monTypeActeur],) ));
+              
+                }
+               },
               child:  Text(
                 " Suivant ",
                 style:  TextStyle(
@@ -230,6 +338,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
-}
 
+
+   
+
+}
 

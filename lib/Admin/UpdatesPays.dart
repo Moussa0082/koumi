@@ -29,7 +29,7 @@ class _UpdatesPaysState extends State<UpdatesPays> {
 
     libelleController.text = payss.nomPays;
     descriptionController.text = payss.descriptionPays;
-    sousRegion = payss.sousRegion;
+    sousRegion = payss.sousRegion!;
   }
 
   @override

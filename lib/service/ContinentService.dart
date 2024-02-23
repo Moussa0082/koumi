@@ -7,7 +7,8 @@ import 'package:path/path.dart';
 
 class ContinentService extends ChangeNotifier {
 
-    static const String baseUrl = 'https://koumi.ml/api-koumi/continent';
+    static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/continent';
+    // static const String baseUrl = 'https://koumi.ml/api-koumi/continent';
 
   List<Continent> continentListe = [];
 

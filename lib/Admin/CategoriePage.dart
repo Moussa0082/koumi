@@ -105,7 +105,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                               },
                                               child: ListTile(
                                                   leading: _getIconForFiliere(
-                                                      e.filiere.libelleFiliere),
+                                                      e.filiere!.libelleFiliere),
                                                   title: Text(
                                                       e.libelleCategorie
                                                           .toUpperCase(),
@@ -116,7 +116,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      e.descriptionCategorie,
+                                                      e.descriptionCategorie!,
                                                       style: const TextStyle(
                                                         color: Colors.black87,
                                                         fontSize: 17,
@@ -136,7 +136,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                                     MainAxisAlignment
                                                         .spaceBetween,
                                                 children: [
-                                                  _buildEtat(e.statutCategorie),
+                                                  _buildEtat(e.statutCategorie!),
                                                   PopupMenuButton<String>(
                                                     padding: EdgeInsets.zero,
                                                     itemBuilder: (context) =>
