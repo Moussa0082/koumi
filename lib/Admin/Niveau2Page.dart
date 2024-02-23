@@ -10,8 +10,8 @@ import 'package:koumi_app/service/Niveau2Service.dart';
 import 'package:provider/provider.dart';
 
 class Niveau2Page extends StatefulWidget {
-  final Niveau1Pays niveau1pays;
-  const Niveau2Page({super.key, required this.niveau1pays});
+  // final Niveau1Pays niveau1pays;
+  const Niveau2Page({super.key});
 
   @override
   State<Niveau2Page> createState() => _Niveau2PageState();
@@ -30,11 +30,11 @@ class _Niveau2PageState extends State<Niveau2Page> {
   List<ParametreGeneraux> paraList = [];
   late Niveau1Pays n1;
 
-  Future<List<Niveau2Pays>> getNiveauListe() async {
-    final response = await Niveau2Service()
-        .fetchNiveau2ByNiveau1(widget.niveau1pays.idNiveau1Pays!);
-    return response;
-  }
+  // Future<List<Niveau2Pays>> getNiveauListe() async {
+  //   final response = await Niveau2Service()
+  //       .fetchNiveau2ByNiveau1(widget.niveau1pays.idNiveau1Pays!);
+  //   return response;
+  // }
 
   @override
   void initState() {
@@ -42,9 +42,9 @@ class _Niveau2PageState extends State<Niveau2Page> {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
     para = paraList[0];
-    _liste = getNiveauListe();
-    _liste.toString();
-    n1 = widget.niveau1pays;
+    // _liste = getNiveauListe();
+    // _liste.toString();
+    // n1 = widget.niveau1pays;
     debugPrint("niveau :${n1.toString()}");
   }
 
@@ -82,7 +82,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
         child: Column(children: [
           Consumer<Niveau2Service>(builder: (context, niveau2Service, child) {
             return FutureBuilder(
-                future: _liste,
+                future: niveau2Service.fetchNiveau2Pays(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -101,322 +101,91 @@ class _Niveau2PageState extends State<Niveau2Page> {
                     niveauList = snapshot.data!;
                     return Column(
                         children: niveauList
-                            .map(
-                              (e) => Padding(
-                                padding: const EdgeInsets.all(10),
-                                child: Column(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    Niveau3Page(
-                                                      niveau2pays: e,
-                                                    )));
-                                      },
-                                      child: ListTile(
-                                        leading: CodePays().getFlag(
-                                            widget.niveau1pays.pays.nomPays),
-                                        title: Text(e.nomN2.toUpperCase(),
-                                            style: const TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 18,
-                                              overflow: TextOverflow.ellipsis,
-                                            )),
-                                        subtitle: Text(e.descriptionN2,
-                                            style: const TextStyle(
-                                              color: Colors.black87,
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.w500,
-                                              fontStyle: FontStyle.italic,
-                                            )),
-                                      ),
+                            .map((e) => Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 15),
+                                  child: Container(
+                                    height: 120,
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.9,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(15),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.2),
+                                          offset: const Offset(0, 2),
+                                          blurRadius: 5,
+                                          spreadRadius: 2,
+                                        ),
+                                      ],
                                     ),
-                                    // Padding(
-                                    //   padding: const EdgeInsets.symmetric(
-                                    //       horizontal: 15),
-                                    //   child: Row(
-                                    //     mainAxisAlignment:
-                                    //         MainAxisAlignment.spaceBetween,
-                                    //     children: [
-                                    //       Text(
-                                    //           "Nombres de :${para.libelleNiveau2Pays}",
-                                    //           style: const TextStyle(
-                                    //             color: Colors.black87,
-                                    //             fontSize: 17,
-                                    //             fontWeight: FontWeight.w500,
-                                    //             fontStyle: FontStyle.italic,
-                                    //           )),
-                                    //       const Text("10",
-                                    //           style: TextStyle(
-                                    //             color: Colors.black87,
-                                    //             fontSize: 18,
-                                    //             fontWeight: FontWeight.w800,
-                                    //           ))
-                                    //     ],
-                                    //   ),
-                                    // ),
-                                    Container(
-                                      alignment: Alignment.bottomRight,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          _buildEtat(e.statutN2),
-                                          PopupMenuButton<String>(
-                                            padding: EdgeInsets.zero,
-                                            itemBuilder: (context) =>
-                                                <PopupMenuEntry<String>>[
-                                              PopupMenuItem<String>(
-                                                child: ListTile(
-                                                  leading: const Icon(
-                                                    Icons.check,
-                                                    color: Colors.green,
-                                                  ),
-                                                  title: const Text(
-                                                    "Activer",
-                                                    style: TextStyle(
-                                                      color: Colors.green,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  onTap: () async {
-                                                    await Niveau2Service()
-                                                        .activerNiveau2(
-                                                            e.idNiveau2Pays!)
-                                                        .then((value) => {
-                                                              Provider.of<Niveau2Service>(
-                                                                      context,
-                                                                      listen:
-                                                                          false)
-                                                                  .applyChange(),
-                                                              setState(() {
-                                                                _liste = Niveau2Service()
-                                                                    .fetchNiveau2ByNiveau1(widget
-                                                                        .niveau1pays
-                                                                        .idNiveau1Pays!);
-                                                              }),
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop(),
-                                                              ScaffoldMessenger
-                                                                      .of(context)
-                                                                  .showSnackBar(
-                                                                const SnackBar(
-                                                                  content: Row(
-                                                                    children: [
-                                                                      Text(
-                                                                          "Activer avec succèss "),
-                                                                    ],
-                                                                  ),
-                                                                  duration:
-                                                                      Duration(
-                                                                          seconds:
-                                                                              2),
-                                                                ),
-                                                              )
-                                                            })
-                                                        .catchError(
-                                                            (onError) => {
-                                                                  ScaffoldMessenger.of(
-                                                                          context)
-                                                                      .showSnackBar(
-                                                                    const SnackBar(
-                                                                      content:
-                                                                          Row(
-                                                                        children: [
-                                                                          Text(
-                                                                              "Une erreur s'est produit"),
-                                                                        ],
-                                                                      ),
-                                                                      duration: Duration(
-                                                                          seconds:
-                                                                              5),
-                                                                    ),
-                                                                  ),
-                                                                  Navigator.of(
-                                                                          context)
-                                                                      .pop(),
-                                                                });
-                                                  },
-                                                ),
-                                              ),
-                                              PopupMenuItem<String>(
-                                                child: ListTile(
-                                                  leading: Icon(
-                                                    Icons.disabled_visible,
-                                                    color: Colors.orange[400],
-                                                  ),
-                                                  title: Text(
-                                                    "Désactiver",
-                                                    style: TextStyle(
-                                                      color: Colors.orange[400],
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  onTap: () async {
-                                                    await Niveau2Service()
-                                                        .desactiverNiveau2Pays(
-                                                            e.idNiveau2Pays!)
-                                                        .then((value) => {
-                                                              Provider.of<Niveau2Service>(
-                                                                      context,
-                                                                      listen:
-                                                                          false)
-                                                                  .applyChange(),
-                                                              setState(() {
-                                                                _liste = Niveau2Service()
-                                                                    .fetchNiveau2ByNiveau1(widget
-                                                                        .niveau1pays
-                                                                        .idNiveau1Pays!);
-                                                              }),
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop(),
-                                                            })
-                                                        .catchError(
-                                                            (onError) => {
-                                                                  ScaffoldMessenger.of(
-                                                                          context)
-                                                                      .showSnackBar(
-                                                                    const SnackBar(
-                                                                      content:
-                                                                          Row(
-                                                                        children: [
-                                                                          Text(
-                                                                              "Une erreur s'est produit"),
-                                                                        ],
-                                                                      ),
-                                                                      duration: Duration(
-                                                                          seconds:
-                                                                              5),
-                                                                    ),
-                                                                  ),
-                                                                  Navigator.of(
-                                                                          context)
-                                                                      .pop(),
-                                                                });
-
-                                                    ScaffoldMessenger.of(
-                                                            context)
-                                                        .showSnackBar(
-                                                      const SnackBar(
-                                                        content: Row(
-                                                          children: [
-                                                            Text(
-                                                                "Désactiver avec succèss "),
-                                                          ],
-                                                        ),
-                                                        duration: Duration(
-                                                            seconds: 2),
+                                    child: Column(
+                                      children: [
+                                        ListTile(
+                                          leading: CodePays().getFlag(e.niveau1Pays!.pays.nomPays),
+                                          title: Text(e.nomN2.toUpperCase(),
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 18,
+                                                overflow:
+                                                    TextOverflow.ellipsis,
+                                              )),
+                                          subtitle: Text(e.descriptionN2,
+                                              style: const TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.w500,
+                                                fontStyle: FontStyle.italic,
+                                              )),
+                                        ),
+                                        Container(
+                                          alignment: Alignment.bottomRight,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment
+                                                    .spaceBetween,
+                                            children: [
+                                              _buildEtat(e.statutN2),
+                                              PopupMenuButton<String>(
+                                                padding: EdgeInsets.zero,
+                                                itemBuilder: (context) =>
+                                                    <PopupMenuEntry<String>>[
+                                                  PopupMenuItem<String>(
+                                                    child: ListTile(
+                                                      leading: const Icon(
+                                                        Icons.check,
+                                                        color: Colors.green,
                                                       ),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                              PopupMenuItem<String>(
-                                                child: ListTile(
-                                                  leading: const Icon(
-                                                    Icons.edit,
-                                                    color: Colors.green,
-                                                  ),
-                                                  title: const Text(
-                                                    "Modifier",
-                                                    style: TextStyle(
-                                                      color: Colors.green,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  onTap: () async {
-                                                    // Ouvrir la boîte de dialogue de modification
-                                                    var updatedSousRegion =
-                                                        await showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext
-                                                              context) =>
-                                                          AlertDialog(
-                                                              backgroundColor:
-                                                                  Colors.white,
-                                                              shape:
-                                                                  RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            16),
-                                                              ),
-                                                              content:
-                                                                  UpdatesNiveau2(
-                                                                      niveau2pays:
-                                                                          e)),
-                                                    );
-
-                                                    // Si les détails sont modifiés, appliquer les changements
-                                                    if (updatedSousRegion !=
-                                                        null) {
-                                                      Provider.of<Niveau2Service>(
-                                                              context,
-                                                              listen: false)
-                                                          .applyChange();
-                                                      setState(() {
-                                                        _liste =
-                                                            updatedSousRegion;
-                                                      });
-                                                      // Mettre à jour la liste des sous-régions
-                                                      setState(() {
-                                                        setState(() {
-                                                          _liste = Niveau2Service()
-                                                              .fetchNiveau2ByNiveau1(widget
-                                                                  .niveau1pays
-                                                                  .idNiveau1Pays!);
-                                                        });
-                                                      });
-                                                    }
-                                                  },
-                                                ),
-                                              ),
-                                              PopupMenuItem<String>(
-                                                child: ListTile(
-                                                  leading: const Icon(
-                                                    Icons.delete,
-                                                    color: Colors.red,
-                                                  ),
-                                                  title: const Text(
-                                                    "Supprimer",
-                                                    style: TextStyle(
-                                                      color: Colors.red,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  onTap: () async {
-                                                    await Niveau2Service()
-                                                        .deleteNiveau2Pays(
-                                                            e.idNiveau2Pays!)
-                                                        .then((value) => {
-                                                              Provider.of<Niveau2Service>(
-                                                                      context,
-                                                                      listen:
-                                                                          false)
-                                                                  .applyChange(),
-                                                              setState(() {
-                                                                _liste = Niveau2Service()
-                                                                    .fetchNiveau2ByNiveau1(widget
-                                                                        .niveau1pays
-                                                                        .idNiveau1Pays!);
-                                                              }),
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop(),
-                                                            })
-                                                        .catchError(
-                                                            (onError) => {
+                                                      title: const Text(
+                                                        "Activer",
+                                                        style: TextStyle(
+                                                          color: Colors.green,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      onTap: () async {
+                                                        await Niveau2Service()
+                                                            .activerNiveau2(e
+                                                                .idNiveau2Pays!)
+                                                            .then((value) => {
+                                                                  Provider.of<Niveau2Service>(
+                                                                          context,
+                                                                          listen:
+                                                                              false)
+                                                                      .applyChange(),
+                                                                  // setState(
+                                                                  //     () {
+                                                                  //   _liste = Niveau2Service().fetchNiveau2ByNiveau1(widget
+                                                                  //       .niveau1pays
+                                                                  //       .idNiveau1Pays!);
+                                                                  // }),
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop(),
                                                                   ScaffoldMessenger.of(
                                                                           context)
                                                                       .showSnackBar(
@@ -424,35 +193,221 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                                                       content:
                                                                           Row(
                                                                         children: [
-                                                                          Text(
-                                                                              "Impossible de supprimer"),
+                                                                          Text("Activer avec succèss "),
                                                                         ],
                                                                       ),
-                                                                      duration: Duration(
-                                                                          seconds:
-                                                                              2),
+                                                                      duration:
+                                                                          Duration(seconds: 2),
                                                                     ),
                                                                   )
-                                                                });
-                                                  },
-                                                ),
+                                                                })
+                                                            .catchError(
+                                                                (onError) => {
+                                                                      ScaffoldMessenger.of(context)
+                                                                          .showSnackBar(
+                                                                        const SnackBar(
+                                                                          content:
+                                                                              Row(
+                                                                            children: [
+                                                                              Text("Une erreur s'est produit"),
+                                                                            ],
+                                                                          ),
+                                                                          duration:
+                                                                              Duration(seconds: 5),
+                                                                        ),
+                                                                      ),
+                                                                      Navigator.of(context)
+                                                                          .pop(),
+                                                                    });
+                                                      },
+                                                    ),
+                                                  ),
+                                                  PopupMenuItem<String>(
+                                                    child: ListTile(
+                                                      leading: Icon(
+                                                        Icons
+                                                            .disabled_visible,
+                                                        color: Colors
+                                                            .orange[400],
+                                                      ),
+                                                      title: Text(
+                                                        "Désactiver",
+                                                        style: TextStyle(
+                                                          color: Colors
+                                                              .orange[400],
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      onTap: () async {
+                                                        await Niveau2Service()
+                                                            .desactiverNiveau2Pays(e
+                                                                .idNiveau2Pays!)
+                                                            .then((value) => {
+                                                                  Provider.of<Niveau2Service>(
+                                                                          context,
+                                                                          listen:
+                                                                              false)
+                                                                      .applyChange(),
+                                                                  // setState(
+                                                                  //     () {
+                                                                  //   _liste = Niveau2Service().fetchNiveau2ByNiveau1(widget
+                                                                  //       .niveau1pays
+                                                                  //       .idNiveau1Pays!);
+                                                                  // }),
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop(),
+                                                                })
+                                                            .catchError(
+                                                                (onError) => {
+                                                                      ScaffoldMessenger.of(context)
+                                                                          .showSnackBar(
+                                                                        const SnackBar(
+                                                                          content:
+                                                                              Row(
+                                                                            children: [
+                                                                              Text("Une erreur s'est produit"),
+                                                                            ],
+                                                                          ),
+                                                                          duration:
+                                                                              Duration(seconds: 5),
+                                                                        ),
+                                                                      ),
+                                                                      Navigator.of(context)
+                                                                          .pop(),
+                                                                    });
+                                    
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          const SnackBar(
+                                                            content: Row(
+                                                              children: [
+                                                                Text(
+                                                                    "Désactiver avec succèss "),
+                                                              ],
+                                                            ),
+                                                            duration:
+                                                                Duration(
+                                                                    seconds:
+                                                                        2),
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                                  PopupMenuItem<String>(
+                                                    child: ListTile(
+                                                      leading: const Icon(
+                                                        Icons.edit,
+                                                        color: Colors.green,
+                                                      ),
+                                                      title: const Text(
+                                                        "Modifier",
+                                                        style: TextStyle(
+                                                          color: Colors.green,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      onTap: () async {
+                                                        // Ouvrir la boîte de dialogue de modification
+                                                        var updatedSousRegion =
+                                                            await showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                                  context) =>
+                                                              AlertDialog(
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  shape:
+                                                                      RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            16),
+                                                                  ),
+                                                                  content: UpdatesNiveau2(
+                                                                      niveau2pays:
+                                                                          e)),
+                                                        );
+                                    
+                                                        // Si les détails sont modifiés, appliquer les changements
+                                                        if (updatedSousRegion !=
+                                                            null) {
+                                                          Provider.of<Niveau2Service>(
+                                                                  context,
+                                                                  listen:
+                                                                      false)
+                                                              .applyChange();
+                                                          setState(() {
+                                                            _liste =
+                                                                updatedSousRegion;
+                                                          });
+                                                          // Mettre à jour la liste des sous-régions
+                                                         
+                                                        }
+                                                      },
+                                                    ),
+                                                  ),
+                                                  PopupMenuItem<String>(
+                                                    child: ListTile(
+                                                      leading: const Icon(
+                                                        Icons.delete,
+                                                        color: Colors.red,
+                                                      ),
+                                                      title: const Text(
+                                                        "Supprimer",
+                                                        style: TextStyle(
+                                                          color: Colors.red,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      onTap: () async {
+                                                        await Niveau2Service()
+                                                            .deleteNiveau2Pays(e
+                                                                .idNiveau2Pays!)
+                                                            .then((value) => {
+                                                                  Provider.of<Niveau2Service>(
+                                                                          context,
+                                                                          listen:
+                                                                              false)
+                                                                      .applyChange(),
+                                                                 
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop(),
+                                                                })
+                                                            .catchError(
+                                                                (onError) => {
+                                                                      ScaffoldMessenger.of(context)
+                                                                          .showSnackBar(
+                                                                        const SnackBar(
+                                                                          content:
+                                                                              Row(
+                                                                            children: [
+                                                                              Text("Impossible de supprimer"),
+                                                                            ],
+                                                                          ),
+                                                                          duration:
+                                                                              Duration(seconds: 2),
+                                                                        ),
+                                                                      )
+                                                                    });
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           ),
-                                        ],
-                                      ),
+                                        )
+                                      ],
                                     ),
-                                    const Divider(
-                                      color: Colors.grey,
-                                      height: 2,
-                                      thickness: 1,
-                                      indent: 50,
-                                      endIndent: 0,
-                                    )
-                                  ],
-                                ),
-                              ),
-                            )
+                                  ),
+                                ))
                             .toList());
                   }
                 });
@@ -548,38 +503,57 @@ class _Niveau2PageState extends State<Niveau2Page> {
                               final String libelle = libelleController.text;
                               final String description =
                                   descriptionController.text;
-                              final Niveau1Pays niveau1 = widget.niveau1pays;
+                              // final Niveau1Pays niveau1 = widget.niveau1pays;
                               if (formkey.currentState!.validate()) {
-                                try {
-                                  await Niveau2Service().addNiveau2Pays(
-                                    nomN2: libelle,
-                                    descriptionN2: description,
-                                    niveau1pays: niveau1,
-                                  );
+                                // debugPrint(niveau1.toString());
 
-                                  Provider.of<Niveau2Service>(context,
-                                          listen: false)
-                                      .applyChange();
-                                  setState(() {
-                                    _liste = Niveau2Service()
-                                        .fetchNiveau2ByNiveau1(
-                                            widget.niveau1pays.idNiveau1Pays!);
-                                  });
+                                // try {
+                                //   await Niveau2Service()
+                                //   .addNiveau2Pays(
+                                //     nomN2: libelle,
+                                //     descriptionN2: description,
+                                //     niveau1pays: niveau1,
+                                //   );
+                                // } catch (e) {
+                                //   print(e.toString());
+                                // }
+                                // debugPrint(
+                                //     "Apres envoie ${niveau1.toString()}");
+                                // try {
+                                //   await Niveau2Service()
+                                //       .addNiveau2Pays(
+                                //         nomN2: libelle,
+                                //         descriptionN2: description,
+                                //         niveau1pays: widget.niveau1pays,
+                                //       )
+                                //       .then((value) => {
+                                //             Provider.of<Niveau2Service>(context,
+                                //                     listen: false)
+                                //                 .applyChange(),
+                                //             setState(() {
+                                //               _liste = Niveau2Service()
+                                //                   .fetchNiveau2ByNiveau1(widget
+                                //                       .niveau1pays
+                                //                       .idNiveau1Pays!);
+                                //             }),
+                                //           })
+                                //       .catchError((onError) =>
+                                //           {print(onError.toString())});
 
-                                  libelleController.clear();
-                                  descriptionController.clear();
-                                  Navigator.of(context).pop();
-                                } catch (e) {
-                                  final String errorMessage = e.toString();
-                                  print(errorMessage);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content:
-                                          Text("Une erreur s'est produite"),
-                                      duration: Duration(seconds: 5),
-                                    ),
-                                  );
-                                }
+                                //   libelleController.clear();
+                                //   descriptionController.clear();
+                                //   Navigator.of(context).pop();
+                                // } catch (e) {
+                                //   final String errorMessage = e.toString();
+                                //   print(errorMessage);
+                                //   ScaffoldMessenger.of(context).showSnackBar(
+                                //     const SnackBar(
+                                //       content:
+                                //           Text("Une erreur s'est produite"),
+                                //       duration: Duration(seconds: 5),
+                                //     ),
+                                //   );
+                                // }
                               }
                             },
                             style: ElevatedButton.styleFrom(

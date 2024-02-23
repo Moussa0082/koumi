@@ -76,31 +76,22 @@ class _PaysListState extends State<PaysList> {
                                   padding: const EdgeInsets.all(10),
                                   child: Column(
                                     children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      Niveau1Page(pays: e)));
-                                        },
-                                        child: ListTile(
-                                          leading:
-                                              CodePays().getFlag(e.nomPays),
-                                          title: Text(e.nomPays.toUpperCase(),
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 18,
-                                                overflow: TextOverflow.ellipsis,
-                                              )),
-                                          subtitle: Text(e.descriptionPays,
-                                              style: const TextStyle(
-                                                color: Colors.black87,
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.w500,
-                                                fontStyle: FontStyle.italic,
-                                              )),
-                                        ),
+                                      ListTile(
+                                        leading:
+                                            CodePays().getFlag(e.nomPays),
+                                        title: Text(e.nomPays.toUpperCase(),
+                                            style: const TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 18,
+                                              overflow: TextOverflow.ellipsis,
+                                            )),
+                                        subtitle: Text(e.descriptionPays,
+                                            style: const TextStyle(
+                                              color: Colors.black87,
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w500,
+                                              fontStyle: FontStyle.italic,
+                                            )),
                                       ),
                                       const Divider(
                                         color: Colors.grey,

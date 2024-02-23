@@ -7,8 +7,8 @@ import 'package:koumi_app/service/PaysService.dart';
 import 'package:provider/provider.dart';
 
 class PaysPage extends StatefulWidget {
-  final SousRegion sousRegions;
-  const PaysPage({super.key, required this.sousRegions});
+  // final SousRegion sousRegions;
+  const PaysPage({super.key});
 
   @override
   State<PaysPage> createState() => _PaysPageState();
@@ -26,17 +26,17 @@ class _PaysPageState extends State<PaysPage> {
   late Future<List<Pays>> _liste;
   bool isLoading = false;
 
-  Future<List<Pays>> getSousPaysListe() async {
-    setState(() {
-      isLoading = true;
-    });
-    return await PaysService().fetchPaysBySousRegion(sousRegion.idSousRegion!);
-  }
+  // Future<List<Pays>> getSousPaysListe() async {
+  //   setState(() {
+  //     isLoading = true;
+  //   });
+  //   return await PaysService().fetchPaysBySousRegion(sousRegion.idSousRegion!);
+  // }
 
   @override
   void initState() {
-    sousRegion = widget.sousRegions;
-    _liste = getSousPaysListe();
+    // sousRegion = widget.sousRegions;
+    // _liste = getSousPaysListe();
     super.initState();
   }
 
@@ -75,7 +75,7 @@ class _PaysPageState extends State<PaysPage> {
             Consumer<PaysService>(
               builder: (context, paysService, child) {
                 return FutureBuilder(
-                    future: _liste,
+                    future: paysService.fetchPays(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(
@@ -117,324 +117,301 @@ class _PaysPageState extends State<PaysPage> {
                                             ),
                                           ],
                                         ),
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            // Navigator.push(
-                                            //     context,
-                                            //     MaterialPageRoute(
-                                            //         builder: (context) =>
-                                            //             PaysPage(
-                                            //               sousRegions: e,
-                                            //             )));
-                                          },
-                                          child: Column(
-                                            children: [
-                                              ListTile(
-                                                  leading: getFlag(e.nomPays),
-                                                  title: Text(
-                                                      e.nomPays.toUpperCase(),
-                                                      style: const TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 20,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      )),
-                                                  subtitle: Text(
-                                                      e.descriptionPays,
-                                                      style: const TextStyle(
-                                                        color: Colors.black87,
-                                                        fontSize: 17,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontStyle:
-                                                            FontStyle.italic,
-                                                      )
-                                                      )
-                                                      ),
-                                              // const Padding(
-                                              //   padding: EdgeInsets.symmetric(
-                                              //       horizontal: 15),
-                                              //   child: Row(
-                                              //     mainAxisAlignment:
-                                              //         MainAxisAlignment
-                                              //             .spaceBetween,
-                                              //     children: [
-                                              //       Text("Nombres pays :",
-                                              //           style: TextStyle(
-                                              //             color: Colors.black87,
-                                              //             fontSize: 17,
-                                              //             fontWeight:
-                                              //                 FontWeight.w500,
-                                              //             fontStyle:
-                                              //                 FontStyle.italic,
-                                              //           )),
-                                              //       Text("10",
-                                              //           style: TextStyle(
-                                              //             color: Colors.black87,
-                                              //             fontSize: 18,
-                                              //             fontWeight:
-                                              //                 FontWeight.w800,
-                                              //           ))
-                                              //     ],
-                                              //   ),
-                                              // ),
-                                              Container(
-                                                alignment:
-                                                    Alignment.bottomRight,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 10),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    _buildEtat(e.statutPays),
-                                                    PopupMenuButton<String>(
-                                                      padding: EdgeInsets.zero,
-                                                      itemBuilder: (context) =>
-                                                          <PopupMenuEntry<
-                                                              String>>[
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: const Icon(
-                                                              Icons.check,
-                                                              color:
-                                                                  Colors.green,
-                                                            ),
-                                                            title: const Text(
-                                                              "Activer",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .green,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            onTap: () async {
-                                                              await PaysService()
-                                                                  .activerPays(
-                                                                      e.idPays!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<PaysService>(context, listen: false).applyChange(),
-                                                                            setState(() {
-                                                                              _liste = PaysService().fetchPaysBySousRegion(sousRegion.idSousRegion!);
-                                                                            }),
-                                                                            Navigator.of(context).pop(),
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Activer avec succèss "),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 2),
-                                                                              ),
-                                                                            )
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Une erreur s'est produit"),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 5),
-                                                                              ),
-                                                                            ),
-                                                                            Navigator.of(context).pop(),
-                                                                          });
-                                                            },
-                                                          ),
-                                                        ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: Icon(
-                                                              Icons
-                                                                  .disabled_visible,
-                                                              color: Colors
-                                                                  .orange[400],
-                                                            ),
-                                                            title: Text(
-                                                              "Désactiver",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                        .orange[
-                                                                    400],
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            onTap: () async {
-                                                              await PaysService()
-                                                                  .desactiverPays(
-                                                                      e.idPays!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<PaysService>(context, listen: false).applyChange(),
-                                                                            setState(() {
-                                                                              _liste = PaysService().fetchPaysBySousRegion(sousRegion.idSousRegion!);
-                                                                            }),
-                                                                            Navigator.of(context).pop(),
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Une erreur s'est produit"),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 5),
-                                                                              ),
-                                                                            ),
-                                                                            Navigator.of(context).pop(),
-                                                                          });
-
-                                                              ScaffoldMessenger
-                                                                      .of(context)
-                                                                  .showSnackBar(
-                                                                const SnackBar(
-                                                                  content: Row(
-                                                                    children: [
-                                                                      Text(
-                                                                          "Désactiver avec succèss "),
-                                                                    ],
-                                                                  ),
-                                                                  duration:
-                                                                      Duration(
-                                                                          seconds:
-                                                                              2),
-                                                                ),
-                                                              );
-                                                            },
-                                                          ),
-                                                        ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: const Icon(
-                                                              Icons.edit,
-                                                              color:
-                                                                  Colors.green,
-                                                            ),
-                                                            title: const Text(
-                                                              "Modifier",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .green,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            onTap: () async {
-                                                              // Ouvrir la boîte de dialogue de modification
-                                                              var updatedSousRegion =
-                                                                  await showDialog(
-                                                                context:
-                                                                    context,
-                                                                builder: (BuildContext
-                                                                        context) =>
-                                                                    AlertDialog(
-                                                                  backgroundColor:
-                                                                      Colors
-                                                                          .white,
-                                                                  shape:
-                                                                      RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            16),
-                                                                  ),
-                                                                  content:  UpdatesPays(pays:e)
-                                                                ),
-                                                              );
-
-                                                              // Si les détails sont modifiés, appliquer les changements
-                                                              if (updatedSousRegion !=
-                                                                  null) {
-                                                                Provider.of<PaysService>(
-                                                                        context,
-                                                                        listen:
-                                                                            false)
-                                                                    .applyChange();
-                                                                setState(() {
-                                                                  _liste =
-                                                                      updatedSousRegion;
-                                                                });
-                                                                // Mettre à jour la liste des sous-régions
-                                                                setState(() {
-                                                                  _liste = PaysService()
-                                                                      .fetchPaysBySousRegion(
-                                                                          sousRegion
-                                                                              .idSousRegion!);
-                                                                });
-                                                              }
-                                                            },
-                                                          ),
-                                                        ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: const Icon(
-                                                              Icons.delete,
-                                                              color: Colors.red,
-                                                            ),
-                                                            title: const Text(
-                                                              "Supprimer",
-                                                              style: TextStyle(
-                                                                color:
-                                                                    Colors.red,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            onTap: () async {
-                                                              await PaysService()
-                                                                  .deletePays(
-                                                                      e.idPays!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<PaysService>(context, listen: false).applyChange(),
-                                                                            setState(() {
-                                                                              _liste = PaysService().fetchPaysBySousRegion(sousRegion.idSousRegion!);
-                                                                            }),
-                                                                            Navigator.of(context).pop(),
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Impossible de supprimer"),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 2),
-                                                                              ),
-                                                                            )
-                                                                          });
-                                                            },
-                                                          ),
-                                                        ),
-                                                      ],
+                                        child: Column(
+                                          children: [
+                                            ListTile(
+                                                leading: getFlag(e.nomPays),
+                                                title: Text(
+                                                    e.nomPays.toUpperCase(),
+                                                    style: const TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 20,
+                                                      overflow: TextOverflow
+                                                          .ellipsis,
+                                                    )),
+                                                subtitle: Text(
+                                                    e.descriptionPays,
+                                                    style: const TextStyle(
+                                                      color: Colors.black87,
+                                                      fontSize: 17,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontStyle:
+                                                          FontStyle.italic,
+                                                    )
+                                                    )
                                                     ),
-                                                  ],
-                                                ),
-                                              )
-                                            ],
-                                          ),
+                                            // const Padding(
+                                            //   padding: EdgeInsets.symmetric(
+                                            //       horizontal: 15),
+                                            //   child: Row(
+                                            //     mainAxisAlignment:
+                                            //         MainAxisAlignment
+                                            //             .spaceBetween,
+                                            //     children: [
+                                            //       Text("Nombres pays :",
+                                            //           style: TextStyle(
+                                            //             color: Colors.black87,
+                                            //             fontSize: 17,
+                                            //             fontWeight:
+                                            //                 FontWeight.w500,
+                                            //             fontStyle:
+                                            //                 FontStyle.italic,
+                                            //           )),
+                                            //       Text("10",
+                                            //           style: TextStyle(
+                                            //             color: Colors.black87,
+                                            //             fontSize: 18,
+                                            //             fontWeight:
+                                            //                 FontWeight.w800,
+                                            //           ))
+                                            //     ],
+                                            //   ),
+                                            // ),
+                                            Container(
+                                              alignment:
+                                                  Alignment.bottomRight,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  _buildEtat(e.statutPays),
+                                                  PopupMenuButton<String>(
+                                                    padding: EdgeInsets.zero,
+                                                    itemBuilder: (context) =>
+                                                        <PopupMenuEntry<
+                                                            String>>[
+                                                      PopupMenuItem<String>(
+                                                        child: ListTile(
+                                                          leading: const Icon(
+                                                            Icons.check,
+                                                            color:
+                                                                Colors.green,
+                                                          ),
+                                                          title: const Text(
+                                                            "Activer",
+                                                            style: TextStyle(
+                                                              color: Colors
+                                                                  .green,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                          onTap: () async {
+                                                            await PaysService()
+                                                                .activerPays(
+                                                                    e.idPays!)
+                                                                .then(
+                                                                    (value) =>
+                                                                        {
+                                                                          Provider.of<PaysService>(context, listen: false).applyChange(),
+                                                                          setState(() {
+                                                                            _liste = PaysService().fetchPaysBySousRegion(sousRegion.idSousRegion!);
+                                                                          }),
+                                                                          Navigator.of(context).pop(),
+                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                            const SnackBar(
+                                                                              content: Row(
+                                                                                children: [
+                                                                                  Text("Activer avec succèss "),
+                                                                                ],
+                                                                              ),
+                                                                              duration: Duration(seconds: 2),
+                                                                            ),
+                                                                          )
+                                                                        })
+                                                                .catchError(
+                                                                    (onError) =>
+                                                                        {
+                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                            const SnackBar(
+                                                                              content: Row(
+                                                                                children: [
+                                                                                  Text("Une erreur s'est produit"),
+                                                                                ],
+                                                                              ),
+                                                                              duration: Duration(seconds: 5),
+                                                                            ),
+                                                                          ),
+                                                                          Navigator.of(context).pop(),
+                                                                        });
+                                                          },
+                                                        ),
+                                                      ),
+                                                      PopupMenuItem<String>(
+                                                        child: ListTile(
+                                                          leading: Icon(
+                                                            Icons
+                                                                .disabled_visible,
+                                                            color: Colors
+                                                                .orange[400],
+                                                          ),
+                                                          title: Text(
+                                                            "Désactiver",
+                                                            style: TextStyle(
+                                                              color: Colors
+                                                                      .orange[
+                                                                  400],
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                          onTap: () async {
+                                                            await PaysService()
+                                                                .desactiverPays(
+                                                                    e.idPays!)
+                                                                .then(
+                                                                    (value) =>
+                                                                        {
+                                                                          Provider.of<PaysService>(context, listen: false).applyChange(),
+                                                                          // setState(() {
+                                                                          //   _liste = PaysService().fetchPaysBySousRegion(sousRegion.idSousRegion!);
+                                                                          // }),
+                                                                          Navigator.of(context).pop(),
+                                                                        })
+                                                                .catchError(
+                                                                    (onError) =>
+                                                                        {
+                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                            const SnackBar(
+                                                                              content: Row(
+                                                                                children: [
+                                                                                  Text("Une erreur s'est produit"),
+                                                                                ],
+                                                                              ),
+                                                                              duration: Duration(seconds: 5),
+                                                                            ),
+                                                                          ),
+                                                                          Navigator.of(context).pop(),
+                                                                        });
+                                        
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                              const SnackBar(
+                                                                content: Row(
+                                                                  children: [
+                                                                    Text(
+                                                                        "Désactiver avec succèss "),
+                                                                  ],
+                                                                ),
+                                                                duration:
+                                                                    Duration(
+                                                                        seconds:
+                                                                            2),
+                                                              ),
+                                                            );
+                                                          },
+                                                        ),
+                                                      ),
+                                                      PopupMenuItem<String>(
+                                                        child: ListTile(
+                                                          leading: const Icon(
+                                                            Icons.edit,
+                                                            color:
+                                                                Colors.green,
+                                                          ),
+                                                          title: const Text(
+                                                            "Modifier",
+                                                            style: TextStyle(
+                                                              color: Colors
+                                                                  .green,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                          onTap: () async {
+                                                            // Ouvrir la boîte de dialogue de modification
+                                                            var updatedSousRegion =
+                                                                await showDialog(
+                                                              context:
+                                                                  context,
+                                                              builder: (BuildContext
+                                                                      context) =>
+                                                                  AlertDialog(
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .white,
+                                                                shape:
+                                                                    RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
+                                                                          16),
+                                                                ),
+                                                                content:  UpdatesPays(pays:e)
+                                                              ),
+                                                            );
+                                        
+                                                            // Si les détails sont modifiés, appliquer les changements
+                                                            if (updatedSousRegion !=
+                                                                null) {
+                                                              Provider.of<PaysService>(
+                                                                      context,
+                                                                      listen:
+                                                                          false)
+                                                                  .applyChange();
+                                                             
+                                                            }
+                                                          },
+                                                        ),
+                                                      ),
+                                                      PopupMenuItem<String>(
+                                                        child: ListTile(
+                                                          leading: const Icon(
+                                                            Icons.delete,
+                                                            color: Colors.red,
+                                                          ),
+                                                          title: const Text(
+                                                            "Supprimer",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.red,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                          onTap: () async {
+                                                            await PaysService()
+                                                                .deletePays(
+                                                                    e.idPays!)
+                                                                .then(
+                                                                    (value) =>
+                                                                        {
+                                                                          Provider.of<PaysService>(context, listen: false).applyChange(),
+                                                                          
+                                                                          Navigator.of(context).pop(),
+                                                                        })
+                                                                .catchError(
+                                                                    (onError) =>
+                                                                        {
+                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                            const SnackBar(
+                                                                              content: Row(
+                                                                                children: [
+                                                                                  Text("Impossible de supprimer"),
+                                                                                ],
+                                                                              ),
+                                                                              duration: Duration(seconds: 2),
+                                                                            ),
+                                                                          )
+                                                                        });
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          ],
                                         ),
                                       ),
                                     ))

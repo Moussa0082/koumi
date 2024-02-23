@@ -230,7 +230,7 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
                       children: [
                         Container(
                           width: double.infinity,
-                          child: Image.asset('assets/images/rc.png'),
+                          child: Image.asset('assets/images/rectangle.png', width:double.infinity),
                         ),
                         Container(
                           child: Image.network(
@@ -255,16 +255,16 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                   TextButton(
-                style: ButtonStyle(
-                  fixedSize: MaterialStateProperty.all(Size(20, 10)),
-                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50.0),
-                  )),
-                ),
-                onPressed: null,
-                child: Text('Voir', style: TextStyle(fontWeight: FontWeight.bold),),
-              ),
+              //      TextButton(
+              //   style: ButtonStyle(
+              //     fixedSize: MaterialStateProperty.all(Size(20, 10)),
+              //     shape: MaterialStateProperty.all(RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(50.0),
+              //     )),
+              //   ),
+              //   onPressed: null,
+              //   child: Text('Voir', style: TextStyle(fontWeight: FontWeight.bold),),
+              // ),
                   ],
                 ),
               ),

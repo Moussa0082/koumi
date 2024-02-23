@@ -3,9 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
-import 'package:koumi_app/models/Campagne.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
-import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/Speculation.dart';
 
 class SpeculationService extends ChangeNotifier {
@@ -49,10 +47,8 @@ class SpeculationService extends ChangeNotifier {
       'descriptionSpeculation': descriptionSpeculation,
     });
 
-    final response = await http.post(
-        Uri.parse("$baseUrl/update/$idSpeculation"),
-        headers: {'Content-Type': 'application/json'},
-        body: addSpeculations);
+    final response = await http.put(Uri.parse("$baseUrl/update/$idSpeculation"),
+        headers: {'Content-Type': 'application/json'}, body: addSpeculations);
     debugPrint(addSpeculations.toString());
     if (response.statusCode == 200 || response.statusCode == 201) {
       debugPrint(response.body);
@@ -124,7 +120,7 @@ class SpeculationService extends ChangeNotifier {
 
   Future<void> activerSpeculation(String idSpeculation) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/activer/$idSpeculation"));
+        await http.put(Uri.parse("$baseUrl/activer/$idSpeculation"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -136,7 +132,7 @@ class SpeculationService extends ChangeNotifier {
 
   Future<void> desactiverSpeculation(String idSpeculation) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/desactiver/$idSpeculation"));
+        await http.put(Uri.parse("$baseUrl/desactiver/$idSpeculation"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
 

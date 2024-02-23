@@ -107,7 +107,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                               blurRadius: 5,
                                               spreadRadius: 2,
                                             ),
-                                          ],
+                                           ],
                                         ),
                                         child: GestureDetector(
                                           onTap: () {
@@ -192,7 +192,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                             leading: const Icon(
                                                               Icons.check,
                                                               color:
-                                                                  Colors.green,
+                                                                    Colors.green,
                                                             ),
                                                             title: const Text(
                                                               "Activer",

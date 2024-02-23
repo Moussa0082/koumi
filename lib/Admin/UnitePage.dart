@@ -71,17 +71,10 @@ class _UnitePageState extends State<UnitePage> {
                         );
                       }
 
-                      if (snapshot.hasError) {
-                        return const Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Text("Une erreur s'est produite"),
-                        );
-                      }
-
                       if (!snapshot.hasData) {
                         return const Padding(
                           padding: EdgeInsets.all(10),
-                          child: Text("Aucun type trouvé"),
+                          child: Center(child: Text("Aucun type trouvé")),
                         );
                       } else {
                         uniteList = snapshot.data!;
@@ -435,8 +428,8 @@ class _UnitePageState extends State<UnitePage> {
                         controller: libelleController,
                         decoration: InputDecoration(
                           hintText: "Nom unité",
-                          contentPadding:
-                              const EdgeInsets.symmetric(vertical: 10),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 15),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),

@@ -17,11 +17,9 @@ class Niveau2Service extends ChangeNotifier {
     required Niveau1Pays niveau1pays,
   }) async {
     var addPays = jsonEncode({
-      'idNiveau2Pays': null,
       'nomN2': nomN2,
       'descriptionN2': descriptionN2,
-      'niveau1pays': niveau1pays
-          .toMap(),
+      'niveau1pays': niveau1pays.toMap(),
     });
 
     final response = await http.post(

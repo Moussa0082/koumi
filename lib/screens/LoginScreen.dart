@@ -218,7 +218,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    // checkUserSession();
+    checkUserSession();
     super.initState();
   }
   // login methode end
@@ -342,56 +342,62 @@ class _LoginScreenState extends State<LoginScreen> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          SizedBox(
-                            width: 50,
-                            height: 30,
-                            child: FittedBox(
-                              fit: BoxFit.contain,
-                              child: Switch(
-                                value: light,
-                                activeColor: Colors.orange,
-                                onChanged: (bool value) {
-                                  // This is called when the user toggles the switch.
-                                  setState(() {
-                                    light = value;
-                                  });
-                                },
+                          Expanded(
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 50,
+                                  height: 30,
+                                  child: FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: Switch(
+                                      value: light,
+                                      activeColor: Colors.orange,
+                                      onChanged: (bool value) {
+                                        setState(() {
+                                          light = value;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                const Text(
+                                  "Se souvenir de moi",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              print("ho");
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ForgetPassScreen(),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "Mot de passe oublié ",
+                              style: TextStyle(
+                                fontSize: 15,
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue,
                               ),
                             ),
                           ),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          const Text(
-                            "Se souvenir de moi",
-                            style: TextStyle(
-                              fontSize: 15,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Align(
-                              alignment: Alignment.centerRight,
-                              child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const ForgetPassScreen()));
-                                  },
-                                  child: const Text(
-                                    "Mot de passe oublier ",
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        decoration: TextDecoration.underline,
-                                        color: Colors.blue),
-                                  ))),
                         ],
                       ),
                     ),
+
                     const SizedBox(
                       height: 15,
                     ),

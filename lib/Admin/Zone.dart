@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/Admin/AddZone.dart';
 import 'package:koumi_app/Admin/UpdateZone.dart';
+import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/ZoneProduction.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +19,15 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _ZoneState extends State<Zone> {
   late List<ZoneProduction> zoneList = [];
+  late Acteur acteur;
+
+  @override
+  void initState() {
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,20 +62,13 @@ class _ZoneState extends State<Zone> {
           Consumer<ZoneProductionService>(
               builder: (context, zoneService, child) {
             return FutureBuilder(
-                future: zoneService.fetchZone(),
+                future: zoneService.fetchZoneByActeur(acteur.idActeur!),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
                       child: CircularProgressIndicator(
                         color: Colors.orange,
                       ),
-                    );
-                  }
-
-                  if (snapshot.hasError) {
-                    return const Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Center(child: Text("Une erreur s'est produite")),
                     );
                   }
 

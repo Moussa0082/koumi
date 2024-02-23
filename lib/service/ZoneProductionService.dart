@@ -118,6 +118,26 @@ class ZoneProductionService extends ChangeNotifier {
       throw Exception(e.toString());
     }
   }
+  Future<List<ZoneProduction>> fetchZoneByActeur(String idActeur) async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/getAllZonesByActeurs/$idActeur'));
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("Fetching data");
+        List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+        zoneList = body.map((e) => ZoneProduction.fromMap(e)).toList();
+        debugPrint(zoneList.toString());
+        return zoneList;
+      } else {
+        zoneList = [];
+        print(
+            'Échec de la requête avec le code d\'état: ${response.statusCode}');
+        throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
 
   Future deleteZone(String idZone) async {
     final response =
