@@ -219,7 +219,7 @@ void hideLoadingDialog(BuildContext context) {
           return AlertDialog(
             title: const Center(child: Text('Erreur')),
             content: const Text(
-              "Une erreur s'est produite veuillez réessayer", // Afficher l'exception
+              "Une erreur s'est produite veuillez vérifier votre connexion internet", // Afficher l'exception
               textAlign: TextAlign.justify,
               style: TextStyle(color: Colors.black, fontSize: 20),
             ),

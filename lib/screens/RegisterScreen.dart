@@ -151,7 +151,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             borderRadius: BorderRadius.circular(15)),
                         // labelText: "Email",
                         hintText: "Entrez votre email",
-                        
                         ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (val) {

@@ -94,15 +94,7 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
     }
     fetchRegions();
     _buildShimmerEffect();
-    // Lancez un timer de 10 secondes pour vérifier si le chargement est terminé
-    // Timer(Duration(seconds: 10), () {
-    //   if (!_loadingFinished) {
-    //     setState(() {
-    //       // Si le chargement n'est pas terminé, mettez à jour l'état pour afficher le message
-    //       _loadingFinished = true;
-    //     });
-    //   }
-    // });
+   
   }
 
      @override
@@ -251,6 +243,7 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
                       ],
                     ),
                     Text(
+                      overflow:TextOverflow.ellipsis,
                       filteredMagasins[index]['nomMagasin'].toString().toUpperCase() ?? 'Pas de nom défini',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
