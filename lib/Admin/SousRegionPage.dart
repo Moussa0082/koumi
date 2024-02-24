@@ -346,13 +346,6 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                                 backgroundColor:
                                                                     Colors
                                                                         .white,
-                                                                shape:
-                                                                    RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              16),
-                                                                ),
                                                                 content:
                                                                     updateSousRegions(
                                                                         sousRegion:
@@ -443,18 +436,6 @@ class _SousRegionPageState extends State<SousRegionPage> {
           borderRadius: BorderRadius.circular(16),
         ),
         child: Container(
-          decoration: BoxDecoration(
-            color: Color.fromARGB(255, 250, 250, 250),
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.4),
-                offset: Offset(0, 4),
-                blurRadius: 10,
-                spreadRadius: 2,
-              ),
-            ],
-          ),
           padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
