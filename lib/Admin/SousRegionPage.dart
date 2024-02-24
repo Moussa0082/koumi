@@ -103,7 +103,6 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 15),
                                       child: Container(
-                                        height: 150,
                                         width:
                                             MediaQuery.of(context).size.width *
                                                 0.9,

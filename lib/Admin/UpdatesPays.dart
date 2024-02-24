@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/SousRegion.dart';
 import 'package:koumi_app/service/PaysService.dart';
@@ -20,13 +23,17 @@ class _UpdatesPaysState extends State<UpdatesPays> {
   TextEditingController libelleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   late SousRegion sousRegion;
+  String? sousValue;
+  late Future _sousRegionList;
   late Pays payss;
 
   @override
   void initState() {
     super.initState();
+    _sousRegionList =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/sousRegion/read'));
     payss = widget.pays;
-
+    sousValue = payss.sousRegion!.idSousRegion;
     libelleController.text = payss.nomPays;
     descriptionController.text = payss.descriptionPays;
     sousRegion = payss.sousRegion!;
@@ -38,164 +45,192 @@ class _UpdatesPaysState extends State<UpdatesPays> {
       padding: const EdgeInsets.all(16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Center(
-            child: Text(
-              "Modifier pays",
+          ListTile(
+            title: Text(
+              "Modification",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
                 fontSize: 18,
               ),
               textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
+            ),
+            trailing: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: Icon(
+                Icons.close,
+                color: Colors.red,
+                size: 24,
+              ),
             ),
           ),
-          const SizedBox(height: 5),
+          SizedBox(height: 16),
           Form(
             key: formkey,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(
-                  height: 10,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: TextFormField(
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Veuillez remplir les champs";
-                      }
-                      return null;
-                    },
-                    controller: libelleController,
-                    decoration: InputDecoration(
-                      hintText: "Nom de sous région",
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 15),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Veuillez remplir ce champ";
+                    }
+                    return null;
+                  },
+                  controller: libelleController,
+                  decoration: InputDecoration(
+                    labelText: "Nom du pays",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: TextFormField(
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Veuillez remplir les champs";
+                SizedBox(height: 16),
+                FutureBuilder(
+                  future: _sousRegionList,
+                  builder: (_, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text("${snapshot.error}");
+                    }
+                    if (snapshot.hasData) {
+                      final reponse = json.decode((snapshot.data.body)) as List;
+                      final sousList = reponse
+                          .map((e) => SousRegion.fromMap(e))
+                          .where((con) => con.statutSousRegion == true)
+                          .toList();
+
+                      if (sousList.isEmpty) {
+                        return Text(
+                          'Aucun sous region disponible',
+                          style: TextStyle(overflow: TextOverflow.ellipsis),
+                        );
                       }
-                      return null;
-                    },
-                    controller: descriptionController,
-                    decoration: InputDecoration(
-                      hintText: "Description",
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 15),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () async {
-                          final String libelle = libelleController.text;
-                          final String description = descriptionController.text;
-                          if (formkey.currentState!.validate()) {
-                            try {
-                              await PaysService()
-                                  .updatePays(
-                                    idPays: payss.idPays!,
-                                      nomPays: libelle,
-                                      descriptionPays: description,
-                                      sousRegion: sousRegion)
-                                  .then((value) => {
-                                        Provider.of<PaysService>(context,
-                                                listen: false)
-                                            .applyChange(),
-                                        Provider.of<PaysService>(context,
-                                                listen: false)
-                                            .applyChange(),
-                                       
-                                        libelleController.clear(),
-                                        descriptionController.clear(),
-                                        Navigator.of(context).pop()
-                                      });
-                            } catch (e) {
-                              final String errorMessage = e.toString();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text("Une erreur s'est produit"),
-                                    ],
-                                  ),
-                                  duration: Duration(seconds: 5),
-                                ),
-                              );
+
+                      return DropdownButtonFormField<String>(
+                        items: sousList
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e.idSousRegion,
+                                child: Text(e.nomSousRegion),
+                              ),
+                            )
+                            .toList(),
+                        value: sousValue,
+                        onChanged: (newValue) {
+                          setState(() {
+                            sousValue = newValue;
+                            if (newValue != null) {
+                              sousRegion = sousList.firstWhere((element) =>
+                                  element.idSousRegion == newValue);
+                              debugPrint(
+                                  "con select ${sousRegion.idSousRegion.toString()}");
+                              // typeSelected = true;
                             }
-                          }
+                          });
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                        ),
-                        icon: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Ajouter",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
+                        decoration: InputDecoration(
+                          labelText: 'Sélectionner un sous région',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                      ),
+                      );
+                    }
+                    return Text(
+                      'Aucune donnée disponible',
+                      style: TextStyle(overflow: TextOverflow.ellipsis),
+                    );
+                  },
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Veuillez remplir ce champ";
+                    }
+                    return null;
+                  },
+                  controller: descriptionController,
+                  maxLines: null,
+                  decoration: InputDecoration(
+                    labelText: "Description",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pop(); // Ferme la boîte de dialogue
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                        ),
-                        icon: const Icon(
-                          Icons.close,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Annuler",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    final String libelle = libelleController.text;
+                    final String description = descriptionController.text;
+                    if (formkey.currentState!.validate()) {
+                      try {
+                        await PaysService()
+                            .updatePays(
+                                idPays: payss.idPays!,
+                                nomPays: libelle,
+                                descriptionPays: description,
+                                sousRegion: sousRegion)
+                            .then((value) => {
+                                  Provider.of<PaysService>(context,
+                                          listen: false)
+                                      .applyChange(),
+                                  Provider.of<PaysService>(context,
+                                          listen: false)
+                                      .applyChange(),
+                                  libelleController.clear(),
+                                  descriptionController.clear(),
+                                  setState(() {
+                                    sousRegion == null;
+                                  }),
+                                  Navigator.of(context).pop()
+                                });
+                      } catch (e) {
+                        final String errorMessage = e.toString();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Row(
+                              children: [
+                                Text("Une erreur s'est produit"),
+                              ],
+                            ),
+                            duration: Duration(seconds: 5),
                           ),
-                        ),
-                      ),
+                        );
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green, // Orange color code
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
                     ),
-                  ],
+                    minimumSize: const Size(290, 45),
+                  ),
+                  icon: const Icon(
+                    Icons.edit,
+                    color: Colors.white,
+                  ),
+                  label: const Text(
+                    "Modufuer",
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 )
               ],
             ),
-          )
+          ),
         ],
       ),
     );

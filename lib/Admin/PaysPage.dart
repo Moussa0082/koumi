@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/UpdatesPays.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/SousRegion.dart';
@@ -25,18 +28,13 @@ class _PaysPageState extends State<PaysPage> {
   List<Pays> paysList = [];
   late Future<List<Pays>> _liste;
   bool isLoading = false;
-
-  // Future<List<Pays>> getSousPaysListe() async {
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-  //   return await PaysService().fetchPaysBySousRegion(sousRegion.idSousRegion!);
-  // }
+  String? sousValue;
+  late Future _sousRegionList;
 
   @override
   void initState() {
-    // sousRegion = widget.sousRegions;
-    // _liste = getSousPaysListe();
+    _sousRegionList =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/sousRegion/read'));
     super.initState();
   }
 
@@ -62,9 +60,9 @@ class _PaysPageState extends State<PaysPage> {
               _showDialog();
             },
             icon: const Icon(
-              Icons.add_circle_outline,
+              Icons.add,
               color: d_colorGreen,
-              size: 25,
+              size: 30,
             ),
           )
         ],
@@ -99,7 +97,6 @@ class _PaysPageState extends State<PaysPage> {
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 15),
                                       child: Container(
-                                        height: 120,
                                         width:
                                             MediaQuery.of(context).size.width *
                                                 0.9,
@@ -126,21 +123,19 @@ class _PaysPageState extends State<PaysPage> {
                                                     style: const TextStyle(
                                                       color: Colors.black,
                                                       fontSize: 20,
-                                                      overflow: TextOverflow
-                                                          .ellipsis,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     )),
-                                                subtitle: Text(
-                                                    e.descriptionPays,
-                                                    style: const TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 17,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                    )
-                                                    )
-                                                    ),
+                                                subtitle:
+                                                    Text(e.descriptionPays,
+                                                        style: const TextStyle(
+                                                          color: Colors.black87,
+                                                          fontSize: 17,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          fontStyle:
+                                                              FontStyle.italic,
+                                                        ))),
                                             // const Padding(
                                             //   padding: EdgeInsets.symmetric(
                                             //       horizontal: 15),
@@ -169,8 +164,7 @@ class _PaysPageState extends State<PaysPage> {
                                             //   ),
                                             // ),
                                             Container(
-                                              alignment:
-                                                  Alignment.bottomRight,
+                                              alignment: Alignment.bottomRight,
                                               padding:
                                                   const EdgeInsets.symmetric(
                                                       horizontal: 10),
@@ -189,14 +183,13 @@ class _PaysPageState extends State<PaysPage> {
                                                         child: ListTile(
                                                           leading: const Icon(
                                                             Icons.check,
-                                                            color:
-                                                                Colors.green,
+                                                            color: Colors.green,
                                                           ),
                                                           title: const Text(
                                                             "Activer",
                                                             style: TextStyle(
-                                                              color: Colors
-                                                                  .green,
+                                                              color:
+                                                                  Colors.green,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -207,14 +200,18 @@ class _PaysPageState extends State<PaysPage> {
                                                                 .activerPays(
                                                                     e.idPays!)
                                                                 .then(
-                                                                    (value) =>
-                                                                        {
-                                                                          Provider.of<PaysService>(context, listen: false).applyChange(),
-                                                                          setState(() {
-                                                                            _liste = PaysService().fetchPaysBySousRegion(sousRegion.idSousRegion!);
+                                                                    (value) => {
+                                                                          Provider.of<PaysService>(context, listen: false)
+                                                                              .applyChange(),
+                                                                          setState(
+                                                                              () {
+                                                                            _liste =
+                                                                                PaysService().fetchPaysBySousRegion(sousRegion.idSousRegion!);
                                                                           }),
-                                                                          Navigator.of(context).pop(),
-                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                          Navigator.of(context)
+                                                                              .pop(),
+                                                                          ScaffoldMessenger.of(context)
+                                                                              .showSnackBar(
                                                                             const SnackBar(
                                                                               content: Row(
                                                                                 children: [
@@ -228,7 +225,8 @@ class _PaysPageState extends State<PaysPage> {
                                                                 .catchError(
                                                                     (onError) =>
                                                                         {
-                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                          ScaffoldMessenger.of(context)
+                                                                              .showSnackBar(
                                                                             const SnackBar(
                                                                               content: Row(
                                                                                 children: [
@@ -238,7 +236,8 @@ class _PaysPageState extends State<PaysPage> {
                                                                               duration: Duration(seconds: 5),
                                                                             ),
                                                                           ),
-                                                                          Navigator.of(context).pop(),
+                                                                          Navigator.of(context)
+                                                                              .pop(),
                                                                         });
                                                           },
                                                         ),
@@ -255,8 +254,7 @@ class _PaysPageState extends State<PaysPage> {
                                                             "Désactiver",
                                                             style: TextStyle(
                                                               color: Colors
-                                                                      .orange[
-                                                                  400],
+                                                                  .orange[400],
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -267,18 +265,20 @@ class _PaysPageState extends State<PaysPage> {
                                                                 .desactiverPays(
                                                                     e.idPays!)
                                                                 .then(
-                                                                    (value) =>
-                                                                        {
-                                                                          Provider.of<PaysService>(context, listen: false).applyChange(),
+                                                                    (value) => {
+                                                                          Provider.of<PaysService>(context, listen: false)
+                                                                              .applyChange(),
                                                                           // setState(() {
                                                                           //   _liste = PaysService().fetchPaysBySousRegion(sousRegion.idSousRegion!);
                                                                           // }),
-                                                                          Navigator.of(context).pop(),
+                                                                          Navigator.of(context)
+                                                                              .pop(),
                                                                         })
                                                                 .catchError(
                                                                     (onError) =>
                                                                         {
-                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                          ScaffoldMessenger.of(context)
+                                                                              .showSnackBar(
                                                                             const SnackBar(
                                                                               content: Row(
                                                                                 children: [
@@ -288,9 +288,10 @@ class _PaysPageState extends State<PaysPage> {
                                                                               duration: Duration(seconds: 5),
                                                                             ),
                                                                           ),
-                                                                          Navigator.of(context).pop(),
+                                                                          Navigator.of(context)
+                                                                              .pop(),
                                                                         });
-                                        
+
                                                             ScaffoldMessenger
                                                                     .of(context)
                                                                 .showSnackBar(
@@ -314,14 +315,13 @@ class _PaysPageState extends State<PaysPage> {
                                                         child: ListTile(
                                                           leading: const Icon(
                                                             Icons.edit,
-                                                            color:
-                                                                Colors.green,
+                                                            color: Colors.green,
                                                           ),
                                                           title: const Text(
                                                             "Modifier",
                                                             style: TextStyle(
-                                                              color: Colors
-                                                                  .green,
+                                                              color:
+                                                                  Colors.green,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -331,24 +331,23 @@ class _PaysPageState extends State<PaysPage> {
                                                             // Ouvrir la boîte de dialogue de modification
                                                             var updatedSousRegion =
                                                                 await showDialog(
-                                                              context:
-                                                                  context,
+                                                              context: context,
                                                               builder: (BuildContext
                                                                       context) =>
                                                                   AlertDialog(
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .white,
-                                                                shape:
-                                                                    RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius.circular(
-                                                                          16),
-                                                                ),
-                                                                content:  UpdatesPays(pays:e)
-                                                              ),
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      shape:
+                                                                          RoundedRectangleBorder(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(16),
+                                                                      ),
+                                                                      content: UpdatesPays(
+                                                                          pays:
+                                                                              e)),
                                                             );
-                                        
+
                                                             // Si les détails sont modifiés, appliquer les changements
                                                             if (updatedSousRegion !=
                                                                 null) {
@@ -357,7 +356,6 @@ class _PaysPageState extends State<PaysPage> {
                                                                       listen:
                                                                           false)
                                                                   .applyChange();
-                                                             
                                                             }
                                                           },
                                                         ),
@@ -371,8 +369,7 @@ class _PaysPageState extends State<PaysPage> {
                                                           title: const Text(
                                                             "Supprimer",
                                                             style: TextStyle(
-                                                              color:
-                                                                  Colors.red,
+                                                              color: Colors.red,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -383,16 +380,17 @@ class _PaysPageState extends State<PaysPage> {
                                                                 .deletePays(
                                                                     e.idPays!)
                                                                 .then(
-                                                                    (value) =>
-                                                                        {
-                                                                          Provider.of<PaysService>(context, listen: false).applyChange(),
-                                                                          
-                                                                          Navigator.of(context).pop(),
+                                                                    (value) => {
+                                                                          Provider.of<PaysService>(context, listen: false)
+                                                                              .applyChange(),
+                                                                          Navigator.of(context)
+                                                                              .pop(),
                                                                         })
                                                                 .catchError(
                                                                     (onError) =>
                                                                         {
-                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                          ScaffoldMessenger.of(context)
+                                                                              .showSnackBar(
                                                                             const SnackBar(
                                                                               content: Row(
                                                                                 children: [
@@ -438,9 +436,10 @@ class _PaysPageState extends State<PaysPage> {
           padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Center(
-                child: Text(
+              ListTile(
+                title: Text(
                   "Ajouter un pays",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -448,160 +447,182 @@ class _PaysPageState extends State<PaysPage> {
                     fontSize: 18,
                   ),
                   textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.red,
+                    size: 24,
+                  ),
                 ),
               ),
-              const SizedBox(height: 5),
+              SizedBox(height: 16),
               Form(
                 key: formkey,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: libelleController,
-                        decoration: InputDecoration(
-                          hintText: "Nom de sous région",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                    TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Veuillez remplir ce champ";
+                        }
+                        return null;
+                      },
+                      controller: libelleController,
+                      decoration: InputDecoration(
+                        labelText: "Nom du pays",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
+                    SizedBox(height: 16),
+                    FutureBuilder(
+                      future: _sousRegionList,
+                      builder: (_, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        }
+                        if (snapshot.hasError) {
+                          return Text("${snapshot.error}");
+                        }
+                        if (snapshot.hasData) {
+                          final reponse =
+                              json.decode((snapshot.data.body)) as List;
+                          final sousList = reponse
+                              .map((e) => SousRegion.fromMap(e))
+                              .where((con) => con.statutSousRegion == true)
+                              .toList();
+
+                          if (sousList.isEmpty) {
+                            return Text(
+                              'Aucun sous region disponible',
+                              style: TextStyle(overflow: TextOverflow.ellipsis),
+                            );
                           }
-                          return null;
-                        },
-                        controller: descriptionController,
-                        decoration: InputDecoration(
-                          hintText: "Description",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () async {
-                              final String libelle = libelleController.text;
-                              final String description =
-                                  descriptionController.text;
-                              if (formkey.currentState!.validate()) {
-                                try {
-                                  await PaysService()
-                                      .addPays(
-                                          nomPays: libelle,
-                                          descriptionPays: description,
-                                          sousRegion: sousRegion)
-                                      .then((value) => {
-                                            Provider.of<PaysService>(context,
-                                                    listen: false)
-                                                .applyChange(),
-                                            Provider.of<PaysService>(context,
-                                                    listen: false)
-                                                .applyChange(),
-                                            setState(() {
-                                              _liste = PaysService()
-                                                  .fetchPaysBySousRegion(
-                                                      sousRegion.idSousRegion!);
-                                            }),
-                                            libelleController.clear(),
-                                            descriptionController.clear(),
-                                            Navigator.of(context).pop()
-                                          });
-                                } catch (e) {
-                                  final String errorMessage = e.toString();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Row(
-                                        children: [
-                                          Text("Une erreur s'est produit"),
-                                        ],
-                                      ),
-                                      duration: Duration(seconds: 5),
-                                    ),
-                                  );
+
+                          return DropdownButtonFormField<String>(
+                            items: sousList
+                                .map(
+                                  (e) => DropdownMenuItem(
+                                    value: e.idSousRegion,
+                                    child: Text(e.nomSousRegion),
+                                  ),
+                                )
+                                .toList(),
+                            value: sousValue,
+                            onChanged: (newValue) {
+                              setState(() {
+                                sousValue = newValue;
+                                if (newValue != null) {
+                                  sousRegion = sousList.firstWhere((element) =>
+                                      element.idSousRegion == newValue);
+                                  debugPrint(
+                                      "con select ${sousRegion.idSousRegion.toString()}");
+                                  // typeSelected = true;
                                 }
-                              }
+                              });
                             },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            icon: const Icon(
-                              Icons.add,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              "Ajouter",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
+                            decoration: InputDecoration(
+                              labelText: 'Sélectionner un sous région',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                          ),
+                          );
+                        }
+                        return Text(
+                          'Aucune donnée disponible',
+                          style: TextStyle(overflow: TextOverflow.ellipsis),
+                        );
+                      },
+                    ),
+                    SizedBox(height: 16),
+                    TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Veuillez remplir ce champ";
+                        }
+                        return null;
+                      },
+                      controller: descriptionController,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                        labelText: "Description",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pop(); // Ferme la boîte de dialogue
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            icon: const Icon(
-                              Icons.close,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              "Annuler",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        final String libelle = libelleController.text;
+                        final String description = descriptionController.text;
+                        if (formkey.currentState!.validate()) {
+                          try {
+                            await PaysService()
+                                .addPays(
+                                    nomPays: libelle,
+                                    descriptionPays: description,
+                                    sousRegion: sousRegion)
+                                .then((value) => {
+                                      Provider.of<PaysService>(context,
+                                              listen: false)
+                                          .applyChange(),
+                                      Provider.of<PaysService>(context,
+                                              listen: false)
+                                          .applyChange(),
+                                      libelleController.clear(),
+                                      descriptionController.clear(),
+                                      setState(() {
+                                        sousRegion == null;
+                                      }),
+                                      Navigator.of(context).pop()
+                                    });
+                          } catch (e) {
+                            final String errorMessage = e.toString();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Row(
+                                  children: [
+                                    Text("Une erreur s'est produit"),
+                                  ],
+                                ),
+                                duration: Duration(seconds: 5),
                               ),
-                            ),
-                          ),
+                            );
+                          }
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green, // Orange color code
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                      ],
+                        minimumSize: const Size(290, 45),
+                      ),
+                      icon: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                      ),
+                      label: const Text(
+                        "Ajouter",
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     )
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),
