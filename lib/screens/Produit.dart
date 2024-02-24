@@ -98,7 +98,7 @@ class _ProduitScreenState extends State<ProduitScreen>
 
     if (categorieProduit.isEmpty) {
       fetchCategorie();
-      fetchProduitByCategorie(selectedCategorieProduit);
+      // fetchProduitByCategorie(selectedCategorieProduit);
 
     }
   }
@@ -160,7 +160,7 @@ class _ProduitScreenState extends State<ProduitScreen>
                     child: TabBarView(
                       controller: _tabController,
                       children: categorieProduit.map((categorie) {
-                        return buildGridView(categorie.idCategorieProduit!);
+                        return buildGridView(categorie.idCategorieProduit!, widget.id!);
                       }).toList(),
                     ),
                   ),
@@ -173,7 +173,14 @@ class _ProduitScreenState extends State<ProduitScreen>
     );
   }
 
-Widget buildGridView(String idCategorie) {
+
+Widget buildGridView(String idCategorie, String idMagasin) {
+  // Filtrer les stocks en fonction de la catégorie sélectionnée
+  // List<Stock> filteredStocks = stock.where((stock) {
+  //   // Vérifier si le stock appartient au magasin sélectionné
+  //   return stock.magasin!.idMagasin == idMagasin &&
+  //       stock.speculation!.categorieProduit.idCategorieProduit == idCategorie;
+  // }).toList();
   List<Stock> filteredStocks = stock;
  
   if (filteredStocks.isEmpty) {

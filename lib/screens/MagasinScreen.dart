@@ -33,50 +33,60 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
   Set<String> loadedRegions = {}; // Ensemble pour garder une trace des régions pour lesquelles les magasins ont déjà été chargés
 
   void fetchRegions() async {
-    try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:9000/niveau1Pays/read'));
-      if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body);
-        setState(() {
-          regionsData = data.cast<Map<String, dynamic>>();
-          regions = regionsData.map((item) => item['nomN1'] as String).toList();
-          idNiveau1Pays = regionsData.map((item) => item['idNiveau1Pays'] as String).toList();
-        });
-        _tabController = TabController(length: regions.length, vsync: this);
-        _tabController!.addListener(_handleTabChange);
-        // Fetch les magasins pour la première région
-        fetchMagasinsByRegion(idNiveau1Pays.isNotEmpty ? idNiveau1Pays[_tabController!.index] : '');
-      } else {
-        throw Exception('Failed to load regions');
-      }
-    } catch (e) {
-      print('Error fetching regions: $e');
+  try {
+    final response = await http.get(Uri.parse('http://10.0.2.2:9000/niveau1Pays/read'));
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      
+      // Filtrer les éléments avec statutN1 == true
+      List<dynamic> filteredData = data.where((item) => item['statutN1'] == true).toList();
+      
+      setState(() {
+        regionsData = filteredData.cast<Map<String, dynamic>>();
+        regions = regionsData.map((item) => item['nomN1'] as String).toList();
+        idNiveau1Pays = regionsData.map((item) => item['idNiveau1Pays'] as String).toList();
+      });
+      
+      _tabController = TabController(length: regions.length, vsync: this);
+      _tabController!.addListener(_handleTabChange);
+      
+      // Fetch les magasins pour la première région
+      fetchMagasinsByRegion(idNiveau1Pays.isNotEmpty ? idNiveau1Pays[_tabController!.index] : '');
+    } else {
+      throw Exception('Failed to load regions');
     }
+  } catch (e) {
+    print('Error fetching regions: $e');
   }
+}
+
 
   void fetchMagasinsByRegion(String id) async {
-    try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:9000/Magasin/getAllMagasinByPays/${id}'));
-      if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body);
-        setState(() {
-          magasinsParRegion[id] = data.map((item) => {
+  try {
+    final response = await http.get(Uri.parse('http://10.0.2.2:9000/Magasin/getAllMagasinByPays/${id}'));
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      List<Map<String, dynamic>> magasins = data
+          .where((magasin) => magasin['statutMagasin'] == true) // Filtrer les magasins actifs
+          .map<Map<String, dynamic>>((item) => {
             'nomMagasin': item['nomMagasin'],
             'idMagasin': item['idMagasin'],
             'photo': item['photo'],
-          }).toList();
-        });
-        // Si les magasins pour cette région n'ont pas déjà été chargés, ajoutez l'ID de la région à loadedRegions
-        if (!loadedRegions.contains(id)) {
-          loadedRegions.add(id);
-        }
-      } else {
-        throw Exception('Failed to load magasins for region $id');
+          })
+          .toList();
+      setState(() {
+        magasinsParRegion[id] = magasins;
+      });
+      if (!loadedRegions.contains(id)) {
+        loadedRegions.add(id);
       }
-    } catch (e) {
-      print('Error fetching magasins for region $id: $e');
+    } else {
+      throw Exception('Failed to load magasins for region $id');
     }
+  } catch (e) {
+    print('Error fetching magasins for region $id: $e');
   }
+}
 
  void _handleTabChange() {
   if (_tabController != null && _tabController!.index >= 0 && _tabController!.index < idNiveau1Pays.length) {

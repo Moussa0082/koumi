@@ -341,6 +341,8 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
                   child: FutureBuilder(
                                       future: _mesPays,
                                       builder: (_, snapshot) {
+                                        try {
+                                          
                                                   List<DropdownMenuItem<String>> dropdownItems = [];
                                         if (snapshot.connectionState ==
                                             ConnectionState.waiting) {
@@ -393,8 +395,11 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
                                                 });
                                               });
                                         }
-                                        return DropdownButton(
-                                            items: const [], onChanged: (value) {});
+                                         return Text('Aucune donnée disponible');
+                                      } catch (e) {
+                                        // Gérer l'absence de connexion ici
+                                        return Center(child: Text('Pays non disponible, verifier \nvotre connexion internet ', style: TextStyle(fontSize: 15),));
+                                    }
                                       },
                                     )
                 ),
