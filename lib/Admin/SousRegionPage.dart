@@ -1,10 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:koumi_app/Admin/PaysPage.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/UpdateSousRegions.dart';
 import 'package:koumi_app/models/Continent.dart';
 import 'package:koumi_app/models/SousRegion.dart';
 import 'package:koumi_app/service/SousRegionService.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class SousRegionPage extends StatefulWidget {
   // final Continent continent;
@@ -21,11 +24,10 @@ class _SousRegionPageState extends State<SousRegionPage> {
   final formkey = GlobalKey<FormState>();
   TextEditingController libelleController = TextEditingController();
   late Continent continents;
+  String? continentValue;
   List<SousRegion> regionList = [];
   late Future<List<SousRegion>> _liste;
-  bool isLoading = false;
-  bool isDataLoaded = false; // Déclaration de la variable booléenne
-
+  late Future _continentList;
   // Future<List<SousRegion>> getSousRegionListe() async {
   //   setState(() {
   //     isLoading = true;
@@ -38,6 +40,9 @@ class _SousRegionPageState extends State<SousRegionPage> {
   void initState() {
     // continents = widget.continent;
     // _liste = getSousRegionListe();
+    _continentList =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/continent/read'));
+
     super.initState();
   }
 
@@ -63,9 +68,9 @@ class _SousRegionPageState extends State<SousRegionPage> {
                 _showDialog();
               },
               icon: const Icon(
-                Icons.add_circle_outline,
+                Icons.add,
                 color: d_colorGreen,
-                size: 25,
+                size: 30,
               ),
             )
           ],
@@ -131,8 +136,8 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                     style: const TextStyle(
                                                       color: Colors.black,
                                                       fontSize: 20,
-                                                      overflow: TextOverflow
-                                                          .ellipsis,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     )),
                                                 subtitle: Text(
                                                     e.continent.nomContinent,
@@ -172,8 +177,7 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                               ),
                                             ),
                                             Container(
-                                              alignment:
-                                                  Alignment.bottomRight,
+                                              alignment: Alignment.bottomRight,
                                               padding:
                                                   const EdgeInsets.symmetric(
                                                       horizontal: 10),
@@ -193,14 +197,13 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                         child: ListTile(
                                                           leading: const Icon(
                                                             Icons.check,
-                                                            color:
-                                                                Colors.green,
+                                                            color: Colors.green,
                                                           ),
                                                           title: const Text(
                                                             "Activer",
                                                             style: TextStyle(
-                                                              color: Colors
-                                                                  .green,
+                                                              color:
+                                                                  Colors.green,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -211,14 +214,16 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                                 .activerSousRegion(e
                                                                     .idSousRegion!)
                                                                 .then(
-                                                                    (value) =>
-                                                                        {
-                                                                          Provider.of<SousRegionService>(context, listen: false).applyChange(),
+                                                                    (value) => {
+                                                                          Provider.of<SousRegionService>(context, listen: false)
+                                                                              .applyChange(),
                                                                           // setState(() {
                                                                           //   _liste = SousRegionService().fetchSousRegionByContinent(continents.idContinent!);
                                                                           // }),
-                                                                          Navigator.of(context).pop(),
-                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                          Navigator.of(context)
+                                                                              .pop(),
+                                                                          ScaffoldMessenger.of(context)
+                                                                              .showSnackBar(
                                                                             const SnackBar(
                                                                               content: Row(
                                                                                 children: [
@@ -232,7 +237,8 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                                 .catchError(
                                                                     (onError) =>
                                                                         {
-                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                          ScaffoldMessenger.of(context)
+                                                                              .showSnackBar(
                                                                             const SnackBar(
                                                                               content: Row(
                                                                                 children: [
@@ -242,7 +248,8 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                                               duration: Duration(seconds: 5),
                                                                             ),
                                                                           ),
-                                                                          Navigator.of(context).pop(),
+                                                                          Navigator.of(context)
+                                                                              .pop(),
                                                                         });
                                                           },
                                                         ),
@@ -259,8 +266,7 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                             "Désactiver",
                                                             style: TextStyle(
                                                               color: Colors
-                                                                      .orange[
-                                                                  400],
+                                                                  .orange[400],
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -271,16 +277,17 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                                 .desactiverSousRegion(e
                                                                     .idSousRegion!)
                                                                 .then(
-                                                                    (value) =>
-                                                                        {
-                                                                          Provider.of<SousRegionService>(context, listen: false).applyChange(),
-                                                                         
-                                                                          Navigator.of(context).pop(),
+                                                                    (value) => {
+                                                                          Provider.of<SousRegionService>(context, listen: false)
+                                                                              .applyChange(),
+                                                                          Navigator.of(context)
+                                                                              .pop(),
                                                                         })
                                                                 .catchError(
                                                                     (onError) =>
                                                                         {
-                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                          ScaffoldMessenger.of(context)
+                                                                              .showSnackBar(
                                                                             const SnackBar(
                                                                               content: Row(
                                                                                 children: [
@@ -290,9 +297,10 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                                               duration: Duration(seconds: 5),
                                                                             ),
                                                                           ),
-                                                                          Navigator.of(context).pop(),
+                                                                          Navigator.of(context)
+                                                                              .pop(),
                                                                         });
-                                        
+
                                                             ScaffoldMessenger
                                                                     .of(context)
                                                                 .showSnackBar(
@@ -316,14 +324,13 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                         child: ListTile(
                                                           leading: const Icon(
                                                             Icons.edit,
-                                                            color:
-                                                                Colors.green,
+                                                            color: Colors.green,
                                                           ),
                                                           title: const Text(
                                                             "Modifier",
                                                             style: TextStyle(
-                                                              color: Colors
-                                                                  .green,
+                                                              color:
+                                                                  Colors.green,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -333,8 +340,7 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                             // Ouvrir la boîte de dialogue de modification
                                                             var updatedSousRegion =
                                                                 await showDialog(
-                                                              context:
-                                                                  context,
+                                                              context: context,
                                                               builder: (BuildContext
                                                                       context) =>
                                                                   AlertDialog(
@@ -344,15 +350,17 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                                 shape:
                                                                     RoundedRectangleBorder(
                                                                   borderRadius:
-                                                                      BorderRadius.circular(
-                                                                          16),
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              16),
                                                                 ),
-                                                                content: updateSousRegions(
-                                                                    sousRegion:
-                                                                        e),
+                                                                content:
+                                                                    updateSousRegions(
+                                                                        sousRegion:
+                                                                            e),
                                                               ),
                                                             );
-                                        
+
                                                             // Si les détails sont modifiés, appliquer les changements
                                                             if (updatedSousRegion !=
                                                                 null) {
@@ -361,8 +369,6 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                                       listen:
                                                                           false)
                                                                   .applyChange();
-                                        
-                                                            
                                                             }
                                                           },
                                                         ),
@@ -376,8 +382,7 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                           title: const Text(
                                                             "Supprimer",
                                                             style: TextStyle(
-                                                              color:
-                                                                  Colors.red,
+                                                              color: Colors.red,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -388,16 +393,17 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                                 .deleteSousRegion(e
                                                                     .idSousRegion!)
                                                                 .then(
-                                                                    (value) =>
-                                                                        {
-                                                                          Provider.of<SousRegionService>(context, listen: false).applyChange(),
-                                                                        
-                                                                          Navigator.of(context).pop(),
+                                                                    (value) => {
+                                                                          Provider.of<SousRegionService>(context, listen: false)
+                                                                              .applyChange(),
+                                                                          Navigator.of(context)
+                                                                              .pop(),
                                                                         })
                                                                 .catchError(
                                                                     (onError) =>
                                                                         {
-                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                          ScaffoldMessenger.of(context)
+                                                                              .showSnackBar(
                                                                             const SnackBar(
                                                                               content: Row(
                                                                                 children: [
@@ -438,23 +444,43 @@ class _SousRegionPageState extends State<SousRegionPage> {
           borderRadius: BorderRadius.circular(16),
         ),
         child: Container(
+          decoration: BoxDecoration(
+            color: Color.fromARGB(255, 250, 250, 250),
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                offset: const Offset(0, 2),
+                blurRadius: 5,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
           padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Center(
-                child: Text(
-                  "Ajouter une sous region",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 18,
+              ListTile(
+                  title: Text(
+                    "Ajouter une sous region",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 18,
+                    ),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(height: 5),
+                  trailing: IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.red,
+                        size: 20,
+                      ))),
+              const SizedBox(height: 10),
               Form(
                 key: formkey,
                 child: Column(
@@ -474,8 +500,8 @@ class _SousRegionPageState extends State<SousRegionPage> {
                         controller: libelleController,
                         decoration: InputDecoration(
                           hintText: "Nom de sous région",
-                          contentPadding:
-                              const EdgeInsets.symmetric(vertical: 10),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 15),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -483,95 +509,164 @@ class _SousRegionPageState extends State<SousRegionPage> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () async {
-                              final String libelle = libelleController.text;
-                              if (formkey.currentState!.validate()) {
-                                try {
-                                  await SousRegionService()
-                                      .addSousRegion(
-                                          nomSousRegion: libelle,
-                                          continent: continents)
-                                      .then((value) => {
-                                            Provider.of<SousRegionService>(
-                                                    context,
-                                                    listen: false)
-                                                .applyChange(),
-                                            setState(() {
-                                              _liste = SousRegionService()
-                                                  .fetchSousRegionByContinent(
-                                                      continents.idContinent!);
-                                            }),
-                                            libelleController.clear(),
-                                            Navigator.of(context).pop()
-                                          });
-                                } catch (e) {
-                                  final String errorMessage = e.toString();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Row(
-                                        children: [
-                                          Text("Une erreur s'est produit"),
-                                        ],
-                                      ),
-                                      duration: Duration(seconds: 5),
-                                    ),
-                                  );
-                                }
+                    Container(
+                      height: 40,
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            offset: const Offset(0, 2),
+                            blurRadius: 5,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: FutureBuilder(
+                          future: _continentList,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Shimmer.fromColors(
+                                baseColor: Colors.grey[300]!,
+                                highlightColor: Colors.grey[100]!,
+                                child: DropdownButton(
+                                    dropdownColor: Colors.orange,
+                                    items: [],
+                                    onChanged: (value) {}),
+                              );
+                            }
+                            if (snapshot.hasError) {
+                              return Text("${snapshot.error}");
+                            }
+                            if (snapshot.hasData) {
+                              final reponse =
+                                  json.decode((snapshot.data.body)) as List;
+                              final continentList = reponse
+                                  .map((e) => Continent.fromMap(e))
+                                  .where((con) =>
+                                      con.statutContinent ==
+                                      true) // Filtrer les types d'acteurs actifs et différents de l'administrateur
+                                  .toList();
+
+                              List<DropdownMenuItem<String>> dropdownItems = [];
+
+                              if (continentList.isNotEmpty) {
+                                dropdownItems = continentList
+                                    .map((e) => DropdownMenuItem(
+                                          alignment:
+                                              AlignmentDirectional.center,
+                                          child: Text(
+                                            e.nomContinent,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          value: e.idContinent,
+                                        ))
+                                    .toList();
+                              } else {
+                                dropdownItems.add(DropdownMenuItem(
+                                  child: Text('Aucun continent disponible'),
+                                  value: null,
+                                ));
                               }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            icon: const Icon(
-                              Icons.add,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              "Ajouter",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
+                              // bool typeSelected = false;
+                              return DropdownButton(
+                                alignment: AlignmentDirectional.center,
+                                items: dropdownItems,
+                                value: continentValue,
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    continentValue = newValue;
+                                    if (newValue != null) {
+                                      continents = continentList.firstWhere(
+                                          (element) =>
+                                              element.idContinent == newValue);
+                                      debugPrint(
+                                          continents.idContinent.toString());
+                                      // typeSelected = true;
+                                    } else {
+                                      // typeSelected = false;
+                                      // Gérer le cas où aucun type n'est sélectionné
+                                      // if (!typeSelected) {
+                                      //   Text(
+                                      //     "Veuillez choisir un type d'acteur",
+                                      //     style: TextStyle(color: Colors.red),
+                                      //   );
+                                      // }
+                                    }
+                                  });
+                                },
+                              );
+                            }
+                            return Text('Aucune donnée disponible');
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        final String libelle = libelleController.text;
+                        if (formkey.currentState!.validate()) {
+                          try {
+                            await SousRegionService()
+                                .addSousRegion(
+                                    nomSousRegion: libelle,
+                                    continent: continents)
+                                .then((value) => {
+                                      Provider.of<SousRegionService>(context,
+                                              listen: false)
+                                          .applyChange(),
+                                      setState(() {
+                                        _liste = SousRegionService()
+                                            .fetchSousRegionByContinent(
+                                                continents.idContinent!);
+                                      }),
+                                      libelleController.clear(),
+                                      setState(() {
+                                        continents == null;
+                                      }),
+                                      Navigator.of(context).pop()
+                                    });
+                          } catch (e) {
+                            final String errorMessage = e.toString();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Row(
+                                  children: [
+                                    Text("Une erreur s'est produit"),
+                                  ],
+                                ),
+                                duration: Duration(seconds: 5),
                               ),
-                            ),
-                          ),
+                            );
+                          }
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green, // Orange color code
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                        const SizedBox(
-                          width: 5,
+                        minimumSize: const Size(290, 45),
+                      ),
+                      icon: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                      ),
+                      label: const Text(
+                        "Ajouter",
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
                         ),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pop(); // Ferme la boîte de dialogue
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            icon: const Icon(
-                              Icons.close,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              "Annuler",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     )
                   ],
                 ),
