@@ -7,7 +7,6 @@ import 'package:koumi_app/models/Continent.dart';
 import 'package:koumi_app/models/SousRegion.dart';
 import 'package:koumi_app/service/SousRegionService.dart';
 import 'package:provider/provider.dart';
-import 'package:shimmer/shimmer.dart';
 
 class SousRegionPage extends StatefulWidget {
   // final Continent continent;
@@ -449,9 +448,9 @@ class _SousRegionPageState extends State<SousRegionPage> {
             borderRadius: BorderRadius.circular(15),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                offset: const Offset(0, 2),
-                blurRadius: 5,
+                color: Colors.grey.withOpacity(0.4),
+                offset: Offset(0, 4),
+                blurRadius: 10,
                 spreadRadius: 2,
               ),
             ],
@@ -459,156 +458,108 @@ class _SousRegionPageState extends State<SousRegionPage> {
           padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               ListTile(
-                  title: Text(
-                    "Ajouter une sous region",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 18,
-                    ),
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
+                title: Text(
+                  "Ajouter une sous-région",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    fontSize: 18,
                   ),
-                  trailing: IconButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      icon: Icon(
-                        Icons.close,
-                        color: Colors.red,
-                        size: 20,
-                      ))),
-              const SizedBox(height: 10),
+                  textAlign: TextAlign.center,
+                ),
+                trailing: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.red,
+                    size: 24,
+                  ),
+                ),
+              ),
+              SizedBox(height: 16),
               Form(
                 key: formkey,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(
-                      height: 10,
+                    TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Veuillez remplir ce champ";
+                        }
+                        return null;
+                      },
+                      controller: libelleController,
+                      decoration: InputDecoration(
+                        labelText: "Nom de la sous-région",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
+                    SizedBox(height: 16),
+                    FutureBuilder(
+                      future: _continentList,
+                      builder: (_, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        }
+                        if (snapshot.hasError) {
+                          return Text("${snapshot.error}");
+                        }
+                        if (snapshot.hasData) {
+                          final reponse =
+                              json.decode((snapshot.data.body)) as List;
+                          final continentList = reponse
+                              .map((e) => Continent.fromMap(e))
+                              .where((con) => con.statutContinent == true)
+                              .toList();
+
+                          if (continentList.isEmpty) {
+                            return Text('Aucun continent disponible');
                           }
-                          return null;
-                        },
-                        controller: libelleController,
-                        decoration: InputDecoration(
-                          hintText: "Nom de sous région",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Container(
-                      height: 40,
-                      width: MediaQuery.of(context).size.width * 0.7,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            offset: const Offset(0, 2),
-                            blurRadius: 5,
-                            spreadRadius: 2,
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: FutureBuilder(
-                          future: _continentList,
-                          builder: (_, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Shimmer.fromColors(
-                                baseColor: Colors.grey[300]!,
-                                highlightColor: Colors.grey[100]!,
-                                child: DropdownButton(
-                                    dropdownColor: Colors.orange,
-                                    items: [],
-                                    onChanged: (value) {}),
-                              );
-                            }
-                            if (snapshot.hasError) {
-                              return Text("${snapshot.error}");
-                            }
-                            if (snapshot.hasData) {
-                              final reponse =
-                                  json.decode((snapshot.data.body)) as List;
-                              final continentList = reponse
-                                  .map((e) => Continent.fromMap(e))
-                                  .where((con) =>
-                                      con.statutContinent ==
-                                      true) // Filtrer les types d'acteurs actifs et différents de l'administrateur
-                                  .toList();
 
-                              List<DropdownMenuItem<String>> dropdownItems = [];
-
-                              if (continentList.isNotEmpty) {
-                                dropdownItems = continentList
-                                    .map((e) => DropdownMenuItem(
-                                          alignment:
-                                              AlignmentDirectional.center,
-                                          child: Text(
-                                            e.nomContinent,
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          value: e.idContinent,
-                                        ))
-                                    .toList();
-                              } else {
-                                dropdownItems.add(DropdownMenuItem(
-                                  child: Text('Aucun continent disponible'),
-                                  value: null,
-                                ));
-                              }
-                              // bool typeSelected = false;
-                              return DropdownButton(
-                                alignment: AlignmentDirectional.center,
-                                items: dropdownItems,
-                                value: continentValue,
-                                onChanged: (newValue) {
-                                  setState(() {
-                                    continentValue = newValue;
-                                    if (newValue != null) {
-                                      continents = continentList.firstWhere(
-                                          (element) =>
-                                              element.idContinent == newValue);
-                                      debugPrint(
-                                          continents.idContinent.toString());
-                                      // typeSelected = true;
-                                    } else {
-                                      // typeSelected = false;
-                                      // Gérer le cas où aucun type n'est sélectionné
-                                      // if (!typeSelected) {
-                                      //   Text(
-                                      //     "Veuillez choisir un type d'acteur",
-                                      //     style: TextStyle(color: Colors.red),
-                                      //   );
-                                      // }
-                                    }
-                                  });
-                                },
-                              );
-                            }
-                            return Text('Aucune donnée disponible');
-                          },
-                        ),
-                      ),
+                          return DropdownButtonFormField<String>(
+                            items: continentList
+                                .map(
+                                  (e) => DropdownMenuItem(
+                                    value: e.idContinent,
+                                    child: Text(e.nomContinent),
+                                  ),
+                                )
+                                .toList(),
+                            value: continentValue,
+                            onChanged: (newValue) {
+                              setState(() {
+                                continentValue = newValue;
+                                if (newValue != null) {
+                                  continents = continentList.firstWhere(
+                                      (element) =>
+                                          element.idContinent == newValue);
+                                  debugPrint(
+                                      "con select ${continents.idContinent.toString()}");
+                                  // typeSelected = true;
+                                }
+                              });
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'Sélectionner un continent',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
+                        }
+                        return Text('Aucune donnée disponible');
+                      },
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     ElevatedButton.icon(
                       onPressed: () async {
                         final String libelle = libelleController.text;
@@ -622,11 +573,6 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                       Provider.of<SousRegionService>(context,
                                               listen: false)
                                           .applyChange(),
-                                      setState(() {
-                                        _liste = SousRegionService()
-                                            .fetchSousRegionByContinent(
-                                                continents.idContinent!);
-                                      }),
                                       libelleController.clear(),
                                       setState(() {
                                         continents == null;
@@ -670,7 +616,7 @@ class _SousRegionPageState extends State<SousRegionPage> {
                     )
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),

@@ -150,7 +150,7 @@ class _ParametreState extends State<Parametre> {
                       endIndent: 0,
                     ),
                     getList(
-                        "pays.png",
+                        "sous.png",
                         'Sous région',
                         const SousRegionPage(),
                         const Icon(
@@ -180,7 +180,7 @@ class _ParametreState extends State<Parametre> {
                       endIndent: 0,
                     ),
                     getList(
-                        "pays.png",
+                        "region.png",
                         params.libelleNiveau1Pays,
                         const Niveau1Page(),
                         const Icon(
@@ -195,7 +195,7 @@ class _ParametreState extends State<Parametre> {
                       endIndent: 0,
                     ),
                     getList(
-                        "pays.png",
+                        "region.png",
                         params.libelleNiveau2Pays,
                         const Niveau2Page(),
                         const Icon(
@@ -210,7 +210,7 @@ class _ParametreState extends State<Parametre> {
                       endIndent: 0,
                     ),
                     getList(
-                        "pays.png",
+                        "region.png",
                         params.libelleNiveau3Pays,
                         const Niveau3Page(),
                         const Icon(
