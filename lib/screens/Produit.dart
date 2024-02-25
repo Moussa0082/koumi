@@ -27,14 +27,15 @@ class _ProduitScreenState extends State<ProduitScreen>
 
   Set<String> loadedRegions = {};
 
-  void fetchProduitByCategorie(String idCategorie) async {
+  void fetchProduitByCategorie(String idCategorie, String idMagasin) async {
     try {
       final response = await http.get(
-          Uri.parse('http://10.0.2.2:9000/Stock/categorieProduit/$idCategorie'));
+          Uri.parse('http://10.0.2.2:9000/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {
-          stock = data
+          stock = data.
+    where((stock) => stock['statutSotck'] == true)
               .map((item) => Stock(
                     idStock: item['idStock'] as String,
                     nomProduit: item['nomProduit'] as String,
@@ -69,7 +70,7 @@ class _ProduitScreenState extends State<ProduitScreen>
           _tabController!.addListener(_handleTabChange);
           selectedCategorieProduit =
               categorieProduit.isNotEmpty ? categorieProduit.first.idCategorieProduit! : '';
-          fetchProduitByCategorie(selectedCategorieProduit);
+          fetchProduitByCategorie(selectedCategorieProduit, widget.id!);
         });
         debugPrint("Id Cat : ${categorieProduit.map((e) => e.idCategorieProduit)}");
       } else {
@@ -86,7 +87,7 @@ class _ProduitScreenState extends State<ProduitScreen>
         _tabController!.index < categorieProduit.length) {
       selectedCategorieProduit =
           categorieProduit[_tabController!.index].idCategorieProduit!;
-      fetchProduitByCategorie(selectedCategorieProduit);
+      fetchProduitByCategorie(selectedCategorieProduit, widget.id!);
       debugPrint("Cat id : " + selectedCategorieProduit);
     }
   }
