@@ -1,10 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/CodePays.dart';
-import 'package:koumi_app/Admin/Niveau3Page.dart';
 import 'package:koumi_app/Admin/UpdatesNiveau2.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
+import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/Niveau2Service.dart';
 import 'package:provider/provider.dart';
@@ -28,13 +31,17 @@ class _Niveau2PageState extends State<Niveau2Page> {
   TextEditingController descriptionController = TextEditingController();
   late Future<List<Niveau2Pays>> _liste;
   List<ParametreGeneraux> paraList = [];
-  late Niveau1Pays n1;
+  late Niveau1Pays niveau1;
+  late Pays pays;
+  String? paysValue;
+  late Future _paysList;
+  String? n1Value;
+  late Future _niveauList;
 
-  // Future<List<Niveau2Pays>> getNiveauListe() async {
-  //   final response = await Niveau2Service()
-  //       .fetchNiveau2ByNiveau1(widget.niveau1pays.idNiveau1Pays!);
-  //   return response;
-  // }
+  Future<List<Niveau2Pays>> getNiveauListe(String id) async {
+    final response = await Niveau2Service().fetchNiveau2ByNiveau1(id);
+    return response;
+  }
 
   @override
   void initState() {
@@ -42,10 +49,9 @@ class _Niveau2PageState extends State<Niveau2Page> {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
     para = paraList[0];
-    // _liste = getNiveauListe();
-    // _liste.toString();
-    // n1 = widget.niveau1pays;
-    debugPrint("niveau :${n1.toString()}");
+    _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
+    _niveauList =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
   }
 
   @override
@@ -71,9 +77,9 @@ class _Niveau2PageState extends State<Niveau2Page> {
               _showDialog();
             },
             icon: const Icon(
-              Icons.add_circle_outline,
+              Icons.add,
               color: d_colorGreen,
-              size: 25,
+              size: 30,
             ),
           )
         ],
@@ -105,7 +111,6 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 15),
                                   child: Container(
-                                    height: 120,
                                     width:
                                         MediaQuery.of(context).size.width * 0.9,
                                     decoration: BoxDecoration(
@@ -123,13 +128,13 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                     child: Column(
                                       children: [
                                         ListTile(
-                                          leading: CodePays().getFlag(e.niveau1Pays!.pays.nomPays),
+                                          leading: CodePays().getFlag(
+                                              e.niveau1Pays!.pays.nomPays),
                                           title: Text(e.nomN2.toUpperCase(),
                                               style: const TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 18,
-                                                overflow:
-                                                    TextOverflow.ellipsis,
+                                                overflow: TextOverflow.ellipsis,
                                               )),
                                           subtitle: Text(e.descriptionN2,
                                               style: const TextStyle(
@@ -145,8 +150,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                               horizontal: 20),
                                           child: Row(
                                             mainAxisAlignment:
-                                                MainAxisAlignment
-                                                    .spaceBetween,
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               _buildEtat(e.statutN2),
                                               PopupMenuButton<String>(
@@ -193,17 +197,20 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                                                       content:
                                                                           Row(
                                                                         children: [
-                                                                          Text("Activer avec succèss "),
+                                                                          Text(
+                                                                              "Activer avec succèss "),
                                                                         ],
                                                                       ),
-                                                                      duration:
-                                                                          Duration(seconds: 2),
+                                                                      duration: Duration(
+                                                                          seconds:
+                                                                              2),
                                                                     ),
                                                                   )
                                                                 })
                                                             .catchError(
                                                                 (onError) => {
-                                                                      ScaffoldMessenger.of(context)
+                                                                      ScaffoldMessenger.of(
+                                                                              context)
                                                                           .showSnackBar(
                                                                         const SnackBar(
                                                                           content:
@@ -216,7 +223,8 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                                                               Duration(seconds: 5),
                                                                         ),
                                                                       ),
-                                                                      Navigator.of(context)
+                                                                      Navigator.of(
+                                                                              context)
                                                                           .pop(),
                                                                     });
                                                       },
@@ -225,10 +233,9 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                                   PopupMenuItem<String>(
                                                     child: ListTile(
                                                       leading: Icon(
-                                                        Icons
-                                                            .disabled_visible,
-                                                        color: Colors
-                                                            .orange[400],
+                                                        Icons.disabled_visible,
+                                                        color:
+                                                            Colors.orange[400],
                                                       ),
                                                       title: Text(
                                                         "Désactiver",
@@ -261,7 +268,8 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                                                 })
                                                             .catchError(
                                                                 (onError) => {
-                                                                      ScaffoldMessenger.of(context)
+                                                                      ScaffoldMessenger.of(
+                                                                              context)
                                                                           .showSnackBar(
                                                                         const SnackBar(
                                                                           content:
@@ -274,10 +282,11 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                                                               Duration(seconds: 5),
                                                                         ),
                                                                       ),
-                                                                      Navigator.of(context)
+                                                                      Navigator.of(
+                                                                              context)
                                                                           .pop(),
                                                                     });
-                                    
+
                                                         ScaffoldMessenger.of(
                                                                 context)
                                                             .showSnackBar(
@@ -288,10 +297,8 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                                                     "Désactiver avec succèss "),
                                                               ],
                                                             ),
-                                                            duration:
-                                                                Duration(
-                                                                    seconds:
-                                                                        2),
+                                                            duration: Duration(
+                                                                seconds: 2),
                                                           ),
                                                         );
                                                       },
@@ -332,21 +339,19 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                                                       niveau2pays:
                                                                           e)),
                                                         );
-                                    
+
                                                         // Si les détails sont modifiés, appliquer les changements
                                                         if (updatedSousRegion !=
                                                             null) {
                                                           Provider.of<Niveau2Service>(
                                                                   context,
-                                                                  listen:
-                                                                      false)
+                                                                  listen: false)
                                                               .applyChange();
                                                           setState(() {
                                                             _liste =
                                                                 updatedSousRegion;
                                                           });
                                                           // Mettre à jour la liste des sous-régions
-                                                         
                                                         }
                                                       },
                                                     ),
@@ -375,14 +380,14 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                                                           listen:
                                                                               false)
                                                                       .applyChange(),
-                                                                 
                                                                   Navigator.of(
                                                                           context)
                                                                       .pop(),
                                                                 })
                                                             .catchError(
                                                                 (onError) => {
-                                                                      ScaffoldMessenger.of(context)
+                                                                      ScaffoldMessenger.of(
+                                                                              context)
                                                                           .showSnackBar(
                                                                         const SnackBar(
                                                                           content:
@@ -427,188 +432,261 @@ class _Niveau2PageState extends State<Niveau2Page> {
         ),
         child: Container(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Center(
-                child: Text(
-                  "Ajouter un(e) ${para.libelleNiveau2Pays}",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 18,
-                  ),
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(height: 5),
-              Form(
-                key: formkey,
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 10,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ListTile(
+                  title: Text(
+                    "Ajouter un(e) ${para.libelleNiveau2Pays}",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 18,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextFormField(
+                    textAlign: TextAlign.center,
+                  ),
+                  trailing: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: Icon(
+                      Icons.close,
+                      color: Colors.red,
+                      size: 24,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Form(
+                  key: formkey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
+                            return "Veuillez remplir ce champ";
                           }
                           return null;
                         },
                         controller: libelleController,
                         decoration: InputDecoration(
-                          hintText: "Nom du niveau 2",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
+                          labelText: "Nom du ${para.libelleNiveau2Pays}",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextFormField(
+                      SizedBox(height: 16),
+                      FutureBuilder(
+                        future: _paysList,
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          }
+                          if (snapshot.hasError) {
+                            return Text("${snapshot.error}");
+                          }
+                          if (snapshot.hasData) {
+                            final reponse =
+                                json.decode((snapshot.data.body)) as List;
+                            final paysList = reponse
+                                .map((e) => Pays.fromMap(e))
+                                .where((con) => con.statutPays == true)
+                                .toList();
+
+                            if (paysList.isEmpty) {
+                              return Text(
+                                'Aucun donné disponible',
+                                style:
+                                    TextStyle(overflow: TextOverflow.ellipsis),
+                              );
+                            }
+
+                            return DropdownButtonFormField<String>(
+                              items: paysList
+                                  .map(
+                                    (e) => DropdownMenuItem(
+                                      value: e.idPays,
+                                      child: Text(e.nomPays),
+                                    ),
+                                  )
+                                  .toList(),
+                              value: paysValue,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  paysValue = newValue;
+                                  if (newValue != null) {
+                                    pays = paysList.firstWhere((element) =>
+                                        element.idPays == newValue);
+
+                                    // typeSelected = true;
+                                  }
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Sélectionner un pays',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+                          return Text(
+                            'Aucune donnée disponible',
+                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 16),
+                      FutureBuilder(
+                        future: _niveauList,
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          }
+                          if (snapshot.hasError) {
+                            return Text("${snapshot.error}");
+                          }
+                          if (snapshot.hasData) {
+                            final reponse =
+                                json.decode((snapshot.data.body)) as List;
+                            final niveauList = reponse
+                                .map((e) => Niveau1Pays.fromMap(e))
+                                .where((con) => con.statutN1 == true)
+                                .toList();
+
+                            if (niveauList.isEmpty) {
+                              return Text(
+                                'Aucun donné disponible',
+                                style:
+                                    TextStyle(overflow: TextOverflow.ellipsis),
+                              );
+                            }
+
+                            return DropdownButtonFormField<String>(
+                              items: niveauList
+                                  .map(
+                                    (e) => DropdownMenuItem(
+                                      value: e.idNiveau1Pays,
+                                      child: Text(e.nomN1),
+                                    ),
+                                  )
+                                  .toList(),
+                              value: n1Value,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  paysValue = newValue;
+                                  if (newValue != null) {
+                                    niveau1 = niveauList.firstWhere((element) =>
+                                        element.idNiveau1Pays == newValue);
+                                    debugPrint(
+                                        "niveau select :${niveau1.toString()}");
+                                    // typeSelected = true;
+                                  }
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText:
+                                    'Sélectionner un ${para.libelleNiveau2Pays}',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+                          return Text(
+                            'Aucune donnée disponible',
+                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
+                            return "Veuillez remplir ce champ";
                           }
                           return null;
                         },
                         controller: descriptionController,
+                        maxLines: null,
                         decoration: InputDecoration(
-                          hintText: "Description",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
+                          labelText: "Description",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () async {
-                              final String libelle = libelleController.text;
-                              final String description =
-                                  descriptionController.text;
-                              // final Niveau1Pays niveau1 = widget.niveau1pays;
-                              if (formkey.currentState!.validate()) {
-                                // debugPrint(niveau1.toString());
-
-                                // try {
-                                //   await Niveau2Service()
-                                //   .addNiveau2Pays(
-                                //     nomN2: libelle,
-                                //     descriptionN2: description,
-                                //     niveau1pays: niveau1,
-                                //   );
-                                // } catch (e) {
-                                //   print(e.toString());
-                                // }
-                                // debugPrint(
-                                //     "Apres envoie ${niveau1.toString()}");
-                                // try {
-                                //   await Niveau2Service()
-                                //       .addNiveau2Pays(
-                                //         nomN2: libelle,
-                                //         descriptionN2: description,
-                                //         niveau1pays: widget.niveau1pays,
-                                //       )
-                                //       .then((value) => {
-                                //             Provider.of<Niveau2Service>(context,
-                                //                     listen: false)
-                                //                 .applyChange(),
-                                //             setState(() {
-                                //               _liste = Niveau2Service()
-                                //                   .fetchNiveau2ByNiveau1(widget
-                                //                       .niveau1pays
-                                //                       .idNiveau1Pays!);
-                                //             }),
-                                //           })
-                                //       .catchError((onError) =>
-                                //           {print(onError.toString())});
-
-                                //   libelleController.clear();
-                                //   descriptionController.clear();
-                                //   Navigator.of(context).pop();
-                                // } catch (e) {
-                                //   final String errorMessage = e.toString();
-                                //   print(errorMessage);
-                                //   ScaffoldMessenger.of(context).showSnackBar(
-                                //     const SnackBar(
-                                //       content:
-                                //           Text("Une erreur s'est produite"),
-                                //       duration: Duration(seconds: 5),
-                                //     ),
-                                //   );
-                                // }
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            icon: const Icon(
-                              Icons.add,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              "Ajouter",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
+                      SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final String libelle = libelleController.text;
+                          final String description = descriptionController.text;
+                          if (formkey.currentState!.validate()) {
+                            try {
+                              await Niveau2Service()
+                                  .addNiveau2Pays(
+                                    nomN2: libelle,
+                                    descriptionN2: description,
+                                    niveau1Pays: niveau1,
+                                  )
+                                  .then((value) => {
+                                        Provider.of<Niveau2Service>(context,
+                                                listen: false)
+                                            .applyChange(),
+                                        libelleController.clear(),
+                                        descriptionController.clear(),
+                                        Navigator.of(context).pop(),
+                                        setState(() {
+                                          pays == null;
+                                          niveau1 == null;
+                                        }),
+                                      });
+                            } catch (e) {
+                              final String errorMessage = e.toString();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Text("Une erreur s'est produit"),
+                                    ],
+                                  ),
+                                  duration: Duration(seconds: 5),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green, // Orange color code
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          minimumSize: const Size(290, 45),
+                        ),
+                        icon: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          "Ajouter",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pop(); // Ferme la boîte de dialogue
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            icon: const Icon(
-                              Icons.close,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              "Annuler",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
-              )
-            ],
+              ],
+            ),
           ),
         ),
       ),

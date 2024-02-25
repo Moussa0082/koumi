@@ -14,12 +14,13 @@ class Niveau2Service extends ChangeNotifier {
   Future<void> addNiveau2Pays({
     required String nomN2,
     required String descriptionN2,
-    required Niveau1Pays niveau1pays,
+    required Niveau1Pays niveau1Pays,
+    // required Niveau1Pays niveau1pays, probleme ultime dif entre p & P
   }) async {
     var addPays = jsonEncode({
       'nomN2': nomN2,
       'descriptionN2': descriptionN2,
-      'niveau1pays': niveau1pays.toMap(),
+      'niveau1Pays': niveau1Pays.toMap(),
     });
 
     final response = await http.post(

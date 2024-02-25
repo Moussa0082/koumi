@@ -434,196 +434,198 @@ class _PaysPageState extends State<PaysPage> {
         ),
         child: Container(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              ListTile(
-                title: Text(
-                  "Ajouter un pays",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 18,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                trailing: IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  icon: Icon(
-                    Icons.close,
-                    color: Colors.red,
-                    size: 24,
-                  ),
-                ),
-              ),
-              SizedBox(height: 16),
-              Form(
-                key: formkey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextFormField(
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Veuillez remplir ce champ";
-                        }
-                        return null;
-                      },
-                      controller: libelleController,
-                      decoration: InputDecoration(
-                        labelText: "Nom du pays",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ListTile(
+                  title: Text(
+                    "Ajouter un pays",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 18,
                     ),
-                    SizedBox(height: 16),
-                    FutureBuilder(
-                      future: _sousRegionList,
-                      builder: (_, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        }
-                        if (snapshot.hasError) {
-                          return Text("${snapshot.error}");
-                        }
-                        if (snapshot.hasData) {
-                          final reponse =
-                              json.decode((snapshot.data.body)) as List;
-                          final sousList = reponse
-                              .map((e) => SousRegion.fromMap(e))
-                              .where((con) => con.statutSousRegion == true)
-                              .toList();
-
-                          if (sousList.isEmpty) {
-                            return Text(
-                              'Aucun sous region disponible',
-                              style: TextStyle(overflow: TextOverflow.ellipsis),
-                            );
+                    textAlign: TextAlign.center,
+                  ),
+                  trailing: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: Icon(
+                      Icons.close,
+                      color: Colors.red,
+                      size: 24,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Form(
+                  key: formkey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
                           }
-
-                          return DropdownButtonFormField<String>(
-                            items: sousList
-                                .map(
-                                  (e) => DropdownMenuItem(
-                                    value: e.idSousRegion,
-                                    child: Text(e.nomSousRegion),
-                                  ),
-                                )
-                                .toList(),
-                            value: sousValue,
-                            onChanged: (newValue) {
-                              setState(() {
-                                sousValue = newValue;
-                                if (newValue != null) {
-                                  sousRegion = sousList.firstWhere((element) =>
-                                      element.idSousRegion == newValue);
-                                  debugPrint(
-                                      "con select ${sousRegion.idSousRegion.toString()}");
-                                  // typeSelected = true;
-                                }
-                              });
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Sélectionner un sous région',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          );
-                        }
-                        return Text(
-                          'Aucune donnée disponible',
-                          style: TextStyle(overflow: TextOverflow.ellipsis),
-                        );
-                      },
-                    ),
-                    SizedBox(height: 16),
-                    TextFormField(
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Veuillez remplir ce champ";
-                        }
-                        return null;
-                      },
-                      controller: descriptionController,
-                      maxLines: null,
-                      decoration: InputDecoration(
-                        labelText: "Description",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          return null;
+                        },
+                        controller: libelleController,
+                        decoration: InputDecoration(
+                          labelText: "Nom du pays",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 20),
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        final String libelle = libelleController.text;
-                        final String description = descriptionController.text;
-                        if (formkey.currentState!.validate()) {
-                          try {
-                            await PaysService()
-                                .addPays(
-                                    nomPays: libelle,
-                                    descriptionPays: description,
-                                    sousRegion: sousRegion)
-                                .then((value) => {
-                                      Provider.of<PaysService>(context,
-                                              listen: false)
-                                          .applyChange(),
-                                      Provider.of<PaysService>(context,
-                                              listen: false)
-                                          .applyChange(),
-                                      libelleController.clear(),
-                                      descriptionController.clear(),
-                                      setState(() {
-                                        sousRegion == null;
-                                      }),
-                                      Navigator.of(context).pop()
-                                    });
-                          } catch (e) {
-                            final String errorMessage = e.toString();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Row(
-                                  children: [
-                                    Text("Une erreur s'est produit"),
-                                  ],
+                      SizedBox(height: 16),
+                      FutureBuilder(
+                        future: _sousRegionList,
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          }
+                          if (snapshot.hasError) {
+                            return Text("${snapshot.error}");
+                          }
+                          if (snapshot.hasData) {
+                            final reponse =
+                                json.decode((snapshot.data.body)) as List;
+                            final sousList = reponse
+                                .map((e) => SousRegion.fromMap(e))
+                                .where((con) => con.statutSousRegion == true)
+                                .toList();
+            
+                            if (sousList.isEmpty) {
+                              return Text(
+                                'Aucun sous region disponible',
+                                style: TextStyle(overflow: TextOverflow.ellipsis),
+                              );
+                            }
+            
+                            return DropdownButtonFormField<String>(
+                              items: sousList
+                                  .map(
+                                    (e) => DropdownMenuItem(
+                                      value: e.idSousRegion,
+                                      child: Text(e.nomSousRegion),
+                                    ),
+                                  )
+                                  .toList(),
+                              value: sousValue,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  sousValue = newValue;
+                                  if (newValue != null) {
+                                    sousRegion = sousList.firstWhere((element) =>
+                                        element.idSousRegion == newValue);
+                                    debugPrint(
+                                        "con select ${sousRegion.idSousRegion.toString()}");
+                                    // typeSelected = true;
+                                  }
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Sélectionner un sous région',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                                duration: Duration(seconds: 5),
                               ),
                             );
                           }
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green, // Orange color code
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
+                          return Text(
+                            'Aucune donnée disponible',
+                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: descriptionController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Description",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
-                        minimumSize: const Size(290, 45),
                       ),
-                      icon: const Icon(
-                        Icons.add,
-                        color: Colors.white,
-                      ),
-                      label: const Text(
-                        "Ajouter",
-                        style: TextStyle(
-                          fontSize: 20,
+                      SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final String libelle = libelleController.text;
+                          final String description = descriptionController.text;
+                          if (formkey.currentState!.validate()) {
+                            try {
+                              await PaysService()
+                                  .addPays(
+                                      nomPays: libelle,
+                                      descriptionPays: description,
+                                      sousRegion: sousRegion)
+                                  .then((value) => {
+                                        Provider.of<PaysService>(context,
+                                                listen: false)
+                                            .applyChange(),
+                                        Provider.of<PaysService>(context,
+                                                listen: false)
+                                            .applyChange(),
+                                        libelleController.clear(),
+                                        descriptionController.clear(),
+                                        setState(() {
+                                          sousRegion == null;
+                                        }),
+                                        Navigator.of(context).pop()
+                                      });
+                            } catch (e) {
+                              final String errorMessage = e.toString();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Text("Une erreur s'est produit"),
+                                    ],
+                                  ),
+                                  duration: Duration(seconds: 5),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green, // Orange color code
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          minimumSize: const Size(290, 45),
+                        ),
+                        icon: const Icon(
+                          Icons.add,
                           color: Colors.white,
-                          fontWeight: FontWeight.w700,
                         ),
-                      ),
-                    )
-                  ],
+                        label: const Text(
+                          "Ajouter",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

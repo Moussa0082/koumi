@@ -13,13 +13,13 @@ class Niveau3Service extends ChangeNotifier {
   Future<void> addNiveau3Pays({
     required String nomN3,
     required String descriptionN3,
-    required Niveau2Pays niveau2pays,
+    required Niveau2Pays niveau2Pays,
   }) async {
     var addPays = jsonEncode({
       'idNiveau3Pays': null,
       'nomN3': nomN3,
       'descriptionN3': descriptionN3,
-      'niveau2pays': niveau2pays.toMap()
+      'niveau2Pays': niveau2Pays.toMap()
     });
 
     final response = await http.post(Uri.parse("$baseUrl/create"),
