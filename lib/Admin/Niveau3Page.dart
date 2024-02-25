@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/CodePays.dart';
 import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
@@ -26,22 +29,18 @@ class _Niveau3PageState extends State<Niveau3Page> {
   TextEditingController descriptionController = TextEditingController();
   late Future<List<Niveau3Pays>> _liste;
   List<ParametreGeneraux> paraList = [];
-  late Niveau2Pays n2;
-
-  // Future<List<Niveau3Pays>> getNiveauListe() async {
-  //   final response = await Niveau3Service()
-  //       .fetchNiveau3ByNiveau2(widget.niveau2pays.idNiveau2Pays!);
-  //   return response;
-  // }
+  late Niveau2Pays niveau2;
+  late Future _paysList;
+  String? niveau2Value;
+  late Future _niveauList;
 
   @override
   void initState() {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
     para = paraList[0];
-    // _liste = getNiveauListe();
-    // _liste.toString();
-    // n2 = widget.niveau2pays;
+    _niveauList =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau2Pays/read'));
     super.initState();
   }
 
@@ -68,9 +67,9 @@ class _Niveau3PageState extends State<Niveau3Page> {
               _showDialog();
             },
             icon: const Icon(
-              Icons.add_circle_outline,
+              Icons.add,
               color: d_colorGreen,
-              size: 25,
+              size: 30,
             ),
           )
         ],
@@ -81,7 +80,7 @@ class _Niveau3PageState extends State<Niveau3Page> {
             Consumer<Niveau3Service>(
               builder: (context, niveau3Service, child) {
                 return FutureBuilder(
-                    future: _liste,
+                    future: niveau3Service.fetchNiveau3Pays(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(
@@ -92,9 +91,11 @@ class _Niveau3PageState extends State<Niveau3Page> {
                       }
 
                       if (!snapshot.hasData) {
-                        return const Padding(
+                        return Padding(
                           padding: EdgeInsets.all(10),
-                          child: Center(child: Text("Aucun catégorie trouvé")),
+                          child: Center(
+                              child: Text(
+                                  "Aucun ${para.libelleNiveau3Pays} trouvé")),
                         );
                       } else {
                         niveauList = snapshot.data!;
@@ -105,7 +106,6 @@ class _Niveau3PageState extends State<Niveau3Page> {
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 15),
                                       child: Container(
-                                        height: 120,
                                         width:
                                             MediaQuery.of(context).size.width *
                                                 0.9,
@@ -126,9 +126,11 @@ class _Niveau3PageState extends State<Niveau3Page> {
                                         child: Column(
                                           children: [
                                             ListTile(
-                                                leading: CodePays().getFlag(
-                                                    e.niveau2Pays.niveau1Pays!.pays.nomPays
-                                                        ),
+                                                leading: CodePays().getFlag(e
+                                                    .niveau2Pays
+                                                    .niveau1Pays!
+                                                    .pays
+                                                    .nomPays),
                                                 title:
                                                     Text(e.nomN3.toUpperCase(),
                                                         style: const TextStyle(
@@ -251,7 +253,6 @@ class _Niveau3PageState extends State<Niveau3Page> {
                                                                     (value) => {
                                                                           Provider.of<Niveau3Service>(context, listen: false)
                                                                               .applyChange(),
-                                                                         
                                                                           Navigator.of(context)
                                                                               .pop(),
                                                                         })
@@ -332,7 +333,6 @@ class _Niveau3PageState extends State<Niveau3Page> {
                                                               ),
                                                             );
 
-                                                           
                                                             if (updatedSousRegion !=
                                                                 null) {
                                                               Provider.of<Niveau3Service>(
@@ -340,12 +340,6 @@ class _Niveau3PageState extends State<Niveau3Page> {
                                                                       listen:
                                                                           false)
                                                                   .applyChange();
-                                                              // setState(() {
-                                                              //   _liste = Niveau3Service()
-                                                              //       .fetchCategorieByFiliere(
-                                                              //           filiere
-                                                              //               .idFiliere!);
-                                                              // });
                                                             }
                                                           },
                                                         ),
@@ -373,11 +367,6 @@ class _Niveau3PageState extends State<Niveau3Page> {
                                                                     (value) => {
                                                                           Provider.of<Niveau3Service>(context, listen: false)
                                                                               .applyChange(),
-                                                                          // setState(
-                                                                          //     () {
-                                                                          //   _liste =
-                                                                          //       Niveau3Service().fetchNiveau3ByNiveau2(widget.niveau2pays.idNiveau2Pays!);
-                                                                          // }),
                                                                           Navigator.of(context)
                                                                               .pop(),
                                                                         })
@@ -429,173 +418,259 @@ class _Niveau3PageState extends State<Niveau3Page> {
         ),
         child: Container(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Center(
-                child: Text(
-                  "Ajouter un(e) ${para.libelleNiveau2Pays}",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 18,
-                  ),
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(height: 5),
-              Form(
-                key: formkey,
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 10,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ListTile(
+                  title: Text(
+                    "Ajouter un(e) ${para.libelleNiveau2Pays}",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 18,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextFormField(
+                    textAlign: TextAlign.center,
+                  ),
+                  trailing: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: Icon(
+                      Icons.close,
+                      color: Colors.red,
+                      size: 24,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Form(
+                  key: formkey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
+                            return "Veuillez remplir ce champ";
                           }
                           return null;
                         },
                         controller: libelleController,
                         decoration: InputDecoration(
-                          hintText: "Nom du niveau 2",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
+                          labelText: "Nom du ${para.libelleNiveau3Pays}",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextFormField(
+                      // SizedBox(height: 16),
+                      // FutureBuilder(
+                      //   future: _paysList,
+                      //   builder: (_, snapshot) {
+                      //     if (snapshot.connectionState ==
+                      //         ConnectionState.waiting) {
+                      //       return CircularProgressIndicator();
+                      //     }
+                      //     if (snapshot.hasError) {
+                      //       return Text("${snapshot.error}");
+                      //     }
+                      //     if (snapshot.hasData) {
+                      //       final reponse =
+                      //           json.decode((snapshot.data.body)) as List;
+                      //       final paysList = reponse
+                      //           .map((e) => Pays.fromMap(e))
+                      //           .where((con) => con.statutPays == true)
+                      //           .toList();
+
+                      //       if (paysList.isEmpty) {
+                      //         return Text(
+                      //           'Aucun donné disponible',
+                      //           style:
+                      //               TextStyle(overflow: TextOverflow.ellipsis),
+                      //         );
+                      //       }
+
+                      //       return DropdownButtonFormField<String>(
+                      //         items: paysList
+                      //             .map(
+                      //               (e) => DropdownMenuItem(
+                      //                 value: e.idPays,
+                      //                 child: Text(e.nomPays),
+                      //               ),
+                      //             )
+                      //             .toList(),
+                      //         value: paysValue,
+                      //         onChanged: (newValue) {
+                      //           setState(() {
+                      //             paysValue = newValue;
+                      //             if (newValue != null) {
+                      //               pays = paysList.firstWhere((element) =>
+                      //                   element.idPays == newValue);
+
+                      //               // typeSelected = true;
+                      //             }
+                      //           });
+                      //         },
+                      //         decoration: InputDecoration(
+                      //           labelText: 'Sélectionner un pays',
+                      //           border: OutlineInputBorder(
+                      //             borderRadius: BorderRadius.circular(8),
+                      //           ),
+                      //         ),
+                      //       );
+                      //     }
+                      //     return Text(
+                      //       'Aucune donnée disponible',
+                      //       style: TextStyle(overflow: TextOverflow.ellipsis),
+                      //     );
+                      //   },
+                      // ),
+                      SizedBox(height: 16),
+                      FutureBuilder(
+                        future: _niveauList,
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          }
+                          if (snapshot.hasError) {
+                            return Text("${snapshot.error}");
+                          }
+                          if (snapshot.hasData) {
+                            final reponse =
+                                json.decode((snapshot.data.body)) as List;
+                            final niveauList = reponse
+                                .map((e) => Niveau2Pays.fromMap(e))
+                                .where((con) => con.statutN2 == true)
+                                .toList();
+
+                            if (niveauList.isEmpty) {
+                              return Text(
+                                'Aucun donné disponible',
+                                style:
+                                    TextStyle(overflow: TextOverflow.ellipsis),
+                              );
+                            }
+
+                            return DropdownButtonFormField<String>(
+                              items: niveauList
+                                  .map(
+                                    (e) => DropdownMenuItem(
+                                      value: e.idNiveau2Pays,
+                                      child: Text(e.nomN2),
+                                    ),
+                                  )
+                                  .toList(),
+                              value: niveau2Value,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  niveau2Value = newValue;
+                                  if (newValue != null) {
+                                    niveau2 = niveauList.firstWhere((element) =>
+                                        element.idNiveau2Pays == newValue);
+                                    debugPrint(
+                                        "niveau select :${niveau2.toString()}");
+                                    // typeSelected = true;
+                                  }
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText:
+                                    'Sélectionner un ${para.libelleNiveau2Pays}',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+                          return Text(
+                            'Aucune donnée disponible',
+                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
+                            return "Veuillez remplir ce champ";
                           }
                           return null;
                         },
                         controller: descriptionController,
+                        maxLines: null,
                         decoration: InputDecoration(
-                          hintText: "Description",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
+                          labelText: "Description",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () async {
-                              final String libelle = libelleController.text;
-                              final String description =
-                                  descriptionController.text;
-                              // final Niveau2Pays niveau2 = widget.niveau2pays;
-                              if (formkey.currentState!.validate()) {
-                                // try {
-                                //   await Niveau3Service()
-                                //       .addNiveau3Pays(
-                                //           nomN3: libelle,
-                                //           descriptionN3: description,
-                                //           niveau2pays: niveau2)
-                                //       .then((value) => {
-                                //             Provider.of<Niveau3Service>(context,
-                                //                     listen: false)
-                                //                 .applyChange(),
-                                //             setState(() {
-                                //               _liste = Niveau3Service()
-                                //                   .fetchNiveau3ByNiveau2(widget
-                                //                       .niveau2pays
-                                //                       .idNiveau2Pays!);
-                                //             })
-                                //           })
-                                //       .catchError((onError) =>
-                                //           {print(onError.message)});
-
-                                //   libelleController.clear();
-                                //   descriptionController.clear();
-                                //   Navigator.of(context).pop();
-                                // } catch (e) {
-                                //   final String errorMessage = e.toString();
-                                //   print(errorMessage);
-                                //   ScaffoldMessenger.of(context).showSnackBar(
-                                //     const SnackBar(
-                                //       content:
-                                //           Text("Une erreur s'est produite"),
-                                //       duration: Duration(seconds: 5),
-                                //     ),
-                                //   );
-                                // }
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            icon: const Icon(
-                              Icons.add,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              "Ajouter",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
+                      SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final String libelle = libelleController.text;
+                          final String description = descriptionController.text;
+                          if (formkey.currentState!.validate()) {
+                            try {
+                              await Niveau3Service()
+                                  .addNiveau3Pays(
+                                      nomN3: libelle,
+                                      descriptionN3: description,
+                                      niveau2Pays: niveau2)
+                                  .then((value) => {
+                                        Provider.of<Niveau3Service>(context,
+                                                listen: false)
+                                            .applyChange(),
+                                        libelleController.clear(),
+                                        descriptionController.clear(),
+                                        Navigator.of(context).pop(),
+                                        setState(() {
+                                          niveau2 == null;
+                                        }),
+                                      });
+                            } catch (e) {
+                              final String errorMessage = e.toString();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Text("Une erreur s'est produit"),
+                                    ],
+                                  ),
+                                  duration: Duration(seconds: 5),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green, // Orange color code
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          minimumSize: const Size(290, 45),
+                        ),
+                        icon: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          "Ajouter",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pop(); // Ferme la boîte de dialogue
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            icon: const Icon(
-                              Icons.close,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              "Annuler",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
-              )
-            ],
+              ],
+            ),
           ),
         ),
       ),

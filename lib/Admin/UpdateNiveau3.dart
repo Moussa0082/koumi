@@ -1,62 +1,46 @@
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:koumi_app/models/Niveau2Pays.dart';
+import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-import 'package:koumi_app/models/Acteur.dart';
-import 'package:koumi_app/models/Niveau1Pays.dart';
-import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
-import 'package:koumi_app/models/Pays.dart';
-import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
-import 'package:koumi_app/service/Niveau2Service.dart';
+import 'package:koumi_app/service/Niveau3Service.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 
-class UpdatesNiveau2 extends StatefulWidget {
-  final Niveau2Pays niveau2pays;
-  const UpdatesNiveau2({super.key, required this.niveau2pays});
+class UpdateNiveau3 extends StatefulWidget {
+  final Niveau3Pays niveau3pays;
+  const UpdateNiveau3({super.key, required this.niveau3pays});
 
   @override
-  State<UpdatesNiveau2> createState() => _UpdatesNiveau2State();
+  State<UpdateNiveau3> createState() => _UpdateNiveau3State();
 }
 
-const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
-const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
-
-class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
+class _UpdateNiveau3State extends State<UpdateNiveau3> {
   late ParametreGeneraux para;
-  List<Niveau2Pays> niveauList = [];
   final formkey = GlobalKey<FormState>();
   TextEditingController libelleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  late Future<List<Niveau2Pays>> _liste;
+
   List<ParametreGeneraux> paraList = [];
-  late Niveau2Pays niveau;
-  late Acteur acteur;
-  late Niveau1Pays niveau1;
-  late Pays pays;
-  String? paysValue;
+  late Niveau2Pays niveau2;
   late Future _paysList;
-  String? n1Value;
+  String? niveau2Value;
   late Future _niveauList;
 
   @override
   void initState() {
     super.initState();
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
     para = paraList[0];
-    _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
     _niveauList =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
-    niveau = widget.niveau2pays;
-    libelleController.text = niveau.nomN2;
-    descriptionController.text = niveau.descriptionN2;
-    niveau1 = niveau.niveau1Pays!;
-    n1Value = niveau.niveau1Pays!.idNiveau1Pays;
-    paysValue = niveau.niveau1Pays!.pays.idPays;
-    pays = niveau.niveau1Pays!.pays;
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau2Pays/read'));
+    libelleController.text = widget.niveau3pays.nomN3;
+    descriptionController.text = widget.niveau3pays.descriptionN3;
+    niveau2 = widget.niveau3pays.niveau2Pays;
+    niveau2Value = widget.niveau3pays.niveau2Pays.idNiveau2Pays;
   }
 
   @override
@@ -104,71 +88,74 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                     },
                     controller: libelleController,
                     decoration: InputDecoration(
-                      labelText: "Nom du ${para.libelleNiveau2Pays}",
+                      labelText: "Nom du ${para.libelleNiveau3Pays}",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                   ),
-                  SizedBox(height: 16),
-                  FutureBuilder(
-                    future: _paysList,
-                    builder: (_, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      }
-                      if (snapshot.hasError) {
-                        return Text("${snapshot.error}");
-                      }
-                      if (snapshot.hasData) {
-                        final reponse = json.decode((snapshot.data.body)) as List;
-                        final paysList = reponse
-                            .map((e) => Pays.fromMap(e))
-                            .where((con) => con.statutPays == true)
-                            .toList();
-        
-                        if (paysList.isEmpty) {
-                          return Text(
-                            'Aucun donné disponible',
-                            style: TextStyle(overflow: TextOverflow.ellipsis),
-                          );
-                        }
-        
-                        return DropdownButtonFormField<String>(
-                          items: paysList
-                              .map(
-                                (e) => DropdownMenuItem(
-                                  value: e.idPays,
-                                  child: Text(e.nomPays),
-                                ),
-                              )
-                              .toList(),
-                          value: paysValue,
-                          onChanged: (newValue) {
-                            setState(() {
-                              paysValue = newValue;
-                              if (newValue != null) {
-                                pays = paysList.firstWhere(
-                                    (element) => element.idPays == newValue);
-        
-                                // typeSelected = true;
-                              }
-                            });
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'Sélectionner un pays',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        );
-                      }
-                      return Text(
-                        'Aucune donnée disponible',
-                        style: TextStyle(overflow: TextOverflow.ellipsis),
-                      );
-                    },
-                  ),
+                  // SizedBox(height: 16),
+                  // FutureBuilder(
+                  //   future: _paysList,
+                  //   builder: (_, snapshot) {
+                  //     if (snapshot.connectionState ==
+                  //         ConnectionState.waiting) {
+                  //       return CircularProgressIndicator();
+                  //     }
+                  //     if (snapshot.hasError) {
+                  //       return Text("${snapshot.error}");
+                  //     }
+                  //     if (snapshot.hasData) {
+                  //       final reponse =
+                  //           json.decode((snapshot.data.body)) as List;
+                  //       final paysList = reponse
+                  //           .map((e) => Pays.fromMap(e))
+                  //           .where((con) => con.statutPays == true)
+                  //           .toList();
+
+                  //       if (paysList.isEmpty) {
+                  //         return Text(
+                  //           'Aucun donné disponible',
+                  //           style:
+                  //               TextStyle(overflow: TextOverflow.ellipsis),
+                  //         );
+                  //       }
+
+                  //       return DropdownButtonFormField<String>(
+                  //         items: paysList
+                  //             .map(
+                  //               (e) => DropdownMenuItem(
+                  //                 value: e.idPays,
+                  //                 child: Text(e.nomPays),
+                  //               ),
+                  //             )
+                  //             .toList(),
+                  //         value: paysValue,
+                  //         onChanged: (newValue) {
+                  //           setState(() {
+                  //             paysValue = newValue;
+                  //             if (newValue != null) {
+                  //               pays = paysList.firstWhere((element) =>
+                  //                   element.idPays == newValue);
+
+                  //               // typeSelected = true;
+                  //             }
+                  //           });
+                  //         },
+                  //         decoration: InputDecoration(
+                  //           labelText: 'Sélectionner un pays',
+                  //           border: OutlineInputBorder(
+                  //             borderRadius: BorderRadius.circular(8),
+                  //           ),
+                  //         ),
+                  //       );
+                  //     }
+                  //     return Text(
+                  //       'Aucune donnée disponible',
+                  //       style: TextStyle(overflow: TextOverflow.ellipsis),
+                  //     );
+                  //   },
+                  // ),
                   SizedBox(height: 16),
                   FutureBuilder(
                     future: _niveauList,
@@ -180,37 +167,38 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                         return Text("${snapshot.error}");
                       }
                       if (snapshot.hasData) {
-                        final reponse = json.decode((snapshot.data.body)) as List;
+                        final reponse =
+                            json.decode((snapshot.data.body)) as List;
                         final niveauList = reponse
-                            .map((e) => Niveau1Pays.fromMap(e))
-                            .where((con) => con.statutN1 == true)
+                            .map((e) => Niveau2Pays.fromMap(e))
+                            .where((con) => con.statutN2 == true)
                             .toList();
-        
+
                         if (niveauList.isEmpty) {
                           return Text(
                             'Aucun donné disponible',
                             style: TextStyle(overflow: TextOverflow.ellipsis),
                           );
                         }
-        
+
                         return DropdownButtonFormField<String>(
                           items: niveauList
                               .map(
                                 (e) => DropdownMenuItem(
-                                  value: e.idNiveau1Pays,
-                                  child: Text(e.nomN1),
+                                  value: e.idNiveau2Pays,
+                                  child: Text(e.nomN2),
                                 ),
                               )
                               .toList(),
-                          value: n1Value,
+                          value: niveau2Value,
                           onChanged: (newValue) {
                             setState(() {
-                              paysValue = newValue;
+                              niveau2Value = newValue;
                               if (newValue != null) {
-                                niveau1 = niveauList.firstWhere((element) =>
-                                    element.idNiveau1Pays == newValue);
+                                niveau2 = niveauList.firstWhere((element) =>
+                                    element.idNiveau2Pays == newValue);
                                 debugPrint(
-                                    "niveau select :${niveau1.toString()}");
+                                    "niveau select :${niveau2.toString()}");
                                 // typeSelected = true;
                               }
                             });
@@ -254,23 +242,17 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                       final String description = descriptionController.text;
                       if (formkey.currentState!.validate()) {
                         try {
-                          await Niveau2Service()
-                              .updateNiveau2Pays(
-                                  idNiveau2Pays: niveau.idNiveau2Pays!,
-                                  nomN2: libelle,
-                                  descriptionN2: description,
-                                  personeModif: acteur.nomActeur,
-                                  niveau1Pays: niveau1)
+                          await Niveau3Service()
+                              .updateNiveau3Pays(idNiveau3Pays: widget.niveau3pays.idNiveau3Pays! , nomN3: libelle, descriptionN3: description, niveau2Pays: niveau2)
                               .then((value) => {
-                                    Provider.of<Niveau2Service>(context,
+                                    Provider.of<Niveau3Service>(context,
                                             listen: false)
                                         .applyChange(),
                                     libelleController.clear(),
                                     descriptionController.clear(),
                                     Navigator.of(context).pop(),
                                     setState(() {
-                                      pays == null;
-                                      niveau1 == null;
+                                      niveau2 == null;
                                     }),
                                   });
                         } catch (e) {

@@ -99,9 +99,9 @@ class _Niveau2PageState extends State<Niveau2Page> {
                   }
 
                   if (!snapshot.hasData) {
-                    return const Padding(
+                    return  Padding(
                       padding: EdgeInsets.all(10),
-                      child: Center(child: Text("Aucun donné trouvé")),
+                      child: Center(child: Text("Aucun ${para.libelleNiveau2Pays} trouvé")),
                     );
                   } else {
                     niveauList = snapshot.data!;
@@ -479,68 +479,68 @@ class _Niveau2PageState extends State<Niveau2Page> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 16),
-                      FutureBuilder(
-                        future: _paysList,
-                        builder: (_, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return CircularProgressIndicator();
-                          }
-                          if (snapshot.hasError) {
-                            return Text("${snapshot.error}");
-                          }
-                          if (snapshot.hasData) {
-                            final reponse =
-                                json.decode((snapshot.data.body)) as List;
-                            final paysList = reponse
-                                .map((e) => Pays.fromMap(e))
-                                .where((con) => con.statutPays == true)
-                                .toList();
+                      // SizedBox(height: 16),
+                      // FutureBuilder(
+                      //   future: _paysList,
+                      //   builder: (_, snapshot) {
+                      //     if (snapshot.connectionState ==
+                      //         ConnectionState.waiting) {
+                      //       return CircularProgressIndicator();
+                      //     }
+                      //     if (snapshot.hasError) {
+                      //       return Text("${snapshot.error}");
+                      //     }
+                      //     if (snapshot.hasData) {
+                      //       final reponse =
+                      //           json.decode((snapshot.data.body)) as List;
+                      //       final paysList = reponse
+                      //           .map((e) => Pays.fromMap(e))
+                      //           .where((con) => con.statutPays == true)
+                      //           .toList();
 
-                            if (paysList.isEmpty) {
-                              return Text(
-                                'Aucun donné disponible',
-                                style:
-                                    TextStyle(overflow: TextOverflow.ellipsis),
-                              );
-                            }
+                      //       if (paysList.isEmpty) {
+                      //         return Text(
+                      //           'Aucun donné disponible',
+                      //           style:
+                      //               TextStyle(overflow: TextOverflow.ellipsis),
+                      //         );
+                      //       }
 
-                            return DropdownButtonFormField<String>(
-                              items: paysList
-                                  .map(
-                                    (e) => DropdownMenuItem(
-                                      value: e.idPays,
-                                      child: Text(e.nomPays),
-                                    ),
-                                  )
-                                  .toList(),
-                              value: paysValue,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  paysValue = newValue;
-                                  if (newValue != null) {
-                                    pays = paysList.firstWhere((element) =>
-                                        element.idPays == newValue);
+                      //       return DropdownButtonFormField<String>(
+                      //         items: paysList
+                      //             .map(
+                      //               (e) => DropdownMenuItem(
+                      //                 value: e.idPays,
+                      //                 child: Text(e.nomPays),
+                      //               ),
+                      //             )
+                      //             .toList(),
+                      //         value: paysValue,
+                      //         onChanged: (newValue) {
+                      //           setState(() {
+                      //             paysValue = newValue;
+                      //             if (newValue != null) {
+                      //               pays = paysList.firstWhere((element) =>
+                      //                   element.idPays == newValue);
 
-                                    // typeSelected = true;
-                                  }
-                                });
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Sélectionner un pays',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            );
-                          }
-                          return Text(
-                            'Aucune donnée disponible',
-                            style: TextStyle(overflow: TextOverflow.ellipsis),
-                          );
-                        },
-                      ),
+                      //               // typeSelected = true;
+                      //             }
+                      //           });
+                      //         },
+                      //         decoration: InputDecoration(
+                      //           labelText: 'Sélectionner un pays',
+                      //           border: OutlineInputBorder(
+                      //             borderRadius: BorderRadius.circular(8),
+                      //           ),
+                      //         ),
+                      //       );
+                      //     }
+                      //     return Text(
+                      //       'Aucune donnée disponible',
+                      //       style: TextStyle(overflow: TextOverflow.ellipsis),
+                      //     );
+                      //   },
+                      // ),
                       SizedBox(height: 16),
                       FutureBuilder(
                         future: _niveauList,

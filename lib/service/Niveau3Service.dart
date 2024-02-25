@@ -36,13 +36,13 @@ class Niveau3Service extends ChangeNotifier {
     required String idNiveau3Pays,
     required String nomN3,
     required String descriptionN3,
-    required Niveau2Pays niveau2pays,
+    required Niveau2Pays niveau2Pays,
   }) async {
     var addPays = jsonEncode({
       'idNiveau3Pays': idNiveau3Pays,
       'nomN3': nomN3,
       'descriptionN3': descriptionN3,
-      'niveau2pays': niveau2pays.toMap()
+      'niveau2Pays': niveau2Pays.toMap()
     });
 
     final response = await http.post(Uri.parse("$baseUrl/update/$idNiveau3Pays"),

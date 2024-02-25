@@ -11,6 +11,7 @@ class Niveau3Pays {
   final bool statutN3;
   final String? dateAjout;
   final String? dateModif;
+  final String? personneModif;
   final Niveau2Pays niveau2Pays;
   
   Niveau3Pays({
@@ -21,9 +22,11 @@ class Niveau3Pays {
     required this.statutN3,
     this.dateAjout,
     this.dateModif,
+    this.personneModif,
     required this.niveau2Pays,
   });
   
+ 
 
   Niveau3Pays copyWith({
     String? idNiveau3Pays,
@@ -33,6 +36,7 @@ class Niveau3Pays {
     bool? statutN3,
     String? dateAjout,
     String? dateModif,
+    String? personneModif,
     Niveau2Pays? niveau2Pays,
   }) {
     return Niveau3Pays(
@@ -43,6 +47,7 @@ class Niveau3Pays {
       statutN3: statutN3 ?? this.statutN3,
       dateAjout: dateAjout ?? this.dateAjout,
       dateModif: dateModif ?? this.dateModif,
+      personneModif: personneModif ?? this.personneModif,
       niveau2Pays: niveau2Pays ?? this.niveau2Pays,
     );
   }
@@ -56,6 +61,7 @@ class Niveau3Pays {
       'statutN3': statutN3,
       'dateAjout': dateAjout,
       'dateModif': dateModif,
+      'personneModif': personneModif,
       'niveau2Pays': niveau2Pays.toMap(),
     };
   }
@@ -69,6 +75,7 @@ class Niveau3Pays {
       statutN3: map['statutN3'] as bool,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
+      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       niveau2Pays: Niveau2Pays.fromMap(map['niveau2Pays'] as Map<String,dynamic>),
     );
   }
@@ -79,7 +86,7 @@ class Niveau3Pays {
 
   @override
   String toString() {
-    return 'Niveau3Pays(idNiveau3Pays: $idNiveau3Pays, codeN3: $codeN3, nomN3: $nomN3, descriptionN3: $descriptionN3, statutN3: $statutN3, dateAjout: $dateAjout, dateModif: $dateModif, niveau2Pays: $niveau2Pays)';
+    return 'Niveau3Pays(idNiveau3Pays: $idNiveau3Pays, codeN3: $codeN3, nomN3: $nomN3, descriptionN3: $descriptionN3, statutN3: $statutN3, dateAjout: $dateAjout, dateModif: $dateModif, personneModif: $personneModif, niveau2Pays: $niveau2Pays)';
   }
 
   @override
@@ -94,6 +101,7 @@ class Niveau3Pays {
       other.statutN3 == statutN3 &&
       other.dateAjout == dateAjout &&
       other.dateModif == dateModif &&
+      other.personneModif == personneModif &&
       other.niveau2Pays == niveau2Pays;
   }
 
@@ -106,6 +114,7 @@ class Niveau3Pays {
       statutN3.hashCode ^
       dateAjout.hashCode ^
       dateModif.hashCode ^
+      personneModif.hashCode ^
       niveau2Pays.hashCode;
   }
 }
