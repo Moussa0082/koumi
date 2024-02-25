@@ -10,7 +10,8 @@ import 'package:shimmer/shimmer.dart';
 
 class ProduitScreen extends StatefulWidget {
   final String? id; // ID du magasin (optionnel)
-  ProduitScreen({super.key, this.id});
+  final String? nom;
+  ProduitScreen({super.key, this.id, this.nom});
 
   @override
   State<ProduitScreen> createState() => _ProduitScreenState();
@@ -24,6 +25,7 @@ class _ProduitScreenState extends State<ProduitScreen>
   List<Stock> stock = [];
   List<CategorieProduit> categorieProduit = [];
   String selectedCategorieProduit = "";
+  String selectedCategorieProduitNom = "";
 
   Set<String> loadedRegions = {};
 
@@ -70,6 +72,8 @@ class _ProduitScreenState extends State<ProduitScreen>
           _tabController!.addListener(_handleTabChange);
           selectedCategorieProduit =
               categorieProduit.isNotEmpty ? categorieProduit.first.idCategorieProduit! : '';
+          selectedCategorieProduitNom =
+              categorieProduit.isNotEmpty ? categorieProduit[_tabController!.index].libelleCategorie : '';
           fetchProduitByCategorie(selectedCategorieProduit, widget.id!);
         });
         debugPrint("Id Cat : ${categorieProduit.map((e) => e.idCategorieProduit)}");
@@ -87,6 +91,8 @@ class _ProduitScreenState extends State<ProduitScreen>
         _tabController!.index < categorieProduit.length) {
       selectedCategorieProduit =
           categorieProduit[_tabController!.index].idCategorieProduit!;
+      selectedCategorieProduitNom =
+          categorieProduit[_tabController!.index].libelleCategorie;
       fetchProduitByCategorie(selectedCategorieProduit, widget.id!);
       debugPrint("Cat id : " + selectedCategorieProduit);
     }
@@ -176,28 +182,35 @@ class _ProduitScreenState extends State<ProduitScreen>
 
 
 Widget buildGridView(String idCategorie, String idMagasin) {
-  // Filtrer les stocks en fonction de la catégorie sélectionnée
-  // List<Stock> filteredStocks = stock.where((stock) {
-  //   // Vérifier si le stock appartient au magasin sélectionné
-  //   return stock.magasin!.idMagasin == idMagasin &&
-  //       stock.speculation!.categorieProduit.idCategorieProduit == idCategorie;
-  // }).toList();
+  
   List<Stock> filteredStocks = stock;
- 
+  String searchText = "";
   if (filteredStocks.isEmpty) {
-    return _buildShimmerEffect();
+   return Padding(
+     padding: const EdgeInsets.all(8.0),
+     child: Center(
+          child: Text( textAlign:TextAlign.justify,
+            'Aucun produit trouvé dans le magasin ' + widget.nom!.toUpperCase() + " dans la categorie " +  selectedCategorieProduitNom.toUpperCase(),
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
+   );
   } else {
     List<Stock> filteredStocksSearch = filteredStocks.where((stock) {
       String nomProduit = stock.nomProduit!.toLowerCase();
-      String searchText = _searchController.text.toLowerCase();
+       searchText = _searchController.text.toLowerCase();
       return nomProduit.contains(searchText);
     }).toList();
 
     if (filteredStocksSearch.isEmpty) {
-      return Center(
-        child: Text(
-          'Aucun stock trouvé',
-          style: TextStyle(fontSize: 16),
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Text(
+            textAlign:TextAlign.justify,
+            'Aucun produit trouvé avec le nom ' +  searchText.toUpperCase()  + " dans la categorie " +  selectedCategorieProduitNom.toUpperCase(),
+            style: TextStyle(fontSize: 16),
+          ),
         ),
       );
     }

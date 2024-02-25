@@ -219,9 +219,10 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
             child: GestureDetector(
               onTap:(){
                  String id = magasin['idMagasin'];
+                 String nom = magasin['nomMagasin'];
                 Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => ProduitScreen(id:id)),
+            MaterialPageRoute(builder: (context) => ProduitScreen(id:id, nom: nom,)),
           );
               },
               child: Card(
