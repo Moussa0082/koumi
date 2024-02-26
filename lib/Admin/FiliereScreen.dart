@@ -1,9 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/AddCategorie.dart';
 import 'package:koumi_app/Admin/UpdatesFiliere.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Filiere.dart';
+import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
 import 'package:provider/provider.dart';
 
@@ -19,16 +25,26 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _FiliereScreenState extends State<FiliereScreen> {
   List<Filiere> filiereList = [];
+  late ParametreGeneraux para;
+  List<ParametreGeneraux> paraList = [];
   late Acteur acteur;
   final formkey = GlobalKey<FormState>();
   TextEditingController libelleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  String? filiereValue;
+  late Future _filiereList;
+  late Filiere filiere;
 
   @override
   void initState() {
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-
     super.initState();
+
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+    para = paraList[0];
+    _filiereList = http.get(
+        Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
   }
 
   @override
@@ -48,16 +64,57 @@ class _FiliereScreenState extends State<FiliereScreen> {
           style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              _showDialog();
-            },
-            icon: const Icon(
-              Icons.add_circle_outline,
-              color: d_colorGreen,
-              size: 25,
-            ),
+          PopupMenuButton<String>(
+            padding: EdgeInsets.zero,
+            itemBuilder: (context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.add,
+                    color: Colors.green,
+                  ),
+                  title: const Text(
+                    "Ajouter filières",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onTap: () async {
+                    _showDialog();
+                  },
+                ),
+              ),
+              PopupMenuItem<String>(
+                child: ListTile(
+                  leading: Icon(
+                    Icons.add,
+                    color: Colors.orange[400],
+                  ),
+                  title: Text(
+                    "Ajouter catégorie",
+                    style: TextStyle(
+                      color: Colors.orange[400],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onTap: () async {
+                    _addCategorie();
+                  },
+                ),
+              ),
+            ],
           )
+          // IconButton(
+          //   onPressed: () {
+          //     _addCategorie();
+          //   },
+          //   icon: const Icon(
+          //     Icons.add_circle_outline,
+          //     color: d_colorGreen,
+          //     size: 25,
+          //   ),
+          // )
         ],
       ),
       body: SingleChildScrollView(
@@ -91,7 +148,6 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 15),
                                       child: Container(
-                                        height: 120,
                                         width:
                                             MediaQuery.of(context).size.width *
                                                 0.9,
@@ -107,7 +163,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                               blurRadius: 5,
                                               spreadRadius: 2,
                                             ),
-                                           ],
+                                          ],
                                         ),
                                         child: GestureDetector(
                                           onTap: () {
@@ -192,7 +248,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                             leading: const Icon(
                                                               Icons.check,
                                                               color:
-                                                                    Colors.green,
+                                                                  Colors.green,
                                                             ),
                                                             title: const Text(
                                                               "Activer",
@@ -329,19 +385,13 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                                   await showDialog(
                                                                 context:
                                                                     context,
-                                                                builder: (BuildContext
-                                                                        context) =>
-                                                                    AlertDialog(
-                                                                        backgroundColor:
-                                                                            Colors
-                                                                                .white,
-                                                                        shape:
-                                                                            RoundedRectangleBorder(
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(16),
-                                                                        ),
-                                                                        content:
-                                                                            UpdatesFilieres(filiere: e)),
+                                                                builder: (BuildContext context) => AlertDialog(
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .white,
+                                                                    content: UpdatesFilieres(
+                                                                        filiere:
+                                                                            e)),
                                                               );
 
                                                               // Si les détails sont modifiés, appliquer les changements
@@ -488,32 +538,40 @@ class _FiliereScreenState extends State<FiliereScreen> {
         ),
         child: Container(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Center(
-                child: Text(
-                  "Ajouter une filière",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 18,
-                  ),
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(height: 5),
-              Form(
-                key: formkey,
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 10,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: Text(
+                    "Ajouter une filière",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 18,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextFormField(
+                    textAlign: TextAlign.center,
+                  ),
+                  trailing: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: Icon(
+                      Icons.close,
+                      color: Colors.red,
+                      size: 24,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Form(
+                  key: formkey,
+                  child: Column(
+                    children: [
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "Veuillez remplir les champs";
@@ -523,20 +581,15 @@ class _FiliereScreenState extends State<FiliereScreen> {
                         controller: libelleController,
                         decoration: InputDecoration(
                           hintText: "Nom de la filiere",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextFormField(
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "Veuillez remplir les champs";
@@ -544,109 +597,293 @@ class _FiliereScreenState extends State<FiliereScreen> {
                           return null;
                         },
                         controller: descriptionController,
+                        maxLines: null,
                         decoration: InputDecoration(
-                          hintText: "Description",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
+                          labelText: "Description",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                       ),
+                      const SizedBox(height: 10),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final String libelle = libelleController.text;
+                          final String description = descriptionController.text;
+                          if (formkey.currentState!.validate()) {
+                            try {
+                              await FiliereService()
+                                  .addFileres(
+                                      libelleFiliere: libelle,
+                                      descriptionFiliere: description,
+                                      acteur: acteur)
+                                  .then((value) => {
+                                        Provider.of<FiliereService>(context,
+                                                listen: false)
+                                            .applyChange(),
+                                        libelleController.clear(),
+                                        descriptionController.clear(),
+                                        Navigator.of(context).pop()
+                                      });
+                            } catch (e) {
+                              final String errorMessage = e.toString();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Text("Une erreur s'est produite"),
+                                    ],
+                                  ),
+                                  duration: Duration(seconds: 5),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green, // Orange color code
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          minimumSize: const Size(290, 45),
+                        ),
+                        icon: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          "Ajouter",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _addCategorie() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ListTile(
+                  title: Text(
+                    "Ajouter une catégorie",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 18,
                     ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () async {
-                              final String libelle = libelleController.text;
-                              final String description =
-                                  descriptionController.text;
-                              if (formkey.currentState!.validate()) {
-                                try {
-                                  await FiliereService()
-                                      .addFileres(
-                                          libelleFiliere: libelle,
-                                          descriptionFiliere: description,
-                                          acteur: acteur)
-                                      .then((value) => {
-                                            Provider.of<FiliereService>(context,
-                                                    listen: false)
-                                                .applyChange(),
-                                            libelleController.clear(),
-                                            descriptionController.clear(),
-                                            Navigator.of(context).pop()
-                                          });
-                                } catch (e) {
-                                  final String errorMessage = e.toString();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Row(
-                                        children: [
-                                          Text("Une erreur s'est produite"),
-                                        ],
-                                      ),
-                                      duration: Duration(seconds: 5),
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            icon: const Icon(
-                              Icons.add,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              "Ajouter",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pop(); // Ferme la boîte de dialogue
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            icon: const Icon(
-                              Icons.close,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              "Annuler",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
+                    textAlign: TextAlign.center,
+                  ),
+                  trailing: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: Icon(
+                      Icons.close,
+                      color: Colors.red,
+                      size: 24,
+                    ),
+                  ),
                 ),
-              )
-            ],
+                SizedBox(height: 16),
+                Form(
+                  key: formkey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: libelleController,
+                        decoration: InputDecoration(
+                          labelText: "Nom de la catégorie",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      FutureBuilder(
+                        future: _filiereList,
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          }
+                          if (snapshot.hasError) {
+                            return Text("${snapshot.error}");
+                          }
+                          if (snapshot.hasData) {
+                            final reponse =
+                                json.decode((snapshot.data.body)) as List;
+                            final filiereList = reponse
+                                .map((e) => Filiere.fromMap(e))
+                                .where((con) => con.statutFiliere == true)
+                                .toList();
+
+                            if (filiereList.isEmpty) {
+                              return Text(
+                                'Aucun donné disponible',
+                                style:
+                                    TextStyle(overflow: TextOverflow.ellipsis),
+                              );
+                            }
+
+                            return DropdownButtonFormField<String>(
+                              items: filiereList
+                                  .map(
+                                    (e) => DropdownMenuItem(
+                                      value: e.idFiliere,
+                                      child: Text(e.libelleFiliere),
+                                    ),
+                                  )
+                                  .toList(),
+                              value: filiereValue,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  filiereValue = newValue;
+                                  if (newValue != null) {
+                                    filiere = filiereList.firstWhere(
+                                        (element) =>
+                                            element.idFiliere == newValue);
+
+                                    // typeSelected = true;
+                                  }
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Sélectionner un filiere',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+                          return Text(
+                            'Aucune donnée disponible',
+                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: descriptionController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Description",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final String libelle = libelleController.text;
+                          final String description = descriptionController.text;
+                          if (formkey.currentState!.validate()) {
+                            try {
+                              await CategorieService()
+                                  .addCategorie(
+                                      libelleCategorie: libelle,
+                                      descriptionCategorie: description,
+                                      filiere: filiere,
+                                      acteur: acteur)
+                                  .then((value) => {
+                                        Provider.of<CategorieService>(context,
+                                                listen: false)
+                                            .applyChange(),
+                                        setState(() {
+                                          filiere == null;
+                                        }),
+                                        libelleController.clear(),
+                                        descriptionController.clear(),
+                                        Navigator.of(context).pop(),
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Row(
+                                              children: [
+                                                Text(
+                                                    "Catégorie ajouter avec success"),
+                                              ],
+                                            ),
+                                            duration: Duration(seconds: 3),
+                                          ),
+                                        )
+                                      });
+                            } catch (e) {
+                              final String errorMessage = e.toString();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Text("Une erreur s'est produit"),
+                                    ],
+                                  ),
+                                  duration: Duration(seconds: 5),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green, // Orange color code
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          minimumSize: const Size(290, 45),
+                        ),
+                        icon: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          "Ajouter",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -51,197 +51,199 @@ class _UpdatesNiveau1State extends State<UpdatesNiveau1> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          ListTile(
-            title: Text(
-              "Modification du ${niveau.nomN1} ",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 18,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            trailing: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: Icon(
-                Icons.close,
-                color: Colors.red,
-                size: 24,
-              ),
-            ),
-          ),
-          SizedBox(height: 16),
-          Form(
-            key: formkey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextFormField(
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Veuillez remplir ce champ";
-                    }
-                    return null;
-                  },
-                  controller: libelleController,
-                  decoration: InputDecoration(
-                    labelText: "Nom du ${para.libelleNiveau1Pays}",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ListTile(
+              title: Text(
+                "Modification",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 18,
                 ),
-                SizedBox(height: 16),
-                FutureBuilder(
-                  future: _paysList,
-                  builder: (_, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
-                    }
-                    if (snapshot.hasError) {
-                      return Text("${snapshot.error}");
-                    }
-                    if (snapshot.hasData) {
-                      final reponse = json.decode((snapshot.data.body)) as List;
-                      final paysList = reponse
-                          .map((e) => Pays.fromMap(e))
-                          .where((con) => con.statutPays == true)
-                          .toList();
-
-                      if (paysList.isEmpty) {
-                        return Text(
-                          'Aucun donné disponible',
-                          style: TextStyle(overflow: TextOverflow.ellipsis),
-                        );
+                textAlign: TextAlign.center,
+              ),
+              trailing: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(
+                  Icons.close,
+                  color: Colors.red,
+                  size: 24,
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+            Form(
+              key: formkey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextFormField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez remplir ce champ";
                       }
-
-                      return DropdownButtonFormField<String>(
-                        items: paysList
-                            .map(
-                              (e) => DropdownMenuItem(
-                                value: e.idPays,
-                                child: Text(e.nomPays),
-                              ),
-                            )
-                            .toList(),
-                        value: paysValue,
-                        onChanged: (newValue) {
-                          setState(() {
-                            paysValue = newValue;
-                            if (newValue != null) {
-                              pays = paysList.firstWhere(
-                                  (element) => element.idPays == newValue);
-
-                              // typeSelected = true;
-                            }
-                          });
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Sélectionner un pays',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      );
-                    }
-                    return Text(
-                      'Aucune donnée disponible',
-                      style: TextStyle(overflow: TextOverflow.ellipsis),
-                    );
-                  },
-                ),
-                SizedBox(height: 16),
-                TextFormField(
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Veuillez remplir ce champ";
-                    }
-                    return null;
-                  },
-                  controller: descriptionController,
-                  maxLines: null,
-                  decoration: InputDecoration(
-                    labelText: "Description",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      return null;
+                    },
+                    controller: libelleController,
+                    decoration: InputDecoration(
+                      labelText: "Nom du ${para.libelleNiveau1Pays}",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    final String libelle = libelleController.text;
-                    final String description = descriptionController.text;
-                    if (formkey.currentState!.validate()) {
-                      try {
-                        await Niveau1Service()
-                            .updateNiveau1Pays(
-                                idNiveau1Pays: niveau.idNiveau1Pays!,
-                                nomN1: libelle,
-                                descriptionN1: description,
-                                pays: pays)
-                            .then((value) => {
-                                  Provider.of<Niveau1Service>(context,
-                                          listen: false)
-                                      .applyChange(),
-                                  Provider.of<Niveau1Service>(context,
-                                      listen: false),
-                                  libelleController.clear(),
-                                  descriptionController.clear(),
-                                  setState(() {
-                                    pays == null;
-                                  }),
-                                  Navigator.of(context).pop()
-                                })
-                            .catchError(
-                                (onError) => {print(onError.toString())});
-                      } catch (e) {
-                        final String errorMessage = e.toString();
-                        print(errorMessage);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Row(
-                              children: [
-                                Text("Une erreur s'est produit"),
-                              ],
+                  SizedBox(height: 16),
+                  FutureBuilder(
+                    future: _paysList,
+                    builder: (_, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text("${snapshot.error}");
+                      }
+                      if (snapshot.hasData) {
+                        final reponse = json.decode((snapshot.data.body)) as List;
+                        final paysList = reponse
+                            .map((e) => Pays.fromMap(e))
+                            .where((con) => con.statutPays == true)
+                            .toList();
+        
+                        if (paysList.isEmpty) {
+                          return Text(
+                            'Aucun donné disponible',
+                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                          );
+                        }
+        
+                        return DropdownButtonFormField<String>(
+                          items: paysList
+                              .map(
+                                (e) => DropdownMenuItem(
+                                  value: e.idPays,
+                                  child: Text(e.nomPays),
+                                ),
+                              )
+                              .toList(),
+                          value: paysValue,
+                          onChanged: (newValue) {
+                            setState(() {
+                              paysValue = newValue;
+                              if (newValue != null) {
+                                pays = paysList.firstWhere(
+                                    (element) => element.idPays == newValue);
+        
+                                // typeSelected = true;
+                              }
+                            });
+                          },
+                          decoration: InputDecoration(
+                            labelText: 'Sélectionner un pays',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            duration: Duration(seconds: 5),
                           ),
                         );
                       }
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green, // Orange color code
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
+                      return Text(
+                        'Aucune donnée disponible',
+                        style: TextStyle(overflow: TextOverflow.ellipsis),
+                      );
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez remplir ce champ";
+                      }
+                      return null;
+                    },
+                    controller: descriptionController,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      labelText: "Description",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
-                    minimumSize: const Size(290, 45),
                   ),
-                  icon: const Icon(
-                    Icons.edit,
-                    color: Colors.white,
-                  ),
-                  label: const Text(
-                    "Modifier",
-                    style: TextStyle(
-                      fontSize: 20,
+                  SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      final String libelle = libelleController.text;
+                      final String description = descriptionController.text;
+                      if (formkey.currentState!.validate()) {
+                        try {
+                          await Niveau1Service()
+                              .updateNiveau1Pays(
+                                  idNiveau1Pays: niveau.idNiveau1Pays!,
+                                  nomN1: libelle,
+                                  descriptionN1: description,
+                                  pays: pays)
+                              .then((value) => {
+                                    Provider.of<Niveau1Service>(context,
+                                            listen: false)
+                                        .applyChange(),
+                                    Provider.of<Niveau1Service>(context,
+                                        listen: false),
+                                    libelleController.clear(),
+                                    descriptionController.clear(),
+                                    setState(() {
+                                      pays == null;
+                                    }),
+                                    Navigator.of(context).pop()
+                                  })
+                              .catchError(
+                                  (onError) => {print(onError.toString())});
+                        } catch (e) {
+                          final String errorMessage = e.toString();
+                          print(errorMessage);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Row(
+                                children: [
+                                  Text("Une erreur s'est produit"),
+                                ],
+                              ),
+                              duration: Duration(seconds: 5),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green, // Orange color code
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      minimumSize: const Size(290, 45),
+                    ),
+                    icon: const Icon(
+                      Icons.edit,
                       color: Colors.white,
-                      fontWeight: FontWeight.w700,
                     ),
-                  ),
-                )
-              ],
+                    label: const Text(
+                      "Modifier",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -45,7 +45,7 @@ class Niveau3Service extends ChangeNotifier {
       'niveau2Pays': niveau2Pays.toMap()
     });
 
-    final response = await http.post(Uri.parse("$baseUrl/update/$idNiveau3Pays"),
+    final response = await http.put(Uri.parse("$baseUrl/update/$idNiveau3Pays"),
         headers: {'Content-Type': 'application/json'}, body: addPays);
     debugPrint(addPays.toString());
     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -58,8 +58,9 @@ class Niveau3Service extends ChangeNotifier {
   Future<List<Niveau3Pays>> fetchNiveau3Pays() async {
     final response = await http.get(Uri.parse('$baseUrl/read'));
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+        debugPrint(response.body);
       niveauList = body.map((item) => Niveau3Pays.fromMap(item)).toList();
       debugPrint(response.body);
       return niveauList;

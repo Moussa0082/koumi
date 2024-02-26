@@ -51,10 +51,21 @@ class _AddCategorieState extends State<AddCategorie> {
                 Navigator.of(context).pop();
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-          title: const Text(
-            "Catégorie produit",
-            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
-          ),
+          title: Column(children: [
+            Text(
+              "Catégorie produit",
+              style:
+                  TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              "Filière : ${filiere.libelleFiliere}",
+              style:
+                  TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+            )
+          ]),
           actions: [
             IconButton(
               onPressed: () {
@@ -100,7 +111,6 @@ class _AddCategorieState extends State<AddCategorie> {
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 10, horizontal: 15),
                                         child: Container(
-                                          height: 120,
                                           width: MediaQuery.of(context)
                                                   .size
                                                   .width *
@@ -122,8 +132,8 @@ class _AddCategorieState extends State<AddCategorie> {
                                           child: Column(
                                             children: [
                                               ListTile(
-                                                  leading: _getIconForFiliere(
-                                                      e.filiere!.libelleFiliere),
+                                                  leading: _getIconForFiliere(e
+                                                      .filiere!.libelleFiliere),
                                                   title: Text(
                                                       e.libelleCategorie
                                                           .toUpperCase(),
@@ -452,8 +462,8 @@ class _AddCategorieState extends State<AddCategorie> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Center(
-                child: Text(
+              ListTile(
+                title: Text(
                   "Ajouter une catégorie",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -461,7 +471,16 @@ class _AddCategorieState extends State<AddCategorie> {
                     fontSize: 18,
                   ),
                   textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.red,
+                    size: 24,
+                  ),
                 ),
               ),
               const SizedBox(height: 5),
@@ -472,46 +491,35 @@ class _AddCategorieState extends State<AddCategorie> {
                     const SizedBox(
                       height: 10,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: libelleController,
-                        decoration: InputDecoration(
-                          hintText: "Nom de la catégorie",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                    TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Veuillez remplir ce champ";
+                        }
+                        return null;
+                      },
+                      controller: libelleController,
+                      decoration: InputDecoration(
+                        labelText: "Nom de la catégorie",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: descriptionController,
-                        decoration: InputDecoration(
-                          hintText: "Description",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                    SizedBox(height: 16),
+                    TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Veuillez remplir ce champ";
+                        }
+                        return null;
+                      },
+                      controller: descriptionController,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                        labelText: "Description",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
                     ),
@@ -581,34 +589,7 @@ class _AddCategorieState extends State<AddCategorie> {
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pop(); // Ferme la boîte de dialogue
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            icon: const Icon(
-                              Icons.close,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              "Annuler",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
+                       
                       ],
                     )
                   ],

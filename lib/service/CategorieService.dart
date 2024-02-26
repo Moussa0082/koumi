@@ -40,12 +40,15 @@ class CategorieService extends ChangeNotifier {
       {required String idCategorieProduit,
       required String libelleCategorie,
       required String descriptionCategorie,
-      required String personneModif}) async {
+      required String personneModif,
+       required Filiere filiere,
+      }) async {
     var addcat = jsonEncode({
       'idCategorieProduit': idCategorieProduit,
       'libelleCategorie': libelleCategorie,
       'descriptionCategorie': descriptionCategorie,
-      'personneModif': personneModif
+      'personneModif': personneModif,
+      'filiere': filiere.toMap(),
     });
 
     final response = await http.put(

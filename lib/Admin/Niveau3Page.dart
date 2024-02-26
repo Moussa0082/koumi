@@ -23,14 +23,12 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _Niveau3PageState extends State<Niveau3Page> {
   late ParametreGeneraux para;
-  List<Niveau3Pays> niveauList = [];
+  List<Niveau3Pays> niveau3Liste = [];
   final formkey = GlobalKey<FormState>();
   TextEditingController libelleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  late Future<List<Niveau3Pays>> _liste;
   List<ParametreGeneraux> paraList = [];
   late Niveau2Pays niveau2;
-  late Future _paysList;
   String? niveau2Value;
   late Future _niveauList;
 
@@ -98,10 +96,10 @@ class _Niveau3PageState extends State<Niveau3Page> {
                                   "Aucun ${para.libelleNiveau3Pays} trouvé")),
                         );
                       } else {
-                        niveauList = snapshot.data!;
+                        niveau3Liste = snapshot.data!;
 
                         return Column(
-                            children: niveauList
+                            children: niveau3Liste
                                 .map((e) => Padding(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 15),
