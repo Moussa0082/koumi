@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:koumi_app/models/Niveau2Pays.dart';
 
 class Niveau3Pays {
-
   final String? idNiveau3Pays;
   final String codeN3;
   final String nomN3;

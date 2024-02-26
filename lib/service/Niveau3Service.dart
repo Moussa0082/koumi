@@ -56,7 +56,7 @@ class Niveau3Service extends ChangeNotifier {
   }
 
   Future<List<Niveau3Pays>> fetchNiveau3Pays() async {
-    final response = await http.get(Uri.parse('$baseUrl/read'));
+    final response = await http.get(Uri.parse('http://localhost:9000/api-koumi/nivveau3Pays/read'));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));

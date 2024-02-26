@@ -30,14 +30,23 @@ class _PaysPageState extends State<PaysPage> {
   bool isLoading = false;
   String? sousValue;
   late Future _sousRegionList;
+  late TextEditingController _searchController;
 
   @override
   void initState() {
+        super.initState();
+
     _sousRegionList =
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/sousRegion/read'));
-    super.initState();
+         _searchController = TextEditingController();
   }
 
+  @override
+  void dispose() {
+    _searchController
+        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
