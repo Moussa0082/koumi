@@ -107,7 +107,7 @@ class _UpdatesCategorieState extends State<UpdatesCategorie> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  ElevatedButton(
+                  ElevatedButton.icon(
                     onPressed: () async {
                       final String libelle = libelleController.text;
                       final String description = descriptionController.text;
@@ -126,7 +126,18 @@ class _UpdatesCategorieState extends State<UpdatesCategorie> {
                                         .applyChange(),
                                     libelleController.clear(),
                                     descriptionController.clear(),
-                                    Navigator.of(context).pop()
+                                    Navigator.of(context).pop(),
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Row(
+                                          children: [
+                                            Text(
+                                                "Catégorie modifier avec success"),
+                                          ],
+                                        ),
+                                        duration: Duration(seconds: 5),
+                                      ),
+                                    )
                                   });
                         } catch (e) {
                           final String errorMessage = e.toString();
@@ -144,10 +155,17 @@ class _UpdatesCategorieState extends State<UpdatesCategorie> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      backgroundColor: Colors.green, // Orange color code
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      minimumSize: const Size(290, 45),
                     ),
-                    child: const Text(
+                    icon: const Icon(
+                      Icons.edit,
+                      color: Colors.white,
+                    ),
+                    label: const Text(
                       "Modifier",
                       style: TextStyle(
                         fontSize: 20,

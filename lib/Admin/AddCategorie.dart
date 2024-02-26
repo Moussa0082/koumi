@@ -72,9 +72,9 @@ class _AddCategorieState extends State<AddCategorie> {
                 _showDialog();
               },
               icon: const Icon(
-                Icons.add_circle_outline,
+                Icons.add,
                 color: d_colorGreen,
-                size: 25,
+                size: 30,
               ),
             )
           ],
@@ -589,7 +589,6 @@ class _AddCategorieState extends State<AddCategorie> {
                             ),
                           ),
                         ),
-                       
                       ],
                     )
                   ],
