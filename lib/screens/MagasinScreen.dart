@@ -107,12 +107,7 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
    
   }
 
-     @override
-  void dispose() {
-    _tabController?.dispose();
-    _searchController.dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
-    super.dispose();
-  }
+  
 
 
   @override
