@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:koumi_app/models/Niveau2Pays.dart';
@@ -13,7 +14,6 @@ class Niveau3Pays {
   final String? dateAjout;
   final String? dateModif;
   final Niveau2Pays niveau2Pays;
-
   Niveau3Pays({
     this.idNiveau3Pays,
     required this.codeN3,
@@ -25,7 +25,6 @@ class Niveau3Pays {
     this.dateModif,
     required this.niveau2Pays,
   });
-  
 
   Niveau3Pays copyWith({
     String? idNiveau3Pays,

@@ -51,9 +51,20 @@ class _SpeculationPageState extends State<SpeculationPage> {
                 Navigator.of(context).pop();
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-          title: const Text(
-            "Spéculation",
-            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+          title: Column(
+            children: [
+              Text(
+                "Spéculation",
+                style:
+                    TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Text(
+                cat.libelleCategorie,
+                style:
+                    TextStyle(color: d_colorGreen, fontWeight: FontWeight.w600),
+              ),
+            ],
           ),
           actions: [
             IconButton(

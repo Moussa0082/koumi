@@ -9,6 +9,7 @@ class SousRegion {
   final bool statutSousRegion;
   final String? dateAjout;
   final String? dateModif;
+  final String? personneModif;
   final Continent continent;
   SousRegion({
     this.idSousRegion,
@@ -17,6 +18,7 @@ class SousRegion {
     required this.statutSousRegion,
     this.dateAjout,
     this.dateModif,
+    this.personneModif,
     required this.continent,
   });
 
@@ -27,6 +29,7 @@ class SousRegion {
     bool? statutSousRegion,
     String? dateAjout,
     String? dateModif,
+    String? personneModif,
     Continent? continent,
   }) {
     return SousRegion(
@@ -36,6 +39,7 @@ class SousRegion {
       statutSousRegion: statutSousRegion ?? this.statutSousRegion,
       dateAjout: dateAjout ?? this.dateAjout,
       dateModif: dateModif ?? this.dateModif,
+      personneModif: personneModif ?? this.personneModif,
       continent: continent ?? this.continent,
     );
   }
@@ -48,6 +52,7 @@ class SousRegion {
       'statutSousRegion': statutSousRegion,
       'dateAjout': dateAjout,
       'dateModif': dateModif,
+      'personneModif': personneModif,
       'continent': continent.toMap(),
     };
   }
@@ -60,6 +65,7 @@ class SousRegion {
       statutSousRegion: map['statutSousRegion'] as bool,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
+      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       continent: Continent.fromMap(map['continent'] as Map<String,dynamic>),
     );
   }
@@ -70,7 +76,7 @@ class SousRegion {
 
   @override
   String toString() {
-    return 'SousRegion(idSousRegion: $idSousRegion, codeSousRegion: $codeSousRegion, nomSousRegion: $nomSousRegion, statutSousRegion: $statutSousRegion, dateAjout: $dateAjout, dateModif: $dateModif, continent: $continent)';
+    return 'SousRegion(idSousRegion: $idSousRegion, codeSousRegion: $codeSousRegion, nomSousRegion: $nomSousRegion, statutSousRegion: $statutSousRegion, dateAjout: $dateAjout, dateModif: $dateModif, personneModif: $personneModif, continent: $continent)';
   }
 
   @override
@@ -84,6 +90,7 @@ class SousRegion {
       other.statutSousRegion == statutSousRegion &&
       other.dateAjout == dateAjout &&
       other.dateModif == dateModif &&
+      other.personneModif == personneModif &&
       other.continent == continent;
   }
 
@@ -95,6 +102,7 @@ class SousRegion {
       statutSousRegion.hashCode ^
       dateAjout.hashCode ^
       dateModif.hashCode ^
+      personneModif.hashCode ^
       continent.hashCode;
   }
 }

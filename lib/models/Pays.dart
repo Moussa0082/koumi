@@ -7,20 +7,21 @@ class Pays {
   final String codePays;
   final String nomPays;
   final String descriptionPays;
+  final String? personneModif;
   final bool statutPays;
   final String? dateAjout;
   final String? dateModif;
-  final SousRegion? sousRegion;
-  
+  final SousRegion sousRegion;
   Pays({
     this.idPays,
     required this.codePays,
     required this.nomPays,
     required this.descriptionPays,
+    this.personneModif,
     required this.statutPays,
     this.dateAjout,
     this.dateModif,
-   this.sousRegion,
+    required this.sousRegion,
   });
 
   Pays copyWith({
@@ -28,6 +29,7 @@ class Pays {
     String? codePays,
     String? nomPays,
     String? descriptionPays,
+    String? personneModif,
     bool? statutPays,
     String? dateAjout,
     String? dateModif,
@@ -38,6 +40,7 @@ class Pays {
       codePays: codePays ?? this.codePays,
       nomPays: nomPays ?? this.nomPays,
       descriptionPays: descriptionPays ?? this.descriptionPays,
+      personneModif: personneModif ?? this.personneModif,
       statutPays: statutPays ?? this.statutPays,
       dateAjout: dateAjout ?? this.dateAjout,
       dateModif: dateModif ?? this.dateModif,
@@ -51,38 +54,27 @@ class Pays {
       'codePays': codePays,
       'nomPays': nomPays,
       'descriptionPays': descriptionPays,
+      'personneModif': personneModif,
       'statutPays': statutPays,
       'dateAjout': dateAjout,
       'dateModif': dateModif,
-      'sousRegion': sousRegion?.toMap(),
+      'sousRegion': sousRegion.toMap(),
     };
   }
 
-  // factory Pays.fromMap(Map<String, dynamic> map) {
-  //   return Pays(
-  //     idPays: map['idPays'] != null ? map['idPays'] as String : null,
-  //     codePays: map['codePays'] as String,
-  //     nomPays: map['nomPays'] as String,
-  //     descriptionPays: map['descriptionPays'] as String,
-  //     statutPays: map['statutPays'] as bool,
-  //     dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
-  //     dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
-  //     sousRegion: SousRegion.fromMap(map['sousRegion'] as Map<String,dynamic>),
-  //   );
-  // }
   factory Pays.fromMap(Map<String, dynamic> map) {
-  return Pays(
-    idPays: map['idPays'] != null ? map['idPays'] as String : null,
-    codePays: map['codePays'] as String,
-    nomPays: map['nomPays'] as String,
-    descriptionPays: map['descriptionPays'] as String,
-    statutPays: map['statutPays'] as bool,
-    dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
-    dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
-    sousRegion: map['sousRegion'] != null ? SousRegion.fromMap(map['sousRegion'] as Map<String, dynamic>) : null,
-  );
-}
-
+    return Pays(
+      idPays: map['idPays'] != null ? map['idPays'] as String : null,
+      codePays: map['codePays'] as String,
+      nomPays: map['nomPays'] as String,
+      descriptionPays: map['descriptionPays'] as String,
+      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
+      statutPays: map['statutPays'] as bool,
+      dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
+      dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
+      sousRegion: SousRegion.fromMap(map['sousRegion'] as Map<String,dynamic>),
+    );
+  }
 
   String toJson() => json.encode(toMap());
 
@@ -90,7 +82,7 @@ class Pays {
 
   @override
   String toString() {
-    return 'Pays(idPays: $idPays, codePays: $codePays, nomPays: $nomPays, descriptionPays: $descriptionPays, statutPays: $statutPays, dateAjout: $dateAjout, dateModif: $dateModif, sousRegion: $sousRegion)';
+    return 'Pays(idPays: $idPays, codePays: $codePays, nomPays: $nomPays, descriptionPays: $descriptionPays, personneModif: $personneModif, statutPays: $statutPays, dateAjout: $dateAjout, dateModif: $dateModif, sousRegion: $sousRegion)';
   }
 
   @override
@@ -102,6 +94,7 @@ class Pays {
       other.codePays == codePays &&
       other.nomPays == nomPays &&
       other.descriptionPays == descriptionPays &&
+      other.personneModif == personneModif &&
       other.statutPays == statutPays &&
       other.dateAjout == dateAjout &&
       other.dateModif == dateModif &&
@@ -114,6 +107,7 @@ class Pays {
       codePays.hashCode ^
       nomPays.hashCode ^
       descriptionPays.hashCode ^
+      personneModif.hashCode ^
       statutPays.hashCode ^
       dateAjout.hashCode ^
       dateModif.hashCode ^

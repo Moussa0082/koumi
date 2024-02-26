@@ -1,12 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/SpeculationPage.dart';
+import 'package:koumi_app/Admin/UpdatesCategorie.dart';
+import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Filiere.dart';
-import 'package:koumi_app/service/CategorieService.dart';
-import 'package:provider/provider.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/CategorieService.dart';
-import 'package:koumi_app/Admin/UpdatesCategorie.dart';
+import 'package:koumi_app/service/SpeculationService.dart';
+import 'package:provider/provider.dart';
 
 class CategoriPage extends StatefulWidget {
   const CategoriPage({super.key});
@@ -14,7 +18,7 @@ class CategoriPage extends StatefulWidget {
   @override
   State<CategoriPage> createState() => _CategoriPageState();
 }
- 
+
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
@@ -25,6 +29,32 @@ class _CategoriPageState extends State<CategoriPage> {
 
   List<CategorieProduit> categorieList = [];
   late Future<List<CategorieProduit>> _liste;
+  late Acteur acteur;
+  final formkey = GlobalKey<FormState>();
+  TextEditingController libelleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+  String? filiereValue;
+  late Future _filiereList;
+  late Filiere filiere;
+  String? catValue;
+  late Future _categorieList;
+  late CategorieProduit categorieProduit;
+
+  Future<List<CategorieProduit>> getCat() async {
+    return await CategorieService().fetchCategorie();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    _filiereList = http.get(
+        Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+    _categorieList = http.get(
+        Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
+    _liste = getCat();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +72,49 @@ class _CategoriPageState extends State<CategoriPage> {
           "Catégorie produit",
           style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
+        actions: [
+          PopupMenuButton<String>(
+            padding: EdgeInsets.zero,
+            itemBuilder: (context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.add,
+                    color: Colors.green,
+                  ),
+                  title: const Text(
+                    "Ajouter une spéculation",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onTap: () async {
+                    _showDialogSpeculation();
+                  },
+                ),
+              ),
+              PopupMenuItem<String>(
+                child: ListTile(
+                  leading: Icon(
+                    Icons.add,
+                    color: Colors.orange[400],
+                  ),
+                  title: Text(
+                    "Ajouter catégorie",
+                    style: TextStyle(
+                      color: Colors.orange[400],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onTap: () async {
+                    _addCategorie();
+                  },
+                ),
+              ),
+            ],
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -73,7 +146,6 @@ class _CategoriPageState extends State<CategoriPage> {
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 15),
                                       child: Container(
-                                        height: 120,
                                         width:
                                             MediaQuery.of(context).size.width *
                                                 0.9,
@@ -104,8 +176,8 @@ class _CategoriPageState extends State<CategoriPage> {
                                                                     e)));
                                               },
                                               child: ListTile(
-                                                  leading: _getIconForFiliere(
-                                                      e.filiere!.libelleFiliere),
+                                                  leading: _getIconForFiliere(e
+                                                      .filiere!.libelleFiliere),
                                                   title: Text(
                                                       e.libelleCategorie
                                                           .toUpperCase(),
@@ -126,6 +198,34 @@ class _CategoriPageState extends State<CategoriPage> {
                                                             FontStyle.italic,
                                                       ))),
                                             ),
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 15),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text("Filière appartenant:",
+                                                      style: TextStyle(
+                                                        color: Colors.black87,
+                                                        fontSize: 17,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontStyle:
+                                                            FontStyle.italic,
+                                                      )),
+                                                  Text(
+                                                      e.filiere!.libelleFiliere,
+                                                      style: TextStyle(
+                                                        color: Colors.black87,
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ))
+                                                ],
+                                              ),
+                                            ),
                                             Container(
                                               alignment: Alignment.bottomRight,
                                               padding:
@@ -136,7 +236,8 @@ class _CategoriPageState extends State<CategoriPage> {
                                                     MainAxisAlignment
                                                         .spaceBetween,
                                                 children: [
-                                                  _buildEtat(e.statutCategorie!),
+                                                  _buildEtat(
+                                                      e.statutCategorie!),
                                                   PopupMenuButton<String>(
                                                     padding: EdgeInsets.zero,
                                                     itemBuilder: (context) =>
@@ -405,6 +506,225 @@ class _CategoriPageState extends State<CategoriPage> {
     );
   }
 
+  void _addCategorie() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ListTile(
+                  title: Text(
+                    "Ajouter une catégorie",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 18,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  trailing: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: Icon(
+                      Icons.close,
+                      color: Colors.red,
+                      size: 24,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Form(
+                  key: formkey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: libelleController,
+                        decoration: InputDecoration(
+                          labelText: "Nom de la catégorie",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      FutureBuilder(
+                        future: _filiereList,
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          }
+                          if (snapshot.hasError) {
+                            return Text("${snapshot.error}");
+                          }
+                          if (snapshot.hasData) {
+                            final reponse =
+                                json.decode((snapshot.data.body)) as List;
+                            final filiereList = reponse
+                                .map((e) => Filiere.fromMap(e))
+                                .where((con) => con.statutFiliere == true)
+                                .toList();
+
+                            if (filiereList.isEmpty) {
+                              return Text(
+                                'Aucun donné disponible',
+                                style:
+                                    TextStyle(overflow: TextOverflow.ellipsis),
+                              );
+                            }
+
+                            return DropdownButtonFormField<String>(
+                              items: filiereList
+                                  .map(
+                                    (e) => DropdownMenuItem(
+                                      value: e.idFiliere,
+                                      child: Text(e.libelleFiliere),
+                                    ),
+                                  )
+                                  .toList(),
+                              value: filiereValue,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  filiereValue = newValue;
+                                  if (newValue != null) {
+                                    filiere = filiereList.firstWhere(
+                                        (element) =>
+                                            element.idFiliere == newValue);
+
+                                    // typeSelected = true;
+                                  }
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Sélectionner un filiere',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+                          return Text(
+                            'Aucune donnée disponible',
+                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: descriptionController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Description",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final String libelle = libelleController.text;
+                          final String description = descriptionController.text;
+                          if (formkey.currentState!.validate()) {
+                            try {
+                              await CategorieService()
+                                  .addCategorie(
+                                      libelleCategorie: libelle,
+                                      descriptionCategorie: description,
+                                      filiere: filiere,
+                                      acteur: acteur)
+                                  .then((value) => {
+                                        Provider.of<CategorieService>(context,
+                                                listen: false)
+                                            .applyChange(),
+                                        setState(() {
+                                          filiere == null;
+                                        }),
+                                        libelleController.clear(),
+                                        descriptionController.clear(),
+                                        Navigator.of(context).pop(),
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Row(
+                                              children: [
+                                                Text(
+                                                    "Catégorie ajouter avec success"),
+                                              ],
+                                            ),
+                                            duration: Duration(seconds: 3),
+                                          ),
+                                        )
+                                      });
+                            } catch (e) {
+                              final String errorMessage = e.toString();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Text("Une erreur s'est produit"),
+                                    ],
+                                  ),
+                                  duration: Duration(seconds: 5),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green, // Orange color code
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          minimumSize: const Size(290, 45),
+                        ),
+                        icon: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          "Ajouter",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _getIconForFiliere(String libelle) {
     switch (libelle.toLowerCase()) {
       case 'céréale':
@@ -457,6 +777,223 @@ class _CategoriPageState extends State<CategoriPage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         color: isState ? Colors.green : Colors.red,
+      ),
+    );
+  }
+
+  void _showDialogSpeculation() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ListTile(
+                  title: Text(
+                    "Ajouter une spéculation",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 18,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  trailing: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: Icon(
+                      Icons.close,
+                      color: Colors.red,
+                      size: 24,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Form(
+                  key: formkey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: libelleController,
+                        decoration: InputDecoration(
+                          labelText: "Nom de la speculation",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      FutureBuilder(
+                        future: _categorieList,
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          }
+                          if (snapshot.hasError) {
+                            return Text("${snapshot.error}");
+                          }
+                          if (snapshot.hasData) {
+                            final reponse =
+                                json.decode((snapshot.data.body)) as List;
+                            final catList = reponse
+                                .map((e) => CategorieProduit.fromMap(e))
+                                .where((con) => con.statutCategorie == true)
+                                .toList();
+
+                            if (catList.isEmpty) {
+                              return Text(
+                                'Aucun donné disponible',
+                                style:
+                                    TextStyle(overflow: TextOverflow.ellipsis),
+                              );
+                            }
+
+                            return DropdownButtonFormField<String>(
+                              items: catList
+                                  .map(
+                                    (e) => DropdownMenuItem(
+                                      value: e.idCategorieProduit,
+                                      child: Text(e.libelleCategorie),
+                                    ),
+                                  )
+                                  .toList(),
+                              value: catValue,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  catValue = newValue;
+                                  if (newValue != null) {
+                                    categorieProduit = categorieList.firstWhere(
+                                        (element) =>
+                                            element.idCategorieProduit ==
+                                            newValue);
+
+                                    // typeSelected = true;
+                                  }
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Sélectionner une categorie',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+                          return Text(
+                            'Aucune donnée disponible',
+                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: descriptionController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Description",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final String libelle = libelleController.text;
+                          final String description = descriptionController.text;
+                          if (formkey.currentState!.validate()) {
+                            try {
+                              await SpeculationService()
+                                  .addSpeculation(
+                                      nomSpeculation: libelle,
+                                      descriptionSpeculation: description,
+                                      categorieProduit: categorieProduit,
+                                      acteur: acteur)
+                                  .then((value) => {
+                                        Provider.of<SpeculationService>(context,
+                                                listen: false)
+                                            .applyChange(),
+                                        libelleController.clear(),
+                                        descriptionController.clear(),
+                                        Navigator.of(context).pop(),
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Row(
+                                              children: [
+                                                Text(
+                                                    "Spéculation ajouter avec success"),
+                                              ],
+                                            ),
+                                            duration: Duration(seconds: 5),
+                                          ),
+                                        )
+                                      });
+                            } catch (e) {
+                              final String errorMessage = e.toString();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Text("Une erreur s'est produite"),
+                                    ],
+                                  ),
+                                  duration: Duration(seconds: 5),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green, // Orange color code
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          minimumSize: const Size(290, 45),
+                        ),
+                        icon: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          "Ajouter",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

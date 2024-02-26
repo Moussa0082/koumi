@@ -64,7 +64,7 @@ class CategorieService extends ChangeNotifier {
   }
 
   Future<List<CategorieProduit>> fetchCategorie() async {
-    final response = await http.get(Uri.parse('$baseUrl/allCategorie'));
+    final response = await http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
