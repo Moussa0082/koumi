@@ -27,6 +27,8 @@ class _SousRegionPageState extends State<SousRegionPage> {
   List<SousRegion> regionList = [];
   late Future<List<SousRegion>> _liste;
   late Future _continentList;
+     late TextEditingController _searchController;
+
   // Future<List<SousRegion>> getSousRegionListe() async {
   //   setState(() {
   //     isLoading = true;
@@ -41,8 +43,16 @@ class _SousRegionPageState extends State<SousRegionPage> {
     // _liste = getSousRegionListe();
     _continentList =
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/continent/read'));
+    _searchController = TextEditingController();
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController
+        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    super.dispose();
   }
 
   @override
@@ -76,6 +86,42 @@ class _SousRegionPageState extends State<SousRegionPage> {
         ),
         body: SingleChildScrollView(
           child: Column(children: [
+             const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.search,
+                        color: Colors.blueGrey[400]), // Couleur de l'icône
+                    SizedBox(
+                        width:
+                            10), // Espacement entre l'icône et le champ de recherche
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Rechercher',
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(
+                              color: Colors
+                                  .blueGrey[400]), // Couleur du texte d'aide
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
             Consumer<SousRegionService>(
               builder: (context, sousService, child) {
                 return FutureBuilder(
@@ -97,8 +143,15 @@ class _SousRegionPageState extends State<SousRegionPage> {
                         );
                       } else {
                         regionList = snapshot.data!;
+                         String searchText = "";
+                        List<SousRegion> filtereSearch =
+                            regionList.where((search) {
+                          String libelle = search.nomSousRegion.toLowerCase();
+                          searchText = _searchController.text.toLowerCase();
+                          return libelle.contains(searchText);
+                        }).toList();
                         return Column(
-                            children: regionList
+                            children: filtereSearch
                                 .map((e) => Padding(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 15),

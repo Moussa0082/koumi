@@ -37,6 +37,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
   late Future _paysList;
   String? n1Value;
   late Future _niveauList;
+   late TextEditingController _searchController;
 
   Future<List<Niveau2Pays>> getNiveauListe(String id) async {
     final response = await Niveau2Service().fetchNiveau2ByNiveau1(id);
@@ -46,12 +47,20 @@ class _Niveau2PageState extends State<Niveau2Page> {
   @override
   void initState() {
     super.initState();
+     _searchController = TextEditingController();
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
     para = paraList[0];
     _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
     _niveauList =
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+  }
+
+  @override
+  void dispose() {
+    _searchController
+        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    super.dispose();
   }
 
   @override
@@ -86,6 +95,42 @@ class _Niveau2PageState extends State<Niveau2Page> {
       ),
       body: SingleChildScrollView(
         child: Column(children: [
+             const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.search,
+                      color: Colors.blueGrey[400]), // Couleur de l'icône
+                  SizedBox(
+                      width:
+                          10), // Espacement entre l'icône et le champ de recherche
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Rechercher',
+                        border: InputBorder.none,
+                        hintStyle: TextStyle(
+                            color: Colors
+                                .blueGrey[400]), // Couleur du texte d'aide
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
           Consumer<Niveau2Service>(builder: (context, niveau2Service, child) {
             return FutureBuilder(
                 future: niveau2Service.fetchNiveau2Pays(),
@@ -105,8 +150,15 @@ class _Niveau2PageState extends State<Niveau2Page> {
                     );
                   } else {
                     niveauList = snapshot.data!;
+                     String searchText = "";
+                    List<Niveau2Pays> filtereSearch =
+                        niveauList.where((search) {
+                      String libelle = search.nomN2.toLowerCase();
+                      searchText = _searchController.text.toLowerCase();
+                      return libelle.contains(searchText);
+                    }).toList();
                     return Column(
-                        children: niveauList
+                        children: filtereSearch
                             .map((e) => Padding(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 15),
