@@ -19,6 +19,21 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
   final formkey = GlobalKey<FormState>();
   TextEditingController libelleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  late TextEditingController _searchController;
+
+  @override
+  void initState() {
+    _searchController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController
+        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,23 +57,50 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                     _showDialog();
                   },
                   icon: const Icon(
-                    Icons.add_circle_outline,
+                    Icons.add,
                     color: d_colorGreen,
-                    size: 25,
+                    size: 30,
                   ))
             ]),
         body: SingleChildScrollView(
           child: Column(
             children: [
-              // Container(
-              //     alignment: Alignment.topRight,
-              //     child: TextButton(
-              //         onPressed: () {
-              //           _showDialog();
-              //         },
-              //         child: const Text("+ Ajouter un type d'acteur",
-              //             style:
-              //                 TextStyle(fontSize: 16, color: d_colorGreen)))),
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.search,
+                          color: Colors.blueGrey[400]), // Couleur de l'icône
+                      SizedBox(
+                          width:
+                              10), // Espacement entre l'icône et le champ de recherche
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          onChanged: (value) {
+                            setState(() {});
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Rechercher',
+                            border: InputBorder.none,
+                            hintStyle: TextStyle(
+                                color: Colors
+                                    .blueGrey[400]), // Couleur du texte d'aide
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
               Consumer<TypeActeurService>(
                 builder: (context, typeService, child) {
                   return FutureBuilder(
@@ -85,13 +127,19 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                           );
                         } else {
                           typeList = snapshot.data!;
+                          String searchText = "";
+                          List<TypeActeur> filtereSearch =
+                              typeList.where((search) {
+                            String libelle = search.libelle.toLowerCase();
+                            searchText = _searchController.text.toLowerCase();
+                            return libelle.contains(searchText);
+                          }).toList();
                           return Column(
-                              children: typeList
+                              children: filtereSearch
                                   .map((e) => Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 10, horizontal: 15),
                                         child: Container(
-                                          height: 150,
                                           width: MediaQuery.of(context)
                                                   .size
                                                   .width *
@@ -427,18 +475,17 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
         ),
         child: Container(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  Image.asset(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: Image.asset(
                     "assets/images/type.png",
                     width: 80,
-                    height: 100,
+                    height: 80,
                   ),
-                  const SizedBox(width: 5),
-                  const Text(
+                  title: Text(
                     "Ajouter un type d'acteur",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -446,28 +493,34 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                       fontSize: 18,
                     ),
                     textAlign: TextAlign.center,
-                    overflow: TextOverflow.visible,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ],
-              ),
-              // const SizedBox(height: 10),
-              Form(
-                key: formkey,
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    const Text(
-                      'Libellé',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
+                  trailing: IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.red,
+                        size: 30,
+                      )),
+                ),
+                // const SizedBox(height: 10),
+                Form(
+                  key: formkey,
+                  child: Column(
+                    children: [
+                      const SizedBox(
+                        height: 10,
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextFormField(
+                      const Text(
+                        'Libellé',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                        ),
+                      ),
+                      TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "Veuillez remplir les champs";
@@ -477,135 +530,94 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                         controller: libelleController,
                         decoration: InputDecoration(
                           hintText: "Libellé",
-                          contentPadding:
-                              const EdgeInsets.symmetric(vertical: 10),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Description',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Description',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
+                      TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez remplir les champs";
+                            }
+                            return null;
+                          },
+                          controller: descriptionController,
+                          maxLines: null,
+                          decoration: InputDecoration(
+                            labelText: "Description",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          )),
+                      const SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final String libelle = libelleController.text;
+                          final String desc = descriptionController.text;
+                          if (formkey.currentState!.validate()) {
+                            try {
+                              await TypeActeurService()
+                                  .addTypeActeur(
+                                      libelle: libelle,
+                                      descriptionTypeActeur: desc)
+                                  .then((value) => {
+                                        Provider.of<TypeActeurService>(context,
+                                                listen: false)
+                                            .applyChange(),
+                                        libelleController.clear(),
+                                        descriptionController.clear(),
+                                        Navigator.of(context).pop()
+                                      });
+                            } catch (e) {
+                              final String errorMessage = e.toString();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Text(
+                                          "Une erreur s'est produit : $errorMessage"),
+                                    ],
+                                  ),
+                                  duration: const Duration(seconds: 5),
+                                ),
+                              );
+                            }
                           }
-                          return null;
                         },
-                        controller: descriptionController,
-                        decoration: InputDecoration(
-                          hintText: "Description",
-                          contentPadding:
-                              const EdgeInsets.symmetric(vertical: 15),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          minimumSize: const Size(290, 45),
+                        ),
+                        icon: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          "Ajouter",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () async {
-                              final String libelle = libelleController.text;
-                              final String desc = descriptionController.text;
-                              if (formkey.currentState!.validate()) {
-                                try {
-                                  await TypeActeurService()
-                                      .addTypeActeur(
-                                          libelle: libelle,
-                                          descriptionTypeActeur: desc)
-                                      .then((value) => {
-                                            Provider.of<TypeActeurService>(
-                                                    context,
-                                                    listen: false)
-                                                .applyChange(),
-                                            libelleController.clear(),
-                                            descriptionController.clear(),
-                                            Navigator.of(context).pop()
-                                          });
-                                } catch (e) {
-                                  final String errorMessage = e.toString();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Row(
-                                        children: [
-                                          Text(
-                                              "Une erreur s'est produit : $errorMessage"),
-                                        ],
-                                      ),
-                                      duration: const Duration(seconds: 5),
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            icon: const Icon(
-                              Icons.add,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              "Ajouter",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pop(); // Ferme la boîte de dialogue
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            icon: const Icon(
-                              Icons.close,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              "Annuler",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              )
-            ],
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),

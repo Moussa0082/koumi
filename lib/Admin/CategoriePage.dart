@@ -39,6 +39,7 @@ class _CategoriPageState extends State<CategoriPage> {
   String? catValue;
   late Future _categorieList;
   late CategorieProduit categorieProduit;
+  late TextEditingController _searchController;
 
   Future<List<CategorieProduit>> getCat() async {
     return await CategorieService().fetchCategorie();
@@ -54,6 +55,14 @@ class _CategoriPageState extends State<CategoriPage> {
     _categorieList = http.get(
         Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
     _liste = getCat();
+    _searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController
+        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    super.dispose();
   }
 
   @override
@@ -119,6 +128,42 @@ class _CategoriPageState extends State<CategoriPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.search,
+                        color: Colors.blueGrey[400]), // Couleur de l'icône
+                    SizedBox(
+                        width:
+                            10), // Espacement entre l'icône et le champ de recherche
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Rechercher',
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(
+                              color: Colors
+                                  .blueGrey[400]), // Couleur du texte d'aide
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
             Consumer<CategorieService>(
               builder: (context, categorieService, child) {
                 return FutureBuilder(
@@ -139,9 +184,15 @@ class _CategoriPageState extends State<CategoriPage> {
                         );
                       } else {
                         categorieList = snapshot.data!;
-
+                        String searchText = "";
+                        List<CategorieProduit> filteredCatSearch =
+                            categorieList.where((cate) {
+                          String nomCat = cate.libelleCategorie.toLowerCase();
+                          searchText = _searchController.text.toLowerCase();
+                          return nomCat.contains(searchText);
+                        }).toList();
                         return Column(
-                            children: categorieList
+                            children: filteredCatSearch
                                 .map((e) => Padding(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 15),

@@ -26,6 +26,7 @@ class _SpeculationPageState extends State<SpeculationPage> {
   TextEditingController descriptionController = TextEditingController();
   List<Speculation> speculationList = [];
   late Future<List<Speculation>> _liste;
+  late TextEditingController _searchController;
 
   Future<List<Speculation>> getCatListe(String id) async {
     return await SpeculationService().fetchSpeculationByCategorie(id);
@@ -36,7 +37,15 @@ class _SpeculationPageState extends State<SpeculationPage> {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     cat = widget.categorieProduit;
     _liste = getCatListe(cat.idCategorieProduit!);
+    _searchController = TextEditingController();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController
+        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    super.dispose();
   }
 
   @override
@@ -82,6 +91,42 @@ class _SpeculationPageState extends State<SpeculationPage> {
         body: SingleChildScrollView(
           child: Column(
             children: [
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.search,
+                          color: Colors.blueGrey[400]), // Couleur de l'icône
+                      SizedBox(
+                          width:
+                              10), // Espacement entre l'icône et le champ de recherche
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          onChanged: (value) {
+                            setState(() {});
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Rechercher',
+                            border: InputBorder.none,
+                            hintStyle: TextStyle(
+                                color: Colors
+                                    .blueGrey[400]), // Couleur du texte d'aide
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
               Consumer<SpeculationService>(
                 builder: (context, speculationService, child) {
                   return FutureBuilder(
@@ -99,14 +144,21 @@ class _SpeculationPageState extends State<SpeculationPage> {
                         if (!snapshot.hasData) {
                           return const Padding(
                             padding: EdgeInsets.all(10),
-                            child:
-                                Center(child: Text("Aucun catégorie trouvé")),
+                            child: Center(
+                                child: Text("Aucune spéculation trouvé")),
                           );
                         } else {
                           speculationList = snapshot.data!;
-
+                          String searchText = "";
+                          List<Speculation> filtereSearch =
+                              speculationList.where((search) {
+                            String libelle =
+                                search.nomSpeculation.toLowerCase();
+                            searchText = _searchController.text.toLowerCase();
+                            return libelle.contains(searchText);
+                          }).toList();
                           return Column(
-                              children: speculationList
+                              children: filtereSearch
                                   .map((e) => Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 10, horizontal: 15),

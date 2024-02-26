@@ -8,38 +8,44 @@ import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:shimmer/shimmer.dart';
 
-
 class ProduitScreen extends StatefulWidget {
-    final String? id; // ID du magasin (optionnel)
-   ProduitScreen({super.key, this.id});
+  final String? id; // ID du magasin (optionnel)
+  final String? nom;
+  ProduitScreen({super.key, this.id, this.nom});
 
   @override
   State<ProduitScreen> createState() => _ProduitScreenState();
 }
-class _ProduitScreenState extends State<ProduitScreen> with TickerProviderStateMixin {
-    // Déclarez une variable pour suivre si le chargement est terminé
 
+class _ProduitScreenState extends State<ProduitScreen>
+    with TickerProviderStateMixin {
   TabController? _tabController;
-    late TextEditingController _searchController;
+  late TextEditingController _searchController;
 
   List<Stock> stock = [];
   List<CategorieProduit> categorieProduit = [];
-   String selectedCategorieProduit = "" ;
-   
+  String selectedCategorieProduit = "";
+  String selectedCategorieProduitNom = "";
 
-  Set<String> loadedRegions = {}; // Ensemble pour garder une trace des régions pour lesquelles les magasins ont déjà été chargés
+  Set<String> loadedRegions = {};
 
-  void fetchProduitByCategorie(String id) async {
+  void fetchProduitByCategorie(String idCategorie, String idMagasin) async {
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:9000/Stock/getAllStocksByIdMagasin/${id}'));
+      final response = await http.get(Uri.parse(
+          'http://10.0.2.2:9000/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
-      stock= data.map((item) => Stock(
-        idStock: item['idStock'] as String,
-        nomProduit: item['nomProduit']as String,
-      )).toList();
-
-        
+        setState(() {
+          stock = data
+              .where((stock) => stock['statutSotck'] == true)
+              .map((item) => Stock(
+                    idStock: item['idStock'] as String,
+                    nomProduit: item['nomProduit'] as String,
+                    photo: item['photo'] ?? '',
+                  ))
+              .toList();
+        });
+        debugPrint("Produit : ${stock.map((e) => e.nomProduit)}");
       } else {
         throw Exception('Failed to load stock');
       }
@@ -50,117 +56,125 @@ class _ProduitScreenState extends State<ProduitScreen> with TickerProviderStateM
 
   void fetchCategorie() async {
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:9000/Categorie/allCategorie'));
+      final response = await http
+          .get(Uri.parse('http://10.0.2.2:9000/Categorie/allCategorie'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
-      setState(() {
-        categorieProduit = data.map((item) => CategorieProduit(
-          idCategorieProduit: item['idCategorieProduit'],
-          libelleCategorie: item['libelleCategorie'],
-        )).toList();
-        // Mise à jour du TabController une fois les catégories récupérées
-        _tabController = TabController(length: categorieProduit.length, vsync: this);
-        _tabController!.addListener(_handleTabChange);
-      });
-      // Si des catégories de produits ont été récupérées, récupérez les stocks pour la première catégorie (si elle existe)
-      if (categorieProduit.isNotEmpty) {
-        fetchProduitByCategorie(categorieProduit[0].idCategorieProduit!);
+        setState(() {
+          categorieProduit = data
+              .map((item) => CategorieProduit(
+                    idCategorieProduit: item['idCategorieProduit'] as String,
+                    libelleCategorie: item['libelleCategorie'] as String,
+                  ))
+              .toList();
+          _tabController =
+              TabController(length: categorieProduit.length, vsync: this);
+          _tabController!.addListener(_handleTabChange);
+          selectedCategorieProduit = categorieProduit.isNotEmpty
+              ? categorieProduit.first.idCategorieProduit!
+              : '';
+          selectedCategorieProduitNom = categorieProduit.isNotEmpty
+              ? categorieProduit[_tabController!.index].libelleCategorie
+              : '';
+          fetchProduitByCategorie(selectedCategorieProduit, widget.id!);
+        });
+        debugPrint(
+            "Id Cat : ${categorieProduit.map((e) => e.idCategorieProduit)}");
+      } else {
+        throw Exception('Failed to load categories');
       }
-    } else {
-      throw Exception('Failed to load categoris');
-    }
     } catch (e) {
-      print('Error fetching categoris for magasins : $e');
+      print('Error fetching categories: $e');
     }
   }
 
- void _handleTabChange() {
-  if (_tabController != null && _tabController!.index >= 0 && _tabController!.index <categorieProduit.length) {
-    fetchCategorie();
+  void _handleTabChange() {
+    if (_tabController != null &&
+        _tabController!.index >= 0 &&
+        _tabController!.index < categorieProduit.length) {
+      selectedCategorieProduit =
+          categorieProduit[_tabController!.index].idCategorieProduit!;
+      selectedCategorieProduitNom =
+          categorieProduit[_tabController!.index].libelleCategorie;
+      fetchProduitByCategorie(selectedCategorieProduit, widget.id!);
+      debugPrint("Cat id : " + selectedCategorieProduit);
+    }
   }
-}
 
   @override
   void initState() {
     super.initState();
-    // debugPrint("Id : ${widget.id!}");
-     _searchController = TextEditingController();
+    _searchController = TextEditingController();
 
-  _tabController = TabController(length: categorieProduit.length, vsync: this); // Initialiser le TabController avec une longueur de 0
-
-    fetchCategorie();
-   _buildShimmerEffect();
-
+    if (categorieProduit.isEmpty) {
+      fetchCategorie();
+      // fetchProduitByCategorie(selectedCategorieProduit);
+    }
   }
 
-     @override
+  @override
   void dispose() {
     _tabController?.dispose();
-    _searchController.dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    _searchController.dispose();
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
-    if(categorieProduit.length<0){
-   return Text("Vide");
-    }
     return Container(
       child: DefaultTabController(
         length: categorieProduit.length,
         child: Scaffold(
           appBar: AppBar(
-          centerTitle: true,
-          title: Text('Categories'),
-          bottom: TabBar(
-            isScrollable: true,
-            labelColor: Colors.black,
-            controller: _tabController, // Ajoutez le contrôleur TabBar
-            tabs: categorieProduit.map((categorie) => Tab(text: categorie.libelleCategorie)).toList(),
-          ),
+            centerTitle: true,
+            title: Text('Categories'),
+            bottom: TabBar(
+              isScrollable: true,
+              labelColor: Colors.black,
+              controller: _tabController,
+              tabs: categorieProduit
+                  .map((categorie) => Tab(text: categorie.libelleCategorie))
+                  .toList(),
+            ),
           ),
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                // const SizedBox(height:10),
-                //  SizedBox(
-                //      height:40,
-                //    child: Container(
-                //      padding: EdgeInsets.only(left: 5),
-                //      decoration: BoxDecoration(
-                //        color: Color.fromARGB(255, 245, 212, 169),
-                //        borderRadius: BorderRadius.circular(30),
-                                    
-                //      ),
-                //      child: TextField(
-                //       controller: _searchController,
-                //        onChanged: (value) {
-                //               setState(() {
-                //                 // Le changement de texte déclenche la reconstruction du widget
-                //               });
-                //             },
-                //        decoration: InputDecoration(
-                //          hintText: 'Rechercher',
-                //          contentPadding: EdgeInsets.all(10),
-                //          border: InputBorder.none,
-                //        ),
-                //      ),
-                //    ),
-                //  ),
-                // const SizedBox(height:10),
-                // // const SizedBox(height:10),
-                // // Flexible(
-                // //   child: GestureDetector(
-                // //     child:  TabBarView(
-                // //   controller: _tabController,
-                // //   children: categorieProduit.map((categorie) {
-                // //     return buildGridView(widget.id!, categorie.idCategorieProduit!);
-                // //   }).toList(),
-                // // ),
-                // //   ),
-                // // ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 40,
+                  child: Container(
+                    padding: EdgeInsets.only(left: 5),
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(255, 245, 212, 169),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Rechercher',
+                        contentPadding: EdgeInsets.all(10),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Flexible(
+                  child: GestureDetector(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: categorieProduit.map((categorie) {
+                        return buildGridView(
+                            categorie.idCategorieProduit!, widget.id!);
+                      }).toList(),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -169,44 +183,53 @@ class _ProduitScreenState extends State<ProduitScreen> with TickerProviderStateM
     );
   }
 
-  Widget buildGridView(String id, String idCategorie) {
-  // Filtrer les stocks en fonction de la catégorie sélectionnée
-  List<Stock> filteredStocks = stock.where((stock) => stock.magasin!.idMagasin == id).toList();
-
-  // Filtrer les stocks en fonction de la catégorie sélectionnée
-  // List<Stock> filteredStocksByCategory = filteredStocks.where((stock) => stock.magasin!.CategorieProduit!.idCategorieProduit == idCategorie).toList();
-
-
-    if (filteredStocks == null) {
-      // Si les données ne sont pas encore chargées, affichez l'effet Shimmer
-      return _buildShimmerEffect();
-    } else {
-     // Filtrer les stocks en fonction du texte de recherche
-  List<Stock> filteredStocksSearch = filteredStocks.where((stock) {
-    String nomProduit = stock.nomProduit!.toLowerCase();
-    String searchText = _searchController.text.toLowerCase();
-    return nomProduit.contains(searchText);
-  }).toList();
-
-      // Si aucun magasin n'est trouvé après le filtrage
-      if (filteredStocks.isEmpty) {
-        // Vous pouvez afficher une image ou un texte ici
-        return Center(
+  Widget buildGridView(String idCategorie, String idMagasin) {
+    List<Stock> filteredStocks = stock;
+    String searchText = "";
+    if (filteredStocks.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
           child: Text(
-            'Aucun magasin trouvé',
+            textAlign: TextAlign.justify,
+            'Aucun produit trouvé dans le magasin ' +
+                widget.nom!.toUpperCase() +
+                " dans la categorie " +
+                selectedCategorieProduitNom.toUpperCase(),
             style: TextStyle(fontSize: 16),
+          ),
+        ),
+      );
+    } else {
+      List<Stock> filteredStocksSearch = filteredStocks.where((stock) {
+        String nomProduit = stock.nomProduit!.toLowerCase();
+        searchText = _searchController.text.toLowerCase();
+        return nomProduit.contains(searchText);
+      }).toList();
+
+      if (filteredStocksSearch.isEmpty) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Text(
+              textAlign: TextAlign.justify,
+              'Aucun produit trouvé avec le nom ' +
+                  searchText.toUpperCase() +
+                  " dans la categorie " +
+                  selectedCategorieProduitNom.toUpperCase(),
+              style: TextStyle(fontSize: 16),
+            ),
           ),
         );
       }
 
-      // Sinon, afficher la GridView avec les magasins filtrés
       return GridView.builder(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          mainAxisSpacing: 10, 
+          mainAxisSpacing: 10,
           crossAxisSpacing: 10,
         ),
-        itemCount: filteredStocks.length,
+        itemCount: filteredStocksSearch.length, // Utiliser la liste filtrée
         itemBuilder: (context, index) {
           return Container(
             child: Card(
@@ -221,11 +244,13 @@ class _ProduitScreenState extends State<ProduitScreen> with TickerProviderStateM
                       ),
                       Container(
                         child: Image.network(
-                          filteredStocksSearch[index].nomProduit ?? 'assets/images/magasin.png',
+                          filteredStocksSearch[index].photo ??
+                              'assets/images/magasin.png', // Utiliser la photo du stock
                           width: double.infinity,
                           height: null,
                           fit: BoxFit.cover,
-                          errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                          errorBuilder: (BuildContext context, Object exception,
+                              StackTrace? stackTrace) {
                             return Image.asset(
                               'assets/images/magasin.png',
                               width: double.infinity,
@@ -238,20 +263,12 @@ class _ProduitScreenState extends State<ProduitScreen> with TickerProviderStateM
                     ],
                   ),
                   Text(
-                    filteredStocksSearch[index].nomProduit ?? 'Pas de nom défini',
+                    overflow: TextOverflow.ellipsis,
+                    filteredStocksSearch[index].nomProduit ??
+                        'Pas de nom défini',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                 TextButton(
-  style: ButtonStyle(
-    fixedSize: MaterialStateProperty.all(Size(20, 10)),
-    shape: MaterialStateProperty.all(RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(50.0),
-    )),
-  ),
-  onPressed: null,
-  child: Text('Voir', style: TextStyle(fontWeight: FontWeight.bold),),
-),
                 ],
               ),
             ),
@@ -271,7 +288,7 @@ class _ProduitScreenState extends State<ProduitScreen> with TickerProviderStateM
           mainAxisSpacing: 10,
           crossAxisSpacing: 10,
         ),
-        itemCount: 6, // Nombre de cellules de la grille
+        itemCount: 6,
         itemBuilder: (context, index) {
           return Container(
             decoration: BoxDecoration(
@@ -284,6 +301,3 @@ class _ProduitScreenState extends State<ProduitScreen> with TickerProviderStateM
     );
   }
 }
-
-
-

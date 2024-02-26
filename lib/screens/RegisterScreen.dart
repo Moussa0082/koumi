@@ -31,6 +31,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     String _errorMessage = "";
 
+    String dropdownvalue = 'Item 1';    
+  
+  // List of items in our dropdown menu 
+  var items = [     
+    'Item 2', 
+    
+  ]; 
+
   TextEditingController nomActeurController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController telephoneController = TextEditingController();
@@ -151,7 +159,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             borderRadius: BorderRadius.circular(15)),
                         // labelText: "Email",
                         hintText: "Entrez votre email",
-                        
                         ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (val) {
@@ -213,7 +220,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 //  selcet type acteur 
                  
-           Container(
+          Container(
   height: 70,
   width: double.infinity,
   child: Padding(
@@ -221,79 +228,75 @@ class _RegisterScreenState extends State<RegisterScreen> {
     child: FutureBuilder(
       future: _mesTypeActeur,
       builder: (_, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-           return Shimmer.fromColors(
-                                   baseColor: Colors.grey[300]!,
-                                   highlightColor: Colors.grey[100]!,
-                                   child: DropdownButton(
-                                   dropdownColor: Colors.orange,
-                                   items: [], onChanged: (value) {}              
-                                            ),
-                                          );
-                                        }
-        if (snapshot.hasError) {
-          return Text("${snapshot.error}");
-        }
-        if (snapshot.hasData) {
-          final reponse = json.decode((snapshot.data.body)) as List;
-          final mesType = reponse
-              .map((e) => TypeActeur.fromMap(e))
-              .where((typeActeur) =>
-                  typeActeur.statutTypeActeur == true &&
-                  typeActeur.libelle != 'Admin') // Filtrer les types d'acteurs actifs et différents de l'administrateur
-              .toList();
-
-          List<DropdownMenuItem<String>> dropdownItems = [];
-
-          if (mesType.isNotEmpty) {
-            dropdownItems = mesType
-                .map((e) => DropdownMenuItem(
-                  alignment:AlignmentDirectional.center,
-                      child: Text(
-                        e.libelle,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      value: e.idTypeActeur,
-                    ))
-                .toList();
-          } else {
-            dropdownItems.add(DropdownMenuItem(
-              child: Text('Aucun type d\'acteur disponible'),
-              value: null,
-            ));
+        try {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: DropdownButton(
+                dropdownColor: Colors.orange,
+                items: [],
+                onChanged: (value) {},
+              ),
+            );
           }
-    // bool typeSelected = false;
-          return DropdownButton(
-            alignment: AlignmentDirectional.center,
-            items: dropdownItems,
-            value: typeValue,
-            onChanged: (newValue) {
-              setState(() {
-                typeValue = newValue;
-                if (newValue != null) {
-                  monTypeActeur = mesType.firstWhere(
-                      (element) => element.idTypeActeur == newValue);
-                  debugPrint(monTypeActeur.idTypeActeur.toString());
-                  // typeSelected = true;
-                } else {
-                  // typeSelected = false;
-                  // Gérer le cas où aucun type n'est sélectionné
-                  // if (!typeSelected) {
-                  //   Text(
-                  //     "Veuillez choisir un type d'acteur",
-                  //     style: TextStyle(color: Colors.red),
-                  //   );
-                  // }
-                }
-              });
-            },
-          );
+          if (snapshot.hasError) {
+            return Text("${snapshot.error}");
+          }
+          if (snapshot.hasData) {
+            final reponse = json.decode((snapshot.data.body)) as List;
+            final mesType = reponse
+                .map((e) => TypeActeur.fromMap(e))
+                .where((typeActeur) =>
+                    typeActeur.statutTypeActeur == true &&
+                    typeActeur.libelle != 'Admin') // Filtrer les types d'acteurs actifs et différents de l'administrateur
+                .toList();
+
+            List<DropdownMenuItem<String>> dropdownItems = [];
+
+            if (mesType.isNotEmpty) {
+              dropdownItems = mesType
+                  .map((e) => DropdownMenuItem(
+                        alignment: AlignmentDirectional.center,
+                        child: Text(
+                          e.libelle,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        value: e.idTypeActeur,
+                      ))
+                  .toList();
+            } else {
+              dropdownItems.add(DropdownMenuItem(
+                child: Text('Aucun type d\'acteur disponible'),
+                value: null,
+              ));
+            }
+            return DropdownButton(
+              alignment: AlignmentDirectional.center,
+              items: dropdownItems,
+              value: typeValue,
+              onChanged: (newValue) {
+                setState(() {
+                  typeValue = newValue;
+                  if (newValue != null) {
+                    monTypeActeur = mesType.firstWhere(
+                        (element) => element.idTypeActeur == newValue);
+                    debugPrint(monTypeActeur.idTypeActeur.toString());
+                  }
+                });
+              },
+            );
+          }
+          return Text('Aucune donnée disponible');
+        } catch (e) {
+          // Gérer l'absence de connexion ici
+          return Center(child: Text('Type d\'acteur non disponible,\n verifier votre connexion internet ', style: TextStyle(fontSize: 15),));
         }
-        return Text('Aucune donnée disponible');
       },
     ),
   ),
 ),
+
 
                 //end select type acteur 
      const  SizedBox(height: 10,),

@@ -34,17 +34,25 @@ class _FiliereScreenState extends State<FiliereScreen> {
   String? filiereValue;
   late Future _filiereList;
   late Filiere filiere;
+  late TextEditingController _searchController;
 
   @override
   void initState() {
     super.initState();
-
+    _searchController = TextEditingController();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
     para = paraList[0];
     _filiereList = http.get(
         Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+  }
+
+  @override
+  void dispose() {
+    _searchController
+        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    super.dispose();
   }
 
   @override
@@ -120,6 +128,42 @@ class _FiliereScreenState extends State<FiliereScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.search,
+                        color: Colors.blueGrey[400]), // Couleur de l'icône
+                    SizedBox(
+                        width:
+                            10), // Espacement entre l'icône et le champ de recherche
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Rechercher',
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(
+                              color: Colors
+                                  .blueGrey[400]), // Couleur du texte d'aide
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
             Consumer<FiliereService>(
               builder: (context, filiereService, child) {
                 return FutureBuilder(
@@ -141,9 +185,15 @@ class _FiliereScreenState extends State<FiliereScreen> {
                         );
                       } else {
                         filiereList = snapshot.data!;
-
+                        String searchText = "";
+                        List<Filiere> filteredFiliereSearch =
+                            filiereList.where((fil) {
+                          String nomfiliere = fil.libelleFiliere.toLowerCase();
+                          searchText = _searchController.text.toLowerCase();
+                          return nomfiliere.contains(searchText);
+                        }).toList();
                         return Column(
-                            children: filiereList
+                            children: filteredFiliereSearch
                                 .map((e) => Padding(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 15),
