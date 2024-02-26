@@ -1,178 +1,190 @@
+
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/CategorieProduit.dart';
+import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/screens/Produit.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
-
-class ProduitActeur extends StatefulWidget {
-  const ProduitActeur({super.key});
+class ProduitActeurScreen extends StatefulWidget {
+  final String? id; // ID du magasin (optionnel)
+  final String? nom;
+   ProduitActeurScreen({super.key , this.id, this.nom});
 
   @override
-  State<ProduitActeur> createState() => _ProduitActeurState();
+  State<ProduitActeurScreen> createState() => _ProduitActeurScreenState();
 }
 
-class _ProduitActeurState extends State<ProduitActeur>  with TickerProviderStateMixin{
-  
-   late Acteur acteur;
-   TabController? _tabController;
-    late TextEditingController _searchController;
+class _ProduitActeurScreenState extends State<ProduitActeurScreen>  with TickerProviderStateMixin {
+  TabController? _tabController;
+  late TextEditingController _searchController;
+  late Acteur acteur;
 
-  List<String> regions = [];
-  List<String> idNiveau1Pays = [];
-   String selectedRegionId = ''; // Ajoutez une variable pour stocker l'ID de la région sélectionnée
-  
-  Map<String, List<Map<String, dynamic>>> magasinsParRegion = {};
+  List<Stock> stock = [];
+  List<CategorieProduit> categorieProduit = [];
+  String selectedCategorieProduit = "";
+  String selectedCategorieProduitNom = "";
 
-  List<Map<String, dynamic>> regionsData = [];
-  List<String> magasins = [];
-  int currentIndex = 0;
+  Set<String> loadedRegions = {};
 
-  Set<String> loadedRegions = {}; // Ensemble pour garder une trace des régions pour lesquelles les magasins ont déjà été chargés
-
-  void fetchRegions() async {
-  try {
-    final response = await http.get(Uri.parse('http://10.0.2.2:9000/niveau1Pays/read'));
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
-      
-      // Filtrer les éléments avec statutN1 == true
-      List<dynamic> filteredData = data.where((item) => item['statutN1'] == true).toList();
-      
-      setState(() {
-        regionsData = filteredData.cast<Map<String, dynamic>>();
-        regions = regionsData.map((item) => item['nomN1'] as String).toList();
-        idNiveau1Pays = regionsData.map((item) => item['idNiveau1Pays'] as String).toList();
-      });
-      
-      _tabController = TabController(length: regions.length, vsync: this);
-      _tabController!.addListener(_handleTabChange);
-      
-      // Fetch les magasins pour la première région
-      fetchMagasinsByRegionAndActeur(acteur.idActeur!,idNiveau1Pays.isNotEmpty ? idNiveau1Pays[_tabController!.index] : '');
-    } else {
-      throw Exception('Failed to load regions');
-    }
-  } catch (e) {
-    print('Error fetching regions: $e');
-  }
-}
-
-
-  void fetchMagasinsByRegionAndActeur(String idNiveau1Pays,String idActeur) async {
-  try {
-    final response = await http.get(Uri.parse('http://10.0.2.2:9000/Magasin/getAllMagasinByActeurAndNieau1Pays/${idActeur}/${idNiveau1Pays}'));
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
-      List<Map<String, dynamic>> magasins = data
-          .where((magasin) => magasin['statutMagasin'] == true) // Filtrer les magasins actifs
-          .map<Map<String, dynamic>>((item) => {
-            'nomMagasin': item['nomMagasin'],
-            'idMagasin': item['idMagasin'],
-            'photo': item['photo'],
-          })
-          .toList();
-      setState(() {
-        magasinsParRegion[idNiveau1Pays] = magasins;
-      });
-      if (!loadedRegions.contains(idNiveau1Pays)) {
-        loadedRegions.add(idNiveau1Pays);
+  void fetchProduitByCategorie(String idCategorie, String idMagasin,String idActeur) async {
+    try {
+      final response = await http.get(
+          Uri.parse('http://10.0.2.2:9000/Stock/categorieAndActeur/$idCategorie/$idMagasin/$idActeur'));
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        setState(() {
+          stock = data.
+    where((stock) => stock['statutSotck'] == true)
+              .map((item) => Stock(
+                    idStock: item['idStock'] as String,
+                    nomProduit: item['nomProduit'] as String,
+                    photo: item['photo'] ?? '',
+                  ))
+              .toList();
+        });
+        debugPrint("Produit : ${stock.map((e) => e.nomProduit)}");
+      } else {
+        throw Exception('Failed to load stock');
       }
-    } else {
-      throw Exception('Failed to load magasins for acteur $idActeur');
+    } catch (e) {
+      print('Error fetching stock: $e');
     }
-  } catch (e) {
-    print('Error fetching magasins for acteur $idActeur: $e');
   }
-}
 
- void _handleTabChange() {
-  if (_tabController != null && _tabController!.index >= 0 && _tabController!.index < idNiveau1Pays.length) {
-    String selectedRegionId = idNiveau1Pays[_tabController!.index];
-    fetchMagasinsByRegionAndActeur( acteur.idActeur!,selectedRegionId);
+  void fetchCategorie() async {
+    try {
+      final response =
+          await http.get(Uri.parse('http://10.0.2.2:9000/Categorie/allCategorie'));
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        setState(() {
+          categorieProduit = data
+              .map((item) => CategorieProduit(
+                    idCategorieProduit: item['idCategorieProduit'] as String,
+                    libelleCategorie: item['libelleCategorie'] as String,
+                  ))
+              .toList();
+          _tabController =
+              TabController(length: categorieProduit.length, vsync: this);
+          _tabController!.addListener(_handleTabChange);
+          selectedCategorieProduit =
+              categorieProduit.isNotEmpty ? categorieProduit.first.idCategorieProduit! : '';
+          selectedCategorieProduitNom =
+              categorieProduit.isNotEmpty ? categorieProduit[_tabController!.index].libelleCategorie : '';
+          fetchProduitByCategorie(selectedCategorieProduit, widget.id!, acteur.idActeur!);
+        });
+        debugPrint("Id Cat : ${categorieProduit.map((e) => e.idCategorieProduit)}");
+      } else {
+        throw Exception('Failed to load categories');
+      }
+    } catch (e) {
+      print('Error fetching categories: $e');
+    }
   }
-}
 
-   
-   @override
+  void _handleTabChange() {
+    if (_tabController != null &&
+        _tabController!.index >= 0 &&
+        _tabController!.index < categorieProduit.length) {
+      selectedCategorieProduit =
+          categorieProduit[_tabController!.index].idCategorieProduit!;
+      selectedCategorieProduitNom =
+          categorieProduit[_tabController!.index].libelleCategorie;
+      fetchProduitByCategorie(selectedCategorieProduit, widget.id!, acteur.idActeur!);
+      debugPrint("Cat id : " + selectedCategorieProduit);
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
-    _searchController = TextEditingController();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-   if (idNiveau1Pays.isNotEmpty) {
-      selectedRegionId = idNiveau1Pays[_tabController!.index];
+    _searchController = TextEditingController();
+
+    if (categorieProduit.isEmpty) {
+      fetchCategorie();
+      // fetchProduitByCategorie(selectedCategorieProduit);
+
     }
-    fetchRegions();
-    _buildShimmerEffect();
   }
 
-       @override
+  @override
   void dispose() {
     _tabController?.dispose();
-    _searchController.dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    _searchController.dispose();
     super.dispose();
   }
 
-    @override
+  @override
   Widget build(BuildContext context) {
     return Container(
       child: DefaultTabController(
-        length: regions.length,
+        length: categorieProduit.length,
         child: Scaffold(
           appBar: AppBar(
-            centerTitle:true,
-            title: Text('Mes boutiques'),
+            centerTitle: true,
+            title: Text('Categories'),
             bottom: TabBar(
-              isScrollable: regions.length > 4,
+              isScrollable: true,
               labelColor: Colors.black,
-              controller: _tabController, // Ajoutez le contrôleur TabBar
-              tabs: regions.map((region) => Tab(text: region)).toList(),
+              controller: _tabController,
+              tabs: categorieProduit
+                  .map((categorie) => Tab(text: categorie.libelleCategorie))
+                  .toList(),
             ),
           ),
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                const SizedBox(height:10),
-                 SizedBox(
-                     height:40,
-                   child: Container(
-                     padding: EdgeInsets.only(left: 5),
-                     decoration: BoxDecoration(
-                       color: Color.fromARGB(255, 245, 212, 169),
-                       borderRadius: BorderRadius.circular(30),
-                                    
-                     ),
-                     child: TextField(
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 40,
+                  child: Container(
+                    padding: EdgeInsets.only(left: 5),
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(255, 245, 212, 169),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: TextField(
                       controller: _searchController,
-                       onChanged: (value) {
-                              setState(() {
-                                // Le changement de texte déclenche la reconstruction du widget
-                              });
-                            },
-                       decoration: InputDecoration(
-                         hintText: 'Rechercher',
-                         contentPadding: EdgeInsets.all(10),
-                         border: InputBorder.none,
-                       ),
-                     ),
-                   ),
-                 ),
-                const SizedBox(height:10),
-                // const SizedBox(height:10),
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Rechercher',
+                        contentPadding: EdgeInsets.all(10),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
                 Flexible(
                   child: GestureDetector(
                     child: TabBarView(
-                      controller: _tabController, // Ajoutez le contrôleur TabBarView
-                      children: idNiveau1Pays.map((region) {
-                        return buildGridView(acteur.idActeur!,region);
+                      controller:  _tabController,
+                      children: categorieProduit.map((categorie) {
+                        return buildGridView(categorie.idCategorieProduit!, widget.id!, acteur.idActeur!);
                       }).toList(),
                     ),
                   ),
                 ),
+        //         final List<String> type =
+        //     acteur.typeActeur.map((e) => e.libelle).toList();
+        // if (type.contains('admin') || type.contains('Admin')) {
+        //   Navigator.pushReplacement(
+        //     context,
+        //     MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
+        //   );
+        // }
+         
               ],
             ),
           ),
@@ -181,104 +193,93 @@ class _ProduitActeurState extends State<ProduitActeur>  with TickerProviderState
     );
   }
 
-  Widget buildGridView(String idMagasin, String idActeur) {
-    List<Map<String, dynamic>>? magasins = magasinsParRegion[idMagasin];
-    if (magasins == null) {
-      // Si les données ne sont pas encore chargées, affichez l'effet Shimmer
-      return _buildShimmerEffect();
-    } else {
-      // Filtrer les magasins en fonction du texte de recherche
-      List<Map<String, dynamic>> filteredMagasins = magasins.where((magasin) {
-        String nomMagasin = magasin['nomMagasin']!.toString().toLowerCase();
-        String searchText = _searchController.text.toLowerCase();
-        return nomMagasin.contains(searchText);
-      }).toList();
 
-      // Si aucun magasin n'est trouvé après le filtrage
-      if (filteredMagasins.isEmpty) {
-        // Vous pouvez afficher une image ou un texte ici
-        return Center(
-          child: Text(
-            'Aucun magasin trouvé',
+Widget buildGridView(String idCategorie, String idMagasin, String idActeur) {
+  
+  List<Stock> filteredStocks = stock;
+  String searchText = "";
+  if (filteredStocks.isEmpty) {
+   return Padding(
+     padding: const EdgeInsets.all(8.0),
+     child: Center(
+          child: Text( textAlign:TextAlign.justify,
+            'Aucun produit trouvé dans le magasin ' + widget.nom!.toUpperCase() + " dans la categorie " +  selectedCategorieProduitNom.toUpperCase(),
             style: TextStyle(fontSize: 16),
           ),
-        );
-      }
-
-      // Sinon, afficher la GridView avec les magasins filtrés
-      return GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
         ),
-        itemCount: filteredMagasins.length,
-        itemBuilder: (context, index) {
-          // ici on a recuperer les details du  magasin 
-            Map<String, dynamic> magasin = filteredMagasins[index];
-          return Container(
-            child: GestureDetector(
-              onTap:(){
-                 String id = magasin['idMagasin'];
-                 String nom = magasin['nomMagasin'];
-                Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => ProduitScreen(id:id, nom: nom,)),
-          );
-              },
-              child: Card(
-                shadowColor: Colors.white,
-                child: Column(
-                  children: [
-                    Stack(
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          child: Image.asset('assets/images/rectangle.png', width:double.infinity),
-                        ),
-                        Container(
-                          child: Image.network(
-                            filteredMagasins[index]['photo'] ?? 'assets/images/magasin.png',
-                            width: double.infinity,
-                            height: null,
-                            fit: BoxFit.cover,
-                            errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                              return Image.asset(
-                                'assets/images/magasin.png',
-                                width: double.infinity,
-                                height: 150,
-                                fit: BoxFit.cover,
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      overflow:TextOverflow.ellipsis,
-                      filteredMagasins[index]['nomMagasin'].toString().toUpperCase() ?? 'Pas de nom défini',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-              //      TextButton(
-              //   style: ButtonStyle(
-              //     fixedSize: MaterialStateProperty.all(Size(20, 10)),
-              //     shape: MaterialStateProperty.all(RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(50.0),
-              //     )),
-              //   ),
-              //   onPressed: null,
-              //   child: Text('Voir', style: TextStyle(fontWeight: FontWeight.bold),),
-              // ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
+   );
+  } else {
+    List<Stock> filteredStocksSearch = filteredStocks.where((stock) {
+      String nomProduit = stock.nomProduit!.toLowerCase();
+       searchText = _searchController.text.toLowerCase();
+      return nomProduit.contains(searchText);
+    }).toList();
+
+    if (filteredStocksSearch.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Text(
+            textAlign:TextAlign.justify,
+            'Aucun produit trouvé avec le nom ' +  searchText.toUpperCase()  + " dans la categorie " +  selectedCategorieProduitNom.toUpperCase(),
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
       );
     }
+
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+      ),
+      itemCount: filteredStocksSearch.length, // Utiliser la liste filtrée
+      itemBuilder: (context, index) {
+        return Container(
+          child: Card(
+            shadowColor: Colors.white,
+            child: Column(
+              children: [
+                Stack(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      child: Image.asset('assets/images/rc.png'),
+                    ),
+                    Container(
+                      child: Image.network(
+                        filteredStocksSearch[index].photo ?? 'assets/images/magasin.png', // Utiliser la photo du stock
+                        width: double.infinity,
+                        height: null,
+                        fit: BoxFit.cover,
+                        errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                          return Image.asset(
+                            'assets/images/magasin.png',
+                            width: double.infinity,
+                            height: 150,
+                            fit: BoxFit.cover,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  overflow: TextOverflow.ellipsis,
+                  filteredStocksSearch[index].nomProduit ?? 'Pas de nom défini',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
+}
+
 
   Widget _buildShimmerEffect() {
     return Shimmer.fromColors(
@@ -290,7 +291,7 @@ class _ProduitActeurState extends State<ProduitActeur>  with TickerProviderState
           mainAxisSpacing: 10,
           crossAxisSpacing: 10,
         ),
-        itemCount: 6, // Nombre de cellules de la grille
+        itemCount: 6,
         itemBuilder: (context, index) {
           return Container(
             decoration: BoxDecoration(
@@ -303,3 +304,4 @@ class _ProduitActeurState extends State<ProduitActeur>  with TickerProviderState
     );
   }
 }
+
