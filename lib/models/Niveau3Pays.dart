@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:koumi_app/models/Niveau2Pays.dart';
@@ -11,8 +12,7 @@ class Niveau3Pays {
   final bool statutN3;
   final String? dateAjout;
   final String? dateModif;
-  final Niveau2Pays niveau2Pays;
-
+  final Niveau2Pays? niveau2Pays;
   Niveau3Pays({
     this.idNiveau3Pays,
     required this.codeN3,
@@ -22,8 +22,10 @@ class Niveau3Pays {
     required this.statutN3,
     this.dateAjout,
     this.dateModif,
-    required this.niveau2Pays,
+    this.niveau2Pays,
   });
+
+ 
 
   Niveau3Pays copyWith({
     String? idNiveau3Pays,
@@ -59,7 +61,7 @@ class Niveau3Pays {
       'statutN3': statutN3,
       'dateAjout': dateAjout,
       'dateModif': dateModif,
-      'niveau2Pays': niveau2Pays.toMap(),
+      'niveau2Pays': niveau2Pays?.toMap(),
     };
   }
 
@@ -73,7 +75,7 @@ class Niveau3Pays {
       statutN3: map['statutN3'] as bool,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
-      niveau2Pays: Niveau2Pays.fromMap(map['niveau2Pays'] as Map<String,dynamic>),
+      niveau2Pays: map['niveau2Pays'] != null ? Niveau2Pays.fromMap(map['niveau2Pays'] as Map<String,dynamic>) : null,
     );
   }
 

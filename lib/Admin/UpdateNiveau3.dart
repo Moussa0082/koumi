@@ -39,8 +39,8 @@ class _UpdateNiveau3State extends State<UpdateNiveau3> {
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau2Pays/read'));
     libelleController.text = widget.niveau3pays.nomN3;
     descriptionController.text = widget.niveau3pays.descriptionN3;
-    niveau2 = widget.niveau3pays.niveau2Pays;
-    niveau2Value = widget.niveau3pays.niveau2Pays.idNiveau2Pays;
+    niveau2 = widget.niveau3pays.niveau2Pays!;
+    niveau2Value = widget.niveau3pays.niveau2Pays!.idNiveau2Pays;
   }
 
   @override

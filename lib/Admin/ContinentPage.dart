@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:koumi_app/Admin/SousRegionPage.dart';
 import 'package:koumi_app/Admin/UpdateContinents.dart';
 import 'package:koumi_app/models/Continent.dart';
+import 'package:koumi_app/models/SousRegion.dart';
 import 'package:koumi_app/service/ContinentService.dart';
+import 'package:koumi_app/service/SousRegionService.dart';
 import 'package:provider/provider.dart';
 
 class ContinentPage extends StatefulWidget {
@@ -21,14 +22,15 @@ class _ContinentPageState extends State<ContinentPage> {
   TextEditingController libelleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   late TextEditingController _searchController;
+  List<SousRegion> regionList = [];
 
-@override
+  @override
   void initState() {
-     _searchController = TextEditingController();
+    _searchController = TextEditingController();
     super.initState();
   }
 
-   @override
+  @override
   void dispose() {
     _searchController
         .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
@@ -122,7 +124,7 @@ class _ContinentPageState extends State<ContinentPage> {
                         );
                       } else {
                         continentList = snapshot.data!;
-                         String searchText = "";
+                        String searchText = "";
                         List<Continent> filtereSearch =
                             continentList.where((search) {
                           String libelle = search.nomContinent.toLowerCase();
@@ -135,7 +137,6 @@ class _ContinentPageState extends State<ContinentPage> {
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 15),
                                       child: Container(
-                                        height: 150,
                                         width:
                                             MediaQuery.of(context).size.width *
                                                 0.9,
@@ -167,49 +168,112 @@ class _ContinentPageState extends State<ContinentPage> {
                                                     style: const TextStyle(
                                                       color: Colors.black,
                                                       fontSize: 20,
-                                                      overflow: TextOverflow
-                                                          .ellipsis,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     )),
-                                                subtitle: Text(
-                                                    e.descriptionContinent,
-                                                    style: const TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 17,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                    ))),
-                                            const Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 15),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text("Nombres de sous région :",
-                                                      style: TextStyle(
-                                                        color: Colors.black87,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontStyle:
-                                                            FontStyle.italic,
-                                                      )),
-                                                  Text("10",
-                                                      style: TextStyle(
-                                                        color: Colors.black87,
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.w800,
-                                                      ))
-                                                ],
-                                              ),
-                                            ),
+                                                subtitle:
+                                                    Text(e.descriptionContinent,
+                                                        style: const TextStyle(
+                                                          color: Colors.black87,
+                                                          fontSize: 17,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          fontStyle:
+                                                              FontStyle.italic,
+                                                        ))),
+                                            FutureBuilder(
+                                                future: SousRegionService()
+                                                    .fetchSousRegionByContinent(
+                                                        e.idContinent!),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return const Center(
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                        color: Colors.orange,
+                                                      ),
+                                                    );
+                                                  }
+
+                                                  if (!snapshot.hasData) {
+                                                    return Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 15),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                              "Nombres de sous région :",
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .black87,
+                                                                fontSize: 17,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .italic,
+                                                              )),
+                                                          Text("0",
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .black87,
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w800,
+                                                              ))
+                                                        ],
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    regionList = snapshot.data!;
+                                                    return Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 15),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                              "Nombres de sous région :",
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .black87,
+                                                                fontSize: 17,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .italic,
+                                                              )),
+                                                          Text(
+                                                              regionList.length
+                                                                  .toString(),
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .black87,
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w800,
+                                                              ))
+                                                        ],
+                                                      ),
+                                                    );
+                                                  }
+                                                }),
                                             Container(
-                                              alignment:
-                                                  Alignment.bottomRight,
+                                              alignment: Alignment.bottomRight,
                                               padding:
                                                   const EdgeInsets.symmetric(
                                                       horizontal: 10),
@@ -218,8 +282,7 @@ class _ContinentPageState extends State<ContinentPage> {
                                                     MainAxisAlignment
                                                         .spaceBetween,
                                                 children: [
-                                                  _buildEtat(
-                                                      e.statutContinent),
+                                                  _buildEtat(e.statutContinent),
                                                   PopupMenuButton<String>(
                                                     padding: EdgeInsets.zero,
                                                     itemBuilder: (context) =>
@@ -229,14 +292,13 @@ class _ContinentPageState extends State<ContinentPage> {
                                                         child: ListTile(
                                                           leading: const Icon(
                                                             Icons.check,
-                                                            color:
-                                                                Colors.green,
+                                                            color: Colors.green,
                                                           ),
                                                           title: const Text(
                                                             "Activer",
                                                             style: TextStyle(
-                                                              color: Colors
-                                                                  .green,
+                                                              color:
+                                                                  Colors.green,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -247,11 +309,13 @@ class _ContinentPageState extends State<ContinentPage> {
                                                                 .activerContinent(e
                                                                     .idContinent!)
                                                                 .then(
-                                                                    (value) =>
-                                                                        {
-                                                                          Provider.of<ContinentService>(context, listen: false).applyChange(),
-                                                                          Navigator.of(context).pop(),
-                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                    (value) => {
+                                                                          Provider.of<ContinentService>(context, listen: false)
+                                                                              .applyChange(),
+                                                                          Navigator.of(context)
+                                                                              .pop(),
+                                                                          ScaffoldMessenger.of(context)
+                                                                              .showSnackBar(
                                                                             const SnackBar(
                                                                               content: Row(
                                                                                 children: [
@@ -265,7 +329,8 @@ class _ContinentPageState extends State<ContinentPage> {
                                                                 .catchError(
                                                                     (onError) =>
                                                                         {
-                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                          ScaffoldMessenger.of(context)
+                                                                              .showSnackBar(
                                                                             const SnackBar(
                                                                               content: Row(
                                                                                 children: [
@@ -275,7 +340,8 @@ class _ContinentPageState extends State<ContinentPage> {
                                                                               duration: Duration(seconds: 5),
                                                                             ),
                                                                           ),
-                                                                          Navigator.of(context).pop(),
+                                                                          Navigator.of(context)
+                                                                              .pop(),
                                                                         });
                                                           },
                                                         ),
@@ -292,8 +358,7 @@ class _ContinentPageState extends State<ContinentPage> {
                                                             "Désactiver",
                                                             style: TextStyle(
                                                               color: Colors
-                                                                      .orange[
-                                                                  400],
+                                                                  .orange[400],
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -304,15 +369,17 @@ class _ContinentPageState extends State<ContinentPage> {
                                                                 .desactiverContinent(e
                                                                     .idContinent!)
                                                                 .then(
-                                                                    (value) =>
-                                                                        {
-                                                                          Provider.of<ContinentService>(context, listen: false).applyChange(),
-                                                                          Navigator.of(context).pop(),
+                                                                    (value) => {
+                                                                          Provider.of<ContinentService>(context, listen: false)
+                                                                              .applyChange(),
+                                                                          Navigator.of(context)
+                                                                              .pop(),
                                                                         })
                                                                 .catchError(
                                                                     (onError) =>
                                                                         {
-                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                          ScaffoldMessenger.of(context)
+                                                                              .showSnackBar(
                                                                             const SnackBar(
                                                                               content: Row(
                                                                                 children: [
@@ -322,9 +389,10 @@ class _ContinentPageState extends State<ContinentPage> {
                                                                               duration: Duration(seconds: 5),
                                                                             ),
                                                                           ),
-                                                                          Navigator.of(context).pop(),
+                                                                          Navigator.of(context)
+                                                                              .pop(),
                                                                         });
-                                        
+
                                                             ScaffoldMessenger
                                                                     .of(context)
                                                                 .showSnackBar(
@@ -348,14 +416,13 @@ class _ContinentPageState extends State<ContinentPage> {
                                                         child: ListTile(
                                                           leading: const Icon(
                                                             Icons.edit,
-                                                            color:
-                                                                Colors.green,
+                                                            color: Colors.green,
                                                           ),
                                                           title: const Text(
                                                             "Modifier",
                                                             style: TextStyle(
-                                                              color: Colors
-                                                                  .green,
+                                                              color:
+                                                                  Colors.green,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -368,8 +435,9 @@ class _ContinentPageState extends State<ContinentPage> {
                                                                 builder: (BuildContext
                                                                         context) =>
                                                                     AlertDialog(
-                                                                        backgroundColor: Colors
-                                                                            .white,
+                                                                        backgroundColor:
+                                                                            Colors
+                                                                                .white,
                                                                         shape:
                                                                             RoundedRectangleBorder(
                                                                           borderRadius:
@@ -377,7 +445,7 @@ class _ContinentPageState extends State<ContinentPage> {
                                                                         ),
                                                                         content:
                                                                             UpdateContinents(continent: e)));
-                                        
+
                                                             Navigator.of(
                                                                     context)
                                                                 .pop();
@@ -393,8 +461,7 @@ class _ContinentPageState extends State<ContinentPage> {
                                                           title: const Text(
                                                             "Supprimer",
                                                             style: TextStyle(
-                                                              color:
-                                                                  Colors.red,
+                                                              color: Colors.red,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -405,15 +472,17 @@ class _ContinentPageState extends State<ContinentPage> {
                                                                 .deleteContinent(e
                                                                     .idContinent!)
                                                                 .then(
-                                                                    (value) =>
-                                                                        {
-                                                                          Provider.of<ContinentService>(context, listen: false).applyChange(),
-                                                                          Navigator.of(context).pop(),
+                                                                    (value) => {
+                                                                          Provider.of<ContinentService>(context, listen: false)
+                                                                              .applyChange(),
+                                                                          Navigator.of(context)
+                                                                              .pop(),
                                                                         })
                                                                 .catchError(
                                                                     (onError) =>
                                                                         {
-                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                          ScaffoldMessenger.of(context)
+                                                                              .showSnackBar(
                                                                             const SnackBar(
                                                                               content: Row(
                                                                                 children: [
