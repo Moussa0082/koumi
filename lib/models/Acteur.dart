@@ -47,7 +47,7 @@ class Acteur {
     this.personneModif,
     required this.localiteActeur,
     required this.emailActeur,
-    required this.filiereActeur,
+     this.filiereActeur,
      this.statutActeur,
     required this.typeActeur,
     required this.maillonActeur,
@@ -55,7 +55,10 @@ class Acteur {
 
 
  // Méthode pour créer une instance d'Acteur à partir des données de SharedPreferences
-  factory Acteur.fromSharedPreferencesData(String emailActeur, String password, List<String> userTypeList) {
+  factory Acteur.fromSharedPreferencesData(String emailActeur, String password, 
+  List<String> userTypeList, String idActeur, String nomActeur, String telephoneActeur,
+   String adressActeur, String whatsAppActeur, String niveau3PaysActeur,
+    String localiteActeur, String maillonActeur) {
     // Créez une liste de TypeActeur à partir de la liste de chaînes userTypeList
     List<TypeActeur> typeActeurList = userTypeList.map((libelle) => TypeActeur(libelle: libelle)).toList();
 
@@ -64,7 +67,12 @@ class Acteur {
       // Initialiser les autres propriétés de l'acteur selon vos besoins
       emailActeur: emailActeur,
       password: password,
-      typeActeur: typeActeurList, nomActeur: '', adresseActeur: '', telephoneActeur: '', whatsAppActeur: '', niveau3PaysActeur: '', localiteActeur: '', filiereActeur: '', maillonActeur: '',
+      typeActeur: typeActeurList, 
+      idActeur:idActeur,
+      nomActeur: nomActeur, 
+      adresseActeur: adressActeur,telephoneActeur: telephoneActeur,
+      whatsAppActeur:whatsAppActeur, niveau3PaysActeur: niveau3PaysActeur, 
+      localiteActeur:localiteActeur , maillonActeur: maillonActeur,
     );
   }
   

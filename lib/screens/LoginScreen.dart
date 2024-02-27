@@ -105,6 +105,33 @@ class _LoginScreenState extends State<LoginScreen> {
         prefs.setString('emailActeur', emailActeur);
         prefs.setString('password', password);
         // prefs.setString('nomActeur', responseBody['nomActeur']);
+        final nomActeur =  responseBody['nomActeur']  ;
+      final idActeur = responseBody['idActeur']  ;
+      final adresseActeur =  responseBody['adresseActeur']  ;
+      final telephoneActeur = responseBody['telephoneActeur']  ;
+      final whatsAppActeur =  responseBody['whatsAppActeur'] ;
+      // final logoActeur =  responseBody['logoActeur'] ;
+      // final photoSiegeActeur = responseBody['photoSiegeActeur'] ;
+      final filiereActeur = responseBody['filiereActeur'] ;
+      final niveau3PaysActeur =  responseBody['niveau3PaysActeur'] ;
+      final localiteActeur =  responseBody['localiteActeur'] ;
+      final maillonActeur =  responseBody['maillonActeur'] ;
+
+          prefs.setString('nomActeur', nomActeur); 
+         prefs.setString('idActeur', idActeur);  
+        //  prefs.setString('resetToken', responseBody['resetToken']);  
+        //  prefs.setString('codeActeur', responseBody['codeActeur']);  
+         prefs.setString('adresseActeur', adresseActeur);  
+         prefs.setString('telephoneActeur', telephoneActeur);  
+         prefs.setString('whatsAppActeur', whatsAppActeur);  
+        //  prefs.setString('logoActeur', logoActeur);  
+        //  prefs.setString('photoSiegeActeur', photoSiegeActeur);  
+         prefs.setString('filiereActeur', filiereActeur);  
+         prefs.setString('niveau3PaysActeur', niveau3PaysActeur);  
+         prefs.setString('localiteActeur', localiteActeur);  
+         prefs.setString('maillonActeur', maillonActeur);  
+        // Enregistrer la liste des types d'utilisateur dans SharedPreferences
+
         
         // Enregistrer la liste des types d'utilisateur dans SharedPreferences
 
