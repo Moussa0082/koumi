@@ -311,11 +311,11 @@ class _ProfilAState extends State<ProfilA> {
                       // Déconnexion avec le provider
                       await acteurProvider.logout();
                        SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.clear();
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => LoginScreen()));
+                      await prefs.clear();
+                      Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => LoginScreen()),
+                           );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,

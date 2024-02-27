@@ -32,9 +32,23 @@ late Acteur acteur;
   @override
 void initState() {
   super.initState();
-  checkLoggedIn();
-}
+   // Vérifie d'abord si l'email de l'acteur est présent dans SharedPreferences
+    checkEmailInSharedPreferences();
+  }
 
+  void checkEmailInSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? emailActeur = prefs.getString('emailActeur');
+    if (emailActeur != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      checkLoggedIn();
+    } else {
+      // Si l'email de l'acteur n'est pas présent, redirige directement vers l'écran de connexion
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+    }
+  }
 
   void checkLoggedIn() async {
   // Initialise les données de l'utilisateur à partir de SharedPreferences
@@ -61,16 +75,17 @@ void initState() {
         ),
       );
     }
-  } else {
-    // Redirige vers l'écran de connexion si l'utilisateur n'est pas connecté
-    Timer(
-      const Duration(seconds: 5),
-      () => Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      ),
-    );
   }
-}
+  //  else {
+  //   // Redirige vers l'écran de connexion si l'utilisateur n'est pas connecté
+  //   Timer(
+  //     const Duration(seconds: 5),
+  //     () => Navigator.of(context).pushReplacement(
+  //       MaterialPageRoute(builder: (_) => const LoginScreen()),
+  //     ),
+  //   );
+  // }
+  }
 
 
   
