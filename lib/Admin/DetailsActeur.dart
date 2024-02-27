@@ -85,7 +85,9 @@ class _DetailsActeurState extends State<DetailsActeur> {
   Widget _buildPanel() {
     return ExpansionPanelList(
       expansionCallback: (int index, bool isExpanded) {
-        setState(() {});
+        setState(() {
+          active = !active;
+        });
       },
       children: <ExpansionPanel>[
         ExpansionPanel(
@@ -102,7 +104,18 @@ class _DetailsActeurState extends State<DetailsActeur> {
                 ),
               );
             },
-            body: ListTile(),
+            body: Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildProfile("whatsApp", acteurs.whatsAppActeur),
+                  _buildProfile("Pays", acteurs.niveau3PaysActeur),
+                  _buildProfile("Localité", acteurs.localiteActeur),
+                  _buildProfile("Filière", acteurs.filiereActeur!),
+                ],
+              ),
+            ),
             isExpanded: active,
             canTapOnHeader: true)
       ],
@@ -136,4 +149,65 @@ class _DetailsActeurState extends State<DetailsActeur> {
       ),
     );
   }
+
+//   Widget _buildPanel() {
+//   return ExpansionPanelList(
+//     expansionCallback: (int index, bool isExpanded) {
+//       setState(() {});
+//     },
+//     children: <ExpansionPanel>[
+//       ExpansionPanel(
+//         headerBuilder: (context, isExpanded) {
+//           return Padding(
+//             padding: const EdgeInsets.all(10.0),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 _buildProfile("Adresse", acteurs.adresseActeur),
+//                 _buildProfile("Téléphone", acteurs.telephoneActeur),
+//                 _buildProfile("Email", acteurs.emailActeur),
+//               ],
+//             ),
+//           );
+//         },
+//         body: Container(), // Replace with your body widget if needed
+//         isExpanded: active,
+//         canTapOnHeader: true,
+//       )
+//     ],
+//   );
+// }
+
+// Widget _buildProfile(String title, String value) {
+//   return Column(
+//     crossAxisAlignment: CrossAxisAlignment.start,
+//     children: [
+//       Padding(
+//         padding: const EdgeInsets.only(bottom: 8.0),
+//         child: Text(
+//           title,
+//           style: const TextStyle(
+//             color: Colors.black87,
+//             fontWeight: FontWeight.bold,
+//             fontSize: 16,
+//           ),
+//         ),
+//       ),
+//       Padding(
+//         padding: const EdgeInsets.only(bottom: 16.0),
+//         child: Text(
+//           value,
+//           style: const TextStyle(
+//             color: Colors.black,
+//             fontSize: 14,
+//           ),
+//         ),
+//       ),
+//       Divider(
+//         height: 1,
+//         color: Colors.grey[300],
+//       ),
+//     ],
+//   );
+// }
 }
