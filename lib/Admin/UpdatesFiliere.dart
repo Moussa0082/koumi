@@ -116,7 +116,7 @@ class _UpdatesFilieresState extends State<UpdatesFilieres> {
                                   idFiliere: widget.filiere.idFiliere!,
                                   libelleFiliere: libelle,
                                   descriptionFiliere: description,
-                                  personneModif: acteur.nomActeur)
+                                  personneModif: acteur.nomActeur!)
                               .then((value) => {
                                     Provider.of<FiliereService>(context,
                                             listen: false)

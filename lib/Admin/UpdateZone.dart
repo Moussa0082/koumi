@@ -271,7 +271,7 @@ class _UpdateZoneState extends State<UpdateZone> {
                                     nomZoneProduction: nom,
                                     latitude: latitude,
                                     longitude: longitude,
-                                    personneModif: acteur.nomActeur)
+                                    personneModif: acteur.nomActeur!)
                                 .then((value) => {
                                       Provider.of<ZoneProductionService>(
                                               context,
@@ -304,7 +304,7 @@ class _UpdateZoneState extends State<UpdateZone> {
                                     nomZoneProduction: nom,
                                     latitude: latitude,
                                     longitude: longitude,
-                                    personneModif: acteur.nomActeur)
+                                    personneModif: acteur.nomActeur!)
                                 .then((value) => {
                                       Provider.of<ZoneProductionService>(
                                               context,

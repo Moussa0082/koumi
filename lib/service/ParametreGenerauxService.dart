@@ -110,7 +110,7 @@ class ParametreGenerauxService extends ChangeNotifier {
           'PUT',
           Uri.parse(
               // 'https://koumi.ml/api-koumi/parametreGeneraux/update/$idParametreGeneraux'));
-              'http://10.0.2.2:9000/parametreGeneraux/update/$idParametreGeneraux'));
+              'http://10.0.2.2:9000/api-koumi/parametreGeneraux/update/$idParametreGeneraux'));
 
       if (logoSysteme != null) {
         requete.files.add(http.MultipartFile('image',

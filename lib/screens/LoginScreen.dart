@@ -36,6 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> loginUser() async {
     final String emailActeur = emailController.text;
     final String password = passwordController.text;
+
     // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
     const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
@@ -103,11 +104,45 @@ class _LoginScreenState extends State<LoginScreen> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('emailActeur', emailActeur);
         prefs.setString('password', password);
+        // prefs.setString('nomActeur', responseBody['nomActeur']);
+        final nomActeur = responseBody['nomActeur'];
+        final idActeur = responseBody['idActeur'];
+        final adresseActeur = responseBody['adresseActeur'];
+        final telephoneActeur = responseBody['telephoneActeur'];
+        final whatsAppActeur = responseBody['whatsAppActeur'];
+        // final logoActeur =  responseBody['logoActeur'] ;
+        // final photoSiegeActeur = responseBody['photoSiegeActeur'] ;
+        final filiereActeur = responseBody['filiereActeur'];
+        final niveau3PaysActeur = responseBody['niveau3PaysActeur'];
+        final localiteActeur = responseBody['localiteActeur'];
+        final maillonActeur = responseBody['maillonActeur'];
+
+        prefs.setString('nomActeur', nomActeur);
+        prefs.setString('idActeur', idActeur);
+        //  prefs.setString('resetToken', responseBody['resetToken']);
+        //  prefs.setString('codeActeur', responseBody['codeActeur']);
+        prefs.setString('adresseActeur', adresseActeur);
+        prefs.setString('telephoneActeur', telephoneActeur);
+        prefs.setString('whatsAppActeur', whatsAppActeur);
+        //  prefs.setString('logoActeur', logoActeur);
+        //  prefs.setString('photoSiegeActeur', photoSiegeActeur);
+        prefs.setString('filiereActeur', filiereActeur);
+        prefs.setString('niveau3PaysActeur', niveau3PaysActeur);
+        prefs.setString('localiteActeur', localiteActeur);
+        prefs.setString('maillonActeur', maillonActeur);
+        // Enregistrer la liste des types d'utilisateur dans SharedPreferences
+
+        // Enregistrer la liste des types d'utilisateur dans SharedPreferences
 
         List<dynamic> typeActeurData = responseBody['typeActeur'];
         List<TypeActeur> typeActeurList =
             typeActeurData.map((data) => TypeActeur.fromMap(data)).toList();
+// Extraire les libellés des types d'utilisateur et les ajouter à une nouvelle liste de chaînes
+        List<String> userTypeLabels =
+            typeActeurList.map((typeActeur) => typeActeur.libelle!).toList();
 
+// Enregistrer la liste des libellés des types d'utilisateur dans SharedPreferences
+        prefs.setStringList('userType', userTypeLabels);
         Acteur acteur = Acteur(
           idActeur: responseBody['idActeur'],
           resetToken: responseBody['resetToken'],
@@ -137,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
         acteurProvider.setActeur(acteur);
 
         final List<String> type =
-            acteur.typeActeur.map((e) => e.libelle).toList();
+            acteur.typeActeur.map((e) => e.libelle!).toList();
         if (type.contains('admin') || type.contains('Admin')) {
           Navigator.pushReplacement(
             context,
@@ -218,7 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    checkUserSession();
+    // checkUserSession();
     super.initState();
   }
   // login methode end

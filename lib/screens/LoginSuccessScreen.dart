@@ -20,15 +20,15 @@ class _LoginSuccessScreenState extends State<LoginSuccessScreen> {
    @override
   void initState() {
     super.initState();
-     Timer(
-     const  Duration(seconds:10), 
-      () =>
-      Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-      builder: (_) =>  const LoginScreen()   
-      ),
-      ),
-     );
+    //  Timer(
+    //  const  Duration(seconds:10), 
+    //   () =>
+    //   Navigator.of(context).pushReplacement(
+    //   MaterialPageRoute(
+    //   builder: (_) =>  const LoginScreen()   
+    //   ),
+    //   ),
+    //  );
 
   }
 
@@ -51,10 +51,9 @@ class _LoginSuccessScreenState extends State<LoginSuccessScreen> {
                 child: 
                             Align(
                 alignment:Alignment.topRight,
-                child: Icon(Icons.clear, size: 40, color: Colors.black,)),
-                
-                
-                            ),
+                child: Icon(Icons.clear, size: 40, color: Colors.black,)
+                ),
+               ),
               ),
            Center(
              child: Container(

@@ -130,7 +130,7 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                           String searchText = "";
                           List<TypeActeur> filtereSearch =
                               typeList.where((search) {
-                            String libelle = search.libelle.toLowerCase();
+                            String libelle = search.libelle!.toLowerCase();
                             searchText = _searchController.text.toLowerCase();
                             return libelle.contains(searchText);
                           }).toList();
@@ -162,9 +162,9 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                                             children: [
                                               ListTile(
                                                   leading: _getIconForType(
-                                                      e.libelle),
+                                                      e.libelle!),
                                                   title: Text(
-                                                      e.libelle.toUpperCase(),
+                                                      e.libelle!.toUpperCase(),
                                                       style: const TextStyle(
                                                         color: Colors.black,
                                                         fontSize: 20,
@@ -172,7 +172,7 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      e.descriptionTypeActeur,
+                                                      e.descriptionTypeActeur!,
                                                       style: const TextStyle(
                                                         color: Colors.black87,
                                                         fontSize: 17,
@@ -193,7 +193,7 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                                                           .spaceBetween,
                                                   children: [
                                                     _buildEtat(
-                                                        e.statutTypeActeur),
+                                                        e.statutTypeActeur!),
                                                     PopupMenuButton<String>(
                                                       padding: EdgeInsets.zero,
                                                       itemBuilder: (context) =>

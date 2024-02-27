@@ -8,6 +8,7 @@ import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilA extends StatefulWidget {
   const ProfilA({super.key});
@@ -309,6 +310,8 @@ class _ProfilAState extends State<ProfilA> {
 
                       // Déconnexion avec le provider
                       await acteurProvider.logout();
+                       SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
                       Navigator.push(
                           context,
                           MaterialPageRoute(

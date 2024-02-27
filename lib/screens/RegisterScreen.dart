@@ -259,7 +259,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   .map((e) => DropdownMenuItem(
                         alignment: AlignmentDirectional.center,
                         child: Text(
-                          e.libelle,
+                          e.libelle!,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         value: e.idTypeActeur,

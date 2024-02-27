@@ -96,7 +96,7 @@ class _UpdateUniteState extends State<UpdateUnite> {
                                 idUnite: widget.unite.idUnite!,
                                 nomUnite: libelle,
                                 acteur: acteur,
-                                personneModif: acteur.nomActeur)
+                                personneModif: acteur.nomActeur!)
                             .then((value) => {
                                   Provider.of<UniteService>(context,
                                           listen: false)

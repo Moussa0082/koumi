@@ -259,7 +259,7 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                                   idNiveau2Pays: niveau.idNiveau2Pays!,
                                   nomN2: libelle,
                                   descriptionN2: description,
-                                  personeModif: acteur.nomActeur,
+                                  personeModif: acteur.nomActeur!,
                                   niveau1Pays: niveau1)
                               .then((value) => {
                                     Provider.of<Niveau2Service>(context,

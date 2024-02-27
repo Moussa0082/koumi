@@ -4,10 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
-import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Materiel.dart';
 import 'package:path/path.dart';
-
 
 class MaterielService extends ChangeNotifier {
   // static const String baseUrl = 'https://koumi.ml/api-koumi/Materiel';
@@ -25,7 +23,8 @@ class MaterielService extends ChangeNotifier {
     required Acteur acteur,
   }) async {
     try {
-      var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/addMateriel'));
+      var requete =
+          http.MultipartRequest('POST', Uri.parse('$baseUrl/addMateriel'));
 
       if (photoMateriel != null) {
         requete.files.add(http.MultipartFile('image',
@@ -34,13 +33,13 @@ class MaterielService extends ChangeNotifier {
       }
 
       requete.fields['materiel'] = jsonEncode({
-        'prix':prix,
-        'nom':nom,
-        'description':description,
-        'photoMateriel':"",
+        'prix': prix,
+        'nom': nom,
+        'description': description,
+        'photoMateriel': "",
         'localisation': localisation,
-        'etatMateriel':etatMateriel,
-        'acteur':acteur.toMap(),
+        'etatMateriel': etatMateriel,
+        'acteur': acteur.toMap(),
       });
 
       var response = await requete.send();
@@ -59,8 +58,8 @@ class MaterielService extends ChangeNotifier {
     }
   }
 
-Future<void> updateMateriel({
-  required String idMateriel,
+  Future<void> updateMateriel({
+    required String idMateriel,
     required String prix,
     required String nom,
     required String description,
@@ -70,8 +69,8 @@ Future<void> updateMateriel({
     required Acteur acteur,
   }) async {
     try {
-      var requete =
-          http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idMateriel'));
+      var requete = http.MultipartRequest(
+          'PUT', Uri.parse('$baseUrl/update/$idMateriel'));
 
       if (photoMateriel != null) {
         requete.files.add(http.MultipartFile('image',
@@ -80,7 +79,7 @@ Future<void> updateMateriel({
       }
 
       requete.fields['materiel'] = jsonEncode({
-        'idMateriel':idMateriel,
+        'idMateriel': idMateriel,
         'prix': prix,
         'nom': nom,
         'description': description,

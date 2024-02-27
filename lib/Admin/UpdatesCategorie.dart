@@ -118,7 +118,7 @@ class _UpdatesCategorieState extends State<UpdatesCategorie> {
                                   idCategorieProduit: cat.idCategorieProduit!,
                                   libelleCategorie: libelle,
                                   descriptionCategorie: description,
-                                  personneModif: acteur.nomActeur,
+                                  personneModif: acteur.nomActeur!,
                                   filiere: filiere)
                               .then((value) => {
                                     Provider.of<CategorieService>(context,

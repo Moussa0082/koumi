@@ -21,8 +21,8 @@ class _UpdateTypeActeurState extends State<UpdateTypeActeur> {
   @override
   void initState() {
     type = widget.typeActeur;
-    libelleController.text = type.libelle;
-    descriptionController.text = type.descriptionTypeActeur;
+    libelleController.text = type.libelle!;
+    descriptionController.text = type.descriptionTypeActeur!;
     super.initState();
   }
 

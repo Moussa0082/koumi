@@ -618,7 +618,6 @@ class _Niveau1PageState extends State<Niveau1Page> {
                                 .map((e) => Pays.fromMap(e))
                                 .where((con) => con.statutPays == true)
                                 .toList();
-
                             if (paysList.isEmpty) {
                               return Text(
                                 'Aucun donné disponible',
@@ -643,7 +642,6 @@ class _Niveau1PageState extends State<Niveau1Page> {
                                   if (newValue != null) {
                                     pays = paysList.firstWhere((element) =>
                                         element.idPays == newValue);
-
                                     // typeSelected = true;
                                   }
                                 });
