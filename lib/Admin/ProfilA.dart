@@ -312,10 +312,12 @@ class _ProfilAState extends State<ProfilA> {
                       await acteurProvider.logout();
                        SharedPreferences prefs = await SharedPreferences.getInstance();
                       await prefs.clear();
-                      Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => LoginScreen()),
-                           );
+    //                   Navigator.pushReplacement(
+    // context,
+    // MaterialPageRoute(builder: (context) => LoginScreen()),
+    //                        );
+     Navigator.of(context, rootNavigator: true).pushReplacement(MaterialPageRoute(builder: (context) => new LoginScreen()));
+
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
