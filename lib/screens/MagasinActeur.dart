@@ -122,6 +122,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>  with TickerP
       child: DefaultTabController(
         length: regions.length,
         child: Scaffold(
+  // floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
           appBar: AppBar(
             centerTitle:true,
             title: Text('Mes boutiques'),
@@ -131,6 +132,50 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>  with TickerP
               controller: _tabController, // Ajoutez le contrôleur TabBar
               tabs: regions.map((region) => Tab(text: region)).toList(),
             ),
+            actions:[
+          PopupMenuButton<String>(
+            padding: EdgeInsets.zero,
+            itemBuilder: (context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.add,
+                    color: Colors.green,
+                  ),
+                  title: const Text(
+                    "Ajouter Magasin",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onTap: () async {
+                    // _showDialog();
+                  },
+                ),
+              ),
+              PopupMenuItem<String>(
+                child: ListTile(
+                  leading: Icon(
+                    Icons.add,
+                    color: Colors.orange[400],
+                  ),
+                  title: Text(
+                    "Ajouter Produit",
+                    style: TextStyle(
+                      color: Colors.orange[400],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onTap: () async {
+                    // _addCategorie();
+                  },
+                ),
+              ),
+            ],
+          )
+        ],
+            
           ),
           body: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -173,9 +218,19 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>  with TickerP
                     ),
                   ),
                 ),
+
               ],
             ),
           ),
+  //               floatingActionButton: FloatingActionButton(
+  //   backgroundColor: Colors.orange,
+  //   onPressed: null,
+  //   child: IconButton(
+  //     onPressed: null,
+  //     icon: Icon(Icons.add),
+  //     color: Colors.white,
+  //   ),
+  // ),
         ),
       ),
     );

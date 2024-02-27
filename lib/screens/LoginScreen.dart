@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:email_validator/email_validator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -26,63 +25,19 @@ class _LoginScreenState extends State<LoginScreen> {
   String email = "";
   bool _obscureText = true;
   bool light = true;
-  String _errorMessage = "";
   // late Acteur acteur;
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   // TextEditingController Controller = TextEditingController();
-  void validateEmail(String val) {
-    if (val.isEmpty) {
-      setState(() {
-        _errorMessage = "Email ne doit pas être vide";
-      });
-    } else if (!EmailValidator.validate(val, true)) {
-      setState(() {
-        _errorMessage = "Email non valide";
-      });
-    } else {
-      setState(() {
-        _errorMessage = "";
-      });
-    }
-  }
-   
-                       // Fonction pour afficher la boîte de dialogue de chargement
-void showLoadingDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    barrierDismissible: false, // Empêche de fermer la boîte de dialogue en cliquant en dehors
-    builder: (BuildContext context) {
-      return const AlertDialog(
-        title:  Center(child: Text('Traitement en cours')),
-        content: CupertinoActivityIndicator(
-          color: Colors.orange,
-          radius: 22,
-        ),
-        actions: <Widget>[
-          // Pas besoin de bouton ici
-        ],
-      );
-    },
-  );
-}
 
-// Fonction pour fermer la boîte de dialogue de chargement
-void hideLoadingDialog(BuildContext context) {
-  Navigator.of(context).pop(); // Ferme la boîte de dialogue
-}
-
-    
   //  login methode start
   Future<void> loginUser() async {
-
-       showLoadingDialog(context);
-
     final String emailActeur = emailController.text;
     final String password = passwordController.text;
+   
+    // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
     const String baseUrl = 'http://10.0.2.2:9000/acteur/login';
 
     ActeurProvider acteurProvider =
@@ -121,23 +76,46 @@ void hideLoadingDialog(BuildContext context) {
         },
       );
 
-   
       if (response.statusCode == 200) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return const AlertDialog(
+              title: Center(child: Text('Connexion en cours')),
+              content: CupertinoActivityIndicator(
+                color: Colors.orange,
+                radius: 22,
+              ),
+              actions: <Widget>[
+                // Pas besoin de bouton ici
+              ],
+            );
+          },
+        );
 
+        await Future.delayed(const Duration(milliseconds: 500));
 
+        Navigator.of(context).pop();
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
         emailController.clear();
         passwordController.clear();
-       hideLoadingDialog(context);
+
         // Sauvegarder les données de l'utilisateur dans shared preferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('emailActeur', emailActeur);
         prefs.setString('password', password);
+        // prefs.setString('nomActeur', responseBody['nomActeur']);
+        
+        // Enregistrer la liste des types d'utilisateur dans SharedPreferences
 
         List<dynamic> typeActeurData = responseBody['typeActeur'];
         List<TypeActeur> typeActeurList =
             typeActeurData.map((data) => TypeActeur.fromMap(data)).toList();
+// Extraire les libellés des types d'utilisateur et les ajouter à une nouvelle liste de chaînes
+List<String> userTypeLabels = typeActeurList.map((typeActeur) => typeActeur.libelle!).toList();
 
+// Enregistrer la liste des libellés des types d'utilisateur dans SharedPreferences
+      prefs.setStringList('userType', userTypeLabels);
         Acteur acteur = Acteur(
           idActeur: responseBody['idActeur'],
           resetToken: responseBody['resetToken'],
@@ -163,12 +141,11 @@ void hideLoadingDialog(BuildContext context) {
           typeActeur: typeActeurList,
           password: password,
         );
- 
-        acteurProvider.setActeur(acteur);
-        
 
-       final List<String> type =
-            acteur.typeActeur.map((e) => e.libelle).toList();
+        acteurProvider.setActeur(acteur);
+
+        final List<String> type =
+            acteur.typeActeur.map((e) => e.libelle!).toList();
         if (type.contains('admin') || type.contains('Admin')) {
           Navigator.pushReplacement(
             context,
@@ -181,13 +158,10 @@ void hideLoadingDialog(BuildContext context) {
                 builder: (context) => const BottomNavigationPage()),
           );
         }
-
-       
       } else {
         // Traitement en cas d'échec
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
         final errorMessage = responseBody['message'];
-       hideLoadingDialog(context);
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -252,7 +226,7 @@ void hideLoadingDialog(BuildContext context) {
 
   @override
   void initState() {
-    //  checkUserSession();
+    // checkUserSession();
     super.initState();
   }
   // login methode end
@@ -282,20 +256,13 @@ void hideLoadingDialog(BuildContext context) {
                       color: Color(0xfff2b6706)),
                 ),
                 Form(
-                  key:_formKey,
                     child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(
                       height: 10,
                     ),
-                    // debut email
-                    Padding(
-                  padding: EdgeInsets.all( 10),
-                  child: Center(
-                    child: Text(_errorMessage),
-                  ),
-                ),
+                    // debut fullname
                     const Padding(
                       padding: EdgeInsets.only(left: 10.0),
                       child: Text(
@@ -310,7 +277,11 @@ void hideLoadingDialog(BuildContext context) {
                             borderRadius: BorderRadius.circular(15)),
                         // labelText: "Adresse email",
                         hintText: "Entrez votre adresse email",
-                       
+                        // icon: const Icon(
+                        //   Icons.mail,
+                        //   color: Color(0xFFF2B6706),
+                        //   size: 20,
+                        // )
                       ),
                       keyboardType: TextInputType.text,
                       validator: (val) {
@@ -319,9 +290,6 @@ void hideLoadingDialog(BuildContext context) {
                         } else {
                           return null;
                         }
-                      },
-                      onChanged: (val) {
-                        validateEmail(val);
                       },
                       onSaved: (val) => email = val!,
                     ),
@@ -380,63 +348,63 @@ void hideLoadingDialog(BuildContext context) {
 
                     const SizedBox(height: 10),
                     Padding(
-  padding: const EdgeInsets.all(8.0),
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Expanded(
-        child: Row(
-          children: [
-            SizedBox(
-              width: 50,
-              height: 30,
-              child: FittedBox(
-                fit: BoxFit.contain,
-                child: Switch(
-                  value: light,
-                  activeColor: Colors.orange,
-                  onChanged: (bool value) {
-                    setState(() {
-                      light = value;
-                    });
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(
-              width: 5,
-            ),
-            const Text(
-              "Se souvenir de moi",
-              style: TextStyle(
-                fontSize: 15,
-              ),
-            ),
-          ],
-        ),
-      ),
-      GestureDetector(
-        onTap: () {
-          print("ho");
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>  ForgetPassScreen(),
-            ),
-          );
-        },
-        child: const Text(
-          "Mot de passe oublié ",
-          style: TextStyle(
-            fontSize: 15,
-            decoration: TextDecoration.underline,
-            color: Colors.blue,
-          ),
-        ),
-      ),
-    ],
-  ),
-),
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 50,
+                                  height: 30,
+                                  child: FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: Switch(
+                                      value: light,
+                                      activeColor: Colors.orange,
+                                      onChanged: (bool value) {
+                                        setState(() {
+                                          light = value;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                const Text(
+                                  "Se souvenir de moi",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              print("ho");
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ForgetPassScreen(),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "Mot de passe oublié ",
+                              style: TextStyle(
+                                fontSize: 15,
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
 
                     const SizedBox(
                       height: 15,
@@ -444,10 +412,8 @@ void hideLoadingDialog(BuildContext context) {
                     Center(
                       child: ElevatedButton(
                         onPressed: () {
-                          if(_formKey.currentState!.validate()){
                           // Handle button press action here
                           loginUser();
-                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
@@ -496,7 +462,7 @@ void hideLoadingDialog(BuildContext context) {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                             RegisterScreen()));
+                                            RegisterScreen()));
                               },
                               child: const Text(
                                 "M'inscrire",

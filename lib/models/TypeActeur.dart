@@ -2,18 +2,18 @@ import 'dart:convert';
 
 class TypeActeur {
   final String? idTypeActeur;
-  final String libelle;
-  final String codeTypeActeur;
-  final bool    statutTypeActeur;
-  final String descriptionTypeActeur;
+  final String? libelle;
+  final String? codeTypeActeur;
+  final bool?    statutTypeActeur;
+  final String? descriptionTypeActeur;
   final String? dateAjout;
   final String? dateModif;
   TypeActeur({
     this.idTypeActeur,
-    required this.libelle,
-    required this.codeTypeActeur,
-    required this.statutTypeActeur,
-    required this.descriptionTypeActeur,
+     this.libelle,
+     this.codeTypeActeur,
+     this.statutTypeActeur,
+     this.descriptionTypeActeur,
     this.dateAjout,
     this.dateModif,
   });
@@ -83,19 +83,20 @@ class TypeActeur {
     return 'TypeActeur(idTypeActeur: $idTypeActeur, libelle: $libelle, codeTypeActeur: $codeTypeActeur, statutTypeActeur: $statutTypeActeur, descriptionTypeActeur: $descriptionTypeActeur, dateAjout: $dateAjout, dateModif: $dateModif)';
   }
 
-  @override
-  bool operator ==(covariant TypeActeur other) {
-    if (identical(this, other)) return true;
-  
-    return 
-      other.idTypeActeur == idTypeActeur &&
-      other.libelle == libelle &&
-      other.codeTypeActeur == codeTypeActeur &&
-      other.statutTypeActeur == statutTypeActeur &&
-      other.descriptionTypeActeur == descriptionTypeActeur &&
-      other.dateAjout == dateAjout &&
-      other.dateModif == dateModif;
-  }
+ @override
+bool operator ==(covariant TypeActeur other) {
+  if (identical(this, other)) return true;
+
+  return 
+    other.idTypeActeur == idTypeActeur &&
+    other.libelle == libelle &&
+    other.codeTypeActeur == codeTypeActeur &&
+    other.statutTypeActeur == statutTypeActeur &&
+    other.descriptionTypeActeur == descriptionTypeActeur &&
+    other.dateAjout == dateAjout &&
+    other.dateModif == dateModif;
+}
+
 
   @override
   int get hashCode {

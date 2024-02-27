@@ -7,7 +7,8 @@ import 'package:path/path.dart';
 
 class ContinentService extends ChangeNotifier {
 
-    static const String baseUrl = 'http://10.0.2.2:9000/continent';
+    static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/continent';
+    // static const String baseUrl = 'https://koumi.ml/api-koumi/continent';
 
   List<Continent> continentListe = [];
 
@@ -44,7 +45,7 @@ class ContinentService extends ChangeNotifier {
 
     final response = await http.put(Uri.parse("$baseUrl/update/$idContinent"),
         headers: {'Content-Type': 'application/json'}, body: addcontinents);
-    debugPrint(addcontinents.toString());
+    // debugPrint(addcontinents.toString());
     if (response.statusCode == 200 || response.statusCode == 201) {
       debugPrint(response.body);
     } else {
@@ -81,7 +82,7 @@ class ContinentService extends ChangeNotifier {
 
   Future<void> activerContinent(String idContinent) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/enable/$idContinent"));
+        await http.put(Uri.parse("$baseUrl/activer/$idContinent"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -93,7 +94,7 @@ class ContinentService extends ChangeNotifier {
 
   Future<void> desactiverContinent(String idContinent) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/disable/$idContinent"));
+        await http.put(Uri.parse("$baseUrl/desactiver/$idContinent"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
 

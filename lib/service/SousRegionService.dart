@@ -8,7 +8,8 @@ import 'package:path/path.dart';
 
 class SousRegionService extends ChangeNotifier {
 
-  static const String baseUrl = 'http://10.0.2.2:9000/sousRegion';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/sousRegion';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/sousRegion';
 
   List<SousRegion> sousRegionList = [];
 
@@ -56,7 +57,7 @@ class SousRegionService extends ChangeNotifier {
   Future<List<SousRegion>> fetchSousRegion() async {
     final response = await http.get(Uri.parse('$baseUrl/read'));
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 200) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
       sousRegionList = body.map((item) => SousRegion.fromMap(item)).toList();
       debugPrint(response.body);
@@ -70,7 +71,7 @@ class SousRegionService extends ChangeNotifier {
   Future<List<SousRegion>> fetchSousRegionByContinent(String idContinent) async {
     final response = await http.get(Uri.parse('$baseUrl/listeSousRegionByContinent/$idContinent'));
       
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
       sousRegionList = body.map((item) => SousRegion.fromMap(item)).toList();
       debugPrint(response.body);
@@ -96,7 +97,7 @@ class SousRegionService extends ChangeNotifier {
 
   Future<void> activerSousRegion(String idSousRegion) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/activer/$idSousRegion"));
+        await http.put(Uri.parse("$baseUrl/activer/$idSousRegion"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -108,7 +109,7 @@ class SousRegionService extends ChangeNotifier {
 
   Future<void> desactiverSousRegion(String idSousRegion) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/desactiver/$idSousRegion"));
+        await http.put(Uri.parse("$baseUrl/desactiver/$idSousRegion"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());

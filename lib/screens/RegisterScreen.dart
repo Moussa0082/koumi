@@ -66,7 +66,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // TODO: implement initState
     super.initState();
     _mesTypeActeur  =
-        http.get(Uri.parse('http://10.0.2.2:9000/typeActeur/read'));
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/typeActeur/read'));
     
   }
 
@@ -259,7 +259,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   .map((e) => DropdownMenuItem(
                         alignment: AlignmentDirectional.center,
                         child: Text(
-                          e.libelle,
+                          e.libelle!,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         value: e.idTypeActeur,

@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 class ParametreGeneraux {
@@ -20,7 +21,6 @@ class ParametreGeneraux {
    String localiteStructure;
    String? dateAjout;
    String? dateModif;
-  
   ParametreGeneraux({
     this.idParametreGeneraux,
     required this.sigleStructure,
@@ -42,6 +42,8 @@ class ParametreGeneraux {
     this.dateAjout,
     this.dateModif,
   });
+  
+ 
 
   ParametreGeneraux copyWith({
     String? idParametreGeneraux,

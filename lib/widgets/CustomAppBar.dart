@@ -5,7 +5,6 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key});
@@ -24,9 +23,13 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
   @override
   void initState() {
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     super.initState();
-  }
+ // Vérifiez si acteur est non nul avant de l'attribuer à la variable locale
+  // if (Provider.of<ActeurProvider>(context, listen: false).acteur != null) {
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+  // }
+  // debugPrint("Acteur : ${acteur.nomActeur}");
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -37,17 +40,11 @@ class _CustomAppBarState extends State<CustomAppBar> {
         child: Consumer<ActeurProvider>(
           builder: (context, acteurProvider, child) {
             final ac = acteurProvider.acteur;
-            // debugPrint("appBar ${ac.toString()}");
             if (ac == null) {
-              return CircularProgressIndicator();
+              return const CircularProgressIndicator();
             }
 
-            // List<TypeActeur> typeActeurData = ac.typeActeur;
-            // List<String> typeActeurList =
-            //     typeActeurData.map((data) => data.libelle).toList();
-            // String type = typeActeurList.toString();
-
-             List<TypeActeur> typeActeurData = ac.typeActeur;
+            List<TypeActeur> typeActeurData = ac.typeActeur;
             String type = typeActeurData.map((data) => data.libelle).join(', ');
             return ListTile(
               leading: ac.logoActeur == null || ac.logoActeur!.isEmpty
@@ -64,15 +61,15 @@ class _CustomAppBarState extends State<CustomAppBar> {
                       image: NetworkImage("http:10.0.2.2/${ac.logoActeur}"),
                     ),
               title: Text(
-                ac.nomActeur.toUpperCase(),
-                style: TextStyle(
+                ac.nomActeur!.toUpperCase(),
+                style: const TextStyle(
                     color: d_colorGreen,
-                    fontSize: 22,
+                    fontSize: 18,
                     fontWeight: FontWeight.w800),
               ),
               subtitle: Text(
                 type,
-                style: TextStyle(
+                style: const TextStyle(
                     color: d_colorOr,
                     fontSize: 18,
                     fontWeight: FontWeight.w400),

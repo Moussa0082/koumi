@@ -6,6 +6,7 @@ import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:path/path.dart';
 
 class ParametreGenerauxService extends ChangeNotifier {
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/parametreGeneraux';
   static const String baseUrl = 'http://10.0.2.2:9000/parametreGeneraux';
 
   List<ParametreGeneraux> parametreList = [];
@@ -108,6 +109,7 @@ class ParametreGenerauxService extends ChangeNotifier {
       var requete = http.MultipartRequest(
           'PUT',
           Uri.parse(
+              // 'https://koumi.ml/api-koumi/parametreGeneraux/update/$idParametreGeneraux'));
               'http://10.0.2.2:9000/parametreGeneraux/update/$idParametreGeneraux'));
 
       if (logoSysteme != null) {

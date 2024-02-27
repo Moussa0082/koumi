@@ -16,13 +16,13 @@ class Acteur {
     String? photoSiegeActeur;
     String? logoActeur;
     String niveau3PaysActeur;
-    String password;
+    String? password;
     String? dateAjout;
     String? dateModif;
     String? personneModif;
     String localiteActeur;
     String emailActeur;
-    String filiereActeur;
+    String? filiereActeur;
     bool? statutActeur;
     List<TypeActeur> typeActeur;
     String maillonActeur;
@@ -53,6 +53,20 @@ class Acteur {
     required this.maillonActeur,
   });
 
+
+ // Méthode pour créer une instance d'Acteur à partir des données de SharedPreferences
+  factory Acteur.fromSharedPreferencesData(String emailActeur, String password, List<String> userTypeList) {
+    // Créez une liste de TypeActeur à partir de la liste de chaînes userTypeList
+    List<TypeActeur> typeActeurList = userTypeList.map((libelle) => TypeActeur(libelle: libelle)).toList();
+
+    // Retournez une nouvelle instance d'Acteur avec les données fournies
+    return Acteur(
+      // Initialiser les autres propriétés de l'acteur selon vos besoins
+      emailActeur: emailActeur,
+      password: password,
+      typeActeur: typeActeurList, nomActeur: '', adresseActeur: '', telephoneActeur: '', whatsAppActeur: '', niveau3PaysActeur: '', localiteActeur: '', filiereActeur: '', maillonActeur: '',
+    );
+  }
   
  Acteur acteurFromJson(String str) => Acteur.fromJson(json.decode(str));
 

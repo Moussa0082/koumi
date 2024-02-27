@@ -5,20 +5,21 @@ import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 
 class Niveau3Service extends ChangeNotifier {
-  static const String baseUrl = 'http://10.0.2.2:9000/niveau3Pays';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/niveau3Pays';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/nivveau3Pays';
 
   List<Niveau3Pays> niveauList = [];
 
   Future<void> addNiveau3Pays({
     required String nomN3,
     required String descriptionN3,
-    required Niveau2Pays niveau2pays,
+    required Niveau2Pays niveau2Pays,
   }) async {
     var addPays = jsonEncode({
       'idNiveau3Pays': null,
       'nomN3': nomN3,
       'descriptionN3': descriptionN3,
-      'niveau2pays': niveau2pays.toMap()
+      'niveau2Pays': niveau2Pays.toMap()
     });
 
     final response = await http.post(Uri.parse("$baseUrl/create"),
@@ -35,16 +36,16 @@ class Niveau3Service extends ChangeNotifier {
     required String idNiveau3Pays,
     required String nomN3,
     required String descriptionN3,
-    required Niveau2Pays niveau2pays,
+    required Niveau2Pays niveau2Pays,
   }) async {
     var addPays = jsonEncode({
       'idNiveau3Pays': idNiveau3Pays,
       'nomN3': nomN3,
       'descriptionN3': descriptionN3,
-      'niveau2pays': niveau2pays.toMap()
+      'niveau2Pays': niveau2Pays.toMap()
     });
 
-    final response = await http.post(Uri.parse("$baseUrl/update/$idNiveau3Pays"),
+    final response = await http.put(Uri.parse("$baseUrl/update/$idNiveau3Pays"),
         headers: {'Content-Type': 'application/json'}, body: addPays);
     debugPrint(addPays.toString());
     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -55,10 +56,11 @@ class Niveau3Service extends ChangeNotifier {
   }
 
   Future<List<Niveau3Pays>> fetchNiveau3Pays() async {
-    final response = await http.get(Uri.parse('$baseUrl/read'));
+    final response = await http.get(Uri.parse('http://localhost:9000/api-koumi/nivveau3Pays/read'));
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+        debugPrint(response.body);
       niveauList = body.map((item) => Niveau3Pays.fromMap(item)).toList();
       debugPrint(response.body);
       return niveauList;
@@ -73,7 +75,7 @@ class Niveau3Service extends ChangeNotifier {
     final response = await http.get(
         Uri.parse('$baseUrl/listeNiveau3PaysByIdNiveau2Pays/$idNiveau2Pays'));
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201 ) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
       niveauList = body.map((item) => Niveau3Pays.fromMap(item)).toList();
       debugPrint(response.body);
@@ -99,7 +101,7 @@ class Niveau3Service extends ChangeNotifier {
 
   Future<void> activerNiveau3(String idNiveau3Pays) async {
     final response =
-        await http.delete(Uri.parse("$baseUrl/activer/$idNiveau3Pays"));
+        await http.put(Uri.parse("$baseUrl/activer/$idNiveau3Pays"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -111,7 +113,7 @@ class Niveau3Service extends ChangeNotifier {
 
   Future<void> desactiverNiveau3Pays(String idNiveau3Pays) async {
     final response =
-        await http.delete(Uri.parse("$baseUrl/desactiver/$idNiveau3Pays"));
+        await http.put(Uri.parse("$baseUrl/desactiver/$idNiveau3Pays"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
 

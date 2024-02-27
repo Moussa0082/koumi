@@ -21,8 +21,8 @@ class _UpdateTypeActeurState extends State<UpdateTypeActeur> {
   @override
   void initState() {
     type = widget.typeActeur;
-    libelleController.text = type.libelle;
-    descriptionController.text = type.descriptionTypeActeur;
+    libelleController.text = type.libelle!;
+    descriptionController.text = type.descriptionTypeActeur!;
     super.initState();
   }
 
@@ -33,25 +33,31 @@ class _UpdateTypeActeurState extends State<UpdateTypeActeur> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Image.asset(
-                "assets/images/type.png",
-                width: 80,
-                height: 80,
+          ListTile(
+            leading: Image.asset(
+              "assets/images/type.png",
+              width: 80,
+              height: 80,
+            ),
+            title: Text(
+              "Modification",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+                fontSize: 18,
               ),
-              const SizedBox(width: 5),
-              const Text(
-                "Modification",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  fontSize: 18,
-                ),
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+            ),
+            trailing: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(
+                  Icons.close,
+                  color: Colors.red,
+                  size: 30,
+                )),
           ),
           const SizedBox(height: 10),
           Form(
@@ -68,22 +74,18 @@ class _UpdateTypeActeurState extends State<UpdateTypeActeur> {
                     fontSize: 22,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: TextFormField(
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Veuillez remplir les champs";
-                      }
-                      return null;
-                    },
-                    controller: libelleController,
-                    decoration: InputDecoration(
-                      hintText: "Libellé",
-                       contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Veuillez remplir les champs";
+                    }
+                    return null;
+                  },
+                  controller: libelleController,
+                  decoration: InputDecoration(
+                    hintText: "Libellé",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                 ),
@@ -95,114 +97,79 @@ class _UpdateTypeActeurState extends State<UpdateTypeActeur> {
                     fontSize: 22,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: TextFormField(
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Veuillez remplir les champs";
-                      }
-                      return null;
-                    },
-                    controller: descriptionController,
-                    decoration: InputDecoration(
-                      hintText: "Description",
-                       contentPadding: const EdgeInsets.symmetric(vertical: 15),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Veuillez remplir les champs";
+                    }
+                    return null;
+                  },
+                  controller: descriptionController,
+                  maxLines: null,
+                  decoration: InputDecoration(
+                    labelText: "Description",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                 ),
                 const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () async {
-                          final String libelle = libelleController.text;
-                          final String desc = descriptionController.text;
-                          if (formkey.currentState!.validate()) {
-                            try {
-                              await TypeActeurService()
-                                  .updateTypeActeur(
-                                      idTypeActeur: type.idTypeActeur!,
-                                      libelle: libelle,
-                                      descriptionTypeActeur: desc)
-                                  .then((value) => {
-                                        Provider.of<TypeActeurService>(context,
-                                                listen: false)
-                                            .applyChange(),
-                                        libelleController.clear(),
-                                        descriptionController.clear(),
-                                        Navigator.of(context).pop()
-                                      });
-                            } catch (e) {
-                              final String errorMessage = e.toString();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Row(
-                                    children: [
-                                     
-                                      const SizedBox(width: 10),
-                                      Text(
-                                          "Une erreur s'est produit : $errorMessage"),
-                                    ],
-                                  ),
-                                  duration: const Duration(seconds: 5),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                        ),
-                        icon: const Icon(
-                          Icons.edit,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Modifier",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    final String libelle = libelleController.text;
+                    final String desc = descriptionController.text;
+                    if (formkey.currentState!.validate()) {
+                      try {
+                        await TypeActeurService()
+                            .updateTypeActeur(
+                                idTypeActeur: type.idTypeActeur!,
+                                libelle: libelle,
+                                descriptionTypeActeur: desc)
+                            .then((value) => {
+                                  Provider.of<TypeActeurService>(context,
+                                          listen: false)
+                                      .applyChange(),
+                                  libelleController.clear(),
+                                  descriptionController.clear(),
+                                  Navigator.of(context).pop()
+                                });
+                      } catch (e) {
+                        final String errorMessage = e.toString();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(
+                              children: [
+                                const SizedBox(width: 10),
+                                Text(
+                                    "Une erreur s'est produit : $errorMessage"),
+                              ],
+                            ),
+                            duration: const Duration(seconds: 5),
                           ),
-                        ),
-                      ),
+                        );
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
                     ),
-                    const SizedBox(
-                      width: 5,
+                    minimumSize: const Size(290, 45),
+                  ),
+                  icon: const Icon(
+                    Icons.edit,
+                    color: Colors.white,
+                  ),
+                  label: const Text(
+                    "Modifier",
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
                     ),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pop(); // Ferme la boîte de dialogue
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                        ),
-                        icon: const Icon(
-                          Icons.close,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Annuler",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )
+                  ),
+                ),
               ],
             ),
           )

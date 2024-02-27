@@ -5,8 +5,10 @@ import 'package:koumi_app/Admin/TypeActeurPage.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilA extends StatefulWidget {
   const ProfilA({super.key});
@@ -96,13 +98,12 @@ class _ProfilAState extends State<ProfilA> {
                                     color: Colors.black54,
                                     fontSize: 18,
                                     fontWeight: FontWeight.w400),
-                              ),
+                              )
                             ),
                             const SizedBox(
                               height: 10,
                             ),
                             Container(
-                              height: 300,
                               width: MediaQuery.of(context).size.width * 0.9,
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -145,7 +146,6 @@ class _ProfilAState extends State<ProfilA> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                 child: Container(
-                  height: 100,
                   width: MediaQuery.of(context).size.width * 0.9,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -199,7 +199,6 @@ class _ProfilAState extends State<ProfilA> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                 child: Container(
-                  height: 100,
                   width: MediaQuery.of(context).size.width * 0.9,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -253,7 +252,6 @@ class _ProfilAState extends State<ProfilA> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                 child: Container(
-                  height: 100,
                   width: MediaQuery.of(context).size.width * 0.9,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -302,6 +300,43 @@ class _ProfilAState extends State<ProfilA> {
                     ],
                   ),
                 ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                child: ElevatedButton.icon(
+                    onPressed: () async {
+                      final acteurProvider =
+                          Provider.of<ActeurProvider>(context, listen: false);
+
+                      // Déconnexion avec le provider
+                      await acteurProvider.logout();
+                       SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => LoginScreen()));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      elevation: 10, // Orange color code
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      minimumSize: const Size(290, 45),
+                    ),
+                    icon: const Icon(
+                      Icons.logout_rounded,
+                      color: Colors.green,
+                    ),
+                    label: Text(
+                      "Déconnexion",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.green,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    )),
               )
             ],
           ),

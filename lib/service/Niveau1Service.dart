@@ -8,7 +8,8 @@ import 'package:koumi_app/models/SousRegion.dart';
 import 'package:path/path.dart';
 
 class Niveau1Service extends ChangeNotifier {
-  static const String baseUrl = 'http://10.0.2.2:9000/niveau1Pays';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/niveau1Pays';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/niveau1Pays';
 
   List<Niveau1Pays> niveauList = [];
 
@@ -26,9 +27,10 @@ class Niveau1Service extends ChangeNotifier {
 
     final response = await http.post(Uri.parse("$baseUrl/create"),
         headers: {'Content-Type': 'application/json'}, body: addPays);
-    debugPrint(addPays.toString());
+    // debugPrint(addPays.toString());
     if (response.statusCode == 200 || response.statusCode == 201) {
       debugPrint(response.body);
+      
     } else {
       throw Exception("Une erreur s'est produite' : ${response.statusCode}");
     }
@@ -52,6 +54,7 @@ class Niveau1Service extends ChangeNotifier {
     debugPrint(addPays.toString());
     if (response.statusCode == 200 || response.statusCode == 201) {
       debugPrint(response.body);
+      applyChange();
     } else {
       throw Exception("Une erreur s'est produite' : ${response.statusCode}");
     }
@@ -100,7 +103,7 @@ class Niveau1Service extends ChangeNotifier {
   }
 
   Future<void> activerNiveau1(String idNiveau1Pays) async {
-    final response = await http.delete(Uri.parse("$baseUrl/activer/$idNiveau1Pays"));
+    final response = await http.put(Uri.parse("$baseUrl/activer/$idNiveau1Pays"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -112,7 +115,7 @@ class Niveau1Service extends ChangeNotifier {
 
   Future<void> desactiverNiveau1Pays(String idNiveau1Pays) async {
     final response =
-        await http.delete(Uri.parse("$baseUrl/desactiver/$idNiveau1Pays"));
+        await http.put(Uri.parse("$baseUrl/desactiver/$idNiveau1Pays"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
 

@@ -4,22 +4,21 @@ import 'dart:convert';
 import 'package:koumi_app/models/Acteur.dart';
 
 class ZoneProduction {
-   String? idZoneProduction;
+  String? idZoneProduction;
   final String? codeZone;
   final String nomZoneProduction;
-   String? personneModif;
-   String? latitude;
-   String? longitude;
-   String? photoZone;
-   String? dateAjout;
-   String? dateModif;
+  String? personneModif;
+  String? latitude;
+  String? longitude;
+  String? photoZone;
+  String? dateAjout;
+  String? dateModif;
   final bool statutZone;
-  final Acteur acteur;
-
+  final Acteur? acteur;
   
   ZoneProduction({
     this.idZoneProduction,
-    required this.codeZone,
+    this.codeZone,
     required this.nomZoneProduction,
     this.personneModif,
     this.latitude,
@@ -28,7 +27,7 @@ class ZoneProduction {
     this.dateAjout,
     this.dateModif,
     required this.statutZone,
-    required this.acteur,
+    this.acteur,
   });
 
  
@@ -73,14 +72,14 @@ class ZoneProduction {
       'dateAjout': dateAjout,
       'dateModif': dateModif,
       'statutZone': statutZone,
-      'acteur': acteur.toMap(),
+      'acteur': acteur?.toMap(),
     };
   }
 
   factory ZoneProduction.fromMap(Map<String, dynamic> map) {
     return ZoneProduction(
       idZoneProduction: map['idZoneProduction'] != null ? map['idZoneProduction'] as String : null,
-      codeZone: map['codeZone'] as String,
+      codeZone: map['codeZone'] != null ? map['codeZone'] as String : null,
       nomZoneProduction: map['nomZoneProduction'] as String,
       personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       latitude: map['latitude'] != null ? map['latitude'] as String : null,
@@ -89,7 +88,7 @@ class ZoneProduction {
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
       statutZone: map['statutZone'] as bool,
-      acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
+      acteur: map['acteur'] != null ? Acteur.fromMap(map['acteur'] as Map<String,dynamic>) : null,
     );
   }
 

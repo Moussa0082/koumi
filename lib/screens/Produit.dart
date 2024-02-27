@@ -31,13 +31,13 @@ class _ProduitScreenState extends State<ProduitScreen>
 
   void fetchProduitByCategorie(String idCategorie, String idMagasin) async {
     try {
-      final response = await http.get(
-          Uri.parse('http://10.0.2.2:9000/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
+      final response = await http.get(Uri.parse(
+          'http://10.0.2.2:9000/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {
-          stock = data.
-    where((stock) => stock['statutSotck'] == true)
+          stock = data
+              .where((stock) => stock['statutSotck'] == true)
               .map((item) => Stock(
                     idStock: item['idStock'] as String,
                     nomProduit: item['nomProduit'] as String,
@@ -56,8 +56,8 @@ class _ProduitScreenState extends State<ProduitScreen>
 
   void fetchCategorie() async {
     try {
-      final response =
-          await http.get(Uri.parse('http://10.0.2.2:9000/Categorie/allCategorie'));
+      final response = await http
+          .get(Uri.parse('http://10.0.2.2:9000/Categorie/allCategorie'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {
@@ -70,13 +70,16 @@ class _ProduitScreenState extends State<ProduitScreen>
           _tabController =
               TabController(length: categorieProduit.length, vsync: this);
           _tabController!.addListener(_handleTabChange);
-          selectedCategorieProduit =
-              categorieProduit.isNotEmpty ? categorieProduit.first.idCategorieProduit! : '';
-          selectedCategorieProduitNom =
-              categorieProduit.isNotEmpty ? categorieProduit[_tabController!.index].libelleCategorie : '';
+          selectedCategorieProduit = categorieProduit.isNotEmpty
+              ? categorieProduit.first.idCategorieProduit!
+              : '';
+          selectedCategorieProduitNom = categorieProduit.isNotEmpty
+              ? categorieProduit[_tabController!.index].libelleCategorie
+              : '';
           fetchProduitByCategorie(selectedCategorieProduit, widget.id!);
         });
-        debugPrint("Id Cat : ${categorieProduit.map((e) => e.idCategorieProduit)}");
+        debugPrint(
+            "Id Cat : ${categorieProduit.map((e) => e.idCategorieProduit)}");
       } else {
         throw Exception('Failed to load categories');
       }
@@ -106,7 +109,6 @@ class _ProduitScreenState extends State<ProduitScreen>
     if (categorieProduit.isEmpty) {
       fetchCategorie();
       // fetchProduitByCategorie(selectedCategorieProduit);
-
     }
   }
 
@@ -167,7 +169,8 @@ class _ProduitScreenState extends State<ProduitScreen>
                     child: TabBarView(
                       controller: _tabController,
                       children: categorieProduit.map((categorie) {
-                        return buildGridView(categorie.idCategorieProduit!, widget.id!);
+                        return buildGridView(
+                            categorie.idCategorieProduit!, widget.id!);
                       }).toList(),
                     ),
                   ),
@@ -180,93 +183,100 @@ class _ProduitScreenState extends State<ProduitScreen>
     );
   }
 
-
-Widget buildGridView(String idCategorie, String idMagasin) {
-  
-  List<Stock> filteredStocks = stock;
-  String searchText = "";
-  if (filteredStocks.isEmpty) {
-   return Padding(
-     padding: const EdgeInsets.all(8.0),
-     child: Center(
-          child: Text( textAlign:TextAlign.justify,
-            'Aucun produit trouvé dans le magasin ' + widget.nom!.toUpperCase() + " dans la categorie " +  selectedCategorieProduitNom.toUpperCase(),
-            style: TextStyle(fontSize: 16),
-          ),
-        ),
-   );
-  } else {
-    List<Stock> filteredStocksSearch = filteredStocks.where((stock) {
-      String nomProduit = stock.nomProduit!.toLowerCase();
-       searchText = _searchController.text.toLowerCase();
-      return nomProduit.contains(searchText);
-    }).toList();
-
-    if (filteredStocksSearch.isEmpty) {
+  Widget buildGridView(String idCategorie, String idMagasin) {
+    List<Stock> filteredStocks = stock;
+    String searchText = "";
+    if (filteredStocks.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(8.0),
         child: Center(
           child: Text(
-            textAlign:TextAlign.justify,
-            'Aucun produit trouvé avec le nom ' +  searchText.toUpperCase()  + " dans la categorie " +  selectedCategorieProduitNom.toUpperCase(),
+            textAlign: TextAlign.justify,
+            'Aucun produit trouvé dans le magasin ' +
+                widget.nom!.toUpperCase() +
+                " dans la categorie " +
+                selectedCategorieProduitNom.toUpperCase(),
             style: TextStyle(fontSize: 16),
           ),
         ),
       );
-    }
+    } else {
+      List<Stock> filteredStocksSearch = filteredStocks.where((stock) {
+        String nomProduit = stock.nomProduit!.toLowerCase();
+        searchText = _searchController.text.toLowerCase();
+        return nomProduit.contains(searchText);
+      }).toList();
 
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-      ),
-      itemCount: filteredStocksSearch.length, // Utiliser la liste filtrée
-      itemBuilder: (context, index) {
-        return Container(
-          child: Card(
-            shadowColor: Colors.white,
-            child: Column(
-              children: [
-                Stack(
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      child: Image.asset('assets/images/rc.png'),
-                    ),
-                    Container(
-                      child: Image.network(
-                        filteredStocksSearch[index].photo ?? 'assets/images/magasin.png', // Utiliser la photo du stock
-                        width: double.infinity,
-                        height: null,
-                        fit: BoxFit.cover,
-                        errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                          return Image.asset(
-                            'assets/images/magasin.png',
-                            width: double.infinity,
-                            height: 150,
-                            fit: BoxFit.cover,
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  overflow: TextOverflow.ellipsis,
-                  filteredStocksSearch[index].nomProduit ?? 'Pas de nom défini',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ],
+      if (filteredStocksSearch.isEmpty) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Text(
+              textAlign: TextAlign.justify,
+              'Aucun produit trouvé avec le nom ' +
+                  searchText.toUpperCase() +
+                  " dans la categorie " +
+                  selectedCategorieProduitNom.toUpperCase(),
+              style: TextStyle(fontSize: 16),
             ),
           ),
         );
-      },
-    );
-  }
-}
+      }
 
+      return GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+        ),
+        itemCount: filteredStocksSearch.length, // Utiliser la liste filtrée
+        itemBuilder: (context, index) {
+          return Container(
+            child: Card(
+              shadowColor: Colors.white,
+              child: Column(
+                children: [
+                  Stack(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        child: Image.asset('assets/images/rc.png'),
+                      ),
+                      Container(
+                        child: Image.network(
+                          filteredStocksSearch[index].photo ??
+                              'assets/images/magasin.png', // Utiliser la photo du stock
+                          width: double.infinity,
+                          height: null,
+                          fit: BoxFit.cover,
+                          errorBuilder: (BuildContext context, Object exception,
+                              StackTrace? stackTrace) {
+                            return Image.asset(
+                              'assets/images/magasin.png',
+                              width: double.infinity,
+                              height: 150,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    overflow: TextOverflow.ellipsis,
+                    filteredStocksSearch[index].nomProduit ??
+                        'Pas de nom défini',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+  }
 
   Widget _buildShimmerEffect() {
     return Shimmer.fromColors(
@@ -291,4 +301,3 @@ Widget buildGridView(String idCategorie, String idMagasin) {
     );
   }
 }
-

@@ -132,7 +132,7 @@ Future<void> _pickImage(ImageSource source) async {
     super.initState();
     String typeActeurNames = '';
 for (TypeActeur typeActeur in widget.typeActeur) {
-  typeActeurNames += typeActeur.libelle + ', ';
+  typeActeurNames += typeActeur.libelle! + ', ';
 }
 
 debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}, Email : ${widget.email}, Types d'acteurs : $typeActeurNames");

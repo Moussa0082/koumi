@@ -5,7 +5,7 @@ import 'package:koumi_app/models/Filiere.dart';
 
 class CategorieProduit {
   final String? idCategorieProduit;
-   String? codeCategorie;
+  String? codeCategorie;
   final String libelleCategorie;
   final String? descriptionCategorie;
   final bool? statutCategorie;

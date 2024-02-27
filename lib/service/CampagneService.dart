@@ -8,8 +8,9 @@ import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/Campagne.dart';
 import 'package:path/path.dart';
 
-class PaysService extends ChangeNotifier {
-  static const String baseUrl = 'http://10.0.2.2:9000/Campagne';
+class CampagneService extends ChangeNotifier {
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/Campagne';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Campagne';
 
   List<Campagne> campagneList = [];
 

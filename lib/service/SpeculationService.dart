@@ -3,13 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
-import 'package:koumi_app/models/Campagne.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
-import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/Speculation.dart';
 
-class PaysService extends ChangeNotifier {
-  static const String baseUrl = 'http://10.0.2.2:9000/Speculation';
+class SpeculationService extends ChangeNotifier {
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/Speculation';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Speculation';
 
   List<Speculation> speculationList = [];
 
@@ -41,22 +40,19 @@ class PaysService extends ChangeNotifier {
     required String idSpeculation,
     required String nomSpeculation,
     required String descriptionSpeculation,
-    required CategorieProduit categorieProduit,
-    required Acteur acteur,
   }) async {
     var addSpeculations = jsonEncode({
       'idSpeculation': idSpeculation,
       'nomSpeculation': nomSpeculation,
       'descriptionSpeculation': descriptionSpeculation,
-      'categorieProduit': categorieProduit.toMap(),
-      'acteur': acteur.toMap(),
     });
 
-    final response = await http.post(Uri.parse("$baseUrl/update/$idSpeculation"),
+    final response = await http.put(Uri.parse("$baseUrl/update/$idSpeculation"),
         headers: {'Content-Type': 'application/json'}, body: addSpeculations);
     debugPrint(addSpeculations.toString());
     if (response.statusCode == 200 || response.statusCode == 201) {
       debugPrint(response.body);
+      applyChange();
     } else {
       throw Exception("Une erreur s'est produite' : ${response.statusCode}");
     }
@@ -78,8 +74,8 @@ class PaysService extends ChangeNotifier {
   }
 
   Future<List<Speculation>> fetchSpeculationByActeur(String idActeur) async {
-    final response =
-        await http.get(Uri.parse('$baseUrl/getAllSpeculationByActeur/$idActeur'));
+    final response = await http
+        .get(Uri.parse('$baseUrl/getAllSpeculationByActeur/$idActeur'));
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
@@ -95,8 +91,8 @@ class PaysService extends ChangeNotifier {
 
   Future<List<Speculation>> fetchSpeculationByCategorie(
       String idSpeculation) async {
-    final response = await http.get(
-        Uri.parse('$baseUrl/getAllSpeculationByCategorie/$idSpeculation'));
+    final response = await http
+        .get(Uri.parse('$baseUrl/getAllSpeculationByCategorie/$idSpeculation'));
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
@@ -111,8 +107,8 @@ class PaysService extends ChangeNotifier {
   }
 
   Future<void> deleteSpeculation(String idSpeculation) async {
-    final response =
-        await http.delete(Uri.parse("$baseUrl/deleteSpeculation/$idSpeculation"));
+    final response = await http
+        .delete(Uri.parse("$baseUrl/deleteSpeculation/$idSpeculation"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -124,7 +120,7 @@ class PaysService extends ChangeNotifier {
 
   Future<void> activerSpeculation(String idSpeculation) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/activer/$idSpeculation"));
+        await http.put(Uri.parse("$baseUrl/activer/$idSpeculation"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -136,7 +132,7 @@ class PaysService extends ChangeNotifier {
 
   Future<void> desactiverSpeculation(String idSpeculation) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/desactiver/$idSpeculation"));
+        await http.put(Uri.parse("$baseUrl/desactiver/$idSpeculation"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
 

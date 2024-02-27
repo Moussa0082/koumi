@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/Admin/ContinentPage.dart';
+import 'package:koumi_app/Admin/Niveau1Page.dart';
+import 'package:koumi_app/Admin/Niveau2Page.dart';
+import 'package:koumi_app/Admin/Niveau3Page.dart';
 import 'package:koumi_app/Admin/PaysPage.dart';
+import 'package:koumi_app/Admin/SousRegionPage.dart';
 import 'package:koumi_app/Admin/UnitePage.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
-import 'package:koumi_app/service/ParametreGenerauxService.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:provider/provider.dart';
 
 class Parametre extends StatefulWidget {
@@ -24,7 +28,9 @@ class _ParametreState extends State<Parametre> {
   void initState() {
     super.initState();
 
-    // params = Provider.of<ParametreGProvider>(context, listen: false).param!;
+    paramList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+    params = paramList[0];
   }
 
   @override
@@ -46,102 +52,73 @@ class _ParametreState extends State<Parametre> {
       ),
       body: SingleChildScrollView(
         child: Column(children: [
-          Consumer<ParametreGenerauxService>(
-              builder: (context, paramService, child) {
-            return FutureBuilder(
-                future: paramService.fetchParametre(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.orange,
-                      ),
-                    );
-                  }
-                  if (snapshot.hasError) {
-                    return const Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Text("Une erreur s'est produite"),
-                    );
-                  }
-                  if (!snapshot.hasData) {
-                    return const Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Text("Aucun donnée trouvé"),
-                    );
-                  } else {
-                    paramList = snapshot.data!;
-                    params = paramList[0];
-                    return Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: MediaQuery.of(context).size.height * 0.02,
-                          horizontal: MediaQuery.of(context).size.width * 0.05,
-                        ),
-                        child: Container(
-                          height: 110,
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                offset: const Offset(0, 2),
-                                blurRadius: 5,
-                                spreadRadius: 2,
-                              ),
-                            ],
-                          ),
-                          child: ListTile(
-                            leading: params.logoSysteme!.isEmpty ||
-                                    params.logoSysteme == null
-                                ? SizedBox(
-                                    width: 110,
-                                    height: 150,
-                                    child: Image.asset(
-                                      "assets/images/type.png",
-                                      scale: 1,
-                                      fit: BoxFit.fill,
-                                    ),
-                                  )
-                                : SizedBox(
-                                    width: 110,
-                                    height: 150,
-                                    child: Image.network(
-                                      "http://10.0.2.2/${params.logoSysteme!}",
-                                      scale: 1,
-                                      fit: BoxFit.fill,
-                                    ),
-                                  ),
-                            title: Text(
-                              params.nomSysteme,
-                              style: const TextStyle(
-                                fontSize: 22,
-                                color: Colors.black,
-                                overflow: TextOverflow.ellipsis,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            subtitle: Text(
-                              params.sloganSysteme,
-                              style: const TextStyle(
-                                fontSize: 17,
-                                overflow: TextOverflow.ellipsis,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ));
-                  }
-                });
-          }),
           Padding(
               padding: EdgeInsets.symmetric(
                 vertical: MediaQuery.of(context).size.height * 0.02,
                 horizontal: MediaQuery.of(context).size.width * 0.05,
               ),
               child: Container(
-                height: 225,
+                height: 110,
+                width: MediaQuery.of(context).size.width * 0.9,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      offset: const Offset(0, 2),
+                      blurRadius: 5,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: ListTile(
+                  leading:
+                      params.logoSysteme!.isEmpty || params.logoSysteme == null
+                          ? SizedBox(
+                              width: 110,
+                              height: 150,
+                              child: Image.asset(
+                                "assets/images/type.png",
+                                scale: 1,
+                                fit: BoxFit.fill,
+                              ),
+                            )
+                          : SizedBox(
+                              width: 110,
+                              height: 150,
+                              child: Image.network(
+                                "http://10.0.2.2/${params.logoSysteme!}",
+                                scale: 1,
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                  title: Text(
+                    params.nomSysteme,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      color: Colors.black,
+                      overflow: TextOverflow.ellipsis,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(
+                    params.sloganSysteme,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      overflow: TextOverflow.ellipsis,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              )),
+          Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: MediaQuery.of(context).size.height * 0.02,
+                horizontal: MediaQuery.of(context).size.width * 0.05,
+              ),
+              child: Container(
+                height: 380,
                 width: MediaQuery.of(context).size.width * 0.9,
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -173,6 +150,21 @@ class _ParametreState extends State<Parametre> {
                       endIndent: 0,
                     ),
                     getList(
+                        "sous.png",
+                        'Sous région',
+                        const SousRegionPage(),
+                        const Icon(
+                          Icons.chevron_right_sharp,
+                          size: 30,
+                        )),
+                    const Divider(
+                      color: Colors.grey,
+                      height: 4,
+                      thickness: 1,
+                      indent: 50,
+                      endIndent: 0,
+                    ),
+                    getList(
                         "pays.png",
                         'Pays',
                         const PaysPage(),
@@ -188,9 +180,9 @@ class _ParametreState extends State<Parametre> {
                       endIndent: 0,
                     ),
                     getList(
-                        "zone.png",
-                        'Zone de production',
-                        const PaysPage(),
+                        "region.png",
+                        params.libelleNiveau1Pays,
+                        const Niveau1Page(),
                         const Icon(
                           Icons.chevron_right_sharp,
                           size: 30,
@@ -203,8 +195,38 @@ class _ParametreState extends State<Parametre> {
                       endIndent: 0,
                     ),
                     getList(
-                        "zone.png",
-                        'Unite de mésure',
+                        "region.png",
+                        params.libelleNiveau2Pays,
+                        const Niveau2Page(),
+                        const Icon(
+                          Icons.chevron_right_sharp,
+                          size: 30,
+                        )),
+                    const Divider(
+                      color: Colors.grey,
+                      height: 4,
+                      thickness: 1,
+                      indent: 50,
+                      endIndent: 0,
+                    ),
+                    getList(
+                        "region.png",
+                        params.libelleNiveau3Pays,
+                        const Niveau3Page(),
+                        const Icon(
+                          Icons.chevron_right_sharp,
+                          size: 30,
+                        )),
+                    const Divider(
+                      color: Colors.grey,
+                      height: 4,
+                      thickness: 1,
+                      indent: 50,
+                      endIndent: 0,
+                    ),
+                    getList(
+                        "unite.png",
+                        'Unite de mesure',
                         const UnitePage(),
                         const Icon(
                           Icons.chevron_right_sharp,
@@ -261,22 +283,4 @@ class _ParametreState extends State<Parametre> {
       ),
     );
   }
-  // Widget getList(Icon icon1, String text, Widget page, Icon icon2) {
-  //   return ListTile(
-  //     // isThreeLine: true,
-  //     leading: icon1,
-  //     title: TextButton(
-  //       onPressed: () {
-  //         Navigator.push(
-  //           context,
-  //           MaterialPageRoute(
-  //               builder: (context) =>
-  //                   page),
-  //                             );
-  //       },
-  //       child: Text(text),
-  //     ),
-  //     trailing: icon2,
-  //   );
-  // }
 }

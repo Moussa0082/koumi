@@ -37,9 +37,9 @@ class _UpdateUniteState extends State<UpdateUnite> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Center(
-            child: Text(
-              "Mofifier unite ",
+          ListTile(
+            title: Text(
+              "Modification",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
@@ -48,6 +48,15 @@ class _UpdateUniteState extends State<UpdateUnite> {
               textAlign: TextAlign.center,
               overflow: TextOverflow.visible,
             ),
+            trailing: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(
+                  Icons.close,
+                  color: Colors.red,
+                  size: 30,
+                )),
           ),
           const SizedBox(height: 5),
           Form(
@@ -77,91 +86,60 @@ class _UpdateUniteState extends State<UpdateUnite> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () async {
-                          final String libelle = libelleController.text;
-                          if (formkey.currentState!.validate()) {
-                            try {
-                              await UniteService()
-                                  .updateUnite(
-                                      idUnite: widget.unite.idUnite!,
-                                      nomUnite: libelle,
-                                      acteur: acteur,
-                                      personneModif: acteur.nomActeur)
-                                  .then((value) => {
-                                        Provider.of<UniteService>(context,
-                                                listen: false)
-                                            .applyChange(),
-                                        libelleController.clear(),
-                                        Navigator.of(context).pop()
-                                      });
-                            } catch (e) {
-                              final String errorMessage = e.toString();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text(
-                                          "Une erreur s'est produit : $errorMessage"),
-                                    ],
-                                  ),
-                                  duration: const Duration(seconds: 5),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                        ),
-                        icon: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Modifer",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    final String libelle = libelleController.text;
+                    if (formkey.currentState!.validate()) {
+                      try {
+                        await UniteService()
+                            .updateUnite(
+                                idUnite: widget.unite.idUnite!,
+                                nomUnite: libelle,
+                                acteur: acteur,
+                                personneModif: acteur.nomActeur!)
+                            .then((value) => {
+                                  Provider.of<UniteService>(context,
+                                          listen: false)
+                                      .applyChange(),
+                                  libelleController.clear(),
+                                  Navigator.of(context).pop()
+                                });
+                      } catch (e) {
+                        final String errorMessage = e.toString();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(
+                              children: [
+                                Text(
+                                    "Une erreur s'est produit : $errorMessage"),
+                              ],
+                            ),
+                            duration: const Duration(seconds: 5),
                           ),
-                        ),
-                      ),
+                        );
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green, // Orange color code
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
                     ),
-                    const SizedBox(
-                      width: 5,
+                    minimumSize: const Size(290, 45),
+                  ),
+                  icon: const Icon(
+                    Icons.edit,
+                    color: Colors.white,
+                  ),
+                  label: const Text(
+                    "Modifer",
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
                     ),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pop(); // Ferme la boîte de dialogue
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                        ),
-                        icon: const Icon(
-                          Icons.close,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Annuler",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )
+                  ),
+                ),
               ],
             ),
           )
