@@ -293,7 +293,7 @@ class _SousRegionListState extends State<SousRegionList> {
                                             //         );
                                             //       }
                                             //     }),
-                                            
+
                                             Container(
                                               alignment: Alignment.bottomRight,
                                               padding:
@@ -335,9 +335,11 @@ class _SousRegionListState extends State<SousRegionList> {
                                                                     (value) => {
                                                                           Provider.of<SousRegionService>(context, listen: false)
                                                                               .applyChange(),
-                                                                          // setState(() {
-                                                                          //   _liste = SousRegionService().fetchSousRegionByContinent(continents.idContinent!);
-                                                                          // }),
+                                                                          setState(
+                                                                              () {
+                                                                            _liste =
+                                                                                SousRegionService().fetchSousRegionByContinent(continents.idContinent!);
+                                                                          }),
                                                                           Navigator.of(context)
                                                                               .pop(),
                                                                           ScaffoldMessenger.of(context)
@@ -398,6 +400,11 @@ class _SousRegionListState extends State<SousRegionList> {
                                                                     (value) => {
                                                                           Provider.of<SousRegionService>(context, listen: false)
                                                                               .applyChange(),
+                                                                          setState(
+                                                                              () {
+                                                                            _liste =
+                                                                                SousRegionService().fetchSousRegionByContinent(continents.idContinent!);
+                                                                          }),
                                                                           Navigator.of(context)
                                                                               .pop(),
                                                                         })
@@ -508,6 +515,11 @@ class _SousRegionListState extends State<SousRegionList> {
                                                                     (value) => {
                                                                           Provider.of<SousRegionService>(context, listen: false)
                                                                               .applyChange(),
+                                                                          setState(
+                                                                              () {
+                                                                            _liste =
+                                                                                SousRegionService().fetchSousRegionByContinent(continents.idContinent!);
+                                                                          }),
                                                                           Navigator.of(context)
                                                                               .pop(),
                                                                         })

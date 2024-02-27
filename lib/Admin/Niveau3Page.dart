@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/CodePays.dart';
+import 'package:koumi_app/Admin/UpdateNiveau3.dart';
 import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
@@ -366,20 +367,17 @@ class _Niveau3PageState extends State<Niveau3Page> {
                                                               builder: (BuildContext
                                                                       context) =>
                                                                   AlertDialog(
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .white,
-                                                                shape:
-                                                                    RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              16),
-                                                                ),
-                                                                // content: UpdatesCategorie(
-                                                                //     categorieProduit:
-                                                                //         e)
-                                                              ),
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      shape:
+                                                                          RoundedRectangleBorder(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(16),
+                                                                      ),
+                                                                      content: UpdateNiveau3(
+                                                                          niveau3pays:
+                                                                              e)),
                                                             );
 
                                                             if (updatedSousRegion !=
