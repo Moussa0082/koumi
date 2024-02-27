@@ -129,6 +129,23 @@ class StockService extends ChangeNotifier {
     }
   }
 
+  Future<List<Stock>> fetchStockBySpeculation(
+      String idSpeculation) async {
+    final response = await http
+        .get(Uri.parse('$baseUrl/getAllStocksBySpeculation/$idSpeculation'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      stockList = body.map((item) => Stock.fromMap(item)).toList();
+      debugPrint(response.body);
+      return stockList;
+    } else {
+      stockList = [];
+      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+    }
+  }
+
   Future<Stock> updateQuantiteStock(Stock stock, String id) async {
     final response = await http.put(
       Uri.parse('$baseUrl/updateQuantiteStock/$id'),

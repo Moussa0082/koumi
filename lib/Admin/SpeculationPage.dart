@@ -3,8 +3,10 @@ import 'package:koumi_app/Admin/UpdatesSpeculation.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Speculation.dart';
+import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/SpeculationService.dart';
+import 'package:koumi_app/service/StockService.dart';
 import 'package:provider/provider.dart';
 
 class SpeculationPage extends StatefulWidget {
@@ -25,6 +27,7 @@ class _SpeculationPageState extends State<SpeculationPage> {
   TextEditingController libelleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   List<Speculation> speculationList = [];
+  List<Stock> stockList = [];
   late Future<List<Speculation>> _liste;
   late TextEditingController _searchController;
 
@@ -163,7 +166,6 @@ class _SpeculationPageState extends State<SpeculationPage> {
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 10, horizontal: 15),
                                         child: Container(
-                                          height: 145,
                                           width: MediaQuery.of(context)
                                                   .size
                                                   .width *
@@ -208,6 +210,104 @@ class _SpeculationPageState extends State<SpeculationPage> {
                                                         fontStyle:
                                                             FontStyle.italic,
                                                       ))),
+                                              FutureBuilder(
+                                                  future: StockService()
+                                                      .fetchStockBySpeculation(
+                                                          e.idSpeculation!),
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot
+                                                            .connectionState ==
+                                                        ConnectionState
+                                                            .waiting) {
+                                                      return const Center(
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                          color: Colors.orange,
+                                                        ),
+                                                      );
+                                                    }
+
+                                                    if (!snapshot.hasData) {
+                                                      return Padding(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 15),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Text(
+                                                                "Nombres de produit:",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .black87,
+                                                                  fontSize: 17,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  fontStyle:
+                                                                      FontStyle
+                                                                          .italic,
+                                                                )),
+                                                            Text("0",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .black87,
+                                                                  fontSize: 18,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w800,
+                                                                ))
+                                                          ],
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      stockList =
+                                                          snapshot.data!;
+                                                      return Padding(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 15),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Text(
+                                                                "Nombres de produit",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .black87,
+                                                                  fontSize: 17,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  fontStyle:
+                                                                      FontStyle
+                                                                          .italic,
+                                                                )),
+                                                            Text(
+                                                                speculationList
+                                                                    .length
+                                                                    .toString(),
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .black87,
+                                                                  fontSize: 18,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w800,
+                                                                ))
+                                                          ],
+                                                        ),
+                                                      );
+                                                    }
+                                                  }),
                                               Container(
                                                 alignment:
                                                     Alignment.bottomRight,
