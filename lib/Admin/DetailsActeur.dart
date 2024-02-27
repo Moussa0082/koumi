@@ -71,6 +71,10 @@ class _DetailsActeurState extends State<DetailsActeur> {
                         fontSize: 22,
                         overflow: TextOverflow.ellipsis,
                       ))),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: _buildPanel(),
             )
           ],
         ),
@@ -86,31 +90,17 @@ class _DetailsActeurState extends State<DetailsActeur> {
       children: <ExpansionPanel>[
         ExpansionPanel(
             headerBuilder: (context, isExpanded) {
-              return Container(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        offset: const Offset(0, 2),
-                        blurRadius: 5,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildProfile("Adresse", acteurs.adresseActeur),
-                        _buildProfile("Téléphone", acteurs.telephoneActeur),
-                        _buildProfile("Email", acteurs.emailActeur),
-                      ],
-                    ),
-                  ));
+              return Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildProfile("Adresse", acteurs.adresseActeur),
+                    _buildProfile("Téléphone", acteurs.telephoneActeur),
+                    _buildProfile("Email", acteurs.emailActeur),
+                  ],
+                ),
+              );
             },
             body: ListTile(),
             isExpanded: active,
@@ -121,7 +111,7 @@ class _DetailsActeurState extends State<DetailsActeur> {
 
   Widget _buildProfile(String title, String value) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
