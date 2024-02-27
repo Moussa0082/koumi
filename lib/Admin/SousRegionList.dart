@@ -1,37 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:koumi_app/Admin/CodePays.dart';
+import 'package:koumi_app/models/Continent.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/SousRegion.dart';
 import 'package:koumi_app/service/PaysService.dart';
+import 'package:koumi_app/service/SousRegionService.dart';
 import 'package:provider/provider.dart';
 
-class PaysList extends StatefulWidget {
-  final SousRegion sousRegion;
-  const PaysList({super.key, required this.sousRegion});
+class SousRegionList extends StatefulWidget {
+  final Continent continent;
+  const SousRegionList({super.key, required this.continent});
 
   @override
-  State<PaysList> createState() => _PaysListState();
+  State<SousRegionList> createState() => _SousRegionListState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _PaysListState extends State<PaysList> {
-  List<Pays> paysList = [];
-  late SousRegion region;
+class _SousRegionListState extends State<SousRegionList> {
+  List<SousRegion> regionList = [];
   late TextEditingController _searchController;
-  late Future<List<Pays>> _liste;
+  late Continent continents;
+  late Future<List<SousRegion>> _liste;
+  List<Pays> paysList = [];
 
-  Future<List<Pays>> getPaysListe(String id) async {
-    return await PaysService().fetchPaysBySousRegion(id);
+  Future<List<SousRegion>> getSousListe() async {
+    return await SousRegionService()
+        .fetchSousRegionByContinent(continents.idContinent!);
   }
 
   @override
   void initState() {
-    region = widget.sousRegion;
-    _searchController = TextEditingController();
-    _liste = getPaysListe(region.idSousRegion!);
     super.initState();
+    continents = widget.continent;
+    _liste = getSousListe();
+    _searchController = TextEditingController();
   }
 
   @override
@@ -44,35 +47,22 @@ class _PaysListState extends State<PaysList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 250, 250, 250),
-      appBar: AppBar(
-        centerTitle: true,
-        toolbarHeight: 100,
-        leading: IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-        title: Text(
-          "Sous region : ${region.nomSousRegion}",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+        appBar: AppBar(
+          centerTitle: true,
+          toolbarHeight: 100,
+          leading: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+          title: Text(
+            continents.nomContinent,
+            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+          ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              _showDialog();
-            },
-            icon: const Icon(
-              Icons.add,
-              color: d_colorGreen,
-              size: 30,
-            ),
-          )
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
+        body: SingleChildScrollView(
+          child: Column(children: [
             const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.all(10.0),
@@ -109,8 +99,8 @@ class _PaysListState extends State<PaysList> {
               ),
             ),
             const SizedBox(height: 10),
-            Consumer<PaysService>(
-              builder: (context, paysService, child) {
+            Consumer<SousRegionService>(
+              builder: (context, sousService, child) {
                 return FutureBuilder(
                     future: _liste,
                     builder: (context, snapshot) {
@@ -125,18 +115,20 @@ class _PaysListState extends State<PaysList> {
                       if (!snapshot.hasData) {
                         return const Padding(
                           padding: EdgeInsets.all(10),
-                          child: Center(child: Text("Aucun pays trouvé")),
+                          child:
+                              Center(child: Text("Aucun sous region trouvé")),
                         );
                       } else {
-                        paysList = snapshot.data!;
+                        regionList = snapshot.data!;
                         String searchText = "";
-                        List<Pays> filteredPaysSearch = paysList.where((pays) {
-                          String nomPays = pays.nomPays.toLowerCase();
+                        List<SousRegion> filtereSearch =
+                            regionList.where((search) {
+                          String libelle = search.nomSousRegion.toLowerCase();
                           searchText = _searchController.text.toLowerCase();
-                          return nomPays.contains(searchText);
+                          return libelle.contains(searchText);
                         }).toList();
                         return Column(
-                            children: filteredPaysSearch
+                            children: filtereSearch
                                 .map((e) => Padding(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 15),
@@ -161,53 +153,147 @@ class _PaysListState extends State<PaysList> {
                                         child: Column(
                                           children: [
                                             ListTile(
-                                                leading: CodePays()
-                                                    .getFlag(e.nomPays),
+                                                leading: Image.asset(
+                                                  "assets/images/sous.png",
+                                                  width: 50,
+                                                  height: 50,
+                                                ),
                                                 title: Text(
-                                                    e.nomPays.toUpperCase(),
+                                                    e.nomSousRegion
+                                                        .toUpperCase(),
                                                     style: const TextStyle(
                                                       color: Colors.black,
                                                       fontSize: 20,
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                     )),
-                                                subtitle:
-                                                    Text(e.descriptionPays,
-                                                        style: const TextStyle(
-                                                          color: Colors.black87,
-                                                          fontSize: 17,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontStyle:
-                                                              FontStyle.italic,
-                                                        ))),
-                                            // const Padding(
-                                            //   padding: EdgeInsets.symmetric(
-                                            //       horizontal: 15),
-                                            //   child: Row(
-                                            //     mainAxisAlignment:
-                                            //         MainAxisAlignment
-                                            //             .spaceBetween,
-                                            //     children: [
-                                            //       Text("Nombres pays :",
-                                            //           style: TextStyle(
-                                            //             color: Colors.black87,
-                                            //             fontSize: 17,
-                                            //             fontWeight:
-                                            //                 FontWeight.w500,
-                                            //             fontStyle:
-                                            //                 FontStyle.italic,
-                                            //           )),
-                                            //       Text("10",
-                                            //           style: TextStyle(
-                                            //             color: Colors.black87,
-                                            //             fontSize: 18,
-                                            //             fontWeight:
-                                            //                 FontWeight.w800,
-                                            //           ))
-                                            //     ],
-                                            //   ),
-                                            // ),
+                                                subtitle: Text(
+                                                    e.continent.nomContinent,
+                                                    style: const TextStyle(
+                                                      color: Colors.black87,
+                                                      fontSize: 17,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontStyle:
+                                                          FontStyle.italic,
+                                                    ))),
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 15),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text("Continent :",
+                                                      style: TextStyle(
+                                                        color: Colors.black87,
+                                                        fontSize: 17,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontStyle:
+                                                            FontStyle.italic,
+                                                      )),
+                                                  Text(e.continent.nomContinent,
+                                                      style: TextStyle(
+                                                        color: Colors.black87,
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                      ))
+                                                ],
+                                              ),
+                                            ),
+                                            // FutureBuilder(
+                                            //     future: PaysService()
+                                            //         .fetchPaysBySousRegion(
+                                            //             e.idSousRegion!),
+                                            //     builder: (context, snapshot) {
+                                            //       if (snapshot
+                                            //               .connectionState ==
+                                            //           ConnectionState.waiting) {
+                                            //         return const Center(
+                                            //           child:
+                                            //               CircularProgressIndicator(
+                                            //             color: Colors.orange,
+                                            //           ),
+                                            //         );
+                                            //       }
+
+                                            //       if (!snapshot.hasData) {
+                                            //         return Padding(
+                                            //           padding:
+                                            //               EdgeInsets.symmetric(
+                                            //                   horizontal: 15),
+                                            //           child: Row(
+                                            //             mainAxisAlignment:
+                                            //                 MainAxisAlignment
+                                            //                     .spaceBetween,
+                                            //             children: [
+                                            //               Text("Nombres pays :",
+                                            //                   style: TextStyle(
+                                            //                     color: Colors
+                                            //                         .black87,
+                                            //                     fontSize: 17,
+                                            //                     fontWeight:
+                                            //                         FontWeight
+                                            //                             .w500,
+                                            //                     fontStyle:
+                                            //                         FontStyle
+                                            //                             .italic,
+                                            //                   )),
+                                            //               Text("0",
+                                            //                   style: TextStyle(
+                                            //                     color: Colors
+                                            //                         .black87,
+                                            //                     fontSize: 18,
+                                            //                     fontWeight:
+                                            //                         FontWeight
+                                            //                             .w800,
+                                            //                   ))
+                                            //             ],
+                                            //           ),
+                                            //         );
+                                            //       } else {
+                                            //         paysList = snapshot.data!;
+                                            //         return Padding(
+                                            //           padding:
+                                            //               EdgeInsets.symmetric(
+                                            //                   horizontal: 15),
+                                            //           child: Row(
+                                            //             mainAxisAlignment:
+                                            //                 MainAxisAlignment
+                                            //                     .spaceBetween,
+                                            //             children: [
+                                            //               Text("Nombres pays :",
+                                            //                   style: TextStyle(
+                                            //                     color: Colors
+                                            //                         .black87,
+                                            //                     fontSize: 17,
+                                            //                     fontWeight:
+                                            //                         FontWeight
+                                            //                             .w500,
+                                            //                     fontStyle:
+                                            //                         FontStyle
+                                            //                             .italic,
+                                            //                   )),
+                                            //               Text(
+                                            //                   paysList.length
+                                            //                       .toString(),
+                                            //                   style: TextStyle(
+                                            //                     color: Colors
+                                            //                         .black87,
+                                            //                     fontSize: 18,
+                                            //                     fontWeight:
+                                            //                         FontWeight
+                                            //                             .w800,
+                                            //                   ))
+                                            //             ],
+                                            //           ),
+                                            //         );
+                                            //       }
+                                            //     }),
+
                                             Container(
                                               alignment: Alignment.bottomRight,
                                               padding:
@@ -218,7 +304,8 @@ class _PaysListState extends State<PaysList> {
                                                     MainAxisAlignment
                                                         .spaceBetween,
                                                 children: [
-                                                  _buildEtat(e.statutPays),
+                                                  _buildEtat(
+                                                      e.statutSousRegion),
                                                   PopupMenuButton<String>(
                                                     padding: EdgeInsets.zero,
                                                     itemBuilder: (context) =>
@@ -241,17 +328,17 @@ class _PaysListState extends State<PaysList> {
                                                             ),
                                                           ),
                                                           onTap: () async {
-                                                            await PaysService()
-                                                                .activerPays(
-                                                                    e.idPays!)
+                                                            await SousRegionService()
+                                                                .activerSousRegion(e
+                                                                    .idSousRegion!)
                                                                 .then(
                                                                     (value) => {
-                                                                          Provider.of<PaysService>(context, listen: false)
+                                                                          Provider.of<SousRegionService>(context, listen: false)
                                                                               .applyChange(),
                                                                           setState(
                                                                               () {
                                                                             _liste =
-                                                                                PaysService().fetchPaysBySousRegion(region.idSousRegion!);
+                                                                                SousRegionService().fetchSousRegionByContinent(continents.idContinent!);
                                                                           }),
                                                                           Navigator.of(context)
                                                                               .pop(),
@@ -306,17 +393,17 @@ class _PaysListState extends State<PaysList> {
                                                             ),
                                                           ),
                                                           onTap: () async {
-                                                            await PaysService()
-                                                                .desactiverPays(
-                                                                    e.idPays!)
+                                                            await SousRegionService()
+                                                                .desactiverSousRegion(e
+                                                                    .idSousRegion!)
                                                                 .then(
                                                                     (value) => {
-                                                                          Provider.of<PaysService>(context, listen: false)
+                                                                          Provider.of<SousRegionService>(context, listen: false)
                                                                               .applyChange(),
                                                                           setState(
                                                                               () {
                                                                             _liste =
-                                                                                PaysService().fetchPaysBySousRegion(region.idSousRegion!);
+                                                                                SousRegionService().fetchSousRegionByContinent(continents.idContinent!);
                                                                           }),
                                                                           Navigator.of(context)
                                                                               .pop(),
@@ -358,58 +445,53 @@ class _PaysListState extends State<PaysList> {
                                                           },
                                                         ),
                                                       ),
-                                                      PopupMenuItem<String>(
-                                                        child: ListTile(
-                                                          leading: const Icon(
-                                                            Icons.edit,
-                                                            color: Colors.green,
-                                                          ),
-                                                          title: const Text(
-                                                            "Modifier",
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.green,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          onTap: () async {
-                                                            // Ouvrir la boîte de dialogue de modification
-                                                            var updatedSousRegion =
-                                                                await showDialog(
-                                                              context: context,
-                                                              builder: (BuildContext
-                                                                      context) =>
-                                                                  AlertDialog(
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .white,
-                                                                shape:
-                                                                    RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              16),
-                                                                ),
-                                                                // content: UpdatesPays(
-                                                                //     pays:
-                                                                //         e)
-                                                              ),
-                                                            );
+                                                      // PopupMenuItem<String>(
+                                                      //   child: ListTile(
+                                                      //     leading: const Icon(
+                                                      //       Icons.edit,
+                                                      //       color:
+                                                      //           Colors.green,
+                                                      //     ),
+                                                      //     title: const Text(
+                                                      //       "Modifier",
+                                                      //       style: TextStyle(
+                                                      //         color: Colors
+                                                      //             .green,
+                                                      //         fontWeight:
+                                                      //             FontWeight
+                                                      //                 .bold,
+                                                      //       ),
+                                                      //     ),
+                                                      //     onTap: () async {
+                                                      //       // Ouvrir la boîte de dialogue de modification
+                                                      //       var updatedSousRegion =
+                                                      //           await showDialog(
+                                                      //         context:
+                                                      //             context,
+                                                      //         builder: (BuildContext
+                                                      //                 context) =>
+                                                      //             AlertDialog(
+                                                      //           backgroundColor:
+                                                      //               Colors
+                                                      //                   .white,
+                                                      //           // content: updateSousRegions(
+                                                      //           //     sousRegion:
+                                                      //           //         e),
+                                                      //         ),
+                                                      //       );
 
-                                                            // Si les détails sont modifiés, appliquer les changements
-                                                            if (updatedSousRegion !=
-                                                                null) {
-                                                              Provider.of<PaysService>(
-                                                                      context,
-                                                                      listen:
-                                                                          false)
-                                                                  .applyChange();
-                                                            }
-                                                          },
-                                                        ),
-                                                      ),
+                                                      //       // Si les détails sont modifiés, appliquer les changements
+                                                      //       if (updatedSousRegion !=
+                                                      //           null) {
+                                                      //         Provider.of<SousRegionService>(
+                                                      //                 context,
+                                                      //                 listen:
+                                                      //                     false)
+                                                      //             .applyChange();
+                                                      //       }
+                                                      //     },
+                                                      //   ),
+                                                      // ),
                                                       PopupMenuItem<String>(
                                                         child: ListTile(
                                                           leading: const Icon(
@@ -426,13 +508,18 @@ class _PaysListState extends State<PaysList> {
                                                             ),
                                                           ),
                                                           onTap: () async {
-                                                            await PaysService()
-                                                                .deletePays(
-                                                                    e.idPays!)
+                                                            await SousRegionService()
+                                                                .deleteSousRegion(e
+                                                                    .idSousRegion!)
                                                                 .then(
                                                                     (value) => {
-                                                                          Provider.of<PaysService>(context, listen: false)
+                                                                          Provider.of<SousRegionService>(context, listen: false)
                                                                               .applyChange(),
+                                                                          setState(
+                                                                              () {
+                                                                            _liste =
+                                                                                SousRegionService().fetchSousRegionByContinent(continents.idContinent!);
+                                                                          }),
                                                                           Navigator.of(context)
                                                                               .pop(),
                                                                         })
@@ -468,10 +555,8 @@ class _PaysListState extends State<PaysList> {
                     });
               },
             ),
-          ],
-        ),
-      ),
-    );
+          ]),
+        ));
   }
 
   Widget _buildEtat(bool isState) {
@@ -484,6 +569,4 @@ class _PaysListState extends State<PaysList> {
       ),
     );
   }
-
-  void _showDialog() {}
 }

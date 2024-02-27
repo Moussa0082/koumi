@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Niveau2Pays.dart';
@@ -55,12 +56,12 @@ class Niveau3Service extends ChangeNotifier {
     }
   }
 
-  Future<List<Niveau3Pays>> fetchNiveau3Pays() async {
-    final response = await http.get(Uri.parse('http://localhost:9000/api-koumi/nivveau3Pays/read'));
+   Future<List<Niveau3Pays>> fetchNiveau3Pays() async {
+    final response = await http.get(Uri.parse('$baseUrl/read'));
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-        debugPrint(response.body);
+      debugPrint("body N3: ${body.toString()}");
       niveauList = body.map((item) => Niveau3Pays.fromMap(item)).toList();
       debugPrint(response.body);
       return niveauList;
@@ -75,7 +76,7 @@ class Niveau3Service extends ChangeNotifier {
     final response = await http.get(
         Uri.parse('$baseUrl/listeNiveau3PaysByIdNiveau2Pays/$idNiveau2Pays'));
 
-    if (response.statusCode == 200 || response.statusCode == 201 ) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
       niveauList = body.map((item) => Niveau3Pays.fromMap(item)).toList();
       debugPrint(response.body);

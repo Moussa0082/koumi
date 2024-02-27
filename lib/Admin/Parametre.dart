@@ -58,7 +58,6 @@ class _ParametreState extends State<Parametre> {
                 horizontal: MediaQuery.of(context).size.width * 0.05,
               ),
               child: Container(
-                height: 110,
                 width: MediaQuery.of(context).size.width * 0.9,
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -104,9 +103,10 @@ class _ParametreState extends State<Parametre> {
                   ),
                   subtitle: Text(
                     params.sloganSysteme,
+                    textAlign: TextAlign.justify,
                     style: const TextStyle(
                       fontSize: 17,
-                      overflow: TextOverflow.ellipsis,
+                      // overflow: TextOverflow.ellipsis,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

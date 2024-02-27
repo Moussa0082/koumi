@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/CodePays.dart';
+import 'package:koumi_app/Admin/UpdateNiveau3.dart';
 import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
@@ -31,12 +32,11 @@ class _Niveau3PageState extends State<Niveau3Page> {
   late Niveau2Pays niveau2;
   String? niveau2Value;
   late Future _niveauList;
-     late TextEditingController _searchController;
-
+  late TextEditingController _searchController;
 
   @override
   void initState() {
-     _searchController = TextEditingController();
+    _searchController = TextEditingController();
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
     para = paraList[0];
@@ -51,7 +51,6 @@ class _Niveau3PageState extends State<Niveau3Page> {
         .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +85,7 @@ class _Niveau3PageState extends State<Niveau3Page> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-               const SizedBox(height: 10),
+            const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Container(
@@ -144,7 +143,7 @@ class _Niveau3PageState extends State<Niveau3Page> {
                         );
                       } else {
                         niveau3Liste = snapshot.data!;
-String searchText = "";
+                        String searchText = "";
                         List<Niveau3Pays> filtereSearch =
                             niveau3Liste.where((search) {
                           String libelle = search.nomN3.toLowerCase();
@@ -178,7 +177,7 @@ String searchText = "";
                                           children: [
                                             ListTile(
                                                 leading: CodePays().getFlag(e
-                                                    .niveau2Pays
+                                                    .niveau2Pays!
                                                     .niveau1Pays
                                                     .pays
                                                     .nomPays),
@@ -368,20 +367,17 @@ String searchText = "";
                                                               builder: (BuildContext
                                                                       context) =>
                                                                   AlertDialog(
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .white,
-                                                                shape:
-                                                                    RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              16),
-                                                                ),
-                                                                // content: UpdatesCategorie(
-                                                                //     categorieProduit:
-                                                                //         e)
-                                                              ),
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      shape:
+                                                                          RoundedRectangleBorder(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(16),
+                                                                      ),
+                                                                      content: UpdateNiveau3(
+                                                                          niveau3pays:
+                                                                              e)),
                                                             );
 
                                                             if (updatedSousRegion !=

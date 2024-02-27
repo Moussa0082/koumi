@@ -1,5 +1,8 @@
+
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Acteur.dart';
+
+import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ActeurProvider with ChangeNotifier {
@@ -49,5 +52,8 @@ class ActeurProvider with ChangeNotifier {
     _acteur = null;
     notifyListeners();
     // Rediriger vers la page de connexion
-  }
+
+  
 }
+
+  }

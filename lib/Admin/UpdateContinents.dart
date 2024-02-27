@@ -33,18 +33,17 @@ class _UpdateContinentsState extends State<UpdateContinents> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              Image.asset(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Image.asset(
                 "assets/images/continent.png",
                 width: 50,
                 height: 50,
               ),
-              const SizedBox(width: 5),
-              const Text(
+              title: Text(
                 "Modification",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -52,28 +51,34 @@ class _UpdateContinentsState extends State<UpdateContinents> {
                   fontSize: 18,
                 ),
                 textAlign: TextAlign.center,
-                overflow: TextOverflow.visible,
+                overflow: TextOverflow.ellipsis,
               ),
-            ],
-          ),
-          // const SizedBox(height: 10),
-          Form(
-            key: formkey,
-            child: Column(
-              children: [
-                const SizedBox(
-                  height: 5,
-                ),
-                const Text(
-                  'Nom continent',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
+              trailing: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.red,
+                    size: 30,
+                  )),
+            ),
+            // const SizedBox(height: 10),
+            Form(
+              key: formkey,
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 5,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: TextFormField(
+                  const Text(
+                    'Nom continent',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
+                    ),
+                  ),
+                  TextFormField(
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "Veuillez remplir les champs";
@@ -83,125 +88,95 @@ class _UpdateContinentsState extends State<UpdateContinents> {
                     controller: libelleController,
                     decoration: InputDecoration(
                       hintText: "Nom continent",
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 10),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Description',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Description',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: TextFormField(
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Veuillez remplir les champs";
+                  TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Veuillez remplir les champs";
+                        }
+                        return null;
+                      },
+                      controller: descriptionController,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                        labelText: "Description",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      )),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      final String libelle = libelleController.text;
+                      final String desc = descriptionController.text;
+                      if (formkey.currentState!.validate()) {
+                        try {
+                          await ContinentService()
+                              .updateContinent(
+                                  idContinent: cont.idContinent!,
+                                  nomContinent: libelle,
+                                  descriptionContinent: desc)
+                              .then((value) => {
+                                    Provider.of<ContinentService>(context,
+                                            listen: false)
+                                        .applyChange(),
+                                    libelleController.clear(),
+                                    descriptionController.clear(),
+                                    Navigator.of(context).pop()
+                                  });
+                        } catch (e) {
+                          final String errorMessage = e.toString();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  Text(
+                                      "Une erreur s'est produit : $errorMessage"),
+                                ],
+                              ),
+                              duration: const Duration(seconds: 5),
+                            ),
+                          );
+                        }
                       }
-                      return null;
                     },
-                    controller: descriptionController,
-                    decoration: InputDecoration(
-                      hintText: "Description",
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 15, horizontal: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      minimumSize: const Size(290, 45),
+                    ),
+                    icon: const Icon(
+                      Icons.edit,
+                      color: Colors.white,
+                    ),
+                    label: const Text(
+                      "Modifier",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          final String libelle = libelleController.text;
-                          final String desc = descriptionController.text;
-                          if (formkey.currentState!.validate()) {
-                            try {
-                              await ContinentService()
-                                  .updateContinent(
-                                      idContinent: cont.idContinent!,
-                                      nomContinent: libelle,
-                                      descriptionContinent: desc)
-                                  .then((value) => {
-                                        Provider.of<ContinentService>(context,
-                                                listen: false)
-                                            .applyChange(),
-                                        libelleController.clear(),
-                                        descriptionController.clear(),
-                                        Navigator.of(context).pop()
-                                      });
-                            } catch (e) {
-                              final String errorMessage = e.toString();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text(
-                                          "Une erreur s'est produit : $errorMessage"),
-                                    ],
-                                  ),
-                                  duration: const Duration(seconds: 5),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                        ),
-                        child: const Text(
-                          "Modifier",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pop(); // Ferme la boîte de dialogue
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                        ),
-                        child: const Text(
-                          "Annuler",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          )
-        ],
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

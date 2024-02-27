@@ -65,6 +65,7 @@ class Niveau2Service extends ChangeNotifier {
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      debugPrint("body N2: ${body.toString()}");
       niveauList = body.map((item) => Niveau2Pays.fromMap(item)).toList();
       debugPrint(response.body);
       return niveauList;

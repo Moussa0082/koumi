@@ -1,56 +1,73 @@
 import 'package:flutter/material.dart';
-import 'package:koumi_app/Admin/DetailsActeur.dart';
-import 'package:koumi_app/models/Acteur.dart';
-import 'package:koumi_app/service/ActeurService.dart';
-import 'package:profile_photo/profile_photo.dart';
+import 'package:koumi_app/Admin/CodePays.dart';
+import 'package:koumi_app/models/Niveau1Pays.dart';
+import 'package:koumi_app/models/ParametreGeneraux.dart';
+import 'package:koumi_app/models/Pays.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/service/Niveau1Service.dart';
 import 'package:provider/provider.dart';
 
-class ActeurScreen extends StatefulWidget {
-  const ActeurScreen({super.key});
+class Niveau1List extends StatefulWidget {
+  final Pays pays;
+  const Niveau1List({super.key, required this.pays});
 
   @override
-  State<ActeurScreen> createState() => _ActeurScreenState();
+  State<Niveau1List> createState() => _Niveau1ListState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _ActeurScreenState extends State<ActeurScreen> {
+class _Niveau1ListState extends State<Niveau1List> {
+  late ParametreGeneraux para;
+  List<ParametreGeneraux> paraList = [];
+
   late TextEditingController _searchController;
-  List<Acteur> acteurList = [];
+  late Pays payss;
+  late Future<List<Niveau1Pays>> _liste;
+  List<Niveau1Pays> niveauList = [];
+
+  Future<List<Niveau1Pays>> getSousListe() async {
+    return await Niveau1Service().fetchNiveau1ByPays(widget.pays.idPays!);
+  }
 
   @override
   void initState() {
-    _searchController = TextEditingController();
     super.initState();
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+    para = paraList[0];
+    _liste = getSousListe();
+    _searchController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _searchController
+        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 250, 250, 250),
-      appBar: AppBar(
-        centerTitle: true,
-        toolbarHeight: 100,
-        leading: IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-        title: Text(
-          "Listes des acteurs",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+        appBar: AppBar(
+          centerTitle: true,
+          toolbarHeight: 100,
+          leading: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+          title: Text(
+            widget.pays.nomPays.toUpperCase(),
+            style: const TextStyle(
+                color: d_colorGreen, fontWeight: FontWeight.bold),
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
+        body: SingleChildScrollView(
+          child: Column(children: [
             const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.all(10.0),
@@ -87,9 +104,9 @@ class _ActeurScreenState extends State<ActeurScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            Consumer<ActeurService>(builder: (context, acteurService, child) {
+            Consumer<Niveau1Service>(builder: (context, niveau1Service, child) {
               return FutureBuilder(
-                  future: acteurService.fetchActeur(),
+                  future: _liste,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
@@ -102,32 +119,22 @@ class _ActeurScreenState extends State<ActeurScreen> {
                     if (!snapshot.hasData) {
                       return const Padding(
                         padding: EdgeInsets.all(10),
-                        child: Center(child: Text("Aucun acteur trouvé")),
+                        child: Center(child: Text("Aucun donné trouvé")),
                       );
                     } else {
-                      acteurList = snapshot.data!;
+                      niveauList = snapshot.data!;
                       String searchText = "";
-                      List<Acteur> filtereSearch = acteurList.where((search) {
-                        String libelle = search.nomActeur.toLowerCase();
+                      List<Niveau1Pays> filtereSearch =
+                          niveauList.where((search) {
+                        String libelle = search.nomN1.toLowerCase();
                         searchText = _searchController.text.toLowerCase();
                         return libelle.contains(searchText);
                       }).toList();
-
                       return Column(
                           children: filtereSearch
-                              // .where((element) => element.typeActeur.any((e) =>
-                              //     e.libelle.toLowerCase().contains('admin')))
                               .map((e) => Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 15),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  DetailsActeur(acteur: e)));
-                                    },
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 15),
                                     child: Container(
                                       width: MediaQuery.of(context).size.width *
                                           0.9,
@@ -146,78 +153,33 @@ class _ActeurScreenState extends State<ActeurScreen> {
                                       child: Column(
                                         children: [
                                           ListTile(
-                                              leading: e.logoActeur == null ||
-                                                      e.logoActeur!.isEmpty
-                                                  ? ProfilePhoto(
-                                                      totalWidth: 50,
-                                                      cornerRadius: 50,
-                                                      color: Colors.black,
-                                                      image: const AssetImage(
-                                                          'assets/images/profil.jpg'),
-                                                    )
-                                                  : ProfilePhoto(
-                                                      totalWidth: 50,
-                                                      cornerRadius: 50,
-                                                      color: Colors.black,
-                                                      image: NetworkImage(
-                                                          "http://10.0.2.2/${e.logoActeur}"),
-                                                    ),
-                                              title: Text(
-                                                  e.nomActeur.toUpperCase(),
-                                                  style: const TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 20,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  )),
-                                              subtitle: Text(
-                                                  e.typeActeur
-                                                      .map((data) =>
-                                                          data.libelle)
-                                                      .join(', '),
-                                                  style: const TextStyle(
-                                                    color: Colors.black87,
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w500,
-                                                    fontStyle: FontStyle.italic,
-                                                  ))),
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 15),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text("Date d'adhésion :",
-                                                    style: TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 15,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                    )),
-                                                Text(e.dateAjout!,
-                                                    style: TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w800,
-                                                    ))
-                                              ],
-                                            ),
+                                            leading: CodePays()
+                                                .getFlag(e.pays.nomPays),
+                                            title: Text(e.nomN1.toUpperCase(),
+                                                style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 18,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                )),
+                                            subtitle: Text(e.descriptionN1,
+                                                style: const TextStyle(
+                                                  color: Colors.black87,
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.w500,
+                                                  fontStyle: FontStyle.italic,
+                                                )),
                                           ),
                                           Container(
                                             alignment: Alignment.bottomRight,
                                             padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
+                                                horizontal: 20),
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                _buildEtat(e.statutActeur!),
+                                                _buildEtat(e.statutN1),
                                                 PopupMenuButton<String>(
                                                   padding: EdgeInsets.zero,
                                                   itemBuilder: (context) =>
@@ -237,15 +199,21 @@ class _ActeurScreenState extends State<ActeurScreen> {
                                                           ),
                                                         ),
                                                         onTap: () async {
-                                                          await ActeurService()
-                                                              .activerActeur(
-                                                                  e.idActeur!)
+                                                          await Niveau1Service()
+                                                              .activerNiveau1(e
+                                                                  .idNiveau1Pays!)
                                                               .then((value) => {
-                                                                    Provider.of<ActeurService>(
+                                                                    Provider.of<Niveau1Service>(
                                                                             context,
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
+                                                                    setState(
+                                                                        () {
+                                                                      _liste = Niveau1Service().fetchNiveau1ByPays(widget
+                                                                          .pays
+                                                                          .idPays!);
+                                                                    }),
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop(),
@@ -303,15 +271,21 @@ class _ActeurScreenState extends State<ActeurScreen> {
                                                           ),
                                                         ),
                                                         onTap: () async {
-                                                          await ActeurService()
-                                                              .desactiverActeur(
-                                                                  e.idActeur!)
+                                                          await Niveau1Service()
+                                                              .desactiverNiveau1Pays(e
+                                                                  .idNiveau1Pays!)
                                                               .then((value) => {
-                                                                    Provider.of<ActeurService>(
+                                                                    Provider.of<Niveau1Service>(
                                                                             context,
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
+                                                                    setState(
+                                                                        () {
+                                                                      _liste = Niveau1Service().fetchNiveau1ByPays(widget
+                                                                          .pays
+                                                                          .idPays!);
+                                                                    }),
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop(),
@@ -354,6 +328,56 @@ class _ActeurScreenState extends State<ActeurScreen> {
                                                         },
                                                       ),
                                                     ),
+                                                    // PopupMenuItem<String>(
+                                                    //   child: ListTile(
+                                                    //     leading: const Icon(
+                                                    //       Icons.edit,
+                                                    //       color: Colors.green,
+                                                    //     ),
+                                                    //     title: const Text(
+                                                    //       "Modifier",
+                                                    //       style: TextStyle(
+                                                    //         color: Colors.green,
+                                                    //         fontWeight:
+                                                    //             FontWeight.bold,
+                                                    //       ),
+                                                    //     ),
+                                                    //     onTap: () async {
+                                                    //       // Ouvrir la boîte de dialogue de modification
+                                                    //       var updatedSousRegion =
+                                                    //           await showDialog(
+                                                    //         context: context,
+                                                    //         builder: (BuildContext
+                                                    //                 context) =>
+                                                    //             AlertDialog(
+                                                    //                 backgroundColor:
+                                                    //                     Colors
+                                                    //                         .white,
+                                                    //                 shape:
+                                                    //                     RoundedRectangleBorder(
+                                                    //                   borderRadius:
+                                                    //                       BorderRadius.circular(
+                                                    //                           16),
+                                                    //                 ),
+                                                    //                 content:
+                                                    //                     UpdatesNiveau1(
+                                                    //                   niveau1pays:
+                                                    //                       e,
+                                                    //                 )),
+                                                    //       );
+
+                                                    //       // Si les détails sont modifiés, appliquer les changements
+                                                    //       if (updatedSousRegion !=
+                                                    //           null) {
+                                                    //         Provider.of<Niveau1Service>(
+                                                    //                 context,
+                                                    //                 listen:
+                                                    //                     false)
+                                                    //             .applyChange();
+                                                    //       }
+                                                    //     },
+                                                    //   ),
+                                                    // ),
                                                     PopupMenuItem<String>(
                                                       child: ListTile(
                                                         leading: const Icon(
@@ -369,15 +393,21 @@ class _ActeurScreenState extends State<ActeurScreen> {
                                                           ),
                                                         ),
                                                         onTap: () async {
-                                                          await ActeurService()
-                                                              .deleteActeur(
-                                                                  e.idActeur!)
+                                                          await Niveau1Service()
+                                                              .deleteNiveau1Pays(e
+                                                                  .idNiveau1Pays!)
                                                               .then((value) => {
-                                                                    Provider.of<ActeurService>(
+                                                                    Provider.of<Niveau1Service>(
                                                                             context,
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
+                                                                    setState(
+                                                                        () {
+                                                                      _liste = Niveau1Service().fetchNiveau1ByPays(widget
+                                                                          .pays
+                                                                          .idPays!);
+                                                                    }),
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop(),
@@ -409,15 +439,13 @@ class _ActeurScreenState extends State<ActeurScreen> {
                                         ],
                                       ),
                                     ),
-                                  )))
+                                  ))
                               .toList());
                     }
                   });
             })
-          ],
-        ),
-      ),
-    );
+          ]),
+        ));
   }
 
   Widget _buildEtat(bool isState) {
