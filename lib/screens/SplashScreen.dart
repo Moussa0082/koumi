@@ -87,47 +87,6 @@ void initState() {
   // }
   }
 
-
-
-//   void checkLoggedIn() async {
-//   // Initialise les données de l'utilisateur à partir de SharedPreferences
-//   await Provider.of<ActeurProvider>(context, listen: false).initializeActeurFromSharedPreferences();
-
-//   // Récupère l'objet Acteur
-//   acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-
-//   // Vérifie si l'utilisateur est déjà connecté
-//   if (acteur != null) {
-//     // Vérifie si l'utilisateur est un administrateur
-//     if (acteur.typeActeur.any((type) => type.libelle == 'admin' || type.libelle == 'Admin')) {
-//       Timer(
-//         const Duration(seconds: 5),
-//         () => Navigator.of(context).pushReplacement(
-//           MaterialPageRoute(builder: (_) => const BottomNavBarAdmin()),
-//         ),
-//       );
-//     } else {
-//       Timer(
-//         const Duration(seconds: 5),
-//         () => Navigator.of(context).pushReplacement(
-//           MaterialPageRoute(builder: (_) => const BottomNavigationPage()),
-//         ),
-//       );
-//     }
-//   } else {
-//     // Redirige vers l'écran de connexion si l'utilisateur n'est pas connecté
-//     Timer(
-//       const Duration(seconds: 5),
-//       () => Navigator.of(context).pushReplacement(
-//         MaterialPageRoute(builder: (_) => const LoginScreen()),
-//       ),
-//     );
-//   }
-// }
-
-
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -149,8 +108,3 @@ void initState() {
   }
 }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   // TODO: implement build
-  //   throw UnimplementedError();
-  // }

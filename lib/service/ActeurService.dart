@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
@@ -14,7 +13,7 @@ class ActeurService extends ChangeNotifier {
 
   List<Acteur> acteurList = [];
 
-   Future<void> creerActeur({
+  Future<void> creerActeur({
     required String nomActeur,
     required String adresseActeur,
     required String telephoneActeur,
@@ -25,16 +24,15 @@ class ActeurService extends ChangeNotifier {
     required String localiteActeur,
     required String emailActeur,
     required String filiereActeur,
-     List<TypeActeur>? typeActeur ,
+    List<TypeActeur>? typeActeur,
     File? photoSiegeActeur,
     File? logoActeur,
     required String password,
     required String maillonActeur,
   }) async {
     try {
-
-    //    // Convertir chaque TypeActeur en un objet JSON et les ajouter à une liste JSON
-    // List<String> typeActeurJsonList = typeActeur.map((typeActeur) => typeActeur.toJson()).toList();
+      //    // Convertir chaque TypeActeur en un objet JSON et les ajouter à une liste JSON
+      // List<String> typeActeurJsonList = typeActeur.map((typeActeur) => typeActeur.toJson()).toList();
 
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
 
@@ -51,7 +49,7 @@ class ActeurService extends ChangeNotifier {
             logoActeur.readAsBytes().asStream(), logoActeur.lengthSync(),
             filename: basename(logoActeur.path)));
       }
- 
+
       requete.fields['acteur'] = jsonEncode({
         'nomActeur': nomActeur,
         'adresseActeur': adresseActeur,
@@ -69,7 +67,7 @@ class ActeurService extends ChangeNotifier {
         'password': password,
         'maillonActeur': maillonActeur,
       });
- 
+
       var response = await requete.send();
       var responsed = await http.Response.fromStream(response);
 
@@ -77,9 +75,9 @@ class ActeurService extends ChangeNotifier {
         final donneesResponse = json.decode(responsed.body);
         debugPrint('acteur service ${donneesResponse.toString()}');
       } else {
-            final errorMessage = json.decode(utf8.decode(responsed.bodyBytes))['message'];
-        throw Exception(
-            ' ${errorMessage}' );
+        final errorMessage =
+            json.decode(utf8.decode(responsed.bodyBytes))['message'];
+        throw Exception(' ${errorMessage}');
       }
     } catch (e) {
       throw Exception(
@@ -124,7 +122,7 @@ class ActeurService extends ChangeNotifier {
       }
 
       requete.fields['acteur'] = jsonEncode({
-        'idActeur' : idActeur,
+        'idActeur': idActeur,
         'nomActeur': nomActeur,
         'adresseActeur': adresseActeur,
         'telephoneActeur': telephoneActeur,
@@ -158,62 +156,62 @@ class ActeurService extends ChangeNotifier {
     }
   }
 
-
-  static Future<String> sendOtpCodeEmail(String emailActeur, BuildContext context) async {
+  static Future<String> sendOtpCodeEmail(
+      String emailActeur, BuildContext context) async {
     final url = Uri.parse('$baseUrl/sendOtpCodeEmail?emailActeur=$emailActeur');
-    
+
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
         // Si la réponse est réussie, renvoyer le message de réussite
-         showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Succès'),
-            content: Text("Code envoyé avec succès"),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Succès'),
+              content: Text("Code envoyé avec succès"),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
         debugPrint("Code envoyé par mail : ${response.body} ");
         return response.body;
       } else {
         // Si la réponse n'est pas réussie, lancer une exception avec le message d'erreur
         debugPrint("Non envoyé : ${response.statusCode} ");
-                final Map<String, dynamic> body = json.decode(response.body);
-      final String errorMessage = body['message'] ?? 'Code non envoyé.';
-      // Afficher une alerte d'erreur avec le message spécifique
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Erreur'),
-            content: Text(errorMessage),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+        final Map<String, dynamic> body = json.decode(response.body);
+        final String errorMessage = body['message'] ?? 'Code non envoyé.';
+        // Afficher une alerte d'erreur avec le message spécifique
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Erreur'),
+              content: Text(errorMessage),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
         throw Exception('Failed to verify email: ${response.statusCode}');
       }
     } catch (e) {
       // Gérer les erreurs de requête HTTP
-        debugPrint("Erreur catch non envoyé : ${e} ");
-               
+      debugPrint("Erreur catch non envoyé : ${e} ");
+
       // Afficher une alerte d'erreur avec le message spécifique
       showDialog(
         context: context,
@@ -236,64 +234,65 @@ class ActeurService extends ChangeNotifier {
     }
   }
 
-  static Future<String> sendOtpCodeWhatsApp(String whatsAppActeur, BuildContext context) async {
-      
-    final url = Uri.parse('$baseUrl/sendOtpCodeWhatsApp?whatsAppActeur=$whatsAppActeur');
+  static Future<String> sendOtpCodeWhatsApp(
+      String whatsAppActeur, BuildContext context) async {
+    final url = Uri.parse(
+        '$baseUrl/sendOtpCodeWhatsApp?whatsAppActeur=$whatsAppActeur');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
         debugPrint("Envoyé : ${response.body} ");
         // Si la réponse est réussie, renvoyer le message de réussite
-          
-      // Afficher une alerte d'erreur avec le message spécifique
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Succès'),
-            content: Text("Code envoyé avec succès"),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    
+
+        // Afficher une alerte d'erreur avec le message spécifique
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Succès'),
+              content: Text("Code envoyé avec succès"),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+
         return response.body;
       } else {
         // Si la réponse n'est pas réussie, lancer une exception avec le message d'erreur
         debugPrint("Non envoyé : ${response.statusCode} ");
-         final Map<String, dynamic> body = json.decode(response.body);
-      final String errorMessage = body['message'] ?? 'Code non envoyé.';
-      // Afficher une alerte d'erreur avec le message spécifique
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Erreur'),
-            content: Text(errorMessage),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+        final Map<String, dynamic> body = json.decode(response.body);
+        final String errorMessage = body['message'] ?? 'Code non envoyé.';
+        // Afficher une alerte d'erreur avec le message spécifique
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Erreur'),
+              content: Text(errorMessage),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
         throw Exception('Failed to send code : ${response.statusCode}');
       }
     } catch (e) {
-        debugPrint("Erreur catch non envoyé : ${e} ");
+      debugPrint("Erreur catch non envoyé : ${e} ");
       // Gérer les erreurs de requête HTTP
-     
+
       // Afficher une alerte d'erreur avec le message spécifique
       showDialog(
         context: context,
@@ -316,207 +315,214 @@ class ActeurService extends ChangeNotifier {
     }
   }
 
+  static Future<void> verifyOtpCodeWhatsApp(
+      String whatsAppActeur, String resetToken, BuildContext context) async {
+    final Uri url = Uri.parse(
+        '$baseUrl/verifierOtpCodeWhatsApp?whatsAppActeur=$whatsAppActeur&resetToken=$resetToken');
 
-static Future<void> verifyOtpCodeWhatsApp(String whatsAppActeur, String resetToken, BuildContext context) async {
-  final Uri url = Uri.parse('$baseUrl/verifierOtpCodeWhatsApp?whatsAppActeur=$whatsAppActeur&resetToken=$resetToken');
-  
-  try {
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      // Afficher une alerte de succès
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Succès'),
-            content: Text('Le code a été vérifié avec succès.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    } else if (response.statusCode == 400 || response.statusCode == 500) {
-      // Extraire le message d'erreur du corps de la réponse
-      final Map<String, dynamic> body = json.decode(response.body);
-      final String errorMessage = body['message'] ?? 'Le code est incorrect.';
-      
-      // Afficher une alerte d'erreur avec le message spécifique
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Erreur'),
-            content: Text(errorMessage),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      // Afficher une alerte pour d'autres erreurs
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Erreur'),
-            content: Text('Une erreur est survenue lors de la vérification du code.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  } catch (e) {
-    // Afficher une alerte pour les erreurs de connexion
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Erreur de connexion'),
-          content: Text('Une erreur est survenue lors de la connexion .'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
-            ),
-          ],
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        // Afficher une alerte de succès
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Succès'),
+              content: Text('Le code a été vérifié avec succès.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
         );
-      },
-    );
-  }
-}
-static Future<void> verifyOtpCodeEmail(String emailActeur, String resetToken, BuildContext context) async {
-  final Uri url = Uri.parse('$baseUrl/verifierOtpCodeEmail?emailActeur=$emailActeur&resetToken=$resetToken');
-  
-  try {
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      // Afficher une alerte de succès
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Succès'),
-            content: Text('Le code a été vérifié avec succès.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    } else if (response.statusCode == 400 || response.statusCode == 500) {
-      // Extraire le message d'erreur du corps de la réponse
-      final Map<String, dynamic> body = json.decode(response.body);
-      final String errorMessage = body['message'] ?? 'Le code est incorrect.';
-      
-      // Afficher une alerte d'erreur avec le message spécifique
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Erreur'),
-            content: Text(errorMessage),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      // Afficher une alerte pour d'autres erreurs
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Erreur'),
-            content: Text('Une erreur est survenue lors de la vérification du code.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  } catch (e) {
-    // Afficher une alerte pour les erreurs de connexion
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Erreur de connexion'),
-          content: Text('Une erreur est survenue lors de la connexion .'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
-            ),
-          ],
+      } else if (response.statusCode == 400 || response.statusCode == 500) {
+        // Extraire le message d'erreur du corps de la réponse
+        final Map<String, dynamic> body = json.decode(response.body);
+        final String errorMessage = body['message'] ?? 'Le code est incorrect.';
+
+        // Afficher une alerte d'erreur avec le message spécifique
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Erreur'),
+              content: Text(errorMessage),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
         );
-      },
-    );
-  }
-}
-
-
-   static Future<void> resetPasswordEmail(String emailActeur, String password) async {
-  final Uri url = Uri.parse('$baseUrl/resetPasswordEmail?emailActeur=$emailActeur&password=$password');
-  
-  try {
-    final response = await http.put(url);
-
-    if (response.statusCode == 200) {
-      // Mot de passe réinitialisé avec succès
-      debugPrint("Succès email password update: ${response.statusCode}");
-    } else if (response.statusCode == 500) {
-      // Erreur serveur 
-      debugPrint("Erreur email password update echouer : ${response.statusCode}");
-    } else {
-      throw Exception('Une erreur est survenue lors de la réinitialisation du mot de passe');
-      
+      } else {
+        // Afficher une alerte pour d'autres erreurs
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Erreur'),
+              content: Text(
+                  'Une erreur est survenue lors de la vérification du code.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (e) {
+      // Afficher une alerte pour les erreurs de connexion
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Erreur de connexion'),
+            content: Text('Une erreur est survenue lors de la connexion .'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     }
-  } catch (e) {
-    throw Exception('Une erreur est survenue : $e');
   }
-}
-  
-  
+
+  static Future<void> verifyOtpCodeEmail(
+      String emailActeur, String resetToken, BuildContext context) async {
+    final Uri url = Uri.parse(
+        '$baseUrl/verifierOtpCodeEmail?emailActeur=$emailActeur&resetToken=$resetToken');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        // Afficher une alerte de succès
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Succès'),
+              content: Text('Le code a été vérifié avec succès.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      } else if (response.statusCode == 400 || response.statusCode == 500) {
+        // Extraire le message d'erreur du corps de la réponse
+        final Map<String, dynamic> body = json.decode(response.body);
+        final String errorMessage = body['message'] ?? 'Le code est incorrect.';
+
+        // Afficher une alerte d'erreur avec le message spécifique
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Erreur'),
+              content: Text(errorMessage),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        // Afficher une alerte pour d'autres erreurs
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Erreur'),
+              content: Text(
+                  'Une erreur est survenue lors de la vérification du code.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (e) {
+      // Afficher une alerte pour les erreurs de connexion
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Erreur de connexion'),
+            content: Text('Une erreur est survenue lors de la connexion .'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  static Future<void> resetPasswordEmail(
+      String emailActeur, String password) async {
+    final Uri url = Uri.parse(
+        '$baseUrl/resetPasswordEmail?emailActeur=$emailActeur&password=$password');
+
+    try {
+      final response = await http.put(url);
+
+      if (response.statusCode == 200) {
+        // Mot de passe réinitialisé avec succès
+        debugPrint("Succès email password update: ${response.statusCode}");
+      } else if (response.statusCode == 500) {
+        // Erreur serveur
+        debugPrint(
+            "Erreur email password update echouer : ${response.statusCode}");
+      } else {
+        throw Exception(
+            'Une erreur est survenue lors de la réinitialisation du mot de passe');
+      }
+    } catch (e) {
+      throw Exception('Une erreur est survenue : $e');
+    }
+  }
+
 //   static Future<Map<String, dynamic>> resetPasswordEmail(String email, String password) async {
 //   // Endpoint URL
 //   String url = '$baseUrl/resetPasswordEmail';
@@ -540,26 +546,30 @@ static Future<void> verifyOtpCodeEmail(String emailActeur, String resetToken, Bu
 //   }
 // }
 
-   static Future<void> resetPasswordWhatsApp(String whatsAppActeur, String password) async {
-  final Uri url = Uri.parse('$baseUrl/resetPasswordWhatsApp?whatsAppActeur=$whatsAppActeur&password=$password');
-  
-  try {
-    final response = await http.put(url);
+  static Future<void> resetPasswordWhatsApp(
+      String whatsAppActeur, String password) async {
+    final Uri url = Uri.parse(
+        '$baseUrl/resetPasswordWhatsApp?whatsAppActeur=$whatsAppActeur&password=$password');
 
-    if (response.statusCode == 200) {
-      // Mot de passe réinitialisé avec succès
-      debugPrint("Succès whats App password update réussi : ${response.statusCode}");
-    } else if (response.statusCode == 500) {
-      // Erreur serveur
-      debugPrint("Erreur whats App password update echoué : ${response.statusCode}");
-    } else {
-      throw Exception('Une erreur est survenue lors de la réinitialisation du mot de passe');
+    try {
+      final response = await http.put(url);
+
+      if (response.statusCode == 200) {
+        // Mot de passe réinitialisé avec succès
+        debugPrint(
+            "Succès whats App password update réussi : ${response.statusCode}");
+      } else if (response.statusCode == 500) {
+        // Erreur serveur
+        debugPrint(
+            "Erreur whats App password update echoué : ${response.statusCode}");
+      } else {
+        throw Exception(
+            'Une erreur est survenue lors de la réinitialisation du mot de passe');
+      }
+    } catch (e) {
+      throw Exception('Une erreur est survenue : $e');
     }
-  } catch (e) {
-    throw Exception('Une erreur est survenue : $e');
   }
-}
-
 
   Future<List<Acteur>> fetchActeur() async {
     try {
@@ -594,9 +604,11 @@ static Future<void> verifyOtpCodeEmail(String emailActeur, String resetToken, Bu
   }
 
   Future activerActeur(String idActeur) async {
-    final response = await http.delete(Uri.parse('$baseUrl/enable/$idActeur'));
+    final response = await http.put(Uri.parse('$baseUrl/enable/$idActeur'));
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200 ||
+        response.statusCode == 201 ||
+        response.statusCode == 202) {
       applyChange();
     } else {
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
@@ -605,9 +617,11 @@ static Future<void> verifyOtpCodeEmail(String emailActeur, String resetToken, Bu
   }
 
   Future desactiverActeur(String idActeur) async {
-    final response = await http.delete(Uri.parse('$baseUrl/disable/$idActeur'));
+    final response = await http.put(Uri.parse('$baseUrl/disable/$idActeur'));
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200 ||
+        response.statusCode == 201 ||
+        response.statusCode == 202) {
       applyChange();
     } else {
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
@@ -615,7 +629,8 @@ static Future<void> verifyOtpCodeEmail(String emailActeur, String resetToken, Bu
     }
   }
 
-  Future<Acteur> addTypesToActeur(String idActeur, List<TypeActeur> typeActeurs) async {
+  Future<Acteur> addTypesToActeur(
+      String idActeur, List<TypeActeur> typeActeurs) async {
     final response = await http.post(
       Uri.parse('$baseUrl/addTypesToActeur/$idActeur'),
       body: json.encode(typeActeurs.map((type) => type.toJson()).toList()),
@@ -674,7 +689,7 @@ static Future<void> verifyOtpCodeEmail(String emailActeur, String resetToken, Bu
       headers: {'Content-Type': 'application/json'},
     );
 
-   if (response.statusCode != 200) {
+    if (response.statusCode != 200) {
       throw Exception('Impossible envoyé le message ${response.statusCode}');
     }
   }
@@ -692,7 +707,6 @@ static Future<void> verifyOtpCodeEmail(String emailActeur, String resetToken, Bu
     }
   }
 
-  
   void applyChange() {
     notifyListeners();
   }
