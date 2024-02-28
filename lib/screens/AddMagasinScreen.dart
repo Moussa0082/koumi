@@ -89,23 +89,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
     });
   });
 
-     showDialog(
-            context:  context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Center(child: Text('Succès')),
-                content:const  Text("Magasin ajouté avec succès"),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                        },
-                    child:const  Text('OK'),
-                  ),
-                ],
-              );
-            },
-           );
+    
    
    
   }
@@ -125,6 +109,25 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                                 acteur: acteur ,
                                 photo: photos,
                                 niveau1Pays: niveau1Pays
+                                ).then((value) => 
+                                
+                                 showDialog(
+            context:  context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Center(child: Text('Succès')),
+                content:const  Text("Magasin ajouté avec succès"),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                        },
+                    child:const  Text('OK'),
+                  ),
+                ],
+              );
+            },
+           )
                                 );
           
                       }else{
@@ -156,7 +159,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
             },
           );
                               
-                 }
+        }
 
    }
 
@@ -426,8 +429,40 @@ Future<void> _pickImage(ImageSource source) async {
                           onPressed: () async{
                             // Handle button press action here
                            if(_formKey.currentState!.validate()){
-                             
-                             _handleButtonPress();
+                          final nomMagasin = nomMagasinController.text;
+                            final contactMagasin = contactMagasinController.text;
+                            final localiteMagasin = localiteMagasinController.text;
+
+                            if(photos != null){
+                                try {
+        
+                              await MagasinService().creerMagasin(
+                                nomMagasin: nomMagasin,
+                               contactMagasin: contactMagasin,
+                                localiteMagasin: localiteMagasin, 
+                                acteur: acteur ,
+                                photo: photos,
+                                niveau1Pays: niveau1Pays
+                                );
+                           }catch(e){
+                              print(e.toString());
+                           }
+                          
+                            }else{
+try {
+        
+                              await MagasinService().creerMagasin(
+                                nomMagasin: nomMagasin,
+                               contactMagasin: contactMagasin,
+                                localiteMagasin: localiteMagasin, 
+                                acteur: acteur ,
+                                niveau1Pays: niveau1Pays
+                                );
+                           }catch(e){
+                              print(e.toString());
+                           }
+                            }   
+                          
                            }
                           },
                           style: ElevatedButton.styleFrom(

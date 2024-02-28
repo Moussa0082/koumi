@@ -110,7 +110,6 @@ class _ProduitScreenState extends State<ProduitScreen>
       fetchCategorie();
       // fetchProduitByCategorie(selectedCategorieProduit);
     }
-    _buildShimmerEffect();
   }
 
   @override

@@ -17,11 +17,11 @@ class MagasinService extends ChangeNotifier{
     static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Magasin';
 
 
-     Future<void> creerMagasin({
-  required String nomMagasin,
+  Future<void> creerMagasin({
+    required String nomMagasin,
     required String contactMagasin,
     required String localiteMagasin,
-     File? photo,
+    File? photo,
     required Acteur acteur,
     required Niveau1Pays niveau1Pays,
   }) async {

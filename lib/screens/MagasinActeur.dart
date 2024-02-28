@@ -107,7 +107,6 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>  with TickerP
       selectedRegionId = idNiveau1Pays[_tabController!.index];
     }
     fetchRegions();
-    _buildShimmerEffect();
   }
 
        @override

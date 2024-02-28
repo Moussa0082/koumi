@@ -241,7 +241,8 @@ class _AddZoneState extends State<AddZone> {
                         icon: const Icon(
                           Icons.add_a_photo_rounded,
                           size: 100,
-                        )),
+                        ),
+                    ),
                   ),
                   const SizedBox(height: 40),
                   ElevatedButton.icon(
