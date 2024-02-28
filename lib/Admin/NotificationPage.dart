@@ -58,6 +58,53 @@ class _NotificationPageState extends State<NotificationPage> {
               style:
                   TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
             ),
+            actions: [
+              PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                itemBuilder: (context) => <PopupMenuEntry<String>>[
+                  PopupMenuItem<String>(
+                    child: ListTile(
+                      leading: const Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                      ),
+                      title: const Text(
+                        "Vider la liste",
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onTap: () async {
+                        await MessageService()
+                            .deleteAllMessages()
+                            .then((value) => {
+                                  Provider.of<MessageService>(context,
+                                          listen: false)
+                                      .applyChange(),
+                                  setState(() {
+                                    _liste = getMessage();
+                                  }),
+                                  Navigator.of(context).pop(),
+                                })
+                            .catchError((onError) => {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Row(
+                                        children: [
+                                          Text("Impossible de supprimer"),
+                                        ],
+                                      ),
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  )
+                                });
+                      },
+                    ),
+                  ),
+                ],
+              )
+            ],
           ),
           body: SingleChildScrollView(
             child: Column(children: [
@@ -113,7 +160,20 @@ class _NotificationPageState extends State<NotificationPage> {
                         return Padding(
                           padding: EdgeInsets.all(10),
                           child: Center(
-                            child: Image.asset('assets/images/notif.jpg'),
+                            child: Column(
+                              children: [
+                                Image.asset('assets/images/notif.jpg'),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text('Aucune notification ',
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 17,
+                                      overflow: TextOverflow.ellipsis,
+                                    ))
+                              ],
+                            ),
                           ),
                         );
                       } else {
@@ -181,36 +241,42 @@ class _NotificationPageState extends State<NotificationPage> {
                                                         ),
                                                       ),
                                                       onTap: () async {
-                                                        // await Niveau2Service()
-                                                        //     .deleteNiveau2Pays(e
-                                                        //         .idNiveau2Pays!)
-                                                        //     .then(
-                                                        //         (value) => {
-                                                        //               Provider.of<Niveau2Service>(context, listen: false)
-                                                        //                   .applyChange(),
-                                                        //               setState(
-                                                        //                   () {
-                                                        //                 _liste =
-                                                        //                     Niveau2Service().fetchNiveau2ByNiveau1(widget.niveau1pays.idNiveau1Pays!);
-                                                        //               }),
-                                                        //               Navigator.of(context)
-                                                        //                   .pop(),
-                                                        //             })
-                                                        //     .catchError(
-                                                        //         (onError) =>
-                                                        //             {
-                                                        //               ScaffoldMessenger.of(context)
-                                                        //                   .showSnackBar(
-                                                        //                 const SnackBar(
-                                                        //                   content: Row(
-                                                        //                     children: [
-                                                        //                       Text("Impossible de supprimer"),
-                                                        //                     ],
-                                                        //                   ),
-                                                        //                   duration: Duration(seconds: 2),
-                                                        //                 ),
-                                                        //               )
-                                                        //             });
+                                                        await MessageService()
+                                                            .deleteMessage(
+                                                                e.idMessage)
+                                                            .then((value) => {
+                                                                  Provider.of<MessageService>(
+                                                                          context,
+                                                                          listen:
+                                                                              false)
+                                                                      .applyChange(),
+                                                                  setState(() {
+                                                                    _liste =
+                                                                        getMessage();
+                                                                  }),
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop(),
+                                                                })
+                                                            .catchError(
+                                                                (onError) => {
+                                                                      print(onError
+                                                                          .toString()),
+                                                                      ScaffoldMessenger.of(
+                                                                              context)
+                                                                          .showSnackBar(
+                                                                        const SnackBar(
+                                                                          content:
+                                                                              Row(
+                                                                            children: [
+                                                                              Text("Impossible de supprimer"),
+                                                                            ],
+                                                                          ),
+                                                                          duration:
+                                                                              Duration(seconds: 2),
+                                                                        ),
+                                                                      )
+                                                                    });
                                                       },
                                                     ),
                                                   ),

@@ -10,6 +10,7 @@ import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/ContinentService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
+import 'package:koumi_app/service/MessageService.dart';
 import 'package:koumi_app/service/Niveau1Service.dart';
 import 'package:koumi_app/service/Niveau2Service.dart';
 import 'package:koumi_app/service/Niveau3Service.dart';
@@ -31,6 +32,7 @@ void main() {
     ChangeNotifierProvider(create: (context) => ActeurService()),
     ChangeNotifierProvider(create: (context) => TypeActeurService()),
     ChangeNotifierProvider(create: (context) => ActeurProvider()),
+    ChangeNotifierProvider(create: (context) => MessageService()),
     ChangeNotifierProvider(create: (context) => StockService()),
     ChangeNotifierProvider(create: (context) => ParametreGenerauxService()),
     ChangeNotifierProvider(create: (context) => ParametreGenerauxProvider()),

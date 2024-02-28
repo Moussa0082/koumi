@@ -59,6 +59,19 @@ Future<List<MessageWa>> fetchMessage() async {
           "Erreur lors de la suppression avec le code: ${response.statusCode}");
     }
   }
+
+  Future<void> deleteAllMessages() async {
+    final response =
+        await http.delete(Uri.parse("$baseUrl/deleteAllMessage"));
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      applyChange();
+      debugPrint(response.body.toString());
+    } else {
+      throw Exception(
+          "Erreur lors de la suppression avec le code: ${response.statusCode}");
+    }
+  }
+  
   void applyChange() {
     notifyListeners();
   }
