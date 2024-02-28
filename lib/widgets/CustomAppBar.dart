@@ -87,17 +87,18 @@ class _CustomAppBarState extends State<CustomAppBar> {
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.orange,
-                            ),
-                          );
+                          return Text("0",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w800,
+                              ));
                         }
 
                         if (!snapshot.hasData) {
                           return Text("0",
                               style: TextStyle(
-                                color: Colors.black87,
+                                color: Colors.white,
                                 fontSize: 17,
                                 fontWeight: FontWeight.w800,
                               ));
