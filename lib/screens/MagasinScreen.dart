@@ -1,11 +1,10 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/screens/AddMagasinScreen.dart';
 import 'package:koumi_app/screens/Produit.dart';
 import 'package:shimmer/shimmer.dart';
-
 
 class MagasinScreen extends StatefulWidget {
   const MagasinScreen({super.key});
@@ -13,101 +12,109 @@ class MagasinScreen extends StatefulWidget {
   @override
   State<MagasinScreen> createState() => _MagasinScreenState();
 }
-class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateMixin {
-    // Déclarez une variable pour suivre si le chargement est terminé
+
+class _MagasinScreenState extends State<MagasinScreen>
+    with TickerProviderStateMixin {
+  // Déclarez une variable pour suivre si le chargement est terminé
   bool _loadingFinished = false;
 
   TabController? _tabController;
-    late TextEditingController _searchController;
+  late TextEditingController _searchController;
 
   List<String> regions = [];
   List<String> idNiveau1Pays = [];
-   String selectedRegionId = ''; // Ajoutez une variable pour stocker l'ID de la région sélectionnée
-  
+  String selectedRegionId =
+      ''; // Ajoutez une variable pour stocker l'ID de la région sélectionnée
+
   Map<String, List<Map<String, dynamic>>> magasinsParRegion = {};
 
   List<Map<String, dynamic>> regionsData = [];
   List<String> magasins = [];
 
-  Set<String> loadedRegions = {}; // Ensemble pour garder une trace des régions pour lesquelles les magasins ont déjà été chargés
+  Set<String> loadedRegions =
+      {}; // Ensemble pour garder une trace des régions pour lesquelles les magasins ont déjà été chargés
 
   void fetchRegions() async {
-  try {
-    final response = await http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
-      
-      // Filtrer les éléments avec statutN1 == true
-      List<dynamic> filteredData = data.where((item) => item['statutN1'] == true).toList();
-      
-      setState(() {
-        regionsData = filteredData.cast<Map<String, dynamic>>();
-        regions = regionsData.map((item) => item['nomN1'] as String).toList();
-        idNiveau1Pays = regionsData.map((item) => item['idNiveau1Pays'] as String).toList();
-      });
-      
-      _tabController = TabController(length: regions.length, vsync: this);
-      _tabController!.addListener(_handleTabChange);
-      
-      // Fetch les magasins pour la première région
-      fetchMagasinsByRegion(idNiveau1Pays.isNotEmpty ? idNiveau1Pays[_tabController!.index] : '');
-    } else {
-      throw Exception('Failed to load regions');
-    }
-  } catch (e) {
-    print('Error fetching regions: $e');
-  }
-}
+    try {
+      final response = await http
+          .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
 
+        // Filtrer les éléments avec statutN1 == true
+        List<dynamic> filteredData =
+            data.where((item) => item['statutN1'] == true).toList();
+
+        setState(() {
+          regionsData = filteredData.cast<Map<String, dynamic>>();
+          regions = regionsData.map((item) => item['nomN1'] as String).toList();
+          idNiveau1Pays = regionsData
+              .map((item) => item['idNiveau1Pays'] as String)
+              .toList();
+        });
+
+        _tabController = TabController(length: regions.length, vsync: this);
+        _tabController!.addListener(_handleTabChange);
+
+        // Fetch les magasins pour la première région
+        fetchMagasinsByRegion(idNiveau1Pays.isNotEmpty
+            ? idNiveau1Pays[_tabController!.index]
+            : '');
+      } else {
+        throw Exception('Failed to load regions');
+      }
+    } catch (e) {
+      print('Error fetching regions: $e');
+    }
+  }
 
   void fetchMagasinsByRegion(String id) async {
-  try {
-    final response = await http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
-      List<Map<String, dynamic>> magasins = data
-          .where((magasin) => magasin['statutMagasin'] == true) // Filtrer les magasins actifs
-          .map<Map<String, dynamic>>((item) => {
-            'nomMagasin': item['nomMagasin'],
-            'idMagasin': item['idMagasin'],
-            'photo': item['photo'],
-          })
-          .toList();
-      setState(() {
-        magasinsParRegion[id] = magasins;
-      });
-      if (!loadedRegions.contains(id)) {
-        loadedRegions.add(id);
+    try {
+      final response = await http.get(Uri.parse(
+          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        List<Map<String, dynamic>> magasins = data
+            .where((magasin) =>
+                magasin['statutMagasin'] == true) // Filtrer les magasins actifs
+            .map<Map<String, dynamic>>((item) => {
+                  'nomMagasin': item['nomMagasin'],
+                  'idMagasin': item['idMagasin'],
+                  'photo': item['photo'],
+                })
+            .toList();
+        setState(() {
+          magasinsParRegion[id] = magasins;
+        });
+        if (!loadedRegions.contains(id)) {
+          loadedRegions.add(id);
+        }
+      } else {
+        throw Exception('Failed to load magasins for region $id');
       }
-    } else {
-      throw Exception('Failed to load magasins for region $id');
+    } catch (e) {
+      print('Error fetching magasins for region $id: $e');
     }
-  } catch (e) {
-    print('Error fetching magasins for region $id: $e');
   }
-}
 
- void _handleTabChange() {
-  if (_tabController != null && _tabController!.index >= 0 && _tabController!.index < idNiveau1Pays.length) {
-    String selectedRegionId = idNiveau1Pays[_tabController!.index];
-    fetchMagasinsByRegion(selectedRegionId);
+  void _handleTabChange() {
+    if (_tabController != null &&
+        _tabController!.index >= 0 &&
+        _tabController!.index < idNiveau1Pays.length) {
+      String selectedRegionId = idNiveau1Pays[_tabController!.index];
+      fetchMagasinsByRegion(selectedRegionId);
+    }
   }
-}
 
   @override
   void initState() {
     super.initState();
-     _searchController = TextEditingController();
-     if (idNiveau1Pays.isNotEmpty) {
+    _searchController = TextEditingController();
+    if (idNiveau1Pays.isNotEmpty) {
       selectedRegionId = idNiveau1Pays[_tabController!.index];
     }
     fetchRegions();
-    _buildShimmerEffect();
-   
   }
-
-  
-
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +123,7 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
         length: regions.length,
         child: Scaffold(
           appBar: AppBar(
-            centerTitle:true,
+            centerTitle: true,
             title: Text('Tous les boutiques'),
             bottom: TabBar(
               isScrollable: regions.length > 4,
@@ -124,42 +131,70 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
               controller: _tabController, // Ajoutez le contrôleur TabBar
               tabs: regions.map((region) => Tab(text: region)).toList(),
             ),
+            actions: [
+              PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                itemBuilder: (context) => <PopupMenuEntry<String>>[
+                  PopupMenuItem<String>(
+                    child: ListTile(
+                      leading: const Icon(
+                        Icons.add,
+                        color: Colors.green,
+                      ),
+                      title: const Text(
+                        "Ajouter Magasin",
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onTap: () async {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddMagasinScreen()));
+                      },
+                    ),
+                  ),
+                ],
+              )
+            ],
           ),
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                const SizedBox(height:10),
-                 SizedBox(
-                     height:40,
-                   child: Container(
-                     padding: EdgeInsets.only(left: 5),
-                     decoration: BoxDecoration(
-                       color: Color.fromARGB(255, 245, 212, 169),
-                       borderRadius: BorderRadius.circular(30),
-                                    
-                     ),
-                     child: TextField(
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 40,
+                  child: Container(
+                    padding: EdgeInsets.only(left: 5),
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(255, 245, 212, 169),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: TextField(
                       controller: _searchController,
-                       onChanged: (value) {
-                              setState(() {
-                                // Le changement de texte déclenche la reconstruction du widget
-                              });
-                            },
-                       decoration: InputDecoration(
-                         hintText: 'Rechercher',
-                         contentPadding: EdgeInsets.all(10),
-                         border: InputBorder.none,
-                       ),
-                     ),
-                   ),
-                 ),
-                const SizedBox(height:10),
+                      onChanged: (value) {
+                        setState(() {
+                          // Le changement de texte déclenche la reconstruction du widget
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Rechercher',
+                        contentPadding: EdgeInsets.all(10),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
                 // const SizedBox(height:10),
                 Flexible(
                   child: GestureDetector(
                     child: TabBarView(
-                      controller: _tabController, // Ajoutez le contrôleur TabBarView
+                      controller:
+                          _tabController, // Ajoutez le contrôleur TabBarView
                       children: idNiveau1Pays.map((region) {
                         return buildGridView(region);
                       }).toList(),
@@ -207,17 +242,21 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
         ),
         itemCount: filteredMagasins.length,
         itemBuilder: (context, index) {
-          // ici on a recuperer les details du  magasin 
-            Map<String, dynamic> magasin = filteredMagasins[index];
+          // ici on a recuperer les details du  magasin
+          Map<String, dynamic> magasin = filteredMagasins[index];
           return Container(
             child: GestureDetector(
-              onTap:(){
-                 String id = magasin['idMagasin'];
-                 String nom = magasin['nomMagasin'];
+              onTap: () {
+                String id = magasin['idMagasin'];
+                String nom = magasin['nomMagasin'];
                 Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => ProduitScreen(id:id, nom: nom,)),
-          );
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProduitScreen(
+                            id: id,
+                            nom: nom,
+                          )),
+                );
               },
               child: Card(
                 shadowColor: Colors.white,
@@ -227,15 +266,18 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
                       children: [
                         Container(
                           width: double.infinity,
-                          child: Image.asset('assets/images/rectangle.png', width:double.infinity),
+                          child: Image.asset('assets/images/rectangle.png',
+                              width: double.infinity),
                         ),
                         Container(
                           child: Image.network(
-                            filteredMagasins[index]['photo'] ?? 'assets/images/magasin.png',
+                            filteredMagasins[index]['photo'] ??
+                                'assets/images/magasin.png',
                             width: double.infinity,
                             height: null,
                             fit: BoxFit.cover,
-                            errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                            errorBuilder: (BuildContext context,
+                                Object exception, StackTrace? stackTrace) {
                               return Image.asset(
                                 'assets/images/magasin.png',
                                 width: double.infinity,
@@ -248,21 +290,25 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
                       ],
                     ),
                     Text(
-                      overflow:TextOverflow.ellipsis,
-                      filteredMagasins[index]['nomMagasin'].toString().toUpperCase() ?? 'Pas de nom défini',
+                      overflow: TextOverflow.ellipsis,
+                      filteredMagasins[index]['nomMagasin']
+                              .toString()
+                              .toUpperCase() ??
+                          'Pas de nom défini',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-              //      TextButton(
-              //   style: ButtonStyle(
-              //     fixedSize: MaterialStateProperty.all(Size(20, 10)),
-              //     shape: MaterialStateProperty.all(RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(50.0),
-              //     )),
-              //   ),
-              //   onPressed: null,
-              //   child: Text('Voir', style: TextStyle(fontWeight: FontWeight.bold),),
-              // ),
+                    //      TextButton(
+                    //   style: ButtonStyle(
+                    //     fixedSize: MaterialStateProperty.all(Size(20, 10)),
+                    //     shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    //       borderRadius: BorderRadius.circular(50.0),
+                    //     )),
+                    //   ),
+                    //   onPressed: null,
+                    //   child: Text('Voir', style: TextStyle(fontWeight: FontWeight.bold),),
+                    // ),
                   ],
                 ),
               ),
@@ -296,6 +342,3 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
     );
   }
 }
-
-
-

@@ -17,13 +17,13 @@ class MagasinService extends ChangeNotifier{
     static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Magasin';
 
 
-    static Future<void> creerMagasin({
-  required String nomMagasin,
+  Future<void> creerMagasin({
+    required String nomMagasin,
     required String contactMagasin,
     required String localiteMagasin,
-     File? photo,
+    File? photo,
     required Acteur acteur,
-    required Niveau1Pays niveau1pays,
+    required Niveau1Pays niveau1Pays,
   }) async {
     try {
 
@@ -46,7 +46,7 @@ class MagasinService extends ChangeNotifier{
       'localiteMagasin': localiteMagasin,
       'photo': photo,
       'acteur': acteur.toMap(),
-      'niveau1Pays': niveau1pays.toMap()
+      'niveau1Pays': niveau1Pays.toMap()
       });
  
       var response = await requete.send();
