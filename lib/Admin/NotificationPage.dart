@@ -300,27 +300,27 @@ class _NotificationPageState extends State<NotificationPage> {
       floatingWidget: FloatingActionButton(
         backgroundColor: d_colorGreen,
         onPressed: () {
-          PopupMenuButton<String>(
-            padding: EdgeInsets.zero,
-            itemBuilder: (context) => <PopupMenuEntry<String>>[
-              PopupMenuItem<String>(
-                child: ListTile(
-                  // leading: const Icon(
-                  //   Icons.delete,
-                  //   color: Colors.red,
-                  // ),
-                  title: const Text(
-                    "Envoyer un message à tous le monde",
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  onTap: () async {},
-                ),
-              ),
-            ],
-          );
+          // PopupMenuButton<String>(
+          //   padding: EdgeInsets.zero,
+          //   itemBuilder: (context) => <PopupMenuEntry<String>>[
+          //     PopupMenuItem<String>(
+          //       child: ListTile(
+          //         // leading: const Icon(
+          //         //   Icons.delete,
+          //         //   color: Colors.red,
+          //         // ),
+          //         title: const Text(
+          //           "Envoyer un message à tous le monde",
+          //           style: TextStyle(
+          //             color: Colors.red,
+          //             fontWeight: FontWeight.bold,
+          //           ),
+          //         ),
+          //         onTap: () async {},
+          //       ),
+          //     ),
+          //   ],
+          // );
         },
         child: const Icon(
           Icons.add,
