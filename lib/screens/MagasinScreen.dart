@@ -28,13 +28,12 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
 
   List<Map<String, dynamic>> regionsData = [];
   List<String> magasins = [];
-  int currentIndex = 0;
 
   Set<String> loadedRegions = {}; // Ensemble pour garder une trace des régions pour lesquelles les magasins ont déjà été chargés
 
   void fetchRegions() async {
   try {
-    final response = await http.get(Uri.parse('http://10.0.2.2:9000/niveau1Pays/read'));
+    final response = await http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       
@@ -63,7 +62,7 @@ class _MagasinScreenState extends State<MagasinScreen> with TickerProviderStateM
 
   void fetchMagasinsByRegion(String id) async {
   try {
-    final response = await http.get(Uri.parse('http://10.0.2.2:9000/Magasin/getAllMagasinByPays/${id}'));
+    final response = await http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       List<Map<String, dynamic>> magasins = data

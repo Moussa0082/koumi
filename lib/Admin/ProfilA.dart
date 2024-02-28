@@ -316,7 +316,7 @@ class _ProfilAState extends State<ProfilA> {
     // context,
     // MaterialPageRoute(builder: (context) => LoginScreen()),
     //                        );
-     Navigator.of(context, rootNavigator: true).pushReplacement(MaterialPageRoute(builder: (context) => new LoginScreen()));
+     Navigator.of(context, rootNavigator: true).pushReplacement(MaterialPageRoute(builder: (context) => const LoginScreen()));
 
                     },
                     style: ElevatedButton.styleFrom(

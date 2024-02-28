@@ -28,6 +28,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
   ];
+  
   List pages = <Widget>[
     const AcceuilAdmin(),
     const ProduitA(),

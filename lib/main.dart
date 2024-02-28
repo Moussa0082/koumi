@@ -83,9 +83,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
         useMaterial3: true,
       ),
-      // routes: {
-      //   '/BottomNavigationPage': (context) => const BottomNavigationPage()
-      // },
+      routes: {
+        '/BottomNavigationPage': (context) => const BottomNavigationPage()
+      },
       home: const SplashScreen(),
     );
   }

@@ -35,7 +35,7 @@ class _ProduitActeurScreenState extends State<ProduitActeurScreen>  with TickerP
   void fetchProduitByCategorie(String idCategorie, String idMagasin,String idActeur) async {
     try {
       final response = await http.get(
-          Uri.parse('http://10.0.2.2:9000/Stock/categorieAndActeur/$idCategorie/$idMagasin/$idActeur'));
+          Uri.parse('http://10.0.2.2:9000/api-koumi/Stock/categorieAndActeur/$idCategorie/$idMagasin/$idActeur'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {

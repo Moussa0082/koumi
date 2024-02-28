@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/AddMagasinScreen.dart';
 import 'package:koumi_app/screens/Produit.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -35,7 +36,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>  with TickerP
 
   void fetchRegions() async {
   try {
-    final response = await http.get(Uri.parse('http://10.0.2.2:9000/niveau1Pays/read'));
+    final response = await http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       
@@ -64,7 +65,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>  with TickerP
 
   void fetchMagasinsByRegionAndActeur(String idActeur,String idNiveau1Pays) async {
   try {
-    final response = await http.get(Uri.parse('http://10.0.2.2:9000/Magasin/getAllMagasinByActeurAndNieau1Pays/${idActeur}/${idNiveau1Pays}'));
+    final response = await http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNieau1Pays/${idActeur}/${idNiveau1Pays}'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       List<Map<String, dynamic>> magasins = data
@@ -149,9 +150,12 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>  with TickerP
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  onTap: () async {
-                    // _showDialog();
-                  },
+                  onTap: ()  {
+                    Navigator.pop(context);
+   Navigator.push(context, MaterialPageRoute(builder: (context)=> AddMagasinScreen()));
+ // Fermer le menu contextuel après un court délai
+
+            },
                 ),
               ),
               PopupMenuItem<String>(

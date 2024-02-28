@@ -53,10 +53,10 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
     niveau = widget.niveau2pays;
     libelleController.text = niveau.nomN2;
     descriptionController.text = niveau.descriptionN2;
-    niveau1 = niveau.niveau1Pays!;
-    n1Value = niveau.niveau1Pays!.idNiveau1Pays;
-    paysValue = niveau.niveau1Pays!.pays.idPays;
-    pays = niveau.niveau1Pays!.pays;
+    niveau1 = niveau.niveau1Pays;
+    n1Value = niveau.niveau1Pays.idNiveau1Pays;
+    paysValue = niveau.niveau1Pays.pays!.idPays;
+    pays = niveau.niveau1Pays.pays!;
   }
 
   @override
@@ -198,7 +198,7 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                               .map(
                                 (e) => DropdownMenuItem(
                                   value: e.idNiveau1Pays,
-                                  child: Text(e.nomN1),
+                                  child: Text(e.nomN1!),
                                 ),
                               )
                               .toList(),

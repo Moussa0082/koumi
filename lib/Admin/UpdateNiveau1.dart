@@ -41,10 +41,10 @@ class _UpdatesNiveau1State extends State<UpdatesNiveau1> {
     _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
 
     niveau = widget.niveau1pays;
-    libelleController.text = niveau.nomN1;
-    descriptionController.text = niveau.descriptionN1;
-    paysValue = niveau.pays.idPays;
-    pays = niveau.pays;
+    libelleController.text = niveau.nomN1!;
+    descriptionController.text = niveau.descriptionN1!;
+    paysValue = niveau.pays!.idPays;
+    pays = niveau.pays!;
   }
 
   @override
