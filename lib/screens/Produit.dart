@@ -57,7 +57,7 @@ class _ProduitScreenState extends State<ProduitScreen>
   void fetchCategorie() async {
     try {
       final response = await http
-          .get(Uri.parse('http://10.0.2.2:9000/Categorie/allCategorie'));
+          .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {
@@ -110,6 +110,7 @@ class _ProduitScreenState extends State<ProduitScreen>
       fetchCategorie();
       // fetchProduitByCategorie(selectedCategorieProduit);
     }
+    _buildShimmerEffect();
   }
 
   @override

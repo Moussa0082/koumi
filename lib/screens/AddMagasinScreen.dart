@@ -30,7 +30,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
    String niveau3PaysMagasin = "";
    String localiteMagasin = "";
 
-     File? photo;
+     File? photos;
   String? imageSrc;
 
   late Niveau1Pays niveau1Pays;
@@ -88,26 +88,8 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
       _isLoading = false;
     });
   });
-   
-  }
 
-
-   Future<void> addMagasin() async{
-     final nomMagasin = nomMagasinController.text;
-                            final contactMagasin = contactMagasinController.text;
-                            final localiteMagasin = localiteMagasinController.text;
-                            MagasinService magasinService = MagasinService();
-                            try {
-                              if(photo != null){
-                              await MagasinService.creerMagasin(
-                                nomMagasin: nomMagasin,
-                               contactMagasin: contactMagasin,
-                                localiteMagasin: localiteMagasin, 
-                                acteur: acteur ,
-                                photo: photo as File,
-                                niveau1pays: niveau1Pays
-                                );
-           showDialog(
+     showDialog(
             context:  context,
             builder: (BuildContext context) {
               return AlertDialog(
@@ -124,16 +106,38 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
               );
             },
            );
+   
+   
+  }
+
+
+   Future<void> addMagasin() async{
+     final nomMagasin = nomMagasinController.text;
+                            final contactMagasin = contactMagasinController.text;
+                            final localiteMagasin = localiteMagasinController.text;
+                            MagasinService magasinService = MagasinService();
+                            try {
+                              if(photos != null){
+                              await magasinService.creerMagasin(
+                                nomMagasin: nomMagasin,
+                               contactMagasin: contactMagasin,
+                                localiteMagasin: localiteMagasin, 
+                                acteur: acteur ,
+                                photo: photos,
+                                niveau1Pays: niveau1Pays
+                                );
+          
                       }else{
                               
-                        await MagasinService.creerMagasin(
+                        await magasinService.creerMagasin(
                           nomMagasin: nomMagasin, 
                           contactMagasin: contactMagasin, 
                           localiteMagasin: localiteMagasin,
                             acteur: acteur, 
-                            niveau1pays: niveau1Pays);
+                            niveau1Pays: niveau1Pays);
                       }
                             } catch (e) {
+                              debugPrint("Erreur : $e");
                                  showDialog(
             context:  context,
             builder: (BuildContext context) {
@@ -176,7 +180,7 @@ Future<void> _pickImage(ImageSource source) async {
   final image = await getImage(source);
   if (image != null) {
     setState(() {
-      this.photo = image;
+      this.photos = image;
       imageSrc = image.path;
     });
   }
@@ -406,10 +410,10 @@ Future<void> _pickImage(ImageSource source) async {
                     onTap: (){
                       _showImageSourceDialog();
                     },
-                    child: (photo == null) ?
+                    child: (photos == null) ?
                     Image.asset("assets/images/cam.png"):
                     Image.file(
-                    photo!,
+                    photos!,
                     height:100,
                     width: 200,
                     fit: BoxFit.cover,

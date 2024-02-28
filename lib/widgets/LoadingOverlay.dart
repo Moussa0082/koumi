@@ -19,6 +19,8 @@ class LoadingOverlay extends StatelessWidget {
                 color: Colors.black.withOpacity(0.5), // Opacité pour l'arrière-plan
                 child: Center(
                   child: CircularProgressIndicator(
+                      backgroundColor: (Color.fromARGB(255, 245, 212, 169)),
+          color: (Colors.orange),
                   ), 
                   // Indicateur de chargement
                 ),
