@@ -127,7 +127,7 @@ Future<void> _pickImage(ImageSource source) async {
   TextEditingController confirmPasswordController = TextEditingController();
 
                        // Fonction pour afficher la boîte de dialogue de chargement
-void showLoadingDialog(BuildContext context) {
+ void showLoadingDialog(BuildContext context) {
   showDialog(
     context: context,
     barrierDismissible: false, // Empêche de fermer la boîte de dialogue en cliquant en dehors
@@ -440,7 +440,7 @@ try {
           context:  context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Center(child: Text('Erreur')),
+              title: const Center(child: Text('Succès')),
               content:const  Text("Inscription réussi avec succès"),
               actions: <Widget>[
                 TextButton(

@@ -1,0 +1,30 @@
+import 'package:flutter/material.dart';
+
+class LoadingOverlay extends StatelessWidget {
+  final bool isLoading;
+  final Widget child;
+
+  const LoadingOverlay({
+    required this.isLoading,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        child,
+        isLoading
+            ? Container(
+                color: Colors.black.withOpacity(0.5), // Opacité pour l'arrière-plan
+                child: Center(
+                  child: CircularProgressIndicator(
+                  ), 
+                  // Indicateur de chargement
+                ),
+              )
+            : SizedBox(), // Utilisé pour cacher l'indicateur de chargement
+      ],
+    );
+  }
+}
