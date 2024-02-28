@@ -126,7 +126,7 @@ class _Niveau1ListState extends State<Niveau1List> {
                       String searchText = "";
                       List<Niveau1Pays> filtereSearch =
                           niveauList.where((search) {
-                        String libelle = search.nomN1.toLowerCase();
+                        String libelle = search.nomN1!.toLowerCase();
                         searchText = _searchController.text.toLowerCase();
                         return libelle.contains(searchText);
                       }).toList();
@@ -154,15 +154,15 @@ class _Niveau1ListState extends State<Niveau1List> {
                                         children: [
                                           ListTile(
                                             leading: CodePays()
-                                                .getFlag(e.pays.nomPays),
-                                            title: Text(e.nomN1.toUpperCase(),
+                                                .getFlag(e.pays!.nomPays),
+                                            title: Text(e.nomN1!.toUpperCase(),
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                 )),
-                                            subtitle: Text(e.descriptionN1,
+                                            subtitle: Text(e.descriptionN1!,
                                                 style: const TextStyle(
                                                   color: Colors.black87,
                                                   fontSize: 17,
@@ -179,7 +179,7 @@ class _Niveau1ListState extends State<Niveau1List> {
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                _buildEtat(e.statutN1),
+                                                _buildEtat(e.statutN1!),
                                                 PopupMenuButton<String>(
                                                   padding: EdgeInsets.zero,
                                                   itemBuilder: (context) =>

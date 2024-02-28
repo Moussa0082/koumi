@@ -61,7 +61,7 @@ class _Niveau2ListState extends State<Niveau2List> {
             },
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: Text(
-          widget.niveau1pays.nomN1.toUpperCase(),
+          widget.niveau1pays.nomN1!.toUpperCase(),
           style:
               const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
@@ -156,7 +156,7 @@ class _Niveau2ListState extends State<Niveau2List> {
                                       children: [
                                         ListTile(
                                           leading: CodePays().getFlag(
-                                              e.niveau1Pays.pays.nomPays),
+                                              e.niveau1Pays.pays!.nomPays),
                                           title: Text(e.nomN2.toUpperCase(),
                                               style: const TextStyle(
                                                 color: Colors.black,

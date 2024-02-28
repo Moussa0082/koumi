@@ -196,13 +196,13 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                         children: [
                                           ListTile(
                                             leading: CodePays().getFlag(
-                                                e.niveau1Pays.pays.nomPays),
+                                                e.niveau1Pays.pays!.nomPays),
                                             title: Text(e.nomN2.toUpperCase(),
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
                                                   overflow:
-                                                      TextOverflow.ellipsis,
+                                                  TextOverflow.ellipsis,
                                                 )),
                                             subtitle: Text(e.descriptionN2,
                                                 style: const TextStyle(
@@ -730,7 +730,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                   .map(
                                     (e) => DropdownMenuItem(
                                       value: e.idNiveau1Pays,
-                                      child: Text(e.nomN1),
+                                      child: Text(e.nomN1!),
                                     ),
                                   )
                                   .toList(),
