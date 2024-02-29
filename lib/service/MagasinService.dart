@@ -7,7 +7,6 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 
 
