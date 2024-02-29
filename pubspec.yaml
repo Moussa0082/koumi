@@ -63,6 +63,8 @@ dependencies:
   country_flags: ^2.2.0
   draggable_fab: ^0.1.4
   floating_draggable_widget: ^2.1.5
+  flutter_speed_dial: ^7.0.0
+  multi_dropdown: ^2.1.4
 
 dev_dependencies:
   flutter_test:

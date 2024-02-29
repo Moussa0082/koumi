@@ -592,8 +592,8 @@ class _SpeculationPageState extends State<SpeculationPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Center(
-                child: Text(
+              ListTile(
+                title: Text(
                   "Ajouter une spéculation",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -601,7 +601,16 @@ class _SpeculationPageState extends State<SpeculationPage> {
                     fontSize: 18,
                   ),
                   textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.red,
+                    size: 24,
+                  ),
                 ),
               ),
               const SizedBox(height: 5),
@@ -656,99 +665,64 @@ class _SpeculationPageState extends State<SpeculationPage> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () async {
-                              final String libelle = libelleController.text;
-                              final String description =
-                                  descriptionController.text;
-                              if (formkey.currentState!.validate()) {
-                                try {
-                                  await SpeculationService()
-                                      .addSpeculation(
-                                          nomSpeculation: libelle,
-                                          descriptionSpeculation: description,
-                                          categorieProduit: cat,
-                                          acteur: acteur)
-                                      .then((value) => {
-                                            Provider.of<SpeculationService>(
-                                                    context,
-                                                    listen: false)
-                                                .applyChange(),
-                                            setState(() {
-                                              _liste = getCatListe(
-                                                  cat.idCategorieProduit!);
-                                            }),
-                                            libelleController.clear(),
-                                            descriptionController.clear(),
-                                            Navigator.of(context).pop()
-                                          });
-                                } catch (e) {
-                                  final String errorMessage = e.toString();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Row(
-                                        children: [
-                                          Text("Une erreur s'est produite"),
-                                        ],
-                                      ),
-                                      duration: Duration(seconds: 5),
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            icon: const Icon(
-                              Icons.add,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              "Ajouter",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        final String libelle = libelleController.text;
+                        final String description = descriptionController.text;
+                        if (formkey.currentState!.validate()) {
+                          try {
+                            await SpeculationService()
+                                .addSpeculation(
+                                    nomSpeculation: libelle,
+                                    descriptionSpeculation: description,
+                                    categorieProduit: cat,
+                                    acteur: acteur)
+                                .then((value) => {
+                                      Provider.of<SpeculationService>(context,
+                                              listen: false)
+                                          .applyChange(),
+                                      setState(() {
+                                        _liste = getCatListe(
+                                            cat.idCategorieProduit!);
+                                      }),
+                                      libelleController.clear(),
+                                      descriptionController.clear(),
+                                      Navigator.of(context).pop()
+                                    });
+                          } catch (e) {
+                            final String errorMessage = e.toString();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Row(
+                                  children: [
+                                    Text("Une erreur s'est produite"),
+                                  ],
+                                ),
+                                duration: Duration(seconds: 5),
                               ),
-                            ),
-                          ),
+                            );
+                          }
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green, // Orange color code
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                        const SizedBox(
-                          width: 5,
+                        minimumSize: const Size(290, 45),
+                      ),
+                      icon: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                      ),
+                      label: const Text(
+                        "Ajouter",
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
                         ),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pop(); // Ferme la boîte de dialogue
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            icon: const Icon(
-                              Icons.close,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              "Annuler",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     )
                   ],
                 ),

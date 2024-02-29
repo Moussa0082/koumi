@@ -194,454 +194,488 @@ class _CategoriPageState extends State<CategoriPage> {
                           return nomCat.contains(searchText);
                         }).toList();
                         return Column(
-                            children: filteredCatSearch
-                                .map((e) => Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 15),
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
+                            children: filteredCatSearch.isEmpty
+                                ? [
+                                    Center(
+                                        child: Text("Aucune catégorie trouvée"))
+                                  ]
+                                : filteredCatSearch
+                                    .map((e) => Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 15),
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
                                                 0.9,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color:
-                                                  Colors.grey.withOpacity(0.2),
-                                              offset: const Offset(0, 2),
-                                              blurRadius: 5,
-                                              spreadRadius: 2,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey
+                                                      .withOpacity(0.2),
+                                                  offset: const Offset(0, 2),
+                                                  blurRadius: 5,
+                                                  spreadRadius: 2,
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                        child: Column(
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () {
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            SpeculationPage(
-                                                                categorieProduit:
-                                                                    e)));
-                                              },
-                                              child: ListTile(
-                                                  leading: _getIconForFiliere(e
-                                                      .filiere!.libelleFiliere),
-                                                  title: Text(
-                                                      e.libelleCategorie
-                                                          .toUpperCase(),
-                                                      style: const TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 20,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      )),
-                                                  subtitle: Text(
-                                                      e.descriptionCategorie!,
-                                                      style: const TextStyle(
-                                                        color: Colors.black87,
-                                                        fontSize: 17,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontStyle:
-                                                            FontStyle.italic,
-                                                      ))),
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 15),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text("Filière appartenant:",
-                                                      style: TextStyle(
-                                                        color: Colors.black87,
-                                                        fontSize: 17,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontStyle:
-                                                            FontStyle.italic,
-                                                      )),
-                                                  Text(
-                                                      e.filiere!.libelleFiliere,
-                                                      style: TextStyle(
-                                                        color: Colors.black87,
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ))
-                                                ],
-                                              ),
-                                            ),
-                                            FutureBuilder(
-                                                future: SpeculationService()
-                                                    .fetchSpeculationByCategorie(
-                                                        e.idCategorieProduit!),
-                                                builder: (context, snapshot) {
-                                                  if (snapshot
-                                                          .connectionState ==
-                                                      ConnectionState.waiting) {
-                                                    return const Center(
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                        color: Colors.orange,
-                                                      ),
-                                                    );
-                                                  }
+                                            child: Column(
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                SpeculationPage(
+                                                                    categorieProduit:
+                                                                        e)));
+                                                  },
+                                                  child: ListTile(
+                                                      leading:
+                                                          _getIconForFiliere(e
+                                                              .filiere!
+                                                              .libelleFiliere),
+                                                      title: Text(
+                                                          e.libelleCategorie
+                                                              .toUpperCase(),
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 20,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          )),
+                                                      subtitle: Text(
+                                                          e.descriptionCategorie!,
+                                                          style: const TextStyle(
+                                                            color:
+                                                                Colors.black87,
+                                                            fontSize: 17,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontStyle: FontStyle
+                                                                .italic,
+                                                          ))),
+                                                ),
+                                                Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 15),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                          "Filière appartenant:",
+                                                          style: TextStyle(
+                                                            color:
+                                                                Colors.black87,
+                                                            fontSize: 17,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontStyle: FontStyle
+                                                                .italic,
+                                                          )),
+                                                      Text(
+                                                          e.filiere!
+                                                              .libelleFiliere,
+                                                          style: TextStyle(
+                                                            color:
+                                                                Colors.black87,
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ))
+                                                    ],
+                                                  ),
+                                                ),
+                                                FutureBuilder(
+                                                    future: SpeculationService()
+                                                        .fetchSpeculationByCategorie(e
+                                                            .idCategorieProduit!),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (snapshot
+                                                              .connectionState ==
+                                                          ConnectionState
+                                                              .waiting) {
+                                                        return const Center(
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                            color:
+                                                                Colors.orange,
+                                                          ),
+                                                        );
+                                                      }
 
-                                                  if (!snapshot.hasData) {
-                                                    return Padding(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 15),
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text(
-                                                              "Nombres de spéculation:",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .black87,
-                                                                fontSize: 17,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                fontStyle:
-                                                                    FontStyle
-                                                                        .italic,
-                                                              )),
-                                                          Text("0",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .black87,
-                                                                fontSize: 18,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w800,
-                                                              ))
-                                                        ],
-                                                      ),
-                                                    );
-                                                  } else {
-                                                    speculationList =
-                                                        snapshot.data!;
-                                                    return Padding(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 15),
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text(
-                                                              "Nombres de spéculation",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .black87,
-                                                                fontSize: 17,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                fontStyle:
-                                                                    FontStyle
-                                                                        .italic,
-                                                              )),
-                                                          Text(
-                                                              speculationList
-                                                                  .length
-                                                                  .toString(),
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .black87,
-                                                                fontSize: 18,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w800,
-                                                              ))
-                                                        ],
-                                                      ),
-                                                    );
-                                                  }
-                                                }),
-                                            Container(
-                                              alignment: Alignment.bottomRight,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
+                                                      if (!snapshot.hasData) {
+                                                        return Padding(
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      15),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              Text(
+                                                                  "Nombres de spéculation:",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .black87,
+                                                                    fontSize:
+                                                                        17,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    fontStyle:
+                                                                        FontStyle
+                                                                            .italic,
+                                                                  )),
+                                                              Text("0",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .black87,
+                                                                    fontSize:
+                                                                        18,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w800,
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                        );
+                                                      } else {
+                                                        speculationList =
+                                                            snapshot.data!;
+                                                        return Padding(
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      15),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              Text(
+                                                                  "Nombres de spéculation",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .black87,
+                                                                    fontSize:
+                                                                        17,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    fontStyle:
+                                                                        FontStyle
+                                                                            .italic,
+                                                                  )),
+                                                              Text(
+                                                                  speculationList
+                                                                      .length
+                                                                      .toString(),
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .black87,
+                                                                    fontSize:
+                                                                        18,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w800,
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                        );
+                                                      }
+                                                    }),
+                                                Container(
+                                                  alignment:
+                                                      Alignment.bottomRight,
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
                                                       horizontal: 10),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  _buildEtat(
-                                                      e.statutCategorie!),
-                                                  PopupMenuButton<String>(
-                                                    padding: EdgeInsets.zero,
-                                                    itemBuilder: (context) =>
-                                                        <PopupMenuEntry<
-                                                            String>>[
-                                                      PopupMenuItem<String>(
-                                                        child: ListTile(
-                                                          leading: const Icon(
-                                                            Icons.check,
-                                                            color: Colors.green,
-                                                          ),
-                                                          title: const Text(
-                                                            "Activer",
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.green,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          onTap: () async {
-                                                            await CategorieService()
-                                                                .activerCategorie(e
-                                                                    .idCategorieProduit!)
-                                                                .then(
-                                                                    (value) => {
-                                                                          Provider.of<CategorieService>(context, listen: false)
-                                                                              .applyChange(),
-                                                                          // setState(
-                                                                          //     () {
-                                                                          //   _liste =
-                                                                          //       CategorieService().fetchCategorieByFiliere(filiere.idFiliere!);
-                                                                          // }),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Activer avec succèss "),
-                                                                                ],
-                                                                              ),
-                                                                              duration: Duration(seconds: 2),
-                                                                            ),
-                                                                          )
-                                                                        })
-                                                                .catchError(
-                                                                    (onError) =>
-                                                                        {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Une erreur s'est produit"),
-                                                                                ],
-                                                                              ),
-                                                                              duration: Duration(seconds: 5),
-                                                                            ),
-                                                                          ),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        });
-                                                          },
-                                                        ),
-                                                      ),
-                                                      PopupMenuItem<String>(
-                                                        child: ListTile(
-                                                          leading: Icon(
-                                                            Icons
-                                                                .disabled_visible,
-                                                            color: Colors
-                                                                .orange[400],
-                                                          ),
-                                                          title: Text(
-                                                            "Désactiver",
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .orange[400],
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          onTap: () async {
-                                                            await CategorieService()
-                                                                .desactiverCategorie(e
-                                                                    .idCategorieProduit!)
-                                                                .then(
-                                                                    (value) => {
-                                                                          Provider.of<CategorieService>(context, listen: false)
-                                                                              .applyChange(),
-                                                                          // setState(
-                                                                          //     () {
-                                                                          //   _liste =
-                                                                          //       CategorieService().fetchCategorieByFiliere(filiere.idFiliere!);
-                                                                          // }),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        })
-                                                                .catchError(
-                                                                    (onError) =>
-                                                                        {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Une erreur s'est produit"),
-                                                                                ],
-                                                                              ),
-                                                                              duration: Duration(seconds: 5),
-                                                                            ),
-                                                                          ),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        });
-
-                                                            ScaffoldMessenger
-                                                                    .of(context)
-                                                                .showSnackBar(
-                                                              const SnackBar(
-                                                                content: Row(
-                                                                  children: [
-                                                                    Text(
-                                                                        "Désactiver avec succèss "),
-                                                                  ],
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      _buildEtat(
+                                                          e.statutCategorie!),
+                                                      PopupMenuButton<String>(
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                        itemBuilder:
+                                                            (context) =>
+                                                                <PopupMenuEntry<
+                                                                    String>>[
+                                                          PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                              leading:
+                                                                  const Icon(
+                                                                Icons.check,
+                                                                color: Colors
+                                                                    .green,
+                                                              ),
+                                                              title: const Text(
+                                                                "Activer",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .green,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
                                                                 ),
-                                                                duration:
-                                                                    Duration(
+                                                              ),
+                                                              onTap: () async {
+                                                                await CategorieService()
+                                                                    .activerCategorie(e
+                                                                        .idCategorieProduit!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<CategorieService>(context, listen: false).applyChange(),
+                                                                              // setState(
+                                                                              //     () {
+                                                                              //   _liste =
+                                                                              //       CategorieService().fetchCategorieByFiliere(filiere.idFiliere!);
+                                                                              // }),
+                                                                              Navigator.of(context).pop(),
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Activer avec succèss "),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 2),
+                                                                                ),
+                                                                              )
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 5),
+                                                                                ),
+                                                                              ),
+                                                                              Navigator.of(context).pop(),
+                                                                            });
+                                                              },
+                                                            ),
+                                                          ),
+                                                          PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                              leading: Icon(
+                                                                Icons
+                                                                    .disabled_visible,
+                                                                color: Colors
+                                                                        .orange[
+                                                                    400],
+                                                              ),
+                                                              title: Text(
+                                                                "Désactiver",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                          .orange[
+                                                                      400],
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              onTap: () async {
+                                                                await CategorieService()
+                                                                    .desactiverCategorie(e
+                                                                        .idCategorieProduit!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<CategorieService>(context, listen: false).applyChange(),
+                                                                              // setState(
+                                                                              //     () {
+                                                                              //   _liste =
+                                                                              //       CategorieService().fetchCategorieByFiliere(filiere.idFiliere!);
+                                                                              // }),
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 5),
+                                                                                ),
+                                                                              ),
+                                                                              Navigator.of(context).pop(),
+                                                                            });
+
+                                                                ScaffoldMessenger.of(
+                                                                        context)
+                                                                    .showSnackBar(
+                                                                  const SnackBar(
+                                                                    content:
+                                                                        Row(
+                                                                      children: [
+                                                                        Text(
+                                                                            "Désactiver avec succèss "),
+                                                                      ],
+                                                                    ),
+                                                                    duration: Duration(
                                                                         seconds:
                                                                             2),
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                          PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                              leading:
+                                                                  const Icon(
+                                                                Icons.edit,
+                                                                color: Colors
+                                                                    .green,
                                                               ),
-                                                            );
-                                                          },
-                                                        ),
-                                                      ),
-                                                      PopupMenuItem<String>(
-                                                        child: ListTile(
-                                                          leading: const Icon(
-                                                            Icons.edit,
-                                                            color: Colors.green,
-                                                          ),
-                                                          title: const Text(
-                                                            "Modifier",
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.green,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          onTap: () async {
-                                                            // Ouvrir la boîte de dialogue de modification
-                                                            var updatedSousRegion =
-                                                                await showDialog(
-                                                              context: context,
-                                                              builder: (BuildContext
-                                                                      context) =>
-                                                                  AlertDialog(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      shape:
-                                                                          RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(16),
-                                                                      ),
-                                                                      content: UpdatesCategorie(
-                                                                          categorieProduit:
-                                                                              e)),
-                                                            );
-
-                                                            // setState(() {
-                                                            //   _liste = CategorieService()
-                                                            //       .fetchCategorieByFiliere(
-                                                            //           filiere
-                                                            //               .idFiliere!);
-                                                            // });
-                                                            if (updatedSousRegion !=
-                                                                null) {
-                                                              Provider.of<CategorieService>(
+                                                              title: const Text(
+                                                                "Modifier",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .green,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              onTap: () async {
+                                                                // Ouvrir la boîte de dialogue de modification
+                                                                var updatedSousRegion =
+                                                                    await showDialog(
+                                                                  context:
                                                                       context,
-                                                                      listen:
-                                                                          false)
-                                                                  .applyChange();
-                                                              // setState(() {
-                                                              //   _liste = CategorieService()
-                                                              //       .fetchCategorieByFiliere(
-                                                              //           filiere
-                                                              //               .idFiliere!);
-                                                              // });
-                                                            }
-                                                          },
-                                                        ),
-                                                      ),
-                                                      PopupMenuItem<String>(
-                                                        child: ListTile(
-                                                          leading: const Icon(
-                                                            Icons.delete,
-                                                            color: Colors.red,
-                                                          ),
-                                                          title: const Text(
-                                                            "Supprimer",
-                                                            style: TextStyle(
-                                                              color: Colors.red,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
+                                                                  builder: (BuildContext
+                                                                          context) =>
+                                                                      AlertDialog(
+                                                                          backgroundColor: Colors
+                                                                              .white,
+                                                                          shape:
+                                                                              RoundedRectangleBorder(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(16),
+                                                                          ),
+                                                                          content:
+                                                                              UpdatesCategorie(categorieProduit: e)),
+                                                                );
+
+                                                                // setState(() {
+                                                                //   _liste = CategorieService()
+                                                                //       .fetchCategorieByFiliere(
+                                                                //           filiere
+                                                                //               .idFiliere!);
+                                                                // });
+                                                                if (updatedSousRegion !=
+                                                                    null) {
+                                                                  Provider.of<CategorieService>(
+                                                                          context,
+                                                                          listen:
+                                                                              false)
+                                                                      .applyChange();
+                                                                  // setState(() {
+                                                                  //   _liste = CategorieService()
+                                                                  //       .fetchCategorieByFiliere(
+                                                                  //           filiere
+                                                                  //               .idFiliere!);
+                                                                  // });
+                                                                }
+                                                              },
                                                             ),
                                                           ),
-                                                          onTap: () async {
-                                                            await CategorieService()
-                                                                .deleteCategorie(e
-                                                                    .idCategorieProduit!)
-                                                                .then(
-                                                                    (value) => {
-                                                                          Provider.of<CategorieService>(context, listen: false)
-                                                                              .applyChange(),
-                                                                          // setState(
-                                                                          //     () {
-                                                                          //   _liste =
-                                                                          //       CategorieService().fetchCategorieByFiliere(filiere.idFiliere!);
-                                                                          // }),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        })
-                                                                .catchError(
-                                                                    (onError) =>
-                                                                        {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Impossible de supprimer"),
-                                                                                ],
-                                                                              ),
-                                                                              duration: Duration(seconds: 2),
-                                                                            ),
-                                                                          )
-                                                                        });
-                                                          },
-                                                        ),
+                                                          PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                              leading:
+                                                                  const Icon(
+                                                                Icons.delete,
+                                                                color:
+                                                                    Colors.red,
+                                                              ),
+                                                              title: const Text(
+                                                                "Supprimer",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .red,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              onTap: () async {
+                                                                await CategorieService()
+                                                                    .deleteCategorie(e
+                                                                        .idCategorieProduit!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<CategorieService>(context, listen: false).applyChange(),
+                                                                              // setState(
+                                                                              //     () {
+                                                                              //   _liste =
+                                                                              //       CategorieService().fetchCategorieByFiliere(filiere.idFiliere!);
+                                                                              // }),
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Impossible de supprimer"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 2),
+                                                                                ),
+                                                                              )
+                                                                            });
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ],
                                                   ),
-                                                ],
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ))
-                                .toList());
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ))
+                                    .toList());
                       }
                     });
               },

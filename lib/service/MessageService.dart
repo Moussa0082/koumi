@@ -47,10 +47,25 @@ Future<List<MessageWa>> fetchMessage() async {
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }
+Future<List<MessageWa>> fetchMessageByActeur(String idActeur) async {
+    final response = await http.get(Uri.parse('$baseUrl/messageByActeur/$idActeur'));
 
-   Future<void> deleteMessage(String id) async {
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      // Duration(seconds: 5);
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      messageList = body.map((item) => MessageWa.fromMap(item)).toList();
+      debugPrint(response.body);
+      return messageList;
+    } else {
+      messageList = [];
+      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+    }
+  }
+
+   Future<void> deleteMessage(String idMessage, String idActeur) async {
     final response =
-        await http.delete(Uri.parse("$baseUrl/delete/$id"));
+        await http.delete(Uri.parse("$baseUrl/deleteMessage/$idMessage/$idActeur"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -63,7 +78,7 @@ Future<List<MessageWa>> fetchMessage() async {
   Future<void> deleteAllMessages() async {
     final response =
         await http.delete(Uri.parse("$baseUrl/deleteAllMessage"));
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200 || response.statusCode == 204) {
       applyChange();
       debugPrint(response.body.toString());
     } else {
@@ -71,7 +86,8 @@ Future<List<MessageWa>> fetchMessage() async {
           "Erreur lors de la suppression avec le code: ${response.statusCode}");
     }
   }
-  
+
+
   void applyChange() {
     notifyListeners();
   }

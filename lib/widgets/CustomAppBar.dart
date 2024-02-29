@@ -83,7 +83,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 badgeContent:
                     Consumer(builder: (context, messageService, child) {
                   return FutureBuilder(
-                      future: MessageService().fetchMessage(),
+                      future: MessageService().fetchMessageByActeur(ac.idActeur!),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {

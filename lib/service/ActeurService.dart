@@ -33,7 +33,6 @@ class ActeurService extends ChangeNotifier {
     try {
       //    // Convertir chaque TypeActeur en un objet JSON et les ajouter à une liste JSON
       // List<String> typeActeurJsonList = typeActeur.map((typeActeur) => typeActeur.toJson()).toList();
-
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
 
       if (photoSiegeActeur != null) {
@@ -155,6 +154,22 @@ class ActeurService extends ChangeNotifier {
           'Une erreur s\'est produite lors de la modification de acteur : $e');
     }
   }
+
+//     Future<http.Response>  {
+//   try {
+//     // Vous devez implémenter la logique pour envoyer le message WhatsApp ici
+//     // Par exemple, utiliser une bibliothèque HTTP pour effectuer une requête POST à votre service WhatsApp
+//     // Assurez-vous d'adapter cette logique à votre service WhatsApp spécifique
+
+//     // Pour l'exemple, nous allons simplement simuler l'envoi avec une attente de 2 secondes
+//     await Future.delayed(Duration(seconds: 2));
+
+//     return http.Response('Message envoyé avec succès à tous les acteurs correspondant aux libellés ${libelles.length}', 200);
+//   } catch (e) {
+//     // En cas d'erreur, retourner une réponse avec un message d'erreur
+//     return http.Response('Échec de l\'envoi du message WhatsApp aux acteurs correspondant aux libellés $libelles. Erreur : $e', 500);
+//   }
+// }
 
   static Future<String> sendOtpCodeEmail(
       String emailActeur, BuildContext context) async {
@@ -696,14 +711,18 @@ class ActeurService extends ChangeNotifier {
 
   Future<void> sendMessageToActeurByTypeActeur(
       String message, List<String> libelles) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/sendMessageWathsappToActeurByTypeActeur'),
-      body: json.encode({'message': message, 'libelles': libelles}),
-      headers: {'Content-Type': 'application/json'},
-    );
+    try {
+      final Uri uri = Uri.parse(
+          '$baseUrl/sendMessageWathsappToActeurByTypeActeurs?message=$message&libelles=${libelles.join(',')}');
 
-    if (response.statusCode != 200) {
-      throw Exception('Impossible envoyé le message ${response.statusCode}');
+      final response = await http.get(uri);
+
+      if (response.statusCode != 200) {
+        throw Exception(
+            'Impossible d\'envoyer le message ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Échec de l\'envoi du message WhatsApp : $e');
     }
   }
 
