@@ -397,7 +397,7 @@ class _NotificationPageState extends State<NotificationPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: MultiSelectDropDown.network(
                         networkConfig: NetworkConfig(
                           url: 'https://koumi.ml/api-koumi/typeActeur/read',
@@ -435,7 +435,6 @@ class _NotificationPageState extends State<NotificationPage> {
                             print("type sélectionné ${typeLibelle.toString()}");
                           });
                         },
-
                         responseErrorBuilder: ((context, body) {
                           return const Padding(
                             padding: EdgeInsets.all(16.0),
@@ -446,61 +445,65 @@ class _NotificationPageState extends State<NotificationPage> {
                       ),
                     ),
                     SizedBox(height: 16),
-                    TextFormField(
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Veuillez remplir ce champ";
-                        }
-                        return null;
-                      },
-                      controller: descriptionController,
-                      maxLines: null,
-                      decoration: InputDecoration(
-                        labelText: "Description",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: descriptionController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Description",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                       ),
                     ),
                     SizedBox(height: 20),
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        if (formkey.currentState!.validate()) {
-                          try {} catch (e) {
-                            final String errorMessage = e.toString();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Row(
-                                  children: [
-                                    Text("Une erreur s'est produite"),
-                                  ],
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          if (formkey.currentState!.validate()) {
+                            try {} catch (e) {
+                              final String errorMessage = e.toString();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(errorMessage.isNotEmpty
+                                      ? errorMessage
+                                      : "Une erreur s'est produite"),
+                                  duration: Duration(seconds: 5),
                                 ),
-                                duration: Duration(seconds: 5),
-                              ),
-                            );
+                              );
+                            }
                           }
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green, // Green color code
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          minimumSize: const Size(290, 45),
                         ),
-                        minimumSize: const Size(290, 45),
-                      ),
-                      icon: const Icon(
-                        Icons.add,
-                        color: Colors.white,
-                      ),
-                      label: const Text(
-                        "Envoyer",
-                        style: TextStyle(
-                          fontSize: 20,
+                        icon: const Icon(
+                          Icons.add,
                           color: Colors.white,
-                          fontWeight: FontWeight.w700,
+                        ),
+                        label: const Text(
+                          "Envoyer",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
