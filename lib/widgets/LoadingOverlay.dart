@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class LoadingOverlay extends StatelessWidget {
   final bool isLoading;
   final Widget child;
+  final String? message;
 
-  const LoadingOverlay({
+   LoadingOverlay({
     required this.isLoading,
     required this.child,
+     this.message,
   });
 
   @override

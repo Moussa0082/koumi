@@ -47,6 +47,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
   List<Map<String, dynamic>> regionsData = [];
 
     late Future niveau1PaysList;
+    final String message = "Encore quelques secondes";
 
 
   Set<String> loadedRegions = {}; // Ensemble pour garder une trace des régions pour lesquelles les magasins ont déjà été chargés
@@ -106,8 +107,8 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                                 nomMagasin: nomMagasin,
                                contactMagasin: contactMagasin,
                                 localiteMagasin: localiteMagasin, 
-                                acteur: acteur ,
                                 photo: photos,
+                                acteur: acteur ,
                                 niveau1Pays: niveau1Pays
                                 ).then((value) => 
                                 
@@ -137,7 +138,26 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                           contactMagasin: contactMagasin, 
                           localiteMagasin: localiteMagasin,
                             acteur: acteur, 
-                            niveau1Pays: niveau1Pays);
+                            niveau1Pays: niveau1Pays).then((value) => 
+                                
+                                 showDialog(
+            context:  context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Center(child: Text('Succès')),
+                content:const  Text("Magasin ajouté avec succès"),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                        },
+                    child:const  Text('OK'),
+                  ),
+                ],
+              );
+            },
+           )
+          );
                       }
                             } catch (e) {
                               debugPrint("Erreur : $e");
@@ -146,7 +166,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: const Center(child: Text('Erreur')),
-                content:  Text("Une erreur s'est produite veuiller réessayer : $e"),
+                content:  Text("Une erreur s'est produite veuiller réessayer "),
                 actions: <Widget>[
                   TextButton(
                     onPressed: () {
@@ -244,13 +264,18 @@ Future<void> _pickImage(ImageSource source) async {
   
   @override
   Widget build(BuildContext context) {
+        const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
+
     return Scaffold(
+       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 238, 234, 234),
-        leading: IconButton(icon: Icon(Icons.arrow_back_ios_new_outlined), onPressed: (){
-          Navigator.pop(context);
-        },),
         centerTitle: true,
+        toolbarHeight: 100,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: Text(
           "Ajouter magasin",
           style: TextStyle(
@@ -409,19 +434,16 @@ Future<void> _pickImage(ImageSource source) async {
                         ),
                          const SizedBox(height: 10,),
         
-                  GestureDetector(
-                    onTap: (){
-                      _showImageSourceDialog();
-                    },
-                    child: (photos == null) ?
-                    Image.asset("assets/images/cam.png"):
-                    Image.file(
-                    photos!,
-                    height:100,
-                    width: 200,
-                    fit: BoxFit.cover,
-                      ),
+                  (photos == null) ?
+             IconButton(onPressed: _showImageSourceDialog, icon: Icon(Icons.camera_alt_sharp),iconSize: 50,)  
+                      :
+                  Image.file(
+                  photos!,
+                  height:100,
+                  width: 200,
+                  fit: BoxFit.cover,
                     ),
+                    Text("Choisir une image"),
                          
                          const SizedBox(height: 10,),
                         Center(
@@ -429,40 +451,7 @@ Future<void> _pickImage(ImageSource source) async {
                           onPressed: () async{
                             // Handle button press action here
                            if(_formKey.currentState!.validate()){
-                          final nomMagasin = nomMagasinController.text;
-                            final contactMagasin = contactMagasinController.text;
-                            final localiteMagasin = localiteMagasinController.text;
-
-                            if(photos != null){
-                                try {
-        
-                              await MagasinService().creerMagasin(
-                                nomMagasin: nomMagasin,
-                               contactMagasin: contactMagasin,
-                                localiteMagasin: localiteMagasin, 
-                                acteur: acteur ,
-                                photo: photos,
-                                niveau1Pays: niveau1Pays
-                                );
-                           }catch(e){
-                              print(e.toString());
-                           }
-                          
-                            }else{
-                              try {
-        
-                              await MagasinService().creerMagasin(
-                                nomMagasin: nomMagasin,
-                               contactMagasin: contactMagasin,
-                                localiteMagasin: localiteMagasin, 
-                                acteur: acteur ,
-                                niveau1Pays: niveau1Pays
-                                );
-                           }catch(e){
-                              print(e.toString());
-                           }
-                            }   
-                          
+                           _handleButtonPress();
                            }
                           },
                           style: ElevatedButton.styleFrom(

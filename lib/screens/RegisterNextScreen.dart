@@ -145,7 +145,7 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
+       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),

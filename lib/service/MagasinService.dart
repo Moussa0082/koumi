@@ -43,7 +43,7 @@ class MagasinService extends ChangeNotifier{
            'nomMagasin': nomMagasin,
       'contactMagasin': contactMagasin,
       'localiteMagasin': localiteMagasin,
-      'photo': photo,
+      'photo': "",
       'acteur': acteur.toMap(),
       'niveau1Pays': niveau1Pays.toMap()
       });
@@ -92,7 +92,7 @@ class MagasinService extends ChangeNotifier{
         'nomMagasin': nomMagasin,
       'contactMagasin': contactMagasin,
       'localiteMagasin': localiteMagasin,
-      'photo': photo,
+      'photo': "",
       'acteur': acteur.toMap(),
       'niveau1Pays': niveau1Pays.toMap()
 
