@@ -7,7 +7,6 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 
 
@@ -44,7 +43,7 @@ class MagasinService extends ChangeNotifier{
            'nomMagasin': nomMagasin,
       'contactMagasin': contactMagasin,
       'localiteMagasin': localiteMagasin,
-      'photo': photo,
+      'photo': "",
       'acteur': acteur.toMap(),
       'niveau1Pays': niveau1Pays.toMap()
       });
@@ -93,7 +92,7 @@ class MagasinService extends ChangeNotifier{
         'nomMagasin': nomMagasin,
       'contactMagasin': contactMagasin,
       'localiteMagasin': localiteMagasin,
-      'photo': photo,
+      'photo': "",
       'acteur': acteur.toMap(),
       'niveau1Pays': niveau1Pays.toMap()
 

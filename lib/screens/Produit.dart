@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Magasin.dart';
@@ -42,6 +43,8 @@ class _ProduitScreenState extends State<ProduitScreen>
                     idStock: item['idStock'] as String,
                     nomProduit: item['nomProduit'] as String,
                     photo: item['photo'] ?? '',
+                    quantiteStock: item['quantiteStock'] ?? 0,
+                    prix: item['prix'] ?? 0,
                   ))
               .toList();
         });
@@ -121,12 +124,21 @@ class _ProduitScreenState extends State<ProduitScreen>
 
   @override
   Widget build(BuildContext context) {
+           const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
     return Container(
       child: DefaultTabController(
         length: categorieProduit.length,
         child: Scaffold(
-          appBar: AppBar(
-            centerTitle: true,
+
+       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+      appBar: AppBar(
+        centerTitle: true,
+        toolbarHeight: 100,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
             title: Text('Categories'),
             bottom: TabBar(
               isScrollable: true,
@@ -142,14 +154,22 @@ class _ProduitScreenState extends State<ProduitScreen>
             child: Column(
               children: [
                 const SizedBox(height: 10),
-                SizedBox(
-                  height: 40,
-                  child: Container(
-                    padding: EdgeInsets.only(left: 5),
-                    decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 245, 212, 169),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
+                Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.search,
+                      color: Colors.blueGrey[400]), // Couleur de l'icône
+                  SizedBox(
+                      width:
+                          10), // Espacement entre l'icône et le champ de recherche
+                  Expanded(
                     child: TextField(
                       controller: _searchController,
                       onChanged: (value) {
@@ -157,12 +177,17 @@ class _ProduitScreenState extends State<ProduitScreen>
                       },
                       decoration: InputDecoration(
                         hintText: 'Rechercher',
-                        contentPadding: EdgeInsets.all(10),
                         border: InputBorder.none,
+                        hintStyle: TextStyle(
+                            color: Colors
+                                .blueGrey[400]), // Couleur du texte d'aide
                       ),
                     ),
                   ),
-                ),
+                ],
+              ),
+            ),
+          ),
                 const SizedBox(height: 10),
                 Flexible(
                   child: GestureDetector(
@@ -223,58 +248,114 @@ class _ProduitScreenState extends State<ProduitScreen>
         );
       }
 
-      return GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
-        ),
-        itemCount: filteredStocksSearch.length, // Utiliser la liste filtrée
-        itemBuilder: (context, index) {
-          return Container(
-            child: Card(
-              shadowColor: Colors.white,
-              child: Column(
-                children: [
-                  Stack(
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        child: Image.asset('assets/images/rc.png'),
-                      ),
-                      Container(
-                        child: Image.network(
-                          filteredStocksSearch[index].photo ??
-                              'assets/images/magasin.png', // Utiliser la photo du stock
-                          width: double.infinity,
-                          height: null,
-                          fit: BoxFit.cover,
-                          errorBuilder: (BuildContext context, Object exception,
-                              StackTrace? stackTrace) {
-                            return Image.asset(
-                              'assets/images/magasin.png',
-                              width: double.infinity,
-                              height: 150,
-                              fit: BoxFit.cover,
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    overflow: TextOverflow.ellipsis,
-                    filteredStocksSearch[index].nomProduit ??
-                        'Pas de nom défini',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
+     
+ return Container(
+  color: Colors.white,
+   child: GridView.builder(
+    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 2,
+      mainAxisSpacing: 10,
+      crossAxisSpacing: 10,
+    ),
+    itemCount: filteredStocks.length,
+    itemBuilder: (context, index) {
+      return Container(
+        decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(20)),
+
+        color: const Color.fromARGB(255, 247, 235, 218),
+          boxShadow: [
+            BoxShadow(
+              color: const Color.fromARGB(255, 240, 238, 238).withOpacity(0.2),
+              offset: const Offset(0, 2),
+              blurRadius: 5,
+              spreadRadius: 2,
             ),
-          );
-        },
+          ],
+        ),
+        margin: EdgeInsets.all(5),
+        child: GestureDetector(
+          onTap: () {
+            // Action à effectuer lorsqu'un produit est cliqué
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: double.infinity,
+                height: 120, // Taille de la photo
+                child: Image.network(
+                  filteredStocks[index].photo ?? 'assets/images/produit.png',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/images/produit.png',
+                      fit: BoxFit.cover,
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      filteredStocks[index].nomProduit ?? 'Pas de nom défini',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.grey[200],
+                      ),
+                      child: Text(
+                        filteredStocks[index].quantiteStock.toString(),
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 3,),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${filteredStocks[index].prix!.toInt()} €', // Convertir en entier
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    ),
+                    RatingBar.builder(
+                      initialRating: 3, // Rating initial du produit
+                      minRating: 0,
+                      maxRating: 5,
+                      direction: Axis.horizontal,
+                      allowHalfRating: false,
+                      itemCount: 5,
+                      itemSize: 20, // Taille du rating augmentée
+                      itemBuilder: (context, _) => Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                      ),
+                      onRatingUpdate: (rating) {
+                        // Fonction appelée lorsque l'utilisateur met à jour le rating
+                        // Vous pouvez implémenter ici la logique pour mettre à jour le rating dans la base de données
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       );
+    },
+   ),
+ );
+
     }
   }
 

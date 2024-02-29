@@ -5,6 +5,7 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddMagasinScreen.dart';
 import 'package:koumi_app/screens/Produit.dart';
+import 'package:koumi_app/service/MagasinService.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -31,6 +32,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
   List<Map<String, dynamic>> regionsData = [];
   List<String> magasins = [];
   int currentIndex = 0;
+  bool isAdmin = false;
 
   Set<String> loadedRegions =
       {}; // Ensemble pour garder une trace des régions pour lesquelles les magasins ont déjà été chargés
@@ -131,13 +133,22 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
 
   @override
   Widget build(BuildContext context) {
+          const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
     return Container(
       child: DefaultTabController(
         length: regions.length,
         child: Scaffold(
-          // floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-          appBar: AppBar(
-            centerTitle: true,
+  // floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+
+       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+      appBar: AppBar(
+        centerTitle: true,
+        toolbarHeight: 100,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
             title: Text('Mes boutiques'),
             bottom: TabBar(
               isScrollable: regions.length > 4,
@@ -145,84 +156,48 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
               controller: _tabController, // Ajoutez le contrôleur TabBar
               tabs: regions.map((region) => Tab(text: region)).toList(),
             ),
-            actions: [
-              PopupMenuButton<String>(
-                padding: EdgeInsets.zero,
-                itemBuilder: (context) => <PopupMenuEntry<String>>[
-                  PopupMenuItem<String>(
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.add,
-                        color: Colors.green,
-                      ),
-                      title: const Text(
-                        "Ajouter Magasin",
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AddMagasinScreen()));
-                        // Fermer le menu contextuel après un court délai
-                      },
-                    ),
-                  ),
-                  PopupMenuItem<String>(
-                    child: ListTile(
-                      leading: Icon(
-                        Icons.add,
-                        color: Colors.orange[400],
-                      ),
-                      title: Text(
-                        "Ajouter Produit",
-                        style: TextStyle(
-                          color: Colors.orange[400],
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onTap: () async {
-                        // _addCategorie();
-                      },
-                    ),
-                  ),
-                ],
-              )
-            ],
+            
           ),
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                const SizedBox(height: 10),
-                SizedBox(
-                  height: 40,
-                  child: Container(
-                    padding: EdgeInsets.only(left: 5),
-                    decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 245, 212, 169),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
+                const SizedBox(height:10),
+                Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.search,
+                      color: Colors.blueGrey[400]), // Couleur de l'icône
+                  SizedBox(
+                      width:
+                          10), // Espacement entre l'icône et le champ de recherche
+                  Expanded(
                     child: TextField(
                       controller: _searchController,
                       onChanged: (value) {
-                        setState(() {
-                          // Le changement de texte déclenche la reconstruction du widget
-                        });
+                        setState(() {});
                       },
                       decoration: InputDecoration(
                         hintText: 'Rechercher',
-                        contentPadding: EdgeInsets.all(10),
                         border: InputBorder.none,
+                        hintStyle: TextStyle(
+                            color: Colors
+                                .blueGrey[400]), // Couleur du texte d'aide
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
+                ],
+              ),
+            ),
+          ),
+                const SizedBox(height:10),
                 // const SizedBox(height:10),
                 Flexible(
                   child: GestureDetector(
@@ -238,15 +213,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
               ],
             ),
           ),
-          //               floatingActionButton: FloatingActionButton(
-          //   backgroundColor: Colors.orange,
-          //   onPressed: null,
-          //   child: IconButton(
-          //     onPressed: null,
-          //     icon: Icon(Icons.add),
-          //     color: Colors.white,
-          //   ),
-          // ),
+ 
         ),
       ),
     );
@@ -254,6 +221,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
 
   Widget buildGridView(String idActeur, String idNiveau1Pays) {
     List<Map<String, dynamic>>? magasins = magasinsParRegion[idNiveau1Pays];
+
     if (magasins == null) {
       // Si les données ne sont pas encore chargées, affichez l'effet Shimmer
       return _buildShimmerEffect();
@@ -277,87 +245,353 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
       }
 
       // Sinon, afficher la GridView avec les magasins filtrés
-      return GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
-        ),
-        itemCount: filteredMagasins.length,
-        itemBuilder: (context, index) {
-          // ici on a recuperer les details du  magasin
-          Map<String, dynamic> magasin = filteredMagasins[index];
-          return Container(
-            child: GestureDetector(
-              onTap: () {
-                String id = magasin['idMagasin'];
-                String nom = magasin['nomMagasin'];
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ProduitScreen(
-                            id: id,
-                            nom: nom,
-                          )),
-                );
-              },
-              child: Card(
-                shadowColor: Colors.white,
-                child: Column(
-                  children: [
-                    Stack(
+      return Container(
+        margin: EdgeInsets.all(5),
+        child: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+          ),
+          itemCount: filteredMagasins.length,
+          itemBuilder: (context, index) {
+            // ici on a recuperer les details du  magasin 
+              Map<String, dynamic> magasin = filteredMagasins[index];
+            return Expanded(
+              child: Container(
+                height:300,
+                // width: 150,
+                child: GestureDetector(
+                  onTap:(){
+                     String id = magasin['idMagasin'];
+                     String nom = magasin['nomMagasin'];
+                    Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => ProduitScreen(id:id, nom: nom,)),
+              );
+                  },
+                  child:Padding(
+                    padding: const EdgeInsets.all(2.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Container(
-                          width: double.infinity,
-                          child: Image.asset('assets/images/rectangle.png',
-                              width: double.infinity),
-                        ),
-                        Container(
-                          child: Image.network(
-                            filteredMagasins[index]['photo'] ??
-                                'assets/images/magasin.png',
-                            width: double.infinity,
-                            height: null,
-                            fit: BoxFit.cover,
-                            errorBuilder: (BuildContext context,
-                                Object exception, StackTrace? stackTrace) {
-                              return Image.asset(
-                                'assets/images/magasin.png',
-                                width: double.infinity,
-                                height: 150,
-                                fit: BoxFit.cover,
-                              );
-                            },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Image.network(
+                              "http://10.0.2.2/${filteredMagasins[index]['photo']}" ?? "assets/images/magasin.png",
+                              height: 120,
+                              fit: BoxFit.cover,
+                              errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                return Image.asset(
+                                  'assets/images/magasin.png',
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                            ),
                           ),
                         ),
-                      ],
+                        const SizedBox(height: 10),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text(
+                            filteredMagasins[index]['nomMagasin'].toUpperCase() ?? 'Pas de nom défini',
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                         Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Text(
+                        'Nombre de produits:',
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
                     ),
-                    Text(
-                      overflow: TextOverflow.ellipsis,
-                      filteredMagasins[index]['nomMagasin']
-                              .toString()
-                              .toUpperCase() ??
-                          'Pas de nom défini',
-                      textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Text(
+                        '10',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
                     ),
-                    //      TextButton(
-                    //   style: ButtonStyle(
-                    //     fixedSize: MaterialStateProperty.all(Size(20, 10)),
-                    //     shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                    //       borderRadius: BorderRadius.circular(50.0),
-                    //     )),
-                    //   ),
-                    //   onPressed: null,
-                    //   child: Text('Voir', style: TextStyle(fontWeight: FontWeight.bold),),
-                    // ),
                   ],
                 ),
+                        // if (isAdmin) // Ajoute l'action des trois points si l'utilisateur est un administrateur
+                                                    // Align(
+                                                    //   alignment:
+                                                    //  Alignment.centerRight,
+                                                    //   child: Container(height: 30,
+                                                        
+                                                    //     padding: const EdgeInsets.only(
+                                                    //    left: 140),
+                                                    //                 child: Row(
+                                                    //                   mainAxisAlignment:
+                                                    //                       MainAxisAlignment
+                                                    //                           .spaceBetween,
+                                                    //                   children: [
+                                                                    
+                                                    //                     // _buildEtat(),
+                                                    //                     PopupMenuButton<String>(
+                                                    //                       padding: EdgeInsets.zero,
+                                                    //                       itemBuilder: (context) =>
+                                                    //                           <PopupMenuEntry<
+                                                    //                               String>>[
+                                                    //                         PopupMenuItem<String>(
+                                                    //                           child: ListTile(
+                                                    //                             leading: const Icon(
+                                                    //                               Icons.check,
+                                                    //                               color:
+                                                    //                                   Colors.green,
+                                                    //                             ),
+                                                    //                             title: const Text(
+                                                    //                               "Activer",
+                                                    //                               style: TextStyle(
+                                                    //                                 color: Colors
+                                                    //                                     .green,
+                                                    //                                 fontWeight:
+                                                    //                                     FontWeight
+                                                    //                                         .bold,
+                                                    //                               ),
+                                                    //                             ),
+                                                    //                             onTap: () async {
+                                                    //                               await MagasinService()
+                                                    //                                   .activerMagasin(
+                                                    //                                     filteredMagasins[index]['idMagasin']
+                                                    //                                       )
+                                                    //                                   .then(
+                                                    //                                       (value) =>
+                                                    //                                           {
+                                                    //                                             Provider.of<MagasinService>(context, listen: false).applyChange(),
+                                                    //                                            setState(() {
+                                                    //                                               filteredMagasins = magasins;
+                                                    //                                             }),
+                                                    //                                             Navigator.of(context).pop(),
+                                                    //                                             ScaffoldMessenger.of(context).showSnackBar(
+                                                    //                                               const SnackBar(
+                                                    //                                                 content: Row(
+                                                    //                                                   children: [
+                                                    //                                                     Text("Activer avec succèss "),
+                                                    //                                                   ],
+                                                    //                                                 ),
+                                                    //                                                 duration: Duration(seconds: 2),
+                                                    //                                               ),
+                                                    //                                             )
+                                                    //                                           })
+                                                    //                                   .catchError(
+                                                    //                                       (onError) =>
+                                                    //                                           {
+                                                    //                                             ScaffoldMessenger.of(context).showSnackBar(
+                                                    //                                               const SnackBar(
+                                                    //                                                 content: Row(
+                                                    //                                                   children: [
+                                                    //                                                     Text("Une erreur s'est produit"),
+                                                    //                                                   ],
+                                                    //                                                 ),
+                                                    //                                                 duration: Duration(seconds: 5),
+                                                    //                                               ),
+                                                    //                                             ),
+                                                    //                                             Navigator.of(context).pop(),
+                                                    //                                           });
+                                                    //                             },
+                                                    //                           ),
+                                                    //                         ),
+                                                    //                         PopupMenuItem<String>(
+                                                    //                           child: ListTile(
+                                                    //                             leading: Icon(
+                                                    //                               Icons
+                                                    //                                   .disabled_visible,
+                                                    //                               color: Colors
+                                                    //                                   .orange[400],
+                                                    //                             ),
+                                                    //                             title: Text(
+                                                    //                               "Désactiver",
+                                                    //                               style: TextStyle(
+                                                    //                                 color: Colors
+                                                    //                                         .orange[
+                                                    //                                     400],
+                                                    //                                 fontWeight:
+                                                    //                                     FontWeight
+                                                    //                                         .bold,
+                                                    //                               ),
+                                                    //                             ),
+                                                    //                             onTap: () async {
+                                                    //                               await MagasinService()
+                                                    //                                   .desactiverMagasin(
+                                                    //                                     filteredMagasins[index]['idMagasin']
+                                                    //                                       )
+                                                    //                                   .then(
+                                                    //                                       (value) =>
+                                                    //                                           {
+                                                                                            
+                                                    //                                             Navigator.of(context).pop(),
+                                                    //                                           })
+                                                    //                                   .catchError(
+                                                    //                                       (onError) =>
+                                                    //                                           {
+                                                    //                                             ScaffoldMessenger.of(context).showSnackBar(
+                                                    //                                               const SnackBar(
+                                                    //                                                 content: Row(
+                                                    //                                                   children: [
+                                                    //                                                     Text("Une erreur s'est produit"),
+                                                    //                                                   ],
+                                                    //                                                 ),
+                                                    //                                                 duration: Duration(seconds: 5),
+                                                    //                                               ),
+                                                    //                                             ),
+                                                    //                                             Navigator.of(context).pop(),
+                                                    //                                           });
+                                                                    
+                                                    //                               ScaffoldMessenger
+                                                    //                                       .of(context)
+                                                    //                                   .showSnackBar(
+                                                    //                                 const SnackBar(
+                                                    //                                   content: Row(
+                                                    //                                     children: [
+                                                    //                                       Text(
+                                                    //                                           "Désactiver avec succèss "),
+                                                    //                                     ],
+                                                    //                                   ),
+                                                    //                                   duration:
+                                                    //                                       Duration(
+                                                    //                                           seconds:
+                                                    //                                               2),
+                                                    //                                 ),
+                                                    //                               );
+                                                    //                             },
+                                                    //                           ),
+                                                    //                         ),
+                                                    //                         PopupMenuItem<String>(
+                                                    //                           child: ListTile(
+                                                    //                             leading: Icon(
+                                                    //                               Icons
+                                                    //                                   .disabled_visible,
+                                                    //                               color: Colors
+                                                    //                                   .orange[400],
+                                                    //                             ),
+                                                    //                             title: Text(
+                                                    //                               "Modifier",
+                                                    //                               style: TextStyle(
+                                                    //                                 color: Colors
+                                                    //                                         .orange[
+                                                    //                                     400],
+                                                    //                                 fontWeight:
+                                                    //                                     FontWeight
+                                                    //                                         .bold,
+                                                    //                               ),
+                                                    //                             ),
+                                                    //                             onTap: () async {
+                                                    //                               // await MagasinService()
+                                                    //                               //     .desactiverMagasin(
+                                                    //                               //       filteredMagasins[index]['idMagasin']
+                                                    //                               //         )
+                                                    //                               //     .then(
+                                                    //                               //         (value) =>
+                                                    //                               //             {
+                                                                                            
+                                                    //                               //               Navigator.of(context).pop(),
+                                                    //                               //             })
+                                                    //                               //     .catchError(
+                                                    //                               //         (onError) =>
+                                                    //                               //             {
+                                                    //                               //               ScaffoldMessenger.of(context).showSnackBar(
+                                                    //                               //                 const SnackBar(
+                                                    //                               //                   content: Row(
+                                                    //                               //                     children: [
+                                                    //                               //                       Text("Une erreur s'est produit"),
+                                                    //                               //                     ],
+                                                    //                               //                   ),
+                                                    //                               //                   duration: Duration(seconds: 5),
+                                                    //                               //                 ),
+                                                    //                               //               ),
+                                                    //                               //               Navigator.of(context).pop(),
+                                                    //                               //             });
+                                                                    
+                                                    //                               // ScaffoldMessenger
+                                                    //                               //         .of(context)
+                                                    //                               //     .showSnackBar(
+                                                    //                               //   const SnackBar(
+                                                    //                               //     content: Row(
+                                                    //                               //       children: [
+                                                    //                               //         Text(
+                                                    //                               //             "Désactiver avec succèss "),
+                                                    //                               //       ],
+                                                    //                               //     ),
+                                                    //                               //     duration:
+                                                    //                               //         Duration(
+                                                    //                               //             seconds:
+                                                    //                               //                 2),
+                                                    //                               //   ),
+                                                    //                               // );
+                                                    //                             },
+                                                    //                           ),
+                                                    //                         ),
+                                                                           
+                                                    //                         PopupMenuItem<String>(
+                                                    //                           child: ListTile(
+                                                    //                             leading: const Icon(
+                                                    //                               Icons.delete,
+                                                    //                               color: Colors.red,
+                                                    //                             ),
+                                                    //                             title: const Text(
+                                                    //                               "Supprimer",
+                                                    //                               style: TextStyle(
+                                                    //                                 color:
+                                                    //                                     Colors.red,
+                                                    //                                 fontWeight:
+                                                    //                                     FontWeight
+                                                    //                                         .bold,
+                                                    //                               ),
+                                                    //                             ),
+                                                    //                             onTap: () async {
+                                                    //                               await MagasinService()
+                                                    //                                   .deleteMagasin(
+                                                    //                           filteredMagasins[index]['idMagasin'])
+                                                    //                                   .then(
+                                                    //                                       (value) =>
+                                                    //                                           {
+                                                    //                                             Provider.of<MagasinService>(context, listen: false).applyChange(),
+                                                    //                                             setState(() {
+                                                    //                                               filteredMagasins = magasins;
+                                                    //                                             }),
+                                                    //                                             Navigator.of(context).pop(),
+                                                    //                                           })
+                                                    //                                   .catchError(
+                                                    //                                       (onError) =>
+                                                    //                                           {
+                                                    //                                             ScaffoldMessenger.of(context).showSnackBar(
+                                                    //                                               const SnackBar(
+                                                    //                                                 content: Row(
+                                                    //                                                   children: [
+                                                    //                                                     Text("Impossible de supprimer"),
+                                                    //                                                   ],
+                                                    //                                                 ),
+                                                    //                                                 duration: Duration(seconds: 2),
+                                                    //                                               ),
+                                                    //                                             )
+                                                    //                                           });
+                                                    //                             },
+                                                    //                           ),
+                                                    //                         ),
+                                                    //                       ],
+                                                    //                     ),
+                                                    //                   ],
+                                                    //                 ),
+                                                    //               ),
+                                                    // ),
+                      ],
+                    ),
+                  ),
+                      
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       );
     }
   }
@@ -384,4 +618,16 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
       ),
     );
   }
+
+  Widget _buildEtat(bool isState) {
+    return Container(
+      width: 15,
+      height: 15,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        color: isState ? Colors.green : Colors.red,
+      ),
+    );
+  }
+
 }

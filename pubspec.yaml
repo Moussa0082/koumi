@@ -65,6 +65,7 @@ dependencies:
   floating_draggable_widget: ^2.1.5
   flutter_speed_dial: ^7.0.0
   multi_dropdown: ^2.1.4
+  flutter_rating_bar: ^4.0.1
 
 dev_dependencies:
   flutter_test:

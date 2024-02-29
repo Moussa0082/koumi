@@ -4,6 +4,7 @@ import 'package:koumi_app/Admin/NotificationDetail.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/MessageWa.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/MessageService.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:provider/provider.dart';
@@ -457,7 +458,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         controller: descriptionController,
                         maxLines: null,
                         decoration: InputDecoration(
-                          labelText: "Description",
+                          labelText: "message",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -469,8 +470,27 @@ class _NotificationPageState extends State<NotificationPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: ElevatedButton.icon(
                         onPressed: () async {
+                          final String message = descriptionController.text;
+                          List<String> type = typeLibelle;
                           if (formkey.currentState!.validate()) {
-                            try {} catch (e) {
+                            try {
+                              await ActeurService()
+                                  .sendMessageToActeurByTypeActeur(
+                                      message, type)
+                                  .then((value) => {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                "Message envoyé avec success"),
+                                            duration: Duration(seconds: 3),
+                                          ),
+                                        ),
+                                        Navigator.of(context).pop()
+                                      })
+                                  .catchError(
+                                      (onError) => {print(onError.toString())});
+                            } catch (e) {
                               final String errorMessage = e.toString();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(

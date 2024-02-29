@@ -28,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isActive = true;
   // late Acteur acteur;
      bool _isLoading = false;
+     final String message = "Encore quelques secondes";
 
 
   TextEditingController emailController = TextEditingController();
