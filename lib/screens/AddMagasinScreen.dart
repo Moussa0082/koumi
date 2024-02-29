@@ -449,7 +449,7 @@ Future<void> _pickImage(ImageSource source) async {
                            }
                           
                             }else{
-try {
+                              try {
         
                               await MagasinService().creerMagasin(
                                 nomMagasin: nomMagasin,
