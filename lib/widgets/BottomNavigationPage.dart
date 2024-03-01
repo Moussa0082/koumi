@@ -28,7 +28,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
   ];
   List pages = <Widget>[
     const Accueil(),
-     ProduitScreen(),
+    ProduitScreen(),
     const Panier(),
     const Profil()
   ];
@@ -44,15 +44,25 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
         .changeIndex(index);
   }
 
+  // void _onBackPressed(bool isBackPressed) async {
+  //   if (!isBackPressed) {
+  //     // Essayez de revenir en arrière dans la pile de navigation actuelle
+  //     final NavigatorState? navigator =
+  //         _navigatorKeys[activePageIndex].currentState;
+  //     if (navigator != null && navigator.canPop()) {
+  //       // S'il y a une page précédente, pop la page
+  //       navigator.pop();
+  //     }
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      // onWillPop: () async {
-      //   final isFirstRouteInCurrentTab =
-      //       !await _navigatorKeys[activePageIndex].currentState!.maybePop();
-      //   return isFirstRouteInCurrentTab;
-      // },
-      canPop: true,
+    return WillPopScope(
+      onWillPop: () async {
+       
+        return false;
+      },
       child: Scaffold(
         backgroundColor: d_colorPage,
         appBar: AppBar(
@@ -116,7 +126,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
       '/': (context) {
         return [
           const Accueil(),
-           ProduitScreen(),
+          ProduitScreen(),
           const Panier(),
           const Profil()
         ].elementAt(index);

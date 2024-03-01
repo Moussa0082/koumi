@@ -12,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilA extends StatefulWidget {
   const ProfilA({super.key});
-
+  
   @override
   State<ProfilA> createState() => _ProfilAState();
 }

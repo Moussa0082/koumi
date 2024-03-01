@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
@@ -27,9 +26,8 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscureText = true;
   bool isActive = true;
   // late Acteur acteur;
-     bool _isLoading = false;
-     final String message = "Encore quelques secondes";
-
+  bool _isLoading = false;
+  final String message = "Encore quelques secondes";
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -240,38 +238,36 @@ class _LoginScreenState extends State<LoginScreen> {
         },
       );
     }
-  } 
-
-
-void _handleButtonPress() async{
-  // Afficher l'indicateur de chargement
-  setState(() {
-    _isLoading = true;
-  });
- if(isActive){
- await loginUser().then((_) {
-    // Cacher l'indicateur de chargement lorsque votre fonction est terminée
-    setState(() {
-      _isLoading = false;
-    });
-  });
- }else{
- await loginUserWithoutSavedData().then((_) {
-    // Cacher l'indicateur de chargement lorsque votre fonction est terminée
-    setState(() {
-      _isLoading = false;
-    });
-  });
- }  
   }
 
+  void _handleButtonPress() async {
+    // Afficher l'indicateur de chargement
+    setState(() {
+      _isLoading = true;
+    });
+    if (isActive) {
+      await loginUser().then((_) {
+        // Cacher l'indicateur de chargement lorsque votre fonction est terminée
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    } else {
+      await loginUserWithoutSavedData().then((_) {
+        // Cacher l'indicateur de chargement lorsque votre fonction est terminée
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    }
+  }
 
   Future<void> loginUserWithoutSavedData() async {
     final String emailActeur = emailController.text;
     final String password = passwordController.text;
 
     // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
-    const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
+    const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
 
     ActeurProvider acteurProvider =
         Provider.of<ActeurProvider>(context, listen: false);
@@ -310,12 +306,9 @@ void _handleButtonPress() async{
       );
 
       if (response.statusCode == 200) {
-       
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
         emailController.clear();
         passwordController.clear();
-
-
 
         List<dynamic> typeActeurData = responseBody['typeActeur'];
         List<TypeActeur> typeActeurList =
@@ -421,8 +414,6 @@ void _handleButtonPress() async{
     }
   }
 
-
-
   @override
   void initState() {
     super.initState();
@@ -494,11 +485,11 @@ void _handleButtonPress() async{
                         onSaved: (val) => email = val!,
                       ),
                       // fin  adresse email
-        
+
                       const SizedBox(
                         height: 10,
                       ),
-        
+
                       const Padding(
                         padding: EdgeInsets.only(left: 10.0),
                         child: Text(
@@ -545,7 +536,7 @@ void _handleButtonPress() async{
                         onSaved: (val) => password = val!,
                       ),
                       // fin mot de pass
-        
+
                       const SizedBox(height: 10),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -605,7 +596,7 @@ void _handleButtonPress() async{
                           ],
                         ),
                       ),
-        
+
                       const SizedBox(
                         height: 15,
                       ),
@@ -638,7 +629,7 @@ void _handleButtonPress() async{
                           ),
                         ),
                       ),
-        
+
                       const SizedBox(
                         height: 40,
                       ),
