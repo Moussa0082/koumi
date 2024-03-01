@@ -12,8 +12,8 @@ import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:path/path.dart';
 
 class StockService extends ChangeNotifier {
-  // static const String baseUrl = 'https://koumi.ml/api-koumi/Stock';
-  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Stock';
+  static const String baseUrl = 'https://koumi.ml/api-koumi/Stock';
+  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Stock';
 
   List<Stock> stockList = [];
   List<dynamic> stockListe = [];
@@ -164,7 +164,8 @@ class StockService extends ChangeNotifier {
   Future<List<Stock>> fetchStock() async {
     try {
       final response =
-          await http.get(Uri.parse('http://10.0.2.2:9000/Stock/getAllStocks'));
+          await http.get(Uri.parse('https://koumi.ml/api-koumi/Stock/getAllStocks'));
+          // await http.get(Uri.parse('http://10.0.2.2:9000/Stock/getAllStocks'));
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint("Fetching data for: ${response.statusCode}");

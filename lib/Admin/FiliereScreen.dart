@@ -44,8 +44,9 @@ class _FiliereScreenState extends State<FiliereScreen> {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
     para = paraList[0];
-    _filiereList = http.get(
-        Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+    _filiereList = http
+        .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+    // Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
   }
 
   @override
@@ -179,9 +180,24 @@ class _FiliereScreenState extends State<FiliereScreen> {
                       }
 
                       if (!snapshot.hasData) {
-                        return const Padding(
+                        return Padding(
                           padding: EdgeInsets.all(10),
-                          child: Center(child: Text("Aucune filière trouvé")),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                Image.asset('assets/images/notif.jpg'),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text('Aucune filière trouvé ',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 17,
+                                      overflow: TextOverflow.ellipsis,
+                                    ))
+                              ],
+                            ),
+                          ),
                         );
                       } else {
                         filiereList = snapshot.data!;
@@ -779,68 +795,79 @@ class _FiliereScreenState extends State<FiliereScreen> {
                         ),
                       ),
                       SizedBox(height: 16),
-                      FutureBuilder(
-                        future: _filiereList,
-                        builder: (_, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return CircularProgressIndicator();
-                          }
-                          if (snapshot.hasError) {
-                            return Text("${snapshot.error}");
-                          }
-                          if (snapshot.hasData) {
-                            final reponse =
-                                json.decode((snapshot.data.body)) as List;
-                            final filiereList = reponse
-                                .map((e) => Filiere.fromMap(e))
-                                .where((con) => con.statutFiliere == true)
-                                .toList();
-
-                            if (filiereList.isEmpty) {
-                              return Text(
-                                'Aucun donné disponible',
-                                style:
-                                    TextStyle(overflow: TextOverflow.ellipsis),
-                              );
+                      Consumer<FiliereService>(
+                          builder: (context, filiereService, child) {
+                        return FutureBuilder(
+                          future: _filiereList,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator();
                             }
+                            if (snapshot.hasError) {
+                              return Text("${snapshot.error}");
+                            }
+                            if (snapshot.hasData) {
+                              dynamic responseData =
+                                  json.decode(snapshot.data.body);
+                              if (responseData is List) {
+                                final reponse = responseData;
+                                final filiereList = reponse
+                                    .map((e) => Filiere.fromMap(e))
+                                    .where((con) => con.statutFiliere == true)
+                                    .toList();
 
-                            return DropdownButtonFormField<String>(
-                              items: filiereList
-                                  .map(
-                                    (e) => DropdownMenuItem(
-                                      value: e.idFiliere,
-                                      child: Text(e.libelleFiliere),
+                                if (filiereList.isEmpty) {
+                                  return Text(
+                                    'Aucune filière disponible',
+                                    style: TextStyle(
+                                        overflow: TextOverflow.ellipsis),
+                                  );
+                                }
+
+                                return DropdownButtonFormField<String>(
+                                  items: filiereList
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idFiliere,
+                                          child: Text(e.libelleFiliere),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: filiereValue,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      filiereValue = newValue;
+                                      if (newValue != null) {
+                                        filiere = filiereList.firstWhere(
+                                          (element) =>
+                                              element.idFiliere == newValue,
+                                        );
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Sélectionner un filiere',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                  )
-                                  .toList(),
-                              value: filiereValue,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  filiereValue = newValue;
-                                  if (newValue != null) {
-                                    filiere = filiereList.firstWhere(
-                                        (element) =>
-                                            element.idFiliere == newValue);
-
-                                    // typeSelected = true;
-                                  }
-                                });
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Sélectionner un filiere',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
+                                  ),
+                                );
+                              } else {
+                                return Text(
+                                  'Aucune filière disponible',
+                                  style: TextStyle(
+                                      overflow: TextOverflow.ellipsis),
+                                );
+                              }
+                            }
+                            return Text(
+                              'Aucune filière disponible',
+                              style: TextStyle(overflow: TextOverflow.ellipsis),
                             );
-                          }
-                          return Text(
-                            'Aucune donnée disponible',
-                            style: TextStyle(overflow: TextOverflow.ellipsis),
-                          );
-                        },
-                      ),
+                          },
+                        );
+                      }),
                       SizedBox(height: 16),
                       TextFormField(
                         validator: (value) {

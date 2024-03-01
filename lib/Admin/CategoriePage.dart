@@ -52,10 +52,11 @@ class _CategoriPageState extends State<CategoriPage> {
     super.initState();
 
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    _filiereList = http.get(
-        Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
-    _categorieList = http.get(
-        Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
+    _filiereList = http
+        .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+    // Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+    _categorieList = http
+        .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
     _liste = getCat();
     _searchController = TextEditingController();
   }
@@ -180,9 +181,24 @@ class _CategoriPageState extends State<CategoriPage> {
                       }
 
                       if (!snapshot.hasData) {
-                        return const Padding(
+                        return Padding(
                           padding: EdgeInsets.all(10),
-                          child: Center(child: Text("Aucun catégorie trouvé")),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                Image.asset('assets/images/notif.jpg'),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text('Aucune catégorie trouvé ',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 17,
+                                      overflow: TextOverflow.ellipsis,
+                                    ))
+                              ],
+                            ),
+                          ),
                         );
                       } else {
                         categorieList = snapshot.data!;
@@ -196,8 +212,27 @@ class _CategoriPageState extends State<CategoriPage> {
                         return Column(
                             children: filteredCatSearch.isEmpty
                                 ? [
-                                    Center(
-                                        child: Text("Aucune catégorie trouvée"))
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Center(
+                                        child: Column(
+                                          children: [
+                                            Image.asset(
+                                                'assets/images/notif.jpg'),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Text('Aucune catégorie trouvé ',
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 17,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ))
+                                          ],
+                                        ),
+                                      ),
+                                    )
                                   ]
                                 : filteredCatSearch
                                     .map((e) => Padding(
@@ -755,53 +790,61 @@ class _CategoriPageState extends State<CategoriPage> {
                             return Text("${snapshot.error}");
                           }
                           if (snapshot.hasData) {
-                            final reponse =
-                                json.decode((snapshot.data.body)) as List;
-                            final filiereList = reponse
-                                .map((e) => Filiere.fromMap(e))
-                                .where((con) => con.statutFiliere == true)
-                                .toList();
+                            dynamic responseData =
+                                json.decode(snapshot.data.body);
+                            if (responseData is List) {
+                              final reponse = responseData;
+                              final filiereList = reponse
+                                  .map((e) => Filiere.fromMap(e))
+                                  .where((con) => con.statutFiliere == true)
+                                  .toList();
 
-                            if (filiereList.isEmpty) {
+                              if (filiereList.isEmpty) {
+                                return Text(
+                                  'Aucune filière disponible',
+                                  style: TextStyle(
+                                      overflow: TextOverflow.ellipsis),
+                                );
+                              }
+
+                              return DropdownButtonFormField<String>(
+                                items: filiereList
+                                    .map(
+                                      (e) => DropdownMenuItem(
+                                        value: e.idFiliere,
+                                        child: Text(e.libelleFiliere),
+                                      ),
+                                    )
+                                    .toList(),
+                                value: filiereValue,
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    filiereValue = newValue;
+                                    if (newValue != null) {
+                                      filiere = filiereList.firstWhere(
+                                        (element) =>
+                                            element.idFiliere == newValue,
+                                      );
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Sélectionner un filiere',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            } else {
                               return Text(
-                                'Aucun donné disponible',
+                                'Aucune filière disponible',
                                 style:
                                     TextStyle(overflow: TextOverflow.ellipsis),
                               );
                             }
-
-                            return DropdownButtonFormField<String>(
-                              items: filiereList
-                                  .map(
-                                    (e) => DropdownMenuItem(
-                                      value: e.idFiliere,
-                                      child: Text(e.libelleFiliere),
-                                    ),
-                                  )
-                                  .toList(),
-                              value: filiereValue,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  filiereValue = newValue;
-                                  if (newValue != null) {
-                                    filiere = filiereList.firstWhere(
-                                        (element) =>
-                                            element.idFiliere == newValue);
-
-                                    // typeSelected = true;
-                                  }
-                                });
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Sélectionner un filiere',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            );
                           }
                           return Text(
-                            'Aucune donnée disponible',
+                            'Aucune filière disponible',
                             style: TextStyle(overflow: TextOverflow.ellipsis),
                           );
                         },
@@ -1030,54 +1073,62 @@ class _CategoriPageState extends State<CategoriPage> {
                             return Text("${snapshot.error}");
                           }
                           if (snapshot.hasData) {
-                            final reponse =
-                                json.decode((snapshot.data.body)) as List;
-                            final catList = reponse
-                                .map((e) => CategorieProduit.fromMap(e))
-                                .where((con) => con.statutCategorie == true)
-                                .toList();
+                            dynamic responseData =
+                                json.decode(snapshot.data.body);
+                            if (responseData is List) {
+                              final reponse = responseData;
+                              final filiereList = reponse
+                                  .map((e) => CategorieProduit.fromMap(e))
+                                  .where((con) => con.statutCategorie == true)
+                                  .toList();
 
-                            if (catList.isEmpty) {
+                              if (filiereList.isEmpty) {
+                                return Text(
+                                  'Aucune catégorie disponible',
+                                  style: TextStyle(
+                                      overflow: TextOverflow.ellipsis),
+                                );
+                              }
+
+                              return DropdownButtonFormField<String>(
+                                items: filiereList
+                                    .map(
+                                      (e) => DropdownMenuItem(
+                                        value: e.idCategorieProduit,
+                                        child: Text(e.libelleCategorie),
+                                      ),
+                                    )
+                                    .toList(),
+                                value: catValue,
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    catValue = newValue;
+                                    if (newValue != null) {
+                                      categorieProduit = filiereList.firstWhere(
+                                        (element) =>
+                                            element.idCategorieProduit ==
+                                            newValue,
+                                      );
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Sélectionner une catégorie',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            } else {
                               return Text(
-                                'Aucun donné disponible',
+                                'Aucune catégorie disponible',
                                 style:
                                     TextStyle(overflow: TextOverflow.ellipsis),
                               );
                             }
-
-                            return DropdownButtonFormField<String>(
-                              items: catList
-                                  .map(
-                                    (e) => DropdownMenuItem(
-                                      value: e.idCategorieProduit,
-                                      child: Text(e.libelleCategorie),
-                                    ),
-                                  )
-                                  .toList(),
-                              value: catValue,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  catValue = newValue;
-                                  if (newValue != null) {
-                                    categorieProduit = categorieList.firstWhere(
-                                        (element) =>
-                                            element.idCategorieProduit ==
-                                            newValue);
-
-                                    // typeSelected = true;
-                                  }
-                                });
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Sélectionner une categorie',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            );
                           }
                           return Text(
-                            'Aucune donnée disponible',
+                            'Aucune catégorie disponible',
                             style: TextStyle(overflow: TextOverflow.ellipsis),
                           );
                         },

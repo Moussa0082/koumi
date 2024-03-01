@@ -341,7 +341,7 @@ class _NotificationPageState extends State<NotificationPage> {
               fontWeight: FontWeight.w500,
             ),
             onTap: () {
-              _showEmail();
+              // _showEmail();
             },
           ),
         ],
@@ -511,7 +511,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           minimumSize: const Size(290, 45),
                         ),
                         icon: const Icon(
-                          Icons.add,
+                          Icons.send,
                           color: Colors.white,
                         ),
                         label: const Text(
