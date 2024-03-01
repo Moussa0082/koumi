@@ -231,6 +231,11 @@ class _MagasinScreenState extends State<MagasinScreen>
 
   Widget buildGridView(String id) {
     List<Map<String, dynamic>>? magasins = magasinsParRegion[id];
+    try {
+      
+    } catch (e) {
+      
+    }
     if (magasins == null) {
       // Si les données ne sont pas encore chargées, affichez l'effet Shimmer
       return _buildShimmerEffect();

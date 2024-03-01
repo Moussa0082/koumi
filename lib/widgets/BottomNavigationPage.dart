@@ -19,6 +19,17 @@ const d_colorOr = Color.fromRGBO(254, 243, 231, 1);
 
 class _BottomNavigationPageState extends State<BottomNavigationPage> {
   int activePageIndex = 0;
+    Future<bool> _onBackPressed() async {
+    // Essayez de revenir en arrière dans la pile de navigation actuelle
+    final NavigatorState? navigator =
+        _navigatorKeys[activePageIndex].currentState;
+    if (navigator != null && navigator.canPop()) {
+      // S'il y a une page précédente, pop la page
+      navigator.pop();
+      return false; // Indiquez que l'événement de retour a été géré
+    }
+    return true; // Indiquez que l'application peut se fermer
+  }
 
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
     GlobalKey<NavigatorState>(),
@@ -46,13 +57,9 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      // onWillPop: () async {
-      //   final isFirstRouteInCurrentTab =
-      //       !await _navigatorKeys[activePageIndex].currentState!.maybePop();
-      //   return isFirstRouteInCurrentTab;
-      // },
-      canPop: true,
+    return WillPopScope(
+      onWillPop: _onBackPressed,
+      // canPop: true,
       child: Scaffold(
         backgroundColor: d_colorPage,
         appBar: AppBar(
