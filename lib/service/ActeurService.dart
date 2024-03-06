@@ -48,11 +48,12 @@ class ActeurService extends ChangeNotifier {
             logoActeur.readAsBytes().asStream(), logoActeur.lengthSync(),
             filename: basename(logoActeur.path)));
       }
-
+  
+  //acteur
       requete.fields['acteur'] = jsonEncode({
         'nomActeur': nomActeur,
         'adresseActeur': adresseActeur,
-        'telephoneActeur': telephoneActeur,
+        'telephoneActeur': telephoneActeur, 
         'whatsAppActeur': whatsAppActeur,
         'latitude': latitude,
         'longitude': longitude,
