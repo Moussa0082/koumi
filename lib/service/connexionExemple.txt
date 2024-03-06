@@ -322,3 +322,88 @@ Future<void> checkUserSession() async {
     }
   }
 }
+
+
+
+
+
+ Padding(
+                padding: const EdgeInsets.only(left:10.0),
+                child: Text("Pays *", style: TextStyle(color: (Colors.black), fontSize: 18),),
+              ),
+             
+              //  selcet le niveau 3 pays 
+                       Container(
+              height:70,
+              width:double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child:SizedBox(
+                  child: FutureBuilder(
+                                      future: _mesPays,
+                                      builder: (_, snapshot) {
+                                        try {
+                                          
+                                                  List<DropdownMenuItem<String>> dropdownItems = [];
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return Shimmer.fromColors(
+                                                  baseColor: const Color.fromARGB(185, 224, 224, 224)!,
+                                            highlightColor: Colors.grey[100]!,
+                                            child: DropdownButton(
+                                              dropdownColor: Colors.orange,
+                                                items: [], onChanged: (value) {}
+                                                          
+                                            ),
+                                          );
+                                        }else {
+                              dropdownItems.add(DropdownMenuItem(
+                                child: Text('Aucun pays disponible'),
+                                value: null,
+                              ));
+                            }
+                                        if (snapshot.hasError) {
+                                          return Text("${snapshot.error}");
+                                        }
+                                        if (snapshot.hasData) {
+                                          //debugPrint(snapshot.data.body.toString());
+                                          final  reponse  =
+                                          json.decode((snapshot.data.body))
+                                          as List;
+                                          final mesPays = reponse
+                                              .map((e) =>Pays.fromMap(e))
+                                              .where((e)=> e.statutPays == true)
+                                              .toList();
+                                          //debugPrint(mesCategories.length.toString());
+                                          return DropdownButton(
+                                              items: mesPays
+                                                  .map((e) => DropdownMenuItem(
+                                                child: Text(e.nomPays, style:TextStyle(fontWeight: FontWeight.bold)),
+                                                value: e.idPays,
+                                              ),)
+                                                  .toList(),
+                                              
+                                              value: paysValue,
+                                              onChanged: (newValue) {
+                                                setState(() {
+                                                  paysValue = newValue;
+                                                  monPays = mesPays
+                                                      .firstWhere((element) =>
+                                                  element.idPays ==
+                                                      newValue);
+                                                  debugPrint(
+                                                      monPays.idPays.toString());
+                                                });
+                                              });
+                                        }
+                                         return Text('Aucune donnée disponible');
+                                      } catch (e) {
+                                        // Gérer l'absence de connexion ici
+                                        return Center(child: Text('Pays non disponible, verifier \nvotre connexion internet ', style: TextStyle(fontSize: 15),));
+                                    }
+                                      },
+                                    )
+                ),
+              ),
+            ),
+              //end select

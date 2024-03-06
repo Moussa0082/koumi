@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/Admin/AcceuilAdmin.dart';
-import 'package:koumi_app/Admin/PanierA.dart';
 import 'package:koumi_app/Admin/ProduitA.dart';
 import 'package:koumi_app/Admin/ProfilA.dart';
 import 'package:koumi_app/screens/Panier.dart';
-import 'package:koumi_app/screens/Produit.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:provider/provider.dart';
 
@@ -21,6 +19,17 @@ const d_colorOr = Color.fromRGBO(254, 243, 231, 1);
 
 class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
   int activePageIndex = 0;
+  // void _onBackPressed(bool isBackPressed) async {
+  //   if (!isBackPressed) {
+  //     // Essayez de revenir en arrière dans la pile de navigation actuelle
+  //     final NavigatorState? navigator =
+  //         _navigatorKeys[activePageIndex].currentState;
+  //     if (navigator != null && navigator.canPop()) {
+  //       // S'il y a une page précédente, pop la page
+  //       navigator.pop();
+  //     }
+  //   }
+  // }
 
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
     GlobalKey<NavigatorState>(),
@@ -28,7 +37,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
   ];
-  
+
   List pages = <Widget>[
     const AcceuilAdmin(),
     const ProduitA(),
@@ -51,9 +60,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        final isFirstRouteInCurrentTab =
-            !await _navigatorKeys[activePageIndex].currentState!.maybePop();
-        return isFirstRouteInCurrentTab;
+        return false;
       },
       child: Scaffold(
         backgroundColor: d_colorPage,

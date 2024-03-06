@@ -211,20 +211,35 @@ class _ProduitScreenState extends State<ProduitScreen>
   Widget buildGridView(String idCategorie, String idMagasin) {
     List<Stock> filteredStocks = stock;
     String searchText = "";
+  
+ 
     if (filteredStocks.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Center(
-          child: Text(
-            textAlign: TextAlign.justify,
-            'Aucun produit trouvé dans le magasin ' +
-                widget.nom!.toUpperCase() +
-                " dans la categorie " +
-                selectedCategorieProduitNom.toUpperCase(),
+       return
+    SingleChildScrollView(
+          child: Padding(
+                            padding: EdgeInsets.all(2),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  Image.asset('assets/images/notif.jpg'),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                
+    Padding(
+     padding: const EdgeInsets.all(8.0),
+     child: Center(
+          child: Text( textAlign:TextAlign.justify,
+            'Aucun produit trouvé dans le magasin ' + widget.nom!.toUpperCase() + " dans la categorie " +  selectedCategorieProduitNom.toUpperCase(),
             style: TextStyle(fontSize: 16),
           ),
         ),
-      );
+   )
+                                ],
+                              ),
+                            ),
+                          ),
+        );
     } else {
       List<Stock> filteredStocksSearch = filteredStocks.where((stock) {
         String nomProduit = stock.nomProduit!.toLowerCase();
@@ -233,7 +248,22 @@ class _ProduitScreenState extends State<ProduitScreen>
       }).toList();
 
       if (filteredStocksSearch.isEmpty) {
-        return Padding(
+        return 
+        
+      
+    SingleChildScrollView(
+          child: Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  Image.asset('assets/images/notif.jpg'),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                
+   
+        Padding(
           padding: const EdgeInsets.all(8.0),
           child: Center(
             child: Text(
@@ -245,6 +275,11 @@ class _ProduitScreenState extends State<ProduitScreen>
               style: TextStyle(fontSize: 16),
             ),
           ),
+        )
+                                ],
+                              ),
+                            ),
+                          ),
         );
       }
 

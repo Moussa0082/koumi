@@ -71,6 +71,10 @@ class _DetailsActeurState extends State<DetailsActeur> {
                         fontSize: 22,
                         overflow: TextOverflow.ellipsis,
                       ))),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: _buildPanel(),
             )
           ],
         ),
@@ -81,38 +85,37 @@ class _DetailsActeurState extends State<DetailsActeur> {
   Widget _buildPanel() {
     return ExpansionPanelList(
       expansionCallback: (int index, bool isExpanded) {
-        setState(() {});
+        setState(() {
+          active = !active;
+        });
       },
       children: <ExpansionPanel>[
         ExpansionPanel(
             headerBuilder: (context, isExpanded) {
-              return Container(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        offset: const Offset(0, 2),
-                        blurRadius: 5,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildProfile("Adresse", acteurs.adresseActeur),
-                        _buildProfile("Téléphone", acteurs.telephoneActeur),
-                        _buildProfile("Email", acteurs.emailActeur),
-                      ],
-                    ),
-                  ));
+              return Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildProfile("Adresse", acteurs.adresseActeur),
+                    _buildProfile("Téléphone", acteurs.telephoneActeur),
+                    _buildProfile("Email", acteurs.emailActeur),
+                  ],
+                ),
+              );
             },
-            body: ListTile(),
+            body: Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildProfile("whatsApp", acteurs.whatsAppActeur),
+                  _buildProfile("Pays", acteurs.niveau3PaysActeur!),
+                  _buildProfile("Localité", acteurs.localiteActeur),
+                  _buildProfile("Filière", acteurs.filiereActeur!),
+                ],
+              ),
+            ),
             isExpanded: active,
             canTapOnHeader: true)
       ],
@@ -121,7 +124,7 @@ class _DetailsActeurState extends State<DetailsActeur> {
 
   Widget _buildProfile(String title, String value) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -146,4 +149,65 @@ class _DetailsActeurState extends State<DetailsActeur> {
       ),
     );
   }
+
+//   Widget _buildPanel() {
+//   return ExpansionPanelList(
+//     expansionCallback: (int index, bool isExpanded) {
+//       setState(() {});
+//     },
+//     children: <ExpansionPanel>[
+//       ExpansionPanel(
+//         headerBuilder: (context, isExpanded) {
+//           return Padding(
+//             padding: const EdgeInsets.all(10.0),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 _buildProfile("Adresse", acteurs.adresseActeur),
+//                 _buildProfile("Téléphone", acteurs.telephoneActeur),
+//                 _buildProfile("Email", acteurs.emailActeur),
+//               ],
+//             ),
+//           );
+//         },
+//         body: Container(), // Replace with your body widget if needed
+//         isExpanded: active,
+//         canTapOnHeader: true,
+//       )
+//     ],
+//   );
+// }
+
+// Widget _buildProfile(String title, String value) {
+//   return Column(
+//     crossAxisAlignment: CrossAxisAlignment.start,
+//     children: [
+//       Padding(
+//         padding: const EdgeInsets.only(bottom: 8.0),
+//         child: Text(
+//           title,
+//           style: const TextStyle(
+//             color: Colors.black87,
+//             fontWeight: FontWeight.bold,
+//             fontSize: 16,
+//           ),
+//         ),
+//       ),
+//       Padding(
+//         padding: const EdgeInsets.only(bottom: 16.0),
+//         child: Text(
+//           value,
+//           style: const TextStyle(
+//             color: Colors.black,
+//             fontSize: 14,
+//           ),
+//         ),
+//       ),
+//       Divider(
+//         height: 1,
+//         color: Colors.grey[300],
+//       ),
+//     ],
+//   );
+// }
 }

@@ -15,7 +15,7 @@ class Acteur {
     String? longitude;
     String? photoSiegeActeur;
     String? logoActeur;
-    String niveau3PaysActeur;
+    String? niveau3PaysActeur;
     String? password;
     String? dateAjout;
     String? dateModif;
@@ -40,7 +40,7 @@ class Acteur {
      this.longitude,
      this.photoSiegeActeur,
      this.logoActeur,
-    required this.niveau3PaysActeur,
+     this.niveau3PaysActeur,
     required this.password,
     this.dateAjout,
     this.dateModif,

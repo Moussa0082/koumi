@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:koumi_app/Admin/FiliereScreen.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
-
-import 'package:koumi_app/screens/LoginSuccessScreen.dart';
 import 'package:koumi_app/screens/SplashScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/ContinentService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
+import 'package:koumi_app/service/MessageService.dart';
 import 'package:koumi_app/service/Niveau1Service.dart';
 import 'package:koumi_app/service/Niveau2Service.dart';
 import 'package:koumi_app/service/Niveau3Service.dart';
@@ -24,9 +22,7 @@ import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:provider/provider.dart';
 
-
-
-void main() {
+void main() { 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => ActeurService()),
     ChangeNotifierProvider(create: (context) => TypeActeurService()),
@@ -37,6 +33,7 @@ void main() {
     ChangeNotifierProvider(create: (context) => UniteService()),
     ChangeNotifierProvider(create: (context) => ZoneProductionService()),
     ChangeNotifierProvider(create: (context) => PaysService()),
+    ChangeNotifierProvider(create: (context) => MessageService()),
     ChangeNotifierProvider(create: (context) => ContinentService()),
     ChangeNotifierProvider(create: (context) => CategorieService()),
     ChangeNotifierProvider(create: (context) => SpeculationService()),
@@ -55,21 +52,21 @@ void main() {
 //     checkUserSession(); // Appel de la fonction pour vérifier la session utilisateur
 //   }
 
-  // Future<void> checkUserSession() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String? email = prefs.getString('emailActeur');
-  //   String? password = prefs.getString('password');
+// Future<void> checkUserSession() async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   String? email = prefs.getString('emailActeur');
+//   String? password = prefs.getString('password');
 
-  //   if (email != null && password != null) {
-  //     // S'il existe des informations d'identification utilisateur dans les SharedPreferences, connectez automatiquement l'utilisateur
-  //     // Utilisez votre méthode de connexion appropriée ici
-  //     // Par exemple :
-  //     // loginUser(email, password);
-  //   } else {
-  //     // Si aucune information d'identification utilisateur n'est trouvée, redirigez l'utilisateur vers l'écran de connexion
-  //     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => LoginScreen()));
-  //   }
-  // }
+//   if (email != null && password != null) {
+//     // S'il existe des informations d'identification utilisateur dans les SharedPreferences, connectez automatiquement l'utilisateur
+//     // Utilisez votre méthode de connexion appropriée ici
+//     // Par exemple :
+//     // loginUser(email, password);
+//   } else {
+//     // Si aucune information d'identification utilisateur n'est trouvée, redirigez l'utilisateur vers l'écran de connexion
+//     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => LoginScreen()));
+//   }
+// }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -157,4 +154,3 @@ class MyApp extends StatelessWidget {
 //     );
 //   }
 // }
-

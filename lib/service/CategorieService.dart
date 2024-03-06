@@ -7,8 +7,8 @@ import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Filiere.dart';
 
 class CategorieService extends ChangeNotifier {
-  // static const String baseUrl = 'https://koumi.ml/api-koumi/Categorie';
-  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Categorie';
+  static const String baseUrl = 'https://koumi.ml/api-koumi/Categorie';
+  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Categorie';
 
   List<CategorieProduit> categorieList = [];
 
@@ -36,13 +36,13 @@ class CategorieService extends ChangeNotifier {
     }
   }
 
-  Future<void> updateCategorie(
-      {required String idCategorieProduit,
-      required String libelleCategorie,
-      required String descriptionCategorie,
-      required String personneModif,
-       required Filiere filiere,
-      }) async {
+  Future<void> updateCategorie({
+    required String idCategorieProduit,
+    required String libelleCategorie,
+    required String descriptionCategorie,
+    required String personneModif,
+    required Filiere filiere,
+  }) async {
     var addcat = jsonEncode({
       'idCategorieProduit': idCategorieProduit,
       'libelleCategorie': libelleCategorie,
@@ -64,7 +64,7 @@ class CategorieService extends ChangeNotifier {
   }
 
   Future<List<CategorieProduit>> fetchCategorie() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
+    final response = await http.get(Uri.parse("$baseUrl/allCategorie"));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
@@ -73,9 +73,9 @@ class CategorieService extends ChangeNotifier {
       debugPrint(response.body);
       return categorieList;
     } else {
-      categorieList = [];
+      
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
-      throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+      return categorieList = [];
     }
   }
 

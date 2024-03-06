@@ -12,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilA extends StatefulWidget {
   const ProfilA({super.key});
-
+  
   @override
   State<ProfilA> createState() => _ProfilAState();
 }
@@ -130,7 +130,7 @@ class _ProfilAState extends State<ProfilA> {
                                     _buildProfile('Adresse', ac.adresseActeur),
                                     _buildProfile(
                                         'Localité', ac.localiteActeur),
-                                    _buildProfile('Pays', ac.niveau3PaysActeur),
+                                    _buildProfile('Pays', ac.niveau3PaysActeur!),
                                   ],
                                 ),
                               ),

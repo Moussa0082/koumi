@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 // import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:http/http.dart' as http;
@@ -25,6 +28,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String telephone = "";
   String email = "";
   String? typeValue;
+  String selectedCountry = '';
   late TypeActeur monTypeActeur;
   late Future _mesTypeActeur;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -33,11 +37,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     String dropdownvalue = 'Item 1';    
   
+   final TextEditingController controller = TextEditingController();
+  String initialCountry = 'ML';
+  PhoneNumber number = PhoneNumber(isoCode: 'ML');
   // List of items in our dropdown menu 
   var items = [     
     'Item 2', 
     
   ]; 
+
+   void getPhoneNumber(String phoneNumber) async {
+    PhoneNumber number =
+        await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber, 'US');
+
+    setState(() {
+      this.number = number;
+    });
+  }
+
 
   TextEditingController nomActeurController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -60,6 +77,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  String removePlus(String phoneNumber) {
+  if (phoneNumber.startsWith('+')) {
+    return phoneNumber.substring(1); // Remove the first character
+  } else {
+    return phoneNumber; // No change if "+" is not present
+  }
+}
+
+  String processedNumber = "";
 
    @override
   void initState() {
@@ -68,6 +94,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _mesTypeActeur  =
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/typeActeur/read'));
     
+  }
+
+   @override
+  void dispose() {
+   controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -179,36 +211,52 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   // fin  adresse email
                       const SizedBox(height: 10,),
 
+                     
+
                       Padding(
                   padding: const EdgeInsets.only(left:10.0),
                   child: Text("Téléphone *", style: TextStyle(color: (Colors.black), fontSize: 18),),
                 ),
-                TextFormField(
-                    controller: telephoneController,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15)),
-                        // labelText: "Téléphone",
-                        hintText: " (+223) XX XX XX XX ",
-                       
-                        ),
-                    keyboardType: TextInputType.phone,
-                    validator: (val) {
-                      if (val == null || val.isEmpty ) {
-                        return "Veillez entrez votre numéro de téléphone";
-                      } 
-                      else if (val.length< 8) {
-                        return "Veillez entrez 8 au moins chiffres";
-                      } 
-                      else if (val.length> 11) {
-                        return "Le numéro ne doit pas depasser 11 chiffres";
-                      } 
-                      else {
-                        return null;
-                      }
-                    },
-                    onSaved: (val) => telephone = val!,
-                  ),
+  Container(
+  child: Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: <Widget>[
+      InternationalPhoneNumberInput(
+        formatInput: true,
+        
+        hintText: "Numéro de téléphone",
+        maxLength: 20,
+        errorMessage: "Numéro invalide",
+        onInputChanged: (PhoneNumber number) {
+          print("Pays : $selectedCountry" );
+           processedNumber = removePlus(number.phoneNumber!);
+          print(processedNumber);
+        },
+        onInputValidated: (bool value) {
+          print(value);
+        },
+        selectorConfig: SelectorConfig(
+          selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+          useBottomSheetSafeArea: true,
+        ),
+        ignoreBlank: false,
+        autoValidateMode: AutovalidateMode.disabled,
+        selectorTextStyle: TextStyle(color: Colors.black),
+        keyboardType: TextInputType.phone,
+        inputDecoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+          ),
+        ),
+        onSaved: (PhoneNumber number) {
+          print('On Saved: $number');
+        },
+        textFieldController: controller,
+       
+      ),
+    ],
+  ),
+),
                   // fin  téléphone 
               const SizedBox(height: 10,),
                        Padding(
@@ -230,19 +278,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
       builder: (_, snapshot) {
         try {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: DropdownButton(
-                dropdownColor: Colors.orange,
-                items: [],
-                onChanged: (value) {},
-              ),
-            );
+            return CircularProgressIndicator(
+            backgroundColor: (Color.fromARGB(255, 245, 212, 169)),
+            color: (Colors.orange),
+          );
           }
           if (snapshot.hasError) {
-            return Text("${snapshot.error}");
+            return Text("Une erreur s'est produite veuillez reéssayer plus tard");
           }
+           if (!snapshot.hasData) {
+                    return Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Center(
+                        child: Text("Aucun typpe dacteur disponible"),
+                      ),
+                    );
+                  }
           if (snapshot.hasData) {
             final reponse = json.decode((snapshot.data.body)) as List;
             final mesType = reponse
@@ -308,7 +359,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                  
                 Navigator.push(context, MaterialPageRoute(builder: (context) =>  
                 RegisterNextScreen(nomActeur: nomActeurController.text, email: emailController.text,
-                 telephone: telephoneController.text, typeActeur: [monTypeActeur],) ));
+                 telephone: processedNumber ,typeActeur: [monTypeActeur],) ));
               
                 }
                },

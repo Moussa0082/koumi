@@ -1,7 +1,11 @@
 import 'dart:io';
 
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_multi_formatter/formatters/phone_input_formatter.dart';
+import 'package:flutter_multi_formatter/widgets/country_dropdown.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/screens/RegisterEndScreen.dart';
@@ -17,9 +21,7 @@ class RegisterNextScreen extends StatefulWidget {
 
   String nomActeur, email,telephone;
   late List<TypeActeur> typeActeur;
-    
- 
-
+   
 
    RegisterNextScreen({super.key, required this.nomActeur, required this.email, required this.telephone,  required this.typeActeur});
 
@@ -30,6 +32,7 @@ class RegisterNextScreen extends StatefulWidget {
 class _RegisterNextScreenState extends State<RegisterNextScreen> {
 
 
+    PhoneCountryData? _initialCountryData;
 
       final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String maillon = "";
@@ -48,11 +51,26 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
   // Valeur par défaut
   String selectedOption = "Option 1";
 
+  String processedNumber = "";
+  String initialCountry = 'ML';
+  PhoneNumber number = PhoneNumber(isoCode: 'ML');
+  
+    final TextEditingController controller = TextEditingController();
   TextEditingController localisationController = TextEditingController();
   TextEditingController maillonController = TextEditingController();
   TextEditingController whatsAppController = TextEditingController();
   TextEditingController paysController = TextEditingController();
   TextEditingController adresseController = TextEditingController();
+   String selectedCountry = "";
+
+
+    String removePlus(String phoneNumber) {
+  if (phoneNumber.startsWith('+')) {
+    return phoneNumber.substring(1); // Remove the first character
+  } else {
+    return phoneNumber; // No change if "+" is not present
+  }
+}
 
 
      Future<File> saveImagePermanently(String imagePath) async {
@@ -137,8 +155,8 @@ for (TypeActeur typeActeur in widget.typeActeur) {
 
 debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}, Email : ${widget.email}, Types d'acteurs : $typeActeurNames");
  
-  _mesPays  =
-        http.get(Uri.parse('http://10.0.2.2:9000/pays/read'));
+  // _mesPays  =
+  //       http.get(Uri.parse('http://10.0.2.2:9000/pays/read'));
   }
 
 
@@ -222,7 +240,7 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15)),
-                      labelText: "Votre adresse",
+                      // labelText: "Votre adresse",
                       hintText: "Entrez votre adresse de residence",
                       
                       ),
@@ -249,7 +267,7 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15)),
-                      labelText: "Maillon",
+                      // labelText: "Maillon",
                       hintText: "Entrez votre maillon",
                      
                       ),
@@ -275,7 +293,7 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15)),
-                      labelText: "Localisation",
+                      // labelText: "Localisation",
                       hintText: "Votre localisation ",
                       
                       ),
@@ -298,115 +316,108 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
                 padding: const EdgeInsets.only(left:10.0),
                 child: Text("Numéro WhtasApp", style: TextStyle(color: (Colors.black), fontSize: 18),),
               ),
-              TextFormField(
-                  controller: whatsAppController,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                      labelText: "Numero whatsApp",
-                      hintText: "Votre numéro whtas app ",
+                const SizedBox(height: 4,),
+              // TextFormField(
+              //     controller: whatsAppController,
+              //     decoration: InputDecoration(
+              //         border: OutlineInputBorder(
+              //             borderRadius: BorderRadius.circular(15)),
+              //         // labelText: "Numero whatsApp",
+              //         hintText: "Votre numéro whtas app ",
                       
-                      ),
-                  keyboardType: TextInputType.phone,
-                  validator: (val) {
-                     if (val == null || val.isEmpty ) {
-                        return "Veillez entrez votre numéro de téléphone";
-                      } 
-                      else if (val.length< 8) {
-                        return "Veillez entrez 8 au moins chiffres";
-                      } 
-                      else if (val.length> 11) {
-                        return "Le numéro ne doit pas depasser 11 chiffres";
-                      } 
-                      else {
-                        return null;
-                      }
-                  },
-                  onSaved: (val) => localisation = val!,
-                ),
+              //         ),
+              //     keyboardType: TextInputType.phone,
+              //     validator: (val) {
+              //        if (val == null || val.isEmpty ) {
+              //           return "Veillez entrez votre numéro de téléphone";
+              //         } 
+              //         else if (val.length< 8) {
+              //           return "Veillez entrez 8 au moins chiffres";
+              //         } 
+              //         else if (val.length> 11) {
+              //           return "Le numéro ne doit pas depasser 11 chiffres";
+              //         } 
+              //         else {
+              //           return null;
+              //         }
+              //     },
+              //     onSaved: (val) => localisation = val!,
+              //   ),
+              Container(
+  child: Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: <Widget>[
+      InternationalPhoneNumberInput(
+        formatInput: true,
+        hintText: "Numéro de téléphone",
+        maxLength: 20,
+        errorMessage: "Numéro invalide",
+        onInputChanged: (PhoneNumber number) {
+           processedNumber = removePlus(number.phoneNumber!);
+          print(processedNumber);
+        },
+        onInputValidated: (bool value) {
+          print(value);
+        },
+        selectorConfig: SelectorConfig(
+          selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+          useBottomSheetSafeArea: true,
+        ),
+        ignoreBlank: false,
+        autoValidateMode: AutovalidateMode.disabled,
+        selectorTextStyle: TextStyle(color: Colors.black),
+        keyboardType: TextInputType.phone,
+        inputDecoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+          ),
+        ),
+        onSaved: (PhoneNumber number) {
+          print('On Saved: $number');
+        },
+        textFieldController: controller,
+       
+      ),
+    ],
+  ),
+),
                 // fin whatsApp acteur 
                    
-                     Padding(
-                padding: const EdgeInsets.only(left:10.0),
-                child: Text("Pays *", style: TextStyle(color: (Colors.black), fontSize: 18),),
-              ),
-             
-              //  selcet le niveau 3 pays 
-                       Container(
-              height:70,
-              width:double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child:SizedBox(
-                  child: FutureBuilder(
-                                      future: _mesPays,
-                                      builder: (_, snapshot) {
-                                        try {
-                                          
-                                                  List<DropdownMenuItem<String>> dropdownItems = [];
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return Shimmer.fromColors(
-                                                  baseColor: const Color.fromARGB(185, 224, 224, 224)!,
-                                            highlightColor: Colors.grey[100]!,
-                                            child: DropdownButton(
-                                              dropdownColor: Colors.orange,
-                                                items: [], onChanged: (value) {}
-                                                          
-                                            ),
-                                          );
-                                        }else {
-                              dropdownItems.add(DropdownMenuItem(
-                                child: Text('Aucun pays disponible'),
-                                value: null,
-                              ));
-                            }
-                                        if (snapshot.hasError) {
-                                          return Text("${snapshot.error}");
-                                        }
-                                        if (snapshot.hasData) {
-                                          //debugPrint(snapshot.data.body.toString());
-                                          final  reponse  =
-                                          json.decode((snapshot.data.body))
-                                          as List;
-                                          final mesPays = reponse
-                                              .map((e) =>Pays.fromMap(e))
-                                              .where((e)=> e.statutPays == true)
-                                              .toList();
-                                          //debugPrint(mesCategories.length.toString());
-                                          return DropdownButton(
-                                              items: mesPays
-                                                  .map((e) => DropdownMenuItem(
-                                                child: Text(e.nomPays, style:TextStyle(fontWeight: FontWeight.bold)),
-                                                value: e.idPays,
-                                              ),)
-                                                  .toList(),
-                                              
-                                              value: paysValue,
-                                              onChanged: (newValue) {
-                                                setState(() {
-                                                  paysValue = newValue;
-                                                  monPays = mesPays
-                                                      .firstWhere((element) =>
-                                                  element.idPays ==
-                                                      newValue);
-                                                  debugPrint(
-                                                      monPays.idPays.toString());
-                                                });
-                                              });
-                                        }
-                                         return Text('Aucune donnée disponible');
-                                      } catch (e) {
-                                        // Gérer l'absence de connexion ici
-                                        return Center(child: Text('Pays non disponible, verifier \nvotre connexion internet ', style: TextStyle(fontSize: 15),));
-                                    }
-                                      },
-                                    )
-                ),
-              ),
-            ),
-              //end select  
+                      
                            const  SizedBox(height: 10,),
+                              Padding(
+                padding: const EdgeInsets.only(left:10.0),
+                child: Text("Pays", style: TextStyle(color: (Colors.black), fontSize: 18),),
+              ),
+             SizedBox(
+  width: double.infinity,
+  height: 50,
+  child: Container(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.all(Radius.circular(20)),
+      border: Border.all(
+        color: Colors.orange, // Couleur de la bordure
+        width: 2, // Largeur de la bordure
+      ),
+    ),
+    child: CountryCodePicker(
+      backgroundColor: Colors.transparent, // Fond transparent pour le picker
+      onChanged: (CountryCode countryCode) {
+        setState(() {
+          selectedCountry = countryCode.name!;
+          print("Pays : $selectedCountry");
+        });
+      },
+      initialSelection: 'ML',
+      showCountryOnly: true,
+      showOnlyCountryWhenClosed: true,
+      alignLeft: true,
+    ),
+  ),
+),
+                           const  SizedBox(height: 10,),
+
+
              
                 Center(
                   child: ElevatedButton(
@@ -416,8 +427,8 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
               Navigator.push(context, MaterialPageRoute(builder: (context)=>  RegisterEndScreen(
                 nomActeur: widget.nomActeur, email: widget.email, telephone: widget.telephone, 
                 typeActeur: widget.typeActeur, adresse:adresseController.text, maillon:maillonController.text,
-                numeroWhatsApp: whatsAppController.text, localistaion: localisationController.text,
-                 pays: paysController.text,
+                numeroWhatsApp: processedNumber, localistaion: localisationController.text,
+                 pays: selectedCountry,
                 )));
               }
                            },

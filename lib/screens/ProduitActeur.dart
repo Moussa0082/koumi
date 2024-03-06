@@ -224,7 +224,19 @@ Widget buildGridView(String idCategorie, String idMagasin, String idActeur) {
   List<Stock> filteredStocks = stock;
   String searchText = "";
   if (filteredStocks.isEmpty) {
-   return Padding(
+   return
+    SingleChildScrollView(
+          child: Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  Image.asset('assets/images/notif.jpg'),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                
+    Padding(
      padding: const EdgeInsets.all(8.0),
      child: Center(
           child: Text( textAlign:TextAlign.justify,
@@ -232,7 +244,12 @@ Widget buildGridView(String idCategorie, String idMagasin, String idActeur) {
             style: TextStyle(fontSize: 16),
           ),
         ),
-   );
+   )
+                                ],
+                              ),
+                            ),
+                          ),
+        );
   } else {
     List<Stock> filteredStocksSearch = filteredStocks.where((stock) {
       String nomProduit = stock.nomProduit!.toLowerCase();
@@ -241,16 +258,38 @@ Widget buildGridView(String idCategorie, String idMagasin, String idActeur) {
     }).toList();
 
     if (filteredStocksSearch.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Center(
-          child: Text(
-            textAlign:TextAlign.justify,
-            'Aucun produit trouvé avec le nom ' +  searchText.toUpperCase()  + " dans la categorie " +  selectedCategorieProduitNom.toUpperCase(),
-            style: TextStyle(fontSize: 16),
+      return 
+
+    SingleChildScrollView(
+          child: Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  Image.asset('assets/images/notif.jpg'),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                
+   
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Text(
+              textAlign: TextAlign.justify,
+              'Aucun produit trouvé avec le nom ' +
+                  searchText.toUpperCase() +
+                  " dans la categorie " +
+                  selectedCategorieProduitNom.toUpperCase(),
+              style: TextStyle(fontSize: 16),
+            ),
           ),
-        ),
-      );
+        )
+                                ],
+                              ),
+                            ),
+                          ),
+        );
     }
 
     return Container(

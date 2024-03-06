@@ -13,6 +13,7 @@ import 'package:koumi_app/models/Acteur.dart';
 
 class MagasinService extends ChangeNotifier{
 
+    // static const String baseUrl = 'https://koumi.ml/api-koumi/Magasin';
     static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Magasin';
 
 
@@ -66,53 +67,7 @@ class MagasinService extends ChangeNotifier{
   }
 
 
-   static Future<void> updateActeur({
-    required String idMagasin,
-   required String nomMagasin,
-    required String contactMagasin,
-    required String localiteMagasin,
-     File? photo,
-    required Acteur acteur,
-    required Niveau1Pays niveau1Pays,
-  }) async {
-    try {
-      var requete =
-          http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idMagasin'));
-
-    
-      if (photo != null) {
-        requete.files.add(http.MultipartFile(
-            'image',
-            photo.readAsBytes().asStream(),
-            photo.lengthSync(),
-            filename: basename(photo.path)));
-      }
-      requete.fields['magasin'] = jsonEncode({
-        'idMagasin' : idMagasin,
-        'nomMagasin': nomMagasin,
-      'contactMagasin': contactMagasin,
-      'localiteMagasin': localiteMagasin,
-      'photo': "",
-      'acteur': acteur.toMap(),
-      'niveau1Pays': niveau1Pays.toMap()
-
-      });
-
-      var response = await requete.send();
-      var responsed = await http.Response.fromStream(response);
-
-      if (response.statusCode == 200 || responsed.statusCode == 201 || responsed.statusCode == 202) {
-        final donneesResponse = json.decode(responsed.body);
-        debugPrint('magasin service ${donneesResponse.toString()}');
-      } else {
-        throw Exception(
-            'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
-      }
-    } catch (e) {
-      throw Exception(
-          'Une erreur s\'est produite lors de la modification du magasin : $e');
-    }
-  }
+   
 
      Future<void> updateMagasin(
       {
@@ -120,7 +75,7 @@ class MagasinService extends ChangeNotifier{
         required String nomMagasin,
     required String contactMagasin,
     required String localiteMagasin,
-     String? photo,
+     File? photo,
     required Acteur acteur,
     required Niveau1Pays niveau1Pays,
       }) async {

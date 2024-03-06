@@ -109,8 +109,8 @@ class ParametreGenerauxService extends ChangeNotifier {
       var requete = http.MultipartRequest(
           'PUT',
           Uri.parse(
-              // 'https://koumi.ml/api-koumi/parametreGeneraux/update/$idParametreGeneraux'));
-              'http://10.0.2.2:9000/api-koumi/parametreGeneraux/update/$idParametreGeneraux'));
+              'https://koumi.ml/api-koumi/parametreGeneraux/update/$idParametreGeneraux'));
+              // 'http://10.0.2.2:9000/api-koumi/parametreGeneraux/update/$idParametreGeneraux'));
 
       if (logoSysteme != null) {
         requete.files.add(http.MultipartFile('image',

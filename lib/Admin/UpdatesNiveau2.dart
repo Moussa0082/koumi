@@ -47,9 +47,11 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
     para = paraList[0];
-    _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
+    _paysList = http.get(Uri.parse('https://koumi.ml/api-koumi/pays/read'));
+    // _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
     _niveauList =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
     niveau = widget.niveau2pays;
     libelleController.text = niveau.nomN2;
     descriptionController.text = niveau.descriptionN2;

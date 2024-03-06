@@ -8,8 +8,8 @@ import 'package:koumi_app/models/SousRegion.dart';
 import 'package:path/path.dart';
 
 class Niveau1Service extends ChangeNotifier {
-  // static const String baseUrl = 'https://koumi.ml/api-koumi/niveau1Pays';
-  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/niveau1Pays';
+  static const String baseUrl = 'https://koumi.ml/api-koumi/niveau1Pays';
+  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/niveau1Pays';
 
   List<Niveau1Pays> niveauList = [];
 
