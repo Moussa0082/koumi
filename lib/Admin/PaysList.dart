@@ -54,7 +54,7 @@ class _PaysListState extends State<PaysList> {
             },
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: Text(
-          "Sous region : ${region.nomSousRegion}",
+          region.nomSousRegion.toUpperCase(),
           style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
         actions: [
@@ -171,16 +171,16 @@ class _PaysListState extends State<PaysList> {
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                     )),
-                                                subtitle:
-                                                    Text(e.descriptionPays,
-                                                        style: const TextStyle(
-                                                          color: Colors.black87,
-                                                          fontSize: 17,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontStyle:
-                                                              FontStyle.italic,
-                                                        ))),
+                                                subtitle: Text(
+                                                    e.descriptionPays.trim(),
+                                                    style: const TextStyle(
+                                                      color: Colors.black87,
+                                                      fontSize: 17,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontStyle:
+                                                          FontStyle.italic,
+                                                    ))),
                                             // const Padding(
                                             //   padding: EdgeInsets.symmetric(
                                             //       horizontal: 15),

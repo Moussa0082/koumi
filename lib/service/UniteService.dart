@@ -6,17 +6,19 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Unite.dart';
 
 class UniteService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/Unite';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Unite';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/Unite';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Unite';
 
   List<Unite> uniteList = [];
 
   Future<void> addUnite({
     required String nomUnite,
+    required String sigleUnite,
+    required String description,
     required Acteur acteur,
   }) async {
     var addUnites = jsonEncode(
-        {'idUnite': null, 'nomUnite': nomUnite, 'acteur': acteur.toMap()});
+        {'idUnite': null, 'nomUnite': nomUnite, 'sigleUnite': sigleUnite, 'description':description,'acteur': acteur.toMap()});
 
     final response = await http.post(Uri.parse("$baseUrl/addUnite"),
         headers: {'Content-Type': 'application/json'}, body: addUnites);
@@ -32,11 +34,15 @@ class UniteService extends ChangeNotifier {
     required String idUnite,
     required String nomUnite,
     required String personneModif,
+     required String sigleUnite,
+    required String description,
     required Acteur acteur,
   }) async {
     var addUnites = jsonEncode({
       'idUnite': idUnite,
       'nomUnite': nomUnite,
+      'sigleUnite':sigleUnite,
+      'description': description,
       'personneModif': personneModif,
       'acteur': acteur.toMap()
     });

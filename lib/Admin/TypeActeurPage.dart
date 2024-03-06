@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:koumi_app/Admin/ActeurListe.dart';
 import 'package:koumi_app/Admin/UpdateTypeActeur.dart';
+import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/TypeActeurService.dart';
 import 'package:provider/provider.dart';
 
@@ -16,6 +19,7 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _TypeActeurPageState extends State<TypeActeurPage> {
   List<TypeActeur> typeList = [];
+  List<Acteur> acteurList = [];
   final formkey = GlobalKey<FormState>();
   TextEditingController libelleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -136,31 +140,43 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                           }).toList();
                           return Column(
                               children: filtereSearch
+                                  .where((data) =>
+                                      data.libelle!.trim().toLowerCase() !=
+                                      'admin')
                                   .map((e) => Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 10, horizontal: 15),
-                                        child: Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.9,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.grey
-                                                    .withOpacity(0.2),
-                                                offset: const Offset(0, 2),
-                                                blurRadius: 5,
-                                                spreadRadius: 2,
-                                              ),
-                                            ],
-                                          ),
-                                          child: Column(
-                                            children: [
-                                              ListTile(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ActeurList(
+                                                            typeActeur: e)));
+                                          },
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.9,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey
+                                                      .withOpacity(0.2),
+                                                  offset: const Offset(0, 2),
+                                                  blurRadius: 5,
+                                                  spreadRadius: 2,
+                                                ),
+                                              ],
+                                            ),
+                                            child: Column(
+                                              children: [
+                                                ListTile(
                                                   leading: _getIconForType(
                                                       e.libelle!),
                                                   title: Text(
@@ -171,248 +187,402 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                                                         overflow: TextOverflow
                                                             .ellipsis,
                                                       )),
-                                                  subtitle: Text(
-                                                      e.descriptionTypeActeur!,
-                                                      style: const TextStyle(
-                                                        color: Colors.black87,
-                                                        fontSize: 17,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontStyle:
-                                                            FontStyle.italic,
-                                                      ))),
-                                              Container(
-                                                alignment:
-                                                    Alignment.bottomRight,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 10),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    _buildEtat(
-                                                        e.statutTypeActeur!),
-                                                    PopupMenuButton<String>(
-                                                      padding: EdgeInsets.zero,
-                                                      itemBuilder: (context) =>
-                                                          <PopupMenuEntry<
-                                                              String>>[
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: const Icon(
-                                                              Icons.check,
-                                                              color:
-                                                                  Colors.green,
+                                                  // subtitle: Text(
+                                                  //     e.descriptionTypeActeur!
+                                                  //         .trim(),
+                                                  //     style: const TextStyle(
+                                                  //       color: Colors.black87,
+                                                  //       fontSize: 17,
+                                                  //       fontWeight:
+                                                  //           FontWeight.w500,
+                                                  //       fontStyle:
+                                                  //           FontStyle.italic,
+                                                  //     ))
+                                                ),
+                                                Consumer<ActeurService>(builder:
+                                                    (context, acteurService,
+                                                        child) {
+                                                  return FutureBuilder(
+                                                      future: acteurService
+                                                          .fetchActeurByTypeActeur(
+                                                              e.idTypeActeur!),
+                                                      builder:
+                                                          (context, snapshot) {
+                                                        if (snapshot
+                                                                .connectionState ==
+                                                            ConnectionState
+                                                                .waiting) {
+                                                          return Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(8.0),
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Text(
+                                                                    "Nombres d'acteurs",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .black87,
+                                                                      fontSize:
+                                                                          17,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                      fontStyle:
+                                                                          FontStyle
+                                                                              .italic,
+                                                                    )),
+                                                                Text("0",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .black87,
+                                                                      fontSize:
+                                                                          18,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w800,
+                                                                    ))
+                                                              ],
                                                             ),
-                                                            title: const Text(
-                                                              "Activer",
-                                                              style: TextStyle(
+                                                          );
+                                                        }
+
+                                                        if (!snapshot.hasData) {
+                                                          return Padding(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        15),
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Text(
+                                                                    "Nombres d'acteurs:",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .black87,
+                                                                      fontSize:
+                                                                          17,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                      fontStyle:
+                                                                          FontStyle
+                                                                              .italic,
+                                                                    )),
+                                                                Text("0",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .black87,
+                                                                      fontSize:
+                                                                          18,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w800,
+                                                                    ))
+                                                              ],
+                                                            ),
+                                                          );
+                                                        } else {
+                                                          acteurList =
+                                                              snapshot.data!;
+                                                          return Padding(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        15),
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Text(
+                                                                    "Nombres d'acteurs",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .black87,
+                                                                      fontSize:
+                                                                          17,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                      fontStyle:
+                                                                          FontStyle
+                                                                              .italic,
+                                                                    )),
+                                                                Text(
+                                                                    acteurList
+                                                                        .length
+                                                                        .toString(),
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .black87,
+                                                                      fontSize:
+                                                                          18,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w800,
+                                                                    ))
+                                                              ],
+                                                            ),
+                                                          );
+                                                        }
+                                                      });
+                                                }),
+                                                Container(
+                                                  alignment:
+                                                      Alignment.bottomRight,
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 10),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      _buildEtat(
+                                                          e.statutTypeActeur!),
+                                                      PopupMenuButton<String>(
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                        itemBuilder:
+                                                            (context) =>
+                                                                <PopupMenuEntry<
+                                                                    String>>[
+                                                          PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                              leading:
+                                                                  const Icon(
+                                                                Icons.check,
                                                                 color: Colors
                                                                     .green,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
                                                               ),
+                                                              title: const Text(
+                                                                "Activer",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .green,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              onTap: () async {
+                                                                await TypeActeurService()
+                                                                    .activerTypeActeur(e
+                                                                        .idTypeActeur!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<TypeActeurService>(context, listen: false).applyChange(),
+                                                                              Navigator.of(context).pop(),
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Type acteur activer avec succèss "),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 2),
+                                                                                ),
+                                                                              )
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit : $onError"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: const Duration(seconds: 5),
+                                                                                ),
+                                                                              ),
+                                                                              Navigator.of(context).pop(),
+                                                                            });
+                                                              },
                                                             ),
-                                                            onTap: () async {
-                                                              await TypeActeurService()
-                                                                  .activerTypeActeur(e
-                                                                      .idTypeActeur!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<TypeActeurService>(context, listen: false).applyChange(),
-                                                                            Navigator.of(context).pop(),
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Type acteur activer avec succèss "),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 2),
-                                                                              ),
-                                                                            )
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Une erreur s'est produit : $onError"),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: const Duration(seconds: 5),
-                                                                              ),
-                                                                            ),
-                                                                            Navigator.of(context).pop(),
-                                                                          });
-                                                            },
                                                           ),
-                                                        ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: Icon(
-                                                              Icons
-                                                                  .disabled_visible,
-                                                              color: Colors
-                                                                  .orange[400],
-                                                            ),
-                                                            title: Text(
-                                                              "Désactiver",
-                                                              style: TextStyle(
+                                                          PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                              leading: Icon(
+                                                                Icons
+                                                                    .disabled_visible,
                                                                 color: Colors
                                                                         .orange[
                                                                     400],
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
                                                               ),
-                                                            ),
-                                                            onTap: () async {
-                                                              await TypeActeurService()
-                                                                  .desactiverTypeActeur(e
-                                                                      .idTypeActeur!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<TypeActeurService>(context, listen: false).applyChange(),
-                                                                            Navigator.of(context).pop(),
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Une erreur s'est produit : $onError"),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: const Duration(seconds: 5),
-                                                                              ),
-                                                                            ),
-                                                                            Navigator.of(context).pop(),
-                                                                          });
-
-                                                              ScaffoldMessenger
-                                                                      .of(context)
-                                                                  .showSnackBar(
-                                                                const SnackBar(
-                                                                  content: Row(
-                                                                    children: [
-                                                                      Text(
-                                                                          "Type acteur desactiver avec succèss "),
-                                                                    ],
-                                                                  ),
-                                                                  duration:
-                                                                      Duration(
-                                                                          seconds:
-                                                                              2),
+                                                              title: Text(
+                                                                "Désactiver",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                          .orange[
+                                                                      400],
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
                                                                 ),
-                                                              );
-                                                            },
-                                                          ),
-                                                        ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: const Icon(
-                                                              Icons.edit,
-                                                              color:
-                                                                  Colors.green,
+                                                              ),
+                                                              onTap: () async {
+                                                                await TypeActeurService()
+                                                                    .desactiverTypeActeur(e
+                                                                        .idTypeActeur!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<TypeActeurService>(context, listen: false).applyChange(),
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit : $onError"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: const Duration(seconds: 5),
+                                                                                ),
+                                                                              ),
+                                                                              Navigator.of(context).pop(),
+                                                                            });
+
+                                                                ScaffoldMessenger.of(
+                                                                        context)
+                                                                    .showSnackBar(
+                                                                  const SnackBar(
+                                                                    content:
+                                                                        Row(
+                                                                      children: [
+                                                                        Text(
+                                                                            "Type acteur desactiver avec succèss "),
+                                                                      ],
+                                                                    ),
+                                                                    duration: Duration(
+                                                                        seconds:
+                                                                            2),
+                                                                  ),
+                                                                );
+                                                              },
                                                             ),
-                                                            title: const Text(
-                                                              "Modifier",
-                                                              style: TextStyle(
+                                                          ),
+                                                          PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                              leading:
+                                                                  const Icon(
+                                                                Icons.edit,
                                                                 color: Colors
                                                                     .green,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
                                                               ),
+                                                              title: const Text(
+                                                                "Modifier",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .green,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              onTap: () {
+                                                                showDialog(
+                                                                    context:
+                                                                        context,
+                                                                    builder: (BuildContext
+                                                                            context) =>
+                                                                        AlertDialog(
+                                                                            backgroundColor: Colors
+                                                                                .white,
+                                                                            shape:
+                                                                                RoundedRectangleBorder(
+                                                                              borderRadius: BorderRadius.circular(16),
+                                                                            ),
+                                                                            content:
+                                                                                UpdateTypeActeur(typeActeur: e)));
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                                // setState(() {
+                                                                //   setState(() {
+                                                                //     listFuture =
+                                                                //         DepenseService()
+                                                                //             .fetchParametre();
+                                                                //   });
+                                                                // });
+                                                              },
                                                             ),
-                                                            onTap: () {
-                                                              showDialog(
-                                                                  context:
-                                                                      context,
-                                                                  builder: (BuildContext
-                                                                          context) =>
-                                                                      AlertDialog(
-                                                                          backgroundColor: Colors
-                                                                              .white,
-                                                                          shape:
-                                                                              RoundedRectangleBorder(
-                                                                            borderRadius:
-                                                                                BorderRadius.circular(16),
-                                                                          ),
-                                                                          content:
-                                                                              UpdateTypeActeur(typeActeur: e)));
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop();
-                                                              // setState(() {
-                                                              //   setState(() {
-                                                              //     listFuture =
-                                                              //         DepenseService()
-                                                              //             .fetchParametre();
-                                                              //   });
-                                                              // });
-                                                            },
                                                           ),
-                                                        ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: const Icon(
-                                                              Icons.delete,
-                                                              color: Colors.red,
-                                                            ),
-                                                            title: const Text(
-                                                              "Supprimer",
-                                                              style: TextStyle(
+                                                          PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                              leading:
+                                                                  const Icon(
+                                                                Icons.delete,
                                                                 color:
                                                                     Colors.red,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
                                                               ),
-                                                            ),
-                                                            onTap: () async {
-                                                              await TypeActeurService()
-                                                                  .deleteTypeActeur(e
-                                                                      .idTypeActeur!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<TypeActeurService>(context, listen: false).applyChange(),
-                                                                            Navigator.of(context).pop(),
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Ce type d'acteur est déjà associer à un acteur"),
-                                                                                  ],
+                                                              title: const Text(
+                                                                "Supprimer",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .red,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              onTap: () async {
+                                                                await TypeActeurService()
+                                                                    .deleteTypeActeur(e
+                                                                        .idTypeActeur!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<TypeActeurService>(context, listen: false).applyChange(),
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Ce type d'acteur est déjà associer à un acteur"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 2),
                                                                                 ),
-                                                                                duration: Duration(seconds: 2),
-                                                                              ),
-                                                                            )
-                                                                          });
-                                                            },
+                                                                              )
+                                                                            });
+                                                              },
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                              )
-                                            ],
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ))

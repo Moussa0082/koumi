@@ -1,18 +1,20 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/MagasinService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+
+import '../models/ParametreGeneraux.dart';
 
 class AddMagasinScreen extends StatefulWidget {
   bool? isEditable;
@@ -47,7 +49,8 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
   TextEditingController nomMagasinController = TextEditingController();
   TextEditingController contactMagasinController = TextEditingController();
   TextEditingController localiteMagasinController = TextEditingController();
-
+  late ParametreGeneraux para;
+  List<ParametreGeneraux> paraList = [];
   List<Map<String, dynamic>> regionsData = [];
   bool isLoading = false;
 
@@ -204,23 +207,26 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                 photo: photos,
                 acteur: acteur,
                 niveau1Pays: niveau1Pays)
-            .then((value) => showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Center(child: Text('Succès')),
-                      content: const Text("Magasin ajouté avec succès"),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('OK'),
-                        ),
-                      ],
-                    );
-                  },
-                ));
+            .then((value) => {
+                  nomMagasinController.clear(),
+                  contactMagasinController.clear(),
+                  localiteMagasinController.clear(),
+                  setState(() {
+                    niveau1Pays == null;
+                    photos == null;
+                  }),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Row(
+                        children: [
+                          Text("Activer avec succèss "),
+                        ],
+                      ),
+                      duration: Duration(seconds: 2),
+                    ),
+                  ),
+                  // Navigator.of(context).pop(),
+                });
       } else {
         await magasinService
             .creerMagasin(
@@ -229,23 +235,24 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                 localiteMagasin: localiteMagasin,
                 acteur: acteur,
                 niveau1Pays: niveau1Pays)
-            .then((value) => showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Center(child: Text('Succès')),
-                      content: const Text("Magasin ajouté avec succès"),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('OK'),
-                        ),
-                      ],
-                    );
-                  },
-                ));
+            .then((value) => {
+                  nomMagasinController.clear(),
+                  contactMagasinController.clear(),
+                  localiteMagasinController.clear(),
+                  setState(() {
+                    niveau1Pays == null;
+                  }),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Row(
+                        children: [
+                          Text("Activer avec succèss "),
+                        ],
+                      ),
+                      duration: Duration(seconds: 2),
+                    ),
+                  ),
+                });
       }
     } catch (e) {
       debugPrint("Erreur : $e");
@@ -302,7 +309,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
         return SizedBox(
           height: 150,
           child: AlertDialog(
-            title: Text("Photo d'identité"),
+            title: Text("Choisir une photo"),
             content: Wrap(
               alignment: WrapAlignment.center,
               children: [
@@ -352,6 +359,9 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     niveau1PaysList =
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+    para = paraList[0];
   }
 
   @override
@@ -410,6 +420,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                               return "Veillez entrez le nom du magasin";
                             } else {
                               return null;
+
                             }
                           },
                           onSaved: (val) => nomMagasin = val!,

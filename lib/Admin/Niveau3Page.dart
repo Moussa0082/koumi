@@ -8,6 +8,7 @@ import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/service/Niveau2Service.dart';
 import 'package:koumi_app/service/Niveau3Service.dart';
 import 'package:provider/provider.dart';
 
@@ -41,8 +42,8 @@ class _Niveau3PageState extends State<Niveau3Page> {
         .parametreList!;
     para = paraList[0];
     _niveauList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau2Pays/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau2Pays/read'));
+        // http.get(Uri.parse('https://koumi.ml/api-koumi/niveau2Pays/read'));
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau2Pays/read'));
     super.initState();
   }
 
@@ -71,15 +72,28 @@ class _Niveau3PageState extends State<Niveau3Page> {
               const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              _showDialog();
-            },
-            icon: const Icon(
-              Icons.add,
-              color: d_colorGreen,
-              size: 30,
-            ),
+          PopupMenuButton<String>(
+            padding: EdgeInsets.zero,
+            itemBuilder: (context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.add,
+                    color: Colors.green,
+                  ),
+                  title: Text(
+                    "Ajouter un ${para.libelleNiveau3Pays}",
+                    style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.ellipsis),
+                  ),
+                  onTap: () async {
+                    _showDialog();
+                  },
+                ),
+              ),
+            ],
           )
         ],
       ),
@@ -190,15 +204,16 @@ class _Niveau3PageState extends State<Niveau3Page> {
                                                           overflow: TextOverflow
                                                               .ellipsis,
                                                         )),
-                                                subtitle: Text(e.descriptionN3,
-                                                    style: const TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 17,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                    ))),
+                                                subtitle:
+                                                    Text(e.descriptionN3.trim(),
+                                                        style: const TextStyle(
+                                                          color: Colors.black87,
+                                                          fontSize: 17,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          fontStyle:
+                                                              FontStyle.italic,
+                                                        ))),
                                             Container(
                                               alignment: Alignment.bottomRight,
                                               padding:
@@ -473,7 +488,7 @@ class _Niveau3PageState extends State<Niveau3Page> {
               children: [
                 ListTile(
                   title: Text(
-                    "Ajouter un(e) ${para.libelleNiveau2Pays}",
+                    "Ajouter un(e) ${para.libelleNiveau3Pays}",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -576,66 +591,87 @@ class _Niveau3PageState extends State<Niveau3Page> {
                       //   },
                       // ),
                       SizedBox(height: 16),
-                      FutureBuilder(
-                        future: _niveauList,
-                        builder: (_, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return CircularProgressIndicator();
-                          }
-                          if (snapshot.hasError) {
-                            return Text("${snapshot.error}");
-                          }
-                          if (snapshot.hasData) {
-                            final reponse =
-                                json.decode((snapshot.data.body)) as List;
-                            final niveauList = reponse
-                                .map((e) => Niveau2Pays.fromMap(e))
-                                .where((con) => con.statutN2 == true)
-                                .toList();
+                      Consumer<Niveau2Service>(
+                        builder: (context, niveauService, child) {
+                          return FutureBuilder(
+                            future: _niveauList,
+                            builder: (_, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return CircularProgressIndicator();
+                              }
+                              if (snapshot.hasError) {
+                                return Text("${snapshot.error}");
+                              }
+                              if (snapshot.hasData) {
+                                final reponse = json.decode(snapshot.data.body);
+                                if (reponse is List) {
+                                  final niveauList = reponse
+                                      .map((e) => Niveau2Pays.fromMap(e))
+                                      .where((con) => con.statutN2 == true)
+                                      .toList();
 
-                            if (niveauList.isEmpty) {
-                              return Text(
-                                'Aucun donné disponible',
-                                style:
-                                    TextStyle(overflow: TextOverflow.ellipsis),
-                              );
-                            }
-
-                            return DropdownButtonFormField<String>(
-                              items: niveauList
-                                  .map(
-                                    (e) => DropdownMenuItem(
-                                      value: e.idNiveau2Pays,
-                                      child: Text(e.nomN2),
-                                    ),
-                                  )
-                                  .toList(),
-                              value: niveau2Value,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  niveau2Value = newValue;
-                                  if (newValue != null) {
-                                    niveau2 = niveauList.firstWhere((element) =>
-                                        element.idNiveau2Pays == newValue);
-                                    debugPrint(
-                                        "niveau select :${niveau2.toString()}");
-                                    // typeSelected = true;
+                                  if (niveauList.isEmpty) {
+                                    return DropdownButtonFormField(
+                                      items: [],
+                                      onChanged: null,
+                                      decoration: InputDecoration(
+                                        labelText:
+                                            'Aucun ${para.libelleNiveau2Pays} trouvé',
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    );
                                   }
-                                });
-                              },
-                              decoration: InputDecoration(
-                                labelText:
-                                    'Sélectionner un ${para.libelleNiveau2Pays}',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
+
+                                  return DropdownButtonFormField<String>(
+                                    items: niveauList
+                                        .map(
+                                          (e) => DropdownMenuItem(
+                                            value: e.idNiveau2Pays,
+                                            child: Text(e.nomN2 ?? ''),
+                                          ),
+                                        )
+                                        .toList(),
+                                    value: niveau2Value,
+                                    onChanged: (newValue) {
+                                      setState(() {
+                                        niveau2Value = newValue;
+                                        if (newValue != null) {
+                                          niveau2 = niveauList.firstWhere(
+                                              (element) =>
+                                                  element.idNiveau2Pays ==
+                                                  newValue);
+                                          debugPrint(
+                                              "niveau select :${niveau2.toString()}");
+                                          // typeSelected = true;
+                                        }
+                                      });
+                                    },
+                                    decoration: InputDecoration(
+                                      labelText:
+                                          'Sélectionner un ${para.libelleNiveau2Pays}',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText:
+                                      'Aucun ${para.libelleNiveau2Pays} trouvé',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
-                              ),
-                            );
-                          }
-                          return Text(
-                            'Aucune donnée disponible',
-                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                              );
+                            },
                           );
                         },
                       ),

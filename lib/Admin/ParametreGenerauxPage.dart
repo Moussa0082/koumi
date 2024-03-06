@@ -120,7 +120,8 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
   @override
   void initState() {
     super.initState();
-    parProvider = Provider.of<ParametreGenerauxProvider>(context, listen: false);
+    parProvider =
+        Provider.of<ParametreGenerauxProvider>(context, listen: false);
   }
 
   @override
@@ -130,12 +131,14 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
       appBar: AppBar(
         centerTitle: true,
         toolbarHeight: 100,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen),
-        ),
+        leading: isEditing
+            ? Container()
+            : IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen),
+              ),
         title: const Text(
           "Parametre généraux",
           style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),

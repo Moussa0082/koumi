@@ -6,26 +6,28 @@ class RegroupementParametre {
   final String idRegroupement;
   final String parametreRegroupe;
   final String libelle;
-  final DateTime dateAjout;
-  final DateTime dateModif;
+  final String? dateAjout;
+  final String? dateModif;
   final bool statutRegroupement;
   final ParametreFiche parametreFiche;
+
   RegroupementParametre({
     required this.idRegroupement,
     required this.parametreRegroupe,
     required this.libelle,
-    required this.dateAjout,
-    required this.dateModif,
+    this.dateAjout,
+    this.dateModif,
     required this.statutRegroupement,
     required this.parametreFiche,
   });
+ 
 
   RegroupementParametre copyWith({
     String? idRegroupement,
     String? parametreRegroupe,
     String? libelle,
-    DateTime? dateAjout,
-    DateTime? dateModif,
+    String? dateAjout,
+    String? dateModif,
     bool? statutRegroupement,
     ParametreFiche? parametreFiche,
   }) {
@@ -45,10 +47,10 @@ class RegroupementParametre {
       'idRegroupement': idRegroupement,
       'parametreRegroupe': parametreRegroupe,
       'libelle': libelle,
-      'dateAjout': dateAjout.millisecondsSinceEpoch,
-      'dateModif': dateModif.millisecondsSinceEpoch,
+      'dateAjout': dateAjout,
+      'dateModif': dateModif,
       'statutRegroupement': statutRegroupement,
-      'parametreFiche': parametreFiche.toJson(),
+      'parametreFiche': parametreFiche.toMap(),
     };
   }
 
@@ -57,10 +59,10 @@ class RegroupementParametre {
       idRegroupement: map['idRegroupement'] as String,
       parametreRegroupe: map['parametreRegroupe'] as String,
       libelle: map['libelle'] as String,
-      dateAjout: DateTime.fromMillisecondsSinceEpoch(map['dateAjout'] as int),
-      dateModif: DateTime.fromMillisecondsSinceEpoch(map['dateModif'] as int),
+      dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
+      dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
       statutRegroupement: map['statutRegroupement'] as bool,
-      parametreFiche: ParametreFiche.fromJson(map['parametreFiche'] as Map<String,dynamic>),
+      parametreFiche: ParametreFiche.fromMap(map['parametreFiche'] as Map<String,dynamic>),
     );
   }
 

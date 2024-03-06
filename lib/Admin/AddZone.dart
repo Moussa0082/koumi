@@ -27,7 +27,7 @@ class _AddZoneState extends State<AddZone> {
   String? imageSrc;
   File? photo;
   late Acteur acteur;
-
+  
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;

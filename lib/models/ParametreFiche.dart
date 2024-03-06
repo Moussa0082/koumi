@@ -1,21 +1,24 @@
-import 'package:meta/meta.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
 class ParametreFiche {
-  final String idParametreFiche;
-  final String classeParametre;
-  final String champParametre;
-  final String codeParametre;
-  final String libelleParametre;
-  final String typeDonneeParametre;
-  final List<String> listeDonneeParametre;
-  final int valeurMax;
-  final int valeurMin;
-  final int valeurObligatoire;
-  final DateTime dateAjout;
-  final DateTime dateModif;
-  final String critereChampParametre;
-  final bool statutParametre;
+    final String idParametreFiche;
+    final String classeParametre;
+    final String champParametre;
+    final String codeParametre;
+    final String libelleParametre;
+    final String typeDonneeParametre;
+    final List<String> listeDonneeParametre;
+    final int valeurMax;
+    final String? personneModif;
+    final int valeurMin;
+    final int valeurObligatoire;
+    final String? dateAjout;
+    final String? dateModif;
+    final String critereChampParametre;
+    final bool statutParametre;
 
   ParametreFiche({
     required this.idParametreFiche,
@@ -26,10 +29,11 @@ class ParametreFiche {
     required this.typeDonneeParametre,
     required this.listeDonneeParametre,
     required this.valeurMax,
+    this.personneModif,
     required this.valeurMin,
     required this.valeurObligatoire,
-    required this.dateAjout,
-    required this.dateModif,
+    this.dateAjout,
+    this.dateModif,
     required this.critereChampParametre,
     required this.statutParametre,
   });
@@ -43,69 +47,93 @@ class ParametreFiche {
     String? typeDonneeParametre,
     List<String>? listeDonneeParametre,
     int? valeurMax,
+    String? personneModif,
     int? valeurMin,
     int? valeurObligatoire,
-    DateTime? dateAjout,
-    DateTime? dateModif,
+    String? dateAjout,
+    String? dateModif,
     String? critereChampParametre,
     bool? statutParametre,
-  }) =>
-      ParametreFiche(
-        idParametreFiche: idParametreFiche ?? this.idParametreFiche,
-        classeParametre: classeParametre ?? this.classeParametre,
-        champParametre: champParametre ?? this.champParametre,
-        codeParametre: codeParametre ?? this.codeParametre,
-        libelleParametre: libelleParametre ?? this.libelleParametre,
-        typeDonneeParametre: typeDonneeParametre ?? this.typeDonneeParametre,
-        listeDonneeParametre: listeDonneeParametre ?? this.listeDonneeParametre,
-        valeurMax: valeurMax ?? this.valeurMax,
-        valeurMin: valeurMin ?? this.valeurMin,
-        valeurObligatoire: valeurObligatoire ?? this.valeurObligatoire,
-        dateAjout: dateAjout ?? this.dateAjout,
-        dateModif: dateModif ?? this.dateModif,
-        critereChampParametre:
-            critereChampParametre ?? this.critereChampParametre,
-        statutParametre: statutParametre ?? this.statutParametre,
-      );
+  }) {
+    return ParametreFiche(
+      idParametreFiche: idParametreFiche ?? this.idParametreFiche,
+      classeParametre: classeParametre ?? this.classeParametre,
+      champParametre: champParametre ?? this.champParametre,
+      codeParametre: codeParametre ?? this.codeParametre,
+      libelleParametre: libelleParametre ?? this.libelleParametre,
+      typeDonneeParametre: typeDonneeParametre ?? this.typeDonneeParametre,
+      listeDonneeParametre: listeDonneeParametre ?? this.listeDonneeParametre,
+      valeurMax: valeurMax ?? this.valeurMax,
+      personneModif: personneModif ?? this.personneModif,
+      valeurMin: valeurMin ?? this.valeurMin,
+      valeurObligatoire: valeurObligatoire ?? this.valeurObligatoire,
+      dateAjout: dateAjout ?? this.dateAjout,
+      dateModif: dateModif ?? this.dateModif,
+      critereChampParametre: critereChampParametre ?? this.critereChampParametre,
+      statutParametre: statutParametre ?? this.statutParametre,
+    );
+  }
 
-  factory ParametreFiche.fromRawJson(String str) =>
-      ParametreFiche.fromJson(json.decode(str));
+factory ParametreFiche.fromJson(Map<String, dynamic> map) {
+    return ParametreFiche(
+      idParametreFiche: map['idParametreFiche'] ?? '',
+      classeParametre: map['classeParametre'] ?? '',
+      champParametre: map['champParametre'] ?? '',
+      codeParametre: map['codeParametre'] ?? '',
+      libelleParametre: map['libelleParametre'] ?? '',
+      typeDonneeParametre: map['typeDonneeParametre'] ?? '',
+      listeDonneeParametre: map['listeDonneeParametre'] != null
+          ? List<String>.from(map['listeDonneeParametre'])
+          : [],
+      valeurMax: map['valeurMax'] ?? 0,
+      personneModif: map['personneModif'],
+      valeurMin: map['valeurMin'] ?? 0,
+      valeurObligatoire: map['valeurObligatoire'] ?? 0,
+      dateAjout: map['dateAjout'],
+      dateModif: map['dateModif'],
+      critereChampParametre: map['critereChampParametre'] ?? '',
+      statutParametre: map['statutParametre'] ?? false,
+    );
+  }
 
-  String toRawJson() => json.encode(toJson());
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'idParametreFiche': idParametreFiche,
+      'classeParametre': classeParametre,
+      'champParametre': champParametre,
+      'codeParametre': codeParametre,
+      'libelleParametre': libelleParametre,
+      'typeDonneeParametre': typeDonneeParametre,
+      'listeDonneeParametre': listeDonneeParametre.toList(),
+      'valeurMax': valeurMax,
+      'personneModif': personneModif,
+      'valeurMin': valeurMin,
+      'valeurObligatoire': valeurObligatoire,
+      'dateAjout': dateAjout,
+      'dateModif': dateModif,
+      'critereChampParametre': critereChampParametre,
+      'statutParametre': statutParametre,
+    };
+  }
 
-  factory ParametreFiche.fromJson(Map<String, dynamic> json) => ParametreFiche(
-        idParametreFiche: json["idParametreFiche"],
-        classeParametre: json["classeParametre"],
-        champParametre: json["champParametre"],
-        codeParametre: json["codeParametre"],
-        libelleParametre: json["libelleParametre"],
-        typeDonneeParametre: json["typeDonneeParametre"],
-        listeDonneeParametre:
-            List<String>.from(json["listeDonneeParametre"].map((x) => x)),
-        valeurMax: json["valeurMax"],
-        valeurMin: json["valeurMin"],
-        valeurObligatoire: json["valeurObligatoire"],
-        dateAjout: DateTime.parse(json["dateAjout"]),
-        dateModif: DateTime.parse(json["dateModif"]),
-        critereChampParametre: json["critereChampParametre"],
-        statutParametre: json["statutParametre"],
-      );
+  factory ParametreFiche.fromMap(Map<String, dynamic> map) {
+    return ParametreFiche(
+      idParametreFiche: map['idParametreFiche'] as String,
+      classeParametre: map['classeParametre'] as String,
+      champParametre: map['champParametre'] as String,
+      codeParametre: map['codeParametre'] as String,
+      libelleParametre: map['libelleParametre'] as String,
+      typeDonneeParametre: map['typeDonneeParametre'] as String,
+      listeDonneeParametre:
+          List<String>.from(map['listeDonneeParametre'] as List<String>),
+      valeurMax: map['valeurMax'] as int,
+      valeurMin: map['valeurMin'] as int,
+      valeurObligatoire: map['valeurObligatoire'] as int,
+      dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
+      dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
+      critereChampParametre: map['critereChampParametre'] as String,
+      statutParametre: map['statutParametre'] as bool,
+    );
+  }
 
-  Map<String, dynamic> toJson() => {
-        "idParametreFiche": idParametreFiche,
-        "classeParametre": classeParametre,
-        "champParametre": champParametre,
-        "codeParametre": codeParametre,
-        "libelleParametre": libelleParametre,
-        "typeDonneeParametre": typeDonneeParametre,
-        "listeDonneeParametre":
-            List<dynamic>.from(listeDonneeParametre.map((x) => x)),
-        "valeurMax": valeurMax,
-        "valeurMin": valeurMin,
-        "valeurObligatoire": valeurObligatoire,
-        "dateAjout": dateAjout.toIso8601String(),
-        "dateModif": dateModif.toIso8601String(),
-        "critereChampParametre": critereChampParametre,
-        "statutParametre": statutParametre,
-      };
 }

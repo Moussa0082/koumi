@@ -178,7 +178,7 @@ class _Niveau3ListeState extends State<Niveau3Liste> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      e.descriptionN3,
+                                                      e.descriptionN3.trim(),
                                                       style: const TextStyle(
                                                         color: Colors.black87,
                                                         fontSize: 17,

@@ -162,7 +162,7 @@ class _Niveau1ListState extends State<Niveau1List> {
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                 )),
-                                            subtitle: Text(e.descriptionN1!,
+                                            subtitle: Text(e.descriptionN1!.trim(),
                                                 style: const TextStyle(
                                                   color: Colors.black87,
                                                   fontSize: 17,

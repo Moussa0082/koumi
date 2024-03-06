@@ -12,8 +12,9 @@ import 'package:koumi_app/models/SousRegion.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/Niveau1Service.dart';
 import 'package:koumi_app/service/PaysService.dart';
+import 'package:koumi_app/service/SousRegionService.dart';
 import 'package:provider/provider.dart';
-
+ 
 class PaysPage extends StatefulWidget {
   // final SousRegion sousRegions;
   const PaysPage({super.key});
@@ -47,8 +48,8 @@ class _PaysPageState extends State<PaysPage> {
         .parametreList!;
     para = paraList[0];
     _sousRegionList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/sousRegion/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/sousRegion/read'));
+        // http.get(Uri.parse('https://koumi.ml/api-koumi/sousRegion/read'));
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/sousRegion/read'));
     _searchController = TextEditingController();
   }
 
@@ -76,15 +77,28 @@ class _PaysPageState extends State<PaysPage> {
           style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              _showDialog();
-            },
-            icon: const Icon(
-              Icons.add,
-              color: d_colorGreen,
-              size: 30,
-            ),
+          PopupMenuButton<String>(
+            padding: EdgeInsets.zero,
+            itemBuilder: (context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.add,
+                    color: Colors.green,
+                  ),
+                  title: Text(
+                    "Ajouter un pays",
+                    style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.ellipsis),
+                  ),
+                  onTap: () async {
+                    _showDialog();
+                  },
+                ),
+              ),
+            ],
           )
         ],
       ),
@@ -198,7 +212,7 @@ class _PaysPageState extends State<PaysPage> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      e.descriptionPays,
+                                                      e.descriptionPays.trim(),
                                                       style: const TextStyle(
                                                         color: Colors.black87,
                                                         fontSize: 17,
@@ -619,69 +633,89 @@ class _PaysPageState extends State<PaysPage> {
                         ),
                       ),
                       SizedBox(height: 16),
-                      FutureBuilder(
-                        future: _sousRegionList,
-                        builder: (_, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return CircularProgressIndicator();
-                          }
-                          if (snapshot.hasError) {
-                            return Text("${snapshot.error}");
-                          }
-                          if (snapshot.hasData) {
-                            final reponse =
-                                json.decode((snapshot.data.body)) as List;
-                            final sousList = reponse
-                                .map((e) => SousRegion.fromMap(e))
-                                .where((con) => con.statutSousRegion == true)
-                                .toList();
+                       Consumer<SousRegionService>(
+                        builder: (context, conService, child) {
+                          return FutureBuilder(
+                            future: _sousRegionList,
+                            builder: (_, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return CircularProgressIndicator();
+                              }
+                              if (snapshot.hasError) {
+                                return Text("${snapshot.error}");
+                              }
+                              if (snapshot.hasData) {
+                                final reponse = json.decode(snapshot.data.body);
+                                if (reponse is List) {
+                                  final regionList = reponse
+                                      .map((e) => SousRegion.fromMap(e))
+                                      .where(
+                                          (con) => con.statutSousRegion == true)
+                                      .toList();
 
-                            if (sousList.isEmpty) {
-                              return Text(
-                                'Aucun sous region disponible',
-                                style:
-                                    TextStyle(overflow: TextOverflow.ellipsis),
-                              );
-                            }
-
-                            return DropdownButtonFormField<String>(
-                              items: sousList
-                                  .map(
-                                    (e) => DropdownMenuItem(
-                                      value: e.idSousRegion,
-                                      child: Text(e.nomSousRegion),
-                                    ),
-                                  )
-                                  .toList(),
-                              value: sousValue,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  sousValue = newValue;
-                                  if (newValue != null) {
-                                    sousRegion = sousList.firstWhere(
-                                        (element) =>
-                                            element.idSousRegion == newValue);
-                                    debugPrint(
-                                        "con select ${sousRegion.idSousRegion.toString()}");
-                                    // typeSelected = true;
+                                  if (regionList.isEmpty) {
+                                    return DropdownButtonFormField(
+                                      items: [],
+                                      onChanged: null,
+                                      decoration: InputDecoration(
+                                        labelText: 'Aucun sous region trouvé',
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    );
                                   }
-                                });
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Sélectionner un sous région',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
+
+                                  return DropdownButtonFormField<String>(
+                                    items: regionList
+                                        .map(
+                                          (e) => DropdownMenuItem(
+                                            value: e.idSousRegion,
+                                            child: Text(e.nomSousRegion),
+                                          ),
+                                        )
+                                        .toList(),
+                                    value: sousValue,
+                                    onChanged: (newValue) {
+                                      setState(() {
+                                        sousValue = newValue;
+                                        if (newValue != null) {
+                                          sousRegion = regionList.firstWhere(
+                                              (element) =>
+                                                  element.idSousRegion ==
+                                                  newValue);
+                                          debugPrint(
+                                              "con select ${sousRegion.idSousRegion.toString()}");
+                                          // typeSelected = true;
+                                        }
+                                      });
+                                    },
+                                    decoration: InputDecoration(
+                                      labelText: 'Sélectionner un sous region',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucun sous region trouvé',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
-                              ),
-                            );
-                          }
-                          return Text(
-                            'Aucune donnée disponible',
-                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                              );
+                            },
                           );
                         },
                       ),
+                      
                       SizedBox(height: 16),
                       TextFormField(
                         validator: (value) {

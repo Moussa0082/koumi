@@ -65,16 +65,18 @@ class _SpeculationPageState extends State<SpeculationPage> {
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Column(
             children: [
+              // Text(
+              //   "Spéculation",
+              //   style:
+              //       TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+              // ),
+              // SizedBox(height: 10),
               Text(
-                "Spéculation",
-                style:
-                    TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              Text(
-                cat.libelleCategorie,
-                style:
-                    TextStyle(color: d_colorGreen, fontWeight: FontWeight.w600),
+                "Catégorie ${cat.libelleCategorie}",
+                style: TextStyle(
+                    color: d_colorGreen,
+                    fontWeight: FontWeight.w600,
+                    overflow: TextOverflow.ellipsis),
               ),
             ],
           ),
@@ -201,7 +203,8 @@ class _SpeculationPageState extends State<SpeculationPage> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      e.descriptionSpeculation,
+                                                      e.descriptionSpeculation
+                                                          .trim(),
                                                       style: const TextStyle(
                                                         color: Colors.black87,
                                                         fontSize: 17,
@@ -219,10 +222,40 @@ class _SpeculationPageState extends State<SpeculationPage> {
                                                             .connectionState ==
                                                         ConnectionState
                                                             .waiting) {
-                                                      return const Center(
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                          color: Colors.orange,
+                                                      return Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Text(
+                                                                "Nombres de produit",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .black87,
+                                                                  fontSize: 17,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  fontStyle:
+                                                                      FontStyle
+                                                                          .italic,
+                                                                )),
+                                                            Text("0",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .black87,
+                                                                  fontSize: 18,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w800,
+                                                                ))
+                                                          ],
                                                         ),
                                                       );
                                                     }
@@ -291,7 +324,7 @@ class _SpeculationPageState extends State<SpeculationPage> {
                                                                           .italic,
                                                                 )),
                                                             Text(
-                                                                speculationList
+                                                                stockList
                                                                     .length
                                                                     .toString(),
                                                                 style:
@@ -589,41 +622,40 @@ class _SpeculationPageState extends State<SpeculationPage> {
         ),
         child: Container(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text(
-                  "Ajouter une spéculation",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 18,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                trailing: IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  icon: Icon(
-                    Icons.close,
-                    color: Colors.red,
-                    size: 24,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 5),
-              Form(
-                key: formkey,
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 10,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: Text(
+                    "Ajouter une spéculation",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 18,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextFormField(
+                    textAlign: TextAlign.center,
+                  ),
+                  trailing: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: Icon(
+                      Icons.close,
+                      color: Colors.red,
+                      size: 24,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Form(
+                  key: formkey,
+                  child: Column(
+                    children: [
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "Veuillez remplir les champs";
@@ -633,20 +665,15 @@ class _SpeculationPageState extends State<SpeculationPage> {
                         controller: libelleController,
                         decoration: InputDecoration(
                           hintText: "Nom de la spéculation",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextFormField(
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "Veuillez remplir les champs";
@@ -654,80 +681,79 @@ class _SpeculationPageState extends State<SpeculationPage> {
                           return null;
                         },
                         controller: descriptionController,
+                        maxLines: null,
                         decoration: InputDecoration(
-                          hintText: "Description",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
+                          labelText: "Description",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        final String libelle = libelleController.text;
-                        final String description = descriptionController.text;
-                        if (formkey.currentState!.validate()) {
-                          try {
-                            await SpeculationService()
-                                .addSpeculation(
-                                    nomSpeculation: libelle,
-                                    descriptionSpeculation: description,
-                                    categorieProduit: cat,
-                                    acteur: acteur)
-                                .then((value) => {
-                                      Provider.of<SpeculationService>(context,
-                                              listen: false)
-                                          .applyChange(),
-                                      setState(() {
-                                        _liste = getCatListe(
-                                            cat.idCategorieProduit!);
-                                      }),
-                                      libelleController.clear(),
-                                      descriptionController.clear(),
-                                      Navigator.of(context).pop()
-                                    });
-                          } catch (e) {
-                            final String errorMessage = e.toString();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Row(
-                                  children: [
-                                    Text("Une erreur s'est produite"),
-                                  ],
+                      const SizedBox(height: 10),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final String libelle = libelleController.text;
+                          final String description = descriptionController.text;
+                          if (formkey.currentState!.validate()) {
+                            try {
+                              await SpeculationService()
+                                  .addSpeculation(
+                                      nomSpeculation: libelle,
+                                      descriptionSpeculation: description,
+                                      categorieProduit: cat,
+                                      acteur: acteur)
+                                  .then((value) => {
+                                        Provider.of<SpeculationService>(context,
+                                                listen: false)
+                                            .applyChange(),
+                                        setState(() {
+                                          _liste = getCatListe(
+                                              cat.idCategorieProduit!);
+                                        }),
+                                        libelleController.clear(),
+                                        descriptionController.clear(),
+                                        Navigator.of(context).pop()
+                                      });
+                            } catch (e) {
+                              final String errorMessage = e.toString();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Text("Une erreur s'est produite"),
+                                    ],
+                                  ),
+                                  duration: Duration(seconds: 5),
                                 ),
-                                duration: Duration(seconds: 5),
-                              ),
-                            );
+                              );
+                            }
                           }
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green, // Orange color code
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green, // Orange color code
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          minimumSize: const Size(290, 45),
                         ),
-                        minimumSize: const Size(290, 45),
-                      ),
-                      icon: const Icon(
-                        Icons.add,
-                        color: Colors.white,
-                      ),
-                      label: const Text(
-                        "Ajouter",
-                        style: TextStyle(
-                          fontSize: 20,
+                        icon: const Icon(
+                          Icons.add,
                           color: Colors.white,
-                          fontWeight: FontWeight.w700,
                         ),
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
+                        label: const Text(
+                          "Ajouter",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),

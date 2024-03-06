@@ -8,8 +8,8 @@ import 'package:koumi_app/models/Materiel.dart';
 import 'package:path/path.dart';
 
 class MaterielService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/Materiel';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Materiel';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/Materiel';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Materiel';
 
   List<Materiel> materielList = [];
 
@@ -33,7 +33,7 @@ class MaterielService extends ChangeNotifier {
       }
 
       requete.fields['materiel'] = jsonEncode({
-        'prix': prix,
+        'prix': int.tryParse(prix),
         'nom': nom,
         'description': description,
         'photoMateriel': "",
@@ -57,7 +57,7 @@ class MaterielService extends ChangeNotifier {
           'Une erreur s\'est produite lors de l\'ajout de acteur : $e');
     }
   }
-
+ 
   Future<void> updateMateriel({
     required String idMateriel,
     required String prix,
@@ -80,7 +80,7 @@ class MaterielService extends ChangeNotifier {
 
       requete.fields['materiel'] = jsonEncode({
         'idMateriel': idMateriel,
-        'prix': prix,
+        'prix': int.tryParse(prix),
         'nom': nom,
         'description': description,
         'photoMateriel': "",

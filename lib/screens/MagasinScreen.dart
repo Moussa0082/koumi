@@ -138,7 +138,7 @@ class _MagasinScreenState extends State<MagasinScreen>
 
   @override
   Widget build(BuildContext context) {
-          const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
+    const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
     return Container(
       child: DefaultTabController(
         length: regions.length,
@@ -152,6 +152,7 @@ class _MagasinScreenState extends State<MagasinScreen>
               Navigator.of(context).pop();
             },
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+
             title: Text('Tous les boutiques'),
             bottom: TabBar(
               isScrollable: regions.length > 4,
@@ -194,39 +195,39 @@ class _MagasinScreenState extends State<MagasinScreen>
               children: [
                 const SizedBox(height: 10),
                 Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.search,
-                      color: Colors.blueGrey[400]), // Couleur de l'icône
-                  SizedBox(
-                      width:
-                          10), // Espacement entre l'icône et le champ de recherche
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Rechercher',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(
-                            color: Colors
-                                .blueGrey[400]), // Couleur du texte d'aide
-                      ),
+                  padding: const EdgeInsets.all(10.0),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.search,
+                            color: Colors.blueGrey[400]), // Couleur de l'icône
+                        SizedBox(
+                            width:
+                                10), // Espacement entre l'icône et le champ de recherche
+                        Expanded(
+                          child: TextField(
+                            controller: _searchController,
+                            onChanged: (value) {
+                              setState(() {});
+                            },
+                            decoration: InputDecoration(
+                              hintText: 'Rechercher',
+                              border: InputBorder.none,
+                              hintStyle: TextStyle(
+                                  color: Colors.blueGrey[
+                                      400]), // Couleur du texte d'aide
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
+                ),
                 const SizedBox(height: 10),
                 // const SizedBox(height:10),
                 Flexible(
@@ -808,6 +809,7 @@ filteredMagasins[index]['acteur'] != null ? filteredMagasins[index]['acteur']['n
                                       ),
                                     ),
         
+
               ),
             );
           },

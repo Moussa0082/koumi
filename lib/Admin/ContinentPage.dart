@@ -55,15 +55,28 @@ class _ContinentPageState extends State<ContinentPage> {
             style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
           actions: [
-            IconButton(
-              onPressed: () {
-                _showDialog();
-              },
-              icon: const Icon(
-                Icons.add,
-                color: d_colorGreen,
-                size: 25,
-              ),
+            PopupMenuButton<String>(
+              padding: EdgeInsets.zero,
+              itemBuilder: (context) => <PopupMenuEntry<String>>[
+                PopupMenuItem<String>(
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.add,
+                      color: Colors.green,
+                    ),
+                    title: const Text(
+                      "Ajouter continent",
+                      style: TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                          overflow: TextOverflow.ellipsis),
+                    ),
+                    onTap: () async {
+                      _showDialog();
+                    },
+                  ),
+                ),
+              ],
             )
           ],
         ),
@@ -183,7 +196,8 @@ class _ContinentPageState extends State<ContinentPage> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      e.descriptionContinent,
+                                                      e.descriptionContinent
+                                                          .trim(),
                                                       style: const TextStyle(
                                                         color: Colors.black87,
                                                         fontSize: 17,
@@ -569,7 +583,7 @@ class _ContinentPageState extends State<ContinentPage> {
                         size: 30,
                       )),
                 ),
-            
+
                 // const SizedBox(height: 10),
                 Form(
                   key: formkey,
