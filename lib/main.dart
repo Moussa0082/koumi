@@ -7,10 +7,12 @@ import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/ContinentService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
+import 'package:koumi_app/service/MaterielService.dart';
 import 'package:koumi_app/service/MessageService.dart';
 import 'package:koumi_app/service/Niveau1Service.dart';
 import 'package:koumi_app/service/Niveau2Service.dart';
 import 'package:koumi_app/service/Niveau3Service.dart';
+import 'package:koumi_app/service/ParametreFicheService.dart';
 import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:koumi_app/service/PaysService.dart';
 import 'package:koumi_app/service/SousRegionService.dart';
@@ -18,6 +20,7 @@ import 'package:koumi_app/service/SpeculationService.dart';
 import 'package:koumi_app/service/StockService.dart';
 import 'package:koumi_app/service/TypeActeurService.dart';
 import 'package:koumi_app/service/UniteService.dart';
+import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:provider/provider.dart';
@@ -31,9 +34,13 @@ void main() {
     ChangeNotifierProvider(create: (context) => ParametreGenerauxService()),
     ChangeNotifierProvider(create: (context) => ParametreGenerauxProvider()),
     ChangeNotifierProvider(create: (context) => UniteService()),
+    ChangeNotifierProvider(create: (context) => ParametreFicheService
+    ()),
     ChangeNotifierProvider(create: (context) => ZoneProductionService()),
     ChangeNotifierProvider(create: (context) => PaysService()),
     ChangeNotifierProvider(create: (context) => MessageService()),
+    ChangeNotifierProvider(create: (context) => MaterielService()),
+    ChangeNotifierProvider(create: (context) => VehiculeService()),
     ChangeNotifierProvider(create: (context) => ContinentService()),
     ChangeNotifierProvider(create: (context) => CategorieService()),
     ChangeNotifierProvider(create: (context) => SpeculationService()),

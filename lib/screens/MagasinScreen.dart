@@ -118,21 +118,20 @@ class _MagasinScreenState extends State<MagasinScreen>
 
   @override
   Widget build(BuildContext context) {
-          const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
+    const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
     return Container(
       child: DefaultTabController(
         length: regions.length,
         child: Scaffold(
-
-       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
-      appBar: AppBar(
-        centerTitle: true,
-        toolbarHeight: 100,
-        leading: IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+          backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+          appBar: AppBar(
+            centerTitle: true,
+            toolbarHeight: 100,
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
             title: Text('Tous les boutiques'),
             bottom: TabBar(
               isScrollable: regions.length > 4,
@@ -175,39 +174,39 @@ class _MagasinScreenState extends State<MagasinScreen>
               children: [
                 const SizedBox(height: 10),
                 Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.search,
-                      color: Colors.blueGrey[400]), // Couleur de l'icône
-                  SizedBox(
-                      width:
-                          10), // Espacement entre l'icône et le champ de recherche
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Rechercher',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(
-                            color: Colors
-                                .blueGrey[400]), // Couleur du texte d'aide
-                      ),
+                  padding: const EdgeInsets.all(10.0),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.search,
+                            color: Colors.blueGrey[400]), // Couleur de l'icône
+                        SizedBox(
+                            width:
+                                10), // Espacement entre l'icône et le champ de recherche
+                        Expanded(
+                          child: TextField(
+                            controller: _searchController,
+                            onChanged: (value) {
+                              setState(() {});
+                            },
+                            decoration: InputDecoration(
+                              hintText: 'Rechercher',
+                              border: InputBorder.none,
+                              hintStyle: TextStyle(
+                                  color: Colors.blueGrey[
+                                      400]), // Couleur du texte d'aide
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
+                ),
                 const SizedBox(height: 10),
                 // const SizedBox(height:10),
                 Flexible(
@@ -265,7 +264,7 @@ class _MagasinScreenState extends State<MagasinScreen>
           // ici on a recuperer les details du  magasin
           Map<String, dynamic> magasin = filteredMagasins[index];
           return Container(
-             height:150,
+            height: 150,
             width: 150,
             child: GestureDetector(
               onTap: () {
@@ -283,20 +282,19 @@ class _MagasinScreenState extends State<MagasinScreen>
               child: Card(
                 shadowColor: Colors.white,
                 child: Column(
-               crossAxisAlignment: CrossAxisAlignment.stretch,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-
                     Container(
                       child: ClipRRect(
-          borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: BorderRadius.circular(8.0),
                         child: Image.network(
                           "http://10.0.2.2/${filteredMagasins[index]['photo']}" ??
                               "assets/images/magasin.png",
                           width: double.infinity,
-                           height: 120,
+                          height: 120,
                           fit: BoxFit.cover,
-                          errorBuilder: (BuildContext context,
-                              Object exception, StackTrace? stackTrace) {
+                          errorBuilder: (BuildContext context, Object exception,
+                              StackTrace? stackTrace) {
                             return Image.asset(
                               'assets/images/magasin.png',
                               width: double.infinity,
@@ -307,17 +305,15 @@ class _MagasinScreenState extends State<MagasinScreen>
                         ),
                       ),
                     ),
-                 const SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
                       // overflow: TextOverflow.ellipsis,
-                      filteredMagasins[index]['nomMagasin']
-                              .toUpperCase() ??
+                      filteredMagasins[index]['nomMagasin'].toUpperCase() ??
                           'Pas de nom défini',
                       textAlign: TextAlign.center,
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    
                   ],
                 ),
               ),

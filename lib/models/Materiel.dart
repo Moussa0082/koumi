@@ -7,7 +7,7 @@ import 'package:koumi_app/models/Acteur.dart';
 class Materiel {
   final String? idMateriel;
   final String codeMateriel;
-  final int prix;
+  final String prix;
   final String nom;
   final String description;
   final String? photoMateriel;
@@ -19,6 +19,7 @@ class Materiel {
   final String? dateModif;
   final Acteur acteur;
   final String etatMateriel;
+  
   Materiel({
     this.idMateriel,
     required this.codeMateriel,
@@ -27,7 +28,7 @@ class Materiel {
     required this.description,
     this.photoMateriel,
     required this.localisation,
-    required this.personneModif,
+    this.personneModif,
     required this.statut,
     required this.statutCommande,
     this.dateAjout,
@@ -36,10 +37,11 @@ class Materiel {
     required this.etatMateriel,
   });
 
+
   Materiel copyWith({
     String? idMateriel,
     String? codeMateriel,
-    int? prix,
+    String? prix,
     String? nom,
     String? description,
     String? photoMateriel,
@@ -93,12 +95,12 @@ class Materiel {
     return Materiel(
       idMateriel: map['idMateriel'] != null ? map['idMateriel'] as String : null,
       codeMateriel: map['codeMateriel'] as String,
-      prix: map['prix'] as int,
+      prix: map['prix'] as String,
       nom: map['nom'] as String,
       description: map['description'] as String,
       photoMateriel: map['photoMateriel'] != null ? map['photoMateriel'] as String : null,
       localisation: map['localisation'] as String,
-      personneModif: map['personneModif'] as String,
+      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       statut: map['statut'] as bool,
       statutCommande: map['statutCommande'] as bool,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,

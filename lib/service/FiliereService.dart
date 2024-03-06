@@ -6,8 +6,8 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Filiere.dart';
 
 class FiliereService extends ChangeNotifier {
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Filiere';
-  static const String baseUrl = 'https://koumi.ml/api-koumi/Filiere';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Filiere';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/Filiere';
 
   List<Filiere> filiereList = [];
 
@@ -59,7 +59,7 @@ class FiliereService extends ChangeNotifier {
   }
 
   Future<List<Filiere>> fetchFiliere() async {
-    final response = await http.get(Uri.parse('$baseUrl/getAllFiliere'));
+    final response = await http.get(Uri.parse('$baseUrl/getAllFiliere/'));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
@@ -69,7 +69,8 @@ class FiliereService extends ChangeNotifier {
     } else {
       filiereList = [];
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
-      throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+      return  filiereList = [];
+      
     }
   }
 

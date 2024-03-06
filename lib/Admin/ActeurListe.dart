@@ -1,27 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/Admin/DetailsActeur.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
 
-class ActeurScreen extends StatefulWidget {
-  const ActeurScreen({super.key});
+class ActeurList extends StatefulWidget {
+  final TypeActeur typeActeur;
+  const ActeurList({super.key, required this.typeActeur});
 
   @override
-  State<ActeurScreen> createState() => _ActeurScreenState();
+  State<ActeurList> createState() => _ActeurListState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _ActeurScreenState extends State<ActeurScreen> {
+class _ActeurListState extends State<ActeurList> {
   late TextEditingController _searchController;
   List<Acteur> acteurList = [];
+  late TypeActeur typeActeurs;
+  late Future<List<Acteur>> _liste;
+
+  Future<List<Acteur>> getActeurListe(String id) async {
+    return await ActeurService().fetchActeurByTypeActeur(id);
+  }
 
   @override
   void initState() {
     _searchController = TextEditingController();
+    typeActeurs = widget.typeActeur;
+    _liste = getActeurListe(typeActeurs.idTypeActeur!);
     super.initState();
   }
 
@@ -44,7 +54,7 @@ class _ActeurScreenState extends State<ActeurScreen> {
             },
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: Text(
-          "Listes des acteurs",
+          typeActeurs.libelle!.toUpperCase(),
           style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
       ),
@@ -89,7 +99,7 @@ class _ActeurScreenState extends State<ActeurScreen> {
             const SizedBox(height: 10),
             Consumer<ActeurService>(builder: (context, acteurService, child) {
               return FutureBuilder(
-                  future: acteurService.fetchActeur(),
+                  future: _liste,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
@@ -170,7 +180,7 @@ class _ActeurScreenState extends State<ActeurScreen> {
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                   )),
-                                               subtitle: Text(
+                                              subtitle: Text(
                                                   e.typeActeur
                                                       .map((data) =>
                                                           data.libelle)
@@ -246,6 +256,12 @@ class _ActeurScreenState extends State<ActeurScreen> {
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
+                                                                    setState(
+                                                                        () {
+                                                                      _liste = getActeurListe(
+                                                                          typeActeurs
+                                                                              .idTypeActeur!);
+                                                                    }),
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop(),
@@ -312,6 +328,12 @@ class _ActeurScreenState extends State<ActeurScreen> {
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
+                                                                    setState(
+                                                                        () {
+                                                                      _liste = getActeurListe(
+                                                                          typeActeurs
+                                                                              .idTypeActeur!);
+                                                                    }),
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop(),
@@ -378,6 +400,12 @@ class _ActeurScreenState extends State<ActeurScreen> {
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
+                                                                    setState(
+                                                                        () {
+                                                                      _liste = getActeurListe(
+                                                                          typeActeurs
+                                                                              .idTypeActeur!);
+                                                                    }),
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop(),

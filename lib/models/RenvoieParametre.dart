@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:koumi_app/models/ParametreFiche.dart';
@@ -25,7 +24,8 @@ class RenvoieParametre {
     required this.statutRenvoie,
     required this.parametreFiche,
   });
-  
+
+ 
 
   RenvoieParametre copyWith({
     String? idRenvoiParametre,
@@ -61,7 +61,7 @@ class RenvoieParametre {
       'valeurConditionRenvoi': valeurConditionRenvoi,
       'descriptionRenvoie': descriptionRenvoie,
       'statutRenvoie': statutRenvoie,
-      'parametreFiche': parametreFiche.toJson(),
+      'parametreFiche': parametreFiche.toMap(),
     };
   }
 
@@ -75,7 +75,7 @@ class RenvoieParametre {
       valeurConditionRenvoi: map['valeurConditionRenvoi'] as String,
       descriptionRenvoie: map['descriptionRenvoie'] as String,
       statutRenvoie: map['statutRenvoie'] as bool,
-      parametreFiche: ParametreFiche.fromJson(map['parametreFiche'] as Map<String,dynamic>),
+      parametreFiche: ParametreFiche.fromMap(map['parametreFiche'] as Map<String,dynamic>),
     );
   }
 

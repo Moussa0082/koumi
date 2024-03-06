@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key});
-
+  
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();
   @override

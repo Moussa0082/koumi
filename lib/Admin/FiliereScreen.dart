@@ -33,8 +33,13 @@ class _FiliereScreenState extends State<FiliereScreen> {
   TextEditingController descriptionController = TextEditingController();
   String? filiereValue;
   late Future _filiereList;
+  late Future<List<Filiere>> _liste;
   late Filiere filiere;
   late TextEditingController _searchController;
+
+  Future<List<Filiere>> getFil() async {
+    return await FiliereService().fetchFiliere();
+  }
 
   @override
   void initState() {
@@ -45,8 +50,10 @@ class _FiliereScreenState extends State<FiliereScreen> {
         .parametreList!;
     para = paraList[0];
     _filiereList = http
-        .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
-    // Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+        // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+        .get(
+            Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+    _liste = getFil();
   }
 
   @override
@@ -256,7 +263,8 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      e.descriptionFiliere,
+                                                      e.descriptionFiliere
+                                                          .trim(),
                                                       style: const TextStyle(
                                                         color: Colors.black87,
                                                         fontSize: 17,
@@ -499,6 +507,11 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                                           {
                                                                             Provider.of<FiliereService>(context, listen: false).applyChange(),
                                                                             Navigator.of(context).pop(),
+                                                                            setState(() {
+                                                                              _filiereList = http
+                                                                                  // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+                                                                                  .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+                                                                            })
                                                                           })
                                                                   .catchError(
                                                                       (onError) =>
@@ -507,7 +520,10 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                                               const SnackBar(
                                                                                 content: Row(
                                                                                   children: [
-                                                                                    Text("Impossible de supprimer"),
+                                                                                    Text(
+                                                                                      "Impossible de supprimer car cette filière est déjà associé a une categorie",
+                                                                                      style: TextStyle(overflow: TextOverflow.ellipsis),
+                                                                                    ),
                                                                                   ],
                                                                                 ),
                                                                                 duration: Duration(seconds: 2),
@@ -560,6 +576,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
       case 'bétail':
       case 'betails':
       case 'betail':
+      case 'animal':
         return Image.asset(
           "assets/images/betail.png",
           width: 80,
@@ -687,6 +704,12 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                         Provider.of<FiliereService>(context,
                                                 listen: false)
                                             .applyChange(),
+                                        setState(() {
+                                          _filiereList = http
+                                              // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+                                              .get(Uri.parse(
+                                                  'http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+                                        }),
                                         libelleController.clear(),
                                         descriptionController.clear(),
                                         Navigator.of(context).pop()
@@ -800,13 +823,13 @@ class _FiliereScreenState extends State<FiliereScreen> {
                         return FutureBuilder(
                           future: _filiereList,
                           builder: (_, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return CircularProgressIndicator();
-                            }
-                            if (snapshot.hasError) {
-                              return Text("${snapshot.error}");
-                            }
+                            // if (snapshot.connectionState ==
+                            //     ConnectionState.waiting) {
+                            //   return CircularProgressIndicator();
+                            // }
+                            // if (snapshot.hasError) {
+                            //   return Text("${snapshot.error}");
+                            // }
                             if (snapshot.hasData) {
                               dynamic responseData =
                                   json.decode(snapshot.data.body);
@@ -818,10 +841,15 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                     .toList();
 
                                 if (filiereList.isEmpty) {
-                                  return Text(
-                                    'Aucune filière disponible',
-                                    style: TextStyle(
-                                        overflow: TextOverflow.ellipsis),
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Aucun filière trouvé',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
                                   );
                                 }
 
@@ -854,16 +882,27 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                   ),
                                 );
                               } else {
-                                return Text(
-                                  'Aucune filière disponible',
-                                  style: TextStyle(
-                                      overflow: TextOverflow.ellipsis),
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucun filière trouvé',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
                                 );
                               }
                             }
-                            return Text(
-                              'Aucune filière disponible',
-                              style: TextStyle(overflow: TextOverflow.ellipsis),
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucun filière trouvé',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
                             );
                           },
                         );

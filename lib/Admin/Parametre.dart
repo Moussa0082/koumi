@@ -46,7 +46,7 @@ class _ParametreState extends State<Parametre> {
             },
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: const Text(
-          "Parametre Système",
+          "Paramètre Système",
           style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
       ),
@@ -118,7 +118,6 @@ class _ParametreState extends State<Parametre> {
                 horizontal: MediaQuery.of(context).size.width * 0.05,
               ),
               child: Container(
-                height: 380,
                 width: MediaQuery.of(context).size.width * 0.9,
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -234,7 +233,69 @@ class _ParametreState extends State<Parametre> {
                         )),
                   ],
                 ),
-              ))
+              )),
+          // Padding(
+          //     padding: EdgeInsets.symmetric(
+          //       vertical: MediaQuery.of(context).size.height * 0.02,
+          //       horizontal: MediaQuery.of(context).size.width * 0.05,
+          //     ),
+          //     child: Container(
+          //       width: MediaQuery.of(context).size.width * 0.9,
+          //       decoration: BoxDecoration(
+          //         color: Colors.white,
+          //         borderRadius: BorderRadius.circular(15),
+          //         boxShadow: [
+          //           BoxShadow(
+          //             color: Colors.grey.withOpacity(0.2),
+          //             offset: const Offset(0, 2),
+          //             blurRadius: 5,
+          //             spreadRadius: 2,
+          //           ),
+          //         ],
+          //       ),
+          //       child: Column(
+          //         children: [
+          //           getList(
+          //               "settings.png",
+          //               'Paramètre fiche donnée',
+          //               const ParametreFichePage(),
+          //               const Icon(
+          //                 Icons.chevron_right_sharp,
+          //                 size: 30,
+          //               )),
+          //           const Divider(
+          //             color: Colors.grey,
+          //             height: 4,
+          //             thickness: 1,
+          //             indent: 50,
+          //             endIndent: 0,
+          //           ),
+          //           getList(
+          //              "settings.png",
+          //               'Paramètre regroupée',
+          //               const ParametreRegroupePage(),
+          //               const Icon(
+          //                 Icons.chevron_right_sharp,
+          //                 size: 30,
+          //               )),
+          //           const Divider(
+          //             color: Colors.grey,
+          //             height: 4,
+          //             thickness: 1,
+          //             indent: 50,
+          //             endIndent: 0,
+          //           ),
+          //           getList(
+          //               "settings.png",
+          //               'Renvoie donnée',
+          //               const ParametreRenvoiePage(),
+          //               const Icon(
+          //                 Icons.chevron_right_sharp,
+          //                 size: 30,
+          //               )),
+          //         ],
+          //       ),
+          //     ))
         ]),
       ),
     );

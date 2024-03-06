@@ -195,7 +195,7 @@ class _ProduitScreenState extends State<ProduitScreen>
                       controller: _tabController,
                       children: categorieProduit.map((categorie) {
                         return buildGridView(
-                            categorie.idCategorieProduit!, widget.id!);
+                            categorie.idCategorieProduit!,  widget.id!);
                       }).toList(),
                     ),
                   ),
@@ -208,7 +208,7 @@ class _ProduitScreenState extends State<ProduitScreen>
     );
   }
 
-  Widget buildGridView(String idCategorie, String idMagasin) {
+  Widget buildGridView(String idCategorie, String? idMagasin) {
     List<Stock> filteredStocks = stock;
     String searchText = "";
     if (filteredStocks.isEmpty) {

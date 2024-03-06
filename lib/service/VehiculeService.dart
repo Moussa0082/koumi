@@ -8,63 +8,114 @@ import 'package:koumi_app/models/Vehicule.dart';
 import 'package:path/path.dart';
 
 class VehiculeService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/vehicule';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/vehicule';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/vehicule';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/vehicule';
 
   List<Vehicule> vehiculeList = [];
 
 Future<void> addVehicule({
     required String nomVehicule,
     required String capaciteVehicule,
+    required String prix,
+    required String etatVehicule,
+    required String description,
+    required String localisation,
     File? photoVehicule,
     required Acteur acteur
   }) async {
-    var addvehicules = jsonEncode({
-      'idVehicule': null,
-      'nomVehicule': nomVehicule,
-      'capaciteVehicule': capaciteVehicule,
-      'acteur' : acteur.toMap(),
-    });
+    try {
+      var requete =
+          http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
 
-    final response = await http.post(Uri.parse("$baseUrl/create"),
-        headers: {'Content-Type': 'application/json'}, body: addvehicules);
-    debugPrint(addvehicules.toString());
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      debugPrint(response.body);
-    } else {
-      throw Exception("Une erreur s'est produite' : ${response.statusCode}");
+      if (photoVehicule != null) {
+        requete.files.add(http.MultipartFile('image',
+            photoVehicule.readAsBytes().asStream(), photoVehicule.lengthSync(),
+            filename: basename(photoVehicule.path)));
+      }
+
+      requete.fields['vehicule'] = jsonEncode({
+      'prix': int.tryParse(prix),
+      'nomVehicule': nomVehicule,
+      'etatVehicule': etatVehicule,
+      'localisation':localisation,
+      'description': description,
+      'capaciteVehicule': capaciteVehicule,
+      'acteur': acteur.toMap(),
+      });
+
+      var response = await requete.send();
+      var responsed = await http.Response.fromStream(response);
+
+      if (response.statusCode == 200 || responsed.statusCode == 201) {
+        final donneesResponse = json.decode(responsed.body);
+        debugPrint('intrant service ${donneesResponse.toString()}');
+      } else {
+        throw Exception(
+            'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
+      }
+    } catch (e) {
+      throw Exception(
+          'Une erreur s\'est produite lors de l\'ajout  : $e');
     }
   }
-
 Future<void> updateVehicule({
-    required String idVehicule,
+  required String idVehicule,
     required String nomVehicule,
     required String capaciteVehicule,
+    required String prix,
+    required String etatVehicule,
+    required String localisation,
+     required String description,
     File? photoVehicule,
     required Acteur acteur
   }) async {
-    var addvehicules = jsonEncode({
-      'idVehicule': idVehicule,
-      'nomVehicule': nomVehicule,
-      'capaciteVehicule': capaciteVehicule,
-      'acteur' : acteur.toMap(),
-    });
+    try {
+      var requete =
+          http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idVehicule'));
 
-    final response = await http.put(Uri.parse("$baseUrl/update/$idVehicule"),
-        headers: {'Content-Type': 'application/json'}, body: addvehicules);
-    debugPrint(addvehicules.toString());
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      debugPrint(response.body);
-    } else {
-      throw Exception("Une erreur s'est produite' : ${response.statusCode}");
+      if (photoVehicule != null) {
+        requete.files.add(http.MultipartFile('image',
+            photoVehicule.readAsBytes().asStream(), photoVehicule.lengthSync(),
+            filename: basename(photoVehicule.path)));
+      }
+
+      requete.fields['vehicule'] = jsonEncode({
+        'idVehicule':idVehicule,
+       'prix': int.tryParse(prix),
+        'nomVehicule': nomVehicule,
+        'etatVehicule': etatVehicule,
+        'description': description,
+              'localisation': localisation,
+
+        'capaciteVehicule': capaciteVehicule,
+         'acteur': acteur.toMap(),
+      });
+
+      var response = await requete.send();
+      var responsed = await http.Response.fromStream(response);
+
+      if (response.statusCode == 200 || responsed.statusCode == 201) {
+        final donneesResponse = json.decode(responsed.body);
+        debugPrint('intrant service ${donneesResponse.toString()}');
+      } else {
+        throw Exception(
+            'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
+      }
+    } catch (e) {
+      throw Exception(
+          'Une erreur s\'est produite lors de l\'ajout de acteur : $e');
     }
   }
+
+
+
 
   Future<List<Vehicule>> fetchVehicule() async {
     final response = await http.get(Uri.parse('$baseUrl/read'));
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+       debugPrint(response.body.toString());
       vehiculeList = body.map((item) => Vehicule.fromMap(item)).toList();
       debugPrint(response.body);
       return vehiculeList;
@@ -89,7 +140,7 @@ Future<void> updateVehicule({
 
   Future<void> activerVehicule(String idVehicule) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/enable/$idVehicule"));
+        await http.put(Uri.parse("$baseUrl/enable/$idVehicule"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -101,7 +152,7 @@ Future<void> updateVehicule({
 
   Future<void> desactiverVehicule(String idVehicule) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/disable/$idVehicule"));
+        await http.put(Uri.parse("$baseUrl/disable/$idVehicule"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());

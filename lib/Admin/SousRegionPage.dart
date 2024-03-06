@@ -7,6 +7,7 @@ import 'package:koumi_app/Admin/UpdateSousRegions.dart';
 import 'package:koumi_app/models/Continent.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/SousRegion.dart';
+import 'package:koumi_app/service/ContinentService.dart';
 import 'package:koumi_app/service/PaysService.dart';
 import 'package:koumi_app/service/SousRegionService.dart';
 import 'package:provider/provider.dart';
@@ -43,8 +44,8 @@ class _SousRegionPageState extends State<SousRegionPage> {
     // continents = widget.continent;
     // _liste = getSousRegionListe();
     _continentList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/continent/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/continent/read'));
+        // http.get(Uri.parse('https://koumi.ml/api-koumi/continent/read'));
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/continent/read'));
     _searchController = TextEditingController();
 
     super.initState();
@@ -74,15 +75,28 @@ class _SousRegionPageState extends State<SousRegionPage> {
             style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
           actions: [
-            IconButton(
-              onPressed: () {
-                _showDialog();
-              },
-              icon: const Icon(
-                Icons.add,
-                color: d_colorGreen,
-                size: 30,
-              ),
+            PopupMenuButton<String>(
+              padding: EdgeInsets.zero,
+              itemBuilder: (context) => <PopupMenuEntry<String>>[
+                PopupMenuItem<String>(
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.add,
+                      color: Colors.green,
+                    ),
+                    title: const Text(
+                      "Ajouter une sous région ",
+                      style: TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                          overflow: TextOverflow.ellipsis),
+                    ),
+                    onTap: () async {
+                      _showDialog();
+                    },
+                  ),
+                ),
+              ],
             )
           ],
         ),
@@ -202,7 +216,8 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      e.continent.nomContinent,
+                                                      e.continent.nomContinent
+                                                          .trim(),
                                                       style: const TextStyle(
                                                         color: Colors.black87,
                                                         fontSize: 17,
@@ -669,60 +684,84 @@ class _SousRegionPageState extends State<SousRegionPage> {
                       ),
                     ),
                     SizedBox(height: 16),
-                    FutureBuilder(
-                      future: _continentList,
-                      builder: (_, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        }
-                        if (snapshot.hasError) {
-                          return Text("${snapshot.error}");
-                        }
-                        if (snapshot.hasData) {
-                          final reponse =
-                              json.decode((snapshot.data.body)) as List;
-                          final continentList = reponse
-                              .map((e) => Continent.fromMap(e))
-                              .where((con) => con.statutContinent == true)
-                              .toList();
+                    Consumer<ContinentService>(
+                      builder: (context, conService, child) {
+                        return FutureBuilder(
+                          future: _continentList,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            }
+                            if (snapshot.hasError) {
+                              return Text("${snapshot.error}");
+                            }
+                            if (snapshot.hasData) {
+                              final reponse = json.decode(snapshot.data.body);
+                              if (reponse is List) {
+                                final continentList = reponse
+                                    .map((e) => Continent.fromMap(e))
+                                    .where((con) => con.statutContinent == true)
+                                    .toList();
 
-                          if (continentList.isEmpty) {
-                            return Text('Aucun continent disponible');
-                          }
-
-                          return DropdownButtonFormField<String>(
-                            items: continentList
-                                .map(
-                                  (e) => DropdownMenuItem(
-                                    value: e.idContinent,
-                                    child: Text(e.nomContinent),
-                                  ),
-                                )
-                                .toList(),
-                            value: continentValue,
-                            onChanged: (newValue) {
-                              setState(() {
-                                continentValue = newValue;
-                                if (newValue != null) {
-                                  continents = continentList.firstWhere(
-                                      (element) =>
-                                          element.idContinent == newValue);
-                                  debugPrint(
-                                      "con select ${continents.idContinent.toString()}");
-                                  // typeSelected = true;
+                                if (continentList.isEmpty) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Aucun continent trouvé',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
                                 }
-                              });
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Sélectionner un continent',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
+
+                                return DropdownButtonFormField<String>(
+                                  items: continentList
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idContinent,
+                                          child: Text(e.nomContinent),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: continentValue,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      continentValue = newValue;
+                                      if (newValue != null) {
+                                        continents = continentList.firstWhere(
+                                            (element) =>
+                                                element.idContinent ==
+                                                newValue);
+                                        debugPrint(
+                                            "con select ${continents.idContinent.toString()}");
+                                        // typeSelected = true;
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Sélectionner un continent',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucun continent trouvé',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                               ),
-                            ),
-                          );
-                        }
-                        return Text('Aucune donnée disponible');
+                            );
+                          },
+                        );
                       },
                     ),
                     SizedBox(height: 20),

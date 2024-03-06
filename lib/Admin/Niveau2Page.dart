@@ -11,6 +11,7 @@ import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/service/Niveau1Service.dart';
 import 'package:koumi_app/service/Niveau2Service.dart';
 import 'package:koumi_app/service/Niveau3Service.dart';
 import 'package:provider/provider.dart';
@@ -55,11 +56,11 @@ class _Niveau2PageState extends State<Niveau2Page> {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
     para = paraList[0];
-    _paysList = http.get(Uri.parse('https://koumi.ml/api-koumi/pays/read'));
-    // _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
+    // _paysList = http.get(Uri.parse('https://koumi.ml/api-koumi/pays/read'));
+    _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
     _niveauList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+        // http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
   }
 
   @override
@@ -87,15 +88,28 @@ class _Niveau2PageState extends State<Niveau2Page> {
               const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              _showDialog();
-            },
-            icon: const Icon(
-              Icons.add,
-              color: d_colorGreen,
-              size: 30,
-            ),
+          PopupMenuButton<String>(
+            padding: EdgeInsets.zero,
+            itemBuilder: (context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.add,
+                    color: Colors.green,
+                  ),
+                  title: Text(
+                    "Ajouter un ${para.libelleNiveau2Pays}",
+                    style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.ellipsis),
+                  ),
+                  onTap: () async {
+                    _showDialog();
+                  },
+                ),
+              ),
+            ],
           )
         ],
       ),
@@ -204,9 +218,10 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                                   color: Colors.black,
                                                   fontSize: 18,
                                                   overflow:
-                                                  TextOverflow.ellipsis,
+                                                      TextOverflow.ellipsis,
                                                 )),
-                                            subtitle: Text(e.descriptionN2,
+                                            subtitle: Text(
+                                                e.descriptionN2.trim(),
                                                 style: const TextStyle(
                                                   color: Colors.black87,
                                                   fontSize: 17,
@@ -214,96 +229,101 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                                   fontStyle: FontStyle.italic,
                                                 )),
                                           ),
-                                          FutureBuilder(
-                                              future: Niveau3Service()
-                                                  .fetchNiveau3ByNiveau2(
-                                                      e.idNiveau2Pays!),
-                                              builder: (context, snapshot) {
-                                                if (snapshot.connectionState ==
-                                                    ConnectionState.waiting) {
-                                                  return const Center(
-                                                    child:
-                                                        CircularProgressIndicator(
-                                                      color: Colors.orange,
-                                                    ),
-                                                  );
-                                                }
+                                          Consumer<Niveau1Service>(builder:
+                                              (context, niveauSer, child) {
+                                            return FutureBuilder(
+                                                future: Niveau3Service()
+                                                    .fetchNiveau3ByNiveau2(
+                                                        e.idNiveau2Pays!),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return const Center(
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                        color: Colors.orange,
+                                                      ),
+                                                    );
+                                                  }
 
-                                                if (!snapshot.hasData) {
-                                                  return Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 15),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                            "Nombres ${para.libelleNiveau3Pays} :",
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .black87,
-                                                              fontSize: 17,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              fontStyle:
-                                                                  FontStyle
-                                                                      .italic,
-                                                            )),
-                                                        Text("0",
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .black87,
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w800,
-                                                            ))
-                                                      ],
-                                                    ),
-                                                  );
-                                                } else {
-                                                  niveau3List = snapshot.data!;
-                                                  return Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 15),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                            "Nombres ${para.libelleNiveau3Pays} :",
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .black87,
-                                                              fontSize: 17,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              fontStyle:
-                                                                  FontStyle
-                                                                      .italic,
-                                                            )),
-                                                        Text(
-                                                            niveau3List.length
-                                                                .toString(),
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .black87,
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w800,
-                                                            ))
-                                                      ],
-                                                    ),
-                                                  );
-                                                }
-                                              }),
+                                                  if (!snapshot.hasData) {
+                                                    return Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 15),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                              "Nombres ${para.libelleNiveau3Pays} :",
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .black87,
+                                                                fontSize: 17,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .italic,
+                                                              )),
+                                                          Text("0",
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .black87,
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w800,
+                                                              ))
+                                                        ],
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    niveau3List =
+                                                        snapshot.data!;
+                                                    return Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 15),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                              "Nombres ${para.libelleNiveau3Pays} :",
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .black87,
+                                                                fontSize: 17,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .italic,
+                                                              )),
+                                                          Text(
+                                                              niveau3List.length
+                                                                  .toString(),
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .black87,
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w800,
+                                                              ))
+                                                        ],
+                                                      ),
+                                                    );
+                                                  }
+                                                });
+                                          }),
                                           Container(
                                             alignment: Alignment.bottomRight,
                                             padding: const EdgeInsets.symmetric(
@@ -701,66 +721,87 @@ class _Niveau2PageState extends State<Niveau2Page> {
                       //   },
                       // ),
                       SizedBox(height: 16),
-                      FutureBuilder(
-                        future: _niveauList,
-                        builder: (_, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return CircularProgressIndicator();
-                          }
-                          if (snapshot.hasError) {
-                            return Text("${snapshot.error}");
-                          }
-                          if (snapshot.hasData) {
-                            final reponse =
-                                json.decode((snapshot.data.body)) as List;
-                            final niveauList = reponse
-                                .map((e) => Niveau1Pays.fromMap(e))
-                                .where((con) => con.statutN1 == true)
-                                .toList();
+                      Consumer<Niveau1Service>(
+                        builder: (context, niveauService, child) {
+                          return FutureBuilder(
+                            future: _niveauList,
+                            builder: (_, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return CircularProgressIndicator();
+                              }
+                              if (snapshot.hasError) {
+                                return Text("${snapshot.error}");
+                              }
+                              if (snapshot.hasData) {
+                                final reponse = json.decode(snapshot.data.body);
+                                if (reponse is List) {
+                                  final niveauList = reponse
+                                      .map((e) => Niveau1Pays.fromMap(e))
+                                      .where((con) => con.statutN1 == true)
+                                      .toList();
 
-                            if (niveauList.isEmpty) {
-                              return Text(
-                                'Aucun donné disponible',
-                                style:
-                                    TextStyle(overflow: TextOverflow.ellipsis),
-                              );
-                            }
-
-                            return DropdownButtonFormField<String>(
-                              items: niveauList
-                                  .map(
-                                    (e) => DropdownMenuItem(
-                                      value: e.idNiveau1Pays,
-                                      child: Text(e.nomN1!),
-                                    ),
-                                  )
-                                  .toList(),
-                              value: n1Value,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  paysValue = newValue;
-                                  if (newValue != null) {
-                                    niveau1 = niveauList.firstWhere((element) =>
-                                        element.idNiveau1Pays == newValue);
-                                    debugPrint(
-                                        "niveau select :${niveau1.toString()}");
-                                    // typeSelected = true;
+                                  if (niveauList.isEmpty) {
+                                    return DropdownButtonFormField(
+                                      items: [],
+                                      onChanged: null,
+                                      decoration: InputDecoration(
+                                        labelText:
+                                            'Aucun ${para.libelleNiveau1Pays} trouvé',
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    );
                                   }
-                                });
-                              },
-                              decoration: InputDecoration(
-                                labelText:
-                                    'Sélectionner un ${para.libelleNiveau2Pays}',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
+
+                                  return DropdownButtonFormField<String>(
+                                    items: niveauList
+                                        .map(
+                                          (e) => DropdownMenuItem(
+                                            value: e.idNiveau1Pays,
+                                            child: Text(e.nomN1 ?? ''),
+                                          ),
+                                        )
+                                        .toList(),
+                                    value: n1Value,
+                                    onChanged: (newValue) {
+                                      setState(() {
+                                        n1Value = newValue;
+                                        if (newValue != null) {
+                                          niveau1 = niveauList.firstWhere(
+                                              (element) =>
+                                                  element.idNiveau1Pays ==
+                                                  newValue);
+                                          debugPrint(
+                                              "niveau select :${niveau1.toString()}");
+                                          // typeSelected = true;
+                                        }
+                                      });
+                                    },
+                                    decoration: InputDecoration(
+                                      labelText:
+                                          'Sélectionner un ${para.libelleNiveau1Pays}',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText:
+                                      'Aucun ${para.libelleNiveau1Pays} trouvé',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
-                              ),
-                            );
-                          }
-                          return Text(
-                            'Aucune donnée disponible',
-                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                              );
+                            },
                           );
                         },
                       ),
@@ -800,11 +841,10 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                             .applyChange(),
                                         libelleController.clear(),
                                         descriptionController.clear(),
-                                        Navigator.of(context).pop(),
                                         setState(() {
-                                          pays == null;
                                           niveau1 == null;
                                         }),
+                                        Navigator.of(context).pop(),
                                       });
                             } catch (e) {
                               final String errorMessage = e.toString();

@@ -8,8 +8,8 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:path/path.dart';
 
 class ActeurService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/acteur';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/acteur';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur';
 
   List<Acteur> acteurList = [];
 
@@ -154,22 +154,6 @@ class ActeurService extends ChangeNotifier {
           'Une erreur s\'est produite lors de la modification de acteur : $e');
     }
   }
-
-//     Future<http.Response>  {
-//   try {
-//     // Vous devez implémenter la logique pour envoyer le message WhatsApp ici
-//     // Par exemple, utiliser une bibliothèque HTTP pour effectuer une requête POST à votre service WhatsApp
-//     // Assurez-vous d'adapter cette logique à votre service WhatsApp spécifique
-
-//     // Pour l'exemple, nous allons simplement simuler l'envoi avec une attente de 2 secondes
-//     await Future.delayed(Duration(seconds: 2));
-
-//     return http.Response('Message envoyé avec succès à tous les acteurs correspondant aux libellés ${libelles.length}', 200);
-//   } catch (e) {
-//     // En cas d'erreur, retourner une réponse avec un message d'erreur
-//     return http.Response('Échec de l\'envoi du message WhatsApp aux acteurs correspondant aux libellés $libelles. Erreur : $e', 500);
-//   }
-// }
 
   static Future<String> sendOtpCodeEmail(
       String emailActeur, BuildContext context) async {
@@ -606,6 +590,27 @@ class ActeurService extends ChangeNotifier {
       throw Exception(e.toString());
     }
   }
+ 
+  Future<List<Acteur>> fetchActeurByTypeActeur(String id) async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/listeByTypeActeur/$id'));
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("Fetching data");
+        List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+        acteurList = body.map((e) => Acteur.fromMap(e)).toList();
+        debugPrint(acteurList.toString());
+        return acteurList;
+      } else {
+        acteurList = [];
+        print(
+            'Échec de la requête avec le code d\'état: ${response.statusCode}');
+        throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
 
   Future deleteActeur(String idActeur) async {
     final response = await http.delete(Uri.parse('$baseUrl/delete/$idActeur'));
@@ -714,6 +719,23 @@ class ActeurService extends ChangeNotifier {
     try {
       final Uri uri = Uri.parse(
           '$baseUrl/sendMessageWathsappToActeurByTypeActeurs?message=$message&libelles=${libelles.join(',')}');
+
+      final response = await http.get(uri);
+
+      if (response.statusCode != 200) {
+        throw Exception(
+            'Impossible d\'envoyer le message ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Échec de l\'envoi du message WhatsApp : $e');
+    }
+  }
+
+  Future<void> sendEmailToActeurByTypeActeur(
+      String message, List<String> libelles, String sujet) async {
+    try {
+      final Uri uri = Uri.parse(
+          '$baseUrl/sendEmailToActeurByTypeActeur?message=$message&libelles=${libelles.join(',')}&sujet=$sujet');
 
       final response = await http.get(uri);
 

@@ -62,14 +62,14 @@ class _AddCategorieState extends State<AddCategorie> {
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Column(children: [
-            Text(
-              "Catégorie produit",
-              style:
-                  TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(
-              height: 10,
-            ),
+            // Text(
+            //   "Catégorie produit",
+            //   style:
+            //       TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+            // ),
+            // SizedBox(
+            //   height: 10,
+            // ),
             Text(
               "Filière : ${filiere.libelleFiliere}",
               style:
@@ -196,7 +196,8 @@ class _AddCategorieState extends State<AddCategorie> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      e.descriptionCategorie!,
+                                                      e.descriptionCategorie!
+                                                          .trim(),
                                                       style: const TextStyle(
                                                         color: Colors.black87,
                                                         fontSize: 17,

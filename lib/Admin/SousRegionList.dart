@@ -57,7 +57,7 @@ class _SousRegionListState extends State<SousRegionList> {
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
-            continents.nomContinent,
+            continents.nomContinent.toUpperCase(),
             style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
         ),
@@ -168,7 +168,7 @@ class _SousRegionListState extends State<SousRegionList> {
                                                           TextOverflow.ellipsis,
                                                     )),
                                                 subtitle: Text(
-                                                    e.continent.nomContinent,
+                                                    e.continent.nomContinent.trim(),
                                                     style: const TextStyle(
                                                       color: Colors.black87,
                                                       fontSize: 17,

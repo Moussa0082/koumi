@@ -8,10 +8,10 @@ import 'package:path/path.dart';
 
 class PaysService extends ChangeNotifier {
 
-  static const String baseUrl = 'https://koumi.ml/api-koumi/pays';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/pays';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/pays';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/pays';
 
-  List<Pays> paysList = [];
+   List<Pays> paysList = [];
 
   Future<void> addPays({
     required String nomPays,
