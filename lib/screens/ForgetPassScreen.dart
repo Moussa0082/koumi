@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:koumi_app/screens/CodeConfirmScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
+import 'package:koumi_app/widgets/LoadingOverlay.dart';
 
 class ForgetPassScreen extends StatefulWidget {
   const ForgetPassScreen({super.key});
@@ -93,9 +94,24 @@ void hideLoadingDialog(BuildContext context) {
     },
   );
 }
+ 
+ void _handleClick(BuildContext context) async{
+
+  setState(() {
+    isLoading= true;
+  });
+
+  await handleSendButton(context).then((_) {
+      // Cacher l'indicateur de chargement lorsque votre fonction est terminée
+      setState(() {
+        isLoading = false;
+      });
+    });
+
+  }
 
    // Fonction pour gérer le bouton Envoyer
-void handleSendButton(BuildContext context) async {
+  handleSendButton(BuildContext context) async {
   bool isConnected = await checkInternetConnectivity();
   if (!isConnected) {
     showNoInternetDialog(context);
@@ -104,7 +120,7 @@ void handleSendButton(BuildContext context) async {
 
   // Si la connexion Internet est disponible, poursuivez avec l'envoi du code
   // Affichez la boîte de dialogue de chargement
-  showLoadingDialog(context);
+
 
   try {
     ActeurService acteurService = ActeurService();
@@ -115,7 +131,6 @@ void handleSendButton(BuildContext context) async {
     if (isVisible) {
       await ActeurService.sendOtpCodeEmail(emailActeur,context);
       debugPrint("Code envoyé par mail");
-    hideLoadingDialog(context);
      showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -137,7 +152,6 @@ void handleSendButton(BuildContext context) async {
     } else {
       await ActeurService.sendOtpCodeWhatsApp(whatsAppActeur,context);
       debugPrint("Code envoyé par whats app");
-    hideLoadingDialog(context);
      showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -161,7 +175,6 @@ void handleSendButton(BuildContext context) async {
     // Fermez la boîte de dialogue de chargement après l'envoi du code
   } catch (e) {
     // En cas d'erreur, fermez également la boîte de dialogue de chargement
-    hideLoadingDialog(context);
       showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -189,6 +202,8 @@ void handleSendButton(BuildContext context) async {
   TextEditingController emailController = TextEditingController();
   TextEditingController whatsAppController = TextEditingController();
    bool isVisible = false;
+   bool isLoading = false;
+
 
   @override
   void initState() {
@@ -200,151 +215,153 @@ void handleSendButton(BuildContext context) async {
   @override
   Widget build(BuildContext context) {
      super.build(context);
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: [
-              Align(
-              alignment: Alignment.topLeft,
-              child:  IconButton(
-             onPressed: () {
-               // Fonction de retour
-               Navigator.pop(context);
-             },
-             icon: Icon(
-               Icons.arrow_back,
-               color: Colors.black,
-               size: 30,
-             ),
-             iconSize: 30,
-             splashRadius: 20,
-             padding: EdgeInsets.zero,
-             constraints: BoxConstraints(minWidth: 40, minHeight: 40),
-                        ),
-            ),
-            Center(child: Image.asset('assets/images/fg-pass.png')),
-            // connexion
-               const Text(" Mot de passe oublier  ", style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold , color: Color(0xFFF2B6706)),),
-             Form(
-              
-              key:_formKey,
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-             const SizedBox(height: 10,),
-              // debut email ou whats app  
-              Padding(
-                padding: const EdgeInsets.only(left:10.0),
-                child: Text( isVisible ? " Email *" : "Whats App *" , style: TextStyle(color:  (Colors.black), fontSize: 18),),
+    return LoadingOverlay(
+      isLoading:isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFFFFFFF),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                Align(
+                alignment: Alignment.topLeft,
+                child:  IconButton(
+               onPressed: () {
+                 // Fonction de retour
+                 Navigator.pop(context);
+               },
+               icon: Icon(
+                 Icons.arrow_back,
+                 color: Colors.black,
+                 size: 30,
+               ),
+               iconSize: 30,
+               splashRadius: 20,
+               padding: EdgeInsets.zero,
+               constraints: BoxConstraints(minWidth: 40, minHeight: 40),
+                          ),
               ),
-
-             Padding(
-                  padding: EdgeInsets.all( 2),
-                  child: Center(
-                    child: Text( isVisible ?_errorMessage : ""),
+              Center(child: Image.asset('assets/images/fg-pass.png')),
+              // connexion
+                 const Text(" Mot de passe oublier  ", style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold , color: Color(0xFFF2B6706)),),
+               Form(
+                
+                key:_formKey,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+               const SizedBox(height: 10,),
+                // debut email ou whats app  
+                Padding(
+                  padding: const EdgeInsets.only(left:10.0),
+                  child: Text( isVisible ? " Email *" : "Whats App *" , style: TextStyle(color:  (Colors.black), fontSize: 18),),
+                ),
+      
+               Padding(
+                    padding: EdgeInsets.all( 2),
+                    child: Center(
+                      child: Text( isVisible ?_errorMessage : ""),
+                    ),
                   ),
-                ),
-          Visibility(
-  visible: isVisible, 
-  child: TextFormField(
-    controller: emailController,
-    decoration: InputDecoration(
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-      // labelText: "Email",
-      hintText: "Entrez votre adresse email",
-    ),
-    keyboardType: TextInputType.text,
-    validator: (val) {
-      if (val == null || val.isEmpty) {
-        return "Veillez entrez votre adresse email";
-      } else if(_errorMessage == "Email non valide" && isVisible == false){
-        return "Veillez entrez une adresse email valide";
-
-      }
-       else {
-        return null;
-      }
-    },
-     onChanged: (val) {
-                        validateEmail(val);
-                      },
-    onSaved: (val) => email = val!,
-  ),
-),
-Visibility(
-  visible: !isVisible, 
-  child: TextFormField(
-    controller: whatsAppController,
-    decoration: InputDecoration(
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-      // labelText: "Numéro WhatsApp",
-      hintText: "Entrez votre numéro WhatsApp",
-    ),
-    keyboardType: TextInputType.phone,
-    validator: (val) {
-      if (val == null || val.isEmpty) {
-        return "Veillez entrez votre numéro WhatsApp";
-      } else if(val.length<8){
-        return "Veillez entrez au moins 8 chiffres";
-      }
-      else {
-        return null;
-      }
-    },
-    onSaved: (val) => whatsApp = val!,
-  ),
-),
-
-              
-            ],
-            ),
-          ),
-
-          TextButton(
-  onPressed: ()  {
-
-      setState(() {
-        isVisible = !isVisible;
-      });
-    
-  },
-  child: Text(
-    isVisible ? "Envoyer le code par WhatsApp" : "Envoyer le code par email",
-    style: TextStyle(fontSize: 16),
-  ),
-),
-             const SizedBox(height: 15,),
-                Center(
-                  child: ElevatedButton(
-            onPressed: ()  {
-              if(_formKey.currentState!.validate()){
-
-              handleSendButton(context);
-              }
-            },
-            child:  Text(
-              " Envoyer ",
-              style:  TextStyle(
-                fontSize: 20,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+            Visibility(
+        visible: isVisible, 
+        child: TextFormField(
+      controller: emailController,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+        // labelText: "Email",
+        hintText: "Entrez votre adresse email",
+      ),
+      keyboardType: TextInputType.text,
+      validator: (val) {
+        if (val == null || val.isEmpty) {
+          return "Veillez entrez votre adresse email";
+        } else if(_errorMessage == "Email non valide" && isVisible == false){
+          return "Veillez entrez une adresse email valide";
+      
+        }
+         else {
+          return null;
+        }
+      },
+       onChanged: (val) {
+                          validateEmail(val);
+                        },
+      onSaved: (val) => email = val!,
+        ),
+      ),
+      Visibility(
+        visible: !isVisible, 
+        child: TextFormField(
+      controller: whatsAppController,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+        // labelText: "Numéro WhatsApp",
+        hintText: "Entrez votre numéro WhatsApp",
+      ),
+      keyboardType: TextInputType.phone,
+      validator: (val) {
+        if (val == null || val.isEmpty) {
+          return "Veillez entrez votre numéro WhatsApp";
+        } else if(val.length<8){
+          return "Veillez entrez au moins 8 chiffres";
+        }
+        else {
+          return null;
+        }
+      },
+      onSaved: (val) => whatsApp = val!,
+        ),
+      ),
+      
+                
+              ],
               ),
             ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF8A00), // Orange color code
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              minimumSize: Size(250, 40),
-            ),
-          ),
-           ),
-            ]
+      
+            TextButton(
+        onPressed: ()  {
+      
+        setState(() {
+          isVisible = !isVisible;
+        });
+      
+        },
+        child: Text(
+      isVisible ? "Envoyer le code par WhatsApp" : "Envoyer le code par email",
+      style: TextStyle(fontSize: 16),
+        ),
+      ),
+               const SizedBox(height: 15,),
+                  Center(
+                    child: ElevatedButton(
+              onPressed: ()  {
+                if(_formKey.currentState!.validate()){
+              _handleClick(context);
+                }
+              },
+              child:  Text(
+                " Envoyer ",
+                style:  TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
-              )
-    )
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF8A00), // Orange color code
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                minimumSize: Size(250, 40),
+              ),
+            ),
+             ),
+              ]
+                  ),
+                )
+      )
+      ),
     );
   }
 
