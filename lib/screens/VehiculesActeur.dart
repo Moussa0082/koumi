@@ -3,22 +3,22 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/AddVehiculeTransport.dart';
 import 'package:koumi_app/screens/DetailTransport.dart';
-import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:provider/provider.dart';
 
-class Transport extends StatefulWidget {
-  const Transport({super.key});
+class VehiculeActeur extends StatefulWidget {
+  const VehiculeActeur({super.key});
 
   @override
-  State<Transport> createState() => _TransportState();
+  State<VehiculeActeur> createState() => _VehiculeActeurState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _TransportState extends State<Transport> {
+class _VehiculeActeurState extends State<VehiculeActeur> {
   late Acteur acteur;
   late List<TypeActeur> typeActeurData = [];
   late String type;
@@ -54,66 +54,36 @@ class _TransportState extends State<Transport> {
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
-            'Véhicule de transport',
+            'Mes véhicules',
             style: const TextStyle(
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
           actions: [
             PopupMenuButton<String>(
               padding: EdgeInsets.zero,
-              itemBuilder: (context) {
-                print("Type: $type");
-                return type.toLowerCase() == 'admin' ||
-                        type.toLowerCase() == 'transporteurs' ||
-                        type.toLowerCase() == 'transporteur'
-                    ? <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.add,
-                              color: Colors.green,
-                            ),
-                            title: const Text(
-                              "Ajouter un vehicule",
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            onTap: () async {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => VehiculeActeur()));
-                            },
-                          ),
-                        ),
-                      ]
-                    : <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.add,
-                              color: Colors.green,
-                            ),
-                            title: const Text(
-                              "Voir les transporteurs",
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            onTap: () async {
-                              // Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //         builder: (context) =>
-                              //             AddVehiculeTransport()));
-                            },
-                          ),
-                        ),
-                      ];
-              },
+              itemBuilder: (context) => <PopupMenuEntry<String>>[
+                PopupMenuItem<String>(
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.add,
+                      color: Colors.green,
+                    ),
+                    title: const Text(
+                      "Ajouter un vehicule",
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onTap: () async {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AddVehiculeTransport()));
+                    },
+                  ),
+                ),
+              ],
             )
           ]),
       body: SingleChildScrollView(
@@ -156,7 +126,7 @@ class _TransportState extends State<Transport> {
           const SizedBox(height: 10),
           Consumer<VehiculeService>(builder: (context, vehiculeService, child) {
             return FutureBuilder(
-                future: vehiculeService.fetchVehicule(),
+                future: vehiculeService.fetchVehiculeByActeur(acteur.idActeur!),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -257,7 +227,7 @@ class _TransportState extends State<Transport> {
                                                   color: d_colorGreen),
                                             ),
                                           ),
-                                          _buildItem("Statut:",
+                                          _buildItem("Statut :",
                                               '${e.statutVehicule ? 'Disponible' : 'Non disponible'}'),
                                           _buildItem(
                                               "Localité :", e.localisation),

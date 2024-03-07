@@ -126,6 +126,22 @@ Future<void> updateVehicule({
     }
   }
 
+  Future<List<Vehicule>> fetchVehiculeByActeur(String id) async {
+    final response = await http.get(Uri.parse('$baseUrl/listeVehiculeByActeur/$id'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+       debugPrint(response.body.toString());
+      vehiculeList = body.map((item) => Vehicule.fromMap(item)).toList();
+      debugPrint(response.body);
+      return vehiculeList;
+    } else {
+      vehiculeList = [];
+      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+    }
+  }
+
   Future<void> deleteVehicule(String idVehicule) async {
     final response =
         await http.delete(Uri.parse("$baseUrl/delete/$idVehicule"));

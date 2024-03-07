@@ -189,17 +189,17 @@ class _ProduitScreenState extends State<ProduitScreen>
             ),
           ),
                 const SizedBox(height: 10),
-                Flexible(
-                  child: GestureDetector(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: categorieProduit.map((categorie) {
-                        return buildGridView(
-                            categorie.idCategorieProduit!,  widget.id!);
-                      }).toList(),
-                    ),
-                  ),
-                ),
+                // Flexible(
+                //   child: GestureDetector(
+                //     child: TabBarView(
+                //       controller: _tabController,
+                //       children: categorieProduit.map((categorie) {
+                //         return buildGridView(
+                //             categorie.idCategorieProduit!,  widget.id!);
+                //       }).toList(),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
