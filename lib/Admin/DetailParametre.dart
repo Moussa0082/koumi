@@ -310,7 +310,7 @@ class _DetailParametreState extends State<DetailParametre> {
             controller: controller,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 17,
+              fontSize: 17, 
               color: Colors.black54,
             ),
             enabled: _isEditing,
