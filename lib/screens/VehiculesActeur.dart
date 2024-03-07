@@ -1,31 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:koumi_app/Admin/AddZone.dart';
-import 'package:koumi_app/Admin/UpdateZone.dart';
 import 'package:koumi_app/models/Acteur.dart';
-import 'package:koumi_app/models/ZoneProduction.dart';
+import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/service/ZoneProductionService.dart';
+import 'package:koumi_app/screens/AddVehiculeTransport.dart';
+import 'package:koumi_app/screens/DetailTransport.dart';
+import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:provider/provider.dart';
 
-class Zone extends StatefulWidget {
-  const Zone({super.key});
+class VehiculeActeur extends StatefulWidget {
+  const VehiculeActeur({super.key});
 
   @override
-  State<Zone> createState() => _ZoneState();
+  State<VehiculeActeur> createState() => _VehiculeActeurState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _ZoneState extends State<Zone> {
-  late List<ZoneProduction> zoneList = [];
+class _VehiculeActeurState extends State<VehiculeActeur> {
   late Acteur acteur;
+  late List<TypeActeur> typeActeurData = [];
+  late String type;
+  late TextEditingController _searchController;
+  List<Vehicule> vehiculeListe = [];
+  late Future<List<Vehicule>> _liste;
+
+  Future<List<Vehicule>> getVehicule(String id) async {
+    final response = await VehiculeService().fetchVehiculeByActeur(id);
+    return response;
+  }
 
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-
+    typeActeurData = acteur.typeActeur;
+    type = typeActeurData.map((data) => data.libelle).join(', ');
+    _searchController = TextEditingController();
+    _liste = getVehicule(acteur.idActeur!);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController
+        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    super.dispose();
   }
 
   @override
@@ -33,19 +53,20 @@ class _ZoneState extends State<Zone> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
-        centerTitle: true,
-        toolbarHeight: 100,
-        leading: IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-        title: const Text(
-          "Zone de production",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
-        ),
-        actions: [
-           PopupMenuButton<String>(
+          centerTitle: true,
+          toolbarHeight: 100,
+          leading: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+          title: Text(
+            'Mes véhicules',
+            style: const TextStyle(
+                color: d_colorGreen, fontWeight: FontWeight.bold),
+          ),
+          actions: [
+            PopupMenuButton<String>(
               padding: EdgeInsets.zero,
               itemBuilder: (context) => <PopupMenuEntry<String>>[
                 PopupMenuItem<String>(
@@ -55,7 +76,7 @@ class _ZoneState extends State<Zone> {
                       color: Colors.green,
                     ),
                     title: const Text(
-                      "Ajouter une zone",
+                      "Ajouter un vehicule",
                       style: TextStyle(
                         color: Colors.green,
                         fontWeight: FontWeight.bold,
@@ -65,21 +86,54 @@ class _ZoneState extends State<Zone> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => AddZone()));
+                              builder: (context) => AddVehiculeTransport()));
                     },
                   ),
                 ),
               ],
             )
-         
-        ],
-      ),
+          ]),
       body: SingleChildScrollView(
         child: Column(children: [
-          Consumer<ZoneProductionService>(
-              builder: (context, zoneService, child) {
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.search,
+                      color: Colors.blueGrey[400]), // Couleur de l'icône
+                  SizedBox(
+                      width:
+                          10), // Espacement entre l'icône et le champ de recherche
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Rechercher',
+                        border: InputBorder.none,
+                        hintStyle: TextStyle(
+                            color: Colors
+                                .blueGrey[400]), // Couleur du texte d'aide
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Consumer<VehiculeService>(builder: (context, vehiculeService, child) {
             return FutureBuilder(
-                future: zoneService.fetchZoneByActeur(acteur.idActeur!),
+                future: _liste,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -92,107 +146,109 @@ class _ZoneState extends State<Zone> {
                   if (!snapshot.hasData) {
                     return const Padding(
                       padding: EdgeInsets.all(10),
-                      child: Center(child: Text("Aucun zone trouvé")),
+                      child: Center(child: Text("Aucun donné trouvé")),
                     );
                   } else {
-                    zoneList = snapshot.data!;
-                    return Column(
-                        children: zoneList
-                            .map((ZoneProduction zone) => Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 15),
-                                  child: Card(
-                                    elevation: 5,
-                                    shadowColor: Colors.black,
-                                    color: Colors.white,
-                                    child: SizedBox(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.9,
-                                      height: 305,
-                                      child: Column(children: [
-                                        ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: zone.photoZone == null ||
-                                                  zone.photoZone!.isEmpty
-                                              ? Image.asset(
-                                                  "assets/images/zoneProd.jpg",
-                                                  fit: BoxFit.fitWidth,
-                                                  height: 150,
-                                                  width: double.infinity,
-                                                )
-                                              : Image.network(
-                                                  "http://10.0.2.2/${zone.photoZone!}",
-                                                  fit: BoxFit.fitWidth,
-                                                  height: 150,
-                                                  width: double.infinity,
-                                                ),
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              const Text("Zone de production",
-                                                  style: TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      overflow: TextOverflow
-                                                          .ellipsis)),
-                                              Text(zone.nomZoneProduction,
-                                                  style: const TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 17,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                      overflow: TextOverflow
-                                                          .ellipsis))
-                                            ],
+                    vehiculeListe = snapshot.data!;
+                    String searchText = "";
+                    List<Vehicule> filtereSearch =
+                        vehiculeListe.where((search) {
+                      String libelle = search.nomVehicule.toLowerCase();
+                      searchText = _searchController.text.toLowerCase();
+                      return libelle.contains(searchText);
+                    }).toList();
+                    return Wrap(
+                      // spacing: 10, // Espacement horizontal entre les conteneurs
+                      // runSpacing:
+                      //     10, // Espacement vertical entre les lignes de conteneurs
+                      children: filtereSearch
+                          .map((e) => Padding(
+                                padding: EdgeInsets.all(10),
+                                child: SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.45,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DetailTransport(
+                                                      vehicule: e)));
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(15),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.3),
+                                            offset: const Offset(0, 2),
+                                            blurRadius: 8,
+                                            spreadRadius: 2,
                                           ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(5.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              const Text("Date d'ajout",
-                                                  style: TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      overflow: TextOverflow
-                                                          .ellipsis)),
-                                              Text(
-                                                zone.dateAjout!,
-                                                style: const TextStyle(
-                                                    color: Colors.black87,
-                                                    fontSize: 17,
-                                                    fontWeight: FontWeight.w500,
-                                                    fontStyle: FontStyle.italic,
-                                                    overflow:
-                                                        TextOverflow.ellipsis),
-                                              )
-                                            ],
+                                        ],
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: e.photoVehicule == null
+                                                  ? Image.asset(
+                                                      "assets/images/camion.png",
+                                                      fit: BoxFit.cover,
+                                                      height: 90,
+                                                    )
+                                                  : Image.network(
+                                                      "http://10.0.2.2/${e.photoVehicule}",
+                                                      fit: BoxFit.cover,
+                                                      height: 90,
+                                                      errorBuilder:
+                                                          (BuildContext context,
+                                                              Object exception,
+                                                              StackTrace?
+                                                                  stackTrace) {
+                                                        return Image.asset(
+                                                          'assets/images/camion.png',
+                                                          fit: BoxFit.cover,
+                                                          height: 90,
+                                                        );
+                                                      },
+                                                    ),
+                                            ),
                                           ),
-                                        ),
-                                        Padding(
-                                            padding: const EdgeInsets.all(5),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 5),
+                                            child: Text(
+                                              e.nomVehicule,
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: d_colorGreen),
+                                            ),
+                                          ),
+                                          _buildItem("Statut:",
+                                              '${e.statutVehicule ? 'Disponible' : 'Non disponible'}'),
+                                          _buildItem(
+                                              "Localité :", e.localisation),
+                                          SizedBox(height: 10),
+                                          Container(
+                                            alignment: Alignment.bottomRight,
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10),
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                _buildEtat(zone.statutZone),
+                                                _buildEtat(e.statutVehicule),
                                                 PopupMenuButton<String>(
                                                   padding: EdgeInsets.zero,
                                                   itemBuilder: (context) =>
@@ -212,15 +268,21 @@ class _ZoneState extends State<Zone> {
                                                           ),
                                                         ),
                                                         onTap: () async {
-                                                          await ZoneProductionService()
-                                                              .activerZone(zone
-                                                                  .idZoneProduction!)
+                                                          await VehiculeService()
+                                                              .activerVehicules(
+                                                                  e.idVehicule)
                                                               .then((value) => {
-                                                                    Provider.of<ZoneProductionService>(
+                                                                    Provider.of<VehiculeService>(
                                                                             context,
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
+                                                                    setState(
+                                                                        () {
+                                                                      _liste = getVehicule(
+                                                                          acteur
+                                                                              .idActeur!);
+                                                                    }),
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop(),
@@ -243,15 +305,15 @@ class _ZoneState extends State<Zone> {
                                                                   (onError) => {
                                                                         ScaffoldMessenger.of(context)
                                                                             .showSnackBar(
-                                                                          SnackBar(
+                                                                          const SnackBar(
                                                                             content:
                                                                                 Row(
                                                                               children: [
-                                                                                Text("Une erreur s'est produit : $onError"),
+                                                                                Text("Une erreur s'est produit"),
                                                                               ],
                                                                             ),
                                                                             duration:
-                                                                                const Duration(seconds: 5),
+                                                                                Duration(seconds: 5),
                                                                           ),
                                                                         ),
                                                                         Navigator.of(context)
@@ -278,15 +340,21 @@ class _ZoneState extends State<Zone> {
                                                           ),
                                                         ),
                                                         onTap: () async {
-                                                          await ZoneProductionService()
-                                                              .desactiverZone(zone
-                                                                  .idZoneProduction!)
+                                                          await VehiculeService()
+                                                              .desactiverVehicules(
+                                                                  e.idVehicule)
                                                               .then((value) => {
-                                                                    Provider.of<ZoneProductionService>(
+                                                                    Provider.of<VehiculeService>(
                                                                             context,
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
+                                                                    setState(
+                                                                        () {
+                                                                      _liste = getVehicule(
+                                                                          acteur
+                                                                              .idActeur!);
+                                                                    }),
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop(),
@@ -295,15 +363,15 @@ class _ZoneState extends State<Zone> {
                                                                   (onError) => {
                                                                         ScaffoldMessenger.of(context)
                                                                             .showSnackBar(
-                                                                          SnackBar(
+                                                                          const SnackBar(
                                                                             content:
                                                                                 Row(
                                                                               children: [
-                                                                                Text("Une erreur s'est produit : $onError"),
+                                                                                Text("Une erreur s'est produit"),
                                                                               ],
                                                                             ),
                                                                             duration:
-                                                                                const Duration(seconds: 5),
+                                                                                Duration(seconds: 5),
                                                                           ),
                                                                         ),
                                                                         Navigator.of(context)
@@ -317,7 +385,7 @@ class _ZoneState extends State<Zone> {
                                                               content: Row(
                                                                 children: [
                                                                   Text(
-                                                                      " Desactiver avec succèss "),
+                                                                      "Désactiver avec succèss "),
                                                                 ],
                                                               ),
                                                               duration:
@@ -326,31 +394,6 @@ class _ZoneState extends State<Zone> {
                                                                           2),
                                                             ),
                                                           );
-                                                        },
-                                                      ),
-                                                    ),
-                                                    PopupMenuItem<String>(
-                                                      child: ListTile(
-                                                        leading: const Icon(
-                                                          Icons.edit,
-                                                          color: Colors.green,
-                                                        ),
-                                                        title: const Text(
-                                                          "Modifier",
-                                                          style: TextStyle(
-                                                            color: Colors.green,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                        onTap: () {
-                                                          Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                  builder: (context) =>
-                                                                      UpdateZone(
-                                                                          zone:
-                                                                              zone)));
                                                         },
                                                       ),
                                                     ),
@@ -369,15 +412,21 @@ class _ZoneState extends State<Zone> {
                                                           ),
                                                         ),
                                                         onTap: () async {
-                                                          await ZoneProductionService()
-                                                              .deleteZone(zone
-                                                                  .idZoneProduction!)
+                                                          await VehiculeService()
+                                                              .deleteVehicule(
+                                                                  e.idVehicule)
                                                               .then((value) => {
-                                                                    Provider.of<ZoneProductionService>(
+                                                                    Provider.of<VehiculeService>(
                                                                             context,
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
+                                                                    setState(
+                                                                        () {
+                                                                      _liste = getVehicule(
+                                                                          acteur
+                                                                              .idActeur!);
+                                                                    }),
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop(),
@@ -390,7 +439,7 @@ class _ZoneState extends State<Zone> {
                                                                             content:
                                                                                 Row(
                                                                               children: [
-                                                                                Text("Ce type d'acteur est déjà associer à un acteur"),
+                                                                                Text("Impossible de supprimer"),
                                                                               ],
                                                                             ),
                                                                             duration:
@@ -402,14 +451,18 @@ class _ZoneState extends State<Zone> {
                                                       ),
                                                     ),
                                                   ],
-                                                )
+                                                ),
                                               ],
-                                            ))
-                                      ]),
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ))
-                            .toList());
+                                ),
+                              ))
+                          .toList(),
+                    );
                   }
                 });
           })
@@ -425,6 +478,34 @@ class _ZoneState extends State<Zone> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         color: isState ? Colors.green : Colors.red,
+      ),
+    );
+  }
+
+  Widget _buildItem(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+                color: Colors.black87,
+                fontWeight: FontWeight.w500,
+                fontStyle: FontStyle.italic,
+                overflow: TextOverflow.ellipsis,
+                fontSize: 18),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w800,
+                overflow: TextOverflow.ellipsis,
+                fontSize: 16),
+          )
+        ],
       ),
     );
   }

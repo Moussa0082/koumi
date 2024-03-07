@@ -50,9 +50,9 @@ class _FiliereScreenState extends State<FiliereScreen> {
         .parametreList!;
     para = paraList[0];
     _filiereList = http
-        // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
-        .get(
-            Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+        .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+        // .get(
+        //     Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
     _liste = getFil();
   }
 

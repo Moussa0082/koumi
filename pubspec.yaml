@@ -71,6 +71,8 @@ dependencies:
   flutter_speed_dial: ^7.0.0
   multi_dropdown: ^2.1.4
   flutter_rating_bar: ^4.0.1
+  url_launcher: ^6.2.5
+  font_awesome_flutter: ^10.7.0
 
 dev_dependencies:
   flutter_test:

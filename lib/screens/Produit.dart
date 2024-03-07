@@ -33,7 +33,8 @@ class _ProduitScreenState extends State<ProduitScreen>
   void fetchProduitByCategorie(String idCategorie, String idMagasin) async {
     try {
       final response = await http.get(Uri.parse(
-          'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
+          'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
+          // 'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {
@@ -189,17 +190,17 @@ class _ProduitScreenState extends State<ProduitScreen>
             ),
           ),
                 const SizedBox(height: 10),
-                Flexible(
-                  child: GestureDetector(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: categorieProduit.map((categorie) {
-                        return buildGridView(
-                            categorie.idCategorieProduit!,  widget.id!);
-                      }).toList(),
-                    ),
-                  ),
-                ),
+                // Flexible(
+                //   child: GestureDetector(
+                //     child: TabBarView(
+                //       controller: _tabController,
+                //       children: categorieProduit.map((categorie) {
+                //         return buildGridView(
+                //             categorie.idCategorieProduit!,  widget.id!);
+                //       }).toList(),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),

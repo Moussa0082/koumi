@@ -3,7 +3,9 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/AddVehiculeTransport.dart';
+import 'package:koumi_app/screens/DetailTransport.dart';
+import 'package:koumi_app/screens/PageTransporteur.dart';
+import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:provider/provider.dart';
 
@@ -53,38 +55,66 @@ class _TransportState extends State<Transport> {
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
-            'Transport',
+            'Véhicule de transport',
             style: const TextStyle(
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
-          // type.toLowerCase() ==
-          //     'admin' ?
           actions: [
             PopupMenuButton<String>(
               padding: EdgeInsets.zero,
-              itemBuilder: (context) => <PopupMenuEntry<String>>[
-                PopupMenuItem<String>(
-                  child: ListTile(
-                    leading: const Icon(
-                      Icons.add,
-                      color: Colors.green,
-                    ),
-                    title: const Text(
-                      "Ajouter un vehicule",
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onTap: () async {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AddVehiculeTransport()));
-                    },
-                  ),
-                ),
-              ],
+              itemBuilder: (context) {
+                print("Type: $type");
+                return type.toLowerCase() == 'admin' ||
+                        type.toLowerCase() == 'transporteurs' ||
+                        type.toLowerCase() == 'transporteur'
+                    ? <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.remove_red_eye,
+                              color: Colors.green,
+                            ),
+                            title: const Text(
+                              "Mes véhicule",
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onTap: () async {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => VehiculeActeur()));
+                            },
+                          ),
+                        ),
+                      ]
+                    : <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.remove_red_eye,
+                              color: Colors.green,
+                            ),
+                            title: const Text(
+                              "Voir les transporteurs",
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onTap: () async {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          PageTransporteur()));
+                            },
+                          ),
+                        ),
+                      ];
+              },
             )
           ]),
       body: SingleChildScrollView(
@@ -152,63 +182,94 @@ class _TransportState extends State<Transport> {
                       return libelle.contains(searchText);
                     }).toList();
                     return Wrap(
-                      spacing: 5,
-                      runSpacing: 5,
+                      // spacing: 10, // Espacement horizontal entre les conteneurs
+                      // runSpacing:
+                      //     10, // Espacement vertical entre les lignes de conteneurs
                       children: filtereSearch
+                          .where((element) => element.statutVehicule == true)
                           .map((e) => Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 15),
-                              child: Container(
-                                width: MediaQuery.of(context).size.width *
-                                    0.4, // Largeur du conteneur
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(15),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.3),
-                                      offset: const Offset(0, 2),
-                                      blurRadius: 8,
-                                      spreadRadius: 2,
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      child: e.photoVehicule == null
-                                          ? Image.asset(
-                                              "assets/images/magasin.png",
-                                              fit: BoxFit.cover,
-                                              height: 120,
-                                            )
-                                          : Image.network(
-                                              "http://10.0.2.2/${e.photoVehicule}",
-                                              fit: BoxFit.cover,
-                                              height: 120,
-                                              errorBuilder:
-                                                  (BuildContext context,
-                                                      Object exception,
-                                                      StackTrace? stackTrace) {
-                                                return Image.asset(
-                                                  'assets/images/magasin.png',
-                                                  fit: BoxFit.cover,
-                                                  height: 120,
-                                                );
-                                              },
+                                padding: EdgeInsets.all(10),
+                                child: SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.45,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DetailTransport(
+                                                      vehicule: e)));
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(15),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.3),
+                                            offset: const Offset(0, 2),
+                                            blurRadius: 8,
+                                            spreadRadius: 2,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: e.photoVehicule == null
+                                                  ? Image.asset(
+                                                      "assets/images/camion.png",
+                                                      fit: BoxFit.cover,
+                                                      height: 90,
+                                                    )
+                                                  : Image.network(
+                                                      "http://10.0.2.2/${e.photoVehicule}",
+                                                      fit: BoxFit.cover,
+                                                      height: 90,
+                                                      errorBuilder:
+                                                          (BuildContext context,
+                                                              Object exception,
+                                                              StackTrace?
+                                                                  stackTrace) {
+                                                        return Image.asset(
+                                                          'assets/images/camion.png',
+                                                          fit: BoxFit.cover,
+                                                          height: 90,
+                                                        );
+                                                      },
+                                                    ),
                                             ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 5),
+                                            child: Text(
+                                              e.nomVehicule,
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: d_colorGreen),
+                                            ),
+                                          ),
+                                          _buildItem("Statut:",
+                                              '${e.statutVehicule ? 'Disponible' : 'Non disponible'}'),
+                                          _buildItem(
+                                              "Localité :", e.localisation),
+                                          SizedBox(height: 10),
+                                        ],
+                                      ),
                                     ),
-                                    SizedBox(height: 10),
-                                    _buildItem("Etat :", e.etatVehicule),
-                                    SizedBox(height: 5),
-                                    _buildItem("Localité :", e.localisation),
-                                    SizedBox(height: 10),
-                                  ],
+                                  ),
                                 ),
-                              )))
+                              ))
                           .toList(),
                     );
                   }
@@ -221,7 +282,7 @@ class _TransportState extends State<Transport> {
 
   Widget _buildItem(String title, String value) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -232,7 +293,7 @@ class _TransportState extends State<Transport> {
                 fontWeight: FontWeight.w500,
                 fontStyle: FontStyle.italic,
                 overflow: TextOverflow.ellipsis,
-                fontSize: 18),
+                fontSize: 16),
           ),
           Text(
             value,

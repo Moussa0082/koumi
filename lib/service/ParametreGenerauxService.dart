@@ -6,8 +6,8 @@ import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:path/path.dart';
 
 class ParametreGenerauxService extends ChangeNotifier {
-  // static const String baseUrl = 'https://koumi.ml/api-koumi/parametreGeneraux';
-  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/parametreGeneraux';
+  static const String baseUrl = 'https://koumi.ml/api-koumi/parametreGeneraux';
+  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/parametreGeneraux';
 
   List<ParametreGeneraux> parametreList = [];
   List<ParametreGeneraux> _parametreList = [];
