@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/Vehicule.dart';
@@ -22,6 +24,7 @@ class _DetailTransportState extends State<DetailTransport> {
   late Acteur acteur;
   late List<TypeActeur> typeActeurData = [];
   late String type;
+  late ValueNotifier<bool> isDialOpenNotifier;
 
   @override
   void initState() {
@@ -29,6 +32,7 @@ class _DetailTransportState extends State<DetailTransport> {
     typeActeurData = acteur.typeActeur;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     vehicules = widget.vehicule;
+    isDialOpenNotifier = ValueNotifier<bool>(false);
     super.initState();
   }
 
@@ -78,53 +82,80 @@ class _DetailTransportState extends State<DetailTransport> {
             _buildItem('Statut: : ',
                 '${vehicules.statutVehicule ? 'Disponible' : 'Non disponible'}'),
             _buildItem('Description : ', vehicules.description),
-            type.toLowerCase() == 'admin' ||
-                    type.toLowerCase() == 'transporteurs' ||
-                    type.toLowerCase() == 'transporteur'
-                ? Container()
-                : _buildItem('Propriètaire : ', vehicules.acteur.nomActeur),
-            ElevatedButton(
-                onPressed: () {
-                  final String numberPhone = vehicules.acteur.telephoneActeur;
-                  if (numberPhone != null) {
-                    _makePhoneCall(numberPhone);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange, // Orange color code
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  minimumSize: const Size(290, 45),
-                ),
-                child: Text(
-                  "Contacter",
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ))
+            _buildItem('Propriètaire : ', vehicules.acteur.nomActeur),
+            // type.toLowerCase() == 'admin' ||
+            //         type.toLowerCase() == 'transporteurs' ||
+            //         type.toLowerCase() == 'transporteur'
+            //     ? Container()
+            //     : _buildItem('Propriètaire : ', vehicules.acteur.nomActeur),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          final String whatsappNumber = vehicules.acteur.whatsAppActeur;
-          _openWhatsApp(whatsappNumber);
+      floatingActionButton: SpeedDial(
+        // animatedIcon: AnimatedIcons.close_menu,
+        backgroundColor: d_colorGreen,
+        foregroundColor: Colors.white,
+        overlayColor: Colors.black,
+        overlayOpacity: 0.4,
+        spacing: 12,
+        icon: Icons.phone,
+
+        children: [
+          SpeedDialChild(
+            child: FaIcon(FontAwesomeIcons.whatsapp),
+            label: 'Par wathsApp',
+            labelStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
+            onTap: () {
+              final String whatsappNumber = vehicules.acteur.whatsAppActeur;
+              _makePhoneWa(whatsappNumber);
+            },
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.phone),
+            label: 'Par téléphone ',
+            labelStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
+            onTap: () {
+              final String numberPhone = vehicules.acteur.telephoneActeur;
+              _makePhoneCall(numberPhone);
+            },
+          ),
+        ],
+        // État du Speed Dial (ouvert ou fermé)
+        openCloseDial: isDialOpenNotifier,
+        // Fonction appelée lorsque le bouton principal est pressé
+        onPress: () {
+          isDialOpenNotifier.value =
+              !isDialOpenNotifier.value; // Inverser la valeur du ValueNotifier
         },
-        child: const Icon(Icons.message),
       ),
     );
   }
 
-  Future<void> _openWhatsApp(String whatsappNumber) async {
-    final Uri url = Uri.parse("https://wa.me/$whatsappNumber");
-    if (await launchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      throw 'Impossible de lancer $url';
-    }
+  // Future<void> _openWhatsApp(String whatsappNumber) async {
+  //   final Uri url = Uri.parse("https://wa.me/$whatsappNumber");
+  //   if (await launchUrl(url)) {
+  //     await launchUrl(url);
+  //   } else {
+  //     print("Failed to launch $url");
+  //   }
+  // }
+
+  Future<void> _makePhoneWa(String whatsappNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'https',
+      host: 'wa.me',
+      path: whatsappNumber,
+    );
+    print(Uri);
+    await launchUrl(launchUri);
   }
 
   Future<void> _makePhoneCall(String phoneNumber) async {

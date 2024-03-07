@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/Admin/ParametreGenerauxPage.dart';
+import 'package:koumi_app/Admin/Zone.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
+import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 class Profil extends StatefulWidget {
   const Profil({super.key});
@@ -15,17 +17,22 @@ class Profil extends StatefulWidget {
   @override
   State<Profil> createState() => _ProfilState();
 }
+
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 const d_colorPage = Color.fromRGBO(255, 255, 255, 1);
-class _ProfilState extends State<Profil> {
 
-   late Acteur acteur;
+class _ProfilState extends State<Profil> {
+  late Acteur acteur;
+  late List<TypeActeur> typeActeurData = [];
+  late String type;
+  late List<ZoneProduction> zoneList = [];
 
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-
+    typeActeurData = acteur.typeActeur;
+    type = typeActeurData.map((data) => data.libelle).join(', ');
     super.initState();
   }
 
@@ -139,7 +146,6 @@ class _ProfilState extends State<Profil> {
                   ],
                 ),
               ),
-              
               Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
@@ -193,7 +199,238 @@ class _ProfilState extends State<Profil> {
                   ),
                 ),
               ),
-             
+              type.toLowerCase() == 'producteur'
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 10),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              offset: const Offset(0, 2),
+                              blurRadius: 5,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 0, horizontal: 15),
+                              child: Column(
+                                children: [
+                                  Row(children: [
+                                    const Icon(
+                                        Icons.align_horizontal_left_outlined,
+                                        color: d_colorGreen,
+                                        size: 25),
+                                    const SizedBox(
+                                      width: 15,
+                                    ),
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const Zone()));
+                                        },
+                                        child: Text(
+                                          "Mes zones de production",
+                                          style: TextStyle(
+                                              fontSize: 17,
+                                              color: d_colorGreen),
+                                        ))
+                                  ]),
+                                  Consumer<ZoneProductionService>(
+                                      builder: (context, zoneService, child) {
+                                    return FutureBuilder(
+                                        future: zoneService.fetchZoneByActeur(
+                                            acteur.idActeur!),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return const Center(
+                                              child: CircularProgressIndicator(
+                                                color: Colors.orange,
+                                              ),
+                                            );
+                                          }
+
+                                          if (!snapshot.hasData) {
+                                            return const Padding(
+                                              padding: EdgeInsets.all(10),
+                                              child: Center(
+                                                  child: Text(
+                                                      "Aucun zone trouvé")),
+                                            );
+                                          } else {
+                                            zoneList = snapshot.data!;
+                                            return Column(
+                                                children: zoneList
+                                                    .map(
+                                                        (ZoneProduction zone) =>
+                                                            Column(children: [
+                                                              Align(
+                                                                alignment:
+                                                                    Alignment
+                                                                        .topLeft,
+                                                                child: Text(zone.nomZoneProduction,
+                                                                    style: const TextStyle(
+                                                                        color: Colors
+                                                                            .black87,
+                                                                        fontSize:
+                                                                            17,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w500,
+                                                                        fontStyle:
+                                                                            FontStyle
+                                                                                .italic,
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis)),
+                                                              )
+                                                            ]))
+                                                    .toList());
+                                          }
+                                        });
+                                  })
+                                ],
+                              ),
+                            ),
+                            Container(
+                              alignment: Alignment.bottomRight,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: Image.asset("assets/images/zone.png",
+                                  width: 50, height: 50),
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                  : Container(),
+              type.toLowerCase() == 'producteur'
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 10),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              offset: const Offset(0, 2),
+                              blurRadius: 5,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 0, horizontal: 15),
+                              child: Column(
+                                children: [
+                                  Row(children: [
+                                    const Icon(
+                                        Icons.align_horizontal_left_outlined,
+                                        color: d_colorGreen,
+                                        size: 25),
+                                    const SizedBox(
+                                      width: 15,
+                                    ),
+                                    TextButton(
+                                        onPressed: () {
+                                          // Navigator.push(
+                                          //     context,
+                                          //     MaterialPageRoute(
+                                          //         builder: (context) =>
+                                          //             const Zone()));
+                                        },
+                                        child: Text(
+                                          "Surface cultiver",
+                                          style: TextStyle(
+                                              fontSize: 17,
+                                              color: d_colorGreen),
+                                        ))
+                                  ]),
+                                  // Consumer<ZoneProductionService>(
+                                  //     builder: (context, zoneService, child) {
+                                  //   return FutureBuilder(
+                                  //       future: zoneService.fetchZoneByActeur(
+                                  //           acteur.idActeur!),
+                                  //       builder: (context, snapshot) {
+                                  //         if (snapshot.connectionState ==
+                                  //             ConnectionState.waiting) {
+                                  //           return const Center(
+                                  //             child: CircularProgressIndicator(
+                                  //               color: Colors.orange,
+                                  //             ),
+                                  //           );
+                                  //         }
+
+                                  //         if (!snapshot.hasData) {
+                                  //           return const Padding(
+                                  //             padding: EdgeInsets.all(10),
+                                  //             child: Center(
+                                  //                 child: Text(
+                                  //                     "Aucun zone trouvé")),
+                                  //           );
+                                  //         } else {
+                                  //           zoneList = snapshot.data!;
+                                  //           return Column(
+                                  //               children: zoneList
+                                  //                   .map(
+                                  //                       (ZoneProduction zone) =>
+                                  //                           Column(children: [
+                                  //                             Align(
+                                  //                               alignment:
+                                  //                                   Alignment
+                                  //                                       .topLeft,
+                                  //                               child: Text(zone.nomZoneProduction,
+                                  //                                   style: const TextStyle(
+                                  //                                       color: Colors
+                                  //                                           .black87,
+                                  //                                       fontSize:
+                                  //                                           17,
+                                  //                                       fontWeight:
+                                  //                                           FontWeight
+                                  //                                               .w500,
+                                  //                                       fontStyle:
+                                  //                                           FontStyle
+                                  //                                               .italic,
+                                  //                                       overflow:
+                                  //                                           TextOverflow.ellipsis)),
+                                  //                             )
+                                  //                           ]))
+                                  //                   .toList());
+                                  //         }
+                                  //       });
+                                  // })
+                                ],
+                              ),
+                            ),
+                            Container(
+                              alignment: Alignment.bottomRight,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: Image.asset("assets/images/zone.png",
+                                  width: 50, height: 50),
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                  : Container(),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                 child: ElevatedButton.icon(

@@ -153,28 +153,25 @@ Future<void> updateVehicule({
           "Erreur lors de la suppression avec le code: ${response.statusCode}");
     }
   }
+ Future activerVehicules(String id) async {
+    final response = await http.put(Uri.parse('$baseUrl/enable/$id'));
 
-  Future<void> activerVehicule(String idVehicule) async {
-    final response =
-        await http.put(Uri.parse("$baseUrl/enable/$idVehicule"));
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200 || response.statusCode == 202) {
       applyChange();
-      debugPrint(response.body.toString());
     } else {
-      throw Exception(
-          "Erreur lors de l'activation avec le code: ${response.statusCode}");
+      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }
 
-  Future<void> desactiverVehicule(String idVehicule) async {
-    final response =
-        await http.put(Uri.parse("$baseUrl/disable/$idVehicule"));
-    if (response.statusCode == 200 || response.statusCode == 201) {
+  Future desactiverVehicules(String id) async {
+    final response = await http.put(Uri.parse('$baseUrl/disable/$id'));
+
+    if (response.statusCode == 200 || response.statusCode == 202) {
       applyChange();
-      debugPrint(response.body.toString());
     } else {
-      throw Exception(
-          "Erreur lors de la desactivation avec le code: ${response.statusCode}");
+      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }
 

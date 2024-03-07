@@ -45,16 +45,33 @@ class _ZoneState extends State<Zone> {
           style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
         actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const AddZone()));
-              },
-              icon: const Icon(
-                Icons.add_circle,
-                color: d_colorGreen,
-                size: 25,
-              ))
+           PopupMenuButton<String>(
+              padding: EdgeInsets.zero,
+              itemBuilder: (context) => <PopupMenuEntry<String>>[
+                PopupMenuItem<String>(
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.add,
+                      color: Colors.green,
+                    ),
+                    title: const Text(
+                      "Ajouter une zone",
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onTap: () async {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AddZone()));
+                    },
+                  ),
+                ),
+              ],
+            )
+         
         ],
       ),
       body: SingleChildScrollView(

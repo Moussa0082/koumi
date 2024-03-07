@@ -208,7 +208,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
         return SizedBox(
           height: 150,
           child: AlertDialog(
-            title: Text("Choisir une photo"),
+            title: Text("Choisir une source"),
             content: Wrap(
               alignment: WrapAlignment.center,
               children: [

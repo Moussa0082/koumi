@@ -24,13 +24,20 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
   late String type;
   late TextEditingController _searchController;
   List<Vehicule> vehiculeListe = [];
+  late Future<List<Vehicule>> _liste;
+
+  Future<List<Vehicule>> getVehicule(String id) async {
+    final response = await VehiculeService().fetchVehiculeByActeur(id);
+    return response;
+  }
+
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     typeActeurData = acteur.typeActeur;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
-
+    _liste = getVehicule(acteur.idActeur!);
     super.initState();
   }
 
@@ -126,7 +133,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
           const SizedBox(height: 10),
           Consumer<VehiculeService>(builder: (context, vehiculeService, child) {
             return FutureBuilder(
-                future: vehiculeService.fetchVehiculeByActeur(acteur.idActeur!),
+                future: _liste,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -196,12 +203,12 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                   ? Image.asset(
                                                       "assets/images/camion.png",
                                                       fit: BoxFit.cover,
-                                                      height: 120,
+                                                      height: 90,
                                                     )
                                                   : Image.network(
                                                       "http://10.0.2.2/${e.photoVehicule}",
                                                       fit: BoxFit.cover,
-                                                      height: 120,
+                                                      height: 90,
                                                       errorBuilder:
                                                           (BuildContext context,
                                                               Object exception,
@@ -210,7 +217,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                         return Image.asset(
                                                           'assets/images/camion.png',
                                                           fit: BoxFit.cover,
-                                                          height: 120,
+                                                          height: 90,
                                                         );
                                                       },
                                                     ),
@@ -227,11 +234,227 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                   color: d_colorGreen),
                                             ),
                                           ),
-                                          _buildItem("Statut :",
+                                          _buildItem("Statut:",
                                               '${e.statutVehicule ? 'Disponible' : 'Non disponible'}'),
                                           _buildItem(
                                               "Localité :", e.localisation),
                                           SizedBox(height: 10),
+                                          Container(
+                                            alignment: Alignment.bottomRight,
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                _buildEtat(e.statutVehicule),
+                                                PopupMenuButton<String>(
+                                                  padding: EdgeInsets.zero,
+                                                  itemBuilder: (context) =>
+                                                      <PopupMenuEntry<String>>[
+                                                    PopupMenuItem<String>(
+                                                      child: ListTile(
+                                                        leading: const Icon(
+                                                          Icons.check,
+                                                          color: Colors.green,
+                                                        ),
+                                                        title: const Text(
+                                                          "Activer",
+                                                          style: TextStyle(
+                                                            color: Colors.green,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        onTap: () async {
+                                                          await VehiculeService()
+                                                              .activerVehicules(
+                                                                  e.idVehicule)
+                                                              .then((value) => {
+                                                                    Provider.of<VehiculeService>(
+                                                                            context,
+                                                                            listen:
+                                                                                false)
+                                                                        .applyChange(),
+                                                                    setState(
+                                                                        () {
+                                                                      _liste = getVehicule(
+                                                                          acteur
+                                                                              .idActeur!);
+                                                                    }),
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop(),
+                                                                    ScaffoldMessenger.of(
+                                                                            context)
+                                                                        .showSnackBar(
+                                                                      const SnackBar(
+                                                                        content:
+                                                                            Row(
+                                                                          children: [
+                                                                            Text("Activer avec succèss "),
+                                                                          ],
+                                                                        ),
+                                                                        duration:
+                                                                            Duration(seconds: 2),
+                                                                      ),
+                                                                    )
+                                                                  })
+                                                              .catchError(
+                                                                  (onError) => {
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          const SnackBar(
+                                                                            content:
+                                                                                Row(
+                                                                              children: [
+                                                                                Text("Une erreur s'est produit"),
+                                                                              ],
+                                                                            ),
+                                                                            duration:
+                                                                                Duration(seconds: 5),
+                                                                          ),
+                                                                        ),
+                                                                        Navigator.of(context)
+                                                                            .pop(),
+                                                                      });
+                                                        },
+                                                      ),
+                                                    ),
+                                                    PopupMenuItem<String>(
+                                                      child: ListTile(
+                                                        leading: Icon(
+                                                          Icons
+                                                              .disabled_visible,
+                                                          color: Colors
+                                                              .orange[400],
+                                                        ),
+                                                        title: Text(
+                                                          "Désactiver",
+                                                          style: TextStyle(
+                                                            color: Colors
+                                                                .orange[400],
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        onTap: () async {
+                                                          await VehiculeService()
+                                                              .desactiverVehicules(
+                                                                  e.idVehicule)
+                                                              .then((value) => {
+                                                                    Provider.of<VehiculeService>(
+                                                                            context,
+                                                                            listen:
+                                                                                false)
+                                                                        .applyChange(),
+                                                                    setState(
+                                                                        () {
+                                                                      _liste = getVehicule(
+                                                                          acteur
+                                                                              .idActeur!);
+                                                                    }),
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop(),
+                                                                  })
+                                                              .catchError(
+                                                                  (onError) => {
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          const SnackBar(
+                                                                            content:
+                                                                                Row(
+                                                                              children: [
+                                                                                Text("Une erreur s'est produit"),
+                                                                              ],
+                                                                            ),
+                                                                            duration:
+                                                                                Duration(seconds: 5),
+                                                                          ),
+                                                                        ),
+                                                                        Navigator.of(context)
+                                                                            .pop(),
+                                                                      });
+
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
+                                                            const SnackBar(
+                                                              content: Row(
+                                                                children: [
+                                                                  Text(
+                                                                      "Désactiver avec succèss "),
+                                                                ],
+                                                              ),
+                                                              duration:
+                                                                  Duration(
+                                                                      seconds:
+                                                                          2),
+                                                            ),
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                    PopupMenuItem<String>(
+                                                      child: ListTile(
+                                                        leading: const Icon(
+                                                          Icons.delete,
+                                                          color: Colors.red,
+                                                        ),
+                                                        title: const Text(
+                                                          "Supprimer",
+                                                          style: TextStyle(
+                                                            color: Colors.red,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        onTap: () async {
+                                                          await VehiculeService()
+                                                              .deleteVehicule(
+                                                                  e.idVehicule)
+                                                              .then((value) => {
+                                                                    Provider.of<VehiculeService>(
+                                                                            context,
+                                                                            listen:
+                                                                                false)
+                                                                        .applyChange(),
+                                                                    setState(
+                                                                        () {
+                                                                      _liste = getVehicule(
+                                                                          acteur
+                                                                              .idActeur!);
+                                                                    }),
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop(),
+                                                                  })
+                                                              .catchError(
+                                                                  (onError) => {
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          const SnackBar(
+                                                                            content:
+                                                                                Row(
+                                                                              children: [
+                                                                                Text("Impossible de supprimer"),
+                                                                              ],
+                                                                            ),
+                                                                            duration:
+                                                                                Duration(seconds: 2),
+                                                                          ),
+                                                                        )
+                                                                      });
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          )
                                         ],
                                       ),
                                     ),
@@ -244,6 +467,17 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                 });
           })
         ]),
+      ),
+    );
+  }
+
+  Widget _buildEtat(bool isState) {
+    return Container(
+      width: 15,
+      height: 15,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        color: isState ? Colors.green : Colors.red,
       ),
     );
   }

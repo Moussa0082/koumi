@@ -34,6 +34,7 @@ class _NotificationPageState extends State<NotificationPage> {
   final MultiSelectController _controller = MultiSelectController();
   late List<TypeActeur> typeActeurData = [];
   late String type;
+
   Future<List<MessageWa>> getMessage(String id) async {
     final response = await MessageService().fetchMessageByActeur(id);
     return response;
@@ -319,12 +320,12 @@ class _NotificationPageState extends State<NotificationPage> {
         ),
         floatingActionButton: type.toLowerCase() == 'admin'
             ? SpeedDial(
-                // animatedIcon: AnimatedIcons.close_menu,
+                foregroundColor: Colors.white,
                 backgroundColor: d_colorGreen,
                 overlayColor: Colors.black,
                 overlayOpacity: 0.4,
                 spacing: 12,
-                icon: Icons.add,
+                icon: Icons.chat,
                 children: [
                   SpeedDialChild(
                     child: Icon(Icons.message),
@@ -347,7 +348,7 @@ class _NotificationPageState extends State<NotificationPage> {
                       fontWeight: FontWeight.w500,
                     ),
                     onTap: () {
-                       _showEmail();
+                      _showEmail();
                     },
                   ),
                 ],
@@ -501,7 +502,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                             ),
                                           ),
                                           Navigator.of(context).pop(),
-                                            descriptionController.clear(),
+                                          descriptionController.clear(),
                                           setState(() {
                                             typeLibelle.clear();
                                           })
@@ -701,7 +702,9 @@ class _NotificationPageState extends State<NotificationPage> {
                             final String subject = sujetController.text;
                             if (formkey.currentState!.validate()) {
                               try {
-                                await ActeurService().sendEmailToActeurByTypeActeur(message, type, subject)
+                                await ActeurService()
+                                    .sendEmailToActeurByTypeActeur(
+                                        message, type, subject)
                                     .then((value) => {
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(

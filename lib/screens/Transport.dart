@@ -4,6 +4,7 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/DetailTransport.dart';
+import 'package:koumi_app/screens/PageTransporteur.dart';
 import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:provider/provider.dart';
@@ -70,11 +71,11 @@ class _TransportState extends State<Transport> {
                         PopupMenuItem<String>(
                           child: ListTile(
                             leading: const Icon(
-                              Icons.add,
+                              Icons.remove_red_eye,
                               color: Colors.green,
                             ),
                             title: const Text(
-                              "Ajouter un vehicule",
+                              "Mes véhicule",
                               style: TextStyle(
                                 color: Colors.green,
                                 fontWeight: FontWeight.bold,
@@ -93,7 +94,7 @@ class _TransportState extends State<Transport> {
                         PopupMenuItem<String>(
                           child: ListTile(
                             leading: const Icon(
-                              Icons.add,
+                              Icons.remove_red_eye,
                               color: Colors.green,
                             ),
                             title: const Text(
@@ -104,11 +105,11 @@ class _TransportState extends State<Transport> {
                               ),
                             ),
                             onTap: () async {
-                              // Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //         builder: (context) =>
-                              //             AddVehiculeTransport()));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          PageTransporteur()));
                             },
                           ),
                         ),
@@ -185,6 +186,7 @@ class _TransportState extends State<Transport> {
                       // runSpacing:
                       //     10, // Espacement vertical entre les lignes de conteneurs
                       children: filtereSearch
+                          .where((element) => element.statutVehicule == true)
                           .map((e) => Padding(
                                 padding: EdgeInsets.all(10),
                                 child: SizedBox(
@@ -226,12 +228,12 @@ class _TransportState extends State<Transport> {
                                                   ? Image.asset(
                                                       "assets/images/camion.png",
                                                       fit: BoxFit.cover,
-                                                      height: 120,
+                                                      height: 90,
                                                     )
                                                   : Image.network(
                                                       "http://10.0.2.2/${e.photoVehicule}",
                                                       fit: BoxFit.cover,
-                                                      height: 120,
+                                                      height: 90,
                                                       errorBuilder:
                                                           (BuildContext context,
                                                               Object exception,
@@ -240,7 +242,7 @@ class _TransportState extends State<Transport> {
                                                         return Image.asset(
                                                           'assets/images/camion.png',
                                                           fit: BoxFit.cover,
-                                                          height: 120,
+                                                          height: 90,
                                                         );
                                                       },
                                                     ),
@@ -291,7 +293,7 @@ class _TransportState extends State<Transport> {
                 fontWeight: FontWeight.w500,
                 fontStyle: FontStyle.italic,
                 overflow: TextOverflow.ellipsis,
-                fontSize: 18),
+                fontSize: 16),
           ),
           Text(
             value,
