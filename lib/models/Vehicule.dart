@@ -4,10 +4,10 @@ import 'dart:convert';
 import 'package:koumi_app/models/Acteur.dart';
 
 class Vehicule {
-  final String idVehicule;
+  final String? idVehicule;
   final String nomVehicule;
   final String capaciteVehicule;
-  final String codeVehicule;
+  final String? codeVehicule;
   final int prix;
   final bool statutVehicule;
   final String? photoVehicule;
@@ -18,11 +18,12 @@ class Vehicule {
   final String etatVehicule;
   final String? personneModif;
   final Acteur acteur;
+  
   Vehicule({
-    required this.idVehicule,
+    this.idVehicule,
     required this.nomVehicule,
     required this.capaciteVehicule,
-    required this.codeVehicule,
+    this.codeVehicule,
     required this.prix,
     required this.statutVehicule,
     this.photoVehicule,
@@ -34,6 +35,7 @@ class Vehicule {
     this.personneModif,
     required this.acteur,
   });
+ 
 
   Vehicule copyWith({
     String? idVehicule,
@@ -90,10 +92,10 @@ class Vehicule {
 
   factory Vehicule.fromMap(Map<String, dynamic> map) {
     return Vehicule(
-      idVehicule: map['idVehicule'] as String,
+      idVehicule: map['idVehicule'] != null ? map['idVehicule'] as String : null,
       nomVehicule: map['nomVehicule'] as String,
       capaciteVehicule: map['capaciteVehicule'] as String,
-      codeVehicule: map['codeVehicule'] as String,
+      codeVehicule: map['codeVehicule'] != null ? map['codeVehicule'] as String : null,
       prix: map['prix'] as int,
       statutVehicule: map['statutVehicule'] as bool,
       photoVehicule: map['photoVehicule'] != null ? map['photoVehicule'] as String : null,

@@ -574,22 +574,24 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ],
                               ),
                             ),
-                            GestureDetector(
-                              onTap: () {
-                                print("ho");
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ForgetPassScreen(),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  print("ho");
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ForgetPassScreen(),
+                                    ),
+                                  );
+                                },
+                                child:  Text(
+                                  "Mot de passe oublié ",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    decoration: TextDecoration.underline,
+                                    color: Colors.blue,
                                   ),
-                                );
-                              },
-                              child: const Text(
-                                "Mot de passe oublié ",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  decoration: TextDecoration.underline,
-                                  color: Colors.blue,
                                 ),
                               ),
                             ),

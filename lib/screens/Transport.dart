@@ -260,7 +260,7 @@ class _TransportState extends State<Transport> {
                                             ),
                                           ),
                                           _buildItem("Statut:",
-                                              '${e.statutVehicule ? 'Disponible' : 'Non disponible'}'),
+                                              '${e.statutVehicule! ? 'Disponible' : 'Non disponible'}'),
                                           _buildItem(
                                               "Localité :", e.localisation),
                                           SizedBox(height: 10),

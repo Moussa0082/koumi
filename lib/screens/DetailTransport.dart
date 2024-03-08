@@ -4,19 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
-import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:image_picker/image_picker.dart';
-
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DetailTransport extends StatefulWidget {
   final Vehicule vehicule;
@@ -34,7 +32,7 @@ class _DetailTransportState extends State<DetailTransport> {
   late Acteur acteur;
   late List<TypeActeur> typeActeurData = [];
   late String type;
-   String? imageSrc;
+  String? imageSrc;
   File? photo;
   late ValueNotifier<bool> isDialOpenNotifier;
   TextEditingController _prixController = TextEditingController();
@@ -52,7 +50,10 @@ class _DetailTransportState extends State<DetailTransport> {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     typeActeurData = acteur.typeActeur;
     type = typeActeurData.map((data) => data.libelle).join(', ');
-    vehicules = widget.vehicule;
+
+    
+      vehicules = widget.vehicule;
+  
     _nomController.text = vehicules.nomVehicule;
     _prixController.text = vehicules.prix.toString();
     _descriptionController.text = vehicules.description;
@@ -63,8 +64,8 @@ class _DetailTransportState extends State<DetailTransport> {
     isDialOpenNotifier = ValueNotifier<bool>(false);
     super.initState();
   }
-  
-Future<File> saveImagePermanently(String imagePath) async {
+
+  Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
     final name = path.basename(imagePath);
     final image = File('${directory.path}/$name');
@@ -132,11 +133,15 @@ Future<File> saveImagePermanently(String imagePath) async {
       },
     );
   }
-  Future<void> updateMethode() async {
+
+ Future<void> updateMethode() async {
+    setState(() {
+      // Afficher l'indicateur de chargement pendant l'opération
+      _isLoading = true;
+    });
+
     try {
-      setState(() {
-        _isLoading = true;
-      });
+      // Récupération des nouvelles valeurs des champs
       final String nom = _nomController.text;
       final String capacite = _capaciteController.text;
       final String description = _descriptionController.text;
@@ -144,26 +149,42 @@ Future<File> saveImagePermanently(String imagePath) async {
       final String etat = _etatController.text;
       final String localite = _localiteController.text;
 
-      await VehiculeService()
-          .updateVehicule(
-              idVehicule: vehicules.idVehicule,
-              nomVehicule: nom,
-              capaciteVehicule: capacite,
-              prix: prix,
-              etatVehicule: etat,
-              localisation: localite,
-              description: description,
-              acteur: acteur)
-          .then((value) => {
-                Provider.of<VehiculeService>(context, listen: false)
-                    .applyChange(),
-                setState(() {
-                  _isLoading = false;
-                }),
-              })
-          .catchError((onError) {});
+      // Appel de la méthode de mise à jour du service
+      await VehiculeService().updateVehicule(
+        idVehicule: vehicules.idVehicule!,
+        nomVehicule: nom,
+        capaciteVehicule: capacite,
+        prix: prix,
+        etatVehicule: etat,
+        localisation: localite,
+        description: description,
+        acteur: acteur,
+      );
+
+      // Mise à jour des données locales
+      setState(() {
+        final int? prixParsed = int.tryParse(prix);
+        final int prixValue = prixParsed ?? 0;
+        vehicules = Vehicule(
+          idVehicule: vehicules.idVehicule,
+          nomVehicule: nom,
+          capaciteVehicule: capacite,
+          description: description,
+          prix: prixValue,
+          etatVehicule: etat,
+          localisation: localite,
+          acteur: acteur, statutVehicule: vehicules.statutVehicule,
+        );
+        // Désactiver l'indicateur de chargement après la mise à jour
+        _isLoading = false;
+      });
     } catch (e) {
+      // Gérer les erreurs potentielles ici
       print(e.toString());
+      setState(() {
+        _isLoading =
+            false; // Assurez-vous de désactiver l'indicateur de chargement en cas d'erreur
+      });
     }
   }
 
@@ -176,120 +197,126 @@ Future<File> saveImagePermanently(String imagePath) async {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
-        appBar: AppBar(
-            centerTitle: true,
-            toolbarHeight: 100,
-            leading: _isEditing
-                ? Container()
-                : IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen),
-                  ),
-            title: Text(
-              'Transport',
-              style: const TextStyle(
-                  color: d_colorGreen, fontWeight: FontWeight.bold),
-            ),
-            actions: acteur.nomActeur == vehicules.acteur.nomActeur
-                ? [
-                    _isEditing
-                        ? IconButton(
-                            onPressed: () async {
-                              setState(() {
-                                _isEditing = false;
-                              });
-                              updateMethode();
-                            },
-                            icon: Icon(Icons.check),
-                          )
-                        : IconButton(
-                            onPressed: () async {
-                              setState(() {
-                                _isEditing = true;
-                              });
-                            },
-                            icon: Icon(Icons.edit),
-                          ),
-                  ]
-                : null),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: vehicules.photoVehicule != null
-                    ? Image.network(
-                        "http://10.0.2.2/${vehicules.photoVehicule!}",
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      )
-                    : Image.asset(
-                        "assets/images/camion.png",
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: 200,
-                      ),
+    return LoadingOverlay(
+      isLoading: _isLoading,
+      child: Scaffold(
+          backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+          appBar: AppBar(
+              centerTitle: true,
+              toolbarHeight: 100,
+              leading: _isEditing
+                  ? Container()
+                  : IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      icon:
+                          const Icon(Icons.arrow_back_ios, color: d_colorGreen),
+                    ),
+              title: Text(
+                'Transport',
+                style: const TextStyle(
+                    color: d_colorGreen, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 30),
-              _isEditing ? _buildEditing() : _buildData()
-            ],
+              actions: acteur.nomActeur == vehicules.acteur.nomActeur
+                  ? [
+                      _isEditing
+                          ? IconButton(
+                              onPressed: () async {
+                                setState(() {
+                                  _isEditing = false;
+                                  vehicules = widget.vehicule;
+                                });
+                                updateMethode();
+                              },
+                              icon: Icon(Icons.check),
+                            )
+                          : IconButton(
+                              onPressed: () async {
+                                setState(() {
+                                  _isEditing = true;
+                                  vehicules = widget.vehicule;
+                                });
+                              },
+                              icon: Icon(Icons.edit),
+                            ),
+                    ]
+                  : null),
+          body: SingleChildScrollView(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: vehicules.photoVehicule != null
+                      ? Image.network(
+                          "http://10.0.2.2/${vehicules.photoVehicule!}",
+                          width: double.infinity,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.asset(
+                          "assets/images/camion.png",
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: 200,
+                        ),
+                ),
+                SizedBox(height: 30),
+                _isEditing ? _buildEditing() : _buildData()
+              ],
+            ),
           ),
-        ),
-        floatingActionButton: acteur.nomActeur != vehicules.acteur.nomActeur
-            ? SpeedDial(
-                // animatedIcon: AnimatedIcons.close_menu,
-                backgroundColor: d_colorGreen,
-                foregroundColor: Colors.white,
-                overlayColor: Colors.black,
-                overlayOpacity: 0.4,
-                spacing: 12,
-                icon: Icons.phone,
+          floatingActionButton: acteur.nomActeur != vehicules.acteur.nomActeur
+              ? SpeedDial(
+                  // animatedIcon: AnimatedIcons.close_menu,
+                  backgroundColor: d_colorGreen,
+                  foregroundColor: Colors.white,
+                  overlayColor: Colors.black,
+                  overlayOpacity: 0.4,
+                  spacing: 12,
+                  icon: Icons.phone,
 
-                children: [
-                  SpeedDialChild(
-                    child: FaIcon(FontAwesomeIcons.whatsapp),
-                    label: 'Par wathsApp',
-                    labelStyle: TextStyle(
-                      color: Colors.black,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
+                  children: [
+                    SpeedDialChild(
+                      child: FaIcon(FontAwesomeIcons.whatsapp),
+                      label: 'Par wathsApp',
+                      labelStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      onTap: () {
+                        final String whatsappNumber =
+                            vehicules.acteur.whatsAppActeur;
+                        _makePhoneWa(whatsappNumber);
+                      },
                     ),
-                    onTap: () {
-                      final String whatsappNumber =
-                          vehicules.acteur.whatsAppActeur;
-                      _makePhoneWa(whatsappNumber);
-                    },
-                  ),
-                  SpeedDialChild(
-                    child: Icon(Icons.phone),
-                    label: 'Par téléphone ',
-                    labelStyle: TextStyle(
-                      color: Colors.black,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    onTap: () {
-                      final String numberPhone =
-                          vehicules.acteur.telephoneActeur;
-                      _makePhoneCall(numberPhone);
-                    },
-                  )
-                ],
-                // État du Speed Dial (ouvert ou fermé)
-                openCloseDial: isDialOpenNotifier,
-                // Fonction appelée lorsque le bouton principal est pressé
-                onPress: () {
-                  isDialOpenNotifier.value = !isDialOpenNotifier
-                      .value; // Inverser la valeur du ValueNotifier
-                },
-              )
-            : Container());
+                    SpeedDialChild(
+                      child: Icon(Icons.phone),
+                      label: 'Par téléphone ',
+                      labelStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      onTap: () {
+                        final String numberPhone =
+                            vehicules.acteur.telephoneActeur;
+                        _makePhoneCall(numberPhone);
+                      },
+                    )
+                  ],
+                  // État du Speed Dial (ouvert ou fermé)
+                  openCloseDial: isDialOpenNotifier,
+                  // Fonction appelée lorsque le bouton principal est pressé
+                  onPress: () {
+                    isDialOpenNotifier.value = !isDialOpenNotifier
+                        .value; // Inverser la valeur du ValueNotifier
+                  },
+                )
+              : Container()),
+    );
   }
 
   // Future<void> _openWhatsApp(String whatsappNumber) async {
