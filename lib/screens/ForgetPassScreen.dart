@@ -43,30 +43,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen> with AutomaticKeepA
     }
   }
 
-                   // Fonction pour afficher la boîte de dialogue de chargement
-void showLoadingDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    barrierDismissible: false, // Empêche de fermer la boîte de dialogue en cliquant en dehors
-    builder: (BuildContext context) {
-      return const AlertDialog(
-        title:  Center(child: Text('Traitement en cours')),
-        content: CupertinoActivityIndicator(
-          color: Colors.orange,
-          radius: 22,
-        ),
-        actions: <Widget>[
-          // Pas besoin de bouton ici
-        ],
-      );
-    },
-  );
-}
-
-// Fonction pour fermer la boîte de dialogue de chargement
-void hideLoadingDialog(BuildContext context) {
-  Navigator.of(context).pop(); // Ferme la boîte de dialogue
-}
+                  
 
    // Fonction pour vérifier la connectivité réseau
    Future<bool> checkInternetConnectivity() async {
@@ -252,10 +229,48 @@ void hideLoadingDialog(BuildContext context) {
               children: [
                const SizedBox(height: 10,),
                 // debut email ou whats app  
-                Padding(
-                  padding: const EdgeInsets.only(left:10.0),
-                  child: Text( isVisible ? " Email *" : "Whats App *" , style: TextStyle(color:  (Colors.black), fontSize: 18),),
-                ),
+                // Row(
+                //   children:[
+                //     Text("Email"),
+
+                //   ]
+                // ),
+                 Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  // Bouton radio Email
+                  Text('Email', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
+                  const SizedBox(width: 4,),
+                  Radio(
+                    value: true,
+                    groupValue: isVisible,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        isVisible = value!;
+                      });
+                    },
+                  ),
+                  // Espace
+                  SizedBox(width: 4),
+                  const SizedBox(width: 10,),
+                  Text('WhatsApp',  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  // Bouton radio WhatsApp
+                  Radio(
+                    value: false,
+                    groupValue: isVisible,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        isVisible = value!;
+                      });
+                    },
+                  ),
+                ],
+              ),
+                
+                //                Padding(
+                //   padding: const EdgeInsets.only(left:10.0),
+                //   child: Text( isVisible ? " Email *" : "Whats App *" , style: TextStyle(color:  (Colors.black), fontSize: 18),),
+                // ),
       
                Padding(
                     padding: EdgeInsets.all( 2),
@@ -319,19 +334,19 @@ void hideLoadingDialog(BuildContext context) {
               ),
             ),
       
-            TextButton(
-        onPressed: ()  {
+      //       TextButton(
+      //   onPressed: ()  {
       
-        setState(() {
-          isVisible = !isVisible;
-        });
+      //   setState(() {
+      //     isVisible = !isVisible;
+      //   });
       
-        },
-        child: Text(
-      isVisible ? "Envoyer le code par WhatsApp" : "Envoyer le code par email",
-      style: TextStyle(fontSize: 16),
-        ),
-      ),
+      //   },
+      //   child: Text(
+      // isVisible ? "Envoyer le code par WhatsApp" : "Envoyer le code par email",
+      // style: TextStyle(fontSize: 16),
+      //   ),
+      // ),
                const SizedBox(height: 15,),
                   Center(
                     child: ElevatedButton(

@@ -558,36 +558,34 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: 50,
-                                    height: 30,
-                                    child: FittedBox(
-                                      fit: BoxFit.contain,
-                                      child: Switch(
-                                        value: isActive,
-                                        activeColor: Colors.orange,
-                                        onChanged: (bool value) {
-                                          setState(() {
-                                            isActive = value;
-                                          });
-                                        },
-                                      ),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 50,
+                                  height: 30,
+                                  child: FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: Switch(
+                                      value: isActive,
+                                      activeColor: Colors.orange,
+                                      onChanged: (bool value) {
+                                        setState(() {
+                                          isActive = value;
+                                        });
+                                      },
                                     ),
                                   ),
-                                  const SizedBox(
-                                    width: 5,
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                const Text(
+                                  "Se souvenir de moi",
+                                  style: TextStyle(
+                                    fontSize: 15,
                                   ),
-                                  const Text(
-                                    "Se souvenir de moi",
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                             GestureDetector(
                               onTap: () {

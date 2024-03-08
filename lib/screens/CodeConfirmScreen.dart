@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pin_code_widget/flutter_pin_code_widget.dart';
 import 'package:koumi_app/screens/ResetPassScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
+import 'package:koumi_app/widgets/LoadingOverlay.dart';
 
 class CodeConfirmScreen extends StatefulWidget {
    final bool? isVisible;
@@ -19,6 +20,7 @@ class CodeConfirmScreen extends StatefulWidget {
 
 class _CodeConfirmScreenState extends State<CodeConfirmScreen> {
  bool _isMounted = false;
+ bool _isLoading = false;
   
      
   String email = "";
@@ -28,29 +30,8 @@ class _CodeConfirmScreenState extends State<CodeConfirmScreen> {
 late Timer timere;
   String pinCode = '';
 
-  void showLoadingDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    barrierDismissible: false, // Empêche de fermer la boîte de dialogue en cliquant en dehors
-    builder: (BuildContext context) {
-      return const AlertDialog(
-        title:  Center(child: Text('Envoi en cours')),
-        content: CupertinoActivityIndicator(
-          color: Colors.orange,
-          radius: 22,
-        ),
-        actions: <Widget>[
-          // Pas besoin de bouton ici
-        ],
-      );
-    },
-  );
-}
+ 
 
-// Fonction pour fermer la boîte de dialogue de chargement
-void hideLoadingDialog(BuildContext context) {
-  Navigator.of(context).pop(); // Ferme la boîte de dialogue
-}
 
    // Fonction pour vérifier la connectivité réseau
    Future<bool> checkInternetConnectivity() async {
@@ -79,8 +60,23 @@ void hideLoadingDialog(BuildContext context) {
   );
 }
 
+
+    void _handleClick(BuildContext context) async{
+
+      setState((){
+     _isLoading = true;
+      });
+    
+     await handleSendButton(context).then((){
+      setState((){
+     _isLoading = false;
+      });
+     });
+
+    }
+
    // Fonction pour gérer le bouton Envoyer
-  void handleSendButton(BuildContext context) async {
+   handleSendButton(BuildContext context) async {
   bool isConnected = await checkInternetConnectivity();
   if (!isConnected) {
     showNoInternetDialog(context);
@@ -89,16 +85,12 @@ void hideLoadingDialog(BuildContext context) {
 
   // Si la connexion Internet est disponible, poursuivez avec l'envoi du code
   // Affichez la boîte de dialogue de chargement
-  showLoadingDialog(context);
 
   try {
     ActeurService acteurService = ActeurService();
-   
-
     if (widget.isVisible!) {
       await ActeurService.verifyOtpCodeEmail(widget.emailActeur!, pinCode, context);
       debugPrint("Code virifier par mail");
-    hideLoadingDialog(context);
      showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -120,7 +112,6 @@ void hideLoadingDialog(BuildContext context) {
     } else {
       await ActeurService.verifyOtpCodeWhatsApp(widget.whatsAppActeur!, pinCode, context);
       debugPrint("Code verifier par whats app");
-    hideLoadingDialog(context);
      showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -143,7 +134,6 @@ void hideLoadingDialog(BuildContext context) {
     // Fermez la boîte de dialogue de chargement après l'envoi du code
   } catch (e) {
     // En cas d'erreur, fermez également la boîte de dialogue de chargement
-    hideLoadingDialog(context);
     // Gérez l'erreur ici
          showDialog(
     context: context,
@@ -213,156 +203,159 @@ String get timerText {
   @override
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Color(0xfff7f6fb),
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 24, horizontal: 32),
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Icon(
-                      Icons.arrow_back,
-                      size: 32,
-                      color: Colors.black54,
+    return LoadingOverlay(
+      isLoading:_isLoading,
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Color(0xfff7f6fb),
+        body: SingleChildScrollView(
+          child: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 24, horizontal: 32),
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Icon(
+                        Icons.arrow_back,
+                        size: 32,
+                        color: Colors.black54,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  height: 18,
-                ),
-                Container(
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: Colors.deepPurple.shade50,
-                    shape: BoxShape.circle,
+                  SizedBox(
+                    height: 18,
                   ),
-                  child: Image.asset(
-                    'assets/images/logo-pr.png',
+                  Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple.shade50,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Image.asset(
+                      'assets/images/logo-pr.png',
+                    ),
                   ),
-                ),
-                SizedBox(
-                  height: 18,
-                ),
-                Text(
-                  'Verification',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+                  SizedBox(
+                    height: 18,
                   ),
-                ),
-                SizedBox(
-                  height: 8,
-                ),
-                Text(
-                 widget.isVisible! ? "Entrer le code envoyer à votre email" : "Entrer le code envoyer par whatsApp",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black38,
+                  Text(
+                    'Verification',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(
-                  height: 24,
-                ),
-                Container(
-                  padding: EdgeInsets.all(26),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                  SizedBox(
+                    height: 8,
                   ),
-                  child: Column(
-                    children: [
-                      Row(
-  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  children: [
-    Expanded(child: _textFieldOTP(first: true, last: false, index:0)),
-    Expanded(child: _textFieldOTP(first: false, last: false, index:1)),
-    Expanded(child: _textFieldOTP(first: false, last: false, index:2)),
-    Expanded(child: _textFieldOTP(first: false, last: true, index:3)),
-  ],
-),
-                      SizedBox(
-                        height: 22,
-                      ),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                           onPressed: () async {
-                  // Imprimer le code saisi
-                //   if(otpCode.length <3){
-                //      ScaffoldMessenger.of(context).showSnackBar(
-                // SnackBar(
-                //   content: Text('Veuillez saisir 4 chiffres.'),
-                //   duration: Duration(seconds: 2),
-                //  ),
-                // );
-                //   }
-                handleSendButton(context);
-                  printPinCode();
-    
-                       },
-                          
-                          style: ButtonStyle(
-                            foregroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
-                            backgroundColor:
-                                MaterialStateProperty.all<Color>(Colors.orange),
-                            shape:
-                                MaterialStateProperty.all<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24.0),
+                  Text(
+                   widget.isVisible! ? "Entrer le code envoyer à votre email" : "Entrer le code envoyer par whatsApp",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black38,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(
+                    height: 24,
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(26),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+      Expanded(child: _textFieldOTP(first: true, last: false, index:0)),
+      Expanded(child: _textFieldOTP(first: false, last: false, index:1)),
+      Expanded(child: _textFieldOTP(first: false, last: false, index:2)),
+      Expanded(child: _textFieldOTP(first: false, last: true, index:3)),
+        ],
+      ),
+                        SizedBox(
+                          height: 22,
+                        ),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                             onPressed: () async {
+                    // Imprimer le code saisi
+                  //   if(otpCode.length <3){
+                  //      ScaffoldMessenger.of(context).showSnackBar(
+                  // SnackBar(
+                  //   content: Text('Veuillez saisir 4 chiffres.'),
+                  //   duration: Duration(seconds: 2),
+                  //  ),
+                  // );
+                  //   }
+                  handleSendButton(context);
+                    printPinCode();
+      
+                         },
+                            
+                            style: ButtonStyle(
+                              foregroundColor:
+                                  MaterialStateProperty.all<Color>(Colors.white),
+                              backgroundColor:
+                                  MaterialStateProperty.all<Color>(Colors.orange),
+                              shape:
+                                  MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24.0),
+                                ),
+                              ),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.all(14.0),
+                              child: Text(
+                                'Verifier',
+                                style: TextStyle(fontSize: 16),
                               ),
                             ),
                           ),
-                          child: Padding(
-                            padding: EdgeInsets.all(14.0),
-                            child: Text(
-                              'Verifier',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-               
-                
-                 Center(child: Text("Expire dans " + "$timerText", style: TextStyle(fontSize: 15),)), 
-                 SizedBox(width: 10,),
-               
-            
-                 Text(
-                  "Vous n'avez pas reçu code?",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black38,
+                  SizedBox(
+                    height: 12,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-
-                Text(
-                  "Envoyer à nouveau",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.orange,
+                 
+                  
+                   Center(child: Text("Expire dans " + "$timerText", style: TextStyle(fontSize: 15),)), 
+                   SizedBox(width: 10,),
+                 
+              
+                   Text(
+                    "Vous n'avez pas reçu code?",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black38,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+      
+                  Text(
+                    "Envoyer à nouveau",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
