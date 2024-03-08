@@ -42,14 +42,13 @@ class _SplashScreenState extends State<SplashScreen> {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       checkLoggedIn();
     } else {
-   Timer(
+      Timer(
         const Duration(seconds: 5),
         () => Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const LoginScreen()),
         ),
       );
       // Si l'email de l'acteur n'est pas présent, redirige directement vers l'écran de connexion
-     
     }
   }
 

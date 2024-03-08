@@ -600,9 +600,9 @@ class _NotificationPageState extends State<NotificationPage> {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: MultiSelectDropDown.network(
                           networkConfig: NetworkConfig(
-                            url:
-                                'http://10.0.2.2:9000/api-koumi/typeActeur/read',
-                            // url: 'https://koumi.ml/api-koumi/typeActeur/read',
+                            // url:
+                                // 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
+                            url: 'https://koumi.ml/api-koumi/typeActeur/read',
                             method: RequestMethod.get,
                             headers: {
                               'Content-Type': 'application/json',

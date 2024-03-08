@@ -42,10 +42,6 @@ class _LoginScreenState extends State<LoginScreen> {
     const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
     // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
-      const String defaultProfileImage = 'assets/images/profil.jpg';
-
-
-
     ActeurProvider acteurProvider =
         Provider.of<ActeurProvider>(context, listen: false);
 
@@ -111,15 +107,6 @@ class _LoginScreenState extends State<LoginScreen> {
         prefs.setString('emailActeur', emailActeur);
         prefs.setString('password', password);
         // prefs.setString('nomActeur', responseBody['nomActeur']);
-        // Vérifier si l'image de profil est présente, sinon, enregistrer l'image par défaut dans SharedPreferences
-      final String? logoActeur = responseBody['logoActeur'];
-      final String? photoSiegeActeur= responseBody['photoSiegeActeur'];
-      if (logoActeur == null) {
-        prefs.setString('logoActeur', defaultProfileImage);
-      }
-      if (photoSiegeActeur == null) {
-        prefs.setString('photoSiegeActeur', defaultProfileImage);
-      }
         final nomActeur = responseBody['nomActeur'];
         final idActeur = responseBody['idActeur'];
         final adresseActeur = responseBody['adresseActeur'];
@@ -139,8 +126,8 @@ class _LoginScreenState extends State<LoginScreen> {
         prefs.setString('adresseActeur', adresseActeur);
         prefs.setString('telephoneActeur', telephoneActeur);
         prefs.setString('whatsAppActeur', whatsAppActeur);
-         prefs.setString('logoActeur', logoActeur!);
-         prefs.setString('photoSiegeActeur', photoSiegeActeur!);
+        //  prefs.setString('logoActeur', logoActeur);
+        //  prefs.setString('photoSiegeActeur', photoSiegeActeur);
         prefs.setString('filiereActeur', filiereActeur);
         prefs.setString('niveau3PaysActeur', niveau3PaysActeur);
         prefs.setString('localiteActeur', localiteActeur);
@@ -280,9 +267,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final String password = passwordController.text;
 
     const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
-
     // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
-
 
     ActeurProvider acteurProvider =
         Provider.of<ActeurProvider>(context, listen: false);
