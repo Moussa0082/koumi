@@ -42,8 +42,8 @@ class _Niveau3PageState extends State<Niveau3Page> {
         .parametreList!;
     para = paraList[0];
     _niveauList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau2Pays/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau2Pays/read'));
+        // http.get(Uri.parse('https://koumi.ml/api-koumi/niveau2Pays/read'));
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau2Pays/read'));
     super.initState();
   }
 

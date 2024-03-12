@@ -6,8 +6,8 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Filiere.dart';
 
 class FiliereService extends ChangeNotifier {
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Filiere';
-  static const String baseUrl = 'https://koumi.ml/api-koumi/Filiere';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Filiere';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/Filiere';
 
   List<Filiere> filiereList = [];
 

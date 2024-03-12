@@ -1,33 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/AddVehiculeTransport.dart';
 import 'package:koumi_app/screens/DetailTransport.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:provider/provider.dart';
 
-class VehiculeActeur extends StatefulWidget {
-  const VehiculeActeur({super.key});
+class ListeVehiculeByType extends StatefulWidget {
+  final TypeVoiture typeVoitures;
+  const ListeVehiculeByType({super.key, required this.typeVoitures});
 
   @override
-  State<VehiculeActeur> createState() => _VehiculeActeurState();
+  State<ListeVehiculeByType> createState() => _ListeVehiculeByTypeState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _VehiculeActeurState extends State<VehiculeActeur> {
+class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
   late Acteur acteur;
   late List<TypeActeur> typeActeurData = [];
   late String type;
   late TextEditingController _searchController;
   List<Vehicule> vehiculeListe = [];
-  late Future<List<Vehicule>> _liste;
+  late TypeVoiture typeVoiture;
+  late Future<List<Vehicule>> futureListe;
 
-  Future<List<Vehicule>> getVehicule(String id) async {
-    final response = await VehiculeService().fetchVehiculeByActeur(id);
+  Future<List<Vehicule>> getListe(String id) async {
+    final response = await VehiculeService().fetchVehiculeByTypeVehicule(id);
     return response;
   }
 
@@ -37,14 +39,14 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
     typeActeurData = acteur.typeActeur;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
-    _liste = getVehicule(acteur.idActeur!);
+    typeVoiture = widget.typeVoitures;
+    futureListe = getListe(typeVoiture.idTypeVoiture);
     super.initState();
   }
 
   @override
   void dispose() {
-    _searchController
-        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -61,7 +63,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
-            'Mes véhicules',
+            typeVoiture.nom.toUpperCase(),
             style: const TextStyle(
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
@@ -133,7 +135,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
           const SizedBox(height: 10),
           Consumer<VehiculeService>(builder: (context, vehiculeService, child) {
             return FutureBuilder(
-                future: _liste,
+                future: futureListe,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -146,7 +148,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                   if (!snapshot.hasData) {
                     return const Padding(
                       padding: EdgeInsets.all(10),
-                      child: Center(child: Text("Aucun donné trouvé")),
+                      child: Center(child: Text("Aucun véhicule trouvé")),
                     );
                   } else {
                     vehiculeListe = snapshot.data!;
@@ -162,6 +164,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                       // runSpacing:
                       //     10, // Espacement vertical entre les lignes de conteneurs
                       children: filtereSearch
+                          // .where((element) => element.statutVehicule == true)
                           .map((e) => Padding(
                                 padding: EdgeInsets.all(10),
                                 child: SizedBox(
@@ -235,7 +238,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                             ),
                                           ),
                                           _buildItem("Statut:",
-                                              '${e.statutVehicule! ? 'Disponible' : 'Non disponible'}'),
+                                              '${e.statutVehicule ? 'Disponible' : 'Non disponible'}'),
                                           _buildItem(
                                               "Localité :", e.localisation),
                                           SizedBox(height: 10),
@@ -248,7 +251,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                _buildEtat(e.statutVehicule!),
+                                                _buildEtat(e.statutVehicule),
                                                 PopupMenuButton<String>(
                                                   padding: EdgeInsets.zero,
                                                   itemBuilder: (context) =>
@@ -279,9 +282,9 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                                         .applyChange(),
                                                                     setState(
                                                                         () {
-                                                                      _liste = getVehicule(
-                                                                          acteur
-                                                                              .idActeur!);
+                                                                      futureListe =
+                                                                          getListe(
+                                                                              typeVoiture.idTypeVoiture);
                                                                     }),
                                                                     Navigator.of(
                                                                             context)
@@ -351,9 +354,9 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                                         .applyChange(),
                                                                     setState(
                                                                         () {
-                                                                      _liste = getVehicule(
-                                                                          acteur
-                                                                              .idActeur!);
+                                                                      futureListe =
+                                                                          getListe(
+                                                                              typeVoiture.idTypeVoiture);
                                                                     }),
                                                                     Navigator.of(
                                                                             context)
@@ -423,9 +426,9 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                                         .applyChange(),
                                                                     setState(
                                                                         () {
-                                                                      _liste = getVehicule(
-                                                                          acteur
-                                                                              .idActeur!);
+                                                                      futureListe =
+                                                                          getListe(
+                                                                              typeVoiture.idTypeVoiture);
                                                                     }),
                                                                     Navigator.of(
                                                                             context)

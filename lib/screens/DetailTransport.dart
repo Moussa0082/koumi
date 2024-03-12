@@ -9,7 +9,6 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -34,29 +33,30 @@ class _DetailTransportState extends State<DetailTransport> {
   late String type;
   String? imageSrc;
   File? photo;
+    late Map<String, int> prixParDestinations;
+
   late ValueNotifier<bool> isDialOpenNotifier;
   TextEditingController _prixController = TextEditingController();
   TextEditingController _nomController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
+  TextEditingController _destinationController = TextEditingController();
   TextEditingController _capaciteController = TextEditingController();
   TextEditingController _etatController = TextEditingController();
   TextEditingController _localiteController = TextEditingController();
 
   bool _isEditing = false;
   bool _isLoading = false;
+  bool active = false;
 
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     typeActeurData = acteur.typeActeur;
     type = typeActeurData.map((data) => data.libelle).join(', ');
+prixParDestinations = {};
+    vehicules = widget.vehicule;
 
-    
-      vehicules = widget.vehicule;
-  
     _nomController.text = vehicules.nomVehicule;
-    _prixController.text = vehicules.prix.toString();
-    _descriptionController.text = vehicules.description;
+    // _prixController.text = vehicules.prix.toString();
     _capaciteController.text = vehicules.capaciteVehicule;
     _etatController.text = vehicules.etatVehicule.toString();
     _localiteController.text = vehicules.localisation;
@@ -134,7 +134,7 @@ class _DetailTransportState extends State<DetailTransport> {
     );
   }
 
- Future<void> updateMethode() async {
+  Future<void> updateMethode() async {
     setState(() {
       // Afficher l'indicateur de chargement pendant l'opération
       _isLoading = true;
@@ -144,37 +144,36 @@ class _DetailTransportState extends State<DetailTransport> {
       // Récupération des nouvelles valeurs des champs
       final String nom = _nomController.text;
       final String capacite = _capaciteController.text;
-      final String description = _descriptionController.text;
       final String prix = _prixController.text;
       final String etat = _etatController.text;
       final String localite = _localiteController.text;
 
       // Appel de la méthode de mise à jour du service
-      await VehiculeService().updateVehicule(
-        idVehicule: vehicules.idVehicule!,
-        nomVehicule: nom,
-        capaciteVehicule: capacite,
-        prix: prix,
-        etatVehicule: etat,
-        localisation: localite,
-        description: description,
-        acteur: acteur,
-      );
+      // await VehiculeService().updateVehicule(
+      //   idVehicule: vehicules.idVehicule!,
+      //   nomVehicule: nom,
+      //   capaciteVehicule: capacite,
+      //   prix: prix,
+      //   etatVehicule: etat,
+      //   localisation: localite,
+      //   description: description,
+      //   acteur: acteur,
+      // );
 
       // Mise à jour des données locales
       setState(() {
         final int? prixParsed = int.tryParse(prix);
         final int prixValue = prixParsed ?? 0;
-        vehicules = Vehicule(
-          idVehicule: vehicules.idVehicule,
-          nomVehicule: nom,
-          capaciteVehicule: capacite,
-          description: description,
-          prix: prixValue,
-          etatVehicule: etat,
-          localisation: localite,
-          acteur: acteur, statutVehicule: vehicules.statutVehicule,
-        );
+        // vehicules = Vehicule(
+        //   idVehicule: vehicules.idVehicule,
+        //   nomVehicule: nom,
+        //   capaciteVehicule: capacite,
+        //   description: description,
+        //   prix: prixValue,
+        //   etatVehicule: etat,
+        //   localisation: localite,
+        //   acteur: acteur, statutVehicule: vehicules.statutVehicule,
+        // );
         // Désactiver l'indicateur de chargement après la mise à jour
         _isLoading = false;
       });
@@ -263,7 +262,10 @@ class _DetailTransportState extends State<DetailTransport> {
                         ),
                 ),
                 SizedBox(height: 30),
-                _isEditing ? _buildEditing() : _buildData()
+                _isEditing ? _buildEditing() : _buildData(),
+                _buildDescription(
+                    'Description : ', vehicules.typeVoiture.description!),
+                _buildPanel()
               ],
             ),
           ),
@@ -352,21 +354,35 @@ class _DetailTransportState extends State<DetailTransport> {
         _buildEditableDetailItem('Nom du véhicule : ', _nomController),
         _buildEditableDetailItem('Capacité : ', _capaciteController),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          padding: EdgeInsets.symmetric(
+            horizontal: 22,
+          ),
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Text(
+              "Destination et prix",
+              style: TextStyle(color: (Colors.black), fontSize: 18),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: Text(
-                  'Prix / voyage',
-                  style: const TextStyle(
-                      color: Colors.black87,
-                      fontWeight: FontWeight.w500,
-                      fontStyle: FontStyle.italic,
-                      overflow: TextOverflow.ellipsis,
-                      fontSize: 18),
+                child: TextFormField(
+                  controller: _destinationController,
+                  decoration: InputDecoration(
+                    hintText: "Destination",
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                 ),
               ),
+              SizedBox(width: 10),
               Expanded(
                 child: TextFormField(
                   controller: _prixController,
@@ -374,19 +390,39 @@ class _DetailTransportState extends State<DetailTransport> {
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly,
                   ],
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 17,
-                    color: Colors.black54,
+                  decoration: InputDecoration(
+                    hintText: "Prix",
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
-                  enabled: _isEditing,
                 ),
-              )
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    String destination = _destinationController.text;
+                    int prix = int.tryParse(_prixController.text) ?? 0;
+
+                    if (destination.isNotEmpty && prix > 0) {
+                      // Ajouter la destination et le prix à la liste prixParDestinations
+                      prixParDestinations.addAll({destination: prix});
+
+                      print(prixParDestinations.toString());
+
+                      _destinationController.clear();
+                      _prixController.clear();
+                    }
+                  });
+                },
+                icon: Icon(Icons.add),
+              ),
             ],
           ),
         ),
         _buildEditableDetailItem('Localisation : ', _localiteController),
-        _buildEditableDetailItem('Description : ', _descriptionController),
         _buildEditableDetailItem('Etat du véhicule : ', _etatController),
       ],
     );
@@ -396,15 +432,20 @@ class _DetailTransportState extends State<DetailTransport> {
     return Column(
       children: [
         _buildItem('Nom du véhicule : ', vehicules.nomVehicule),
+        _buildItem('Type de véhicule : ', vehicules.typeVoiture.nom),
+        vehicules.typeVoiture.nombreSieges != 0
+            ? _buildItem('Nombre de siège : ',
+                vehicules.typeVoiture.nombreSieges.toString())
+            : Container(),
         _buildItem('Capacité : ', vehicules.capaciteVehicule),
-        _buildItem('Prix / voyage: ', vehicules.prix.toString()),
+        // _buildItem('Prix / voyage: ', vehicules.prix.toString()),
         _buildItem('Localisation : ', vehicules.localisation),
         _buildItem('Statut: : ',
             '${vehicules.statutVehicule ? 'Disponible' : 'Non disponible'}'),
-        _buildItem('Description : ', vehicules.description),
         acteur.nomActeur != vehicules.acteur.nomActeur
             ? _buildItem('Propriètaire : ', vehicules.acteur.nomActeur)
-            : Container()
+            : Container(),
+        // _buildItem('Description : ', vehicules.typeVoiture.description!),
       ],
     );
   }
@@ -450,6 +491,37 @@ class _DetailTransportState extends State<DetailTransport> {
     );
   }
 
+  Widget _buildDescription(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+                color: Colors.black87,
+                fontWeight: FontWeight.w500,
+                fontStyle: FontStyle.italic,
+                overflow: TextOverflow.ellipsis,
+                fontSize: 18),
+          ),
+          Text(
+            value,
+            textAlign: TextAlign.justify,
+            softWrap: true,
+            style: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w800,
+              // overflow: TextOverflow.ellipsis,
+              fontSize: 16,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget _buildItem(String title, String value) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
@@ -467,14 +539,66 @@ class _DetailTransportState extends State<DetailTransport> {
           ),
           Text(
             value,
+            textAlign: TextAlign.justify,
+            softWrap: true,
             style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w800,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 16),
+              color: Colors.black,
+              fontWeight: FontWeight.w800,
+              overflow: TextOverflow.ellipsis,
+              fontSize: 16,
+            ),
           )
         ],
       ),
+    );
+  }
+
+  Widget _buildPanel() {
+    return ExpansionPanelList(
+      expansionCallback: (int index, bool isExpanded) {
+        setState(() {
+          active = !active;
+        });
+      },
+      children: <ExpansionPanel>[
+        ExpansionPanel(
+          headerBuilder: (context, isExpanded) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: Text(
+                "Voir les prix par destination",
+                textAlign: TextAlign.justify,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w800,
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 17,
+                ),
+              ),
+            );
+          },
+          body: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Column(
+                  children: List.generate(vehicules.prixParDestination.length,
+                      (index) {
+                    String destination =
+                        vehicules.prixParDestination.keys.elementAt(index);
+                    int prix =
+                        vehicules.prixParDestination.values.elementAt(index);
+                    return _buildItem(destination, "${prix.toString()} FCFA");
+                  }),
+                ),
+              ),
+            ],
+          ),
+          isExpanded: active,
+          canTapOnHeader: true,
+        )
+      ],
     );
   }
 }

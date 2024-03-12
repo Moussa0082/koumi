@@ -39,8 +39,10 @@ class _LoginScreenState extends State<LoginScreen> {
     final String emailActeur = emailController.text;
     final String password = passwordController.text;
 
-    const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
-    // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
+    // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
+    const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
+
+    const String defaultProfileImage = 'assets/images/profil.jpg';
 
     ActeurProvider acteurProvider =
         Provider.of<ActeurProvider>(context, listen: false);
@@ -107,6 +109,15 @@ class _LoginScreenState extends State<LoginScreen> {
         prefs.setString('emailActeur', emailActeur);
         prefs.setString('password', password);
         // prefs.setString('nomActeur', responseBody['nomActeur']);
+        // Vérifier si l'image de profil est présente, sinon, enregistrer l'image par défaut dans SharedPreferences
+        final String? logoActeur = responseBody['logoActeur'];
+        final String? photoSiegeActeur = responseBody['photoSiegeActeur'];
+        // if (logoActeur == null) {
+        //   prefs.setString('logoActeur', defaultProfileImage);
+        // }
+        // if (photoSiegeActeur == null) {
+        //   prefs.setString('photoSiegeActeur', defaultProfileImage);
+        // }
         final nomActeur = responseBody['nomActeur'];
         final idActeur = responseBody['idActeur'];
         final adresseActeur = responseBody['adresseActeur'];
@@ -126,8 +137,8 @@ class _LoginScreenState extends State<LoginScreen> {
         prefs.setString('adresseActeur', adresseActeur);
         prefs.setString('telephoneActeur', telephoneActeur);
         prefs.setString('whatsAppActeur', whatsAppActeur);
-        //  prefs.setString('logoActeur', logoActeur);
-        //  prefs.setString('photoSiegeActeur', photoSiegeActeur);
+        // prefs.setString('logoActeur', logoActeur!);
+        // prefs.setString('photoSiegeActeur', photoSiegeActeur!);
         prefs.setString('filiereActeur', filiereActeur);
         prefs.setString('niveau3PaysActeur', niveau3PaysActeur);
         prefs.setString('localiteActeur', localiteActeur);
@@ -191,13 +202,15 @@ class _LoginScreenState extends State<LoginScreen> {
         // Traitement en cas d'échec
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
         final errorMessage = responseBody['message'];
+        print(errorMessage);
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
               title: const Center(child: Text('Connexion échouée !')),
               content: Text(
-                errorMessage, // Utiliser le message d'erreur du backend
+                'Email ou mot de passe incorrect',
+                // errorMessage,
                 textAlign: TextAlign.justify,
                 style: const TextStyle(color: Colors.black, fontSize: 20),
               ),
@@ -245,6 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _isLoading = true;
     });
+
     if (isActive) {
       await loginUser().then((_) {
         // Cacher l'indicateur de chargement lorsque votre fonction est terminée
@@ -266,8 +280,9 @@ class _LoginScreenState extends State<LoginScreen> {
     final String emailActeur = emailController.text;
     final String password = passwordController.text;
 
-    const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
-    // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
+    // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
+// 
+    const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
     ActeurProvider acteurProvider =
         Provider.of<ActeurProvider>(context, listen: false);
@@ -365,13 +380,14 @@ class _LoginScreenState extends State<LoginScreen> {
         // Traitement en cas d'échec
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
         final errorMessage = responseBody['message'];
+        print(errorMessage);
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
               title: const Center(child: Text('Connexion échouée !')),
               content: Text(
-                errorMessage, // Utiliser le message d'erreur du backend
+'Email ou mot de passe incorrect',                // errorMessage, // Utiliser le message d'erreur du backend
                 textAlign: TextAlign.justify,
                 style: const TextStyle(color: Colors.black, fontSize: 20),
               ),
@@ -389,7 +405,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       // Gérer les exceptionn
-      debugPrint(e.toString());
+      print(e.toString());
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -543,55 +559,51 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: 50,
-                                    height: 30,
-                                    child: FittedBox(
-                                      fit: BoxFit.contain,
-                                      child: Switch(
-                                        value: isActive,
-                                        activeColor: Colors.orange,
-                                        onChanged: (bool value) {
-                                          setState(() {
-                                            isActive = value;
-                                          });
-                                        },
-                                      ),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 50,
+                                  height: 30,
+                                  child: FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: Switch(
+                                      value: isActive,
+                                      activeColor: Colors.orange,
+                                      onChanged: (bool value) {
+                                        setState(() {
+                                          isActive = value;
+                                        });
+                                      },
                                     ),
                                   ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  const Text(
-                                    "Se souvenir de moi",
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  print("ho");
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ForgetPassScreen(),
-                                    ),
-                                  );
-                                },
-                                child:  Text(
-                                  "Mot de passe oublié ",
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                const Text(
+                                  "Se souvenir de moi",
                                   style: TextStyle(
                                     fontSize: 15,
-                                    decoration: TextDecoration.underline,
-                                    color: Colors.blue,
                                   ),
+                                ),
+                              ],
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                print("ho");
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ForgetPassScreen(),
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                "Mot de passe oublié ",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  decoration: TextDecoration.underline,
+                                  color: Colors.blue,
                                 ),
                               ),
                             ),

@@ -1,73 +1,76 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/TypeVoiture.dart';
 
 class Vehicule {
-  final String? idVehicule;
-  final String nomVehicule;
-  final String capaciteVehicule;
-  final String? codeVehicule;
-  final int prix;
-  final bool statutVehicule;
-  final String? photoVehicule;
-  final String localisation;
-  final String description;
-  final String? dateAjout;
-  final String? dateModif;
-  final String etatVehicule;
-  final String? personneModif;
-  final Acteur acteur;
-  
+  String? idVehicule;
+  String nomVehicule;
+  String capaciteVehicule;
+  String? codeVehicule;
+  Map<String, int> prixParDestination;
+  bool statutVehicule;
+  String? photoVehicule;
+  String localisation;
+  String? dateAjout;
+  String? dateModif;
+  String etatVehicule;
+  String? personneModif;
+  Acteur acteur;
+  TypeVoiture typeVoiture;
+
   Vehicule({
     this.idVehicule,
     required this.nomVehicule,
     required this.capaciteVehicule,
     this.codeVehicule,
-    required this.prix,
+    required this.prixParDestination,
     required this.statutVehicule,
     this.photoVehicule,
     required this.localisation,
-    required this.description,
     this.dateAjout,
     this.dateModif,
     required this.etatVehicule,
     this.personneModif,
     required this.acteur,
+    required this.typeVoiture,
   });
- 
+  
 
   Vehicule copyWith({
     String? idVehicule,
     String? nomVehicule,
     String? capaciteVehicule,
     String? codeVehicule,
-    int? prix,
+    Map<String, int>? prixParDestination,
     bool? statutVehicule,
     String? photoVehicule,
     String? localisation,
-    String? description,
     String? dateAjout,
     String? dateModif,
     String? etatVehicule,
     String? personneModif,
     Acteur? acteur,
+    TypeVoiture? typeVoiture,
   }) {
     return Vehicule(
       idVehicule: idVehicule ?? this.idVehicule,
       nomVehicule: nomVehicule ?? this.nomVehicule,
       capaciteVehicule: capaciteVehicule ?? this.capaciteVehicule,
       codeVehicule: codeVehicule ?? this.codeVehicule,
-      prix: prix ?? this.prix,
+      prixParDestination: prixParDestination ?? this.prixParDestination,
       statutVehicule: statutVehicule ?? this.statutVehicule,
       photoVehicule: photoVehicule ?? this.photoVehicule,
       localisation: localisation ?? this.localisation,
-      description: description ?? this.description,
       dateAjout: dateAjout ?? this.dateAjout,
       dateModif: dateModif ?? this.dateModif,
       etatVehicule: etatVehicule ?? this.etatVehicule,
       personneModif: personneModif ?? this.personneModif,
       acteur: acteur ?? this.acteur,
+      typeVoiture: typeVoiture ?? this.typeVoiture,
     );
   }
 
@@ -77,35 +80,41 @@ class Vehicule {
       'nomVehicule': nomVehicule,
       'capaciteVehicule': capaciteVehicule,
       'codeVehicule': codeVehicule,
-      'prix': prix,
+      'prixParDestination': prixParDestination,
       'statutVehicule': statutVehicule,
       'photoVehicule': photoVehicule,
       'localisation': localisation,
-      'description': description,
       'dateAjout': dateAjout,
       'dateModif': dateModif,
       'etatVehicule': etatVehicule,
       'personneModif': personneModif,
       'acteur': acteur.toMap(),
+      'typeVoiture': typeVoiture.toMap(),
     };
   }
 
   factory Vehicule.fromMap(Map<String, dynamic> map) {
     return Vehicule(
-      idVehicule: map['idVehicule'] != null ? map['idVehicule'] as String : null,
+      idVehicule:
+          map['idVehicule'] != null ? map['idVehicule'] as String : null,
       nomVehicule: map['nomVehicule'] as String,
       capaciteVehicule: map['capaciteVehicule'] as String,
-      codeVehicule: map['codeVehicule'] != null ? map['codeVehicule'] as String : null,
-      prix: map['prix'] as int,
+      codeVehicule:
+          map['codeVehicule'] != null ? map['codeVehicule'] as String : null,
+      prixParDestination: Map<String, int>.from(
+          map['prixParDestination'] as Map<String, dynamic>),
       statutVehicule: map['statutVehicule'] as bool,
-      photoVehicule: map['photoVehicule'] != null ? map['photoVehicule'] as String : null,
+      photoVehicule:
+          map['photoVehicule'] != null ? map['photoVehicule'] as String : null,
       localisation: map['localisation'] as String,
-      description: map['description'] as String,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
       etatVehicule: map['etatVehicule'] as String,
-      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
-      acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
+      personneModif:
+          map['personneModif'] != null ? map['personneModif'] as String : null,
+      acteur: Acteur.fromMap(map['acteur'] as Map<String, dynamic>),
+      typeVoiture:
+          TypeVoiture.fromMap(map['typeVoiture'] as Map<String, dynamic>),
     );
   }
 
@@ -115,28 +124,28 @@ class Vehicule {
 
   @override
   String toString() {
-    return 'Vehicule(idVehicule: $idVehicule, nomVehicule: $nomVehicule, capaciteVehicule: $capaciteVehicule, codeVehicule: $codeVehicule, prix: $prix, statutVehicule: $statutVehicule, photoVehicule: $photoVehicule, localisation: $localisation, description: $description, dateAjout: $dateAjout, dateModif: $dateModif, etatVehicule: $etatVehicule, personneModif: $personneModif, acteur: $acteur)';
+    return 'Vehicule(idVehicule: $idVehicule, nomVehicule: $nomVehicule, capaciteVehicule: $capaciteVehicule, codeVehicule: $codeVehicule, prixParDestination: $prixParDestination, statutVehicule: $statutVehicule, photoVehicule: $photoVehicule, localisation: $localisation, dateAjout: $dateAjout, dateModif: $dateModif, etatVehicule: $etatVehicule, personneModif: $personneModif, acteur: $acteur, typeVoiture: $typeVoiture)';
   }
 
   @override
   bool operator ==(covariant Vehicule other) {
     if (identical(this, other)) return true;
   
-    return 
+    return
       other.idVehicule == idVehicule &&
       other.nomVehicule == nomVehicule &&
       other.capaciteVehicule == capaciteVehicule &&
       other.codeVehicule == codeVehicule &&
-      other.prix == prix &&
+      mapEquals(other.prixParDestination, prixParDestination) &&
       other.statutVehicule == statutVehicule &&
       other.photoVehicule == photoVehicule &&
       other.localisation == localisation &&
-      other.description == description &&
       other.dateAjout == dateAjout &&
       other.dateModif == dateModif &&
       other.etatVehicule == etatVehicule &&
       other.personneModif == personneModif &&
-      other.acteur == acteur;
+      other.acteur == acteur &&
+      other.typeVoiture == typeVoiture;
   }
 
   @override
@@ -145,15 +154,15 @@ class Vehicule {
       nomVehicule.hashCode ^
       capaciteVehicule.hashCode ^
       codeVehicule.hashCode ^
-      prix.hashCode ^
+      prixParDestination.hashCode ^
       statutVehicule.hashCode ^
       photoVehicule.hashCode ^
       localisation.hashCode ^
-      description.hashCode ^
       dateAjout.hashCode ^
       dateModif.hashCode ^
       etatVehicule.hashCode ^
       personneModif.hashCode ^
-      acteur.hashCode;
+      acteur.hashCode ^
+      typeVoiture.hashCode;
   }
 }

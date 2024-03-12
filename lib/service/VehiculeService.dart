@@ -4,23 +4,24 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:path/path.dart';
 
 class VehiculeService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/vehicule';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/vehicule';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/vehicule';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/vehicule';
 
   List<Vehicule> vehiculeList = [];
 
   Future<void> addVehicule(
       {required String nomVehicule,
       required String capaciteVehicule,
-      required String prix,
+      required Map<String, int> prixParDestination,
       required String etatVehicule,
-      required String description,
       required String localisation,
       File? photoVehicule,
+      required TypeVoiture typeVoiture,
       required Acteur acteur}) async {
     try {
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
@@ -32,12 +33,12 @@ class VehiculeService extends ChangeNotifier {
       }
 
       requete.fields['vehicule'] = jsonEncode({
-        'prix': int.tryParse(prix),
+        'prixParDestination': prixParDestination,
         'nomVehicule': nomVehicule,
         'etatVehicule': etatVehicule,
         'localisation': localisation,
-        'description': description,
         'capaciteVehicule': capaciteVehicule,
+        'typeVoiture':typeVoiture.toMap(),
         'acteur': acteur.toMap(),
       });
 
@@ -60,11 +61,11 @@ class VehiculeService extends ChangeNotifier {
       {required String idVehicule,
       required String nomVehicule,
       required String capaciteVehicule,
-      required String prix,
+    required Map<String, int> prixParDestination,
       required String etatVehicule,
       required String localisation,
-      required String description,
       File? photoVehicule,
+      required TypeVoiture typeVoiture,
       required Acteur acteur}) async {
     try {
       var requete = http.MultipartRequest(
@@ -78,12 +79,12 @@ class VehiculeService extends ChangeNotifier {
 
       requete.fields['vehicule'] = jsonEncode({
         'idVehicule': idVehicule,
-        'prix': int.tryParse(prix),
+        'prixParDestination': prixParDestination,
         'nomVehicule': nomVehicule,
         'etatVehicule': etatVehicule,
-        'description': description,
         'localisation': localisation,
         'capaciteVehicule': capaciteVehicule,
+        'typeVoiture': typeVoiture.toMap(),
         'acteur': acteur.toMap(),
       });
 
@@ -105,6 +106,22 @@ class VehiculeService extends ChangeNotifier {
 
   Future<List<Vehicule>> fetchVehicule() async {
     final response = await http.get(Uri.parse('$baseUrl/read'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      debugPrint(response.body.toString());
+      vehiculeList = body.map((item) => Vehicule.fromMap(item)).toList();
+      debugPrint(response.body);
+      return vehiculeList;
+    } else {
+      vehiculeList = [];
+      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+    }
+  }
+
+  Future<List<Vehicule>> fetchVehiculeByTypeVehicule(String id) async {
+    final response = await http.get(Uri.parse('$baseUrl/listeVehiculeByType/$id'));
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));

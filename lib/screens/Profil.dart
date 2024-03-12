@@ -3,9 +3,12 @@ import 'package:koumi_app/Admin/ParametreGenerauxPage.dart';
 import 'package:koumi_app/Admin/Zone.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
+import 'package:koumi_app/screens/TypeVehicule.dart';
+import 'package:koumi_app/service/TypeVoitureService.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +30,7 @@ class _ProfilState extends State<Profil> {
   late List<TypeActeur> typeActeurData = [];
   late String type;
   late List<ZoneProduction> zoneList = [];
+  late List<TypeVoiture> typeList = [];
 
   @override
   void initState() {
@@ -134,7 +138,8 @@ class _ProfilState extends State<Profil> {
                                     _buildProfile('Adresse', ac.adresseActeur),
                                     _buildProfile(
                                         'Localité', ac.localiteActeur),
-                                    _buildProfile('Pays', ac.niveau3PaysActeur!),
+                                    _buildProfile(
+                                        'Pays', ac.niveau3PaysActeur!),
                                   ],
                                 ),
                               ),
@@ -182,11 +187,17 @@ class _ProfilState extends State<Profil> {
                                         builder: (context) =>
                                             const ParametreGenerauxPage()));
                               },
-                              child: const Text(
-                                "Parametre Généraux",
-                                style: TextStyle(
-                                    fontSize: 17, color: d_colorGreen),
-                              ))
+                              child: type.toLowerCase() == 'admin'
+                                  ? Text(
+                                      "Parametre Généraux",
+                                      style: TextStyle(
+                                          fontSize: 17, color: d_colorGreen),
+                                    )
+                                  : Text(
+                                      "Information sur la structure",
+                                      style: TextStyle(
+                                          fontSize: 17, color: d_colorGreen),
+                                    ))
                         ]),
                       ),
                       Container(
@@ -431,6 +442,7 @@ class _ProfilState extends State<Profil> {
                       ),
                     )
                   : Container(),
+              _buildType(),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                 child: ElevatedButton.icon(
@@ -503,5 +515,107 @@ class _ProfilState extends State<Profil> {
         ],
       ),
     );
+  }
+
+  Widget _buildType() {
+    return type.toLowerCase() == 'transporteur'
+        ? Padding(
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.9,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    offset: const Offset(0, 2),
+                    blurRadius: 5,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                    child: Column(
+                      children: [
+                        Row(children: [
+                          const Icon(Icons.align_horizontal_left_outlined,
+                              color: d_colorGreen, size: 25),
+                          const SizedBox(
+                            width: 15,
+                          ),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const TypeVehicule()));
+                              },
+                              child: Text(
+                                "Type de véhicule",
+                                style: TextStyle(
+                                    fontSize: 17, color: d_colorGreen),
+                              ))
+                        ]),
+                        Consumer<TypeVoitureService>(
+                            builder: (context, typeService, child) {
+                          return FutureBuilder(
+                              future: typeService
+                                  .fetchTypeVoitureByActeur(acteur.idActeur!),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.orange,
+                                    ),
+                                  );
+                                }
+
+                                if (!snapshot.hasData) {
+                                  return const Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: Center(
+                                        child: Text(
+                                            "Aucun type de véhicule trouvé")),
+                                  );
+                                } else {
+                                  typeList = snapshot.data!;
+                                  return Wrap(
+                                      spacing: 10,
+                                      children: typeList
+                                          .map(
+                                            (e) => Text("${e.nom} ,",
+                                                style: const TextStyle(
+                                                    color: Colors.black87,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontStyle: FontStyle.italic,
+                                                    overflow:
+                                                        TextOverflow.ellipsis)),
+                                          )
+                                          .toList());
+                                }
+                              });
+                        })
+                      ],
+                    ),
+                  ),
+                  Container(
+                    alignment: Alignment.bottomRight,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Image.asset("assets/images/car.png",
+                        width: 50, height: 50),
+                  )
+                ],
+              ),
+            ),
+          )
+        : Container();
   }
 }

@@ -19,6 +19,7 @@ import 'package:koumi_app/service/SousRegionService.dart';
 import 'package:koumi_app/service/SpeculationService.dart';
 import 'package:koumi_app/service/StockService.dart';
 import 'package:koumi_app/service/TypeActeurService.dart';
+import 'package:koumi_app/service/TypeVoitureService.dart';
 import 'package:koumi_app/service/UniteService.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
@@ -34,6 +35,7 @@ void main() {
     ChangeNotifierProvider(create: (context) => ParametreGenerauxService()),
     ChangeNotifierProvider(create: (context) => ParametreGenerauxProvider()),
     ChangeNotifierProvider(create: (context) => UniteService()),
+    ChangeNotifierProvider(create: (context) => TypeVoitureService()),
     ChangeNotifierProvider(create: (context) => ParametreFicheService
     ()),
     ChangeNotifierProvider(create: (context) => ZoneProductionService()),

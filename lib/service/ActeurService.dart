@@ -8,8 +8,8 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:path/path.dart';
 
 class ActeurService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/acteur';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/acteur';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur';
 
   List<Acteur> acteurList = [];
 

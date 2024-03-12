@@ -5,7 +5,6 @@ import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/DetailTransport.dart';
 import 'package:koumi_app/screens/PageTransporteur.dart';
-import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:provider/provider.dart';
 
@@ -25,6 +24,7 @@ class _TransportState extends State<Transport> {
   late String type;
   late TextEditingController _searchController;
   List<Vehicule> vehiculeListe = [];
+
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
@@ -63,57 +63,29 @@ class _TransportState extends State<Transport> {
             PopupMenuButton<String>(
               padding: EdgeInsets.zero,
               itemBuilder: (context) {
-                print("Type: $type");
-                return type.toLowerCase() == 'admin' ||
-                        type.toLowerCase() == 'transporteurs' ||
-                        type.toLowerCase() == 'transporteur'
-                    ? <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.remove_red_eye,
-                              color: Colors.green,
-                            ),
-                            title: const Text(
-                              "Mes véhicule",
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            onTap: () async {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => VehiculeActeur()));
-                            },
-                          ),
+                return <PopupMenuEntry<String>>[
+                  PopupMenuItem<String>(
+                    child: ListTile(
+                      leading: const Icon(
+                        Icons.remove_red_eye,
+                        color: Colors.green,
+                      ),
+                      title: const Text(
+                        "Transporteurs",
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
                         ),
-                      ]
-                    : <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.remove_red_eye,
-                              color: Colors.green,
-                            ),
-                            title: const Text(
-                              "Voir les transporteurs",
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            onTap: () async {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          PageTransporteur()));
-                            },
-                          ),
-                        ),
-                      ];
+                      ),
+                      onTap: () async {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PageTransporteur()));
+                      },
+                    ),
+                  ),
+                ];
               },
             )
           ]),
@@ -186,7 +158,7 @@ class _TransportState extends State<Transport> {
                       // runSpacing:
                       //     10, // Espacement vertical entre les lignes de conteneurs
                       children: filtereSearch
-                          .where((element) => element.statutVehicule == true)
+                          // .where((element) => element.statutVehicule == true)
                           .map((e) => Padding(
                                 padding: EdgeInsets.all(10),
                                 child: SizedBox(
@@ -218,34 +190,35 @@ class _TransportState extends State<Transport> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.stretch,
                                         children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: e.photoVehicule == null
-                                                  ? Image.asset(
-                                                      "assets/images/camion.png",
-                                                      fit: BoxFit.cover,
-                                                      height: 90,
-                                                    )
-                                                  : Image.network(
-                                                      "http://10.0.2.2/${e.photoVehicule}",
-                                                      fit: BoxFit.cover,
-                                                      height: 90,
-                                                      errorBuilder:
-                                                          (BuildContext context,
-                                                              Object exception,
-                                                              StackTrace?
-                                                                  stackTrace) {
-                                                        return Image.asset(
-                                                          'assets/images/camion.png',
-                                                          fit: BoxFit.cover,
-                                                          height: 90,
-                                                        );
-                                                      },
-                                                    ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              child: SizedBox(
+                                                height: 90,
+                                                child: e.photoVehicule == null
+                                                    ? Image.asset(
+                                                        "assets/images/camion.png",
+                                                        fit: BoxFit.cover,
+                                                      )
+                                                    : Image.network(
+                                                        "http://10.0.2.2/${e.photoVehicule}",
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder:
+                                                            (BuildContext
+                                                                    context,
+                                                                Object
+                                                                    exception,
+                                                                StackTrace?
+                                                                    stackTrace) {
+                                                          return Image.asset(
+                                                            'assets/images/camion.png',
+                                                            fit: BoxFit.cover,
+                                                          );
+                                                        },
+                                                      ),
+                                              ),
                                             ),
                                           ),
                                           Padding(
@@ -254,13 +227,14 @@ class _TransportState extends State<Transport> {
                                             child: Text(
                                               e.nomVehicule,
                                               style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: d_colorGreen),
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: d_colorGreen,
+                                              ),
                                             ),
                                           ),
                                           _buildItem("Statut:",
-                                              '${e.statutVehicule! ? 'Disponible' : 'Non disponible'}'),
+                                              '${e.statutVehicule ? 'Disponible' : 'Non disponible'}'),
                                           _buildItem(
                                               "Localité :", e.localisation),
                                           SizedBox(height: 10),
@@ -274,7 +248,7 @@ class _TransportState extends State<Transport> {
                     );
                   }
                 });
-          })
+          }),
         ]),
       ),
     );

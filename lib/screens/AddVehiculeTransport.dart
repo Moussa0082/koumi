@@ -1,9 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
@@ -28,9 +31,14 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
   TextEditingController _capaciteController = TextEditingController();
   TextEditingController _etatController = TextEditingController();
   TextEditingController _localiteController = TextEditingController();
+  TextEditingController _destinationController = TextEditingController();
 
+  late Map<String, int> prixParDestinations;
   final formkey = GlobalKey<FormState>();
   String? imageSrc;
+  String? typeValue;
+  late Future _typeList;
+  late TypeVoiture typeVoiture;
   File? photo;
   late Acteur acteur;
   bool _isLoading = false;
@@ -46,6 +54,9 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
   void initState() {
     super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    prixParDestinations = {};
+    _typeList = http.get(Uri.parse(
+        'http://10.0.2.2:9000/api-koumi/TypeVoiture/listeByActeur/${acteur.idActeur!}'));
   }
 
   Future<File> saveImagePermanently(String imagePath) async {
@@ -204,7 +215,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Text(
-                            "Description",
+                            "Type de véhicule",
                             style:
                                 TextStyle(color: (Colors.black), fontSize: 18),
                           ),
@@ -213,23 +224,113 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 20),
-                        child: TextFormField(
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Veuillez remplir les champs";
+                        child: FutureBuilder(
+                          future: _typeList,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucun type de véhicule trouvé',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
                             }
-                            return null;
+                            if (snapshot.hasError) {
+                              return Text("${snapshot.error}");
+                            }
+                            if (snapshot.hasData) {
+                              dynamic responseData =
+                                  json.decode(snapshot.data.body);
+                              if (responseData is List) {
+                                final reponse = responseData;
+                                final vehiculeList = reponse
+                                    .map((e) => TypeVoiture.fromMap(e))
+                                    .where((con) => con.statutType == true)
+                                    .toList();
+
+                                if (vehiculeList.isEmpty) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText:
+                                          'Aucun type de véhicule trouvé',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return DropdownButtonFormField<String>(
+                                  items: vehiculeList
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idTypeVoiture,
+                                          child: Text(e.nom),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: typeValue,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      typeValue = newValue;
+                                      if (newValue != null) {
+                                        typeVoiture = vehiculeList.firstWhere(
+                                          (element) =>
+                                              element.idTypeVoiture == newValue,
+                                        );
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText:
+                                        'Sélectionner un type de véhicule',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucun type de véhicule trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucun type de véhicule trouvé',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
                           },
-                          controller: _descriptionController,
-                          maxLines: null,
-                          decoration: InputDecoration(
-                            hintText: "Description",
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
                         ),
                       ),
                       SizedBox(
@@ -262,47 +363,6 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                           maxLines: null,
                           decoration: InputDecoration(
                             hintText: "Ex : Bamako, segou",
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 22,
-                        ),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            "Prix/voyage",
-                            style:
-                                TextStyle(color: (Colors.black), fontSize: 18),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        child: TextFormField(
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Veuillez remplir les champs";
-                            }
-                            return null;
-                          },
-                          controller: _prixController,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          decoration: InputDecoration(
-                            hintText: "Prix",
                             contentPadding: const EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 20),
                             border: OutlineInputBorder(
@@ -388,6 +448,83 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                       SizedBox(
                         height: 10,
                       ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 22,
+                        ),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            "Destination et prix",
+                            style:
+                                TextStyle(color: (Colors.black), fontSize: 18),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: _destinationController,
+                                decoration: InputDecoration(
+                                  hintText: "Destination",
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: TextFormField(
+                                controller: _prixController,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: <TextInputFormatter>[
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                decoration: InputDecoration(
+                                  hintText: "Prix",
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  String destination =
+                                      _destinationController.text;
+                                  int prix =
+                                      int.tryParse(_prixController.text) ?? 0;
+
+                                  if (destination.isNotEmpty && prix > 0) {
+                                    // Ajouter la destination et le prix à la liste prixParDestinations
+                                    prixParDestinations
+                                        .addAll({destination: prix});
+
+                                    print(prixParDestinations.toString());
+
+                                    _destinationController.clear();
+                                    _prixController.clear();
+                                  }
+                                });
+                              },
+                              icon: Icon(Icons.add),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
                       SizedBox(
                         child: IconButton(
                           onPressed: _showImageSourceDialog,
@@ -419,9 +556,10 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                                           nomVehicule: nom,
                                           capaciteVehicule: capacite,
                                           localisation: localite,
-                                          prix: prix,
+                                          prixParDestination:
+                                              prixParDestinations,
                                           etatVehicule: etat,
-                                          description: description,
+                                          typeVoiture: typeVoiture,
                                           acteur: acteur)
                                       .then((value) => {
                                             Provider.of<VehiculeService>(
@@ -435,6 +573,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                                             _etatController.clear(),
                                             setState(() {
                                               _isLoading = false;
+                                              typeVoiture == null;
                                             }),
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
@@ -456,10 +595,11 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                                       .addVehicule(
                                           nomVehicule: nom,
                                           capaciteVehicule: capacite,
-                                          prix: prix,
+                                          prixParDestination:
+                                              prixParDestinations,
                                           localisation: localite,
                                           etatVehicule: etat,
-                                          description: description,
+                                          typeVoiture: typeVoiture,
                                           acteur: acteur)
                                       .then((value) => {
                                             Provider.of<VehiculeService>(
@@ -473,6 +613,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                                             _etatController.clear(),
                                             setState(() {
                                               _isLoading = false;
+                                              typeVoiture == null;
                                             }),
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(

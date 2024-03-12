@@ -2,7 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
+import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:path/path.dart' as path;
@@ -39,6 +42,9 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
   late ParametreGeneraux param;
   String? imageSrc;
   File? photo;
+  late Acteur acteur;
+  late List<TypeActeur> typeActeurData = [];
+  late String type;
 
   late ParametreGenerauxProvider parProvider;
 
@@ -122,6 +128,9 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
     super.initState();
     parProvider =
         Provider.of<ParametreGenerauxProvider>(context, listen: false);
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    typeActeurData = acteur.typeActeur;
+    type = typeActeurData.map((data) => data.libelle).join(', ');
   }
 
   @override
@@ -129,96 +138,125 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
-        centerTitle: true,
-        toolbarHeight: 100,
-        leading: isEditing
-            ? Container()
-            : IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen),
-              ),
-        title: const Text(
-          "Parametre généraux",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          isEditing
-              ? IconButton(
-                  onPressed: () async {
-                    setState(() {
-                      isEditing = false;
-                    });
-                    try {
-                      if (photo == null) {
-                        await ParametreGenerauxService()
-                            .updateParametre(
-                                idParametreGeneraux: param.idParametreGeneraux!,
-                                sigleStructure: param.sigleStructure,
-                                nomStructure: param.nomStructure,
-                                sigleSysteme: param.sigleSysteme,
-                                nomSysteme: param.nomSysteme,
-                                descriptionSysteme: param.descriptionSysteme,
-                                sloganSysteme: param.sloganSysteme,
-                                adresseStructure: param.adresseStructure,
-                                emailStructure: param.emailStructure,
-                                telephoneStructure: param.telephoneStructure,
-                                whattsAppStructure: param.whattsAppStructure,
-                                libelleNiveau1Pays: param.libelleNiveau1Pays,
-                                libelleNiveau2Pays: param.libelleNiveau2Pays,
-                                libelleNiveau3Pays: param.libelleNiveau3Pays,
-                                localiteStructure: param.localiteStructure)
-                            .then((value) => {
-                                  print("Modifier avec succèss"),
-                                  Provider.of<ParametreGenerauxService>(context,
-                                          listen: false)
-                                      .applyChange(),
-                                })
-                            .catchError(
-                                (onError) => {print(onError.toString())});
-                      } else {
-                        await ParametreGenerauxService()
-                            .updateParametre(
-                                idParametreGeneraux: param.idParametreGeneraux!,
-                                sigleStructure: param.sigleStructure,
-                                nomStructure: param.nomStructure,
-                                sigleSysteme: param.sigleSysteme,
-                                nomSysteme: param.nomSysteme,
-                                logoSysteme: photo,
-                                descriptionSysteme: param.descriptionSysteme,
-                                sloganSysteme: param.sloganSysteme,
-                                adresseStructure: param.adresseStructure,
-                                emailStructure: param.emailStructure,
-                                telephoneStructure: param.telephoneStructure,
-                                whattsAppStructure: param.whattsAppStructure,
-                                libelleNiveau1Pays: param.libelleNiveau1Pays,
-                                libelleNiveau2Pays: param.libelleNiveau2Pays,
-                                libelleNiveau3Pays: param.libelleNiveau3Pays,
-                                localiteStructure: param.localiteStructure)
-                            .then((value) => {
-                                  print("Modifier avec succèss"),
-                                  Provider.of<ParametreGenerauxService>(context,
-                                          listen: false)
-                                      .applyChange(),
-                                })
-                            .catchError(
-                                (onError) => {print(onError.toString())});
-                      }
-                    } catch (e) {}
-                  },
-                  icon: const Icon(Icons.save),
-                )
+          centerTitle: true,
+          toolbarHeight: 100,
+          leading: isEditing
+              ? Container()
               : IconButton(
                   onPressed: () {
-                    setState(() {
-                      isEditing = true; // Activer le mode édition
-                    });
+                    Navigator.of(context).pop();
                   },
-                  icon: const Icon(Icons.edit),
+                  icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen),
                 ),
-        ],
-      ),
+          title: type.toLowerCase() == 'admin'
+              ? Text(
+                  "Parametre Généraux",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: d_colorGreen),
+                )
+              : Text(
+                  "Information sur la structure",
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: d_colorGreen,
+                      fontWeight: FontWeight.bold),
+                ),
+          actions: type.toLowerCase() == 'admin'
+              ? [
+                  isEditing
+                      ? IconButton(
+                          onPressed: () async {
+                            setState(() {
+                              isEditing = false;
+                            });
+                            try {
+                              if (photo == null) {
+                                await ParametreGenerauxService()
+                                    .updateParametre(
+                                        idParametreGeneraux:
+                                            param.idParametreGeneraux!,
+                                        sigleStructure: param.sigleStructure,
+                                        nomStructure: param.nomStructure,
+                                        sigleSysteme: param.sigleSysteme,
+                                        nomSysteme: param.nomSysteme,
+                                        descriptionSysteme:
+                                            param.descriptionSysteme,
+                                        sloganSysteme: param.sloganSysteme,
+                                        adresseStructure:
+                                            param.adresseStructure,
+                                        emailStructure: param.emailStructure,
+                                        telephoneStructure:
+                                            param.telephoneStructure,
+                                        whattsAppStructure:
+                                            param.whattsAppStructure,
+                                        libelleNiveau1Pays:
+                                            param.libelleNiveau1Pays,
+                                        libelleNiveau2Pays:
+                                            param.libelleNiveau2Pays,
+                                        libelleNiveau3Pays:
+                                            param.libelleNiveau3Pays,
+                                        localiteStructure:
+                                            param.localiteStructure)
+                                    .then((value) => {
+                                          print("Modifier avec succèss"),
+                                          Provider.of<ParametreGenerauxService>(
+                                                  context,
+                                                  listen: false)
+                                              .applyChange(),
+                                        })
+                                    .catchError((onError) =>
+                                        {print(onError.toString())});
+                              } else {
+                                await ParametreGenerauxService()
+                                    .updateParametre(
+                                        idParametreGeneraux:
+                                            param.idParametreGeneraux!,
+                                        sigleStructure: param.sigleStructure,
+                                        nomStructure: param.nomStructure,
+                                        sigleSysteme: param.sigleSysteme,
+                                        nomSysteme: param.nomSysteme,
+                                        logoSysteme: photo,
+                                        descriptionSysteme:
+                                            param.descriptionSysteme,
+                                        sloganSysteme: param.sloganSysteme,
+                                        adresseStructure:
+                                            param.adresseStructure,
+                                        emailStructure: param.emailStructure,
+                                        telephoneStructure:
+                                            param.telephoneStructure,
+                                        whattsAppStructure:
+                                            param.whattsAppStructure,
+                                        libelleNiveau1Pays:
+                                            param.libelleNiveau1Pays,
+                                        libelleNiveau2Pays:
+                                            param.libelleNiveau2Pays,
+                                        libelleNiveau3Pays:
+                                            param.libelleNiveau3Pays,
+                                        localiteStructure:
+                                            param.localiteStructure)
+                                    .then((value) => {
+                                          print("Modifier avec succèss"),
+                                          Provider.of<ParametreGenerauxService>(
+                                                  context,
+                                                  listen: false)
+                                              .applyChange(),
+                                        })
+                                    .catchError((onError) =>
+                                        {print(onError.toString())});
+                              }
+                            } catch (e) {}
+                          },
+                          icon: const Icon(Icons.save),
+                        )
+                      : IconButton(
+                          onPressed: () {
+                            setState(() {
+                              isEditing = true; // Activer le mode édition
+                            });
+                          },
+                          icon: const Icon(Icons.edit),
+                        ),
+                ]
+              : null),
       body: SingleChildScrollView(
         child: Column(
           children: [

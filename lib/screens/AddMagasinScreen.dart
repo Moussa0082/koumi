@@ -358,8 +358,8 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
     }
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     niveau1PaysList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+        // http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
     para = paraList[0];
