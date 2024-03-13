@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -33,7 +36,8 @@ class _DetailTransportState extends State<DetailTransport> {
   late String type;
   String? imageSrc;
   File? photo;
-    late Map<String, int> prixParDestinations;
+  late TypeVoiture typeVoiture;
+  late Map<String, int> prixParDestinations;
 
   late ValueNotifier<bool> isDialOpenNotifier;
   TextEditingController _prixController = TextEditingController();
@@ -46,20 +50,32 @@ class _DetailTransportState extends State<DetailTransport> {
   bool _isEditing = false;
   bool _isLoading = false;
   bool active = false;
+  String? typeValue;
+  late Future _typeList;
 
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     typeActeurData = acteur.typeActeur;
     type = typeActeurData.map((data) => data.libelle).join(', ');
-prixParDestinations = {};
+    _typeList = http.get(Uri.parse(
+        'http://10.0.2.2:9000/api-koumi/TypeVoiture/listeByActeur/${acteur.idActeur!}'));
     vehicules = widget.vehicule;
+    typeVoiture = vehicules.typeVoiture;
+    prixParDestinations = vehicules.prixParDestination;
 
     _nomController.text = vehicules.nomVehicule;
     // _prixController.text = vehicules.prix.toString();
     _capaciteController.text = vehicules.capaciteVehicule;
     _etatController.text = vehicules.etatVehicule.toString();
     _localiteController.text = vehicules.localisation;
+    // String destination = vehicules.prixParDestination.keys.toString();
+    // int prix = vehicules.prixParDestination.values;
+
+    // if (destination.isNotEmpty && prix > 0) {
+    //   // Ajouter la destination et le prix à la liste prixParDestinations
+    //   prixParDestinations.addAll({destination: prix});
+    // }
 
     isDialOpenNotifier = ValueNotifier<bool>(false);
     super.initState();
@@ -149,31 +165,32 @@ prixParDestinations = {};
       final String localite = _localiteController.text;
 
       // Appel de la méthode de mise à jour du service
-      // await VehiculeService().updateVehicule(
-      //   idVehicule: vehicules.idVehicule!,
-      //   nomVehicule: nom,
-      //   capaciteVehicule: capacite,
-      //   prix: prix,
-      //   etatVehicule: etat,
-      //   localisation: localite,
-      //   description: description,
-      //   acteur: acteur,
-      // );
+      await VehiculeService().updateVehicule(
+        idVehicule: vehicules.idVehicule!,
+        nomVehicule: nom,
+        capaciteVehicule: capacite,
+        prixParDestination: prixParDestinations,
+        etatVehicule: etat,
+        localisation: localite,
+        typeVoiture: typeVoiture,
+        acteur: acteur,
+      );
 
       // Mise à jour des données locales
       setState(() {
         final int? prixParsed = int.tryParse(prix);
         final int prixValue = prixParsed ?? 0;
-        // vehicules = Vehicule(
-        //   idVehicule: vehicules.idVehicule,
-        //   nomVehicule: nom,
-        //   capaciteVehicule: capacite,
-        //   description: description,
-        //   prix: prixValue,
-        //   etatVehicule: etat,
-        //   localisation: localite,
-        //   acteur: acteur, statutVehicule: vehicules.statutVehicule,
-        // );
+        vehicules = Vehicule(
+          idVehicule: vehicules.idVehicule,
+          nomVehicule: nom,
+          capaciteVehicule: capacite,
+          prixParDestination: prixParDestinations,
+          etatVehicule: etat,
+          localisation: localite,
+          typeVoiture: typeVoiture,
+          acteur: acteur,
+          statutVehicule: vehicules.statutVehicule,
+        );
         // Désactiver l'indicateur de chargement après la mise à jour
         _isLoading = false;
       });
@@ -239,6 +256,180 @@ prixParDestinations = {};
                               },
                               icon: Icon(Icons.edit),
                             ),
+                      PopupMenuButton<String>(
+                        padding: EdgeInsets.zero,
+                        itemBuilder: (context) => <PopupMenuEntry<String>>[
+                          PopupMenuItem<String>(
+                            child: ListTile(
+                              leading: const Icon(
+                                Icons.check,
+                                color: Colors.green,
+                              ),
+                              title: const Text(
+                                "Activer",
+                                style: TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              onTap: () async {
+                                await VehiculeService()
+                                    .activerVehicules(vehicules.idVehicule!)
+                                    .then((value) => {
+                                          Provider.of<VehiculeService>(context,
+                                                  listen: false)
+                                              .applyChange(),
+                                          setState(() {
+                                            vehicules = Vehicule(
+                                              idVehicule: vehicules.idVehicule,
+                                              nomVehicule:
+                                                  vehicules.nomVehicule,
+                                              capaciteVehicule:
+                                                  vehicules.capaciteVehicule,
+                                              prixParDestination:
+                                                  prixParDestinations,
+                                              etatVehicule:
+                                                  vehicules.etatVehicule,
+                                              localisation:
+                                                  vehicules.localisation,
+                                              typeVoiture: typeVoiture,
+                                              acteur: acteur,
+                                              statutVehicule:
+                                                  vehicules.statutVehicule,
+                                                  
+                                            );
+                                          }),
+                                          Navigator.of(context).pop(),
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Row(
+                                                children: [
+                                                  Text("Activer avec succèss "),
+                                                ],
+                                              ),
+                                              duration: Duration(seconds: 2),
+                                            ),
+                                          )
+                                        })
+                                    .catchError((onError) => {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Row(
+                                                children: [
+                                                  Text(
+                                                      "Une erreur s'est produit"),
+                                                ],
+                                              ),
+                                              duration: Duration(seconds: 5),
+                                            ),
+                                          ),
+                                          Navigator.of(context).pop(),
+                                        });
+                              },
+                            ),
+                          ),
+                          PopupMenuItem<String>(
+                            child: ListTile(
+                              leading: Icon(
+                                Icons.disabled_visible,
+                                color: Colors.orange[400],
+                              ),
+                              title: Text(
+                                "Désactiver",
+                                style: TextStyle(
+                                  color: Colors.orange[400],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              onTap: () async {
+                                await VehiculeService()
+                                    .desactiverVehicules(vehicules.idVehicule!)
+                                    .then((value) => {
+                                          Provider.of<VehiculeService>(context,
+                                                  listen: false)
+                                              .applyChange(),
+                                          // setState(() {
+                                          //   futureListe = getListe(
+                                          //       typeVoiture.idTypeVoiture);
+                                          // }),
+                                          Navigator.of(context).pop(),
+                                        })
+                                    .catchError((onError) => {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Row(
+                                                children: [
+                                                  Text(
+                                                      "Une erreur s'est produit"),
+                                                ],
+                                              ),
+                                              duration: Duration(seconds: 5),
+                                            ),
+                                          ),
+                                          Navigator.of(context).pop(),
+                                        });
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Row(
+                                      children: [
+                                        Text("Désactiver avec succèss "),
+                                      ],
+                                    ),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          PopupMenuItem<String>(
+                            child: ListTile(
+                              leading: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              ),
+                              title: const Text(
+                                "Supprimer",
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              onTap: () async {
+                                await VehiculeService()
+                                    .deleteVehicule(vehicules.idVehicule!)
+                                    .then((value) => {
+                                          Provider.of<VehiculeService>(context,
+                                                  listen: false)
+                                              .applyChange(),
+                                          // setState(() {
+                                          //   futureListe = getListe(
+                                          //       typeVoiture.idTypeVoiture);
+                                          // }),
+                                          Navigator.of(context).pop(),
+                                        })
+                                    .catchError((onError) => {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Row(
+                                                children: [
+                                                  Text(
+                                                      "Impossible de supprimer"),
+                                                ],
+                                              ),
+                                              duration: Duration(seconds: 2),
+                                            ),
+                                          )
+                                        });
+                              },
+                            ),
+                          ),
+                        ],
+                      )
                     ]
                   : null),
           body: SingleChildScrollView(
@@ -263,9 +454,11 @@ prixParDestinations = {};
                 ),
                 SizedBox(height: 30),
                 _isEditing ? _buildEditing() : _buildData(),
-                _buildDescription(
-                    'Description : ', vehicules.typeVoiture.description!),
-                _buildPanel()
+                !_isEditing
+                    ? _buildDescription(
+                        'Description : ', vehicules.typeVoiture.description!)
+                    : Container(),
+                !_isEditing ? _buildPanel() : Container()
               ],
             ),
           ),
@@ -353,6 +546,8 @@ prixParDestinations = {};
       children: [
         _buildEditableDetailItem('Nom du véhicule : ', _nomController),
         _buildEditableDetailItem('Capacité : ', _capaciteController),
+        _buildEditableDetailItem('Localisation : ', _localiteController),
+        _buildEditableDetailItem('Etat du véhicule : ', _etatController),
         Padding(
           padding: EdgeInsets.symmetric(
             horizontal: 22,
@@ -422,8 +617,6 @@ prixParDestinations = {};
             ],
           ),
         ),
-        _buildEditableDetailItem('Localisation : ', _localiteController),
-        _buildEditableDetailItem('Etat du véhicule : ', _etatController),
       ],
     );
   }

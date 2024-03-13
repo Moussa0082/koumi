@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/DetailTransport.dart';
@@ -24,14 +28,19 @@ class _TransportState extends State<Transport> {
   late String type;
   late TextEditingController _searchController;
   List<Vehicule> vehiculeListe = [];
+  TypeVoiture? selectedType;
+  String? typeValue;
+  late Future _typeList;
 
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     typeActeurData = acteur.typeActeur;
+    // selectedType == null;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
-
+    _typeList = http.get(Uri.parse(
+        'http://10.0.2.2:9000/api-koumi/TypeVoiture/listeByActeur/${acteur.idActeur!}'));
     super.initState();
   }
 
@@ -103,10 +112,9 @@ class _TransportState extends State<Transport> {
               child: Row(
                 children: [
                   Icon(Icons.search,
-                      color: Colors.blueGrey[400]), // Couleur de l'icône
-                  SizedBox(
-                      width:
-                          10), // Espacement entre l'icône et le champ de recherche
+                      color: Colors.blueGrey[400],
+                      size: 28), // Utiliser une icône de recherche plus grande
+                  SizedBox(width: 10),
                   Expanded(
                     child: TextField(
                       controller: _searchController,
@@ -116,20 +124,138 @@ class _TransportState extends State<Transport> {
                       decoration: InputDecoration(
                         hintText: 'Rechercher',
                         border: InputBorder.none,
-                        hintStyle: TextStyle(
-                            color: Colors
-                                .blueGrey[400]), // Couleur du texte d'aide
+                        hintStyle: TextStyle(color: Colors.blueGrey[400]),
                       ),
                     ),
+                  ),
+                  
+                  IconButton(
+                    icon: Icon(Icons.clear),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() {});
+                    },
                   ),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            child: FutureBuilder(
+              future: _typeList,
+              builder: (_, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return DropdownButtonFormField(
+                    items: [],
+                    onChanged: null,
+                    decoration: InputDecoration(
+                      labelText: '-- Aucun type de véhicule trouvé --',
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  );
+                }
+                if (snapshot.hasError) {
+                  return Text("${snapshot.error}");
+                }
+                if (snapshot.hasData) {
+                  dynamic responseData = json.decode(snapshot.data.body);
+                  if (responseData is List) {
+                    final reponse = responseData;
+                    final vehiculeList = reponse
+                        .map((e) => TypeVoiture.fromMap(e))
+                        .where((con) => con.statutType == true)
+                        .toList();
+
+                    if (vehiculeList.isEmpty) {
+                      return DropdownButtonFormField(
+                        items: [],
+                        onChanged: null,
+                        decoration: InputDecoration(
+                          labelText: '-- Aucun type de véhicule trouvé --',
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      );
+                    }
+
+                    return DropdownButtonFormField<String>(
+                      items: vehiculeList
+                          .map(
+                            (e) => DropdownMenuItem(
+                              value: e.idTypeVoiture,
+                              child: Text(e.nom),
+                            ),
+                          )
+                          .toList(),
+                      hint: Text(
+                          textAlign: TextAlign.center,
+                          "   -- Filtre par type de véhicule --"),
+                      value: typeValue,
+                      onChanged: (newValue) {
+                        setState(() {
+                          typeValue = newValue;
+                          if (newValue != null) {
+                            selectedType = vehiculeList.firstWhere(
+                              (element) => element.idTypeVoiture == newValue,
+                            );
+                          }
+                        });
+                      },
+                      decoration: InputDecoration(
+                        // labelText: '-- Filtre par type de véhicule --',
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    );
+                  } else {
+                    return DropdownButtonFormField(
+                      items: [],
+                      onChanged: null,
+                      decoration: InputDecoration(
+                        labelText: '-- Aucun type de véhicule trouvé --',
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    );
+                  }
+                }
+                return DropdownButtonFormField(
+                  items: [],
+                  onChanged: null,
+                  decoration: InputDecoration(
+                    labelText: '-- Aucun type de véhicule trouvé --',
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 10),
           Consumer<VehiculeService>(builder: (context, vehiculeService, child) {
-            return FutureBuilder(
-                future: vehiculeService.fetchVehicule(),
+            return FutureBuilder<List<Vehicule>>(
+                future: selectedType != null
+                    ? vehiculeService.fetchVehiculeByTypeVehicule(
+                        selectedType!.idTypeVoiture)
+                    : vehiculeService.fetchVehicule(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
