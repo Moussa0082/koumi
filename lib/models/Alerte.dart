@@ -97,4 +97,24 @@ class Alerte {
 
 
 
-   
+  //  // Méthode pour créer une instance d'Acteur à partir des données de SharedPreferences
+  // factory Acteur.fromSharedPreferencesData(String emailActeur, String password, 
+  // List<String> userTypeList, String idActeur, String nomActeur, String telephoneActeur,
+  //  String adressActeur, String whatsAppActeur, String niveau3PaysActeur,
+  //   String localiteActeur) {
+  //   // Créez une liste de TypeActeur à partir de la liste de chaînes userTypeList
+  //   List<TypeActeur> typeActeurList = userTypeList.map((libelle) => TypeActeur(libelle: libelle)).toList();
+
+  //   // Retournez une nouvelle instance d'Acteur avec les données fournies
+  //   return Acteur(
+  //     // Initialiser les autres propriétés de l'acteur selon vos besoins
+  //     emailActeur: emailActeur,
+  //     password: password,
+  //     typeActeur: typeActeurList, 
+  //     idActeur:idActeur,
+  //     nomActeur: nomActeur, 
+  //     adresseActeur: adressActeur,telephoneActeur: telephoneActeur,
+  //     whatsAppActeur:whatsAppActeur, niveau3PaysActeur: niveau3PaysActeur, 
+  //     localiteActeur:localiteActeur 
+  //   );
+  // }

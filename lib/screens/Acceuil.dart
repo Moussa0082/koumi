@@ -34,10 +34,10 @@ class _AccueilState extends State<Accueil> {
     // TODO: implement initState
     super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
 
-   Snack.info(message:'Connecté en tant que : ${acteur.nomActeur!.toUpperCase()}') ;
-    });
+  //  Snack.info(message:'Connecté en tant que : ${acteur.nomActeur!.toUpperCase()}') ;
+  //   });
 
   }
 
