@@ -15,7 +15,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class AddVehiculeTransport extends StatefulWidget {
-  const AddVehiculeTransport({super.key});
+  final TypeVoiture? typeVoitures;
+  const AddVehiculeTransport({
+    super.key,
+    this.typeVoitures,
+  });
 
   @override
   State<AddVehiculeTransport> createState() => _AddVehiculeTransportState();
@@ -39,6 +43,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
   String? typeValue;
   late Future _typeList;
   late TypeVoiture typeVoiture;
+  late TypeVoiture type;
   File? photo;
   late Acteur acteur;
   bool _isLoading = false;
@@ -55,6 +60,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
     super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     prixParDestinations = {};
+    type = widget.typeVoitures!;
     _typeList = http.get(Uri.parse(
         'http://10.0.2.2:9000/api-koumi/TypeVoiture/listeByActeur/${acteur.idActeur!}'));
   }
@@ -208,54 +214,132 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                       SizedBox(
                         height: 10,
                       ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 22,
-                        ),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            "Type de véhicule",
-                            style:
-                                TextStyle(color: (Colors.black), fontSize: 18),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        child: FutureBuilder(
-                          future: _typeList,
-                          builder: (_, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return DropdownButtonFormField(
-                                items: [],
-                                onChanged: null,
-                                decoration: InputDecoration(
-                                  labelText: 'Aucun type de véhicule trouvé',
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
+                      type == null
+                          ? Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 22,
+                              ),
+                              child: Align(
+                                alignment: Alignment.topLeft,
+                                child: Text(
+                                  "Type de véhicule",
+                                  style: TextStyle(
+                                      color: (Colors.black), fontSize: 18),
                                 ),
-                              );
-                            }
-                            if (snapshot.hasError) {
-                              return Text("${snapshot.error}");
-                            }
-                            if (snapshot.hasData) {
-                              dynamic responseData =
-                                  json.decode(snapshot.data.body);
-                              if (responseData is List) {
-                                final reponse = responseData;
-                                final vehiculeList = reponse
-                                    .map((e) => TypeVoiture.fromMap(e))
-                                    .where((con) => con.statutType == true)
-                                    .toList();
+                              ),
+                            )
+                          : Container(),
+                      type == null
+                          ? Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 20),
+                              child: FutureBuilder(
+                                future: _typeList,
+                                builder: (_, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return DropdownButtonFormField(
+                                      items: [],
+                                      onChanged: null,
+                                      decoration: InputDecoration(
+                                        labelText:
+                                            'Aucun type de véhicule trouvé',
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 10, horizontal: 20),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                  if (snapshot.hasError) {
+                                    return Text("${snapshot.error}");
+                                  }
+                                  if (snapshot.hasData) {
+                                    dynamic responseData =
+                                        json.decode(snapshot.data.body);
+                                    if (responseData is List) {
+                                      final reponse = responseData;
+                                      final vehiculeList = reponse
+                                          .map((e) => TypeVoiture.fromMap(e))
+                                          .where(
+                                              (con) => con.statutType == true)
+                                          .toList();
 
-                                if (vehiculeList.isEmpty) {
+                                      if (vehiculeList.isEmpty) {
+                                        return DropdownButtonFormField(
+                                          items: [],
+                                          onChanged: null,
+                                          decoration: InputDecoration(
+                                            labelText:
+                                                'Aucun type de véhicule trouvé',
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 20),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                        );
+                                      }
+
+                                      return DropdownButtonFormField<String>(
+                                        items: vehiculeList
+                                            .map(
+                                              (e) => DropdownMenuItem(
+                                                value: e.idTypeVoiture,
+                                                child: Text(e.nom),
+                                              ),
+                                            )
+                                            .toList(),
+                                        value: typeValue,
+                                        onChanged: (newValue) {
+                                          setState(() {
+                                            typeValue = newValue;
+                                            if (newValue != null) {
+                                              typeVoiture =
+                                                  vehiculeList.firstWhere(
+                                                (element) =>
+                                                    element.idTypeVoiture ==
+                                                    newValue,
+                                              );
+                                            }
+                                          });
+                                        },
+                                        decoration: InputDecoration(
+                                          labelText:
+                                              'Sélectionner un type de véhicule',
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  vertical: 10, horizontal: 20),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      return DropdownButtonFormField(
+                                        items: [],
+                                        onChanged: null,
+                                        decoration: InputDecoration(
+                                          labelText:
+                                              'Aucun type de véhicule trouvé',
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  vertical: 10, horizontal: 20),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  }
                                   return DropdownButtonFormField(
                                     items: [],
                                     onChanged: null,
@@ -270,69 +354,10 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                                       ),
                                     ),
                                   );
-                                }
-
-                                return DropdownButtonFormField<String>(
-                                  items: vehiculeList
-                                      .map(
-                                        (e) => DropdownMenuItem(
-                                          value: e.idTypeVoiture,
-                                          child: Text(e.nom),
-                                        ),
-                                      )
-                                      .toList(),
-                                  value: typeValue,
-                                  onChanged: (newValue) {
-                                    setState(() {
-                                      typeValue = newValue;
-                                      if (newValue != null) {
-                                        typeVoiture = vehiculeList.firstWhere(
-                                          (element) =>
-                                              element.idTypeVoiture == newValue,
-                                        );
-                                      }
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                    labelText:
-                                        'Sélectionner un type de véhicule',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Aucun type de véhicule trouvé',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                              }
-                            }
-                            return DropdownButtonFormField(
-                              items: [],
-                              onChanged: null,
-                              decoration: InputDecoration(
-                                labelText: 'Aucun type de véhicule trouvé',
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
+                                },
                               ),
-                            );
-                          },
-                        ),
-                      ),
+                            )
+                          : Container(),
                       SizedBox(
                         height: 10,
                       ),
@@ -560,7 +585,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                                 setState(() {
                                   _isLoading = true;
                                 });
-                                if (photo != null) {
+                                if (photo != null && type == null) {
                                   await VehiculeService()
                                       .addVehicule(
                                           nomVehicule: nom,
@@ -609,7 +634,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                                               prixParDestinations,
                                           localisation: localite,
                                           etatVehicule: etat,
-                                          typeVoiture: typeVoiture,
+                                          typeVoiture: type,
                                           acteur: acteur)
                                       .then((value) => {
                                             Provider.of<VehiculeService>(
