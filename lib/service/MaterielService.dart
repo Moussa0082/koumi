@@ -8,8 +8,8 @@ import 'package:koumi_app/models/Materiel.dart';
 import 'package:path/path.dart';
 
 class MaterielService extends ChangeNotifier {
-  // static const String baseUrl = 'https://koumi.ml/api-koumi/Materiel';
-  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Materiel';
+  static const String baseUrl = 'https://koumi.ml/api-koumi/Materiel';
+  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Materiel';
 
   List<Materiel> materielList = [];
 

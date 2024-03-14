@@ -28,7 +28,7 @@ import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:provider/provider.dart';
 
 void main() { 
-  runApp(MultiProvider(providers: [         
+  runApp(MultiProvider(providers: [
 
     ChangeNotifierProvider(create: (context) => ActeurService()),
     ChangeNotifierProvider(create: (context) => TypeActeurService()),
@@ -41,6 +41,7 @@ void main() {
 
     ChangeNotifierProvider(create: (context) => ZoneProductionService()),
     ChangeNotifierProvider(create: (context) => PaysService()),
+    ChangeNotifierProvider(create: (context) => TypeVoitureService()),
     ChangeNotifierProvider(create: (context) => MessageService()),
     ChangeNotifierProvider(create: (context) => MaterielService()),
     ChangeNotifierProvider(create: (context) => VehiculeService()),

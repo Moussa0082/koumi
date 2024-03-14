@@ -138,7 +138,6 @@ class _ProfilState extends State<Profil> {
                                     _buildProfile('Adresse', ac.adresseActeur!),
                                     _buildProfile(
                                         'Localité', ac.localiteActeur!),
-
                                     _buildProfile(
                                         'Pays', ac.niveau3PaysActeur!),
                                   ],
@@ -283,31 +282,26 @@ class _ProfilState extends State<Profil> {
                                             );
                                           } else {
                                             zoneList = snapshot.data!;
-                                            return Column(
+                                            return Wrap(
+                                                spacing: 10,
                                                 children: zoneList
                                                     .map(
-                                                        (ZoneProduction zone) =>
-                                                            Column(children: [
-                                                              Align(
-                                                                alignment:
-                                                                    Alignment
-                                                                        .topLeft,
-                                                                child: Text(zone.nomZoneProduction,
-                                                                    style: const TextStyle(
-                                                                        color: Colors
-                                                                            .black87,
-                                                                        fontSize:
-                                                                            17,
-                                                                        fontWeight:
-                                                                            FontWeight
-                                                                                .w500,
-                                                                        fontStyle:
-                                                                            FontStyle
-                                                                                .italic,
-                                                                        overflow:
-                                                                            TextOverflow.ellipsis)),
-                                                              )
-                                                            ]))
+                                                      (e) => Text(
+                                                          "${e.nomZoneProduction} ,",
+                                                          style: const TextStyle(
+                                                              color: Colors
+                                                                  .black87,
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .italic,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis)),
+                                                    )
                                                     .toList());
                                           }
                                         });

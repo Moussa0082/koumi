@@ -520,6 +520,7 @@ class _MagasinScreenState extends State<MagasinScreen>
                                                       color: Colors.black,
                                                       image: NetworkImage(
                                                           "https://koumi.ml/api-koumi/${magasin.photo}"),
+                                                          // "https://koumi.ml/api-koumi/${magasin.photo}"),
                                                     ),
                                               title: Text(
                    magasin.acteur!.nomActeur != null ? 

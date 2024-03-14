@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -30,97 +28,19 @@ class _LoginScreenState extends State<LoginScreen> {
   // late Acteur acteur;
   bool _isLoading = false;
   final String message = "Encore quelques secondes";
-  String? _currentAddress;
-  Position? _currentPosition;
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
   // TextEditingController Controller = TextEditingController();
-  
-
-   Future<void> _getAddressFromLatLng(Position position) async {
-  try {
-    List<Placemark> placemarks = await placemarkFromCoordinates(
-      _currentPosition!.latitude, 
-      _currentPosition!.longitude,
-    );
-
-    if (placemarks.isNotEmpty) {
-      Placemark place = placemarks[0];
-      setState(() {
-    //  print(" Pos" + placemarks.toString());
-        _currentAddress = "${place.street}, ${place.subLocality}, ${place.subAdministrativeArea!}, ${place.postalCode!}";
-      });
-    } else {
-      setState(() {
-        _currentAddress = "Adresse non disponible";
-      });
-    }
-  } catch (e) {
-    debugPrint("Erreur lors de la récupération de l'adresse: $e");
-    setState(() {
-      _currentAddress = "Erreur lors de la récupération de l'adresse";
-    });
-  }
-}
-
-
-  Future<bool> _handleLocationPermission() async {
-  bool serviceEnabled;
-  LocationPermission permission;
-  
-  serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Location services are disabled. Please enable the services')));
-    return false;
-  }
-  permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {   
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Location permissions are denied')));
-      return false;
-    }
-  }
-  if (permission == LocationPermission.deniedForever) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Location permissions are permanently denied, we cannot request permissions.')));
-    return false;
-  }
-  return true;
-}
-
-  Future<void> _getCurrentPosition() async {
-  final hasPermission = await _handleLocationPermission();
-  if (!hasPermission) return;
-  // await Geolocator.getCurrentPosition(
-  //         desiredAccuracy: LocationAccuracy.high)
-  //     .then((Position position) {
-  //   setState(() => _currentPosition = position);
-  // }).catchError((e) {
-  //   debugPrint(e);
-  // });
-   await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high)
-      .then((Position position) {
-    setState(() => _currentPosition = position);
-    _getAddressFromLatLng(_currentPosition!);
-  }).catchError((e) {
-    debugPrint(e);
-  });
-}
 
   //  login methode start
   Future<void> loginUser() async {
     final String emailActeur = emailController.text;
     final String password = passwordController.text;
 
-    // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
-    const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
-
+    const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
+    // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
     const String defaultProfileImage = 'assets/images/profil.jpg';
 
@@ -161,8 +81,25 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (response.statusCode == 200) {
-       
+        // showDialog(
+        //   context: context,
+        //   builder: (BuildContext context) {
+        //     return const AlertDialog(
+        //       title: Center(child: Text('Connexion en cours')),
+        //       content: CupertinoActivityIndicator(
+        //         color: Colors.orange,
+        //         radius: 22,
+        //       ),
+        //       actions: <Widget>[
+        //         // Pas besoin de bouton ici
+        //       ],
+        //     );
+        //   },
+        // );
 
+        // await Future.delayed(const Duration(milliseconds: 500));
+
+        // Navigator.of(context).pop();
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
         emailController.clear();
         passwordController.clear();
@@ -173,14 +110,6 @@ class _LoginScreenState extends State<LoginScreen> {
         prefs.setString('password', password);
         // prefs.setString('nomActeur', responseBody['nomActeur']);
         // Vérifier si l'image de profil est présente, sinon, enregistrer l'image par défaut dans SharedPreferences
-      // final String? logoActeur = responseBody['logoActeur'];
-      // final String? photoSiegeActeur= responseBody['photoSiegeActeur'];
-      // if (logoActeur == null) {
-      //   prefs.setString('logoActeur', defaultProfileImage);
-      // }
-      // if (photoSiegeActeur == null) {
-      //   prefs.setString('photoSiegeActeur', defaultProfileImage);
-      // }
 
         // if (logoActeur == null) {
         //   prefs.setString('logoActeur', defaultProfileImage);
@@ -193,8 +122,6 @@ class _LoginScreenState extends State<LoginScreen> {
         final adresseActeur = responseBody['adresseActeur'];
         final telephoneActeur = responseBody['telephoneActeur'];
         final whatsAppActeur = responseBody['whatsAppActeur'];
-        // final logoActeur =  responseBody['logoActeur'] ;
-        // final photoSiegeActeur = responseBody['photoSiegeActeur'] ;
 
         final niveau3PaysActeur = responseBody['niveau3PaysActeur'];
         final localiteActeur = responseBody['localiteActeur'];
@@ -224,22 +151,12 @@ class _LoginScreenState extends State<LoginScreen> {
         prefs.setStringList('userType', userTypeLabels);
         Acteur acteur = Acteur(
           idActeur: responseBody['idActeur'],
-          // resetToken: responseBody['resetToken'],
-          // tokenCreationDate: responseBody['tokenCreationDate'],
-          // codeActeur: responseBody['codeActeur'],
           nomActeur: responseBody['nomActeur'],
           adresseActeur: responseBody['adresseActeur'],
           telephoneActeur: responseBody['telephoneActeur'],
-          // latitude: responseBody['latitude'],
-          // longitude: responseBody['longitude'],
-          // photoSiegeActeur: responseBody['photoSiegeActeur'],
-          // logoActeur: responseBody['logoActeur'],
           whatsAppActeur: responseBody['whatsAppActeur'],
           niveau3PaysActeur: responseBody['niveau3PaysActeur'],
           dateAjout: responseBody['dateAjout'],
-          // dateModif: responseBody['dateModif'],
-          // personneModif: responseBody['personneModif'],
-   
           localiteActeur: responseBody['localiteActeur'],
           emailActeur: emailActeur,
           statutActeur: responseBody['statutActeur'],
@@ -274,9 +191,8 @@ class _LoginScreenState extends State<LoginScreen> {
             return AlertDialog(
               title: const Center(child: Text('Connexion échouée !')),
               content: Text(
-                "Email ou mot de passe incorrect", // Utiliser le message d'erreur du backend
-                // errorMessage, // Utiliser le message d'erreur du backend
-
+                'Email ou mot de passe incorrect',
+                // errorMessage,
                 textAlign: TextAlign.justify,
                 style: const TextStyle(color: Colors.black, fontSize: 20),
               ),
@@ -347,10 +263,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final String password = passwordController.text;
 
     // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
-
+//
     const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
-
-
 
     ActeurProvider acteurProvider =
         Provider.of<ActeurProvider>(context, listen: false);
@@ -453,9 +367,7 @@ class _LoginScreenState extends State<LoginScreen> {
             return AlertDialog(
               title: const Center(child: Text('Connexion échouée !')),
               content: Text(
-                "Email ou mot de passe incorrect", // Utiliser le message d'erreur du backend
-                // errorMessage, // Utiliser le message d'erreur du backend
-
+                'Email ou mot de passe incorrect', // errorMessage, // Utiliser le message d'erreur du backend
                 textAlign: TextAlign.justify,
                 style: const TextStyle(color: Colors.black, fontSize: 20),
               ),
@@ -513,18 +425,15 @@ class _LoginScreenState extends State<LoginScreen> {
         child: SingleChildScrollView(
           child: Container(
             child: Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(20.0),
               child: Column(
                 children: [
-                  const SizedBox(height: 20,),
                   Center(
                       child: Image.asset(
                     'assets/images/logo.png',
-                    height: MediaQuery.of(context).size.height * 0.200,
-                  width: MediaQuery.of(context).size.width * 0.45,
+                    height: 220,
+                    width: 110,
                   )),
-                                    const SizedBox(height: 20,),
-
                   // connexion
                   const Text(
                     " Connexion ",
@@ -625,68 +534,61 @@ class _LoginScreenState extends State<LoginScreen> {
                       // fin mot de pass
 
                       const SizedBox(height: 10),
-                      
-                      Text('LAT: ${_currentPosition?.latitude ?? ""}'),
-    Text('LNG: ${_currentPosition?.longitude ?? ""}'),
-    Text('ADDRESS: ${_currentAddress ?? ""}'),
-    const SizedBox(height: 32),
-    ElevatedButton(
-      onPressed: _getCurrentPosition,
-      child: const Text("Get Current Location"),
-    ),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              SizedBox(
-                                width:30,
-                                height: 30,
-                                child: FittedBox(
-                                  fit: BoxFit.contain,
-                                  child: Switch(
-                                    value: isActive,
-                                    activeColor: Colors.orange,
-                                    onChanged: (bool value) {
-                                      setState(() {
-                                        isActive = value;
-                                      });
-                                    },
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 50,
+                                  height: 30,
+                                  child: FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: Switch(
+                                      value: isActive,
+                                      activeColor: Colors.orange,
+                                      onChanged: (bool value) {
+                                        setState(() {
+                                          isActive = value;
+                                        });
+                                      },
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              const Text(
-                                "Se souvenir de moi",
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                const Text(
+                                  "Se souvenir de moi",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                print("ho");
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ForgetPassScreen(),
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                "Mot de passe oublié ",
                                 style: TextStyle(
                                   fontSize: 15,
+                                  decoration: TextDecoration.underline,
+                                  color: Colors.blue,
                                 ),
-                              ),
-                            ],
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              print("ho");
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ForgetPassScreen(),
-                                ),
-                              );
-                            },
-                            child: const Text(
-                              "Mot de passe oublié ",
-                              style: TextStyle(
-                                fontSize: 15,
-                                decoration: TextDecoration.underline,
-                                color: Colors.blue,
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
 
                       const SizedBox(
@@ -728,7 +630,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Container(
                         height: 40,
                         decoration: const BoxDecoration(
-                          color: Colors.black,
+                          color: Color.fromARGB(255, 240, 178, 107),
                         ),
                         child: Center(
                           child: Row(
@@ -737,7 +639,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               const Text(
                                 "Je n'ai pas de compte .",
                                 style: TextStyle(
-                                    color: Colors.orange,
+                                    color: Colors.white,
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold),
                               ),
@@ -755,7 +657,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: const Text(
                                   "M'inscrire",
                                   style: TextStyle(
-                                      color: Colors.orange,
+                                      color: Colors.blue,
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold),
                                 ),

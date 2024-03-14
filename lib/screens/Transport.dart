@@ -32,14 +32,6 @@ class _TransportState extends State<Transport> {
   String? typeValue;
   late Future _typeList;
 
-  String _searchText = '';
-
-// Mise à jour de la chaîne de recherche avec le texte de recherche et le filtre
-  void _updateSearchText(String text) {
-    setState(() {
-      _searchText = text;
-    });
-  }
 
   @override
   void initState() {
