@@ -32,6 +32,15 @@ class _TransportState extends State<Transport> {
   String? typeValue;
   late Future _typeList;
 
+  String _searchText = '';
+
+// Mise à jour de la chaîne de recherche avec le texte de recherche et le filtre
+  void _updateSearchText(String text) {
+    setState(() {
+      _searchText = text;
+    });
+  }
+
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
@@ -100,7 +109,7 @@ class _TransportState extends State<Transport> {
           ]),
       body: SingleChildScrollView(
         child: Column(children: [
-           const SizedBox(height: 10),
+          const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Container(

@@ -509,7 +509,17 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                                     // Ajouter la destination et le prix à la liste prixParDestinations
                                     prixParDestinations
                                         .addAll({destination: prix});
-
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Row(
+                                          children: [
+                                            Text(
+                                                "Prix et destination ajouté à la liste"),
+                                          ],
+                                        ),
+                                        duration: const Duration(seconds: 2),
+                                      ),
+                                    );
                                     print(prixParDestinations.toString());
 
                                     _destinationController.clear();

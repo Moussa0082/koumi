@@ -46,12 +46,14 @@ class _DetailTransportState extends State<DetailTransport> {
   TextEditingController _capaciteController = TextEditingController();
   TextEditingController _etatController = TextEditingController();
   TextEditingController _localiteController = TextEditingController();
-
+  List<TextEditingController> _destinationControllers = [];
+  List<TextEditingController> _prixControllers = [];
   bool _isEditing = false;
   bool _isLoading = false;
   bool active = false;
   String? typeValue;
   late Future _typeList;
+  Map<String, int> newPrixParDestinations = {};
 
   @override
   void initState() {
@@ -70,13 +72,21 @@ class _DetailTransportState extends State<DetailTransport> {
     _etatController.text = vehicules.etatVehicule.toString();
     _localiteController.text = vehicules.localisation;
     // Récupérer les destinations et les prix du véhicule
+    // vehicules.prixParDestination.forEach((destination, prix) {
+    //   if (destination.isNotEmpty && prix > 0) {
+    //     // Ajouter la destination et le prix à la liste prixParDestinations
+    //     prixParDestinations.addAll({destination: prix});
+    //   }
+    // });
     vehicules.prixParDestination.forEach((destination, prix) {
-      if (destination.isNotEmpty && prix > 0) {
-        // Ajouter la destination et le prix à la liste prixParDestinations
-        prixParDestinations.addAll({destination: prix});
-      }
-    });
+      TextEditingController destinationController =
+          TextEditingController(text: destination);
+      TextEditingController prixController =
+          TextEditingController(text: prix.toString());
 
+      _destinationControllers.add(destinationController);
+      _prixControllers.add(prixController);
+    });
     isDialOpenNotifier = ValueNotifier<bool>(false);
     super.initState();
   }
@@ -160,46 +170,52 @@ class _DetailTransportState extends State<DetailTransport> {
       // Récupération des nouvelles valeurs des champs
       final String nom = _nomController.text;
       final String capacite = _capaciteController.text;
-      final String prix = _prixController.text;
       final String etat = _etatController.text;
       final String localite = _localiteController.text;
 
-      // Appel de la méthode de mise à jour du service
+      // Création d'une nouvelle map pour stocker les prix par destination mis à jour
+
+      // Parcourir les destinations et les prix modifiés simultanément
+      for (int i = 0; i < _destinationControllers.length; i++) {
+        String destination = _destinationControllers[i].text;
+        int prix = int.tryParse(_prixControllers[i].text) ?? 0;
+
+        // Ajouter la destination et le prix à la nouvelle map
+        if (destination.isNotEmpty && prix > 0) {
+          newPrixParDestinations[destination] = prix;
+        }
+      }
+
       await VehiculeService().updateVehicule(
         idVehicule: vehicules.idVehicule!,
         nomVehicule: nom,
         capaciteVehicule: capacite,
-        prixParDestination: prixParDestinations,
+        prixParDestination: newPrixParDestinations,
         etatVehicule: etat,
         localisation: localite,
         typeVoiture: typeVoiture,
         acteur: acteur,
       );
 
-      // Mise à jour des données locales
       setState(() {
-        final int? prixParsed = int.tryParse(prix);
-        final int prixValue = prixParsed ?? 0;
         vehicules = Vehicule(
           idVehicule: vehicules.idVehicule,
           nomVehicule: nom,
           capaciteVehicule: capacite,
-          prixParDestination: prixParDestinations,
+          prixParDestination: newPrixParDestinations,
           etatVehicule: etat,
           localisation: localite,
           typeVoiture: typeVoiture,
           acteur: acteur,
           statutVehicule: vehicules.statutVehicule,
         );
-        // Désactiver l'indicateur de chargement après la mise à jour
+
         _isLoading = false;
       });
     } catch (e) {
-      // Gérer les erreurs potentielles ici
       print(e.toString());
       setState(() {
-        _isLoading =
-            false; // Assurez-vous de désactiver l'indicateur de chargement en cas d'erreur
+        _isLoading = false;
       });
     }
   }
@@ -256,179 +272,179 @@ class _DetailTransportState extends State<DetailTransport> {
                               },
                               icon: Icon(Icons.edit),
                             ),
-                      PopupMenuButton<String>(
-                        padding: EdgeInsets.zero,
-                        itemBuilder: (context) => <PopupMenuEntry<String>>[
-                          PopupMenuItem<String>(
-                            child: ListTile(
-                              leading: const Icon(
-                                Icons.check,
-                                color: Colors.green,
-                              ),
-                              title: const Text(
-                                "Activer",
-                                style: TextStyle(
-                                  color: Colors.green,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              onTap: () async {
-                                await VehiculeService()
-                                    .activerVehicules(vehicules.idVehicule!)
-                                    .then((value) => {
-                                          Provider.of<VehiculeService>(context,
-                                                  listen: false)
-                                              .applyChange(),
-                                          setState(() {
-                                            vehicules = Vehicule(
-                                              idVehicule: vehicules.idVehicule,
-                                              nomVehicule:
-                                                  vehicules.nomVehicule,
-                                              capaciteVehicule:
-                                                  vehicules.capaciteVehicule,
-                                              prixParDestination:
-                                                  prixParDestinations,
-                                              etatVehicule:
-                                                  vehicules.etatVehicule,
-                                              localisation:
-                                                  vehicules.localisation,
-                                              typeVoiture: typeVoiture,
-                                              acteur: acteur,
-                                              statutVehicule:
-                                                  vehicules.statutVehicule,
-                                            );
-                                          }),
-                                          Navigator.of(context).pop(),
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  Text("Activer avec succèss "),
-                                                ],
-                                              ),
-                                              duration: Duration(seconds: 2),
-                                            ),
-                                          )
-                                        })
-                                    .catchError((onError) => {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  Text(
-                                                      "Une erreur s'est produit"),
-                                                ],
-                                              ),
-                                              duration: Duration(seconds: 5),
-                                            ),
-                                          ),
-                                          Navigator.of(context).pop(),
-                                        });
-                              },
-                            ),
-                          ),
-                          PopupMenuItem<String>(
-                            child: ListTile(
-                              leading: Icon(
-                                Icons.disabled_visible,
-                                color: Colors.orange[400],
-                              ),
-                              title: Text(
-                                "Désactiver",
-                                style: TextStyle(
-                                  color: Colors.orange[400],
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              onTap: () async {
-                                await VehiculeService()
-                                    .desactiverVehicules(vehicules.idVehicule!)
-                                    .then((value) => {
-                                          Provider.of<VehiculeService>(context,
-                                                  listen: false)
-                                              .applyChange(),
-                                          // setState(() {
-                                          //   futureListe = getListe(
-                                          //       typeVoiture.idTypeVoiture);
-                                          // }),
-                                          Navigator.of(context).pop(),
-                                        })
-                                    .catchError((onError) => {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  Text(
-                                                      "Une erreur s'est produit"),
-                                                ],
-                                              ),
-                                              duration: Duration(seconds: 5),
-                                            ),
-                                          ),
-                                          Navigator.of(context).pop(),
-                                        });
+                      // PopupMenuButton<String>(
+                      //   padding: EdgeInsets.zero,
+                      //   itemBuilder: (context) => <PopupMenuEntry<String>>[
+                      //     PopupMenuItem<String>(
+                      //       child: ListTile(
+                      //         leading: const Icon(
+                      //           Icons.check,
+                      //           color: Colors.green,
+                      //         ),
+                      //         title: const Text(
+                      //           "Activer",
+                      //           style: TextStyle(
+                      //             color: Colors.green,
+                      //             fontWeight: FontWeight.bold,
+                      //           ),
+                      //         ),
+                      //         onTap: () async {
+                      //           await VehiculeService()
+                      //               .activerVehicules(vehicules.idVehicule!)
+                      //               .then((value) => {
+                      //                     Provider.of<VehiculeService>(context,
+                      //                             listen: false)
+                      //                         .applyChange(),
+                      //                     setState(() {
+                      //                       vehicules = Vehicule(
+                      //                         idVehicule: vehicules.idVehicule,
+                      //                         nomVehicule:
+                      //                             vehicules.nomVehicule,
+                      //                         capaciteVehicule:
+                      //                             vehicules.capaciteVehicule,
+                      //                         prixParDestination:
+                      //                             prixParDestinations,
+                      //                         etatVehicule:
+                      //                             vehicules.etatVehicule,
+                      //                         localisation:
+                      //                             vehicules.localisation,
+                      //                         typeVoiture: typeVoiture,
+                      //                         acteur: acteur,
+                      //                         statutVehicule:
+                      //                             vehicules.statutVehicule,
+                      //                       );
+                      //                     }),
+                      //                     Navigator.of(context).pop(),
+                      //                     ScaffoldMessenger.of(context)
+                      //                         .showSnackBar(
+                      //                       const SnackBar(
+                      //                         content: Row(
+                      //                           children: [
+                      //                             Text("Activer avec succèss "),
+                      //                           ],
+                      //                         ),
+                      //                         duration: Duration(seconds: 2),
+                      //                       ),
+                      //                     )
+                      //                   })
+                      //               .catchError((onError) => {
+                      //                     ScaffoldMessenger.of(context)
+                      //                         .showSnackBar(
+                      //                       const SnackBar(
+                      //                         content: Row(
+                      //                           children: [
+                      //                             Text(
+                      //                                 "Une erreur s'est produit"),
+                      //                           ],
+                      //                         ),
+                      //                         duration: Duration(seconds: 5),
+                      //                       ),
+                      //                     ),
+                      //                     Navigator.of(context).pop(),
+                      //                   });
+                      //         },
+                      //       ),
+                      //     ),
+                      //     PopupMenuItem<String>(
+                      //       child: ListTile(
+                      //         leading: Icon(
+                      //           Icons.disabled_visible,
+                      //           color: Colors.orange[400],
+                      //         ),
+                      //         title: Text(
+                      //           "Désactiver",
+                      //           style: TextStyle(
+                      //             color: Colors.orange[400],
+                      //             fontWeight: FontWeight.bold,
+                      //           ),
+                      //         ),
+                      //         onTap: () async {
+                      //           await VehiculeService()
+                      //               .desactiverVehicules(vehicules.idVehicule!)
+                      //               .then((value) => {
+                      //                     Provider.of<VehiculeService>(context,
+                      //                             listen: false)
+                      //                         .applyChange(),
+                      //                     // setState(() {
+                      //                     //   futureListe = getListe(
+                      //                     //       typeVoiture.idTypeVoiture);
+                      //                     // }),
+                      //                     Navigator.of(context).pop(),
+                      //                   })
+                      //               .catchError((onError) => {
+                      //                     ScaffoldMessenger.of(context)
+                      //                         .showSnackBar(
+                      //                       const SnackBar(
+                      //                         content: Row(
+                      //                           children: [
+                      //                             Text(
+                      //                                 "Une erreur s'est produit"),
+                      //                           ],
+                      //                         ),
+                      //                         duration: Duration(seconds: 5),
+                      //                       ),
+                      //                     ),
+                      //                     Navigator.of(context).pop(),
+                      //                   });
 
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Row(
-                                      children: [
-                                        Text("Désactiver avec succèss "),
-                                      ],
-                                    ),
-                                    duration: Duration(seconds: 2),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          PopupMenuItem<String>(
-                            child: ListTile(
-                              leading: const Icon(
-                                Icons.delete,
-                                color: Colors.red,
-                              ),
-                              title: const Text(
-                                "Supprimer",
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              onTap: () async {
-                                await VehiculeService()
-                                    .deleteVehicule(vehicules.idVehicule!)
-                                    .then((value) => {
-                                          Provider.of<VehiculeService>(context,
-                                                  listen: false)
-                                              .applyChange(),
-                                          // setState(() {
-                                          //   futureListe = getListe(
-                                          //       typeVoiture.idTypeVoiture);
-                                          // }),
-                                          Navigator.of(context).pop(),
-                                        })
-                                    .catchError((onError) => {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  Text(
-                                                      "Impossible de supprimer"),
-                                                ],
-                                              ),
-                                              duration: Duration(seconds: 2),
-                                            ),
-                                          )
-                                        });
-                              },
-                            ),
-                          ),
-                        ],
-                      )
+                      //           ScaffoldMessenger.of(context).showSnackBar(
+                      //             const SnackBar(
+                      //               content: Row(
+                      //                 children: [
+                      //                   Text("Désactiver avec succèss "),
+                      //                 ],
+                      //               ),
+                      //               duration: Duration(seconds: 2),
+                      //             ),
+                      //           );
+                      //         },
+                      //       ),
+                      //     ),
+                      //     PopupMenuItem<String>(
+                      //       child: ListTile(
+                      //         leading: const Icon(
+                      //           Icons.delete,
+                      //           color: Colors.red,
+                      //         ),
+                      //         title: const Text(
+                      //           "Supprimer",
+                      //           style: TextStyle(
+                      //             color: Colors.red,
+                      //             fontWeight: FontWeight.bold,
+                      //           ),
+                      //         ),
+                      //         onTap: () async {
+                      //           await VehiculeService()
+                      //               .deleteVehicule(vehicules.idVehicule!)
+                      //               .then((value) => {
+                      //                     Provider.of<VehiculeService>(context,
+                      //                             listen: false)
+                      //                         .applyChange(),
+                      //                     // setState(() {
+                      //                     //   futureListe = getListe(
+                      //                     //       typeVoiture.idTypeVoiture);
+                      //                     // }),
+                      //                     Navigator.of(context).pop(),
+                      //                   })
+                      //               .catchError((onError) => {
+                      //                     ScaffoldMessenger.of(context)
+                      //                         .showSnackBar(
+                      //                       const SnackBar(
+                      //                         content: Row(
+                      //                           children: [
+                      //                             Text(
+                      //                                 "Impossible de supprimer"),
+                      //                           ],
+                      //                         ),
+                      //                         duration: Duration(seconds: 2),
+                      //                       ),
+                      //                     )
+                      //                   });
+                      //         },
+                      //       ),
+                      //     ),
+                      //   ],
+                      // )
                     ]
                   : null),
           body: SingleChildScrollView(
@@ -453,11 +469,11 @@ class _DetailTransportState extends State<DetailTransport> {
                 ),
                 SizedBox(height: 30),
                 _isEditing ? _buildEditing() : _buildData(),
+                !_isEditing ? _buildPanel() : Container(),
                 !_isEditing
                     ? _buildDescription(
                         'Description : ', vehicules.typeVoiture.description!)
                     : Container(),
-                !_isEditing ? _buildPanel() : Container()
               ],
             ),
           ),
@@ -547,6 +563,10 @@ class _DetailTransportState extends State<DetailTransport> {
         _buildEditableDetailItem('Capacité : ', _capaciteController),
         _buildEditableDetailItem('Localisation : ', _localiteController),
         _buildEditableDetailItem('Etat du véhicule : ', _etatController),
+        _buildDestinationPriceFields(),
+        SizedBox(
+          height: 15,
+        ),
         Padding(
           padding: EdgeInsets.symmetric(
             horizontal: 22,
@@ -554,7 +574,7 @@ class _DetailTransportState extends State<DetailTransport> {
           child: Align(
             alignment: Alignment.topLeft,
             child: Text(
-              "Destination et prix",
+              "Ajouter d'autre prix",
               style: TextStyle(color: (Colors.black), fontSize: 18),
             ),
           ),
@@ -602,7 +622,7 @@ class _DetailTransportState extends State<DetailTransport> {
 
                     if (destination.isNotEmpty && prix > 0) {
                       // Ajouter la destination et le prix à la liste prixParDestinations
-                      prixParDestinations.addAll({destination: prix});
+                      newPrixParDestinations.addAll({destination: prix});
 
                       print(prixParDestinations.toString());
 
@@ -639,6 +659,44 @@ class _DetailTransportState extends State<DetailTransport> {
             : Container(),
         // _buildItem('Description : ', vehicules.typeVoiture.description!),
       ],
+    );
+  }
+
+  Widget _buildDestinationPriceFields() {
+    List<Widget> fields = [];
+
+    for (int i = 0; i < _destinationControllers.length; i++) {
+      fields.add(
+        Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: _destinationControllers[i],
+                decoration: InputDecoration(
+                  hintText: 'Destination',
+                ),
+              ),
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: TextFormField(
+                controller: _prixControllers[i],
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly,
+                ],
+                decoration: InputDecoration(
+                  hintText: 'Prix',
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: fields,
     );
   }
 
@@ -686,30 +744,32 @@ class _DetailTransportState extends State<DetailTransport> {
   Widget _buildDescription(String title, String value) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-                color: Colors.black87,
-                fontWeight: FontWeight.w500,
-                fontStyle: FontStyle.italic,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 18),
-          ),
-          Text(
-            value,
-            textAlign: TextAlign.justify,
-            softWrap: true,
-            style: const TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w800,
-              // overflow: TextOverflow.ellipsis,
-              fontSize: 16,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w500,
+                  fontStyle: FontStyle.italic,
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 18),
             ),
-          )
-        ],
+            Text(
+              value,
+              textAlign: TextAlign.justify,
+              softWrap: true,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w800,
+                // overflow: TextOverflow.ellipsis,
+                fontSize: 16,
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
