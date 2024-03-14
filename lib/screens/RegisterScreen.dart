@@ -256,16 +256,16 @@ Container(
     mainAxisAlignment: MainAxisAlignment.center,
     children: <Widget>[
       FutureBuilder<String?>(
-        future: getCurrentCountryFromLocation(),
+        future: _currentPosition != null ? getCountryFromLatLng(_currentPosition!.latitude, _currentPosition!.longitude) : null,
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return CircularProgressIndicator(); // Loading indicator
           } else if (snapshot.hasError || !snapshot.hasData) {
             return Text("Erreur lors de la détection du pays"); // Error message
           } else {
-            String? detectedCountry = snapshot.data;
+            String detectedCountry = snapshot.data!;
             return InternationalPhoneNumberInput(
-              // Supprimez le paramètre initialCountry
+              // initialCountry: detectedCountry,
               formatInput: true,
               hintText: "Numéro de téléphone",
               maxLength: 20,
@@ -295,7 +295,7 @@ Container(
                 print('On Saved: $number');
               },
               textFieldController: controller,
-              // Ne spécifiez pas de pays initial ici
+              // Set the initialCountry based on the detected country
             );
           }
         },

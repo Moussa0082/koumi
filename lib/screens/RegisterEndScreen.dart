@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:koumi_app/models/Speculation.dart';
@@ -48,10 +49,13 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     
 List<Speculation> _speculations = [];
+String id= 'e40ijxd5k0n0yrzj5f80';
   //  final MultiSelectController _controllerCategorie = MultiSelectController();
 
-final MultiSelectController<ValueItem> _controllerCategorie = MultiSelectController<ValueItem>();
-final MultiSelectController<ValueItem> _controllerSpeculation = MultiSelectController<ValueItem>();
+final MultiSelectController _controllerCategorie = MultiSelectController();
+final MultiSelectController _controllerSpeculation = MultiSelectController();
+    
+
 
 
 // Définissez une fonction pour récupérer les spéculations en fonction des catégories sélectionnées
@@ -80,11 +84,15 @@ Future<void> fetchSpeculationsByCategories(List<String> idsCategorieProduit) asy
   String confirmPassword = "";
   
   String filiere = "";
+   String idsJson = "";
   bool _obscureText = true;
     List<String> libelleCategorie = [];
     List<String> libelleSpeculation = [];
     List<String> typeLibelle = [];
+   List<String> selectedCategoryIds = [];
 
+   List<String> idsCategorieProduit = [];
+   String urls = "";
 
   
   String? image2Src;
@@ -497,9 +505,15 @@ Future<void> _pickImage(ImageSource source) async {
         libelleCategorie.addAll(options
             .map((data) => data.label)
             .toList());
+        idsCategorieProduit = _controllerCategorie.selectedOptions.map((item) => item.value.toString()).toList();
 
-        print("categorie sélectionné ${libelleCategorie.toString()}");
+idsCategorieProduit = _controllerCategorie.selectedOptions.map((item) => item.value.toString()).toList();
+  idsJson = jsonEncode(idsCategorieProduit);
+  //  urls = Uri.parse('http://10.0.2.2:9000/api-koumi/Speculation/by-categories')
+  //   .replace(queryParameters: {'idsCategorieProduit': idsJson}) as String;
+        print("categorie sélectionné ${libelleCategorie.toString() + " id " + idsJson.toString()}");
       });
+  print("id s "+ idsCategorieProduit.toString());
       // Fermer automatiquement le dialogue
       FocusScope.of(context).unfocus();
     },
@@ -522,18 +536,21 @@ Future<void> _pickImage(ImageSource source) async {
     style: TextStyle(color: Colors.black, fontSize: 18),
   ),
 ),
-Padding(
+   Padding(
   padding: const EdgeInsets.symmetric(horizontal: 16),
   child: MultiSelectDropDown.network(
     networkConfig: NetworkConfig(
       // Endpoint pour récupérer les spéculations en fonction des catégories sélectionnées
-      // url: 'http://10.0.2.2:9000/api-koumi/Speculation/by-categories',
-      url: '',
+      url: 'http://10.0.2.2:9000/api-koumi/Speculation/by-categories/${idsCategorieProduit.join(',')}', //e40ijxd5k0n0yrzj5f80,
       method: RequestMethod.get,
       headers: {'Content-Type': 'application/json'},
       // Passer les catégories sélectionnées comme paramètre dans la requête
-      
+    
+     
+      // Ajoutez des instructions d'impression pour vérifier les paramètres de la requête
+
     ),
+
     chipConfig: const ChipConfig(wrapType: WrapType.wrap),
     responseParser: (response) {
       final list = (response as List<dynamic>)
@@ -552,10 +569,10 @@ Padding(
     fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
     onOptionSelected: (options) {
       setState(() {
+        print(idsJson);
         libelleSpeculation.clear();
         libelleSpeculation.addAll(options.map((data) => data.label).toList());
         print("Spéculation sélectionnée ${libelleSpeculation.toString()}");
-     
       });
       // Fermer automatiquement le dialogue
       FocusScope.of(context).unfocus();
@@ -569,6 +586,7 @@ Padding(
     // Exemple de personnalisation des styles
   ),
 ),
+
 
                   // fin  filiere
                    const SizedBox(height: 10,),

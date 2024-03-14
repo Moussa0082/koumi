@@ -27,6 +27,8 @@ import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:provider/provider.dart';
 
+
+
 void main() { 
   runApp(MultiProvider(providers: [         
 

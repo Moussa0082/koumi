@@ -146,7 +146,7 @@ class SpeculationService extends ChangeNotifier {
  Future<List<Speculation>> getSpeculationsByCategories(List<String> idsCategorieProduit) async {
   try {
     String idsJson = jsonEncode(idsCategorieProduit);
-    final response = await http.get(Uri.parse('https://api-koumi/Speculation/by-categories?idsCategorieProduit=$idsJson'));
+    final response = await http.get(Uri.parse('http://api-koumi/Speculation/by-categories?idsCategorieProduit=$idsJson'));
 
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
