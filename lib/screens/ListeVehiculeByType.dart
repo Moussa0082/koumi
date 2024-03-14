@@ -4,6 +4,7 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/AddVehiculeTransport.dart';
 import 'package:koumi_app/screens/DetailTransport.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:provider/provider.dart';
@@ -85,10 +86,12 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                       ),
                     ),
                     onTap: () async {
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (context) => AddVehiculeTransport()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AddVehiculeTransport(
+                                    typeVoitures: typeVoiture,
+                                  )));
                     },
                   ),
                 ),

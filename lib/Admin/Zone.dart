@@ -20,12 +20,20 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 class _ZoneState extends State<Zone> {
   late List<ZoneProduction> zoneList = [];
   late Acteur acteur;
+  late TextEditingController _searchController;
 
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-
+    _searchController = TextEditingController();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController
+        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    super.dispose();
   }
 
   @override
@@ -45,37 +53,75 @@ class _ZoneState extends State<Zone> {
           style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
         actions: [
-           PopupMenuButton<String>(
-              padding: EdgeInsets.zero,
-              itemBuilder: (context) => <PopupMenuEntry<String>>[
-                PopupMenuItem<String>(
-                  child: ListTile(
-                    leading: const Icon(
-                      Icons.add,
-                      color: Colors.green,
-                    ),
-                    title: const Text(
-                      "Ajouter une zone",
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onTap: () async {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AddZone()));
-                    },
+          PopupMenuButton<String>(
+            padding: EdgeInsets.zero,
+            itemBuilder: (context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.add,
+                    color: Colors.green,
                   ),
+                  title: const Text(
+                    "Ajouter une zone",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onTap: () async {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => AddZone()));
+                  },
                 ),
-              ],
-            )
-         
+              ),
+            ],
+          )
         ],
       ),
       body: SingleChildScrollView(
         child: Column(children: [
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.search,
+                      color: Colors.blueGrey[400],
+                      size: 28), // Utiliser une icône de recherche plus grande
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Rechercher',
+                        border: InputBorder.none,
+                        hintStyle: TextStyle(color: Colors.blueGrey[400]),
+                      ),
+                    ),
+                  ),
+                  // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
+                  IconButton(
+                    icon: Icon(Icons.clear),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() {});
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
           Consumer<ZoneProductionService>(
               builder: (context, zoneService, child) {
             return FutureBuilder(
@@ -96,8 +142,15 @@ class _ZoneState extends State<Zone> {
                     );
                   } else {
                     zoneList = snapshot.data!;
+                    String searchText = "";
+                    List<ZoneProduction> filtereSearch =
+                        zoneList.where((search) {
+                      String libelle = search.nomZoneProduction.toLowerCase();
+                      searchText = _searchController.text.toLowerCase();
+                      return libelle.contains(searchText);
+                    }).toList();
                     return Column(
-                        children: zoneList
+                        children: filtereSearch
                             .map((ZoneProduction zone) => Padding(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 15),
@@ -107,7 +160,7 @@ class _ZoneState extends State<Zone> {
                                     color: Colors.white,
                                     child: SizedBox(
                                       width: MediaQuery.of(context).size.width *
-                                          0.9,
+                                          0.8,
                                       height: 305,
                                       child: Column(children: [
                                         ClipRRect(

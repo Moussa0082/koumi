@@ -87,6 +87,7 @@ class _DetailTransportState extends State<DetailTransport> {
       _destinationControllers.add(destinationController);
       _prixControllers.add(prixController);
     });
+   
     isDialOpenNotifier = ValueNotifier<bool>(false);
     super.initState();
   }
