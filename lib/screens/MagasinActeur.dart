@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Magasin.dart';
+import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddMagasinScreen.dart';
 import 'package:koumi_app/screens/Produit.dart';
@@ -22,16 +24,13 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
   TabController? _tabController;
   late TextEditingController _searchController;
 
-  List<String> regions = [];
-  List<String> idNiveau1Pays = [];
+  List<Niveau1Pays> niveau1Pays = [];
+    List<Magasin> magasin = [];
+
   String selectedRegionId =
       ''; // Ajoutez une variable pour stocker l'ID de la région sélectionnée
 
-  Map<String, List<Map<String, dynamic>>> magasinsParRegion = {};
 
-  List<Map<String, dynamic>> regionsData = [];
-  List<String> magasins = [];
-  int currentIndex = 0;
   bool isAdmin = false;
 
   Set<String> loadedRegions =
@@ -46,25 +45,25 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
         List<dynamic> data = json.decode(response.body);
 
         // Filtrer les éléments avec statutN1 == true
-        List<dynamic> filteredData =
-            data.where((item) => item['statutN1'] == true).toList();
 
         setState(() {
-          regionsData = filteredData.cast<Map<String, dynamic>>();
-          regions = regionsData.map((item) => item['nomN1'] as String).toList();
-          idNiveau1Pays = regionsData
-              .map((item) => item['idNiveau1Pays'] as String)
-              .toList();
+         niveau1Pays = data
+            .where((niveau1Pays) => niveau1Pays['statutN1'] == true)
+          .map((item) => Niveau1Pays(
+            idNiveau1Pays: item['idNiveau1Pays'] as String,
+            nomN1: item['nomN1']
+          )).toList();
         });
 
-        _tabController = TabController(length: regions.length, vsync: this);
+        _tabController = TabController(length: niveau1Pays.length, vsync: this);
         _tabController!.addListener(_handleTabChange);
 
         // Fetch les magasins pour la première région
+       
         fetchMagasinsByRegionAndActeur(
             acteur.idActeur!,
-            idNiveau1Pays.isNotEmpty
-                ? idNiveau1Pays[_tabController!.index]
+            niveau1Pays.isNotEmpty
+                ? niveau1Pays[_tabController!.index].idNiveau1Pays!
                 : '');
       } else {
         throw Exception('Failed to load regions');
@@ -82,21 +81,37 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
           'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNieau1Pay/${idActeur}/${idNiveau1Pays}'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
-        List<Map<String, dynamic>> magasins = data
-            .where((magasin) =>
-                magasin['statutMagasin'] == true) // Filtrer les magasins actifs
-            .map<Map<String, dynamic>>((item) => {
-                  'nomMagasin': item['nomMagasin'],
-                  'idMagasin': item['idMagasin'],
-                  'photo': item['photo'],
-                })
-            .toList();
+        
         setState(() {
-          magasinsParRegion[idNiveau1Pays] = magasins;
-        });
-        if (!loadedRegions.contains(idNiveau1Pays)) {
-          loadedRegions.add(idNiveau1Pays);
-        }
+        magasin = data
+            .where((magasin) => magasin['statutMagasin'] == true)
+            .map((item) => Magasin(
+               
+                  nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
+                  idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
+                  contactMagasin: item['contactMagasin'] ?? 'Contact manquant',
+                  photo: item['photo'] ?? '', 
+                  // ou utilisez une URL par défaut
+                  acteur: Acteur(
+                    idActeur: item['acteur']['idActeur'] ?? 'manquant',
+                    nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
+                    // Autres champs de l'acteur...
+                  ),
+                  niveau1Pays: Niveau1Pays(
+                    nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
+                    // Autres champs de l'acteur...
+                  ),
+                  dateAjout: item['dateAjout'] ?? 'manquante',
+                  localiteMagasin: item['localiteMagasin'] ?? 'manquante',
+                  statutMagasin: item['statutMagasin'] ?? false, // ou une valeur par défaut
+                  
+                ))
+            .toList();
+      });
+      
+        // if (!loadedRegions.contains(idNiveau1Pays)) {
+        //   loadedRegions.add(idNiveau1Pays);
+        // }
       } else {
         throw Exception('Failed to load magasins for acteur $idActeur');
       }
@@ -108,8 +123,8 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
   void _handleTabChange() {
     if (_tabController != null &&
         _tabController!.index >= 0 &&
-        _tabController!.index < idNiveau1Pays.length) {
-      String selectedRegionId = idNiveau1Pays[_tabController!.index];
+        _tabController!.index < niveau1Pays.length) {
+      String selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
       fetchMagasinsByRegionAndActeur(acteur.idActeur!, selectedRegionId);
     }
   }
@@ -119,8 +134,8 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
     super.initState();
     _searchController = TextEditingController();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    if (idNiveau1Pays.isNotEmpty) {
-      selectedRegionId = idNiveau1Pays[_tabController!.index];
+    if (niveau1Pays.isNotEmpty) {
+      selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
     }
     fetchRegions();
   }
@@ -138,12 +153,68 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
           const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
     return Container(
       child: DefaultTabController(
-        length: regions.length,
+        length: niveau1Pays.length,
         child: Scaffold(
   // floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
 
        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
+        actions: 
+          <PopupMenuEntry<String>>[
+        //     PopupMenuItem<String>(
+        //       value: 'modifier',
+        //       child: Text('Modifier'),
+        //     ),
+        //     PopupMenuItem<String>(
+        //       value: 'activer',
+        //       child: Text('Activer'),
+        //     ),
+        //     PopupMenuItem<String>(
+        //       value: 'desactiver',
+        //       child: Text('Désactiver'),
+        //     ),
+        //     PopupMenuItem<String>(
+        //       value: 'supprimer',
+        //       child: Text('Supprimer'),
+        //     ),
+        //   ],
+        //   elevation: 8.0, // Ajustez l'élévation selon vos préférences
+        // ).then((String? value) {
+        //   if (value != null) {
+        //     // Mettez en œuvre ici la logique pour chaque option sélectionnée
+        //     switch (value) {
+        //       case 'modifier':
+        //         // Mettez en œuvre la logique pour modifier le magasin
+        //         break;
+        //       case 'activer':
+        //         // Mettez en œuvre la logique pour activer le magasin
+        //         break;
+        //       case 'desactiver':
+        //         // Mettez en œuvre la logique pour désactiver le magasin
+        //         break;
+        //       case 'supprimer':
+        //         // Mettez en œuvre la logique pour supprimer le magasin
+        //         break;
+        //     }
+        //   }});
+        //                 },
+        //                 child: Align(
+        //                   alignment: Alignment.bottomRight,
+        //                   child: SizedBox(
+        //                     height: 10,
+        //                     child: IconButton(
+        //                       icon: Icon(Icons.more_vert), // Icône de points de suspension
+        //                       onPressed: () {
+                               
+        //                       },
+        //                     ),
+        //                   ),
+        //                 ),
+        //               ),
+   
+                      
+
+        ],
         centerTitle: true,
         toolbarHeight: 100,
         leading: IconButton(
@@ -153,10 +224,10 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
             title: Text('Mes boutiques'),
             bottom: TabBar(
-              isScrollable: regions.length > 4,
+              isScrollable: niveau1Pays.length > 4,
               labelColor: Colors.black,
               controller: _tabController, // Ajoutez le contrôleur TabBar
-              tabs: regions.map((region) => Tab(text: region)).toList(),
+              tabs: niveau1Pays.map((region) => Tab(text: region.nomN1!)).toList(),
             ),
             
           ),
@@ -207,8 +278,8 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
                       child: TabBarView(
                         controller:
                             _tabController, // Ajoutez le contrôleur TabBarView
-                        children: idNiveau1Pays.map((region) {
-                          return buildGridView(acteur.idActeur!, region);
+                        children: niveau1Pays.map((region) {
+                          return buildGridView(acteur.idActeur!, region.idNiveau1Pays!);
                         }).toList(),
                       ),
                     ),
@@ -226,38 +297,17 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
   Widget buildGridView(String idActeur, String idNiveau1Pays) {
     try {
       
-    List<Map<String, dynamic>>? magasins = magasinsParRegion[idNiveau1Pays];
+    List<Magasin>? magasins = magasin;
 
-    if (magasins == null) {
+    if (magasins.isEmpty) {
       // Si les données ne sont pas encore chargées, affichez l'effet Shimmer
        
-      return SingleChildScrollView(
-          child: Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Center(
-                              child: Column(
-                                children: [
-                                  Image.asset('assets/images/notif.jpg'),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Text('Aucun magasin trouvé ',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 17,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      ),
-                                ],
-                              ),
-                            ),
-                          ),
-        );
+      return _buildShimmerEffect();
          
     } else {
       // Filtrer les magasins en fonction du texte de recherche
-      List<Map<String, dynamic>> filteredMagasins = magasins.where((magasin) {
-        String nomMagasin = magasin['nomMagasin']!.toString().toLowerCase();
+      List<Magasin> filteredMagasins = magasins.where((magasin) {
+        String nomMagasin = magasin.nomMagasin!.toString().toLowerCase();
         String searchText = _searchController.text.toLowerCase();
         return nomMagasin.contains(searchText);
       }).toList();
@@ -300,15 +350,15 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
           itemCount: filteredMagasins.length,
           itemBuilder: (context, index) {
             // ici on a recuperer les details du  magasin 
-              Map<String, dynamic> magasin = filteredMagasins[index];
+              Magasin magasin = filteredMagasins[index];
             return Expanded(
               child: Container(
                  height:150,
               width: 150,
                 child: GestureDetector(
                   onTap:(){
-                     String id = magasin['idMagasin'];
-                     String nom = magasin['nomMagasin'];
+                     String id = magasin.idMagasin!;
+                     String nom = magasin.nomMagasin!;
                     Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => ProduitScreen(id:id, nom: nom,)),
@@ -323,7 +373,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8.0),
                             child: Image.network(
-                              "http://10.0.2.2/${filteredMagasins[index]['photo']}" ?? "assets/images/magasin.png",
+                              "https://koumi.ml/api-koumi/${magasin.photo}" ?? "assets/images/magasin.png",
                               height: 120,
                               fit: BoxFit.cover,
                               errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
@@ -340,7 +390,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: Text(
-                            filteredMagasins[index]['nomMagasin'].toUpperCase() ?? 'Pas de nom défini',
+                            magasin.nomMagasin!.toUpperCase() ?? 'Pas de nom défini',
                             textAlign: TextAlign.center,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

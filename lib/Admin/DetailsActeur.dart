@@ -112,6 +112,7 @@ class _DetailsActeurState extends State<DetailsActeur> {
                   _buildProfile("whatsApp", acteurs.whatsAppActeur!),
                   _buildProfile("Pays", acteurs.niveau3PaysActeur!),
                   _buildProfile("Localité", acteurs.localiteActeur!),
+
                 ],
               ),
             ),

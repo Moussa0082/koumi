@@ -52,7 +52,7 @@ class MagasinService extends ChangeNotifier{
       var response = await requete.send();
       var responsed = await http.Response.fromStream(response);
 
-      if (response.statusCode == 200 || responsed.statusCode == 201 || responsed.statusCode == 202) {
+      if (response.statusCode == 200 || responsed.statusCode == 201) {
         final donneesResponse = json.decode(responsed.body);
         debugPrint('magasin service ${donneesResponse.toString()}');
       } else {
@@ -71,7 +71,7 @@ class MagasinService extends ChangeNotifier{
 
      Future<void> updateMagasin(
       {
-        required String idMagasin,
+        required String id,
         required String nomMagasin,
     required String contactMagasin,
     required String localiteMagasin,
@@ -79,33 +79,51 @@ class MagasinService extends ChangeNotifier{
     required Acteur acteur,
     required Niveau1Pays niveau1Pays,
       }) async {
-     var updateMag = jsonEncode({
-      'nomMagasin': nomMagasin,
+        try{
+    var requete = http.MultipartRequest(
+          'PUT', Uri.parse('$baseUrl/update/$id'));
+
+      if (photo != null) {
+        requete.files.add(http.MultipartFile(
+            'image', photo.readAsBytes().asStream(), photo.lengthSync(),
+            filename: basename(photo.path)));
+      }
+
+      requete.fields['magasin'] = jsonEncode({
+
+          'id': id,
+          'nomMagasin': nomMagasin,
       'contactMagasin': contactMagasin,
       'localiteMagasin': localiteMagasin,
       'photo': photo,
       'acteur': acteur.toMap(),
       'niveau1Pays': niveau1Pays.toMap()
-    });
+      });
 
+      var response = await requete.send();
+      var responsed = await http.Response.fromStream(response);
 
-    final response = await http.put(
-        Uri.parse("$baseUrl/update/$idMagasin"),
-        headers: {'Content-Type': 'application/json'},
-        body: updateMag);
-    // debugPrint(addFileress.toString());
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      debugPrint(response.body);
-    } else {
-      throw Exception("Une erreur s'est produite' : ${response.statusCode}");
+      if (response.statusCode == 200 || responsed.statusCode == 201 || responsed.statusCode == 202) {
+        final donneesResponse = json.decode(responsed.body);
+        debugPrint('magasin service ${donneesResponse.toString()}');
+      } else {
+        throw Exception(
+            'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
+      }
+        }catch(e){
+        debugPrint('magasin service erreur catch ${e.toString()}');
+ throw Exception(
+          'Une erreur s\'est produite lors de la modification du magasin : $e');
     }
+        
+
   }
 
 
     Future<void> deleteMagasin(String idMagasin) async {
     final response =
-        await http.delete(Uri.parse("$baseUrl/delete/$idMagasin"));
-    if (response.statusCode == 200 || response.statusCode == 201) {
+        await http.delete(Uri.parse('$baseUrl/delete/$idMagasin'));
+    if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
       applyChange();
       debugPrint(response.body.toString());
     } else {

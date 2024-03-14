@@ -20,10 +20,11 @@ import 'package:shimmer/shimmer.dart';
 class RegisterNextScreen extends StatefulWidget {
 
   String nomActeur, email,telephone;
-  late List<TypeActeur> typeActeur;
+  // late List<TypeActeur> typeActeur;
    
 
-   RegisterNextScreen({super.key, required this.nomActeur, required this.email, required this.telephone,  required this.typeActeur});
+   RegisterNextScreen({super.key, required this.nomActeur, 
+   required this.email, required this.telephone});
 
   @override
   State<RegisterNextScreen> createState() => _RegisterNextScreenState();
@@ -148,12 +149,12 @@ Future<void> _pickImage(ImageSource source) async {
   void initState() {
     // TODO: implement initState
     super.initState();
-    String typeActeurNames = '';
-for (TypeActeur typeActeur in widget.typeActeur) {
-  typeActeurNames += typeActeur.libelle! + ', ';
-}
+//     String typeActeurNames = '';
+// for (TypeActeur typeActeur in widget.typeActeur) {
+//   typeActeurNames += typeActeur.libelle! + ', ';
+// }
 
-debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}, Email : ${widget.email}, Types d'acteurs : $typeActeurNames");
+debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}, Email : ${widget.email}");
  
   // _mesPays  =
   //       http.get(Uri.parse('http://10.0.2.2:9000/pays/read'));
@@ -427,7 +428,7 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
               if(_formKey.currentState!.validate()){
               Navigator.push(context, MaterialPageRoute(builder: (context)=>  RegisterEndScreen(
                 nomActeur: widget.nomActeur, email: widget.email, telephone: widget.telephone, 
-                typeActeur: widget.typeActeur, adresse:adresseController.text, maillon:maillonController.text,
+                 adresse:adresseController.text, maillon:maillonController.text,
                 numeroWhatsApp: processedNumber, localistaion: localisationController.text,
                  pays: selectedCountry,
                 )));

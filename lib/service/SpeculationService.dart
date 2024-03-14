@@ -143,6 +143,29 @@ class SpeculationService extends ChangeNotifier {
     }
   }
 
+ Future<List<Speculation>> getSpeculationsByCategories(List<String> idsCategorieProduit) async {
+  try {
+    String idsJson = jsonEncode(idsCategorieProduit);
+    final response = await http.get(Uri.parse('https://api-koumi/Speculation/by-categories?idsCategorieProduit=$idsJson'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      List<Speculation> speculations = [];
+      data.forEach((speculationJson) {
+        speculations.add(Speculation.fromJson(speculationJson));
+      });
+      debugPrint("Spéculations par catégorie $idsCategorieProduit : $speculations");
+      return speculations;
+    } else {
+      throw Exception('Échec de la récupération des spéculations: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Erreur lors de la récupération des spéculations : $e');
+    throw Exception('Erreur lors de la récupération des spéculations');
+  }
+}
+
+
   void applyChange() {
     notifyListeners();
   }

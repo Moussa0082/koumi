@@ -30,6 +30,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
     super.initState();
     // Vérifiez si acteur est non nul avant de l'attribuer à la variable locale
     // if (Provider.of<ActeurProvider>(context, listen: false).acteur != null) {
+      
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // }
     // debugPrint("Acteur : ${acteur.nomActeur}");

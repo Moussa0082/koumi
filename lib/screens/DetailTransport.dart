@@ -502,6 +502,7 @@ class _DetailTransportState extends State<DetailTransport> {
                         _makePhoneWa(whatsappNumber);
                       },
                     ),
+
                     SpeedDialChild(
                       child: Icon(Icons.phone),
                       label: 'Par téléphone ',
@@ -656,6 +657,7 @@ class _DetailTransportState extends State<DetailTransport> {
             '${vehicules.statutVehicule ? 'Disponible' : 'Non disponible'}'),
         acteur.nomActeur != vehicules.acteur.nomActeur
             ? _buildItem('Propriètaire : ', vehicules.acteur.nomActeur!)
+
             : Container(),
         // _buildItem('Description : ', vehicules.typeVoiture.description!),
       ],

@@ -20,7 +20,7 @@ class Magasin {
   final Acteur? acteur;
   final Niveau1Pays? niveau1Pays;
 
-  Magasin({
+  Magasin( {
      this.idMagasin,
      this.codeMagasin,
      this.nomMagasin,

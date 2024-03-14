@@ -131,6 +131,7 @@ class _PageTransporteurState extends State<PageTransporteur> {
                                       .toLowerCase()
                                       .contains('transporteur')) ||
                                   element.typeActeur!.any((e) => e.libelle!
+
                                           .toLowerCase()
                                           .contains('transporteurs')) &&
                                       element.idActeur == acteur.idActeur)

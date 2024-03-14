@@ -45,6 +45,7 @@ class _TransportState extends State<Transport> {
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     typeActeurData = acteur.typeActeur!;
+
     // selectedType == null;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();

@@ -6,6 +6,7 @@ import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 
 class Acteur {
+
      final String? idActeur;
     final String? resetToken;
     final String? tokenCreationDate;
@@ -33,6 +34,7 @@ class Acteur {
     this.idActeur,
     this.resetToken,
     this.tokenCreationDate,
+
     this.codeActeur,
     this.nomActeur,
     this.adresseActeur,
@@ -58,8 +60,27 @@ class Acteur {
 
 
 
-    static Acteur? fromSharedPreferencesData(String emailActeur, String password, List<String> userTypeList, String idActeur, String nomActeur, String telephoneActeur, String adresseActeur, String whatsAppActeur, String niveau3paysActeur, String localiteActeur) {}
+ // Méthode pour créer une instance d'Acteur à partir des données de SharedPreferences
+  factory Acteur.fromSharedPreferencesData(String emailActeur, String password, 
+  List<String> userTypeList, String idActeur, String nomActeur, String telephoneActeur,
+   String adressActeur, String whatsAppActeur, String niveau3PaysActeur,
+    String localiteActeur) {
+    // Créez une liste de TypeActeur à partir de la liste de chaînes userTypeList
+    List<TypeActeur> typeActeurList = userTypeList.map((libelle) => TypeActeur(libelle: libelle)).toList();
 
+    // Retournez une nouvelle instance d'Acteur avec les données fournies
+    return Acteur(
+      // Initialiser les autres propriétés de l'acteur selon vos besoins
+      emailActeur: emailActeur,
+      password: password,
+      typeActeur: typeActeurList, 
+      idActeur:idActeur,
+      nomActeur: nomActeur, 
+      adresseActeur: adressActeur,telephoneActeur: telephoneActeur,
+      whatsAppActeur:whatsAppActeur, niveau3PaysActeur: niveau3PaysActeur, 
+      localiteActeur:localiteActeur 
+    );
+  }
 
   Acteur copyWith({
     String? idActeur,
@@ -86,6 +107,7 @@ class Acteur {
     List<TypeActeur>? typeActeur,
   }) {
     return Acteur(
+
       idActeur: idActeur ?? this.idActeur,
       resetToken: resetToken ?? this.resetToken,
       tokenCreationDate: tokenCreationDate ?? this.tokenCreationDate,
@@ -139,6 +161,7 @@ class Acteur {
   }
 
 
+
    factory Acteur.fromMap(Map<String, dynamic> map) {
     return Acteur(
       idActeur: map['idActeur'],
@@ -171,6 +194,35 @@ class Acteur {
           : null,
     );
   }
+
+  //  factory Acteur.fromJson(Map<String, dynamic> json) => Acteur(
+  //       idActeur: json["idActeur"],
+  //       resetToken: json["resetToken"],
+  //       tokenCreationDate: json["tokenCreationDate"],
+  //       codeActeur: json["codeActeur"],
+  //       nomActeur: json["nomActeur"],
+  //       adresseActeur: json["adresseActeur"],
+  //       telephoneActeur: json["telephoneActeur"],
+  //       whatsAppActeur: json["whatsAppActeur"],
+  //       latitude: json["latitude"],
+  //       longitude: json["longitude"],
+  //       photoSiegeActeur: json["photoSiegeActeur"],
+  //       logoActeur: json["logoActeur"],
+  //       niveau3PaysActeur: json["niveau3PaysActeur"],
+  //       password: json["password"],
+  //       dateAjout: json["dateAjout"],
+  //       dateModif: json["dateModif"],
+  //       personneModif: json["personneModif"],
+  //       localiteActeur: json["localiteActeur"],
+  //       emailActeur: json["emailActeur"],
+  //       filiereActeur: json["filiereActeur"],
+  //       statutActeur: json["statutActeur"],
+  //      typeActeur: (json['typeActeur'] as List)
+  //         .map((type) => TypeActeur.fromJson(type))
+  //         .toList(), 
+  //         // typeActeur: List<TypeActeur>.from(json["typeActeur"].map((x) => TypeActeur.fromJson(x))),
+  //       maillonActeur: json["maillonActeur"],
+  //   );
 
   String toJson() => json.encode(toMap());
 
@@ -236,4 +288,3 @@ class Acteur {
       typeActeur.hashCode;
   }
 }
-
