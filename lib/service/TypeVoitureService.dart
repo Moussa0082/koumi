@@ -13,21 +13,23 @@ class TypeVoitureService extends ChangeNotifier {
 
   Future<void> addTypeVoiture({
     required String nom,
-    String? nombreSieges,
+    required String nombreSieges,
     required String description,
     required Acteur acteur,
   }) async {
     var addType = jsonEncode({
       'idTypeVoiture': null,
       'nom': nom,
-      'nombreSieges': int.tryParse(nombreSieges!),
+      'nombreSieges': int.tryParse(nombreSieges),
       'description': description,
       'acteur': acteur.toMap()
     });
 
+    print(addType.toString());
     final response = await http.post(Uri.parse("$baseUrl/create"),
         headers: {'Content-Type': 'application/json'}, body: addType);
-    debugPrint(addType.toString());
+    print(response.body.toString());
+    print(addType.toString());
     if (response.statusCode == 200 || response.statusCode == 201) {
       debugPrint(response.body);
     } else {
@@ -80,6 +82,7 @@ class TypeVoitureService extends ChangeNotifier {
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      print("body ${body.toString()}");
       typeList = body.map((item) => TypeVoiture.fromMap(item)).toList();
       debugPrint(response.body);
       return typeList;

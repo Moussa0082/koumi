@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:koumi_app/models/Acteur.dart';
@@ -13,20 +14,20 @@ class CategorieProduit {
   final String? personneModif;
   final String? dateModif;
   final Filiere? filiere;
-  final Acteur? acteur;
-
+  
   CategorieProduit({
     this.idCategorieProduit,
-     this.codeCategorie,
+    this.codeCategorie,
     required this.libelleCategorie,
-     this.descriptionCategorie,
-     this.statutCategorie,
+    this.descriptionCategorie,
+    this.statutCategorie,
     this.dateAjout,
     this.personneModif,
     this.dateModif,
-     this.filiere,
-     this.acteur,
+    this.filiere,
   });
+
+ 
 
   CategorieProduit copyWith({
     String? idCategorieProduit,
@@ -38,7 +39,6 @@ class CategorieProduit {
     String? personneModif,
     String? dateModif,
     Filiere? filiere,
-    Acteur? acteur,
   }) {
     return CategorieProduit(
       idCategorieProduit: idCategorieProduit ?? this.idCategorieProduit,
@@ -50,7 +50,6 @@ class CategorieProduit {
       personneModif: personneModif ?? this.personneModif,
       dateModif: dateModif ?? this.dateModif,
       filiere: filiere ?? this.filiere,
-      acteur: acteur ?? this.acteur,
     );
   }
 
@@ -65,22 +64,20 @@ class CategorieProduit {
       'personneModif': personneModif,
       'dateModif': dateModif,
       'filiere': filiere?.toMap(),
-      'acteur': acteur?.toMap(),
     };
   }
 
   factory CategorieProduit.fromMap(Map<String, dynamic> map) {
     return CategorieProduit(
       idCategorieProduit: map['idCategorieProduit'] != null ? map['idCategorieProduit'] as String : null,
-      codeCategorie: map['codeCategorie'] as String,
+      codeCategorie: map['codeCategorie'] != null ? map['codeCategorie'] as String : null,
       libelleCategorie: map['libelleCategorie'] as String,
-      descriptionCategorie: map['descriptionCategorie'] as String,
-      statutCategorie: map['statutCategorie'] as bool,
+      descriptionCategorie: map['descriptionCategorie'] != null ? map['descriptionCategorie'] as String : null,
+      statutCategorie: map['statutCategorie'] != null ? map['statutCategorie'] as bool : null,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
-      filiere: Filiere.fromMap(map['filiere'] as Map<String,dynamic>),
-      acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
+      filiere: map['filiere'] != null ? Filiere.fromMap(map['filiere'] as Map<String,dynamic>) : null,
     );
   }
 
@@ -90,7 +87,7 @@ class CategorieProduit {
 
   @override
   String toString() {
-    return 'CategorieProduit(idCategorieProduit: $idCategorieProduit, codeCategorie: $codeCategorie, libelleCategorie: $libelleCategorie, descriptionCategorie: $descriptionCategorie, statutCategorie: $statutCategorie, dateAjout: $dateAjout, personneModif: $personneModif, dateModif: $dateModif, filiere: $filiere, acteur: $acteur)';
+    return 'CategorieProduit(idCategorieProduit: $idCategorieProduit, codeCategorie: $codeCategorie, libelleCategorie: $libelleCategorie, descriptionCategorie: $descriptionCategorie, statutCategorie: $statutCategorie, dateAjout: $dateAjout, personneModif: $personneModif, dateModif: $dateModif, filiere: $filiere)';
   }
 
   @override
@@ -106,8 +103,7 @@ class CategorieProduit {
       other.dateAjout == dateAjout &&
       other.personneModif == personneModif &&
       other.dateModif == dateModif &&
-      other.filiere == filiere &&
-      other.acteur == acteur;
+      other.filiere == filiere;
   }
 
   @override
@@ -120,7 +116,6 @@ class CategorieProduit {
       dateAjout.hashCode ^
       personneModif.hashCode ^
       dateModif.hashCode ^
-      filiere.hashCode ^
-      acteur.hashCode;
+      filiere.hashCode;
   }
 }

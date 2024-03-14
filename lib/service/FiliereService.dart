@@ -14,13 +14,13 @@ class FiliereService extends ChangeNotifier {
   Future<void> addFileres({
     required String libelleFiliere,
     required String descriptionFiliere,
-    required Acteur acteur,
+    // required Acteur acteur,
   }) async {
     var addFileress = jsonEncode({
       'idFiliere': null,
       'libelleFiliere': libelleFiliere,
       'descriptionFiliere': descriptionFiliere,
-      'acteur': acteur.toMap()
+      // 'acteur': acteur.toMap()
     });
 
     final response = await http.post(Uri.parse("$baseUrl/AddFiliere"),

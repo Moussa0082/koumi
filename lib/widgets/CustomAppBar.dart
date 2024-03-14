@@ -48,7 +48,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
               return const CircularProgressIndicator();
             }
 
-            List<TypeActeur> typeActeurData = ac.typeActeur;
+            List<TypeActeur> typeActeurData = ac.typeActeur!;
             String type = typeActeurData.map((data) => data.libelle).join(', ');
             return ListTile(
               leading: ac.logoActeur == null || ac.logoActeur!.isEmpty
@@ -65,7 +65,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                       image: NetworkImage("http:10.0.2.2/${ac.logoActeur}"),
                     ),
               title: Text(
-                ac.nomActeur.toUpperCase(),
+                ac.nomActeur!.toUpperCase(),
                 style: const TextStyle(
                     color: d_colorGreen,
                     fontSize: 18,

@@ -62,7 +62,7 @@ class _ProfilAState extends State<ProfilA> {
                           return const CircularProgressIndicator();
                         }
 
-                        List<TypeActeur> typeActeurData = ac.typeActeur;
+                        List<TypeActeur> typeActeurData = ac.typeActeur!;
                         String type = typeActeurData
                             .map((data) => data.libelle)
                             .join(', ');
@@ -83,10 +83,10 @@ class _ProfilAState extends State<ProfilA> {
                                       cornerRadius: 50,
                                       color: Colors.black,
                                       image: NetworkImage(
-                                          "http:10.0.2.2/${ac.logoActeur}"),
+                                          "http:10.0.2.2/${ac.logoActeur!}"),
                                     ),
                               title: Text(
-                                ac.nomActeur.toUpperCase(),
+                                ac.nomActeur!.toUpperCase(),
                                 style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 22,
@@ -122,14 +122,14 @@ class _ProfilAState extends State<ProfilA> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _buildProfile('Email', ac.emailActeur),
+                                    _buildProfile('Email', ac.emailActeur!),
                                     _buildProfile(
-                                        'Téléphone', ac.telephoneActeur),
+                                        'Téléphone', ac.telephoneActeur!),
                                     _buildProfile(
                                         'WhatsApp', ac.whatsAppActeur ?? ''),
-                                    _buildProfile('Adresse', ac.adresseActeur),
+                                    _buildProfile('Adresse', ac.adresseActeur!),
                                     _buildProfile(
-                                        'Localité', ac.localiteActeur),
+                                        'Localité', ac.localiteActeur!),
                                     _buildProfile('Pays', ac.niveau3PaysActeur!),
                                   ],
                                 ),

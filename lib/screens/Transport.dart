@@ -35,7 +35,7 @@ class _TransportState extends State<Transport> {
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    typeActeurData = acteur.typeActeur;
+    typeActeurData = acteur.typeActeur!;
     // selectedType == null;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
@@ -100,7 +100,7 @@ class _TransportState extends State<Transport> {
           ]),
       body: SingleChildScrollView(
         child: Column(children: [
-          const SizedBox(height: 10),
+           const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Container(
@@ -128,7 +128,7 @@ class _TransportState extends State<Transport> {
                       ),
                     ),
                   ),
-                  
+                  // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
                   IconButton(
                     icon: Icon(Icons.clear),
                     onPressed: () {
@@ -147,18 +147,7 @@ class _TransportState extends State<Transport> {
               future: _typeList,
               builder: (_, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return DropdownButtonFormField(
-                    items: [],
-                    onChanged: null,
-                    decoration: InputDecoration(
-                      labelText: '-- Aucun type de véhicule trouvé --',
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  );
+                  return CircularProgressIndicator();
                 }
                 if (snapshot.hasError) {
                   return Text("${snapshot.error}");
@@ -196,9 +185,7 @@ class _TransportState extends State<Transport> {
                             ),
                           )
                           .toList(),
-                      hint: Text(
-                          textAlign: TextAlign.center,
-                          "   -- Filtre par type de véhicule --"),
+                      hint: Text("-- Filtre par type de véhicule --"),
                       value: typeValue,
                       onChanged: (newValue) {
                         setState(() {
@@ -211,7 +198,6 @@ class _TransportState extends State<Transport> {
                         });
                       },
                       decoration: InputDecoration(
-                        // labelText: '-- Filtre par type de véhicule --',
                         contentPadding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 20),
                         border: OutlineInputBorder(

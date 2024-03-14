@@ -138,7 +138,7 @@ class _UpdateUniteState extends State<UpdateUnite> {
                                   sigleUnite: sigle,
                                   description: description,
                                   acteur: acteur,
-                                  personneModif: acteur.nomActeur)
+                                  personneModif: acteur.nomActeur!)
                               .then((value) => {
                                     Provider.of<UniteService>(context,
                                             listen: false)

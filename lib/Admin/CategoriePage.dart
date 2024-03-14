@@ -905,7 +905,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                       libelleCategorie: libelle,
                                       descriptionCategorie: description,
                                       filiere: filiere,
-                                      acteur: acteur)
+                                      )
                                   .then((value) => {
                                         Provider.of<CategorieService>(context,
                                                 listen: false)
@@ -1212,7 +1212,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                       nomSpeculation: libelle,
                                       descriptionSpeculation: description,
                                       categorieProduit: categorieProduit,
-                                      acteur: acteur)
+                                      )
                                   .then((value) => {
                                         Provider.of<SpeculationService>(context,
                                                 listen: false)

@@ -129,7 +129,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
     parProvider =
         Provider.of<ParametreGenerauxProvider>(context, listen: false);
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    typeActeurData = acteur.typeActeur;
+    typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
   }
 

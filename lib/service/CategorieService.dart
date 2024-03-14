@@ -16,14 +16,14 @@ class CategorieService extends ChangeNotifier {
     required String libelleCategorie,
     required String descriptionCategorie,
     required Filiere filiere,
-    required Acteur acteur,
+    // required Acteur acteur,
   }) async {
     var addcat = jsonEncode({
       'idCategorieProduit': null,
       'libelleCategorie': libelleCategorie,
       'descriptionCategorie': descriptionCategorie,
       'filiere': filiere.toMap(),
-      'acteur': acteur.toMap()
+      // 'acteur': acteur.toMap()
     });
 
     final response = await http.post(Uri.parse("$baseUrl/addCategorie"),

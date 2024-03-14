@@ -56,7 +56,7 @@ class _DetailTransportState extends State<DetailTransport> {
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    typeActeurData = acteur.typeActeur;
+    typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _typeList = http.get(Uri.parse(
         'http://10.0.2.2:9000/api-koumi/TypeVoiture/listeByActeur/${acteur.idActeur!}'));
@@ -69,13 +69,13 @@ class _DetailTransportState extends State<DetailTransport> {
     _capaciteController.text = vehicules.capaciteVehicule;
     _etatController.text = vehicules.etatVehicule.toString();
     _localiteController.text = vehicules.localisation;
-    // String destination = vehicules.prixParDestination.keys.toString();
-    // int prix = vehicules.prixParDestination.values;
-
-    // if (destination.isNotEmpty && prix > 0) {
-    //   // Ajouter la destination et le prix à la liste prixParDestinations
-    //   prixParDestinations.addAll({destination: prix});
-    // }
+    // Récupérer les destinations et les prix du véhicule
+    vehicules.prixParDestination.forEach((destination, prix) {
+      if (destination.isNotEmpty && prix > 0) {
+        // Ajouter la destination et le prix à la liste prixParDestinations
+        prixParDestinations.addAll({destination: prix});
+      }
+    });
 
     isDialOpenNotifier = ValueNotifier<bool>(false);
     super.initState();
@@ -296,7 +296,6 @@ class _DetailTransportState extends State<DetailTransport> {
                                               acteur: acteur,
                                               statutVehicule:
                                                   vehicules.statutVehicule,
-                                                  
                                             );
                                           }),
                                           Navigator.of(context).pop(),
@@ -483,7 +482,7 @@ class _DetailTransportState extends State<DetailTransport> {
                       ),
                       onTap: () {
                         final String whatsappNumber =
-                            vehicules.acteur.whatsAppActeur;
+                            vehicules.acteur.whatsAppActeur!;
                         _makePhoneWa(whatsappNumber);
                       },
                     ),
@@ -497,7 +496,7 @@ class _DetailTransportState extends State<DetailTransport> {
                       ),
                       onTap: () {
                         final String numberPhone =
-                            vehicules.acteur.telephoneActeur;
+                            vehicules.acteur.telephoneActeur!;
                         _makePhoneCall(numberPhone);
                       },
                     )
@@ -636,7 +635,7 @@ class _DetailTransportState extends State<DetailTransport> {
         _buildItem('Statut: : ',
             '${vehicules.statutVehicule ? 'Disponible' : 'Non disponible'}'),
         acteur.nomActeur != vehicules.acteur.nomActeur
-            ? _buildItem('Propriètaire : ', vehicules.acteur.nomActeur)
+            ? _buildItem('Propriètaire : ', vehicules.acteur.nomActeur!)
             : Container(),
         // _buildItem('Description : ', vehicules.typeVoiture.description!),
       ],

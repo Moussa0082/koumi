@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:koumi_app/models/Acteur.dart';
@@ -12,7 +13,6 @@ class TypeVoiture {
   final String? dateModif;
   final bool statutType;
   final Acteur acteur;
-  
   TypeVoiture({
     required this.idTypeVoiture,
     required this.codeTypeVoiture,
@@ -24,7 +24,6 @@ class TypeVoiture {
     required this.statutType,
     required this.acteur,
   });
-
 
   TypeVoiture copyWith({
     String? idTypeVoiture,
@@ -69,18 +68,21 @@ class TypeVoiture {
       idTypeVoiture: map['idTypeVoiture'] as String,
       codeTypeVoiture: map['codeTypeVoiture'] as String,
       nom: map['nom'] as String,
-      nombreSieges: map['nombreSieges'] != null ? map['nombreSieges'] as int : null,
-      description: map['description'] != null ? map['description'] as String : null,
+      nombreSieges:
+          map['nombreSieges'] != null ? map['nombreSieges'] as int : null,
+      description:
+          map['description'] != null ? map['description'] as String : null,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
       statutType: map['statutType'] as bool,
-      acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
+      acteur: Acteur.fromMap(map['acteur'] as Map<String, dynamic>),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory TypeVoiture.fromJson(String source) => TypeVoiture.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory TypeVoiture.fromJson(String source) =>
+      TypeVoiture.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -90,29 +92,28 @@ class TypeVoiture {
   @override
   bool operator ==(covariant TypeVoiture other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.idTypeVoiture == idTypeVoiture &&
-      other.codeTypeVoiture == codeTypeVoiture &&
-      other.nom == nom &&
-      other.nombreSieges == nombreSieges &&
-      other.description == description &&
-      other.dateAjout == dateAjout &&
-      other.dateModif == dateModif &&
-      other.statutType == statutType &&
-      other.acteur == acteur;
+
+    return other.idTypeVoiture == idTypeVoiture &&
+        other.codeTypeVoiture == codeTypeVoiture &&
+        other.nom == nom &&
+        other.nombreSieges == nombreSieges &&
+        other.description == description &&
+        other.dateAjout == dateAjout &&
+        other.dateModif == dateModif &&
+        other.statutType == statutType &&
+        other.acteur == acteur;
   }
 
   @override
   int get hashCode {
     return idTypeVoiture.hashCode ^
-      codeTypeVoiture.hashCode ^
-      nom.hashCode ^
-      nombreSieges.hashCode ^
-      description.hashCode ^
-      dateAjout.hashCode ^
-      dateModif.hashCode ^
-      statutType.hashCode ^
-      acteur.hashCode;
+        codeTypeVoiture.hashCode ^
+        nom.hashCode ^
+        nombreSieges.hashCode ^
+        description.hashCode ^
+        dateAjout.hashCode ^
+        dateModif.hashCode ^
+        statutType.hashCode ^
+        acteur.hashCode;
   }
 }

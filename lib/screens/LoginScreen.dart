@@ -110,8 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
         prefs.setString('password', password);
         // prefs.setString('nomActeur', responseBody['nomActeur']);
         // Vérifier si l'image de profil est présente, sinon, enregistrer l'image par défaut dans SharedPreferences
-        final String? logoActeur = responseBody['logoActeur'];
-        final String? photoSiegeActeur = responseBody['photoSiegeActeur'];
+
         // if (logoActeur == null) {
         //   prefs.setString('logoActeur', defaultProfileImage);
         // }
@@ -123,12 +122,9 @@ class _LoginScreenState extends State<LoginScreen> {
         final adresseActeur = responseBody['adresseActeur'];
         final telephoneActeur = responseBody['telephoneActeur'];
         final whatsAppActeur = responseBody['whatsAppActeur'];
-        // final logoActeur =  responseBody['logoActeur'] ;
-        // final photoSiegeActeur = responseBody['photoSiegeActeur'] ;
-        final filiereActeur = responseBody['filiereActeur'];
+
         final niveau3PaysActeur = responseBody['niveau3PaysActeur'];
         final localiteActeur = responseBody['localiteActeur'];
-        final maillonActeur = responseBody['maillonActeur'];
 
         prefs.setString('nomActeur', nomActeur);
         prefs.setString('idActeur', idActeur);
@@ -137,12 +133,9 @@ class _LoginScreenState extends State<LoginScreen> {
         prefs.setString('adresseActeur', adresseActeur);
         prefs.setString('telephoneActeur', telephoneActeur);
         prefs.setString('whatsAppActeur', whatsAppActeur);
-        // prefs.setString('logoActeur', logoActeur!);
-        // prefs.setString('photoSiegeActeur', photoSiegeActeur!);
-        prefs.setString('filiereActeur', filiereActeur);
+     
         prefs.setString('niveau3PaysActeur', niveau3PaysActeur);
         prefs.setString('localiteActeur', localiteActeur);
-        prefs.setString('maillonActeur', maillonActeur);
         // Enregistrer la liste des types d'utilisateur dans SharedPreferences
 
         // Enregistrer la liste des types d'utilisateur dans SharedPreferences
@@ -158,25 +151,14 @@ class _LoginScreenState extends State<LoginScreen> {
         prefs.setStringList('userType', userTypeLabels);
         Acteur acteur = Acteur(
           idActeur: responseBody['idActeur'],
-          resetToken: responseBody['resetToken'],
-          tokenCreationDate: responseBody['tokenCreationDate'],
-          codeActeur: responseBody['codeActeur'],
           nomActeur: responseBody['nomActeur'],
           adresseActeur: responseBody['adresseActeur'],
           telephoneActeur: responseBody['telephoneActeur'],
-          latitude: responseBody['latitude'],
-          longitude: responseBody['longitude'],
-          photoSiegeActeur: responseBody['photoSiegeActeur'],
-          logoActeur: responseBody['logoActeur'],
           whatsAppActeur: responseBody['whatsAppActeur'],
           niveau3PaysActeur: responseBody['niveau3PaysActeur'],
           dateAjout: responseBody['dateAjout'],
-          dateModif: responseBody['dateModif'],
-          personneModif: responseBody['personneModif'],
           localiteActeur: responseBody['localiteActeur'],
-          maillonActeur: responseBody['maillonActeur'],
           emailActeur: emailActeur,
-          filiereActeur: responseBody['filiereActeur'],
           statutActeur: responseBody['statutActeur'],
           typeActeur: typeActeurList,
           password: password,
@@ -185,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
         acteurProvider.setActeur(acteur);
 
         final List<String> type =
-            acteur.typeActeur.map((e) => e.libelle!).toList();
+            acteur.typeActeur!.map((e) => e.libelle!).toList();
         if (type.contains('admin') || type.contains('Admin')) {
           Navigator.pushReplacement(
             context,
@@ -352,9 +334,7 @@ class _LoginScreenState extends State<LoginScreen> {
           dateModif: responseBody['dateModif'],
           personneModif: responseBody['personneModif'],
           localiteActeur: responseBody['localiteActeur'],
-          maillonActeur: responseBody['maillonActeur'],
           emailActeur: emailActeur,
-          filiereActeur: responseBody['filiereActeur'],
           statutActeur: responseBody['statutActeur'],
           typeActeur: typeActeurList,
           password: password,
@@ -363,7 +343,7 @@ class _LoginScreenState extends State<LoginScreen> {
         acteurProvider.setActeur(acteur);
 
         final List<String> type =
-            acteur.typeActeur.map((e) => e.libelle!).toList();
+            acteur.typeActeur!.map((e) => e.libelle!).toList();
         if (type.contains('admin') || type.contains('Admin')) {
           Navigator.pushReplacement(
             context,

@@ -25,18 +25,17 @@ class _TypeVehiculeState extends State<TypeVehicule> {
   late Acteur acteur;
   late TextEditingController _searchController;
   List<TypeVoiture> typeListe = [];
- 
+
   late List<Vehicule> vehiculeList = [];
   final formkey = GlobalKey<FormState>();
   TextEditingController nomController = TextEditingController();
   TextEditingController nombreSiegesController = TextEditingController();
   TextEditingController descController = TextEditingController();
 
- 
-
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    // print(acteur.toString());
     _searchController = TextEditingController();
     super.initState();
   }
@@ -710,7 +709,13 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                           final String nom = nomController.text;
                           final String siege = nombreSiegesController.text;
                           final String description = descController.text;
-                          // if (formkey.currentState!.validate()) {
+                          // if (formkey.currentState != null &&
+                          //     formkey.currentState!.validate()) {
+                          // Votre code ici
+
+                          print(nom);
+                          print(siege);
+                          print(description);
                           try {
                             await TypeVoitureService()
                                 .addTypeVoiture(
@@ -728,6 +733,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                       Navigator.of(context).pop()
                                     })
                                 .catchError((onError) => {
+                                      print(onError.toString()),
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
@@ -743,6 +749,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                     });
                           } catch (e) {
                             final String errorMessage = e.toString();
+                            print(errorMessage);
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Row(
@@ -755,6 +762,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                               ),
                             );
                           }
+                          // }
                           // }
                         },
                         style: ElevatedButton.styleFrom(

@@ -72,7 +72,7 @@ class _SpeculationPageState extends State<SpeculationPage> {
               // ),
               // SizedBox(height: 10),
               Text(
-                "Catégorie ${cat.libelleCategorie}",
+                cat.libelleCategorie.toUpperCase(),
                 style: TextStyle(
                     color: d_colorGreen,
                     fontWeight: FontWeight.w600,
@@ -701,7 +701,7 @@ class _SpeculationPageState extends State<SpeculationPage> {
                                       nomSpeculation: libelle,
                                       descriptionSpeculation: description,
                                       categorieProduit: cat,
-                                      acteur: acteur)
+                                      )
                                   .then((value) => {
                                         Provider.of<SpeculationService>(context,
                                                 listen: false)

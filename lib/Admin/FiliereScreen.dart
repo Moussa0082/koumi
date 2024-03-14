@@ -51,7 +51,8 @@ class _FiliereScreenState extends State<FiliereScreen> {
     para = paraList[0];
     _filiereList = http
         // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
-        .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+        .get(
+            Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
     _liste = getFil();
   }
 
@@ -174,8 +175,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
             Consumer<FiliereService>(
               builder: (context, filiereService, child) {
                 return FutureBuilder(
-                    future:
-                        filiereService.fetchFiliereByActeur(acteur.idActeur!),
+                    future: filiereService.fetchFiliere(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(
@@ -696,9 +696,9 @@ class _FiliereScreenState extends State<FiliereScreen> {
                             try {
                               await FiliereService()
                                   .addFileres(
-                                      libelleFiliere: libelle,
-                                      descriptionFiliere: description,
-                                      acteur: acteur)
+                                    libelleFiliere: libelle,
+                                    descriptionFiliere: description,
+                                  )
                                   .then((value) => {
                                         Provider.of<FiliereService>(context,
                                                 listen: false)
@@ -706,7 +706,8 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                         setState(() {
                                           _filiereList = http
                                               // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
-                                              .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+                                              .get(Uri.parse(
+                                                  'http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
                                         }),
                                         libelleController.clear(),
                                         descriptionController.clear(),
@@ -931,10 +932,10 @@ class _FiliereScreenState extends State<FiliereScreen> {
                             try {
                               await CategorieService()
                                   .addCategorie(
-                                      libelleCategorie: libelle,
-                                      descriptionCategorie: description,
-                                      filiere: filiere,
-                                      acteur: acteur)
+                                    libelleCategorie: libelle,
+                                    descriptionCategorie: description,
+                                    filiere: filiere,
+                                  )
                                   .then((value) => {
                                         Provider.of<CategorieService>(context,
                                                 listen: false)

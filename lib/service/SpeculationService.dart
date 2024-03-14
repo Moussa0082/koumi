@@ -16,14 +16,14 @@ class SpeculationService extends ChangeNotifier {
     required String nomSpeculation,
     required String descriptionSpeculation,
     required CategorieProduit categorieProduit,
-    required Acteur acteur,
+    // required Acteur acteur,
   }) async {
     var addSpeculations = jsonEncode({
       'idSpeculation': null,
       'nomSpeculation': nomSpeculation,
       'descriptionSpeculation': descriptionSpeculation,
       'categorieProduit': categorieProduit.toMap(),
-      'acteur': acteur.toMap(),
+      // 'acteur': acteur.toMap(),
     });
 
     final response = await http.post(Uri.parse("$baseUrl/addSpeculation"),

@@ -12,8 +12,7 @@ class Filiere {
   final String? dateAjout;
   final String? personneModif;
   final String? dateModif;
-  final Acteur? acteur;
-
+  
   Filiere({
     this.idFiliere,
     this.codeFiliere,
@@ -23,8 +22,9 @@ class Filiere {
     this.dateAjout,
     this.personneModif,
     this.dateModif,
-    this.acteur,
   });
+
+ 
 
   Filiere copyWith({
     String? idFiliere,
@@ -35,7 +35,6 @@ class Filiere {
     String? dateAjout,
     String? personneModif,
     String? dateModif,
-    Acteur? acteur,
   }) {
     return Filiere(
       idFiliere: idFiliere ?? this.idFiliere,
@@ -46,7 +45,6 @@ class Filiere {
       dateAjout: dateAjout ?? this.dateAjout,
       personneModif: personneModif ?? this.personneModif,
       dateModif: dateModif ?? this.dateModif,
-      acteur: acteur ?? this.acteur,
     );
   }
 
@@ -60,63 +58,55 @@ class Filiere {
       'dateAjout': dateAjout,
       'personneModif': personneModif,
       'dateModif': dateModif,
-      'acteur': acteur?.toMap(),
     };
   }
 
   factory Filiere.fromMap(Map<String, dynamic> map) {
     return Filiere(
       idFiliere: map['idFiliere'] != null ? map['idFiliere'] as String : null,
-      codeFiliere:
-          map['codeFiliere'] != null ? map['codeFiliere'] as String : null,
+      codeFiliere: map['codeFiliere'] != null ? map['codeFiliere'] as String : null,
       libelleFiliere: map['libelleFiliere'] as String,
       descriptionFiliere: map['descriptionFiliere'] as String,
       statutFiliere: map['statutFiliere'] as bool,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
-      personneModif:
-          map['personneModif'] != null ? map['personneModif'] as String : null,
+      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
-      acteur: map['acteur'] != null
-          ? Acteur.fromMap(map['acteur'] as Map<String, dynamic>)
-          : null,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Filiere.fromJson(String source) =>
-      Filiere.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Filiere.fromJson(String source) => Filiere.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
-    return 'Filiere(idFiliere: $idFiliere, codeFiliere: $codeFiliere, libelleFiliere: $libelleFiliere, descriptionFiliere: $descriptionFiliere, statutFiliere: $statutFiliere, dateAjout: $dateAjout, personneModif: $personneModif, dateModif: $dateModif, acteur: $acteur)';
+    return 'Filiere(idFiliere: $idFiliere, codeFiliere: $codeFiliere, libelleFiliere: $libelleFiliere, descriptionFiliere: $descriptionFiliere, statutFiliere: $statutFiliere, dateAjout: $dateAjout, personneModif: $personneModif, dateModif: $dateModif)';
   }
 
   @override
   bool operator ==(covariant Filiere other) {
     if (identical(this, other)) return true;
-
-    return other.idFiliere == idFiliere &&
-        other.codeFiliere == codeFiliere &&
-        other.libelleFiliere == libelleFiliere &&
-        other.descriptionFiliere == descriptionFiliere &&
-        other.statutFiliere == statutFiliere &&
-        other.dateAjout == dateAjout &&
-        other.personneModif == personneModif &&
-        other.dateModif == dateModif &&
-        other.acteur == acteur;
+  
+    return 
+      other.idFiliere == idFiliere &&
+      other.codeFiliere == codeFiliere &&
+      other.libelleFiliere == libelleFiliere &&
+      other.descriptionFiliere == descriptionFiliere &&
+      other.statutFiliere == statutFiliere &&
+      other.dateAjout == dateAjout &&
+      other.personneModif == personneModif &&
+      other.dateModif == dateModif;
   }
 
   @override
   int get hashCode {
     return idFiliere.hashCode ^
-        codeFiliere.hashCode ^
-        libelleFiliere.hashCode ^
-        descriptionFiliere.hashCode ^
-        statutFiliere.hashCode ^
-        dateAjout.hashCode ^
-        personneModif.hashCode ^
-        dateModif.hashCode ^
-        acteur.hashCode;
+      codeFiliere.hashCode ^
+      libelleFiliere.hashCode ^
+      descriptionFiliere.hashCode ^
+      statutFiliere.hashCode ^
+      dateAjout.hashCode ^
+      personneModif.hashCode ^
+      dateModif.hashCode;
   }
 }

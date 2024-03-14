@@ -71,7 +71,7 @@ class _AddCategorieState extends State<AddCategorie> {
             //   height: 10,
             // ),
             Text(
-              "Filière : ${filiere.libelleFiliere}",
+              filiere.libelleFiliere.toUpperCase(),
               style:
                   TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
             )
@@ -590,10 +590,10 @@ class _AddCategorieState extends State<AddCategorie> {
                                 try {
                                   await CategorieService()
                                       .addCategorie(
-                                          libelleCategorie: libelle,
-                                          descriptionCategorie: description,
-                                          filiere: filiere,
-                                          acteur: acteur)
+                                        libelleCategorie: libelle,
+                                        descriptionCategorie: description,
+                                        filiere: filiere,
+                                      )
                                       .then((value) => {
                                             Provider.of<CategorieService>(
                                                     context,
