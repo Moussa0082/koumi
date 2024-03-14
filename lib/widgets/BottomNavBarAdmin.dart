@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:koumi_app/Admin/AcceuilAdmin.dart';
 import 'package:koumi_app/Admin/ProduitA.dart';
 import 'package:koumi_app/Admin/ProfilA.dart';
@@ -54,6 +56,12 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
   void _onItemTap(int index) {
     Provider.of<BottomNavigationService>(context, listen: false)
         .changeIndex(index);
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
   }
 
   @override

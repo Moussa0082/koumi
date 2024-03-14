@@ -65,7 +65,7 @@ class _DetailsActeurState extends State<DetailsActeur> {
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Center(
-                  child: Text(acteurs.nomActeur.toUpperCase(),
+                  child: Text(acteurs.nomActeur!.toUpperCase(),
                       style: const TextStyle(
                         color: Colors.black,
                         fontSize: 22,
@@ -97,9 +97,9 @@ class _DetailsActeurState extends State<DetailsActeur> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildProfile("Adresse", acteurs.adresseActeur),
-                    _buildProfile("Téléphone", acteurs.telephoneActeur),
-                    _buildProfile("Email", acteurs.emailActeur),
+                    _buildProfile("Adresse", acteurs.adresseActeur!),
+                    _buildProfile("Téléphone", acteurs.telephoneActeur!),
+                    _buildProfile("Email", acteurs.emailActeur!),
                   ],
                 ),
               );
@@ -109,9 +109,9 @@ class _DetailsActeurState extends State<DetailsActeur> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildProfile("whatsApp", acteurs.whatsAppActeur),
+                  _buildProfile("whatsApp", acteurs.whatsAppActeur!),
                   _buildProfile("Pays", acteurs.niveau3PaysActeur!),
-                  _buildProfile("Localité", acteurs.localiteActeur),
+                  _buildProfile("Localité", acteurs.localiteActeur!),
                   _buildProfile("Filière", acteurs.filiereActeur!),
                 ],
               ),

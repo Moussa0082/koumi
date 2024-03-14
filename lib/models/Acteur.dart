@@ -7,10 +7,10 @@ class Acteur {
     String? resetToken;
     String? tokenCreationDate;
     String? codeActeur;
-    String nomActeur;
-    String adresseActeur;
-    String telephoneActeur;
-    String whatsAppActeur;
+    String? nomActeur;
+    String? adresseActeur;
+    String? telephoneActeur;
+    String? whatsAppActeur;
     String? latitude;
     String? longitude;
     String? photoSiegeActeur;
@@ -20,37 +20,37 @@ class Acteur {
     String? dateAjout;
     String? dateModif;
     String? personneModif;
-    String localiteActeur;
-    String emailActeur;
+    String? localiteActeur;
+    String? emailActeur;
     String? filiereActeur;
     bool? statutActeur;
-    List<TypeActeur> typeActeur;
-    String maillonActeur;
+    List<TypeActeur>? typeActeur;
+    String? maillonActeur;
   
   Acteur({
     this.idActeur,
     this.resetToken,
     this.tokenCreationDate,
      this.codeActeur,
-    required this.nomActeur,
-    required this.adresseActeur,
-    required this.telephoneActeur,
-    required this.whatsAppActeur,
+     this.nomActeur,
+     this.adresseActeur,
+     this.telephoneActeur,
+     this.whatsAppActeur,
      this.latitude,
      this.longitude,
      this.photoSiegeActeur,
      this.logoActeur,
      this.niveau3PaysActeur,
-    required this.password,
+     this.password,
     this.dateAjout,
     this.dateModif,
     this.personneModif,
-    required this.localiteActeur,
-    required this.emailActeur,
+     this.localiteActeur,
+     this.emailActeur,
      this.filiereActeur,
      this.statutActeur,
-    required this.typeActeur,
-    required this.maillonActeur,
+     this.typeActeur,
+     this.maillonActeur,
   });
 
 
@@ -58,7 +58,7 @@ class Acteur {
   factory Acteur.fromSharedPreferencesData(String emailActeur, String password, 
   List<String> userTypeList, String idActeur, String nomActeur, String telephoneActeur,
    String adressActeur, String whatsAppActeur, String niveau3PaysActeur,
-    String localiteActeur, String maillonActeur) {
+    String localiteActeur) {
     // Créez une liste de TypeActeur à partir de la liste de chaînes userTypeList
     List<TypeActeur> typeActeurList = userTypeList.map((libelle) => TypeActeur(libelle: libelle)).toList();
 
@@ -72,7 +72,7 @@ class Acteur {
       nomActeur: nomActeur, 
       adresseActeur: adressActeur,telephoneActeur: telephoneActeur,
       whatsAppActeur:whatsAppActeur, niveau3PaysActeur: niveau3PaysActeur, 
-      localiteActeur:localiteActeur , maillonActeur: maillonActeur,
+      localiteActeur:localiteActeur
     );
   }
   
@@ -103,7 +103,7 @@ class Acteur {
       'emailActeur': emailActeur,
       'filiereActeur': filiereActeur,
       'statutActeur': statutActeur,
-      'typeActeur': typeActeur.map((x) => x.toMap()).toList(),
+      'typeActeur': typeActeur?.map((x) => x.toMap()).toList(),
       'maillonActeur': maillonActeur,
     };
   }
@@ -132,7 +132,7 @@ class Acteur {
         "statutActeur": statutActeur,
         // 'typeActeur': typeActeur.map((type) => type.toJson()).toList(),
 
-        "typeActeur": List<dynamic>.from(typeActeur.map((x) => x.toJson())),
+        "typeActeur": List<dynamic>.from(typeActeur!.map((x) => x.toJson())),
         "maillonActeur": maillonActeur,
     };
 

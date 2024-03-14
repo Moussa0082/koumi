@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -29,9 +31,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String email = "";
   String? typeValue;
   String selectedCountry = '';
-  late TypeActeur monTypeActeur;
+  // late TypeActeur monTypeActeur;
   late Future _mesTypeActeur;
+  Position? _currentPosition;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+
+    String? detectedCountry = "";
 
     String _errorMessage = "";
 
@@ -55,6 +61,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
   }
 
+
+ // Fonction pour obtenir le pays à partir des coordonnées de latitude et de longitude
+Future<String?> getCountryFromLatLng(double latitude, double longitude) async {
+  try {
+    List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+    if (placemarks.isNotEmpty) {
+      return placemarks[0].country;
+    } else {
+      return null; // Aucun résultat trouvé
+    }
+  } catch (e) {
+    print("Erreur lors de la récupération du pays à partir des coordonnées: $e");
+    return null;
+  }
+}
+
+Future<String?> getCurrentCountryFromLocation() async {
+  try {
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
+    return getCountryFromLatLng(position.latitude, position.longitude);
+  } catch (e) {
+    print("Erreur lors de la récupération du pays actuel à partir de la géolocalisation: $e");
+    return null;
+  }
+}
 
   TextEditingController nomActeurController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -116,6 +147,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Center(child: Image.asset('assets/images/logo.png', height: 200, width: 100,)),
                Container(
                  height: 40,
+                 width:MediaQuery.of(context).size.width,
                  decoration: BoxDecoration(
                    color: Color.fromARGB(255, 240, 178, 107),
                  ),
@@ -214,140 +246,66 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                      
 
-                      Padding(
-                  padding: const EdgeInsets.only(left:10.0),
-                  child: Text("Téléphone *", style: TextStyle(color: (Colors.black), fontSize: 18),),
-                ),
-  Container(
+                     Padding(
+  padding: const EdgeInsets.only(left:10.0),
+  child: Text("Téléphone *", style: TextStyle(color: (Colors.black), fontSize: 18),),
+),
+
+Container(
   child: Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: <Widget>[
-      InternationalPhoneNumberInput(
-        formatInput: true,
-        
-        hintText: "Numéro de téléphone",
-        maxLength: 20,
-        errorMessage: "Numéro invalide",
-        onInputChanged: (PhoneNumber number) {
-          print("Pays : $selectedCountry" );
-           processedNumber = removePlus(number.phoneNumber!);
-          print(processedNumber);
+      FutureBuilder<String?>(
+        future: getCurrentCountryFromLocation(),
+        builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator(); // Loading indicator
+          } else if (snapshot.hasError || !snapshot.hasData) {
+            return Text("Erreur lors de la détection du pays"); // Error message
+          } else {
+            String? detectedCountry = snapshot.data;
+            return InternationalPhoneNumberInput(
+              // Supprimez le paramètre initialCountry
+              formatInput: true,
+              hintText: "Numéro de téléphone",
+              maxLength: 20,
+              errorMessage: "Numéro invalide",
+              onInputChanged: (PhoneNumber number) {
+                print("Pays : $detectedCountry");
+                processedNumber = removePlus(number.phoneNumber!);
+                print(processedNumber);
+              },
+              onInputValidated: (bool value) {
+                print(value);
+              },
+              selectorConfig: SelectorConfig(
+                selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+                useBottomSheetSafeArea: true,
+              ),
+              ignoreBlank: false,
+              autoValidateMode: AutovalidateMode.disabled,
+              selectorTextStyle: TextStyle(color: Colors.black),
+              keyboardType: TextInputType.phone,
+              inputDecoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                ),
+              ),
+              onSaved: (PhoneNumber number) {
+                print('On Saved: $number');
+              },
+              textFieldController: controller,
+              // Ne spécifiez pas de pays initial ici
+            );
+          }
         },
-        onInputValidated: (bool value) {
-          print(value);
-        },
-        selectorConfig: SelectorConfig(
-          selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
-          useBottomSheetSafeArea: true,
-        ),
-        ignoreBlank: false,
-        autoValidateMode: AutovalidateMode.disabled,
-        selectorTextStyle: TextStyle(color: Colors.black),
-        keyboardType: TextInputType.phone,
-        inputDecoration: InputDecoration(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(20)),
-          ),
-        ),
-        onSaved: (PhoneNumber number) {
-          print('On Saved: $number');
-        },
-        textFieldController: controller,
-       
       ),
     ],
   ),
 ),
-                  // fin  téléphone 
-              const SizedBox(height: 10,),
-                       Padding(
-                  padding: const EdgeInsets.only(left:10.0),
-                  child: Text("Type Acteur *", style: TextStyle(color: (Colors.black), fontSize: 18),),
-                ),
 
-                const SizedBox(height: 5),
 
-                //  selcet type acteur 
-                 
-          Container(
-  height: 70,
-  width: double.infinity,
-  child: Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: FutureBuilder(
-      future: _mesTypeActeur,
-      builder: (_, snapshot) {
-        try {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator(
-            backgroundColor: (Color.fromARGB(255, 245, 212, 169)),
-            color: (Colors.orange),
-          );
-          }
-          if (snapshot.hasError) {
-            return Text("Une erreur s'est produite veuillez reéssayer plus tard");
-          }
-           if (!snapshot.hasData) {
-                    return Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Center(
-                        child: Text("Aucun typpe dacteur disponible"),
-                      ),
-                    );
-                  }
-          if (snapshot.hasData) {
-            final reponse = json.decode((snapshot.data.body)) as List;
-            final mesType = reponse
-                .map((e) => TypeActeur.fromMap(e))
-                .where((typeActeur) =>
-                    typeActeur.statutTypeActeur == true &&
-                    typeActeur.libelle != 'Admin') // Filtrer les types d'acteurs actifs et différents de l'administrateur
-                .toList();
-
-            List<DropdownMenuItem<String>> dropdownItems = [];
-
-            if (mesType.isNotEmpty) {
-              dropdownItems = mesType
-                  .map((e) => DropdownMenuItem(
-                        alignment: AlignmentDirectional.center,
-                        child: Text(
-                          e.libelle!,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        value: e.idTypeActeur,
-                      ))
-                  .toList();
-            } else {
-              dropdownItems.add(DropdownMenuItem(
-                child: Text('Aucun type d\'acteur disponible'),
-                value: null,
-              ));
-            }
-            return DropdownButton(
-              alignment: AlignmentDirectional.center,
-              items: dropdownItems,
-              value: typeValue,
-              onChanged: (newValue) {
-                setState(() {
-                  typeValue = newValue;
-                  if (newValue != null) {
-                    monTypeActeur = mesType.firstWhere(
-                        (element) => element.idTypeActeur == newValue);
-                    debugPrint(monTypeActeur.idTypeActeur.toString());
-                  }
-                });
-              },
-            );
-          }
-          return Text('Aucune donnée disponible');
-        } catch (e) {
-          // Gérer l'absence de connexion ici
-          return Center(child: Text('Type d\'acteur non disponible,\n verifier votre connexion internet ', style: TextStyle(fontSize: 15),));
-        }
-      },
-    ),
-  ),
-),
+                  // fin  téléphone            
 
 
                 //end select type acteur 
@@ -360,7 +318,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                  
                 Navigator.push(context, MaterialPageRoute(builder: (context) =>  
                 RegisterNextScreen(nomActeur: nomActeurController.text, email: emailController.text,
-                 telephone: processedNumber ,typeActeur: [monTypeActeur],) ));
+                 telephone: processedNumber ) ));
               
                 }
                },

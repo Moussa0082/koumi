@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AlerteScreen.dart';
 import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
@@ -10,6 +12,8 @@ import 'package:koumi_app/screens/MagasinActeur.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
+import 'package:koumi_app/widgets/SnackBar.dart';
+import 'package:provider/provider.dart';
 
 class Accueil extends StatefulWidget {
   const Accueil({super.key});
@@ -22,6 +26,21 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _AccueilState extends State<Accueil> {
+  
+       late Acteur acteur;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+   Snack.info(message:'Connecté en tant que : ${acteur.nomActeur!.toUpperCase()}') ;
+    });
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,7 +67,7 @@ class _AccueilState extends State<Accueil> {
                 _buildAccueilCard("Locations", "location.png", 7),
 
                 _buildAccueilCard("Alertes", "alerte.png", 8),
-                _buildAccueilCard("Mes Produits", "produit.png", 9),
+                _buildAccueilCard("Produits", "produit.png", 9),
                 // _buildAccueilCard("Statistique", "statistique_logo.png", 4)
               ],
             ),
@@ -111,8 +130,8 @@ class _AccueilState extends State<Accueil> {
           child: Padding(
             padding: const EdgeInsets.all(5.0),
             child: Container(
-              width: 150,
-              height: 150,
+              width:MediaQuery.of(context).size.width,
+              height: 155,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: Colors.white,
@@ -134,7 +153,7 @@ class _AccueilState extends State<Accueil> {
                           .cover, // You can adjust the BoxFit based on your needs
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 2),
                   Text(
                     titre,
                     style: const TextStyle(

@@ -4,9 +4,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Stock.dart';
+import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
+import 'package:koumi_app/screens/ProduitActeur.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProduitScreen extends StatefulWidget {
@@ -24,6 +30,11 @@ class _ProduitScreenState extends State<ProduitScreen>
   late TextEditingController _searchController;
 
   List<Stock> stock = [];
+    late Acteur acteur;
+  late List<TypeActeur> typeActeurData = [];
+  late String type;
+    
+   bool? isEditable = false;
   List<CategorieProduit> categorieProduit = [];
   String selectedCategorieProduit = "";
   String selectedCategorieProduitNom = "";
@@ -109,6 +120,9 @@ class _ProduitScreenState extends State<ProduitScreen>
   void initState() {
     super.initState();
     _searchController = TextEditingController();
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    typeActeurData = acteur.typeActeur!;
+    type = typeActeurData.map((data) => data.libelle).join(', ');
 
     if (categorieProduit.isEmpty) {
       fetchCategorie();
@@ -133,23 +147,75 @@ class _ProduitScreenState extends State<ProduitScreen>
 
        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
-        centerTitle: true,
-        toolbarHeight: 100,
-        leading: IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-            title: Text('Categories'),
-            bottom: TabBar(
-              isScrollable: true,
-              labelColor: Colors.black,
-              controller: _tabController,
-              tabs: categorieProduit
-                  .map((categorie) => Tab(text: categorie.libelleCategorie))
-                  .toList(),
-            ),
+          centerTitle: true,
+          toolbarHeight: 100,
+          leading: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+          title: Text(
+            'Produits',
+            style: const TextStyle(
+                color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
+          actions: [
+            PopupMenuButton<String>(
+              padding: EdgeInsets.zero,
+              itemBuilder: (context) {
+                print("Type: $type");
+                return acteur.idActeur! == stock.map((element) => element.acteur!.idActeur!)
+                    ? <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.remove_red_eye,
+                              color: Colors.green,
+                            ),
+                            title: const Text(
+                              "Mes Produits",
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onTap: () async {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ProduitActeurScreen()));
+                            },
+                          ),
+                        ),
+                      ]
+                    : <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.add,
+                              color: Colors.green,
+                            ),
+                            title: const Text(
+                              "Ajouter produit",
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onTap: () async {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          AddAndUpdateProductScreen(isEditable: isEditable,)));
+                            },
+                          ),
+                        ),
+                      ];
+              },
+            )
+          ]),
+
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(

@@ -45,7 +45,7 @@ class _NotificationPageState extends State<NotificationPage> {
     super.initState();
     _searchController = TextEditingController();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    typeActeurData = acteur.typeActeur;
+    typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _liste = getMessage(acteur.idActeur!);
     isDialOpenNotifier =

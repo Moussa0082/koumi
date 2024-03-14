@@ -23,8 +23,9 @@ class AddMagasinScreen extends StatefulWidget {
   String? localiteMagasin = "";
   String? idMagasin = "";
   File? photo;
-  Niveau1Pays? niveau1Pays;
-   AddMagasinScreen({super.key, this.isEditable, this.idMagasin, this.nomMagasin, this.contactMagasin, this.localiteMagasin, this.photo,  this.niveau1Pays});
+  late Niveau1Pays? niveau1Pays;
+   AddMagasinScreen({super.key, this.isEditable, this.idMagasin, this.nomMagasin, 
+   this.contactMagasin, this.localiteMagasin, this.photo,  this.niveau1Pays});
 
   @override
   State<AddMagasinScreen> createState() => _AddMagasinScreenState();
@@ -93,13 +94,13 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
     if (photos != null) {
       await magasinService
           .updateMagasin(
-              idMagasin: widget.idMagasin!,
+              id: widget.idMagasin!,
               nomMagasin: nomMagasin,
               contactMagasin: contactMagasin,
               localiteMagasin: localiteMagasin,
               photo: widget.photo,
               acteur: acteur,
-              niveau1Pays: niveau1Pays)
+              niveau1Pays: widget.niveau1Pays!)
           .then((value) => showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -120,12 +121,12 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
     } else {
       await magasinService
           .updateMagasin(
-              idMagasin:widget.idMagasin!,
+              id:widget.idMagasin!,
               nomMagasin: nomMagasin,
               contactMagasin: contactMagasin,
               localiteMagasin: localiteMagasin,
               acteur: acteur,
-              niveau1Pays: niveau1Pays)
+              niveau1Pays: widget.niveau1Pays!)
           .then((value) => showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -212,7 +213,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                   contactMagasinController.clear(),
                   localiteMagasinController.clear(),
                   setState(() {
-                    niveau1Pays == null;
+                    // niveau1Pays == null;
                     photos == null;
                   }),
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -354,7 +355,8 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
     contactMagasinController.text = widget.contactMagasin!;
     localiteMagasinController.text = widget.localiteMagasin!;
     // photos = widget.photo!;
-    // niveauPaysValue = widget.niveau1Pays!.nomN1;
+    niveauPaysValue = widget.niveau1Pays!.idNiveau1Pays;
+    debugPrint(widget.niveau1Pays!.idNiveau1Pays);
     }
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     niveau1PaysList =
@@ -364,6 +366,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
         .parametreList!;
     para = paraList[0];
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -387,224 +390,221 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                 fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
           ),
         ),
-        body: LoadingOverlay(
-          isLoading: _isLoading,
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(10),
-              child: Container(
-                child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        // Nom magasin
-                        Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                "Nom Magasin *",
-                                style: TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.bold),
-                              )),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Container(
+              child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      // Nom magasin
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              "Nom Magasin *",
+                              style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),
+                            )),
+                      ),
+                      TextFormField(
+                        controller: nomMagasinController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          hintText: "Entrez le nom du magasin",
                         ),
-                        TextFormField(
-                          controller: nomMagasinController,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15)),
-                            hintText: "Entrez le nom du magasin",
-                          ),
-                          keyboardType: TextInputType.text,
-                          validator: (val) {
-                            if (val == null || val.isEmpty) {
-                              return "Veillez entrez le nom du magasin";
-                            } else {
-                              return null;
-
-                            }
-                          },
-                          onSaved: (val) => nomMagasin = val!,
+                        keyboardType: TextInputType.text,
+                        validator: (val) {
+                          if (val == null || val.isEmpty) {
+                            return "Veillez entrez le nom du magasin";
+                          } else {
+                            return null;
+        
+                          }
+                        },
+                        onSaved: (val) => nomMagasin = val!,
+                      ),
+                      // fin  nom magasin
+                      const SizedBox(height: 10),
+              
+                      //Contact magasin
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              "Contact Magasin *",
+                              style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),
+                            )),
+                      ),
+                      TextFormField(
+                        controller: contactMagasinController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          hintText: "Entrez le contact du magasin",
                         ),
-                        // fin  nom magasin
-                        const SizedBox(height: 10),
-      
-                        //Contact magasin
-                        Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                "Contact Magasin *",
-                                style: TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.bold),
-                              )),
+                        keyboardType: TextInputType.text,
+                        validator: (val) {
+                          if (val == null || val.isEmpty) {
+                            return "Veillez entrez le contact du magasin";
+                          } else {
+                            return null;
+                          }
+                        },
+                        onSaved: (val) => contactMagasin = val!,
+                      ),
+                      // fin contact magasin
+              
+                      const SizedBox(height: 10),
+              
+                      //Contact localiteMagasin
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              "Localité Magasin *",
+                              style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),
+                            )),
+                      ),
+                      TextFormField(
+                        controller: localiteMagasinController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          hintText: "Exemple : Bamako , Kayes , Segou",
                         ),
-                        TextFormField(
-                          controller: contactMagasinController,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15)),
-                            hintText: "Entrez le contact du magasin",
-                          ),
-                          keyboardType: TextInputType.text,
-                          validator: (val) {
-                            if (val == null || val.isEmpty) {
-                              return "Veillez entrez le contact du magasin";
-                            } else {
-                              return null;
-                            }
-                          },
-                          onSaved: (val) => contactMagasin = val!,
-                        ),
-                        // fin contact magasin
-      
-                        const SizedBox(height: 10),
-      
-                        //Contact localiteMagasin
-                        Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                "Localité Magasin *",
-                                style: TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.bold),
-                              )),
-                        ),
-                        TextFormField(
-                          controller: localiteMagasinController,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15)),
-                            hintText: "Exemple : Bamako , Kayes , Segou",
-                          ),
-                          keyboardType: TextInputType.text,
-                          validator: (val) {
-                            if (val == null || val.isEmpty) {
-                              return "Veillez entrez la localité du magasin";
-                            } else {
-                              return null;
-                            }
-                          },
-                          onSaved: (val) => localiteMagasin = val!,
-                        ),
-                        // fin localite magasin
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        FutureBuilder(
-                          future: niveau1PaysList,
-                          builder: (_, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return CircularProgressIndicator();
-                            }
-                            if (snapshot.hasError) {
-                              return Text("${snapshot.error}");
-                            }
-                            if (snapshot.hasData) {
-                              final response =
-                                  json.decode(snapshot.data.body) as List;
-                              final niveau1PaysList = response
-                                  .map((e) => Niveau1Pays.fromMap(e))
-                                  .where((con) => con.statutN1 == true)
-                                  .toList();
-                              if (niveau1PaysList.isEmpty) {
-                                return Text(
-                                  'Aucun pays disponible',
-                                  style:
-                                      TextStyle(overflow: TextOverflow.ellipsis),
-                                );
-                              }
-      
-                              return DropdownButtonFormField<String>(
-                                items: niveau1PaysList
-                                    .map(
-                                      (e) => DropdownMenuItem(
-                                        value: e.idNiveau1Pays,
-                                        child: Text(e.nomN1!),
-                                      ),
-                                    )
-                                    .toList(),
-                                value: niveauPaysValue,
-                                onChanged: (newValue) {
-                                  setState(() {
-                                    niveauPaysValue = newValue;
-                                    if (newValue != null) {
-                                      niveau1Pays = niveau1PaysList.firstWhere(
-                                          (element) =>
-                                              element.idNiveau1Pays == newValue);
-                                      debugPrint(
-                                          "con select ${niveau1Pays.toString()}");
-                                      // typeSelected = true;
-                                    }
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                  labelText: 'Sélectionner un sous région',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
+                        keyboardType: TextInputType.text,
+                        validator: (val) {
+                          if (val == null || val.isEmpty) {
+                            return "Veillez entrez la localité du magasin";
+                          } else {
+                            return null;
+                          }
+                        },
+                        onSaved: (val) => localiteMagasin = val!,
+                      ),
+                      // fin localite magasin
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      FutureBuilder(
+                        future: niveau1PaysList,
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          }
+                          if (snapshot.hasError) {
+                            return Text("${snapshot.error}");
+                          }
+                          if (snapshot.hasData) {
+                            final response =
+                                json.decode(snapshot.data.body) as List;
+                            final niveau1PaysList = response
+                                .map((e) => Niveau1Pays.fromMap(e))
+                                .where((con) => con.statutN1 == true)
+                                .toList();
+                            if (niveau1PaysList.isEmpty) {
+                              return Text(
+                                'Aucun pays disponible',
+                                style:
+                                    TextStyle(overflow: TextOverflow.ellipsis),
                               );
                             }
-                            return Text(
-                              'Aucune donnée disponible',
-                              style: TextStyle(overflow: TextOverflow.ellipsis),
+              
+                            return DropdownButtonFormField<String>(
+                              items: niveau1PaysList
+                                  .map(
+                                    (e) => DropdownMenuItem(
+                                      value:  e.idNiveau1Pays  ,
+                                      child: Text(e.nomN1!),
+                                    ),
+                                  )
+                                  .toList(),
+                              value: niveauPaysValue,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  niveauPaysValue = newValue;
+                                  if (newValue != null) {
+                                    niveau1Pays = niveau1PaysList.firstWhere(
+                                        (element) =>
+                                            element.idNiveau1Pays == newValue);
+                                    debugPrint(
+                                        "con select ${niveau1Pays.toString()}");
+                                    // typeSelected = true;
+                                  }
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText:widget.isEditable! == false ? 'Sélectionner un sous région' : widget.niveau1Pays!.nomN1!,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
                             );
-                          },
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-      
-                        (photos == null)
-                            ? IconButton(
-                                onPressed: _showImageSourceDialog,
-                                icon: Icon(Icons.camera_alt_sharp),
-                                iconSize: 50,
-                              )
-                            : Image.file(
-                                photos!,
-                                height: 100,
-                                width: 200,
-                                fit: BoxFit.cover,
-                              ),
-                        Text("Choisir une image"),
-      
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Center(
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              // Handle button press action here
-                              if (_formKey.currentState!.validate()) {
-                                _handleButtonPress();
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color(0xFFFF8A00), // Orange color code
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              minimumSize: const Size(250, 40),
+                          }
+                          return Text(
+                            'Aucune donnée disponible',
+                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                          );
+                        },
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+              
+                      (photos == null)
+                          ? IconButton(
+                              onPressed: _showImageSourceDialog,
+                              icon: Icon(Icons.camera_alt_sharp),
+                              iconSize: 50,
+                            )
+                          : Image.file(
+                              photos!,
+                              height: 100,
+                              width: 200,
+                              fit: BoxFit.cover,
                             ),
-                            child:  Text(
-                             widget.isEditable! == false ? " Ajouter " : " Modifier ",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      Text("Choisir une image"),
+              
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            // Handle button press action here
+                            if (_formKey.currentState!.validate()) {
+                              _handleButtonPress();
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                const Color(0xFFFF8A00), // Orange color code
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            minimumSize: const Size(250, 40),
+                          ),
+                          child:  Text(
+                           widget.isEditable! == false ? " Ajouter " : " Modifier ",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                      ],
-                    )),
-              ),
+                      ),
+                    ],
+                  )),
             ),
           ),
         ),

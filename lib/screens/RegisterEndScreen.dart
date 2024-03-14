@@ -1,5 +1,9 @@
 import 'dart:io';
+import 'package:get/get.dart';
+import 'package:koumi_app/models/Speculation.dart';
+import 'package:koumi_app/service/SpeculationService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
+import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:path/path.dart';
 
 import 'package:flutter/cupertino.dart';
@@ -22,14 +26,14 @@ class RegisterEndScreen extends StatefulWidget {
 
     String nomActeur, email,telephone, adresse , maillon , localistaion, numeroWhatsApp , pays;
     File? image1;
-   late List<TypeActeur> typeActeur;
+   late List<TypeActeur>? typeActeur;
   //  late List<TypeActeur> idTypeActeur;
 
    RegisterEndScreen({
    super.key, required this.nomActeur, 
    this.image1,
    required this.email, required this.telephone, 
-   required this.typeActeur, required this.adresse, 
+    this.typeActeur, required this.adresse, 
    required this.maillon, required this.numeroWhatsApp,
    required this.localistaion, required this.pays});
 
@@ -41,13 +45,46 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
 
  bool isLoading = false;
    
-        final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+ final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    
+List<Speculation> _speculations = [];
+  //  final MultiSelectController _controllerCategorie = MultiSelectController();
+
+final MultiSelectController<ValueItem> _controllerCategorie = MultiSelectController<ValueItem>();
+final MultiSelectController<ValueItem> _controllerSpeculation = MultiSelectController<ValueItem>();
+
+
+// Définissez une fonction pour récupérer les spéculations en fonction des catégories sélectionnées
+Future<void> fetchSpeculationsByCategories(List<String> idsCategorieProduit) async {
+  try {
+    // Utilisez la méthode getSpeculationsByCategories pour récupérer les spéculations
+    
+    List<Speculation> speculations = await SpeculationService().getSpeculationsByCategories(idsCategorieProduit);
+    
+    // Mettez à jour l'état des spéculations avec les données récupérées
+    setState(() {
+      _speculations = speculations;
+    });
+  } catch (e) {
+    // Gérez les erreurs éventuelles
+    print('Erreur lors de la récupération des spéculations : $e');
+    // Affichez un message d'erreur à l'utilisateur ou gérez l'erreur selon votre logique
+  }
+}
+
+// Définissez la fonction onOptionSelected pour gérer la sélection des options dans MultiSelectDropDown
+
+   final MultiSelectController _controllerTypeActeur = MultiSelectController();
 
   String password = "";
   String confirmPassword = "";
   
   String filiere = "";
   bool _obscureText = true;
+    List<String> libelleCategorie = [];
+    List<String> libelleSpeculation = [];
+    List<String> typeLibelle = [];
+
 
   
   String? image2Src;
@@ -284,10 +321,6 @@ Future<void> _pickImage(ImageSource source) async {
       } 
    }
 
-// Fonction pour fermer la boîte de dialogue de chargement
-void hideLoadingDialog(BuildContext context) {
-  Navigator.of(context).pop(); // Ferme la boîte de dialogue
-}
 
     @override
   void initState() {
@@ -370,30 +403,173 @@ void hideLoadingDialog(BuildContext context) {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                const SizedBox(height: 10,),
-                
-                      Padding(
+   
+ const SizedBox(height: 5,),
+   Padding(
                   padding: const EdgeInsets.only(left:10.0),
-                  child: Text("Filiere", style: TextStyle(color: (Colors.black), fontSize: 18),),
+                  child: Text("Type Acteur", style: TextStyle(color: (Colors.black), fontSize: 18),),
                 ),
-                TextFormField(
-                    controller: filiereController,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15)),
-                        // labelText: "Filiere",
-                        hintText: "Votre filiere ",
-                        
-                        ),
-                    keyboardType: TextInputType.text,
-                    validator: (val) {
-                      if (val == null || val.isEmpty) {
-                        return "Veillez entrez votre filiere";
-                      } else {
-                        return null;
-                      }
-                    },
-                    onSaved: (val) => filiere = val!,
-                  ),
+                Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 16),
+  child: MultiSelectDropDown.network(
+    networkConfig: NetworkConfig(
+      url: 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
+      method: RequestMethod.get,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    ),
+    chipConfig: const ChipConfig(wrapType: WrapType.wrap),
+    responseParser: (response) {
+      final list = (response as List<dynamic>)
+          .where((data) =>
+              (data as Map<String, dynamic>)['libelle']
+                  .trim()
+                  .toLowerCase() !=
+              'admin')
+          .map((e) {
+        final item = e as Map<String, dynamic>;
+        return ValueItem(
+          label: item['libelle'] as String,
+          value: item['idTypeActeur'],
+        );
+      }).toList();
+      return Future.value(list);
+    },
+    controller: _controllerTypeActeur,
+    hint: 'Sélectionner un type d\'acteur',
+    fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
+    onOptionSelected: (options) {
+      setState(() {
+        typeLibelle.clear();
+        typeLibelle.addAll(options
+            .map((data) => data.label)
+            .toList());
+        print("Libellé sélectionné ${typeLibelle.toString()}");
+      });
+      // Fermer automatiquement le dialogue
+      FocusScope.of(context).unfocus();
+    },
+    responseErrorBuilder: ((context, body) {
+      return const Padding(
+        padding: EdgeInsets.all(10.0),
+        child: Text('Aucun type disponible'),
+      );
+    }),
+    // Exemple de personnalisation des styles
+  ),
+),
+
+  const SizedBox(height: 5,),
+      Padding(
+                  padding: const EdgeInsets.only(left:10.0),
+                  child: Text("Categorie", style: TextStyle(color: (Colors.black), fontSize: 18),),
+                ),
+                Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 16),
+  child: MultiSelectDropDown.network(
+    networkConfig: NetworkConfig(
+      url: 'http://10.0.2.2:9000/api-koumi/Categorie/allCategorie',
+      method: RequestMethod.get,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    ),
+    chipConfig: const ChipConfig(wrapType: WrapType.wrap),
+    responseParser: (response) {
+      final list = (response as List<dynamic>)
+          
+          .map((e) {
+        final item = e as Map<String, dynamic>;
+        return ValueItem(
+          label: item['libelleCategorie'] as String,
+          value: item['idCategorieProduit'],
+        );
+      }).toList();
+      return Future.value(list);
+    },
+    controller: _controllerCategorie,
+    hint: 'Sélectionner une categorie produit',
+    fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
+    onOptionSelected: (options) {
+      setState(() {
+        libelleCategorie.clear();
+        libelleCategorie.addAll(options
+            .map((data) => data.label)
+            .toList());
+
+        print("categorie sélectionné ${libelleCategorie.toString()}");
+      });
+      // Fermer automatiquement le dialogue
+      FocusScope.of(context).unfocus();
+    },
+    responseErrorBuilder: ((context, body) {
+      return const Padding(
+        padding: EdgeInsets.all(10.0),
+        child: Text('Aucun type disponible'),
+      );
+    }),
+    // Exemple de personnalisation des styles
+  ),
+),
+
+                
+                     // Deuxième widget MultiSelectDropDown pour sélectionner les spéculations
+   Padding(
+  padding: const EdgeInsets.only(left: 10.0),
+  child: Text(
+    "Spéculation",
+    style: TextStyle(color: Colors.black, fontSize: 18),
+  ),
+),
+Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 16),
+  child: MultiSelectDropDown.network(
+    networkConfig: NetworkConfig(
+      // Endpoint pour récupérer les spéculations en fonction des catégories sélectionnées
+      // url: 'http://10.0.2.2:9000/api-koumi/Speculation/by-categories',
+      url: '',
+      method: RequestMethod.get,
+      headers: {'Content-Type': 'application/json'},
+      // Passer les catégories sélectionnées comme paramètre dans la requête
+      
+    ),
+    chipConfig: const ChipConfig(wrapType: WrapType.wrap),
+    responseParser: (response) {
+      final list = (response as List<dynamic>)
+          .map((e) {
+            final item = e as Map<String, dynamic>;
+            return ValueItem(
+              label: item['nomSpeculation'] as String,
+              value: item['idSpeculation'],
+            );
+          })
+          .toList();
+      return Future.value(list);
+    },
+    controller: _controllerSpeculation,
+    hint: 'Sélectionner une spéculation',
+    fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
+    onOptionSelected: (options) {
+      setState(() {
+        libelleSpeculation.clear();
+        libelleSpeculation.addAll(options.map((data) => data.label).toList());
+        print("Spéculation sélectionnée ${libelleSpeculation.toString()}");
+     
+      });
+      // Fermer automatiquement le dialogue
+      FocusScope.of(context).unfocus();
+    },
+    responseErrorBuilder: ((context, body) {
+      return const Padding(
+        padding: EdgeInsets.all(10.0),
+        child: Text('Aucune spéculation disponible'),
+      );
+    }),
+    // Exemple de personnalisation des styles
+  ),
+),
+
                   // fin  filiere
                    const SizedBox(height: 10,),
                   // debut mot de passe

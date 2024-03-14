@@ -115,7 +115,7 @@ class _PageTransporteurState extends State<PageTransporteur> {
                       acteurList = snapshot.data!;
                       String searchText = "";
                       List<Acteur> filtereSearch = acteurList.where((search) {
-                        String libelle = search.nomActeur.toLowerCase();
+                        String libelle = search.nomActeur!.toLowerCase();
                         searchText = _searchController.text.toLowerCase();
                         return libelle.contains(searchText);
                       }).toList();
@@ -123,10 +123,10 @@ class _PageTransporteurState extends State<PageTransporteur> {
                       return Column(
                           children: filtereSearch
                               .where((element) =>
-                                  element.typeActeur.any((e) => e.libelle!
+                                  element.typeActeur!.any((e) => e.libelle!
                                       .toLowerCase()
                                       .contains('transporteur')) ||
-                                  element.typeActeur.any((e) => e.libelle!
+                                  element.typeActeur!.any((e) => e.libelle!
                                       .toLowerCase()
                                       .contains('transporteurs')))
                               .map((e) => Padding(
@@ -175,7 +175,7 @@ class _PageTransporteurState extends State<PageTransporteur> {
                                                           "http://10.0.2.2/${e.logoActeur}"),
                                                     ),
                                               title: Text(
-                                                  e.nomActeur.toUpperCase(),
+                                                  e.nomActeur!.toUpperCase(),
                                                   style: const TextStyle(
                                                     color: Colors.black,
                                                     fontSize: 20,
@@ -183,7 +183,7 @@ class _PageTransporteurState extends State<PageTransporteur> {
                                                         TextOverflow.ellipsis,
                                                   )),
                                               subtitle: Text(
-                                                  e.typeActeur
+                                                  e.typeActeur!
                                                       .map((data) =>
                                                           data.libelle)
                                                       .join(', '),

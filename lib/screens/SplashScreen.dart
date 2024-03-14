@@ -64,7 +64,7 @@ class _SplashScreenState extends State<SplashScreen> {
     // Vérifie si l'utilisateur est déjà connecté
     if (acteur != null) {
       // Vérifie si l'utilisateur est un administrateur
-      if (acteur.typeActeur
+      if (acteur.typeActeur!
           .any((type) => type.libelle == 'admin' || type.libelle == 'Admin')) {
         Timer(
           const Duration(seconds: 5),

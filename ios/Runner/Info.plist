@@ -29,6 +29,12 @@
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>LSApplicationQueriesSchemes</key>
+	<!-- pour la localisation du user  -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+<string>This app needs access to location when open.</string>
+<key>NSLocationAlwaysUsageDescription</key>
+<string>This app needs access to location when in the background.</string>
+ <!-- localisatio du user fin  -->
 <array>
   <string>tel</string>
   <string>watsapp</string>

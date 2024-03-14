@@ -30,6 +30,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
     super.initState();
     // Vérifiez si acteur est non nul avant de l'attribuer à la variable locale
     // if (Provider.of<ActeurProvider>(context, listen: false).acteur != null) {
+      
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // }
     // debugPrint("Acteur : ${acteur.nomActeur}");
@@ -48,7 +49,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
               return const CircularProgressIndicator();
             }
 
-            List<TypeActeur> typeActeurData = ac.typeActeur;
+            List<TypeActeur> typeActeurData = ac.typeActeur!;
             String type = typeActeurData.map((data) => data.libelle).join(', ');
             return ListTile(
               leading: ac.logoActeur == null || ac.logoActeur!.isEmpty
@@ -65,7 +66,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                       image: NetworkImage("http:10.0.2.2/${ac.logoActeur}"),
                     ),
               title: Text(
-                ac.nomActeur.toUpperCase(),
+                ac.nomActeur!.toUpperCase(),
                 style: const TextStyle(
                     color: d_colorGreen,
                     fontSize: 18,

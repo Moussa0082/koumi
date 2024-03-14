@@ -3,6 +3,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Magasin.dart';
+import 'package:koumi_app/models/Niveau1Pays.dart';
+import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/screens/AddMagasinScreen.dart';
 import 'package:koumi_app/screens/Produit.dart';
 import 'package:koumi_app/service/MagasinService.dart';
@@ -27,18 +31,16 @@ class _MagasinScreenState extends State<MagasinScreen>
   TabController? _tabController;
   late TextEditingController _searchController;
 
-  List<String> regions = [];
-  List<String> idNiveau1Pays = [];
+  List<Magasin> magasin = [];
+  late Acteur acteur;
+  List<Niveau1Pays> niveau1Pays = [];
   String selectedRegionId =
       ''; // Ajoutez une variable pour stocker l'ID de la région sélectionnée
 
-  Map<String, List<Map<String, dynamic>>> magasinsParRegion = {};
 
   double scaleFactor = 1;
   bool isVisible = true;
 
-  List<Map<String, dynamic>> regionsData = [];
-  List<String> magasins = [];
 
         String localiteMagasin = "";
         String contactMagasin = "";
@@ -57,23 +59,22 @@ class _MagasinScreenState extends State<MagasinScreen>
         List<dynamic> data = json.decode(response.body);
 
         // Filtrer les éléments avec statutN1 == true
-        List<dynamic> filteredData =
-            data.where((item) => item['statutN1'] == true).toList();
 
         setState(() {
-          regionsData = filteredData.cast<Map<String, dynamic>>();
-          regions = regionsData.map((item) => item['nomN1'] as String).toList();
-          idNiveau1Pays = regionsData
-              .map((item) => item['idNiveau1Pays'] as String)
-              .toList();
+         niveau1Pays = data
+            .where((niveau1Pays) => niveau1Pays['statutN1'] == true)
+          .map((item) => Niveau1Pays(
+            idNiveau1Pays: item['idNiveau1Pays'] as String,
+            nomN1: item['nomN1']
+          )).toList();
         });
 
-        _tabController = TabController(length: regions.length, vsync: this);
+        _tabController = TabController(length: niveau1Pays.length, vsync: this);
         _tabController!.addListener(_handleTabChange);
 
         // Fetch les magasins pour la première région
-        fetchMagasinsByRegion(idNiveau1Pays.isNotEmpty
-            ? idNiveau1Pays[_tabController!.index]
+        fetchMagasinsByRegion(niveau1Pays.isNotEmpty
+            ? niveau1Pays.first.idNiveau1Pays!
             : '');
       } else {
         throw Exception('Failed to load regions');
@@ -83,47 +84,51 @@ class _MagasinScreenState extends State<MagasinScreen>
     }
   }
 
-  void fetchMagasinsByRegion(String id) async {
-    try {
-      final response = await http.get(Uri.parse(
-          'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-      if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body);
-        List<Map<String, dynamic>> magasins = data
-            .where((magasin) =>
-                magasin['statutMagasin'] == true) // Filtrer les magasins actifs
-            .map<Map<String, dynamic>>((item) => {
-                  'nomMagasin': item['nomMagasin'],
-                  'idMagasin': item['idMagasin'],
-                  'contactMagasin': item['contactMagasin'],
-                  'photo': item['photo'],
-                  'acteur':item['acteur'],
-                  'dateAjout':item['dateAjout'],
-                  'localiteMagasin':item['localiteMagasin'],
-                  'statutMagasin': item['statutMagasin'],
-                  'niveau1Pays': item['niveau1Pays'],
-                })
+ void fetchMagasinsByRegion(String id) async {
+  try {
+    final response = await http.get(Uri.parse('https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      setState(() {
+        magasin = data
+            .where((magasin) => magasin['statutMagasin'] == true)
+            .map((item) => Magasin(
+               
+                  nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
+                  idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
+                  contactMagasin: item['contactMagasin'] ?? 'Contact manquant',
+                  photo: item['photo'] ?? '', 
+                  // ou utilisez une URL par défaut
+                  acteur: Acteur(
+                    idActeur: item['acteur']['idActeur'] ?? 'manquant',
+                    nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
+                    // Autres champs de l'acteur...
+                  ),
+                  niveau1Pays: Niveau1Pays(
+                    nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
+                    // Autres champs de l'acteur...
+                  ),
+                  dateAjout: item['dateAjout'] ?? 'manquante',
+                  localiteMagasin: item['localiteMagasin'] ?? 'manquante',
+                  statutMagasin: item['statutMagasin'] ?? false, // ou une valeur par défaut
+                  
+                ))
             .toList();
-        setState(() {
-          magasinsParRegion[id] = magasins;
-        });
-        if (!loadedRegions.contains(id)) {
-          loadedRegions.add(id);
-        }
-      } else {
-        throw Exception('Failed to load magasins for region $id');
-      }
-    } catch (e) {
-      print('Error fetching magasins for region $id: $e');
+      });
+    } else {
+      throw Exception('Failed to load magasins for region $id');
     }
+  } catch (e) {
+    print('Error fetching magasins for region $id: $e');
   }
+}
+
 
   void _handleTabChange() {
     if (_tabController != null &&
         _tabController!.index >= 0 &&
-        _tabController!.index < idNiveau1Pays.length) {
-      String selectedRegionId = idNiveau1Pays[_tabController!.index];
+        _tabController!.index < niveau1Pays.length) {
+       selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
       fetchMagasinsByRegion(selectedRegionId);
     }
   }
@@ -132,8 +137,9 @@ class _MagasinScreenState extends State<MagasinScreen>
   void initState() {
     super.initState();
     _searchController = TextEditingController();
-    if (idNiveau1Pays.isNotEmpty) {
-      selectedRegionId = idNiveau1Pays[_tabController!.index];
+    if (niveau1Pays.isNotEmpty) {
+      selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
+      // fetchMagasinsByRegion(selectedRegionId);
     }
     fetchRegions();
   }
@@ -143,7 +149,7 @@ class _MagasinScreenState extends State<MagasinScreen>
     const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
     return Container(
       child: DefaultTabController(
-        length: regions.length,
+        length: niveau1Pays.length,
         child: Scaffold(
        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
@@ -157,10 +163,10 @@ class _MagasinScreenState extends State<MagasinScreen>
 
             title: Text('Tous les boutiques'),
             bottom: TabBar(
-              isScrollable: regions.length > 4,
+              isScrollable: niveau1Pays.length > 4,
               labelColor: Colors.black,
               controller: _tabController, // Ajoutez le contrôleur TabBar
-              tabs: regions.map((region) => Tab(text: region)).toList(),
+              tabs: niveau1Pays.map((region) => Tab(text: region.nomN1!)).toList(),
             ),
             actions: [
               PopupMenuButton<String>(
@@ -237,8 +243,8 @@ class _MagasinScreenState extends State<MagasinScreen>
                     child: TabBarView(
                       controller:
                           _tabController, // Ajoutez le contrôleur TabBarView
-                      children: idNiveau1Pays.map((region) {
-                        return buildGridView(region);
+                      children:  niveau1Pays.map((region) {
+                        return buildGridView(region.idNiveau1Pays!);
                       }).toList(),
                     ),
                   ),
@@ -252,39 +258,18 @@ class _MagasinScreenState extends State<MagasinScreen>
   }
 
   Widget buildGridView(String id) {
-    List<Map<String, dynamic>>? magasins = magasinsParRegion[id];
+    List<Magasin> magasinss = magasin;
         // Accéder à la liste des types d'acteurs de cet acteur
 
-    if (magasins == null) {
+    if (magasinss.isEmpty) {
       // Si les données ne sont pas encore chargées, affichez l'effet Shimmer
-      return SingleChildScrollView(
-          child: Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Center(
-                              child: Column(
-                                children: [
-                                  Image.asset('assets/images/notif.jpg'),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Text('Aucun magasin trouvé ',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 17,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      ),
-                                ],
-                              ),
-                            ),
-                          ),
-        );
+      return _buildShimmerEffect();
     } else {
       // Filtrer les magasins en fonction du texte de recherche
-      List<Map<String, dynamic>> filteredMagasins = magasins.where((magasin) {
-        String nomMagasin = magasin['nomMagasin']!.toString().toLowerCase();
-         localiteMagasin= magasin['localiteMagasin']!.toString().toLowerCase();
-         contactMagasin= magasin['contactMagasin']!.toString().toLowerCase();
+      List<Magasin> filteredMagasins = magasinss.where((magasin) {
+        String nomMagasin = magasin.nomMagasin!.toString().toLowerCase();
+         localiteMagasin= magasin.localiteMagasin!.toString().toLowerCase();
+         contactMagasin= magasin.contactMagasin!.toString().toLowerCase();
          searchText = _searchController.text.toLowerCase();
         return nomMagasin.contains(searchText);
       }).toList();
@@ -326,15 +311,26 @@ class _MagasinScreenState extends State<MagasinScreen>
           ),
           itemCount: filteredMagasins.length,
           itemBuilder: (context, index) {
+            Magasin magasin = filteredMagasins[index];
+        Magasin currentMagasin = magasin;
+      String typeActeurList = '';
+
+      // Vérifiez d'abord si l'acteur est disponible dans le magasin
+      if (currentMagasin.acteur != null && currentMagasin.acteur!.typeActeur != null) {
+        // Parcourez la liste des types d'acteurs et extrayez les libellés
+        typeActeurList = currentMagasin.acteur!.typeActeur!
+            .map((type) => type.libelle) // Utilisez la propriété libelle pour récupérer le libellé
+            .join(', '); // Joignez tous les libellés avec une virgule
+      }
             // ici on a recuperer les details du  magasin
-            Map<String, dynamic> magasin = filteredMagasins[index];
+            // String magasin = filteredMagasins[index].photo!;
             return Container(
                height:100,
               // width: 150,
               child: GestureDetector(
                 onTap: () {
-                  String id = magasin['idMagasin'];
-                  String nom = magasin['nomMagasin'];
+                  String id = magasin.idMagasin!;
+                  String nom = magasin.nomMagasin!;
                   // Navigator.pushReplacement(
                   //   context,
                   //   MaterialPageRoute(
@@ -509,7 +505,7 @@ class _MagasinScreenState extends State<MagasinScreen>
                                         children: [
                                           ListTile(
                                               leading: 
-                                                      filteredMagasins[index]['photo']
+                                                      magasin.photo!
                                 .toUpperCase().isEmpty
                                                   ? ProfilePhoto(
                                                       totalWidth: 50,
@@ -523,10 +519,11 @@ class _MagasinScreenState extends State<MagasinScreen>
                                                       cornerRadius: 50,
                                                       color: Colors.black,
                                                       image: NetworkImage(
-                                                          "http://10.0.2.2/${filteredMagasins[index]['photo']}"),
+                                                          "https://koumi.ml/api-koumi/${magasin.photo}"),
                                                     ),
                                               title: Text(
-filteredMagasins[index]['acteur'] != null ? filteredMagasins[index]['acteur']['nomActeur'].toUpperCase() : 'N/A' ,
+                   magasin.acteur!.nomActeur != null ? 
+                   magasin.acteur!.nomActeur!.toUpperCase() : 'USER' ,
                                                  style: const TextStyle(
                                                     color: Colors.black,
                                                     fontSize: 20,
@@ -534,7 +531,8 @@ filteredMagasins[index]['acteur'] != null ? filteredMagasins[index]['acteur']['n
                                                         TextOverflow.ellipsis,
                                                   )),
                                               subtitle: Text(
-                                              'Ac',
+                                              magasin.niveau1Pays!.nomN1!,
+                                              // filteredMagasins[index].acteur!.typeActeur.map((e) => e.libelle!).join(', '),
                                                   // filteredMagasins[index]['acteur']['typeActeur']
                                                   //     .map((data) =>
                                                   //         data.libelle)
@@ -545,33 +543,33 @@ filteredMagasins[index]['acteur'] != null ? filteredMagasins[index]['acteur']['n
                                                     fontWeight: FontWeight.w500,
                                                     fontStyle: FontStyle.italic,
                                                   ))),
-                                          // Padding(
-                                          //   padding: EdgeInsets.symmetric(
-                                          //       horizontal: 15),
-                                          //   child: Row(
-                                          //     mainAxisAlignment:
-                                          //         MainAxisAlignment
-                                          //             .spaceBetween,
-                                          //     children: [
-                                          //       Text("Date d'adhésion :",
-                                          //           style: TextStyle(
-                                          //             color: Colors.black87,
-                                          //             fontSize: 15,
-                                          //             fontWeight:
-                                          //                 FontWeight.w500,
-                                          //             fontStyle:
-                                          //                 FontStyle.italic,
-                                          //           )),
-                                          //       Text(filteredMagasins[index]['dateAjout'],
-                                          //           style: TextStyle(
-                                          //             color: Colors.black87,
-                                          //             fontSize: 16,
-                                          //             fontWeight:
-                                          //                 FontWeight.w800,
-                                          //           ))
-                                          //     ],
-                                          //   ),
-                                          // ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 15),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text("Date d'adhésion :",
+                                                    style: TextStyle(
+                                                      color: Colors.black87,
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontStyle:
+                                                          FontStyle.italic,
+                                                    )),
+                                                Text(typeActeurList.toUpperCase(),
+                                                    style: TextStyle(
+                                                      color: Colors.black87,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w800,
+                                                    ))
+                                              ],
+                                            ),
+                                          ),
                                           Container(
                                             alignment: Alignment.bottomRight,
                                             padding: const EdgeInsets.symmetric(
@@ -581,7 +579,7 @@ filteredMagasins[index]['acteur'] != null ? filteredMagasins[index]['acteur']['n
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                _buildEtat(filteredMagasins[index]['statutMagasin']),
+                                                _buildEtat(magasin.statutMagasin!),
                                                 PopupMenuButton<String>(
                                                   padding: EdgeInsets.zero,
                                                   itemBuilder: (context) =>
@@ -603,7 +601,7 @@ filteredMagasins[index]['acteur'] != null ? filteredMagasins[index]['acteur']['n
                                                         onTap: () async {
                                                            await MagasinService()
                                                                                       .activerMagasin(
-                                                                                        filteredMagasins[index]['idMagasin']
+                                                                                        magasin.idMagasin!
                                                                                           )
                                                                                       .then(
                                                                                           (value) =>
@@ -666,7 +664,7 @@ filteredMagasins[index]['acteur'] != null ? filteredMagasins[index]['acteur']['n
                                                         onTap: () async {
                                                            await MagasinService()
                                                                                       .desactiverMagasin(
-                                                                                        filteredMagasins[index]['idMagasin']
+                                                                                        magasin.idMagasin!
                                                                                           )
                                                                                       .then(
                                                                                           (value) =>
@@ -739,10 +737,10 @@ filteredMagasins[index]['acteur'] != null ? filteredMagasins[index]['acteur']['n
           child: AddMagasinScreen(
             idMagasin: id,
             isEditable: isEditable,
-            nomMagasin:filteredMagasins[index]['nomMagasin'] ,
-            contactMagasin: filteredMagasins[index]['contactMagasin'],
-            localiteMagasin:filteredMagasins[index]['localiteMagasin'],
-            // niveau1Pays:filteredMagasins[index]['niveau1Pays'] ,
+            nomMagasin:magasin.nomMagasin,
+            contactMagasin: magasin.contactMagasin,
+            localiteMagasin:magasin.localiteMagasin,
+            niveau1Pays:magasin.niveau1Pays!,
             // photo: filteredMagasins[index]['photo']!,
           ),
         ),
@@ -775,15 +773,25 @@ filteredMagasins[index]['acteur'] != null ? filteredMagasins[index]['acteur']['n
                                                         onTap: () async {
                                                           await MagasinService()
                                                                                       .deleteMagasin(
-                                                                              filteredMagasins[index]['idMagasin'])
+                                                                              filteredMagasins[index].idMagasin!)
                                                                                       .then(
                                                                                           (value) =>
                                                                                               {
                                                                                                 Provider.of<MagasinService>(context, listen: false).applyChange(),
                                                                                                 setState(() {
-                                                                                                  filteredMagasins = magasins;
+                                                                                                  filteredMagasins = magasinss;
                                                                                                 }),
                                                                                                 Navigator.of(context).pop(),
+                                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                                  const SnackBar(
+                                                                                                    content: Row(
+                                                                                                      children: [
+                                                                                                        Text("Magasin supprimer avec succès"),
+                                                                                                      ],
+                                                                                                    ),
+                                                                                                    duration: Duration(seconds: 2),
+                                                                                                  ),
+                                                                                                )
                                                                                               })
                                                                                       .catchError(
                                                                                           (onError) =>

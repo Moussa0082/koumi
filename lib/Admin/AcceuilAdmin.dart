@@ -3,6 +3,8 @@ import 'package:koumi_app/Admin/ActeurScreen.dart';
 import 'package:koumi_app/Admin/AlerteScreen.dart';
 import 'package:koumi_app/Admin/CategoriePage.dart';
 import 'package:koumi_app/Admin/FiliereScreen.dart';
+import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
@@ -15,6 +17,7 @@ import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
+import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
 
 class AcceuilAdmin extends StatefulWidget {
@@ -28,6 +31,20 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _AcceuilAdminState extends State<AcceuilAdmin> {
+  late Acteur acteur;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+   Snack.info(message:'Connecté en tant que : ${acteur.nomActeur!.toUpperCase()}') ;
+    });
+
+  }
+
   @override
   Widget build(BuildContext context) {
     final parametreProvider =
@@ -64,7 +81,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                 _buildAccueilCard("Locations", "location.png", 7),
 
                 _buildAccueilCard("Alertes", "alerte.png", 8),
-                _buildAccueilCard("Mes Produits", "produit.png", 9),
+                _buildAccueilCard("Produits", "produit.png", 9),
                 _buildAccueilCard("Filières", "filiere.png", 10),
                 _buildAccueilCard("Catégorie", "cat.png", 11),
                 _buildAccueilCard("Acteurs", "acteur.png", 12),
@@ -146,8 +163,8 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
           child: Padding(
             padding: const EdgeInsets.all(5.0),
             child: Container(
-              width: 150,
-              height: 150,
+              width:MediaQuery.of(context).size.width,
+              height: 155,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: Colors.white,

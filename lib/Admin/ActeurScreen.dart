@@ -108,14 +108,14 @@ class _ActeurScreenState extends State<ActeurScreen> {
                       acteurList = snapshot.data!;
                       String searchText = "";
                       List<Acteur> filtereSearch = acteurList.where((search) {
-                        String libelle = search.nomActeur.toLowerCase();
+                        String libelle = search.nomActeur!.toLowerCase();
                         searchText = _searchController.text.toLowerCase();
                         return libelle.contains(searchText);
                       }).toList();
 
                       return Column(
                           children: filtereSearch
-                              .where((element) => !element.typeActeur.any((e) =>
+                              .where((element) => !element.typeActeur!.any((e) =>
                                   e.libelle!.toLowerCase().contains('admin')))
                               .map((e) => Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -163,7 +163,7 @@ class _ActeurScreenState extends State<ActeurScreen> {
                                                           "http://10.0.2.2/${e.logoActeur}"),
                                                     ),
                                               title: Text(
-                                                  e.nomActeur.toUpperCase(),
+                                                  e.nomActeur!.toUpperCase(),
                                                   style: const TextStyle(
                                                     color: Colors.black,
                                                     fontSize: 20,
@@ -171,7 +171,7 @@ class _ActeurScreenState extends State<ActeurScreen> {
                                                         TextOverflow.ellipsis,
                                                   )),
                                                subtitle: Text(
-                                                  e.typeActeur
+                                                  e.typeActeur!
                                                       .map((data) =>
                                                           data.libelle)
                                                       .join(', '),

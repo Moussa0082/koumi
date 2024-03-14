@@ -50,7 +50,7 @@ class _DetailTransportState extends State<DetailTransport> {
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    typeActeurData = acteur.typeActeur;
+    typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     vehicules = widget.vehicule;
     _nomController.text = vehicules.nomVehicule;
@@ -262,7 +262,7 @@ Future<File> saveImagePermanently(String imagePath) async {
                     ),
                     onTap: () {
                       final String whatsappNumber =
-                          vehicules.acteur.whatsAppActeur;
+                          vehicules.acteur.whatsAppActeur!;
                       _makePhoneWa(whatsappNumber);
                     },
                   ),
@@ -276,7 +276,7 @@ Future<File> saveImagePermanently(String imagePath) async {
                     ),
                     onTap: () {
                       final String numberPhone =
-                          vehicules.acteur.telephoneActeur;
+                          vehicules.acteur.telephoneActeur!;
                       _makePhoneCall(numberPhone);
                     },
                   )
@@ -376,7 +376,7 @@ Future<File> saveImagePermanently(String imagePath) async {
             '${vehicules.statutVehicule ? 'Disponible' : 'Non disponible'}'),
         _buildItem('Description : ', vehicules.description),
         acteur.nomActeur != vehicules.acteur.nomActeur
-            ? _buildItem('Propriètaire : ', vehicules.acteur.nomActeur)
+            ? _buildItem('Propriètaire : ', vehicules.acteur.nomActeur!)
             : Container()
       ],
     );

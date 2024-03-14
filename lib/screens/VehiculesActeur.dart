@@ -34,7 +34,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    typeActeurData = acteur.typeActeur;
+    typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
     _liste = getVehicule(acteur.idActeur!);
