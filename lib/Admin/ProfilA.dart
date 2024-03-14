@@ -83,7 +83,7 @@ class _ProfilAState extends State<ProfilA> {
                                       cornerRadius: 50,
                                       color: Colors.black,
                                       image: NetworkImage(
-                                          "http:10.0.2.2/${ac.logoActeur}"),
+                                          "http:10.0.2.2/${ac.logoActeur!}"),
                                     ),
                               title: Text(
                                 ac.nomActeur!.toUpperCase(),

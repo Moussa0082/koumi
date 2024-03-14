@@ -4,19 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
-import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:image_picker/image_picker.dart';
-
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DetailTransport extends StatefulWidget {
   final Vehicule vehicule;
@@ -34,37 +34,64 @@ class _DetailTransportState extends State<DetailTransport> {
   late Acteur acteur;
   late List<TypeActeur> typeActeurData = [];
   late String type;
-   String? imageSrc;
+  String? imageSrc;
   File? photo;
+  late TypeVoiture typeVoiture;
+  late Map<String, int> prixParDestinations;
+
   late ValueNotifier<bool> isDialOpenNotifier;
   TextEditingController _prixController = TextEditingController();
   TextEditingController _nomController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
+  TextEditingController _destinationController = TextEditingController();
   TextEditingController _capaciteController = TextEditingController();
   TextEditingController _etatController = TextEditingController();
   TextEditingController _localiteController = TextEditingController();
-
+  List<TextEditingController> _destinationControllers = [];
+  List<TextEditingController> _prixControllers = [];
   bool _isEditing = false;
   bool _isLoading = false;
+  bool active = false;
+  String? typeValue;
+  late Future _typeList;
+  Map<String, int> newPrixParDestinations = {};
 
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
+    _typeList = http.get(Uri.parse(
+        'http://10.0.2.2:9000/api-koumi/TypeVoiture/listeByActeur/${acteur.idActeur!}'));
     vehicules = widget.vehicule;
+    typeVoiture = vehicules.typeVoiture;
+    prixParDestinations = vehicules.prixParDestination;
+
     _nomController.text = vehicules.nomVehicule;
-    _prixController.text = vehicules.prix.toString();
-    _descriptionController.text = vehicules.description;
+    // _prixController.text = vehicules.prix.toString();
     _capaciteController.text = vehicules.capaciteVehicule;
     _etatController.text = vehicules.etatVehicule.toString();
     _localiteController.text = vehicules.localisation;
+    // Récupérer les destinations et les prix du véhicule
+    // vehicules.prixParDestination.forEach((destination, prix) {
+    //   if (destination.isNotEmpty && prix > 0) {
+    //     // Ajouter la destination et le prix à la liste prixParDestinations
+    //     prixParDestinations.addAll({destination: prix});
+    //   }
+    // });
+    vehicules.prixParDestination.forEach((destination, prix) {
+      TextEditingController destinationController =
+          TextEditingController(text: destination);
+      TextEditingController prixController =
+          TextEditingController(text: prix.toString());
 
+      _destinationControllers.add(destinationController);
+      _prixControllers.add(prixController);
+    });
     isDialOpenNotifier = ValueNotifier<bool>(false);
     super.initState();
   }
-  
-Future<File> saveImagePermanently(String imagePath) async {
+
+  Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
     final name = path.basename(imagePath);
     final image = File('${directory.path}/$name');
@@ -132,38 +159,64 @@ Future<File> saveImagePermanently(String imagePath) async {
       },
     );
   }
+
   Future<void> updateMethode() async {
+    setState(() {
+      // Afficher l'indicateur de chargement pendant l'opération
+      _isLoading = true;
+    });
+
     try {
-      setState(() {
-        _isLoading = true;
-      });
+      // Récupération des nouvelles valeurs des champs
       final String nom = _nomController.text;
       final String capacite = _capaciteController.text;
-      final String description = _descriptionController.text;
-      final String prix = _prixController.text;
       final String etat = _etatController.text;
       final String localite = _localiteController.text;
 
-      await VehiculeService()
-          .updateVehicule(
-              idVehicule: vehicules.idVehicule,
-              nomVehicule: nom,
-              capaciteVehicule: capacite,
-              prix: prix,
-              etatVehicule: etat,
-              localisation: localite,
-              description: description,
-              acteur: acteur)
-          .then((value) => {
-                Provider.of<VehiculeService>(context, listen: false)
-                    .applyChange(),
-                setState(() {
-                  _isLoading = false;
-                }),
-              })
-          .catchError((onError) {});
+      // Création d'une nouvelle map pour stocker les prix par destination mis à jour
+
+      // Parcourir les destinations et les prix modifiés simultanément
+      for (int i = 0; i < _destinationControllers.length; i++) {
+        String destination = _destinationControllers[i].text;
+        int prix = int.tryParse(_prixControllers[i].text) ?? 0;
+
+        // Ajouter la destination et le prix à la nouvelle map
+        if (destination.isNotEmpty && prix > 0) {
+          newPrixParDestinations[destination] = prix;
+        }
+      }
+
+      await VehiculeService().updateVehicule(
+        idVehicule: vehicules.idVehicule!,
+        nomVehicule: nom,
+        capaciteVehicule: capacite,
+        prixParDestination: newPrixParDestinations,
+        etatVehicule: etat,
+        localisation: localite,
+        typeVoiture: typeVoiture,
+        acteur: acteur,
+      );
+
+      setState(() {
+        vehicules = Vehicule(
+          idVehicule: vehicules.idVehicule,
+          nomVehicule: nom,
+          capaciteVehicule: capacite,
+          prixParDestination: newPrixParDestinations,
+          etatVehicule: etat,
+          localisation: localite,
+          typeVoiture: typeVoiture,
+          acteur: acteur,
+          statutVehicule: vehicules.statutVehicule,
+        );
+
+        _isLoading = false;
+      });
     } catch (e) {
       print(e.toString());
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -176,120 +229,305 @@ Future<File> saveImagePermanently(String imagePath) async {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
-        appBar: AppBar(
-            centerTitle: true,
-            toolbarHeight: 100,
-            leading: _isEditing
-                ? Container()
-                : IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen),
-                  ),
-            title: Text(
-              'Transport',
-              style: const TextStyle(
-                  color: d_colorGreen, fontWeight: FontWeight.bold),
-            ),
-            actions: acteur.nomActeur == vehicules.acteur.nomActeur
-                ? [
-                    _isEditing
-                        ? IconButton(
-                            onPressed: () async {
-                              setState(() {
-                                _isEditing = false;
-                              });
-                              updateMethode();
-                            },
-                            icon: Icon(Icons.check),
-                          )
-                        : IconButton(
-                            onPressed: () async {
-                              setState(() {
-                                _isEditing = true;
-                              });
-                            },
-                            icon: Icon(Icons.edit),
-                          ),
-                  ]
-                : null),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: vehicules.photoVehicule != null
-                    ? Image.network(
-                        "http://10.0.2.2/${vehicules.photoVehicule!}",
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      )
-                    : Image.asset(
-                        "assets/images/camion.png",
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: 200,
-                      ),
+    return LoadingOverlay(
+      isLoading: _isLoading,
+      child: Scaffold(
+          backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+          appBar: AppBar(
+              centerTitle: true,
+              toolbarHeight: 100,
+              leading: _isEditing
+                  ? Container()
+                  : IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      icon:
+                          const Icon(Icons.arrow_back_ios, color: d_colorGreen),
+                    ),
+              title: Text(
+                'Transport',
+                style: const TextStyle(
+                    color: d_colorGreen, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 30),
-              _isEditing ? _buildEditing() : _buildData()
-            ],
-          ),
-        ),
-        floatingActionButton: acteur.nomActeur != vehicules.acteur.nomActeur
-            ? SpeedDial(
-                // animatedIcon: AnimatedIcons.close_menu,
-                backgroundColor: d_colorGreen,
-                foregroundColor: Colors.white,
-                overlayColor: Colors.black,
-                overlayOpacity: 0.4,
-                spacing: 12,
-                icon: Icons.phone,
+              actions: acteur.nomActeur == vehicules.acteur.nomActeur
+                  ? [
+                      _isEditing
+                          ? IconButton(
+                              onPressed: () async {
+                                setState(() {
+                                  _isEditing = false;
+                                  vehicules = widget.vehicule;
+                                });
+                                updateMethode();
+                              },
+                              icon: Icon(Icons.check),
+                            )
+                          : IconButton(
+                              onPressed: () async {
+                                setState(() {
+                                  _isEditing = true;
+                                  vehicules = widget.vehicule;
+                                });
+                              },
+                              icon: Icon(Icons.edit),
+                            ),
+                      // PopupMenuButton<String>(
+                      //   padding: EdgeInsets.zero,
+                      //   itemBuilder: (context) => <PopupMenuEntry<String>>[
+                      //     PopupMenuItem<String>(
+                      //       child: ListTile(
+                      //         leading: const Icon(
+                      //           Icons.check,
+                      //           color: Colors.green,
+                      //         ),
+                      //         title: const Text(
+                      //           "Activer",
+                      //           style: TextStyle(
+                      //             color: Colors.green,
+                      //             fontWeight: FontWeight.bold,
+                      //           ),
+                      //         ),
+                      //         onTap: () async {
+                      //           await VehiculeService()
+                      //               .activerVehicules(vehicules.idVehicule!)
+                      //               .then((value) => {
+                      //                     Provider.of<VehiculeService>(context,
+                      //                             listen: false)
+                      //                         .applyChange(),
+                      //                     setState(() {
+                      //                       vehicules = Vehicule(
+                      //                         idVehicule: vehicules.idVehicule,
+                      //                         nomVehicule:
+                      //                             vehicules.nomVehicule,
+                      //                         capaciteVehicule:
+                      //                             vehicules.capaciteVehicule,
+                      //                         prixParDestination:
+                      //                             prixParDestinations,
+                      //                         etatVehicule:
+                      //                             vehicules.etatVehicule,
+                      //                         localisation:
+                      //                             vehicules.localisation,
+                      //                         typeVoiture: typeVoiture,
+                      //                         acteur: acteur,
+                      //                         statutVehicule:
+                      //                             vehicules.statutVehicule,
+                      //                       );
+                      //                     }),
+                      //                     Navigator.of(context).pop(),
+                      //                     ScaffoldMessenger.of(context)
+                      //                         .showSnackBar(
+                      //                       const SnackBar(
+                      //                         content: Row(
+                      //                           children: [
+                      //                             Text("Activer avec succèss "),
+                      //                           ],
+                      //                         ),
+                      //                         duration: Duration(seconds: 2),
+                      //                       ),
+                      //                     )
+                      //                   })
+                      //               .catchError((onError) => {
+                      //                     ScaffoldMessenger.of(context)
+                      //                         .showSnackBar(
+                      //                       const SnackBar(
+                      //                         content: Row(
+                      //                           children: [
+                      //                             Text(
+                      //                                 "Une erreur s'est produit"),
+                      //                           ],
+                      //                         ),
+                      //                         duration: Duration(seconds: 5),
+                      //                       ),
+                      //                     ),
+                      //                     Navigator.of(context).pop(),
+                      //                   });
+                      //         },
+                      //       ),
+                      //     ),
+                      //     PopupMenuItem<String>(
+                      //       child: ListTile(
+                      //         leading: Icon(
+                      //           Icons.disabled_visible,
+                      //           color: Colors.orange[400],
+                      //         ),
+                      //         title: Text(
+                      //           "Désactiver",
+                      //           style: TextStyle(
+                      //             color: Colors.orange[400],
+                      //             fontWeight: FontWeight.bold,
+                      //           ),
+                      //         ),
+                      //         onTap: () async {
+                      //           await VehiculeService()
+                      //               .desactiverVehicules(vehicules.idVehicule!)
+                      //               .then((value) => {
+                      //                     Provider.of<VehiculeService>(context,
+                      //                             listen: false)
+                      //                         .applyChange(),
+                      //                     // setState(() {
+                      //                     //   futureListe = getListe(
+                      //                     //       typeVoiture.idTypeVoiture);
+                      //                     // }),
+                      //                     Navigator.of(context).pop(),
+                      //                   })
+                      //               .catchError((onError) => {
+                      //                     ScaffoldMessenger.of(context)
+                      //                         .showSnackBar(
+                      //                       const SnackBar(
+                      //                         content: Row(
+                      //                           children: [
+                      //                             Text(
+                      //                                 "Une erreur s'est produit"),
+                      //                           ],
+                      //                         ),
+                      //                         duration: Duration(seconds: 5),
+                      //                       ),
+                      //                     ),
+                      //                     Navigator.of(context).pop(),
+                      //                   });
 
-                children: [
-                  SpeedDialChild(
-                    child: FaIcon(FontAwesomeIcons.whatsapp),
-                    label: 'Par wathsApp',
-                    labelStyle: TextStyle(
-                      color: Colors.black,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
+                      //           ScaffoldMessenger.of(context).showSnackBar(
+                      //             const SnackBar(
+                      //               content: Row(
+                      //                 children: [
+                      //                   Text("Désactiver avec succèss "),
+                      //                 ],
+                      //               ),
+                      //               duration: Duration(seconds: 2),
+                      //             ),
+                      //           );
+                      //         },
+                      //       ),
+                      //     ),
+                      //     PopupMenuItem<String>(
+                      //       child: ListTile(
+                      //         leading: const Icon(
+                      //           Icons.delete,
+                      //           color: Colors.red,
+                      //         ),
+                      //         title: const Text(
+                      //           "Supprimer",
+                      //           style: TextStyle(
+                      //             color: Colors.red,
+                      //             fontWeight: FontWeight.bold,
+                      //           ),
+                      //         ),
+                      //         onTap: () async {
+                      //           await VehiculeService()
+                      //               .deleteVehicule(vehicules.idVehicule!)
+                      //               .then((value) => {
+                      //                     Provider.of<VehiculeService>(context,
+                      //                             listen: false)
+                      //                         .applyChange(),
+                      //                     // setState(() {
+                      //                     //   futureListe = getListe(
+                      //                     //       typeVoiture.idTypeVoiture);
+                      //                     // }),
+                      //                     Navigator.of(context).pop(),
+                      //                   })
+                      //               .catchError((onError) => {
+                      //                     ScaffoldMessenger.of(context)
+                      //                         .showSnackBar(
+                      //                       const SnackBar(
+                      //                         content: Row(
+                      //                           children: [
+                      //                             Text(
+                      //                                 "Impossible de supprimer"),
+                      //                           ],
+                      //                         ),
+                      //                         duration: Duration(seconds: 2),
+                      //                       ),
+                      //                     )
+                      //                   });
+                      //         },
+                      //       ),
+                      //     ),
+                      //   ],
+                      // )
+                    ]
+                  : null),
+          body: SingleChildScrollView(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: vehicules.photoVehicule != null
+                      ? Image.network(
+                          "http://10.0.2.2/${vehicules.photoVehicule!}",
+                          width: double.infinity,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.asset(
+                          "assets/images/camion.png",
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: 200,
+                        ),
+                ),
+                SizedBox(height: 30),
+                _isEditing ? _buildEditing() : _buildData(),
+                !_isEditing ? _buildPanel() : Container(),
+                !_isEditing
+                    ? _buildDescription(
+                        'Description : ', vehicules.typeVoiture.description!)
+                    : Container(),
+              ],
+            ),
+          ),
+          floatingActionButton: acteur.nomActeur != vehicules.acteur.nomActeur
+              ? SpeedDial(
+                  // animatedIcon: AnimatedIcons.close_menu,
+                  backgroundColor: d_colorGreen,
+                  foregroundColor: Colors.white,
+                  overlayColor: Colors.black,
+                  overlayOpacity: 0.4,
+                  spacing: 12,
+                  icon: Icons.phone,
+
+                  children: [
+                    SpeedDialChild(
+                      child: FaIcon(FontAwesomeIcons.whatsapp),
+                      label: 'Par wathsApp',
+                      labelStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      onTap: () {
+                        final String whatsappNumber =
+                            vehicules.acteur.whatsAppActeur!;
+                        _makePhoneWa(whatsappNumber);
+                      },
                     ),
-                    onTap: () {
-                      final String whatsappNumber =
-                          vehicules.acteur.whatsAppActeur!;
-                      _makePhoneWa(whatsappNumber);
-                    },
-                  ),
-                  SpeedDialChild(
-                    child: Icon(Icons.phone),
-                    label: 'Par téléphone ',
-                    labelStyle: TextStyle(
-                      color: Colors.black,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    onTap: () {
-                      final String numberPhone =
-                          vehicules.acteur.telephoneActeur!;
-                      _makePhoneCall(numberPhone);
-                    },
-                  )
-                ],
-                // État du Speed Dial (ouvert ou fermé)
-                openCloseDial: isDialOpenNotifier,
-                // Fonction appelée lorsque le bouton principal est pressé
-                onPress: () {
-                  isDialOpenNotifier.value = !isDialOpenNotifier
-                      .value; // Inverser la valeur du ValueNotifier
-                },
-              )
-            : Container());
+
+                    SpeedDialChild(
+                      child: Icon(Icons.phone),
+                      label: 'Par téléphone ',
+                      labelStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      onTap: () {
+                        final String numberPhone =
+                            vehicules.acteur.telephoneActeur!;
+                        _makePhoneCall(numberPhone);
+                      },
+                    )
+                  ],
+                  // État du Speed Dial (ouvert ou fermé)
+                  openCloseDial: isDialOpenNotifier,
+                  // Fonction appelée lorsque le bouton principal est pressé
+                  onPress: () {
+                    isDialOpenNotifier.value = !isDialOpenNotifier
+                        .value; // Inverser la valeur du ValueNotifier
+                  },
+                )
+              : Container()),
+    );
   }
 
   // Future<void> _openWhatsApp(String whatsappNumber) async {
@@ -324,22 +562,42 @@ Future<File> saveImagePermanently(String imagePath) async {
       children: [
         _buildEditableDetailItem('Nom du véhicule : ', _nomController),
         _buildEditableDetailItem('Capacité : ', _capaciteController),
+        _buildEditableDetailItem('Localisation : ', _localiteController),
+        _buildEditableDetailItem('Etat du véhicule : ', _etatController),
+        _buildDestinationPriceFields(),
+        SizedBox(
+          height: 15,
+        ),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          padding: EdgeInsets.symmetric(
+            horizontal: 22,
+          ),
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Text(
+              "Ajouter d'autre prix",
+              style: TextStyle(color: (Colors.black), fontSize: 18),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: Text(
-                  'Prix / voyage',
-                  style: const TextStyle(
-                      color: Colors.black87,
-                      fontWeight: FontWeight.w500,
-                      fontStyle: FontStyle.italic,
-                      overflow: TextOverflow.ellipsis,
-                      fontSize: 18),
+                child: TextFormField(
+                  controller: _destinationController,
+                  decoration: InputDecoration(
+                    hintText: "Destination",
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                 ),
               ),
+              SizedBox(width: 10),
               Expanded(
                 child: TextFormField(
                   controller: _prixController,
@@ -347,20 +605,38 @@ Future<File> saveImagePermanently(String imagePath) async {
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly,
                   ],
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 17,
-                    color: Colors.black54,
+                  decoration: InputDecoration(
+                    hintText: "Prix",
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
-                  enabled: _isEditing,
                 ),
-              )
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    String destination = _destinationController.text;
+                    int prix = int.tryParse(_prixController.text) ?? 0;
+
+                    if (destination.isNotEmpty && prix > 0) {
+                      // Ajouter la destination et le prix à la liste prixParDestinations
+                      newPrixParDestinations.addAll({destination: prix});
+
+                      print(prixParDestinations.toString());
+
+                      _destinationController.clear();
+                      _prixController.clear();
+                    }
+                  });
+                },
+                icon: Icon(Icons.add),
+              ),
             ],
           ),
         ),
-        _buildEditableDetailItem('Localisation : ', _localiteController),
-        _buildEditableDetailItem('Description : ', _descriptionController),
-        _buildEditableDetailItem('Etat du véhicule : ', _etatController),
       ],
     );
   }
@@ -369,16 +645,60 @@ Future<File> saveImagePermanently(String imagePath) async {
     return Column(
       children: [
         _buildItem('Nom du véhicule : ', vehicules.nomVehicule),
+        _buildItem('Type de véhicule : ', vehicules.typeVoiture.nom),
+        vehicules.typeVoiture.nombreSieges != 0
+            ? _buildItem('Nombre de siège : ',
+                vehicules.typeVoiture.nombreSieges.toString())
+            : Container(),
         _buildItem('Capacité : ', vehicules.capaciteVehicule),
-        _buildItem('Prix / voyage: ', vehicules.prix.toString()),
+        // _buildItem('Prix / voyage: ', vehicules.prix.toString()),
         _buildItem('Localisation : ', vehicules.localisation),
         _buildItem('Statut: : ',
             '${vehicules.statutVehicule ? 'Disponible' : 'Non disponible'}'),
-        _buildItem('Description : ', vehicules.description),
         acteur.nomActeur != vehicules.acteur.nomActeur
             ? _buildItem('Propriètaire : ', vehicules.acteur.nomActeur!)
-            : Container()
+
+            : Container(),
+        // _buildItem('Description : ', vehicules.typeVoiture.description!),
       ],
+    );
+  }
+
+  Widget _buildDestinationPriceFields() {
+    List<Widget> fields = [];
+
+    for (int i = 0; i < _destinationControllers.length; i++) {
+      fields.add(
+        Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: _destinationControllers[i],
+                decoration: InputDecoration(
+                  hintText: 'Destination',
+                ),
+              ),
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: TextFormField(
+                controller: _prixControllers[i],
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly,
+                ],
+                decoration: InputDecoration(
+                  hintText: 'Prix',
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: fields,
     );
   }
 
@@ -423,6 +743,39 @@ Future<File> saveImagePermanently(String imagePath) async {
     );
   }
 
+  Widget _buildDescription(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w500,
+                  fontStyle: FontStyle.italic,
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 18),
+            ),
+            Text(
+              value,
+              textAlign: TextAlign.justify,
+              softWrap: true,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w800,
+                // overflow: TextOverflow.ellipsis,
+                fontSize: 16,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildItem(String title, String value) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
@@ -440,14 +793,66 @@ Future<File> saveImagePermanently(String imagePath) async {
           ),
           Text(
             value,
+            textAlign: TextAlign.justify,
+            softWrap: true,
             style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w800,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 16),
+              color: Colors.black,
+              fontWeight: FontWeight.w800,
+              overflow: TextOverflow.ellipsis,
+              fontSize: 16,
+            ),
           )
         ],
       ),
+    );
+  }
+
+  Widget _buildPanel() {
+    return ExpansionPanelList(
+      expansionCallback: (int index, bool isExpanded) {
+        setState(() {
+          active = !active;
+        });
+      },
+      children: <ExpansionPanel>[
+        ExpansionPanel(
+          headerBuilder: (context, isExpanded) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: Text(
+                "Voir les prix par destination",
+                textAlign: TextAlign.justify,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w800,
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 17,
+                ),
+              ),
+            );
+          },
+          body: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Column(
+                  children: List.generate(vehicules.prixParDestination.length,
+                      (index) {
+                    String destination =
+                        vehicules.prixParDestination.keys.elementAt(index);
+                    int prix =
+                        vehicules.prixParDestination.values.elementAt(index);
+                    return _buildItem(destination, "${prix.toString()} FCFA");
+                  }),
+                ),
+              ),
+            ],
+          ),
+          isExpanded: active,
+          canTapOnHeader: true,
+        )
+      ],
     );
   }
 }

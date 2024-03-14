@@ -29,6 +29,7 @@ class ActeurProvider with ChangeNotifier {
         idActeur != null && nomActeur != null && adresseActeur!= null &&
         telephoneActeur != null && whatsAppActeur != null && niveau3PaysActeur != null &&
         localiteActeur != null) {
+
       // Créer l'objet Acteur à partir des données de SharedPreferences
       _acteur = Acteur.fromSharedPreferencesData(
         emailActeur, password, userTypeList, idActeur, nomActeur,

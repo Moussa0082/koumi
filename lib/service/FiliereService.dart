@@ -6,21 +6,21 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Filiere.dart';
 
 class FiliereService extends ChangeNotifier {
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Filiere';
-  static const String baseUrl = 'https://koumi.ml/api-koumi/Filiere';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Filiere';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/Filiere';
 
   List<Filiere> filiereList = [];
 
   Future<void> addFileres({
     required String libelleFiliere,
     required String descriptionFiliere,
-    required Acteur acteur,
+    // required Acteur acteur,
   }) async {
     var addFileress = jsonEncode({
       'idFiliere': null,
       'libelleFiliere': libelleFiliere,
       'descriptionFiliere': descriptionFiliere,
-      'acteur': acteur.toMap()
+      // 'acteur': acteur.toMap()
     });
 
     final response = await http.post(Uri.parse("$baseUrl/AddFiliere"),

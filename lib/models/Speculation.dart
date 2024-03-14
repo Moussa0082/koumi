@@ -4,29 +4,31 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 
 class Speculation {
-  final String? idSpeculation;
-  final String? codeSpeculation;
+final String idSpeculation;
+  final String codeSpeculation;
   final String nomSpeculation;
   final String descriptionSpeculation;
   final bool statutSpeculation;
   final CategorieProduit categorieProduit;
   final String? dateAjout;
-  final String? personneModif;
   final String? dateModif;
-  final Acteur acteur;
+  final String? personneModif;
+  final Acteur? acteur;
   
   Speculation({
-    this.idSpeculation,
+    required this.idSpeculation,
     required this.codeSpeculation,
     required this.nomSpeculation,
     required this.descriptionSpeculation,
     required this.statutSpeculation,
     required this.categorieProduit,
     this.dateAjout,
-    this.personneModif,
     this.dateModif,
-    required this.acteur,
+    this.personneModif,
+    this.acteur,
   });
+  
+  
 
   Speculation copyWith({
     String? idSpeculation,
@@ -36,8 +38,8 @@ class Speculation {
     bool? statutSpeculation,
     CategorieProduit? categorieProduit,
     String? dateAjout,
-    String? personneModif,
     String? dateModif,
+    String? personneModif,
     Acteur? acteur,
   }) {
     return Speculation(
@@ -48,8 +50,8 @@ class Speculation {
       statutSpeculation: statutSpeculation ?? this.statutSpeculation,
       categorieProduit: categorieProduit ?? this.categorieProduit,
       dateAjout: dateAjout ?? this.dateAjout,
-      personneModif: personneModif ?? this.personneModif,
       dateModif: dateModif ?? this.dateModif,
+      personneModif: personneModif ?? this.personneModif,
       acteur: acteur ?? this.acteur,
     );
   }
@@ -63,24 +65,24 @@ class Speculation {
       'statutSpeculation': statutSpeculation,
       'categorieProduit': categorieProduit.toMap(),
       'dateAjout': dateAjout,
-      'personneModif': personneModif,
       'dateModif': dateModif,
-      'acteur': acteur.toMap(),
+      'personneModif': personneModif,
+      'acteur': acteur?.toMap(),
     };
   }
 
   factory Speculation.fromMap(Map<String, dynamic> map) {
     return Speculation(
-      idSpeculation: map['idSpeculation'] != null ? map['idSpeculation'] as String : null,
+      idSpeculation: map['idSpeculation'] as String,
       codeSpeculation: map['codeSpeculation'] as String,
       nomSpeculation: map['nomSpeculation'] as String,
       descriptionSpeculation: map['descriptionSpeculation'] as String,
       statutSpeculation: map['statutSpeculation'] as bool,
       categorieProduit: CategorieProduit.fromMap(map['categorieProduit'] as Map<String,dynamic>),
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
-      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
-      acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
+      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
+      acteur: map['acteur'] != null ? Acteur.fromMap(map['acteur'] as Map<String,dynamic>) : null,
     );
   }
 
@@ -90,7 +92,7 @@ class Speculation {
 
   @override
   String toString() {
-    return 'Speculation(idSpeculation: $idSpeculation, codeSpeculation: $codeSpeculation, nomSpeculation: $nomSpeculation, descriptionSpeculation: $descriptionSpeculation, statutSpeculation: $statutSpeculation, categorieProduit: $categorieProduit, dateAjout: $dateAjout, personneModif: $personneModif, dateModif: $dateModif, acteur: $acteur)';
+    return 'Speculation(idSpeculation: $idSpeculation, codeSpeculation: $codeSpeculation, nomSpeculation: $nomSpeculation, descriptionSpeculation: $descriptionSpeculation, statutSpeculation: $statutSpeculation, categorieProduit: $categorieProduit, dateAjout: $dateAjout, dateModif: $dateModif, personneModif: $personneModif, acteur: $acteur)';
   }
 
   @override
@@ -105,8 +107,8 @@ class Speculation {
       other.statutSpeculation == statutSpeculation &&
       other.categorieProduit == categorieProduit &&
       other.dateAjout == dateAjout &&
-      other.personneModif == personneModif &&
       other.dateModif == dateModif &&
+      other.personneModif == personneModif &&
       other.acteur == acteur;
   }
 
@@ -119,8 +121,8 @@ class Speculation {
       statutSpeculation.hashCode ^
       categorieProduit.hashCode ^
       dateAjout.hashCode ^
-      personneModif.hashCode ^
       dateModif.hashCode ^
+      personneModif.hashCode ^
       acteur.hashCode;
   }
 }

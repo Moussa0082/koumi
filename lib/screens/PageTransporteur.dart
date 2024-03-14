@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/Admin/DetailsActeur.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
 
 class PageTransporteur extends StatefulWidget {
   const PageTransporteur({super.key});
- 
+
   @override
   State<PageTransporteur> createState() => _PageTransporteurState();
 }
@@ -19,6 +20,7 @@ class _PageTransporteurState extends State<PageTransporteur> {
   late TextEditingController _searchController;
   List<Acteur> acteurList = [];
   late Future<List<Acteur>> _liste;
+  late Acteur acteur;
 
   Future<List<Acteur>> getActeur() async {
     final response = await ActeurService().fetchActeur();
@@ -29,6 +31,8 @@ class _PageTransporteurState extends State<PageTransporteur> {
   void initState() {
     _searchController = TextEditingController();
     _liste = getActeur();
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+
     super.initState();
   }
 
@@ -127,8 +131,10 @@ class _PageTransporteurState extends State<PageTransporteur> {
                                       .toLowerCase()
                                       .contains('transporteur')) ||
                                   element.typeActeur!.any((e) => e.libelle!
-                                      .toLowerCase()
-                                      .contains('transporteurs')))
+
+                                          .toLowerCase()
+                                          .contains('transporteurs')) &&
+                                      element.idActeur == acteur.idActeur)
                               .map((e) => Padding(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 15),

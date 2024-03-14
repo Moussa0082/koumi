@@ -121,9 +121,8 @@ class _LoginScreenState extends State<LoginScreen> {
     // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
     const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
-      const String defaultProfileImage = 'assets/images/profil.jpg';
 
-
+    const String defaultProfileImage = 'assets/images/profil.jpg';
 
     ActeurProvider acteurProvider =
         Provider.of<ActeurProvider>(context, listen: false);
@@ -182,6 +181,13 @@ class _LoginScreenState extends State<LoginScreen> {
       // if (photoSiegeActeur == null) {
       //   prefs.setString('photoSiegeActeur', defaultProfileImage);
       // }
+
+        // if (logoActeur == null) {
+        //   prefs.setString('logoActeur', defaultProfileImage);
+        // }
+        // if (photoSiegeActeur == null) {
+        //   prefs.setString('photoSiegeActeur', defaultProfileImage);
+        // }
         final nomActeur = responseBody['nomActeur'];
         final idActeur = responseBody['idActeur'];
         final adresseActeur = responseBody['adresseActeur'];
@@ -189,6 +195,7 @@ class _LoginScreenState extends State<LoginScreen> {
         final whatsAppActeur = responseBody['whatsAppActeur'];
         // final logoActeur =  responseBody['logoActeur'] ;
         // final photoSiegeActeur = responseBody['photoSiegeActeur'] ;
+
         final niveau3PaysActeur = responseBody['niveau3PaysActeur'];
         final localiteActeur = responseBody['localiteActeur'];
 
@@ -199,8 +206,7 @@ class _LoginScreenState extends State<LoginScreen> {
         prefs.setString('adresseActeur', adresseActeur);
         prefs.setString('telephoneActeur', telephoneActeur);
         prefs.setString('whatsAppActeur', whatsAppActeur);
-        //  prefs.setString('logoActeur', logoActeur!);
-        //  prefs.setString('photoSiegeActeur', photoSiegeActeur!);
+
         prefs.setString('niveau3PaysActeur', niveau3PaysActeur);
         prefs.setString('localiteActeur', localiteActeur);
         // Enregistrer la liste des types d'utilisateur dans SharedPreferences
@@ -233,6 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
           dateAjout: responseBody['dateAjout'],
           // dateModif: responseBody['dateModif'],
           // personneModif: responseBody['personneModif'],
+   
           localiteActeur: responseBody['localiteActeur'],
           emailActeur: emailActeur,
           statutActeur: responseBody['statutActeur'],
@@ -260,6 +267,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // Traitement en cas d'échec
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
         final errorMessage = responseBody['message'];
+        print(errorMessage);
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -268,6 +276,7 @@ class _LoginScreenState extends State<LoginScreen> {
               content: Text(
                 "Email ou mot de passe incorrect", // Utiliser le message d'erreur du backend
                 // errorMessage, // Utiliser le message d'erreur du backend
+
                 textAlign: TextAlign.justify,
                 style: const TextStyle(color: Colors.black, fontSize: 20),
               ),
@@ -315,6 +324,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _isLoading = true;
     });
+
     if (isActive) {
       await loginUser().then((_) {
         // Cacher l'indicateur de chargement lorsque votre fonction est terminée
@@ -339,6 +349,7 @@ class _LoginScreenState extends State<LoginScreen> {
     // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
 
     const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
+
 
 
     ActeurProvider acteurProvider =
@@ -409,9 +420,7 @@ class _LoginScreenState extends State<LoginScreen> {
           dateModif: responseBody['dateModif'],
           personneModif: responseBody['personneModif'],
           localiteActeur: responseBody['localiteActeur'],
-          maillonActeur: responseBody['maillonActeur'],
           emailActeur: emailActeur,
-          filiereActeur: responseBody['filiereActeur'],
           statutActeur: responseBody['statutActeur'],
           typeActeur: typeActeurList,
           password: password,
@@ -437,6 +446,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // Traitement en cas d'échec
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
         final errorMessage = responseBody['message'];
+        print(errorMessage);
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -445,6 +455,7 @@ class _LoginScreenState extends State<LoginScreen> {
               content: Text(
                 "Email ou mot de passe incorrect", // Utiliser le message d'erreur du backend
                 // errorMessage, // Utiliser le message d'erreur du backend
+
                 textAlign: TextAlign.justify,
                 style: const TextStyle(color: Colors.black, fontSize: 20),
               ),
@@ -462,7 +473,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       // Gérer les exceptionn
-      debugPrint(e.toString());
+      print(e.toString());
       showDialog(
         context: context,
         builder: (BuildContext context) {

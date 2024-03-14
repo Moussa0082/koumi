@@ -83,10 +83,10 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                       ),
                     ),
                     onTap: () async {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AddVehiculeTransport()));
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) => AddVehiculeTransport()));
                     },
                   ),
                 ),
@@ -235,7 +235,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                             ),
                                           ),
                                           _buildItem("Statut:",
-                                              '${e.statutVehicule ? 'Disponible' : 'Non disponible'}'),
+                                              '${e.statutVehicule! ? 'Disponible' : 'Non disponible'}'),
                                           _buildItem(
                                               "Localité :", e.localisation),
                                           SizedBox(height: 10),
@@ -248,7 +248,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                _buildEtat(e.statutVehicule),
+                                                _buildEtat(e.statutVehicule!),
                                                 PopupMenuButton<String>(
                                                   padding: EdgeInsets.zero,
                                                   itemBuilder: (context) =>
@@ -270,7 +270,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                         onTap: () async {
                                                           await VehiculeService()
                                                               .activerVehicules(
-                                                                  e.idVehicule)
+                                                                  e.idVehicule!)
                                                               .then((value) => {
                                                                     Provider.of<VehiculeService>(
                                                                             context,
@@ -342,7 +342,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                         onTap: () async {
                                                           await VehiculeService()
                                                               .desactiverVehicules(
-                                                                  e.idVehicule)
+                                                                  e.idVehicule!)
                                                               .then((value) => {
                                                                     Provider.of<VehiculeService>(
                                                                             context,
@@ -414,7 +414,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                         onTap: () async {
                                                           await VehiculeService()
                                                               .deleteVehicule(
-                                                                  e.idVehicule)
+                                                                  e.idVehicule!)
                                                               .then((value) => {
                                                                     Provider.of<VehiculeService>(
                                                                             context,

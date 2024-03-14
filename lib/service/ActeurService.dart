@@ -8,8 +8,8 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:path/path.dart';
 
 class ActeurService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/acteur';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/acteur';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur';
 
   List<Acteur> acteurList = [];
 
@@ -20,7 +20,7 @@ class ActeurService extends ChangeNotifier {
     required String whatsAppActeur,
     String? latitude,
     String? longitude,
-     String? niveau3PaysActeur,
+    String? niveau3PaysActeur,
     required String localiteActeur,
     required String emailActeur,
     required String filiereActeur,
@@ -48,12 +48,12 @@ class ActeurService extends ChangeNotifier {
             logoActeur.readAsBytes().asStream(), logoActeur.lengthSync(),
             filename: basename(logoActeur.path)));
       }
-  
-  //acteur
+
+      //acteur
       requete.fields['acteur'] = jsonEncode({
         'nomActeur': nomActeur,
         'adresseActeur': adresseActeur,
-        'telephoneActeur': telephoneActeur, 
+        'telephoneActeur': telephoneActeur,
         'whatsAppActeur': whatsAppActeur,
         'latitude': latitude,
         'longitude': longitude,
@@ -576,10 +576,10 @@ class ActeurService extends ChangeNotifier {
       final response = await http.get(Uri.parse('$baseUrl/read'));
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("Fetching data");
         List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+        print("body ${body.toString()}");
         acteurList = body.map((e) => Acteur.fromMap(e)).toList();
-        debugPrint(acteurList.toString());
+        print("acteur ${acteurList.toString()}");
         return acteurList;
       } else {
         acteurList = [];
@@ -591,10 +591,11 @@ class ActeurService extends ChangeNotifier {
       throw Exception(e.toString());
     }
   }
- 
+
   Future<List<Acteur>> fetchActeurByTypeActeur(String id) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/listeByTypeActeur/$id'));
+      final response =
+          await http.get(Uri.parse('$baseUrl/listeByTypeActeur/$id'));
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Fetching data");

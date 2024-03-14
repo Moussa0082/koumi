@@ -7,8 +7,8 @@ import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Speculation.dart';
 
 class SpeculationService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/Speculation';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Speculation';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/Speculation';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Speculation';
 
   List<Speculation> speculationList = [];
 
@@ -16,14 +16,14 @@ class SpeculationService extends ChangeNotifier {
     required String nomSpeculation,
     required String descriptionSpeculation,
     required CategorieProduit categorieProduit,
-    required Acteur acteur,
+    // required Acteur acteur,
   }) async {
     var addSpeculations = jsonEncode({
       'idSpeculation': null,
       'nomSpeculation': nomSpeculation,
       'descriptionSpeculation': descriptionSpeculation,
       'categorieProduit': categorieProduit.toMap(),
-      'acteur': acteur.toMap(),
+      // 'acteur': acteur.toMap(),
     });
 
     final response = await http.post(Uri.parse("$baseUrl/addSpeculation"),

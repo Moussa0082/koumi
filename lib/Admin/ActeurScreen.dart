@@ -160,7 +160,7 @@ class _ActeurScreenState extends State<ActeurScreen> {
                                                       cornerRadius: 50,
                                                       color: Colors.black,
                                                       image: NetworkImage(
-                                                          "http://10.0.2.2/${e.logoActeur}"),
+                                                          "http://10.0.2.2/${e.logoActeur!}"),
                                                     ),
                                               title: Text(
                                                   e.nomActeur!.toUpperCase(),

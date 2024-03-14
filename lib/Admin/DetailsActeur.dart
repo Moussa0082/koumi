@@ -58,7 +58,7 @@ class _DetailsActeurState extends State<DetailsActeur> {
                         cornerRadius: 185,
                         color: Colors.black,
                         image: NetworkImage(
-                            "http://10.0.2.2/${acteurs.logoActeur}"),
+                            "http://10.0.2.2/${acteurs.logoActeur!}"),
                       ),
               ),
             ),
@@ -112,7 +112,7 @@ class _DetailsActeurState extends State<DetailsActeur> {
                   _buildProfile("whatsApp", acteurs.whatsAppActeur!),
                   _buildProfile("Pays", acteurs.niveau3PaysActeur!),
                   _buildProfile("Localité", acteurs.localiteActeur!),
-                  _buildProfile("Filière", acteurs.filiereActeur!),
+
                 ],
               ),
             ),
