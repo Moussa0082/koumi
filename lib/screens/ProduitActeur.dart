@@ -141,6 +141,12 @@ class _ProduitActeurScreenState extends State<ProduitActeurScreen>  with TickerP
 
        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
+         bottom: TabBar(
+              isScrollable: categorieProduit.length > 4,
+              labelColor: Colors.black,
+              controller: _tabController, // Ajoutez le contrôleur TabBar
+              tabs: categorieProduit.map((cat) => Tab(text: cat.libelleCategorie)).toList(),
+            ),
           centerTitle: true,
           toolbarHeight: 100,
           leading: IconButton(

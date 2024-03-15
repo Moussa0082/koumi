@@ -44,8 +44,8 @@ class _ProduitScreenState extends State<ProduitScreen>
   void fetchProduitByCategorie(String idCategorie, String idMagasin) async {
     try {
       final response = await http.get(Uri.parse(
-          'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
-          // 'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
+          // 'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
+          'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {
@@ -72,8 +72,8 @@ class _ProduitScreenState extends State<ProduitScreen>
   void fetchCategorie() async {
     try {
       final response = await http
-          .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
-          // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
+          // .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
+          .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {
@@ -148,6 +148,12 @@ class _ProduitScreenState extends State<ProduitScreen>
 
        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
+        bottom: TabBar(
+              isScrollable: categorieProduit.length > 4,
+              labelColor: Colors.black,
+              controller: _tabController, // Ajoutez le contrôleur TabBar
+              tabs: categorieProduit.map((cat) => Tab(text: cat.libelleCategorie)).toList(),
+            ),
           centerTitle: true,
           toolbarHeight: 100,
           leading: IconButton(
@@ -257,17 +263,17 @@ class _ProduitScreenState extends State<ProduitScreen>
             ),
           ),
                 const SizedBox(height: 10),
-                // Flexible(
-                //   child: GestureDetector(
-                //     child: TabBarView(
-                //       controller: _tabController,
-                //       children: categorieProduit.map((categorie) {
-                //         return buildGridView(
-                //             categorie.idCategorieProduit!,  widget.id!);
-                //       }).toList(),
-                //     ),
-                //   ),
-                // ),
+                Flexible(
+                  child: GestureDetector(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: categorieProduit.map((categorie) {
+                        return buildGridView(
+                            categorie.idCategorieProduit!,  widget.id!);
+                      }).toList(),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

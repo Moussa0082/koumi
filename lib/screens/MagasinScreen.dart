@@ -7,6 +7,7 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddMagasinScreen.dart';
 import 'package:koumi_app/screens/Produit.dart';
 import 'package:koumi_app/service/MagasinService.dart';
@@ -33,6 +34,8 @@ class _MagasinScreenState extends State<MagasinScreen>
 
   List<Magasin> magasin = [];
   late Acteur acteur;
+   late List<TypeActeur> typeActeurData = [];
+  late String type;
   List<Niveau1Pays> niveau1Pays = [];
   String selectedRegionId =
       ''; // Ajoutez une variable pour stocker l'ID de la région sélectionnée
@@ -134,6 +137,12 @@ class _MagasinScreenState extends State<MagasinScreen>
   @override
   void initState() {
     super.initState();
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    typeActeurData = acteur.typeActeur!;
+
+    // selectedType == null;
+    type = typeActeurData.map((data) => data.libelle).join(', ');
+    
     _searchController = TextEditingController();
     if (niveau1Pays.isNotEmpty) {
       selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
@@ -167,6 +176,7 @@ class _MagasinScreenState extends State<MagasinScreen>
               tabs: niveau1Pays.map((region) => Tab(text: region.nomN1!)).toList(),
             ),
             actions: [
+              
               PopupMenuButton<String>(
                 padding: EdgeInsets.zero,
                 itemBuilder: (context) => <PopupMenuEntry<String>>[
@@ -257,7 +267,6 @@ class _MagasinScreenState extends State<MagasinScreen>
 
   Widget buildGridView(String id) {
     List<Magasin> magasinss = magasin;
-    String? idMagasin = "";
         // Accéder à la liste des types d'acteurs de cet acteur
 
     if (magasinss.isEmpty) {
@@ -530,13 +539,14 @@ class _MagasinScreenState extends State<MagasinScreen>
                                                         TextOverflow.ellipsis,
                                                   )),
                                               subtitle: Text(
-                                              magasin.niveau1Pays!.nomN1!,
+                                              magasin.nomMagasin!,
                                               // filteredMagasins[index].acteur!.typeActeur.map((e) => e.libelle!).join(', '),
                                                   // filteredMagasins[index]['acteur']['typeActeur']
                                                   //     .map((data) =>
                                                   //         data.libelle)
                                                   //     .join(', '),
                                                   style: const TextStyle(
+                                                    overflow: TextOverflow.ellipsis,
                                                     color: Colors.black87,
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.w500,
