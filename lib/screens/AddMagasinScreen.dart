@@ -42,7 +42,6 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
   String? imageSrc;
 
   late Niveau1Pays niveau1Pays;
-  bool _isLoading = false;
 
   List<String> regions = [];
   String? niveauPaysValue;
@@ -100,7 +99,8 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
               localiteMagasin: localiteMagasin,
               photo: widget.photo,
               acteur: acteur,
-              niveau1Pays: widget.niveau1Pays!)
+              niveau1Pays: widget.niveau1Pays!
+              )
           .then((value) => showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -111,6 +111,9 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pop();
+                                        nomMagasinController.clear();
+         contactMagasinController.clear();
+         localiteMagasinController.clear();
                         },
                         child: const Text('OK'),
                       ),
@@ -137,6 +140,9 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pop();
+                          nomMagasinController.clear();
+         contactMagasinController.clear();
+         localiteMagasinController.clear();
                         },
                         child: const Text('OK'),
                       ),
@@ -171,22 +177,22 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
   void _handleButtonPress() async {
     // Afficher l'indicateur de chargement
     setState(() {
-      _isLoading = true;
+      isLoading = true;
     });
      
-     if(!widget.isEditable!){
+     if(widget.isEditable! == false){
 
     await addMagasin().then((_) {
       // Cacher l'indicateur de chargement lorsque votre fonction est terminée
       setState(() {
-        _isLoading = false;
+        isLoading = false;
       });
     });
      }else{
        await updateMagasin().then((_) {
       // Cacher l'indicateur de chargement lorsque votre fonction est terminée
       setState(() {
-        _isLoading = false;
+        isLoading = false;
       });
     });
      }
