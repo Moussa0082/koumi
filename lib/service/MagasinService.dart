@@ -13,8 +13,8 @@ import 'package:koumi_app/models/Acteur.dart';
 
 class MagasinService extends ChangeNotifier{
 
-    static const String baseUrl = 'https://koumi.ml/api-koumi/Magasin';
-    // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Magasin';
+    // static const String baseUrl = 'https://koumi.ml/api-koumi/Magasin';
+    static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Magasin';
 
 
   Future<void> creerMagasin({
@@ -71,7 +71,7 @@ class MagasinService extends ChangeNotifier{
 
      Future<void> updateMagasin(
       {
-        required String id,
+        required String idMagasin,
         required String nomMagasin,
     required String contactMagasin,
     required String localiteMagasin,
@@ -81,7 +81,7 @@ class MagasinService extends ChangeNotifier{
       }) async {
         try{
     var requete = http.MultipartRequest(
-          'PUT', Uri.parse('$baseUrl/update/$id'));
+          'PUT', Uri.parse('$baseUrl/update/$idMagasin'));
 
       if (photo != null) {
         requete.files.add(http.MultipartFile(
@@ -91,7 +91,7 @@ class MagasinService extends ChangeNotifier{
 
       requete.fields['magasin'] = jsonEncode({
 
-          'id': id,
+          'idMagasin': idMagasin,
           'nomMagasin': nomMagasin,
       'contactMagasin': contactMagasin,
       'localiteMagasin': localiteMagasin,

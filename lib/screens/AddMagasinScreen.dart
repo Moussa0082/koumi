@@ -94,7 +94,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
     if (photos != null) {
       await magasinService
           .updateMagasin(
-              id: widget.idMagasin!,
+              idMagasin: widget.idMagasin!,
               nomMagasin: nomMagasin,
               contactMagasin: contactMagasin,
               localiteMagasin: localiteMagasin,
@@ -121,7 +121,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
     } else {
       await magasinService
           .updateMagasin(
-              id:widget.idMagasin!,
+              idMagasin:widget.idMagasin!,
               nomMagasin: nomMagasin,
               contactMagasin: contactMagasin,
               localiteMagasin: localiteMagasin,
@@ -356,7 +356,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
     localiteMagasinController.text = widget.localiteMagasin!;
     // photos = widget.photo!;
     niveauPaysValue = widget.niveau1Pays!.idNiveau1Pays;
-    debugPrint(widget.niveau1Pays!.idNiveau1Pays);
+    debugPrint ("Id Magasin "+ widget.idMagasin!);
     }
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     niveau1PaysList =

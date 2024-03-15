@@ -39,9 +39,24 @@ class _SplashScreenState extends State<SplashScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? emailActeur = prefs.getString('emailActeur');
     if (emailActeur != null) {
-      // Si l'email de l'acteur est présent, exécute checkLoggedIn
       checkLoggedIn();
-    } else {
+// Timer(Duration(seconds: 10), () async {
+//     // Supprimer les données de l'utilisateur dans SharedPreferences
+//     SharedPreferences prefs = await SharedPreferences.getInstance();
+//     await prefs.clear();
+
+//     // Naviguer vers l'écran de connexion
+//     Navigator.of(context).pushReplacement(
+//       MaterialPageRoute(
+//         builder: (_) => const LoginScreen(),
+//       ),
+//     );
+//   });
+
+      
+    } 
+    else {
+
       Timer(
         const Duration(seconds: 5),
         () => Navigator.of(context).pushReplacement(
@@ -60,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen> {
     // // Récupère l'objet Acteur
     // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
 
-if (Provider.of<ActeurProvider>(context, listen: false).acteur != null) {
+    if (Provider.of<ActeurProvider>(context, listen: false).acteur != null) {
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
       // La suite de votre logique ici...
     } else {

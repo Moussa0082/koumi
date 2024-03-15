@@ -4,6 +4,7 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_multi_formatter/formatters/phone_input_formatter.dart';
 import 'package:flutter_multi_formatter/widgets/country_dropdown.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:koumi_app/models/Pays.dart';
@@ -50,7 +51,7 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
   String? image1Src;
 
   // Valeur par défaut
-  String selectedOption = "Option 1";
+  late PhoneNumber _phoneNumber;
 
   String processedNumber = "";
   String initialCountry = 'ML';
@@ -63,6 +64,13 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
   TextEditingController paysController = TextEditingController();
   TextEditingController adresseController = TextEditingController();
    String selectedCountry = "";
+
+
+  
+  Future<void> _getCurrentUserLocation() async {
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
+
+  }
 
 
     String removePlus(String phoneNumber) {
@@ -164,6 +172,18 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
 
   @override
   Widget build(BuildContext context) {
+
+
+   _getCurrentUserLocation(); // Call the function to get location
+
+    Locale deviceLocale = Localizations.localeOf(context);
+    String countryCode = deviceLocale.countryCode ?? '';
+
+    setState(() {
+      selectedCountry = countryCode.toUpperCase();
+    });
+
+
     return Scaffold(
        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       body: SingleChildScrollView(
@@ -229,8 +249,9 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
           
              Form(
               key:_formKey,
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                           children: [
+              child: Column(
+               crossAxisAlignment: CrossAxisAlignment.start,
+               children: [
              const SizedBox(height: 10,),
               // debut fullname 
               Padding(
@@ -350,6 +371,9 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
     mainAxisAlignment: MainAxisAlignment.center,
     children: <Widget>[
       InternationalPhoneNumberInput(
+         initialValue: PhoneNumber(
+                      isoCode: Platform.localeName.split('_').last,
+                    ),
         formatInput: true,
         hintText: "Numéro de téléphone",
         maxLength: 20,
@@ -383,9 +407,9 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
     ],
   ),
 ),
+                
                 // fin whatsApp acteur 
                    
-                      
                            const  SizedBox(height: 10,),
                               Padding(
                 padding: const EdgeInsets.only(left:10.0),
@@ -410,7 +434,7 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
           print("Pays : $selectedCountry");
         });
       },
-      initialSelection: 'ML',
+        initialSelection: selectedCountry, // Set initial selection based on detected country code
       showCountryOnly: true,
       showOnlyCountryWhenClosed: true,
       alignLeft: true,

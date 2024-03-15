@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/service/SpeculationService.dart';
@@ -49,7 +50,6 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     
 List<Speculation> _speculations = [];
-String id= 'e40ijxd5k0n0yrzj5f80';
   //  final MultiSelectController _controllerCategorie = MultiSelectController();
 
 final MultiSelectController _controllerCategorie = MultiSelectController();
@@ -92,11 +92,13 @@ Future<void> fetchSpeculationsByCategories(List<String> idsCategorieProduit) asy
    List<String> selectedCategoryIds = [];
 
    List<String> idsCategorieProduit = [];
-   String urls = "";
-
+String idsCategorieProduitAsString = "";
   
   String? image2Src;
   File? image2;
+
+
+    
 
         Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
@@ -334,6 +336,7 @@ Future<void> _pickImage(ImageSource source) async {
   void initState() {
     // TODO: implement initState
     super.initState();
+   
     debugPrint("Adresse : " + widget.adresse + " Maillon : " + widget.maillon + " Type : ${widget.typeActeur}"+
     " Localisation :  " + widget.localistaion + " Whats app : " + widget.numeroWhatsApp + "Email :" + widget.email
   
@@ -506,12 +509,10 @@ Future<void> _pickImage(ImageSource source) async {
             .map((data) => data.label)
             .toList());
         idsCategorieProduit = _controllerCategorie.selectedOptions.map((item) => item.value.toString()).toList();
+      //  idsCategorieProduitAsString = idsCategorieProduit.isEmpty ? idsCategorieProduit.join(',') : "e40ijxd5k0n0yrzj5f80";
+           idsJson = jsonEncode(idsCategorieProduit);
 
-idsCategorieProduit = _controllerCategorie.selectedOptions.map((item) => item.value.toString()).toList();
-  idsJson = jsonEncode(idsCategorieProduit);
-  //  urls = Uri.parse('http://10.0.2.2:9000/api-koumi/Speculation/by-categories')
-  //   .replace(queryParameters: {'idsCategorieProduit': idsJson}) as String;
-        print("categorie sélectionné ${libelleCategorie.toString() + " id " + idsJson.toString()}");
+        print("categorie sélectionné ${libelleCategorie.toString() + " id " + idsCategorieProduit.join(',')}");
       });
   print("id s "+ idsCategorieProduit.toString());
       // Fermer automatiquement le dialogue
@@ -569,7 +570,6 @@ idsCategorieProduit = _controllerCategorie.selectedOptions.map((item) => item.va
     fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
     onOptionSelected: (options) {
       setState(() {
-        print(idsJson);
         libelleSpeculation.clear();
         libelleSpeculation.addAll(options.map((data) => data.label).toList());
         print("Spéculation sélectionnée ${libelleSpeculation.toString()}");

@@ -39,12 +39,10 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
   void fetchRegions() async {
     try {
       final response = await http
-          .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-          // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+          // .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+          .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
-
-        // Filtrer les éléments avec statutN1 == true
 
         setState(() {
          niveau1Pays = data
@@ -63,7 +61,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
         fetchMagasinsByRegionAndActeur(
             acteur.idActeur!,
             niveau1Pays.isNotEmpty
-                ? niveau1Pays[_tabController!.index].idNiveau1Pays!
+                ? niveau1Pays.first.idNiveau1Pays!
                 : '');
       } else {
         throw Exception('Failed to load regions');
@@ -77,14 +75,14 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
       String idActeur, String idNiveau1Pays) async {
     try {
       final response = await http.get(Uri.parse(
-          'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeurAndNieau1Pay/${idActeur}/${idNiveau1Pays}'));
-          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNieau1Pay/${idActeur}/${idNiveau1Pays}'));
+          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeurAndNieau1Pay/${idActeur}/${idNiveau1Pays}'));
+          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pay/${idActeur}/${idNiveau1Pays}'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         
         setState(() {
         magasin = data
-            .where((magasin) => magasin['statutMagasin'] == true)
+            .where((magasin) => magasin['statutMagasin'] == true) 
             .map((item) => Magasin(
                
                   nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
@@ -124,7 +122,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
     if (_tabController != null &&
         _tabController!.index >= 0 &&
         _tabController!.index < niveau1Pays.length) {
-      String selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
+       selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
       fetchMagasinsByRegionAndActeur(acteur.idActeur!, selectedRegionId);
     }
   }
@@ -297,7 +295,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
   Widget buildGridView(String idActeur, String idNiveau1Pays) {
     try {
       
-    List<Magasin>? magasins = magasin;
+    List<Magasin> magasins = magasin;
 
     if (magasins.isEmpty) {
       // Si les données ne sont pas encore chargées, affichez l'effet Shimmer
@@ -373,8 +371,8 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8.0),
                             child: Image.network(
-                              "https://koumi.ml/api-koumi/${magasin.photo}" ?? "assets/images/magasin.png",
                               // "https://koumi.ml/api-koumi/${magasin.photo}" ?? "assets/images/magasin.png",
+                              "http://10.0.2.2:9000/api-koumi/${magasin.photo}" ?? "assets/images/magasin.png",
                               height: 120,
                               fit: BoxFit.cover,
                               errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
@@ -391,7 +389,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: Text(
-                            magasin.nomMagasin!.toUpperCase() ?? 'Pas de nom défini',
+                            magasin.nomMagasin!.toUpperCase() ,
                             textAlign: TextAlign.center,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

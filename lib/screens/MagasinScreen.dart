@@ -53,12 +53,10 @@ class _MagasinScreenState extends State<MagasinScreen>
   void fetchRegions() async {
     try {
       final response = await http
-          .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-          // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+          // .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+          .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
-
-        // Filtrer les éléments avec statutN1 == true
 
         setState(() {
          niveau1Pays = data
@@ -86,7 +84,7 @@ class _MagasinScreenState extends State<MagasinScreen>
 
  void fetchMagasinsByRegion(String id) async {
   try {
-    final response = await http.get(Uri.parse('https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+    final response = await http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       setState(() {
@@ -259,6 +257,7 @@ class _MagasinScreenState extends State<MagasinScreen>
 
   Widget buildGridView(String id) {
     List<Magasin> magasinss = magasin;
+    String? idMagasin = "";
         // Accéder à la liste des types d'acteurs de cet acteur
 
     if (magasinss.isEmpty) {
@@ -505,8 +504,7 @@ class _MagasinScreenState extends State<MagasinScreen>
                                         children: [
                                           ListTile(
                                               leading: 
-                                                      magasin.photo!
-                                .toUpperCase().isEmpty
+                                                      magasin.photo!.isEmpty
                                                   ? ProfilePhoto(
                                                       totalWidth: 50,
                                                       cornerRadius: 50,
@@ -726,7 +724,6 @@ class _MagasinScreenState extends State<MagasinScreen>
                                                           ),
                                                         ),
                                                         onTap: () async {
-                                                          
                                                             Navigator.push(
   context,
   PageRouteBuilder(
@@ -736,7 +733,7 @@ class _MagasinScreenState extends State<MagasinScreen>
         child: ScaleTransition(
           scale: animation,
           child: AddMagasinScreen(
-            idMagasin: id,
+            idMagasin: magasin.idMagasin,
             isEditable: isEditable,
             nomMagasin:magasin.nomMagasin,
             contactMagasin: magasin.contactMagasin,
