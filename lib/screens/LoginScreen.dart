@@ -39,8 +39,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final String emailActeur = emailController.text;
     final String password = passwordController.text;
 
-    const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
-    // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
+    // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
+    const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
     const String defaultProfileImage = 'assets/images/profil.jpg';
 
@@ -534,61 +534,58 @@ class _LoginScreenState extends State<LoginScreen> {
                       // fin mot de pass
 
                       const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 50,
-                                  height: 30,
-                                  child: FittedBox(
-                                    fit: BoxFit.contain,
-                                    child: Switch(
-                                      value: isActive,
-                                      activeColor: Colors.orange,
-                                      onChanged: (bool value) {
-                                        setState(() {
-                                          isActive = value;
-                                        });
-                                      },
-                                    ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 50,
+                                height: 30,
+                                child: FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: Switch(
+                                    value: isActive,
+                                    activeColor: Colors.orange,
+                                    onChanged: (bool value) {
+                                      setState(() {
+                                        isActive = value;
+                                      });
+                                    },
                                   ),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                const Text(
-                                  "Se souvenir de moi",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                print("ho");
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ForgetPassScreen(),
-                                  ),
-                                );
-                              },
-                              child: const Text(
-                                "Mot de passe oublié ",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  decoration: TextDecoration.underline,
-                                  color: Colors.blue,
                                 ),
                               ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              const Text(
+                                "Se souvenir de moi",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ],
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              print("ho");
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ForgetPassScreen(),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "Mot de passe oublié ",
+                              style: TextStyle(
+                                fontSize: 15,
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue,
+                              ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
 
                       const SizedBox(
@@ -637,7 +634,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Text(
-                                "Je n'ai pas de compte .",
+                                "Pas de compte ?.",
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 18,
@@ -655,7 +652,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               RegisterScreen()));
                                 },
                                 child: const Text(
-                                  "M'inscrire",
+                                  "S'inscrire",
                                   style: TextStyle(
                                       color: Colors.blue,
                                       fontSize: 18,

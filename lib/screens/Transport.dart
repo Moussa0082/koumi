@@ -32,17 +32,15 @@ class _TransportState extends State<Transport> {
   String? typeValue;
   late Future _typeList;
 
-
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     typeActeurData = acteur.typeActeur!;
-
     // selectedType == null;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
-    _typeList = http.get(Uri.parse(
-        'http://10.0.2.2:9000/api-koumi/TypeVoiture/listeByActeur/${acteur.idActeur!}'));
+    // _typeList = http.get(Uri.parse('https://koumi.ml/api-koumi/TypeVoiture/read'));
+    _typeList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
     super.initState();
   }
 
@@ -149,7 +147,18 @@ class _TransportState extends State<Transport> {
               future: _typeList,
               builder: (_, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
+                  return DropdownButtonFormField(
+                    items: [],
+                    onChanged: null,
+                    decoration: InputDecoration(
+                      labelText: '-- Aucun type de véhicule trouvé --',
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  );
                 }
                 if (snapshot.hasError) {
                   return Text("${snapshot.error}");

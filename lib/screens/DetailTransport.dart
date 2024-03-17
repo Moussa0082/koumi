@@ -187,16 +187,16 @@ class _DetailTransportState extends State<DetailTransport> {
         }
       }
 
-      await VehiculeService().updateVehicule(
-        idVehicule: vehicules.idVehicule!,
-        nomVehicule: nom,
-        capaciteVehicule: capacite,
-        prixParDestination: newPrixParDestinations,
-        etatVehicule: etat,
-        localisation: localite,
-        typeVoiture: typeVoiture,
-        acteur: acteur,
-      );
+      // await VehiculeService().updateVehicule(
+      //   idVehicule: vehicules.idVehicule!,
+      //   nomVehicule: nom,
+      //   capaciteVehicule: capacite,
+      //   prixParDestination: newPrixParDestinations,
+      //   etatVehicule: etat,
+      //   localisation: localite,
+      //   typeVoiture: typeVoiture,
+      //   acteur: acteur,
+      // );
 
       setState(() {
         vehicules = Vehicule(
@@ -205,6 +205,9 @@ class _DetailTransportState extends State<DetailTransport> {
           capaciteVehicule: capacite,
           prixParDestination: newPrixParDestinations,
           etatVehicule: etat,
+          codeVehicule: vehicules.codeVehicule,
+          description: vehicules.description,
+          nbKilometrage: vehicules.nbKilometrage,
           localisation: localite,
           typeVoiture: typeVoiture,
           acteur: acteur,

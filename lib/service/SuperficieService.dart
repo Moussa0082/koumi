@@ -1,39 +1,36 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Campagne.dart';
-import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/Superficie.dart';
-import 'package:path/path.dart';
 
 class SuperficieService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/Superficie';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Superficie';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/Superficie';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Superficie';
 
   List<Superficie> superficieList = [];
 
-  Future<void> addSuperficie({
-    required String localite,
-    required String superficieHa,
-    required String dateSemi,
-    required Acteur acteur,
-    required List<Intrant> intrants,
-    required Speculation speculation,
-    required Campagne campagne
-  }) async {
-    var addSuperficies = jsonEncode(
-        {
-          'idSuperficie': null,
-          'localite': localite,
-          'superficieHa': superficieHa,
-          'dateSemi': dateSemi,
-          'acteur': acteur.toMap(),
-          'intrant': intrants.toList(),
-          'speculation': speculation.toMap(),
-          'campagne': campagne.toMap()
-          });
+  Future<void> addSuperficie(
+      {required String localite,
+      required String superficieHa,
+      required String dateSemi,
+      required Acteur acteur,
+      required List<String> intrants,
+      required Speculation speculation,
+      required Campagne campagne}) async {
+    var addSuperficies = jsonEncode({
+      'idSuperficie': null,
+      'localite': localite,
+      'superficieHa': superficieHa,
+      'dateSemi': dateSemi,
+      'acteur': acteur.toMap(),
+      'intrants': intrants.toList(),
+      'speculation': speculation.toMap(),
+      'campagne': campagne.toMap()
+    });
 
     final response = await http.post(Uri.parse("$baseUrl/addSuperficie"),
         headers: {'Content-Type': 'application/json'}, body: addSuperficies);
@@ -45,15 +42,14 @@ class SuperficieService extends ChangeNotifier {
     }
   }
 
- Future<void> updateSuperficie(
-      {
-      required String idSuperficie,
+  Future<void> updateSuperficie(
+      {required String idSuperficie,
       required String localite,
       required String superficieHa,
       required String dateSemi,
       required String personneModif,
       required Acteur acteur,
-      required List<Intrant> intrants,
+      required List<String> intrants,
       required Speculation speculation,
       required Campagne campagne}) async {
     var addSuperficies = jsonEncode({
@@ -63,7 +59,7 @@ class SuperficieService extends ChangeNotifier {
       'superficieHa': superficieHa,
       'dateSemi': dateSemi,
       'acteur': acteur.toMap(),
-      'intrant': intrants.toList(),
+      'intrants': intrants.toList(),
       'speculation': speculation.toMap(),
       'campagne': campagne.toMap()
     });
@@ -92,8 +88,10 @@ class SuperficieService extends ChangeNotifier {
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }
+
   Future<List<Superficie>> fetchSuperficieByActeur(String idActeur) async {
-    final response = await http.get(Uri.parse('$baseUrl/getSuperficieByActeur/$idActeur'));
+    final response =
+        await http.get(Uri.parse('$baseUrl/getSuperficieByActeur/$idActeur'));
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
@@ -107,8 +105,10 @@ class SuperficieService extends ChangeNotifier {
     }
   }
 
-  Future<List<Superficie>> fetchSuperficieBySpeculation(String idSpeculation) async {
-    final response = await http.get(Uri.parse('$baseUrl/getAllSuperficieBySpeculation/$idSpeculation'));
+  Future<List<Superficie>> fetchSuperficieBySpeculation(
+      String idSpeculation) async {
+    final response = await http.get(
+        Uri.parse('$baseUrl/getAllSuperficieBySpeculation/$idSpeculation'));
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
@@ -123,7 +123,8 @@ class SuperficieService extends ChangeNotifier {
   }
 
   Future<void> deleteSuperficie(String idSuperficie) async {
-    final response = await http.delete(Uri.parse("$baseUrl/delete/$idSuperficie"));
+    final response =
+        await http.delete(Uri.parse("$baseUrl/delete/$idSuperficie"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -134,7 +135,8 @@ class SuperficieService extends ChangeNotifier {
   }
 
   Future<void> activerSuperficie(String idSuperficie) async {
-    final response = await http.post(Uri.parse("$baseUrl/activer/$idSuperficie"));
+    final response =
+        await http.post(Uri.parse("$baseUrl/activer/$idSuperficie"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -145,7 +147,8 @@ class SuperficieService extends ChangeNotifier {
   }
 
   Future<void> desactiverSuperficie(String idSuperficie) async {
-    final response = await http.post(Uri.parse("$baseUrl/desactiver/$idSuperficie"));
+    final response =
+        await http.post(Uri.parse("$baseUrl/desactiver/$idSuperficie"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
 

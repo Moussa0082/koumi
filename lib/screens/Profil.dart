@@ -7,8 +7,8 @@ import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
-import 'package:koumi_app/screens/TypeVehicule.dart';
-import 'package:koumi_app/service/TypeVoitureService.dart';
+import 'package:koumi_app/screens/Surface.dart';
+import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
@@ -356,11 +356,11 @@ class _ProfilState extends State<Profil> {
                                     ),
                                     TextButton(
                                         onPressed: () {
-                                          // Navigator.push(
-                                          //     context,
-                                          //     MaterialPageRoute(
-                                          //         builder: (context) =>
-                                          //             const Zone()));
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const Surface()));
                                         },
                                         child: Text(
                                           "Surface cultiver",
@@ -549,55 +549,55 @@ class _ProfilState extends State<Profil> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            const TypeVehicule()));
+                                            const VehiculeActeur()));
                               },
                               child: Text(
-                                "Type de véhicule",
+                                "Mes véhicule",
                                 style: TextStyle(
                                     fontSize: 17, color: d_colorGreen),
                               ))
                         ]),
-                        Consumer<TypeVoitureService>(
-                            builder: (context, typeService, child) {
-                          return FutureBuilder(
-                              future: typeService
-                                  .fetchTypeVoitureByActeur(acteur.idActeur!),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Center(
-                                    child: CircularProgressIndicator(
-                                      color: Colors.orange,
-                                    ),
-                                  );
-                                }
+                        // Consumer<TypeVoitureService>(
+                        //     builder: (context, typeService, child) {
+                        //   return FutureBuilder(
+                        //       future: typeService
+                        //           .fetchTypeVoitureByActeur(acteur.idActeur!),
+                        //       builder: (context, snapshot) {
+                        //         if (snapshot.connectionState ==
+                        //             ConnectionState.waiting) {
+                        //           return const Center(
+                        //             child: CircularProgressIndicator(
+                        //               color: Colors.orange,
+                        //             ),
+                        //           );
+                        //         }
 
-                                if (!snapshot.hasData) {
-                                  return const Padding(
-                                    padding: EdgeInsets.all(10),
-                                    child: Center(
-                                        child: Text(
-                                            "Aucun type de véhicule trouvé")),
-                                  );
-                                } else {
-                                  typeList = snapshot.data!;
-                                  return Wrap(
-                                      spacing: 10,
-                                      children: typeList
-                                          .map(
-                                            (e) => Text("${e.nom} ,",
-                                                style: const TextStyle(
-                                                    color: Colors.black87,
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w500,
-                                                    fontStyle: FontStyle.italic,
-                                                    overflow:
-                                                        TextOverflow.ellipsis)),
-                                          )
-                                          .toList());
-                                }
-                              });
-                        })
+                        //         if (!snapshot.hasData) {
+                        //           return const Padding(
+                        //             padding: EdgeInsets.all(10),
+                        //             child: Center(
+                        //                 child: Text(
+                        //                     "Aucun type de véhicule trouvé")),
+                        //           );
+                        //         } else {
+                        //           typeList = snapshot.data!;
+                        //           return Wrap(
+                        //               spacing: 10,
+                        //               children: typeList
+                        //                   .map(
+                        //                     (e) => Text("${e.nom} ,",
+                        //                         style: const TextStyle(
+                        //                             color: Colors.black87,
+                        //                             fontSize: 16,
+                        //                             fontWeight: FontWeight.w500,
+                        //                             fontStyle: FontStyle.italic,
+                        //                             overflow:
+                        //                                 TextOverflow.ellipsis)),
+                        //                   )
+                        //                   .toList());
+                        //         }
+                        //       });
+                        // })
                       ],
                     ),
                   ),

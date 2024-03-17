@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 class ParametreGeneraux {
@@ -7,6 +6,10 @@ class ParametreGeneraux {
    String nomStructure;
    String sigleSysteme;
    String nomSysteme;
+   String? monnaie;
+   String? tauxFcranc;
+   String? tauxDollar;
+   String? tauxYuan;
    String descriptionSysteme;
    String sloganSysteme;
    String? logoSysteme;
@@ -21,12 +24,17 @@ class ParametreGeneraux {
    String localiteStructure;
    String? dateAjout;
    String? dateModif;
+
   ParametreGeneraux({
     this.idParametreGeneraux,
     required this.sigleStructure,
     required this.nomStructure,
     required this.sigleSysteme,
     required this.nomSysteme,
+    this.monnaie,
+    this.tauxFcranc,
+    this.tauxDollar,
+    this.tauxYuan,
     required this.descriptionSysteme,
     required this.sloganSysteme,
     this.logoSysteme,
@@ -42,7 +50,6 @@ class ParametreGeneraux {
     this.dateAjout,
     this.dateModif,
   });
-  
  
 
   ParametreGeneraux copyWith({
@@ -51,6 +58,10 @@ class ParametreGeneraux {
     String? nomStructure,
     String? sigleSysteme,
     String? nomSysteme,
+    String? monnaie,
+    String? tauxFcranc,
+    String? tauxDollar,
+    String? tauxYuan,
     String? descriptionSysteme,
     String? sloganSysteme,
     String? logoSysteme,
@@ -72,6 +83,10 @@ class ParametreGeneraux {
       nomStructure: nomStructure ?? this.nomStructure,
       sigleSysteme: sigleSysteme ?? this.sigleSysteme,
       nomSysteme: nomSysteme ?? this.nomSysteme,
+      monnaie: monnaie ?? this.monnaie,
+      tauxFcranc: tauxFcranc ?? this.tauxFcranc,
+      tauxDollar: tauxDollar ?? this.tauxDollar,
+      tauxYuan: tauxYuan ?? this.tauxYuan,
       descriptionSysteme: descriptionSysteme ?? this.descriptionSysteme,
       sloganSysteme: sloganSysteme ?? this.sloganSysteme,
       logoSysteme: logoSysteme ?? this.logoSysteme,
@@ -96,6 +111,10 @@ class ParametreGeneraux {
       'nomStructure': nomStructure,
       'sigleSysteme': sigleSysteme,
       'nomSysteme': nomSysteme,
+      'monnaie': monnaie,
+      'tauxFcranc': tauxFcranc,
+      'tauxDollar': tauxDollar,
+      'tauxYuan': tauxYuan,
       'descriptionSysteme': descriptionSysteme,
       'sloganSysteme': sloganSysteme,
       'logoSysteme': logoSysteme,
@@ -120,6 +139,10 @@ class ParametreGeneraux {
       nomStructure: map['nomStructure'] as String,
       sigleSysteme: map['sigleSysteme'] as String,
       nomSysteme: map['nomSysteme'] as String,
+      monnaie: map['monnaie'] != null ? map['monnaie'] as String : null,
+      tauxFcranc: map['tauxFcranc'] != null ? map['tauxFcranc'] as String : null,
+      tauxDollar: map['tauxDollar'] != null ? map['tauxDollar'] as String : null,
+      tauxYuan: map['tauxYuan'] != null ? map['tauxYuan'] as String : null,
       descriptionSysteme: map['descriptionSysteme'] as String,
       sloganSysteme: map['sloganSysteme'] as String,
       logoSysteme: map['logoSysteme'] != null ? map['logoSysteme'] as String : null,
@@ -143,7 +166,7 @@ class ParametreGeneraux {
 
   @override
   String toString() {
-    return 'ParametreGeneraux(idParametreGeneraux: $idParametreGeneraux, sigleStructure: $sigleStructure, nomStructure: $nomStructure, sigleSysteme: $sigleSysteme, nomSysteme: $nomSysteme, descriptionSysteme: $descriptionSysteme, sloganSysteme: $sloganSysteme, logoSysteme: $logoSysteme, adresseStructure: $adresseStructure, emailStructure: $emailStructure, telephoneStructure: $telephoneStructure, whattsAppStructure: $whattsAppStructure, libelleNiveau1Pays: $libelleNiveau1Pays, libelleNiveau2Pays: $libelleNiveau2Pays, libelleNiveau3Pays: $libelleNiveau3Pays, codeNiveauStructure: $codeNiveauStructure, localiteStructure: $localiteStructure, dateAjout: $dateAjout, dateModif: $dateModif)';
+    return 'ParametreGeneraux(idParametreGeneraux: $idParametreGeneraux, sigleStructure: $sigleStructure, nomStructure: $nomStructure, sigleSysteme: $sigleSysteme, nomSysteme: $nomSysteme, monnaie: $monnaie, tauxFcranc: $tauxFcranc, tauxDollar: $tauxDollar, tauxYuan: $tauxYuan, descriptionSysteme: $descriptionSysteme, sloganSysteme: $sloganSysteme, logoSysteme: $logoSysteme, adresseStructure: $adresseStructure, emailStructure: $emailStructure, telephoneStructure: $telephoneStructure, whattsAppStructure: $whattsAppStructure, libelleNiveau1Pays: $libelleNiveau1Pays, libelleNiveau2Pays: $libelleNiveau2Pays, libelleNiveau3Pays: $libelleNiveau3Pays, codeNiveauStructure: $codeNiveauStructure, localiteStructure: $localiteStructure, dateAjout: $dateAjout, dateModif: $dateModif)';
   }
 
   @override
@@ -156,6 +179,10 @@ class ParametreGeneraux {
       other.nomStructure == nomStructure &&
       other.sigleSysteme == sigleSysteme &&
       other.nomSysteme == nomSysteme &&
+      other.monnaie == monnaie &&
+      other.tauxFcranc == tauxFcranc &&
+      other.tauxDollar == tauxDollar &&
+      other.tauxYuan == tauxYuan &&
       other.descriptionSysteme == descriptionSysteme &&
       other.sloganSysteme == sloganSysteme &&
       other.logoSysteme == logoSysteme &&
@@ -179,6 +206,10 @@ class ParametreGeneraux {
       nomStructure.hashCode ^
       sigleSysteme.hashCode ^
       nomSysteme.hashCode ^
+      monnaie.hashCode ^
+      tauxFcranc.hashCode ^
+      tauxDollar.hashCode ^
+      tauxYuan.hashCode ^
       descriptionSysteme.hashCode ^
       sloganSysteme.hashCode ^
       logoSysteme.hashCode ^

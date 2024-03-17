@@ -8,6 +8,7 @@ import 'package:koumi_app/Admin/SousRegionPage.dart';
 import 'package:koumi_app/Admin/UnitePage.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/screens/TypeVehicule.dart';
 import 'package:provider/provider.dart';
 
 class Parametre extends StatefulWidget {
@@ -73,12 +74,12 @@ class _ParametreState extends State<Parametre> {
                 ),
                 child: ListTile(
                   leading:
-                      params.logoSysteme!.isEmpty || params.logoSysteme == null
+                      params.logoSysteme == null || params.logoSysteme!.isEmpty
                           ? SizedBox(
                               width: 110,
                               height: 150,
                               child: Image.asset(
-                                "assets/images/type.png",
+                                "assets/images/logo.png",
                                 scale: 1,
                                 fit: BoxFit.fill,
                               ),
@@ -87,7 +88,7 @@ class _ParametreState extends State<Parametre> {
                               width: 110,
                               height: 150,
                               child: Image.network(
-                                "http://10.0.2.2/${params.logoSysteme!}",
+                                "http://10.0.2.2/api-koumi/${params.logoSysteme!}",
                                 scale: 1,
                                 fit: BoxFit.fill,
                               ),
@@ -227,6 +228,21 @@ class _ParametreState extends State<Parametre> {
                         "unite.png",
                         'Unite de mesure',
                         const UnitePage(),
+                        const Icon(
+                          Icons.chevron_right_sharp,
+                          size: 30,
+                        )),
+                         const Divider(
+                      color: Colors.grey,
+                      height: 4,
+                      thickness: 1,
+                      indent: 50,
+                      endIndent: 0,
+                    ),
+                    getList(
+                        "car.png",
+                        'Type de véhicule',
+                        const TypeVehicule(),
                         const Icon(
                           Icons.chevron_right_sharp,
                           size: 30,

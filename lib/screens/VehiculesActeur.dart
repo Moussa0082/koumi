@@ -26,10 +26,10 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
   List<Vehicule> vehiculeListe = [];
   late Future<List<Vehicule>> _liste;
 
-  Future<List<Vehicule>> getVehicule(String id) async {
-    final response = await VehiculeService().fetchVehiculeByActeur(id);
-    return response;
-  }
+  // Future<List<Vehicule>> getVehicule(String id) async {
+  //   final response = await VehiculeService().fetchVehiculeByActeur(id);
+  //   return response;
+  // }
 
   @override
   void initState() {
@@ -37,7 +37,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
     typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
-    _liste = getVehicule(acteur.idActeur!);
+    // _liste = getVehicule(acteur.idActeur!);
     super.initState();
   }
 
@@ -83,10 +83,10 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                       ),
                     ),
                     onTap: () async {
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (context) => AddVehiculeTransport()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AddVehiculeTransport()));
                     },
                   ),
                 ),
@@ -133,7 +133,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
           const SizedBox(height: 10),
           Consumer<VehiculeService>(builder: (context, vehiculeService, child) {
             return FutureBuilder(
-                future: _liste,
+                future: vehiculeService.fetchVehiculeByActeur(acteur.idActeur!),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -277,12 +277,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
-                                                                    setState(
-                                                                        () {
-                                                                      _liste = getVehicule(
-                                                                          acteur
-                                                                              .idActeur!);
-                                                                    }),
+                                                                    
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop(),
@@ -349,12 +344,12 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
-                                                                    setState(
-                                                                        () {
-                                                                      _liste = getVehicule(
-                                                                          acteur
-                                                                              .idActeur!);
-                                                                    }),
+                                                                    // setState(
+                                                                    //     () {
+                                                                    //   _liste = getVehicule(
+                                                                    //       acteur
+                                                                    //           .idActeur!);
+                                                                    // }),
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop(),
@@ -421,12 +416,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
-                                                                    setState(
-                                                                        () {
-                                                                      _liste = getVehicule(
-                                                                          acteur
-                                                                              .idActeur!);
-                                                                    }),
+                                                                   
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop(),

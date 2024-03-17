@@ -157,7 +157,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                 builder: (context, typeService, child) {
               return FutureBuilder(
                   future:
-                      typeService.fetchTypeVoitureByActeur(acteur.idActeur!),
+                      typeService.fetchTypeVoiture(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(

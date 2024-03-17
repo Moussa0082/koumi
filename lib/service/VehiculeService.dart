@@ -9,8 +9,8 @@ import 'package:koumi_app/models/Vehicule.dart';
 import 'package:path/path.dart';
 
 class VehiculeService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/vehicule';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/vehicule';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/vehicule';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/vehicule';
 
   List<Vehicule> vehiculeList = [];
 
@@ -20,6 +20,8 @@ class VehiculeService extends ChangeNotifier {
       required Map<String, int> prixParDestination,
       required String etatVehicule,
       required String localisation,
+      required String description,
+      required String nbKilometrage,
       File? photoVehicule,
       required TypeVoiture typeVoiture,
       required Acteur acteur}) async {
@@ -37,6 +39,8 @@ class VehiculeService extends ChangeNotifier {
         'nomVehicule': nomVehicule,
         'etatVehicule': etatVehicule,
         'localisation': localisation,
+        'description' :description,
+        'nbKilometrage' : int.tryParse(nbKilometrage),
         'capaciteVehicule': capaciteVehicule,
         'typeVoiture':typeVoiture.toMap(),
         'acteur': acteur.toMap(),
@@ -64,6 +68,8 @@ class VehiculeService extends ChangeNotifier {
     required Map<String, int> prixParDestination,
       required String etatVehicule,
       required String localisation,
+       required String description,
+      required String nbKilometrage,
       File? photoVehicule,
       required TypeVoiture typeVoiture,
       required Acteur acteur}) async {
@@ -83,6 +89,8 @@ class VehiculeService extends ChangeNotifier {
         'nomVehicule': nomVehicule,
         'etatVehicule': etatVehicule,
         'localisation': localisation,
+         'description': description,
+        'nbKilometrage': int.tryParse(nbKilometrage),
         'capaciteVehicule': capaciteVehicule,
         'typeVoiture': typeVoiture.toMap(),
         'acteur': acteur.toMap(),
@@ -125,7 +133,7 @@ class VehiculeService extends ChangeNotifier {
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-      debugPrint(response.body.toString());
+      debugPrint("Body : ${response.body.toString()}");
       vehiculeList = body.map((item) => Vehicule.fromMap(item)).toList();
       debugPrint(response.body);
       return vehiculeList;
@@ -142,7 +150,7 @@ class VehiculeService extends ChangeNotifier {
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-      debugPrint(response.body.toString());
+      debugPrint("Body : ${response.body.toString()}");
       vehiculeList = body.map((item) => Vehicule.fromMap(item)).toList();
       debugPrint(response.body);
       return vehiculeList;

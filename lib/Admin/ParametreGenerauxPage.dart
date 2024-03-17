@@ -151,7 +151,10 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
           title: type.toLowerCase() == 'admin'
               ? Text(
                   "Parametre Généraux",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: d_colorGreen),
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: d_colorGreen),
                 )
               : Text(
                   "Information sur la structure",
@@ -321,12 +324,10 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                             ? SizedBox(
                                                 width: 110,
                                                 height: 150,
-                                                child: Expanded(
-                                                  child: Image.asset(
-                                                    "assets/images/type.png",
-                                                    scale: 1,
-                                                    fit: BoxFit.fill,
-                                                  ),
+                                                child: Image.asset(
+                                                  "assets/images/logo.png",
+                                                  scale: 1,
+                                                  fit: BoxFit.fill,
                                                 ),
                                               )
                                             : SizedBox(
@@ -366,7 +367,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                 width: 110,
                                                 height: 150,
                                                 child: Image.asset(
-                                                  "assets/images/type.png",
+                                                  "assets/images/logo.png",
                                                   scale: 1,
                                                   fit: BoxFit.fill,
                                                 ),
@@ -375,7 +376,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                 width: 110,
                                                 height: 150,
                                                 child: Image.network(
-                                                  "http://10.0.2.2/${param.logoSysteme!}",
+                                                  "http://10.0.2.2/api-koumi/${param.logoSysteme!}",
                                                   scale: 1,
                                                   fit: BoxFit.fill,
                                                 ),
