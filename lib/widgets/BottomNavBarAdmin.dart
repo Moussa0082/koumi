@@ -13,6 +13,8 @@ class BottomNavBarAdmin extends StatefulWidget {
 
   @override
   State<BottomNavBarAdmin> createState() => _BottomNavBarAdminState();
+  static final GlobalKey<_BottomNavBarAdminState> navBarKey =
+      GlobalKey<_BottomNavBarAdminState>();
 }
 
 const d_color = Color.fromRGBO(254, 243, 231, 1);
@@ -21,6 +23,7 @@ const d_colorOr = Color.fromRGBO(254, 243, 231, 1);
 
 class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
   int activePageIndex = 0;
+
   // void _onBackPressed(bool isBackPressed) async {
   //   if (!isBackPressed) {
   //     // Essayez de revenir en arrière dans la pile de navigation actuelle
@@ -43,11 +46,17 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
   List pages = <Widget>[
     const AcceuilAdmin(),
     const ProduitA(),
-    const Panier(),
+    Panier(),
     const ProfilA()
   ];
 
   void _changeActivePageValue(int index) {
+    setState(() {
+      activePageIndex = index;
+    });
+  }
+
+  void resetIndex(int index) {
     setState(() {
       activePageIndex = index;
     });
@@ -62,6 +71,10 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    Future.microtask(() {
+      Provider.of<BottomNavigationService>(context, listen: false)
+          .changeIndex(0);
+    });
   }
 
   @override
@@ -134,7 +147,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
         return [
           const AcceuilAdmin(),
           const ProduitA(),
-          const Panier(),
+          Panier(),
           const ProfilA()
         ].elementAt(index);
       },

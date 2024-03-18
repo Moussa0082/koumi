@@ -19,7 +19,7 @@ const d_colorOr = Color.fromRGBO(254, 243, 231, 1);
 
 class _BottomNavigationPageState extends State<BottomNavigationPage> {
   int activePageIndex = 0;
-    Future<bool> _onBackPressed() async {
+  Future<bool> _onBackPressed() async {
     // Essayez de revenir en arrière dans la pile de navigation actuelle
     final NavigatorState? navigator =
         _navigatorKeys[activePageIndex].currentState;
@@ -40,7 +40,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
   List pages = <Widget>[
     const Accueil(),
     ProduitScreen(),
-    const Panier(),
+    Panier(),
     const Profil()
   ];
 
@@ -55,6 +55,15 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
         .changeIndex(index);
   }
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Future.microtask(() {
+      Provider.of<BottomNavigationService>(context, listen: false)
+          .changeIndex(0);
+    });
+  }
   // void _onBackPressed(bool isBackPressed) async {
   //   if (!isBackPressed) {
   //     // Essayez de revenir en arrière dans la pile de navigation actuelle
@@ -70,10 +79,8 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-
       // canPop: true,
       onWillPop: () async {
-       
         return false;
       },
       child: Scaffold(
@@ -137,12 +144,8 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
   Map<String, WidgetBuilder> _routeBuilders(BuildContext context, int index) {
     return {
       '/': (context) {
-        return [
-          const Accueil(),
-          ProduitScreen(),
-          const Panier(),
-          const Profil()
-        ].elementAt(index);
+        return [const Accueil(), ProduitScreen(), Panier(), const Profil()]
+            .elementAt(index);
       },
     };
   }

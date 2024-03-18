@@ -22,13 +22,13 @@ class VehiculeService extends ChangeNotifier {
       required String localisation,
       required String description,
       required String nbKilometrage,
-      File? photoVehicule,
+        File? photoVehicule,
       required TypeVoiture typeVoiture,
       required Acteur acteur}) async {
     try {
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
 
-      if (photoVehicule != null) {
+     if (photoVehicule != null) {
         requete.files.add(http.MultipartFile('image',
             photoVehicule.readAsBytes().asStream(), photoVehicule.lengthSync(),
             filename: basename(photoVehicule.path)));
@@ -40,6 +40,7 @@ class VehiculeService extends ChangeNotifier {
         'etatVehicule': etatVehicule,
         'localisation': localisation,
         'description' :description,
+        'photoVehicule': '',
         'nbKilometrage' : int.tryParse(nbKilometrage),
         'capaciteVehicule': capaciteVehicule,
         'typeVoiture':typeVoiture.toMap(),
@@ -90,6 +91,7 @@ class VehiculeService extends ChangeNotifier {
         'etatVehicule': etatVehicule,
         'localisation': localisation,
         'description': description,
+        'photoVehicule':'',
         'nbKilometrage': int.tryParse(nbKilometrage),
         'capaciteVehicule': capaciteVehicule,
         'typeVoiture': typeVoiture.toMap(),
