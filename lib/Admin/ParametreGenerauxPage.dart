@@ -189,6 +189,9 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                         emailStructure: param.emailStructure,
                                         telephoneStructure:
                                             param.telephoneStructure,
+                                        monnaie: param.monnaie!,
+                                        tauxDollar: param.tauxDollar!,
+                                        tauxYuan: param.tauxYuan!,
                                         whattsAppStructure:
                                             param.whattsAppStructure,
                                         libelleNiveau1Pays:
@@ -218,6 +221,9 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                         sigleSysteme: param.sigleSysteme,
                                         nomSysteme: param.nomSysteme,
                                         logoSysteme: photo,
+                                        monnaie: param.monnaie!,
+                                        tauxDollar: param.tauxDollar!,
+                                        tauxYuan: param.tauxYuan!,
                                         descriptionSysteme:
                                             param.descriptionSysteme,
                                         sloganSysteme: param.sloganSysteme,
@@ -319,8 +325,8 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                 children: [
                                   ListTile(
                                     leading: isEditing
-                                        ? param.logoSysteme!.isEmpty ||
-                                                param.logoSysteme == null
+                                        ? param.logoSysteme == null ||
+                                                param.logoSysteme!.isEmpty
                                             ? SizedBox(
                                                 width: 110,
                                                 height: 150,
@@ -361,8 +367,8 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   ],
                                                 ),
                                               )
-                                        : param.logoSysteme!.isEmpty ||
-                                                param.logoSysteme == null
+                                        : param.logoSysteme == null ||
+                                                param.logoSysteme!.isEmpty
                                             ? SizedBox(
                                                 width: 110,
                                                 height: 150,
@@ -887,7 +893,154 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                 ],
                               ),
                             ),
-                          )
+                          ),
+                          Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical:
+                                      MediaQuery.of(context).size.height * 0.01,
+                                  horizontal:
+                                      MediaQuery.of(context).size.width * 0.05),
+                              child: Container(
+                                // height: isEditing ? 150 : 110,
+                                width: MediaQuery.of(context).size.width * 0.9,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      offset: const Offset(0, 2),
+                                      blurRadius: 5,
+                                      spreadRadius: 2,
+                                    ),
+                                  ],
+                                ),
+                                child: Column(children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Expanded(
+                                          child: Text("Monnaie",
+                                              style: TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.w500,
+                                                fontStyle: FontStyle.italic,
+                                              )),
+                                        ),
+                                        isEditing
+                                            ? Expanded(
+                                                child: TextFormField(
+                                                  initialValue: param.monnaie,
+                                                  onChanged: (value) {
+                                                    param.monnaie = value;
+                                                  },
+                                                  // controller:
+                                                  //     nomStructureController
+                                                ),
+                                              )
+                                            : Text(param.monnaie!,
+                                                style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w800,
+                                                ))
+                                      ],
+                                    ),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.all(10.0),
+                                    child: Divider(
+                                      height: 2,
+                                      color: d_colorGreen,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Expanded(
+                                          child: Text("Taux en Dollars USA",
+                                              style: TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.w500,
+                                                fontStyle: FontStyle.italic,
+                                              )),
+                                        ),
+                                        isEditing
+                                            ? Expanded(
+                                                child: TextFormField(
+                                                  initialValue:
+                                                      param.tauxDollar,
+                                                  onChanged: (value) {
+                                                    param.tauxDollar = value;
+                                                  },
+                                                  // controller:
+                                                  //     sigleStructureController,
+                                                ),
+                                              )
+                                            : Text(
+                                                param.tauxDollar! != null
+                                                    ? param.tauxDollar!
+                                                    : '',
+                                                style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w800,
+                                                ))
+                                      ],
+                                    ),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.all(10.0),
+                                    child: Divider(
+                                      height: 2,
+                                      color: d_colorGreen,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Expanded(
+                                          child: Text("Taux en Yuan",
+                                              style: TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.w500,
+                                                fontStyle: FontStyle.italic,
+                                              )),
+                                        ),
+                                        isEditing
+                                            ? Expanded(
+                                                child: TextFormField(
+                                                  initialValue: param.tauxYuan,
+                                                  onChanged: (value) {
+                                                    param.tauxYuan = value;
+                                                  },
+                                                  // controller:
+                                                  //     sigleStructureController,
+                                                ),
+                                              )
+                                            : Text(param.tauxYuan! != null ? param.tauxYuan! : '' ,
+                                                style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w800,
+                                                ))
+                                      ],
+                                    ),
+                                  )
+                                ]),
+                              )),
                         ],
                       );
                     }

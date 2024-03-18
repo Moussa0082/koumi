@@ -30,7 +30,7 @@ class _UpdateTypeVehiculeState extends State<UpdateTypeVehicule> {
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    nomController.text = widget.typeVoiture.nom;
+    nomController.text = widget.typeVoiture.nom!;
     // Ensure nombreSieges and description are not null
     if (widget.typeVoiture.nombreSieges != null) {
       nombreSiegesController.text = widget.typeVoiture.nombreSieges!.toString();
@@ -146,7 +146,7 @@ class _UpdateTypeVehiculeState extends State<UpdateTypeVehicule> {
                       try {
                         await TypeVoitureService()
                             .updateTypeVoiture(
-                                idTypeVoiture: widget.typeVoiture.idTypeVoiture,
+                                idTypeVoiture: widget.typeVoiture.idTypeVoiture!,
                                 nom: nom,
                                 nombreSieges: siege,
                                 description: description,

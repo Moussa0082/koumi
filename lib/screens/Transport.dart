@@ -101,46 +101,46 @@ class _TransportState extends State<Transport> {
       body: SingleChildScrollView(
         child: Column(children: [
           const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.search,
-                      color: Colors.blueGrey[400],
-                      size: 28), // Utiliser une icône de recherche plus grande
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Rechercher',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(color: Colors.blueGrey[400]),
-                      ),
-                    ),
-                  ),
-                  // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
-                  IconButton(
-                    icon: Icon(Icons.clear),
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() {});
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
+          // Padding(
+          //   padding: const EdgeInsets.all(10.0),
+          //   child: Container(
+          //     padding: EdgeInsets.symmetric(horizontal: 10),
+          //     decoration: BoxDecoration(
+          //       color: Colors.blueGrey[50], // Couleur d'arrière-plan
+          //       borderRadius: BorderRadius.circular(25),
+          //     ),
+          //     child: Row(
+          //       children: [
+          //         Icon(Icons.search,
+          //             color: Colors.blueGrey[400],
+          //             size: 28), // Utiliser une icône de recherche plus grande
+          //         SizedBox(width: 10),
+          //         Expanded(
+          //           child: TextField(
+          //             controller: _searchController,
+          //             onChanged: (value) {
+          //               setState(() {});
+          //             },
+          //             decoration: InputDecoration(
+          //               hintText: 'Rechercher',
+          //               border: InputBorder.none,
+          //               hintStyle: TextStyle(color: Colors.blueGrey[400]),
+          //             ),
+          //           ),
+          //         ),
+          //         // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
+          //         IconButton(
+          //           icon: Icon(Icons.clear),
+          //           onPressed: () {
+          //             _searchController.clear();
+          //             setState(() {});
+          //           },
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
+          // const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: FutureBuilder(
@@ -192,7 +192,7 @@ class _TransportState extends State<Transport> {
                           .map(
                             (e) => DropdownMenuItem(
                               value: e.idTypeVoiture,
-                              child: Text(e.nom),
+                              child: Text(e.nom!),
                             ),
                           )
                           .toList(),
@@ -251,7 +251,7 @@ class _TransportState extends State<Transport> {
             return FutureBuilder<List<Vehicule>>(
                 future: selectedType != null
                     ? vehiculeService.fetchVehiculeByTypeVehicule(
-                        selectedType!.idTypeVoiture)
+                        selectedType!.idTypeVoiture!)
                     : vehiculeService.fetchVehicule(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {

@@ -68,7 +68,7 @@ class VehiculeService extends ChangeNotifier {
     required Map<String, int> prixParDestination,
       required String etatVehicule,
       required String localisation,
-       required String description,
+      required String description,
       required String nbKilometrage,
       File? photoVehicule,
       required TypeVoiture typeVoiture,
@@ -89,7 +89,7 @@ class VehiculeService extends ChangeNotifier {
         'nomVehicule': nomVehicule,
         'etatVehicule': etatVehicule,
         'localisation': localisation,
-         'description': description,
+        'description': description,
         'nbKilometrage': int.tryParse(nbKilometrage),
         'capaciteVehicule': capaciteVehicule,
         'typeVoiture': typeVoiture.toMap(),
@@ -101,7 +101,7 @@ class VehiculeService extends ChangeNotifier {
 
       if (response.statusCode == 200 || responsed.statusCode == 201) {
         final donneesResponse = json.decode(responsed.body);
-        debugPrint('intrant service ${donneesResponse.toString()}');
+        debugPrint('vehicule modifier ${donneesResponse.toString()}');
       } else {
         throw Exception(
             'Échec de la requête avec le code d\'état : ${responsed.statusCode}');

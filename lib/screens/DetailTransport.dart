@@ -7,10 +7,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
@@ -38,11 +40,14 @@ class _DetailTransportState extends State<DetailTransport> {
   File? photo;
   late TypeVoiture typeVoiture;
   late Map<String, int> prixParDestinations;
-
+  List<ParametreGeneraux> paraList = [];
+  late ParametreGeneraux para;
   late ValueNotifier<bool> isDialOpenNotifier;
   TextEditingController _prixController = TextEditingController();
   TextEditingController _nomController = TextEditingController();
   TextEditingController _destinationController = TextEditingController();
+  TextEditingController _descriptionController = TextEditingController();
+  TextEditingController _nbKiloController = TextEditingController();
   TextEditingController _capaciteController = TextEditingController();
   TextEditingController _etatController = TextEditingController();
   TextEditingController _localiteController = TextEditingController();
@@ -60,24 +65,20 @@ class _DetailTransportState extends State<DetailTransport> {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
-    _typeList = http.get(Uri.parse(
-        'http://10.0.2.2:9000/api-koumi/TypeVoiture/listeByActeur/${acteur.idActeur!}'));
+    _typeList =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
     vehicules = widget.vehicule;
     typeVoiture = vehicules.typeVoiture;
     prixParDestinations = vehicules.prixParDestination;
-
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+    para = paraList[0];
     _nomController.text = vehicules.nomVehicule;
-    // _prixController.text = vehicules.prix.toString();
     _capaciteController.text = vehicules.capaciteVehicule;
     _etatController.text = vehicules.etatVehicule.toString();
     _localiteController.text = vehicules.localisation;
-    // Récupérer les destinations et les prix du véhicule
-    // vehicules.prixParDestination.forEach((destination, prix) {
-    //   if (destination.isNotEmpty && prix > 0) {
-    //     // Ajouter la destination et le prix à la liste prixParDestinations
-    //     prixParDestinations.addAll({destination: prix});
-    //   }
-    // });
+    _descriptionController.text = vehicules.description!;
+    _nbKiloController.text = vehicules.nbKilometrage.toString();
     vehicules.prixParDestination.forEach((destination, prix) {
       TextEditingController destinationController =
           TextEditingController(text: destination);
@@ -87,7 +88,7 @@ class _DetailTransportState extends State<DetailTransport> {
       _destinationControllers.add(destinationController);
       _prixControllers.add(prixController);
     });
-   
+
     isDialOpenNotifier = ValueNotifier<bool>(false);
     super.initState();
   }
@@ -173,9 +174,9 @@ class _DetailTransportState extends State<DetailTransport> {
       final String capacite = _capaciteController.text;
       final String etat = _etatController.text;
       final String localite = _localiteController.text;
-
-      // Création d'une nouvelle map pour stocker les prix par destination mis à jour
-
+      final String description = _descriptionController.text;
+      final String nbKil = _nbKiloController.text;
+      final int? nb = int.tryParse(nbKil);
       // Parcourir les destinations et les prix modifiés simultanément
       for (int i = 0; i < _destinationControllers.length; i++) {
         String destination = _destinationControllers[i].text;
@@ -187,35 +188,80 @@ class _DetailTransportState extends State<DetailTransport> {
         }
       }
 
-      // await VehiculeService().updateVehicule(
-      //   idVehicule: vehicules.idVehicule!,
-      //   nomVehicule: nom,
-      //   capaciteVehicule: capacite,
-      //   prixParDestination: newPrixParDestinations,
-      //   etatVehicule: etat,
-      //   localisation: localite,
-      //   typeVoiture: typeVoiture,
-      //   acteur: acteur,
-      // );
+      if (photo != null) {
+        await VehiculeService()
+            .updateVehicule(
+              idVehicule: vehicules.idVehicule,
+              nomVehicule: nom,
+              capaciteVehicule: capacite,
+              prixParDestination: newPrixParDestinations,
+              etatVehicule: etat,
+              photoVehicule: photo,
+              localisation: localite,
+              description: description,
+              nbKilometrage: nb.toString(),
+              typeVoiture: typeVoiture,
+              acteur: acteur,
+            )
+            .then((value) => {
+                  setState(() {
+                    vehicules = Vehicule(
+                      idVehicule: vehicules.idVehicule,
+                      nomVehicule: nom,
+                      photoVehicule: vehicules.photoVehicule,
+                      capaciteVehicule: capacite,
+                      prixParDestination: newPrixParDestinations,
+                      etatVehicule: etat,
+                      codeVehicule: vehicules.codeVehicule,
+                      description: vehicules.description,
+                      nbKilometrage: nb,
+                      localisation: localite,
+                      typeVoiture: typeVoiture,
+                      acteur: acteur,
+                      statutVehicule: vehicules.statutVehicule,
+                    );
 
-      setState(() {
-        vehicules = Vehicule(
-          idVehicule: vehicules.idVehicule,
-          nomVehicule: nom,
-          capaciteVehicule: capacite,
-          prixParDestination: newPrixParDestinations,
-          etatVehicule: etat,
-          codeVehicule: vehicules.codeVehicule,
-          description: vehicules.description,
-          nbKilometrage: vehicules.nbKilometrage,
-          localisation: localite,
-          typeVoiture: typeVoiture,
-          acteur: acteur,
-          statutVehicule: vehicules.statutVehicule,
-        );
+                    _isLoading = false;
+                  })
+                })
+            .catchError((onError) => {print(onError.toString())});
+      } else {
+        await VehiculeService()
+            .updateVehicule(
+              idVehicule: vehicules.idVehicule,
+              nomVehicule: nom,
+              capaciteVehicule: capacite,
+              prixParDestination: newPrixParDestinations,
+              etatVehicule: etat,
+              localisation: localite,
+              description: description,
+              nbKilometrage: nb.toString(),
+              typeVoiture: typeVoiture,
+              acteur: acteur,
+            )
+            .then((value) => {
+                  setState(() {
+                    vehicules = Vehicule(
+                      idVehicule: vehicules.idVehicule,
+                      nomVehicule: nom,
+                      capaciteVehicule: capacite,
+                      prixParDestination: newPrixParDestinations,
+                      etatVehicule: etat,
+                      photoVehicule: vehicules.photoVehicule,
+                      codeVehicule: vehicules.codeVehicule,
+                      description: description,
+                      nbKilometrage: nb,
+                      localisation: localite,
+                      typeVoiture: typeVoiture,
+                      acteur: acteur,
+                      statutVehicule: vehicules.statutVehicule,
+                    );
 
-        _isLoading = false;
-      });
+                    _isLoading = false;
+                  })
+                })
+            .catchError((onError) => {print(onError.toString())});
+      }
     } catch (e) {
       print(e.toString());
       setState(() {
@@ -241,7 +287,13 @@ class _DetailTransportState extends State<DetailTransport> {
               centerTitle: true,
               toolbarHeight: 100,
               leading: _isEditing
-                  ? Container()
+                  ? IconButton(
+                      onPressed: _showImageSourceDialog,
+                      icon: const Icon(
+                        Icons.add_a_photo_rounded,
+                        // size: 60,
+                      ),
+                    )
                   : IconButton(
                       onPressed: () {
                         Navigator.of(context).pop();
@@ -456,27 +508,35 @@ class _DetailTransportState extends State<DetailTransport> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                  child: vehicules.photoVehicule != null
-                      ? Image.network(
-                          "http://10.0.2.2/${vehicules.photoVehicule!}",
-                          width: double.infinity,
-                          height: 200,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.asset(
-                          "assets/images/camion.png",
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: 200,
-                        ),
-                ),
+                photo != null
+                    ? Center(
+                        child: Image.file(
+                        photo!,
+                        width: double.infinity,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ))
+                    : Center(
+                        child: vehicules.photoVehicule != null
+                            ? Image.network(
+                                "http://10.0.2.2/${vehicules.photoVehicule!}",
+                                width: double.infinity,
+                                height: 200,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.asset(
+                                "assets/images/camion.png",
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: 200,
+                              ),
+                      ),
                 SizedBox(height: 30),
                 _isEditing ? _buildEditing() : _buildData(),
                 !_isEditing ? _buildPanel() : Container(),
                 !_isEditing
                     ? _buildDescription(
-                        'Description : ', vehicules.typeVoiture.description!)
+                        'Description : ', vehicules.description!)
                     : Container(),
               ],
             ),
@@ -506,7 +566,6 @@ class _DetailTransportState extends State<DetailTransport> {
                         _makePhoneWa(whatsappNumber);
                       },
                     ),
-
                     SpeedDialChild(
                       child: Icon(Icons.phone),
                       label: 'Par téléphone ',
@@ -568,6 +627,8 @@ class _DetailTransportState extends State<DetailTransport> {
         _buildEditableDetailItem('Capacité : ', _capaciteController),
         _buildEditableDetailItem('Localisation : ', _localiteController),
         _buildEditableDetailItem('Etat du véhicule : ', _etatController),
+        _buildEditableDetailItem('Description : ', _descriptionController),
+        _buildEditableDetailItem('Nombre kilometrage : ', _nbKiloController),
         _buildDestinationPriceFields(),
         SizedBox(
           height: 15,
@@ -649,7 +710,7 @@ class _DetailTransportState extends State<DetailTransport> {
     return Column(
       children: [
         _buildItem('Nom du véhicule : ', vehicules.nomVehicule),
-        _buildItem('Type de véhicule : ', vehicules.typeVoiture.nom),
+        _buildItem('Type de véhicule : ', vehicules.typeVoiture.nom!),
         vehicules.typeVoiture.nombreSieges != 0
             ? _buildItem('Nombre de siège : ',
                 vehicules.typeVoiture.nombreSieges.toString())
@@ -657,13 +718,14 @@ class _DetailTransportState extends State<DetailTransport> {
         _buildItem('Capacité : ', vehicules.capaciteVehicule),
         // _buildItem('Prix / voyage: ', vehicules.prix.toString()),
         _buildItem('Localisation : ', vehicules.localisation),
+        _buildItem('Nombre de kilometrage : ',
+            "${vehicules.nbKilometrage.toString()} Km"),
         _buildItem('Statut: : ',
             '${vehicules.statutVehicule ? 'Disponible' : 'Non disponible'}'),
         acteur.nomActeur != vehicules.acteur.nomActeur
             ? _buildItem('Propriètaire : ', vehicules.acteur.nomActeur!)
-
             : Container(),
-        // _buildItem('Description : ', vehicules.typeVoiture.description!),
+        // _buildItem('Description : ', vehicules.description!),
       ],
     );
   }
@@ -847,7 +909,8 @@ class _DetailTransportState extends State<DetailTransport> {
                         vehicules.prixParDestination.keys.elementAt(index);
                     int prix =
                         vehicules.prixParDestination.values.elementAt(index);
-                    return _buildItem(destination, "${prix.toString()} FCFA");
+                    return _buildItem(
+                        destination, "${prix.toString()} ${para.monnaie}");
                   }),
                 ),
               ),

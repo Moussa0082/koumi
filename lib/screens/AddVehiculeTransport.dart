@@ -4,15 +4,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/NextAddVehicule.dart';
-import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class AddVehiculeTransport extends StatefulWidget {
@@ -38,7 +35,10 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
   TextEditingController _capaciteController = TextEditingController();
 
   String? typeValue;
+  String? n3Value;
   late Future _typeList;
+  late Future _niveau3List;
+  String niveau3 = '';
   late TypeVoiture typeVoiture;
   late TypeVoiture type;
   File? photo;
@@ -60,6 +60,8 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
     type = widget.typeVoitures!;
     _typeList =
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
+    _niveau3List =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
   }
 
   @override
@@ -85,22 +87,6 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(
-                // height: 150,
-                child: Padding(
-                    padding: const EdgeInsets.only(left: 10.0),
-                    child: photo != null
-                        ? Image.file(
-                            photo!,
-                            fit: BoxFit.fitWidth,
-                            height: 150,
-                            width: 300,
-                          )
-                        : Container()),
-              ),
-              SizedBox(
-                height: 30,
-              ),
               Form(
                   key: formkey,
                   child: Column(
@@ -166,6 +152,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                             return null;
                           },
                           controller: _descriptionController,
+                          maxLines: null,
                           decoration: InputDecoration(
                             hintText: "Description",
                             contentPadding: const EdgeInsets.symmetric(
@@ -298,7 +285,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                                             .map(
                                               (e) => DropdownMenuItem(
                                                 value: e.idTypeVoiture,
-                                                child: Text(e.nom),
+                                                child: Text(e.nom!),
                                               ),
                                             )
                                             .toList(),
@@ -383,25 +370,135 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 20),
-                        child: TextFormField(
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Veuillez remplir les champs";
+                        child: FutureBuilder(
+                          future: _niveau3List,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucun commune trouvé',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
                             }
-                            return null;
+                            if (snapshot.hasError) {
+                              return Text("${snapshot.error}");
+                            }
+                            if (snapshot.hasData) {
+                              dynamic responseData =
+                                  json.decode(snapshot.data.body);
+                              if (responseData is List) {
+                                final reponse = responseData;
+                                final niveau3List = reponse
+                                    .map((e) => Niveau3Pays.fromMap(e))
+                                    .where((con) => con.statutN3 == true)
+                                    .toList();
+
+                                if (niveau3List.isEmpty) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Aucun commune trouvé',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return DropdownButtonFormField<String>(
+                                  items: niveau3List
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idNiveau3Pays,
+                                          child: Text(e.nomN3),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: n3Value,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      n3Value = newValue;
+                                      if (newValue != null) {
+                                        niveau3 = niveau3List
+                                            .map((e) => e.nomN3)
+                                            .first;
+                                        print("niveau 3 : ${niveau3}");
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Selectionner une localité',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucun commune trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucun commune trouvé',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
                           },
-                          controller: _localiteController,
-                          maxLines: null,
-                          decoration: InputDecoration(
-                            hintText: "Ex : Bamako, segou",
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
                         ),
                       ),
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(
+                      //       vertical: 10, horizontal: 20),
+                      //   child: TextFormField(
+                      //     validator: (value) {
+                      //       if (value == null || value.isEmpty) {
+                      //         return "Veuillez remplir les champs";
+                      //       }
+                      //       return null;
+                      //     },
+                      //     controller: _localiteController,
+                      //     maxLines: null,
+                      //     decoration: InputDecoration(
+                      //       hintText: "Ex : Bamako, segou",
+                      //       contentPadding: const EdgeInsets.symmetric(
+                      //           vertical: 10, horizontal: 20),
+                      //       border: OutlineInputBorder(
+                      //         borderRadius: BorderRadius.circular(8),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
                       SizedBox(
                         height: 10,
                       ),
@@ -441,17 +538,26 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                       ),
                       ElevatedButton(
                           onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => NextAddVehicule(
-                                        typeVoiture: type,
-                                        nomV: _nomController.text,
-                                        localite: _localiteController.text,
-                                        description:
-                                            _descriptionController.text,
-                                        nbKilo: _nbKilometrageController.text,
-                                        capacite: _capaciteController.text)));
+                            if (formkey.currentState!.validate()) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => NextAddVehicule(
+                                          typeVoiture: type,
+                                          nomV: _nomController.text,
+                                          localite: niveau3,
+                                          description:
+                                              _descriptionController.text,
+                                          nbKilo: _nbKilometrageController.text,
+                                          capacite: _capaciteController
+                                              .text))).then((value) => {
+                                    _nomController.clear(),
+                                    _descriptionController.clear(),
+                                    _localiteController.clear(),
+                                    _nbKilometrageController.clear(),
+                                    _capaciteController.clear()
+                                  });
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange, // Orange color code
