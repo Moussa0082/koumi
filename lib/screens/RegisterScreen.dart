@@ -305,7 +305,7 @@ Future<String?> getCurrentCountryFromLocation() async {
 //   ),
 // ),
  //   ),
-              Container(
+                            Container(
   child: Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: <Widget>[
@@ -346,6 +346,7 @@ Future<String?> getCurrentCountryFromLocation() async {
     ],
   ),
 ),
+   
 
 
                   // fin  téléphone            

@@ -97,6 +97,8 @@ String idsCategorieProduitAsString = "";
   String? image2Src;
   File? image2;
 
+   String speculationUrl = "";
+
 
     
 
@@ -502,7 +504,7 @@ Future<void> _pickImage(ImageSource source) async {
     controller: _controllerCategorie,
     hint: 'Sélectionner une categorie produit',
     fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
-    onOptionSelected: (options) {
+    onOptionSelected: (options) async{
       setState(() {
         libelleCategorie.clear();
         libelleCategorie.addAll(options
@@ -510,11 +512,15 @@ Future<void> _pickImage(ImageSource source) async {
             .toList());
         idsCategorieProduit = _controllerCategorie.selectedOptions.map((item) => item.value.toString()).toList();
       //  idsCategorieProduitAsString = idsCategorieProduit.isEmpty ? idsCategorieProduit.join(',') : "e40ijxd5k0n0yrzj5f80";
-           idsJson = jsonEncode(idsCategorieProduit);
+           idsJson = jsonEncode(idsCategorieProduit.join(','));
+            //  speculationUrl = "e40ijxd5k0n0yrzj5f80";
+             speculationUrl = 'http://10.0.2.2:9000/api-koumi/Speculation/by-categories/${idsJson}';
 
-        print("categorie sélectionné ${libelleCategorie.toString() + " id " + idsCategorieProduit.join(',')}");
+
+        print("categorie sélectionné ${libelleCategorie.toString()+ " speculationJson  "+ speculationUrl +" id " + idsJson}");
       });
-  print("id s "+ idsCategorieProduit.toString());
+      
+  print("id s "+ idsJson);
       // Fermer automatiquement le dialogue
       FocusScope.of(context).unfocus();
     },
@@ -530,28 +536,23 @@ Future<void> _pickImage(ImageSource source) async {
 
                 
                      // Deuxième widget MultiSelectDropDown pour sélectionner les spéculations
-   Padding(
-  padding: const EdgeInsets.only(left: 10.0),
-  child: Text(
-    "Spéculation",
-    style: TextStyle(color: Colors.black, fontSize: 18),
-  ),
-),
+        Padding(
+        padding: const EdgeInsets.only(left: 10.0),
+        child: Text(
+          "Spéculation",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        ),
+      ),
    Padding(
   padding: const EdgeInsets.symmetric(horizontal: 16),
   child: MultiSelectDropDown.network(
     networkConfig: NetworkConfig(
       // Endpoint pour récupérer les spéculations en fonction des catégories sélectionnées
-      url: 'http://10.0.2.2:9000/api-koumi/Speculation/by-categories/${idsCategorieProduit.join(',')}', //e40ijxd5k0n0yrzj5f80,
+      url: speculationUrl , //e40ijxd5k0n0yrzj5f80,
+      // url: 'http://10.0.2.2:9000/api-koumi/Speculation/by-categories/${idsCategorieProduit.join(',')}', //e40ijxd5k0n0yrzj5f80,
       method: RequestMethod.get,
       headers: {'Content-Type': 'application/json'},
-      // Passer les catégories sélectionnées comme paramètre dans la requête
-    
-     
-      // Ajoutez des instructions d'impression pour vérifier les paramètres de la requête
-
     ),
-
     chipConfig: const ChipConfig(wrapType: WrapType.wrap),
     responseParser: (response) {
       final list = (response as List<dynamic>)
@@ -586,7 +587,6 @@ Future<void> _pickImage(ImageSource source) async {
     // Exemple de personnalisation des styles
   ),
 ),
-
 
                   // fin  filiere
                    const SizedBox(height: 10,),

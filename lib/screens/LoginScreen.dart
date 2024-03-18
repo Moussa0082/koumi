@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -31,6 +32,53 @@ class _LoginScreenState extends State<LoginScreen> {
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+ String? _currentAddress;
+  Position? _currentPosition;
+
+
+ Future<bool> _handleLocationPermission() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+  
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Location services are disabled. Please enable the services')));
+    return false;
+  }
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {   
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Location permissions are denied')));
+      return false;
+    }
+  }
+  if (permission == LocationPermission.deniedForever) {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Location permissions are permanently denied, we cannot request permissions.')));
+    return false;
+  }
+  return true;
+}
+
+ Future<void> _getCurrentPosition() async {
+  final hasPermission = await _handleLocationPermission();
+  if (!hasPermission) return;
+  await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high)
+      .then((Position position) {
+    setState(() => _currentPosition = position);
+  }).catchError((e) {
+    debugPrint(e);
+  });
+}
+ 
+
+ 
+
 
   // TextEditingController Controller = TextEditingController();
 
@@ -169,10 +217,11 @@ class _LoginScreenState extends State<LoginScreen> {
         final List<String> type =
             acteur.typeActeur!.map((e) => e.libelle!).toList();
         if (type.contains('admin') || type.contains('Admin')) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
-          );
+Navigator.pushReplacement(
+  context,
+  MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
+);
+
         } else {
           Navigator.pushReplacement(
             context,
@@ -446,6 +495,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                 
+                    Text('LAT: ${_currentPosition?.latitude ?? ""}'),
+    Text('LNG: ${_currentPosition?.longitude ?? ""}'),
+    Text('ADDRESS: ${_currentAddress ?? ""}'),
+    const SizedBox(height: 32),
+    ElevatedButton(
+      onPressed: _getCurrentPosition,
+      child: const Text("Get Current Location"),
+    ),
                       const SizedBox(
                         height: 10,
                       ),

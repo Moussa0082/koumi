@@ -3,6 +3,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
@@ -11,6 +14,8 @@ import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
+import 'package:koumi_app/screens/DetailProduits.dart';
+import 'package:koumi_app/screens/DetailsProduit.dart';
 import 'package:koumi_app/screens/ProduitActeur.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -288,32 +293,8 @@ class _ProduitScreenState extends State<ProduitScreen>
   
  
     if (filteredStocks.isEmpty) {
-       return
-    SingleChildScrollView(
-          child: Padding(
-                            padding: EdgeInsets.all(2),
-                            child: Center(
-                              child: Column(
-                                children: [
-                                  Image.asset('assets/images/notif.jpg'),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                
-    Padding(
-     padding: const EdgeInsets.all(8.0),
-     child: Center(
-          child: Text( textAlign:TextAlign.justify,
-            'Aucun produit trouvé dans le magasin ' + widget.nom!.toUpperCase() + " dans la categorie " +  selectedCategorieProduitNom.toUpperCase(),
-            style: TextStyle(fontSize: 16),
-          ),
-        ),
-   )
-                                ],
-                              ),
-                            ),
-                          ),
-        );
+       return _buildShimmerEffect();
+   
     } else {
       List<Stock> filteredStocksSearch = filteredStocks.where((stock) {
         String nomProduit = stock.nomProduit!.toLowerCase();
@@ -386,7 +367,14 @@ class _ProduitScreenState extends State<ProduitScreen>
         child: GestureDetector(
           onTap: () {
             // Action à effectuer lorsqu'un produit est cliqué
-          },
+ 
+  Get.to(
+  DetailProduits(
+    stock: filteredStocksSearch[index],
+  ), //next page class
+  duration: Duration(seconds: 1), //duration of transitions, default 1 sec
+  transition: Transition.leftToRight //transition effect
+);          },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

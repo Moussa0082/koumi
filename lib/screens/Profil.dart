@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:koumi_app/Admin/ParametreGenerauxPage.dart';
 import 'package:koumi_app/Admin/Zone.dart';
 import 'package:koumi_app/models/Acteur.dart';
@@ -10,6 +13,7 @@ import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/TypeVehicule.dart';
 import 'package:koumi_app/service/TypeVoitureService.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
+import 'package:koumi_app/widgets/BottomNavBarAdmin.dart';
 import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -453,10 +457,15 @@ class _ProfilState extends State<Profil> {
                       //                   Navigator.pushReplacement(
                       // context,
                       // MaterialPageRoute(builder: (context) => LoginScreen()),
-                      //                        );
-                      Navigator.of(context, rootNavigator: true)
-                          .pushReplacement(MaterialPageRoute(
-                              builder: (context) => const LoginScreen()));
+                                          //  );
+                             Get.off(LoginScreen(),
+                             duration: Duration(seconds: 1), //duration of transitions, default 1 sec
+  transition: Transition.leftToRight );
+// Dans votre méthode loginUser de la classe LoginScreen
+
+                      // Navigator.of(context, rootNavigator: true)
+                      //     .pushReplacement(MaterialPageRoute(
+                      //         builder: (context) => const LoginScreen()));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,

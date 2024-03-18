@@ -40,7 +40,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
   List pages = <Widget>[
     const Accueil(),
     ProduitScreen(),
-    const Panier(),
+     Panier(),
     const Profil()
   ];
 
@@ -55,6 +55,15 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
         .changeIndex(index);
   }
 
+ @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+     Future.microtask(() {
+    Provider.of<BottomNavigationService>(context, listen: false)
+        .changeIndex(0);
+  });
+  }
   // void _onBackPressed(bool isBackPressed) async {
   //   if (!isBackPressed) {
   //     // Essayez de revenir en arrière dans la pile de navigation actuelle
@@ -140,7 +149,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
         return [
           const Accueil(),
           ProduitScreen(),
-          const Panier(),
+           Panier(),
           const Profil()
         ].elementAt(index);
       },
