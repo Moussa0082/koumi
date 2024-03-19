@@ -7,6 +7,7 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/AddVehicule.dart';
 import 'package:koumi_app/screens/DetailTransport.dart';
 import 'package:koumi_app/screens/PageTransporteur.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
@@ -40,7 +41,8 @@ class _TransportState extends State<Transport> {
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
     // _typeList = http.get(Uri.parse('https://koumi.ml/api-koumi/TypeVoiture/read'));
-    _typeList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
+    _typeList =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
     super.initState();
   }
 
@@ -69,34 +71,87 @@ class _TransportState extends State<Transport> {
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
           actions: [
-            PopupMenuButton<String>(
-              padding: EdgeInsets.zero,
-              itemBuilder: (context) {
-                return <PopupMenuEntry<String>>[
-                  PopupMenuItem<String>(
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.remove_red_eye,
-                        color: Colors.green,
-                      ),
-                      title: const Text(
-                        "Transporteurs",
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
+            (type.toLowerCase() == 'admin' ||
+                    type.toLowerCase() == 'transporteur')
+                ? PopupMenuButton<String>(
+                    padding: EdgeInsets.zero,
+                    itemBuilder: (context) {
+                      return <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.remove_red_eye,
+                              color: Colors.green,
+                            ),
+                            title: const Text(
+                              "Transporteurs",
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onTap: () async {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          PageTransporteur()));
+                            },
+                          ),
                         ),
-                      ),
-                      onTap: () async {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => PageTransporteur()));
-                      },
-                    ),
-                  ),
-                ];
-              },
-            )
+                        PopupMenuItem<String>(
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.add,
+                              color: Colors.green,
+                            ),
+                            title: const Text(
+                              "Ajouter véhicule",
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onTap: () async {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => AddVehicule()));
+                            },
+                          ),
+                        )
+                      ];
+                    },
+                  )
+                : PopupMenuButton<String>(
+                    padding: EdgeInsets.zero,
+                    itemBuilder: (context) {
+                      return <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.remove_red_eye,
+                              color: Colors.green,
+                            ),
+                            title: const Text(
+                              "Transporteurs",
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onTap: () async {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          PageTransporteur()));
+                            },
+                          ),
+                        ),
+                      ];
+                    },
+                  )
           ]),
       body: SingleChildScrollView(
         child: Column(children: [

@@ -8,28 +8,21 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/ListeVehiculeByType.dart';
 import 'package:koumi_app/screens/NextAddVehicule.dart';
-import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:provider/provider.dart';
 
-class AddVehiculeTransport extends StatefulWidget {
-  final TypeVoiture? typeVoitures;
-
-  const AddVehiculeTransport({
-    Key? key,
-    this.typeVoitures, // Paramètre avec une valeur par défaut
-  }) : super(key: key);
+class AddVehicule extends StatefulWidget {
+  const AddVehicule({super.key});
 
   @override
-  State<AddVehiculeTransport> createState() => _AddVehiculeTransportState();
+  State<AddVehicule> createState() => _AddVehiculeState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
+class _AddVehiculeState extends State<AddVehicule> {
   TextEditingController _nomController = TextEditingController();
   TextEditingController _localiteController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
@@ -59,7 +52,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
   void initState() {
     super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    type = widget.typeVoitures!;
+
     _typeList =
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
     _niveau3List =
@@ -78,9 +71,6 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
           leading: IconButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                Provider.of<VehiculeService>(context, listen: false)
-                    .applyChange();
-                
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
@@ -209,7 +199,134 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                           ),
                         ),
                       ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 22,
+                        ),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            "Type de véhicule",
+                            style:
+                                TextStyle(color: (Colors.black), fontSize: 18),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        child: FutureBuilder(
+                          future: _typeList,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucun type de véhicule trouvé',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+                            if (snapshot.hasError) {
+                              return Text("${snapshot.error}");
+                            }
+                            if (snapshot.hasData) {
+                              dynamic responseData =
+                                  json.decode(snapshot.data.body);
+                              if (responseData is List) {
+                                final reponse = responseData;
+                                final vehiculeList = reponse
+                                    .map((e) => TypeVoiture.fromMap(e))
+                                    .where((con) => con.statutType == true)
+                                    .toList();
 
+                                if (vehiculeList.isEmpty) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText:
+                                          'Aucun type de véhicule trouvé',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return DropdownButtonFormField<String>(
+                                  items: vehiculeList
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idTypeVoiture,
+                                          child: Text(e.nom!),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: typeValue,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      typeValue = newValue;
+                                      if (newValue != null) {
+                                        typeVoiture = vehiculeList.firstWhere(
+                                          (element) =>
+                                              element.idTypeVoiture == newValue,
+                                        );
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText:
+                                        'Sélectionner un type de véhicule',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucun type de véhicule trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucun type de véhicule trouvé',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                       SizedBox(
                         height: 10,
                       ),
@@ -336,28 +453,6 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                           },
                         ),
                       ),
-                      // Padding(
-                      //   padding: const EdgeInsets.symmetric(
-                      //       vertical: 10, horizontal: 20),
-                      //   child: TextFormField(
-                      //     validator: (value) {
-                      //       if (value == null || value.isEmpty) {
-                      //         return "Veuillez remplir les champs";
-                      //       }
-                      //       return null;
-                      //     },
-                      //     controller: _localiteController,
-                      //     maxLines: null,
-                      //     decoration: InputDecoration(
-                      //       hintText: "Ex : Bamako, segou",
-                      //       contentPadding: const EdgeInsets.symmetric(
-                      //           vertical: 10, horizontal: 20),
-                      //       border: OutlineInputBorder(
-                      //         borderRadius: BorderRadius.circular(8),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
                       SizedBox(
                         height: 10,
                       ),
@@ -402,7 +497,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => NextAddVehicule(
-                                          typeVoiture: type,
+                                          typeVoiture: typeVoiture,
                                           nomV: _nomController.text,
                                           localite: niveau3,
                                           description:

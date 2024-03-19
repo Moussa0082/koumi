@@ -559,13 +559,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                             setState(() {
                                               _isLoading = false;
                                             }),
-                                            Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ListeVehiculeByType(
-                                                            typeVoitures:
-                                                                type))),
+                                            Navigator.pop(context),
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
@@ -608,13 +602,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                               _isLoading = false;
                                               // typeVoiture == null;
                                             }),
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ListeVehiculeByType(
-                                                            typeVoitures:
-                                                                type))),
+                                           Navigator.pop(context),
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(

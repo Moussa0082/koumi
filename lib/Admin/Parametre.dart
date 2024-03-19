@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:koumi_app/Admin/ContinentPage.dart';
 import 'package:koumi_app/Admin/Niveau1Page.dart';
 import 'package:koumi_app/Admin/Niveau2Page.dart';
 import 'package:koumi_app/Admin/Niveau3Page.dart';
 import 'package:koumi_app/Admin/PaysPage.dart';
+import 'package:koumi_app/Admin/ProfilA.dart';
 import 'package:koumi_app/Admin/SousRegionPage.dart';
 import 'package:koumi_app/Admin/UnitePage.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
@@ -44,6 +46,7 @@ class _ParametreState extends State<Parametre> {
         leading: IconButton(
             onPressed: () {
               Navigator.of(context).pop();
+              // Get.back();
             },
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: const Text(
@@ -232,7 +235,7 @@ class _ParametreState extends State<Parametre> {
                           Icons.chevron_right_sharp,
                           size: 30,
                         )),
-                         const Divider(
+                    const Divider(
                       color: Colors.grey,
                       height: 4,
                       thickness: 1,

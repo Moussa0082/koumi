@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:koumi_app/Admin/ParametreGenerauxPage.dart';
 import 'package:koumi_app/Admin/Zone.dart';
 import 'package:koumi_app/models/Acteur.dart';
@@ -454,9 +455,11 @@ class _ProfilState extends State<Profil> {
                       // context,
                       // MaterialPageRoute(builder: (context) => LoginScreen()),
                       //                        );
-                      Navigator.of(context, rootNavigator: true)
-                          .pushReplacement(MaterialPageRoute(
-                              builder: (context) => const LoginScreen()));
+                     Get.off(LoginScreen(),
+                          duration: Duration(
+                              seconds:
+                                  1), //duration of transitions, default 1 sec
+                          transition: Transition.leftToRight);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,

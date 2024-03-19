@@ -51,7 +51,8 @@ class _FiliereScreenState extends State<FiliereScreen> {
     para = paraList[0];
     _filiereList = http
         // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
-        .get( Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+        .get(
+            Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
     _liste = getFil();
   }
 
@@ -705,7 +706,8 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                         setState(() {
                                           _filiereList = http
                                               // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
-                                              .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+                                              .get(Uri.parse(
+                                                  'http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
                                         }),
                                         libelleController.clear(),
                                         descriptionController.clear(),
@@ -828,8 +830,11 @@ class _FiliereScreenState extends State<FiliereScreen> {
                             //   return Text("${snapshot.error}");
                             // }
                             if (snapshot.hasData) {
-                              dynamic responseData =
-                                  json.decode(snapshot.data.body);
+                             dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+
+                              // Vérifier si responseData est une liste
                               if (responseData is List) {
                                 final reponse = responseData;
                                 final filiereList = reponse
