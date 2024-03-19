@@ -129,25 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (response.statusCode == 200) {
-        // showDialog(
-        //   context: context,
-        //   builder: (BuildContext context) {
-        //     return const AlertDialog(
-        //       title: Center(child: Text('Connexion en cours')),
-        //       content: CupertinoActivityIndicator(
-        //         color: Colors.orange,
-        //         radius: 22,
-        //       ),
-        //       actions: <Widget>[
-        //         // Pas besoin de bouton ici
-        //       ],
-        //     );
-        //   },
-        // );
-
-        // await Future.delayed(const Duration(milliseconds: 500));
-
-        // Navigator.of(context).pop();
+       
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
         emailController.clear();
         passwordController.clear();
@@ -467,11 +449,12 @@ Navigator.pushReplacement(
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
-      body: LoadingOverlay(
-        isLoading: _isLoading,
-        child: SingleChildScrollView(
+    return 
+    LoadingOverlay(
+      isLoading: _isLoading,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFFFFFFF),
+        body: SingleChildScrollView(
           child: Container(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -497,13 +480,13 @@ Navigator.pushReplacement(
                     children: [
                  
                     Text('LAT: ${_currentPosition?.latitude ?? ""}'),
-    Text('LNG: ${_currentPosition?.longitude ?? ""}'),
-    Text('ADDRESS: ${_currentAddress ?? ""}'),
-    const SizedBox(height: 32),
-    ElevatedButton(
-      onPressed: _getCurrentPosition,
-      child: const Text("Get Current Location"),
-    ),
+              Text('LNG: ${_currentPosition?.longitude ?? ""}'),
+              Text('ADDRESS: ${_currentAddress ?? ""}'),
+              const SizedBox(height: 32),
+              ElevatedButton(
+                onPressed: _getCurrentPosition,
+                child: const Text("Get Current Location"),
+              ),
                       const SizedBox(
                         height: 10,
                       ),
@@ -539,11 +522,11 @@ Navigator.pushReplacement(
                         onSaved: (val) => email = val!,
                       ),
                       // fin  adresse email
-
+              
                       const SizedBox(
                         height: 10,
                       ),
-
+              
                       const Padding(
                         padding: EdgeInsets.only(left: 10.0),
                         child: Text(
@@ -590,7 +573,7 @@ Navigator.pushReplacement(
                         onSaved: (val) => password = val!,
                       ),
                       // fin mot de pass
-
+              
                       const SizedBox(height: 10),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -648,7 +631,7 @@ Navigator.pushReplacement(
                           ],
                         ),
                       ),
-
+              
                       const SizedBox(
                         height: 15,
                       ),
@@ -681,7 +664,7 @@ Navigator.pushReplacement(
                           ),
                         ),
                       ),
-
+              
                       const SizedBox(
                         height: 40,
                       ),

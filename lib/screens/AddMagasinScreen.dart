@@ -545,6 +545,8 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                                     debugPrint(
                                         "con select ${niveau1Pays.toString()}");
                                     // typeSelected = true;
+                                  }else{
+                                    niveauPaysValue = "Aucun pays disponible";
                                   }
                                 });
                               },

@@ -10,8 +10,10 @@ import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Magasin.dart';
+import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/models/Unite.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
@@ -52,7 +54,8 @@ class _ProduitScreenState extends State<ProduitScreen>
           // 'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
           'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
       if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body);
+        final String jsonString = utf8.decode(response.bodyBytes);
+        List<dynamic> data = json.decode(jsonString);
         setState(() {
           stock = data
               .where((stock) => stock['statutSotck'] == true)
@@ -62,6 +65,26 @@ class _ProduitScreenState extends State<ProduitScreen>
                     photo: item['photo'] ?? '',
                     quantiteStock: item['quantiteStock'] ?? 0,
                     prix: item['prix'] ?? 0,
+                    formeProduit: item['formeProduit'] as String,
+                    typeProduit: item['typeProduit'] as String,
+                    descriptionStock: item['descriptionStock'] as String,
+                    speculation: Speculation(
+                      idSpeculation: item['speculation']['idSpeculation'], 
+                      codeSpeculation: item['speculation']['codeSpeculation'], 
+                      nomSpeculation: item['speculation']['nomSpeculation'],
+                       descriptionSpeculation: item['speculation']['descriptionSpeculation'], 
+                       statutSpeculation: item['speculation']['statutSpeculation'],
+                        ),
+                        acteur:Acteur(
+                        idActeur:item['acteur']['idActeur'],
+                        nomActeur:item['acteur']['nomActeur'],
+                        ),
+                       unite: Unite(
+                        nomUnite: item['unite']['nomUnite'],
+                        sigleUnite: item['unite']['sigleUnite'],
+                        description: item['unite']['description'],
+                        statutUnite: item['unite']['statutUnite'],
+                       ), 
                   ))
               .toList();
         });
@@ -367,14 +390,15 @@ class _ProduitScreenState extends State<ProduitScreen>
         child: GestureDetector(
           onTap: () {
             // Action à effectuer lorsqu'un produit est cliqué
+            Stock stock = filteredStocksSearch[index];
  
-  Get.to(
-  DetailProduits(
-    stock: filteredStocksSearch[index],
-  ), //next page class
-  duration: Duration(seconds: 1), //duration of transitions, default 1 sec
-  transition: Transition.leftToRight //transition effect
-);          },
+Get.to(
+  () => DetailProduits(
+    stock: stock,
+  ),
+  duration: const Duration(seconds: 1), // Duration of transition
+  transition: Transition.leftToRight, // Transition effect
+);       },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -398,7 +422,7 @@ class _ProduitScreenState extends State<ProduitScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      filteredStocks[index].nomProduit ?? 'Pas de nom défini',
+                      filteredStocksSearch[index].nomProduit!,
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     Container(
@@ -408,7 +432,7 @@ class _ProduitScreenState extends State<ProduitScreen>
                         color: Colors.grey[200],
                       ),
                       child: Text(
-                        filteredStocks[index].quantiteStock.toString(),
+                        filteredStocksSearch[index].quantiteStock.toString(),
                         style: TextStyle(fontSize: 14),
                       ),
                     ),
@@ -422,26 +446,10 @@ class _ProduitScreenState extends State<ProduitScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '${filteredStocks[index].prix!.toInt()} €', // Convertir en entier
+                      '${filteredStocksSearch[index].prix!.toInt()} €', // Convertir en entier
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                     ),
-                    RatingBar.builder(
-                      initialRating: 3, // Rating initial du produit
-                      minRating: 0,
-                      maxRating: 5,
-                      direction: Axis.horizontal,
-                      allowHalfRating: false,
-                      itemCount: 5,
-                      itemSize: 20, // Taille du rating augmentée
-                      itemBuilder: (context, _) => Icon(
-                        Icons.star,
-                        color: Colors.amber,
-                      ),
-                      onRatingUpdate: (rating) {
-                        // Fonction appelée lorsque l'utilisateur met à jour le rating
-                        // Vous pouvez implémenter ici la logique pour mettre à jour le rating dans la base de données
-                      },
-                    ),
+               
                   ],
                 ),
               ),
@@ -454,6 +462,83 @@ class _ProduitScreenState extends State<ProduitScreen>
  );
 
     }
+  }
+
+  Widget builCard(String idCategorie, String idMagasin){
+  
+     return Container(
+      width: MediaQuery.of(context).size.width / 2 - 20, // Half-width for two cards per row
+      margin: const EdgeInsets.all(10.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 3.0,
+            blurRadius: 5.0,
+          )
+        ],
+        image: DecorationImage(
+          image: NetworkImage(""),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            bottom: 10.0,
+            left: 10.0,
+            child: Text(
+              "Nom",
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 10.0,
+            right: 10.0,
+            child: Row(
+              children: [
+                Icon(
+                  Icons.star,
+                  color: Colors.yellow[700],
+                  size: 16.0,
+                ),
+                Text(
+                  "3", // Display rating with one decimal place
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            top: 10.0,
+            right: 10.0,
+            child: Container(
+              padding: const EdgeInsets.all(5.0),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+              child: Text(
+                '2000', // Display price with two decimal places
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12.0,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
   }
 
   Widget _buildShimmerEffect() {

@@ -6,6 +6,7 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
+import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -316,6 +317,8 @@ class _ProfilAState extends State<ProfilA> {
     // context,
     // MaterialPageRoute(builder: (context) => LoginScreen()),
     //                        );
+                       Provider.of<BottomNavigationService>(context, listen: false)
+        .changeIndex(0);
      Navigator.of(context, rootNavigator: true).pushReplacement(MaterialPageRoute(builder: (context) => const LoginScreen()));
 
                     },

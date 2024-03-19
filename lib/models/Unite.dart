@@ -10,9 +10,9 @@ class Unite {
   final String description;
    String? dateAjout;
    String? dateModif;
-  final bool statutUnite;
+  final bool?  statutUnite;
    String? personneModif;
-  final Acteur acteur;
+  final Acteur? acteur;
   Unite({
     this.idUnite,
     this.codeUnite,
@@ -21,9 +21,9 @@ class Unite {
     required this.description,
     this.dateAjout,
     this.dateModif,
-    required this.statutUnite,
+     this.statutUnite,
     this.personneModif,
-    required this.acteur,
+     this.acteur,
   });
  
 
@@ -64,7 +64,7 @@ class Unite {
       'dateModif': dateModif,
       'statutUnite': statutUnite,
       'personneModif': personneModif,
-      'acteur': acteur.toMap(),
+      'acteur': acteur?.toMap(),
     };
   }
 

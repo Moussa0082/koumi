@@ -94,7 +94,6 @@ class _MagasinScreenState extends State<MagasinScreen>
         magasin = data
             .where((magasin) => magasin['statutMagasin'] == true)
             .map((item) => Magasin(
-               
                   nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
                   idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
                   contactMagasin: item['contactMagasin'] ?? 'Contact manquant',

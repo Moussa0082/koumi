@@ -11,6 +11,7 @@ import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/TypeVehicule.dart';
+import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/TypeVoitureService.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:koumi_app/widgets/BottomNavBarAdmin.dart';
@@ -458,9 +459,11 @@ class _ProfilState extends State<Profil> {
                       // context,
                       // MaterialPageRoute(builder: (context) => LoginScreen()),
                                           //  );
+                                          Provider.of<BottomNavigationService>(context, listen: false)
+        .changeIndex(0);
                              Get.off(LoginScreen(),
                              duration: Duration(seconds: 1), //duration of transitions, default 1 sec
-  transition: Transition.leftToRight );
+  transition: Transition.rightToLeft );
 // Dans votre méthode loginUser de la classe LoginScreen
 
                       // Navigator.of(context, rootNavigator: true)

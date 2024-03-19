@@ -9,7 +9,7 @@ final String idSpeculation;
   final String nomSpeculation;
   final String descriptionSpeculation;
   final bool statutSpeculation;
-  final CategorieProduit categorieProduit;
+  final CategorieProduit? categorieProduit;
   final String? dateAjout;
   final String? dateModif;
   final String? personneModif;
@@ -21,7 +21,7 @@ final String idSpeculation;
     required this.nomSpeculation,
     required this.descriptionSpeculation,
     required this.statutSpeculation,
-    required this.categorieProduit,
+     this.categorieProduit,
     this.dateAjout,
     this.dateModif,
     this.personneModif,
@@ -63,7 +63,7 @@ final String idSpeculation;
       'nomSpeculation': nomSpeculation,
       'descriptionSpeculation': descriptionSpeculation,
       'statutSpeculation': statutSpeculation,
-      'categorieProduit': categorieProduit.toMap(),
+      'categorieProduit': categorieProduit?.toMap(),
       'dateAjout': dateAjout,
       'dateModif': dateModif,
       'personneModif': personneModif,
