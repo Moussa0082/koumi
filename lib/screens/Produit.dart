@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/CartItem.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Speculation.dart';
@@ -170,6 +170,8 @@ class _ProduitScreenState extends State<ProduitScreen>
   @override
   Widget build(BuildContext context) {
            const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
+           // Wrap your loading content with Redacted Widget
+
     return Container(
       child: DefaultTabController(
         length: categorieProduit.length,
@@ -457,7 +459,7 @@ Get.to(
             if (filteredStocksSearch[index].acteur!.idActeur! == acteur.idActeur!){
                         Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
                         }else{
-                          
+                          ShoppingCart().addToCart(filteredStocksSearch[index]);
                         }
             // Par exemple, ajouter le produit au panier
           },
