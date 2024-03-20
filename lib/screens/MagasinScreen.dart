@@ -338,14 +338,7 @@ class _MagasinScreenState extends State<MagasinScreen>
                 onTap: () {
                   String id = magasin.idMagasin!;
                   String nom = magasin.nomMagasin!;
-                  // Navigator.pushReplacement(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //       builder: (context) => ProduitScreen(
-                  //             id: id,
-                  //             nom: nom,
-                  //           )),
-                  // );
+                  
                   Navigator.push(
   context,
   PageRouteBuilder(
@@ -365,133 +358,15 @@ class _MagasinScreenState extends State<MagasinScreen>
         child: child,
       );
     },
-    transitionDuration: const Duration(milliseconds: 1500 ), // Durée de la transition
+    transitionDuration: const Duration(milliseconds: 1900 ), // Durée de la transition
   ),
 );
 
-//                   Navigator.push(
-// context,
-// PageRouteBuilder(
-// pageBuilder: (context, animation, secondaryAnimation) => ProduitScreen(
-//                               id: id,
-//                               nom: nom,
-//                             ),
-// transitionsBuilder: (context, animation, secondaryAnimation, child) {
-// var begin = Offset(1.0, 0.0);
-// var end = Offset.zero;
-// var curve = Curves.ease;
 
-// var tween = Tween(begin: begin, end: end)
-// .chain(CurveTween(curve: curve));
-
-// return SlideTransition(
-// position: animation.drive(tween),
-// child: child,
-// );
-// },
-// ),
-// );
                 },
-        //         child: Card(
-        //           shadowColor: Colors.white,
-        //           child: Column(
-        //          crossAxisAlignment: CrossAxisAlignment.stretch,
-        //             children: [
-        
-        //               Container(
-        //                 child: ClipRRect(
-        //     borderRadius: BorderRadius.circular(8.0),
-        //                   child: Image.network(
-        //                     "http://10.0.2.2/${filteredMagasins[index]['photo']}" ??
-        //                         "assets/images/magasin.png",
-        //                     width: double.infinity,
-        //                      height: 120,
-        //                     fit: BoxFit.cover,
-        //                     errorBuilder: (BuildContext context,
-        //                         Object exception, StackTrace? stackTrace) {
-        //                       return Image.asset(
-        //                         'assets/images/magasin.png',
-        //                         width: double.infinity,
-        //                         height: 150,
-        //                         fit: BoxFit.cover,
-        //                       );
-        //                     },
-        //                   ),
-        //                 ),
-        //               ),
-        //            const SizedBox(height: 10),
-        //               Text(
-        //                 // overflow: TextOverflow.ellipsis,
-        //                 filteredMagasins[index]['nomMagasin']
-        //                         .toUpperCase() ??
-        //                     'Pas de nom défini',
-        //                 textAlign: TextAlign.center,
-        //                 style:
-        //                     TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        //               ),
-
-        //               GestureDetector(
-        //                 onTap:(){
-                           
-        // showMenu(
-        //   context: context,
-        //   position: RelativeRect.fromLTRB(0, 0, 0, 0), // Vous pouvez ajuster la position selon vos besoins
-        //   items: <PopupMenuEntry<String>>[
-        //     PopupMenuItem<String>(
-        //       value: 'modifier',
-        //       child: Text('Modifier'),
-        //     ),
-        //     PopupMenuItem<String>(
-        //       value: 'activer',
-        //       child: Text('Activer'),
-        //     ),
-        //     PopupMenuItem<String>(
-        //       value: 'desactiver',
-        //       child: Text('Désactiver'),
-        //     ),
-        //     PopupMenuItem<String>(
-        //       value: 'supprimer',
-        //       child: Text('Supprimer'),
-        //     ),
-        //   ],
-        //   elevation: 8.0, // Ajustez l'élévation selon vos préférences
-        // ).then((String? value) {
-        //   if (value != null) {
-        //     // Mettez en œuvre ici la logique pour chaque option sélectionnée
-        //     switch (value) {
-        //       case 'modifier':
-        //         // Mettez en œuvre la logique pour modifier le magasin
-        //         break;
-        //       case 'activer':
-        //         // Mettez en œuvre la logique pour activer le magasin
-        //         break;
-        //       case 'desactiver':
-        //         // Mettez en œuvre la logique pour désactiver le magasin
-        //         break;
-        //       case 'supprimer':
-        //         // Mettez en œuvre la logique pour supprimer le magasin
-        //         break;
-        //     }
-        //   }});
-        //                 },
-        //                 child: Align(
-        //                   alignment: Alignment.bottomRight,
-        //                   child: SizedBox(
-        //                     height: 10,
-        //                     child: IconButton(
-        //                       icon: Icon(Icons.more_vert), // Icône de points de suspension
-        //                       onPressed: () {
-                               
-        //                       },
-        //                     ),
-        //                   ),
-        //                 ),
-        //               ),
-   
+       
                       
-        //             ],
-        //           ),
-        //         ),
+       
         child:
         Container(
                                       width: MediaQuery.of(context).size.width *

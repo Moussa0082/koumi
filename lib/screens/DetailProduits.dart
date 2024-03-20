@@ -218,6 +218,7 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
                       
                     ],
                   ),
+            
                   const SizedBox(height: 5),
                  Row(
                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -251,7 +252,26 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
                    
                    ],
                  ),
-                 
+                       Container(
+                    height:70, 
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children:  [
+                        Text("Code Qr: ", style: TextStyle(fontSize: 20,fontStyle:FontStyle.italic)),   
+                          GestureDetector(
+                            onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) {
+                  return DetailScreen(); // écran de détail avec l'image agrandie
+                }));
+              },
+
+                            child: Image.asset(
+                              "assets/images/qr.png"
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   widget.stock!.acteur!.idActeur! == acteur.idActeur! ? SizedBox() : Center(
                     child: SizedBox(
@@ -322,5 +342,38 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
     cartItems.remove(productId);
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(_keyCartItems, cartItems);
+  }
+}
+
+
+
+
+
+
+ class DetailScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: GestureDetector(
+        onVerticalDragUpdate: (details) {
+          if (details.delta.dy > 10) {
+            Navigator.pop(context); // Ferme l'écran si glissé vers le bas
+          }
+        },
+        child: Center(
+          child: ListView(
+            children: [
+              Hero(
+                tag: "qrImage", // Référence au même tag utilisé dans l'écran précédent
+                child: Image.asset("assets/images/qr.png"), // Image agrandie
+              ),
+              // Autres éléments de l'écran de détail ici...
+            ],
+          ),
+        ),
+      ),
+      // Ferme l'écran si glissé vers la gauche ou la droite
+      resizeToAvoidBottomInset: false,
+    );
   }
 }

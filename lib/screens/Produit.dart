@@ -19,6 +19,7 @@ import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/screens/DetailsProduit.dart';
 import 'package:koumi_app/screens/ProduitActeur.dart';
+import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -326,9 +327,7 @@ class _ProduitScreenState extends State<ProduitScreen>
       }).toList();
 
       if (filteredStocksSearch.isEmpty) {
-        return 
-        
-      
+        return  
     SingleChildScrollView(
           child: Padding(
                             padding: EdgeInsets.all(10),
@@ -339,8 +338,6 @@ class _ProduitScreenState extends State<ProduitScreen>
                                   SizedBox(
                                     height: 10,
                                   ),
-                                
-   
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Center(
@@ -374,12 +371,11 @@ class _ProduitScreenState extends State<ProduitScreen>
     itemBuilder: (context, index) {
       return Container(
         decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-
-        color: const Color.fromARGB(255, 247, 235, 218),
+         color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: const Color.fromARGB(255, 240, 238, 238).withOpacity(0.2),
+              color: Colors.grey.withOpacity(0.2),
               offset: const Offset(0, 2),
               blurRadius: 5,
               spreadRadius: 2,
@@ -406,11 +402,11 @@ Get.to(
                 width: double.infinity,
                 height: 120, // Taille de la photo
                 child: Image.network(
-                  filteredStocks[index].photo ?? 'assets/images/produit.png',
+                  filteredStocks[index].photo ?? 'assets/images/mang.jpg',
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Image.asset(
-                      'assets/images/produit.png',
+                      'assets/images/mang.jpg',
                       fit: BoxFit.cover,
                     );
                   },
@@ -423,17 +419,16 @@ Get.to(
                   children: [
                     Text(
                       filteredStocksSearch[index].nomProduit!,
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold , overflow:TextOverflow.ellipsis),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(40),
                         color: Colors.grey[200],
                       ),
                       child: Text(
-                        filteredStocksSearch[index].quantiteStock.toString(),
-                        style: TextStyle(fontSize: 14),
+                        filteredStocksSearch[index].quantiteStock!.toInt().toString(),
+                        style: TextStyle(fontSize: 14,  overflow:TextOverflow.ellipsis),
                       ),
                     ),
                   ],
@@ -441,18 +436,43 @@ Get.to(
               ),
               const SizedBox(height: 3,),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '${filteredStocksSearch[index].prix!.toInt()} €', // Convertir en entier
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                    ),
-               
-                  ],
-                ),
-              ),
+  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text(
+        '${filteredStocksSearch[index].prix!.toInt()} FCFA', // Convertir en entier
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, overflow:TextOverflow.ellipsis),
+      ),
+      Container(
+        width: 30, // Largeur du conteneur réduite
+        height: 30, // Hauteur du conteneur réduite
+        decoration: BoxDecoration(
+          color: Colors.blue, // Couleur de fond du bouton
+          borderRadius: BorderRadius.circular(15), // Coins arrondis du bouton
+        ),
+        child: IconButton(
+          onPressed: () {
+            // Action à effectuer lorsque le bouton est pressé
+            if (filteredStocksSearch[index].acteur!.idActeur! == acteur.idActeur!){
+                        Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
+                        }else{
+                          
+                        }
+            // Par exemple, ajouter le produit au panier
+          },
+          icon: Icon(Icons.add), // Icône du panier
+          color: Colors.white, // Couleur de l'icône
+          iconSize: 20, // Taille de l'icône réduite
+          padding: EdgeInsets.zero, // Aucune marge intérieure
+          splashRadius: 15, // Rayon de l'effet de pression réduit
+          tooltip: 'Ajouter au panier', // Info-bulle au survol de l'icône
+        ),
+      ),
+    ],
+  ),
+),
+
             ],
           ),
         ),
@@ -467,6 +487,7 @@ Get.to(
   Widget builCard(String idCategorie, String idMagasin){
   
      return Container(
+      height:  200, 
       width: MediaQuery.of(context).size.width / 2 - 20, // Half-width for two cards per row
       margin: const EdgeInsets.all(10.0),
       decoration: BoxDecoration(
