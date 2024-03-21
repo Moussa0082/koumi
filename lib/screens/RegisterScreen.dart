@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
@@ -251,58 +252,101 @@ Future<String?> getCurrentCountryFromLocation() async {
   child: Text("Téléphone *", style: TextStyle(color: (Colors.black), fontSize: 18),),
 ),
 
-Container(
+//  Container(
+//   child: Column(
+//     mainAxisAlignment: MainAxisAlignment.center,
+//     children: <Widget>[
+//       FutureBuilder<String?>(
+//         future: _currentPosition != null ? getCountryFromLatLng(_currentPosition!.latitude, _currentPosition!.longitude) : null,
+//         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
+//           if (snapshot.connectionState == ConnectionState.waiting) {
+//             return CircularProgressIndicator(); // Loading indicator
+//           } else if (snapshot.hasError || !snapshot.hasData) {
+//             return Text("Erreur lors de la détection du pays"); // Error message
+//           } else {
+//             String detectedCountry = snapshot.data!;
+//             return InternationalPhoneNumberInput(
+//               // initialCountry: detectedCountry,
+//               formatInput: true,
+//               hintText: "Numéro de téléphone",
+//               maxLength: 20,
+//               errorMessage: "Numéro invalide",
+//               onInputChanged: (PhoneNumber number) {
+//                 print("Pays : $detectedCountry");
+//                 processedNumber = removePlus(number.phoneNumber!);
+//                 print(processedNumber);
+//               },
+//               onInputValidated: (bool value) {
+//                 print(value);
+//               },
+//               selectorConfig: SelectorConfig(
+//                 selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+//                 useBottomSheetSafeArea: true,
+//               ),
+//               ignoreBlank: false,
+//               autoValidateMode: AutovalidateMode.disabled,
+//               selectorTextStyle: TextStyle(color: Colors.black),
+//               keyboardType: TextInputType.phone,
+//               inputDecoration: InputDecoration(
+//                 border: OutlineInputBorder(
+//                   borderRadius: BorderRadius.all(Radius.circular(20)),
+//                 ),
+//               ),
+//               onSaved: (PhoneNumber number) {
+//                 print('On Saved: $number');
+//               },
+//               textFieldController: controller,
+//               // Set the initialCountry based on the detected country
+//             );
+//           }
+//         },
+//       ),
+//     ],
+//   ),
+// ),
+ //   ),
+                            Container(
   child: Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: <Widget>[
-      FutureBuilder<String?>(
-        future: _currentPosition != null ? getCountryFromLatLng(_currentPosition!.latitude, _currentPosition!.longitude) : null,
-        builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator(); // Loading indicator
-          } else if (snapshot.hasError || !snapshot.hasData) {
-            return Text("Erreur lors de la détection du pays"); // Error message
-          } else {
-            String detectedCountry = snapshot.data!;
-            return InternationalPhoneNumberInput(
-              // initialCountry: detectedCountry,
-              formatInput: true,
-              hintText: "Numéro de téléphone",
-              maxLength: 20,
-              errorMessage: "Numéro invalide",
-              onInputChanged: (PhoneNumber number) {
-                print("Pays : $detectedCountry");
-                processedNumber = removePlus(number.phoneNumber!);
-                print(processedNumber);
-              },
-              onInputValidated: (bool value) {
-                print(value);
-              },
-              selectorConfig: SelectorConfig(
-                selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
-                useBottomSheetSafeArea: true,
-              ),
-              ignoreBlank: false,
-              autoValidateMode: AutovalidateMode.disabled,
-              selectorTextStyle: TextStyle(color: Colors.black),
-              keyboardType: TextInputType.phone,
-              inputDecoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                ),
-              ),
-              onSaved: (PhoneNumber number) {
-                print('On Saved: $number');
-              },
-              textFieldController: controller,
-              // Set the initialCountry based on the detected country
-            );
-          }
+      InternationalPhoneNumberInput(
+         initialValue: PhoneNumber(
+                      isoCode: Platform.localeName.split('_').last,
+                    ),
+        formatInput: true,
+        hintText: "Numéro de téléphone",
+        maxLength: 20,
+        errorMessage: "Numéro invalide",
+        onInputChanged: (PhoneNumber number) {
+           processedNumber = removePlus(number.phoneNumber!);
+          print(processedNumber);
         },
+        onInputValidated: (bool value) {
+          print(value);
+        },
+        selectorConfig: SelectorConfig(
+          selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+          useBottomSheetSafeArea: true,
+        ),
+        ignoreBlank: false,
+        autoValidateMode: AutovalidateMode.disabled,
+        selectorTextStyle: TextStyle(color: Colors.black),
+        keyboardType: TextInputType.phone,
+        inputDecoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+          ),
+        ),
+        onSaved: (PhoneNumber number) {
+          print('On Saved: $number');
+        },
+        textFieldController: controller,
+       
       ),
     ],
   ),
 ),
+   
 
 
                   // fin  téléphone            

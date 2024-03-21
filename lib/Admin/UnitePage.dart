@@ -187,7 +187,7 @@ class _UnitePageState extends State<UnitePage> {
                                                     MainAxisAlignment
                                                         .spaceBetween,
                                                 children: [
-                                                  _buildEtat(e.statutUnite),
+                                                  _buildEtat(e.statutUnite!),
                                                   PopupMenuButton<String>(
                                                     padding: EdgeInsets.zero,
                                                     itemBuilder: (context) =>

@@ -11,4 +11,5 @@ class BottomNavigationService extends ChangeNotifier {
       notifyListeners();
     }
   }
+  
 }

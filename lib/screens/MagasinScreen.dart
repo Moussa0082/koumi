@@ -7,11 +7,13 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddMagasinScreen.dart';
 import 'package:koumi_app/screens/Produit.dart';
 import 'package:koumi_app/service/MagasinService.dart';
 import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class MagasinScreen extends StatefulWidget {
@@ -32,7 +34,9 @@ class _MagasinScreenState extends State<MagasinScreen>
   late TextEditingController _searchController;
 
   List<Magasin> magasin = [];
-  late Acteur acteur;
+  late Acteur acteur = Acteur();
+  late List<TypeActeur> typeActeurData = [];
+  late String type;
   List<Niveau1Pays> niveau1Pays = [];
   String selectedRegionId =
       ''; // Ajoutez une variable pour stocker l'ID de la région sélectionnée
@@ -128,15 +132,39 @@ class _MagasinScreenState extends State<MagasinScreen>
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _searchController = TextEditingController();
-    if (niveau1Pays.isNotEmpty) {
+  bool isExist = false;
+  String? email = "";
+
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      typeActeurData = acteur.typeActeur!;
+      type = typeActeurData.map((data) => data.libelle).join(', ');
+      setState(() {
+        isExist = true;
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
+      if (niveau1Pays.isNotEmpty) {
       selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
       // fetchMagasinsByRegion(selectedRegionId);
     }
     fetchRegions();
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    verify();
+    _searchController = TextEditingController();
+  
   }
 
   @override
@@ -257,7 +285,6 @@ class _MagasinScreenState extends State<MagasinScreen>
 
   Widget buildGridView(String id) {
     List<Magasin> magasinss = magasin;
-    String? idMagasin = "";
     // Accéder à la liste des types d'acteurs de cet acteur
 
     if (magasinss.isEmpty) {
@@ -333,14 +360,7 @@ class _MagasinScreenState extends State<MagasinScreen>
                 onTap: () {
                   String id = magasin.idMagasin!;
                   String nom = magasin.nomMagasin!;
-                  // Navigator.pushReplacement(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //       builder: (context) => ProduitScreen(
-                  //             id: id,
-                  //             nom: nom,
-                  //           )),
-                  // );
+
                   Navigator.push(
                     context,
                     PageRouteBuilder(
@@ -365,132 +385,10 @@ class _MagasinScreenState extends State<MagasinScreen>
                         );
                       },
                       transitionDuration: const Duration(
-                          milliseconds: 1500), // Durée de la transition
+                          milliseconds: 1900), // Durée de la transition
                     ),
                   );
-
-//                   Navigator.push(
-// context,
-// PageRouteBuilder(
-// pageBuilder: (context, animation, secondaryAnimation) => ProduitScreen(
-//                               id: id,
-//                               nom: nom,
-//                             ),
-// transitionsBuilder: (context, animation, secondaryAnimation, child) {
-// var begin = Offset(1.0, 0.0);
-// var end = Offset.zero;
-// var curve = Curves.ease;
-
-// var tween = Tween(begin: begin, end: end)
-// .chain(CurveTween(curve: curve));
-
-// return SlideTransition(
-// position: animation.drive(tween),
-// child: child,
-// );
-// },
-// ),
-// );
                 },
-                //         child: Card(
-                //           shadowColor: Colors.white,
-                //           child: Column(
-                //          crossAxisAlignment: CrossAxisAlignment.stretch,
-                //             children: [
-
-                //               Container(
-                //                 child: ClipRRect(
-                //     borderRadius: BorderRadius.circular(8.0),
-                //                   child: Image.network(
-                //                     "http://10.0.2.2/${filteredMagasins[index]['photo']}" ??
-                //                         "assets/images/magasin.png",
-                //                     width: double.infinity,
-                //                      height: 120,
-                //                     fit: BoxFit.cover,
-                //                     errorBuilder: (BuildContext context,
-                //                         Object exception, StackTrace? stackTrace) {
-                //                       return Image.asset(
-                //                         'assets/images/magasin.png',
-                //                         width: double.infinity,
-                //                         height: 150,
-                //                         fit: BoxFit.cover,
-                //                       );
-                //                     },
-                //                   ),
-                //                 ),
-                //               ),
-                //            const SizedBox(height: 10),
-                //               Text(
-                //                 // overflow: TextOverflow.ellipsis,
-                //                 filteredMagasins[index]['nomMagasin']
-                //                         .toUpperCase() ??
-                //                     'Pas de nom défini',
-                //                 textAlign: TextAlign.center,
-                //                 style:
-                //                     TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                //               ),
-
-                //               GestureDetector(
-                //                 onTap:(){
-
-                // showMenu(
-                //   context: context,
-                //   position: RelativeRect.fromLTRB(0, 0, 0, 0), // Vous pouvez ajuster la position selon vos besoins
-                //   items: <PopupMenuEntry<String>>[
-                //     PopupMenuItem<String>(
-                //       value: 'modifier',
-                //       child: Text('Modifier'),
-                //     ),
-                //     PopupMenuItem<String>(
-                //       value: 'activer',
-                //       child: Text('Activer'),
-                //     ),
-                //     PopupMenuItem<String>(
-                //       value: 'desactiver',
-                //       child: Text('Désactiver'),
-                //     ),
-                //     PopupMenuItem<String>(
-                //       value: 'supprimer',
-                //       child: Text('Supprimer'),
-                //     ),
-                //   ],
-                //   elevation: 8.0, // Ajustez l'élévation selon vos préférences
-                // ).then((String? value) {
-                //   if (value != null) {
-                //     // Mettez en œuvre ici la logique pour chaque option sélectionnée
-                //     switch (value) {
-                //       case 'modifier':
-                //         // Mettez en œuvre la logique pour modifier le magasin
-                //         break;
-                //       case 'activer':
-                //         // Mettez en œuvre la logique pour activer le magasin
-                //         break;
-                //       case 'desactiver':
-                //         // Mettez en œuvre la logique pour désactiver le magasin
-                //         break;
-                //       case 'supprimer':
-                //         // Mettez en œuvre la logique pour supprimer le magasin
-                //         break;
-                //     }
-                //   }});
-                //                 },
-                //                 child: Align(
-                //                   alignment: Alignment.bottomRight,
-                //                   child: SizedBox(
-                //                     height: 10,
-                //                     child: IconButton(
-                //                       icon: Icon(Icons.more_vert), // Icône de points de suspension
-                //                       onPressed: () {
-
-                //                       },
-                //                     ),
-                //                   ),
-                //                 ),
-                //               ),
-
-                //             ],
-                //           ),
-                //         ),
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.9,
                   decoration: BoxDecoration(
@@ -521,8 +419,8 @@ class _MagasinScreenState extends State<MagasinScreen>
                                   cornerRadius: 50,
                                   color: Colors.black,
                                   image: NetworkImage(
-                                      // "https://koumi.ml/api-koumi/${magasin.photo}"),
-                                  "http://10.0.2.2:9000/api-koumi/${magasin.photo}"),
+                                      "https://koumi.ml/api-koumi/${magasin.photo}"),
+                                  // "https://koumi.ml/api-koumi/${magasin.photo}"),
                                 ),
                           title: Text(
                               magasin.acteur!.nomActeur != null
@@ -533,13 +431,14 @@ class _MagasinScreenState extends State<MagasinScreen>
                                 fontSize: 20,
                                 overflow: TextOverflow.ellipsis,
                               )),
-                          subtitle: Text(magasin.niveau1Pays!.nomN1!,
+                          subtitle: Text(magasin.nomMagasin!,
                               // filteredMagasins[index].acteur!.typeActeur.map((e) => e.libelle!).join(', '),
                               // filteredMagasins[index]['acteur']['typeActeur']
                               //     .map((data) =>
                               //         data.libelle)
                               //     .join(', '),
                               style: const TextStyle(
+                                overflow: TextOverflow.ellipsis,
                                 color: Colors.black87,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w500,

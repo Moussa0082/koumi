@@ -1,12 +1,11 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
-import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -31,7 +30,7 @@ class _ProduitScreenState extends State<ProduitScreen>
   late TextEditingController _searchController;
 
   List<Stock> stock = [];
-late Acteur acteur =
+  late Acteur acteur =
       Acteur(); // Initialisez acteur avec une valeur par défaut  Acteur acteurs = new Acteur();
   late List<TypeActeur> typeActeurData = [];
   late String type;
@@ -128,10 +127,9 @@ late Acteur acteur =
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-       typeActeurData = acteur.typeActeur!;
+      typeActeurData = acteur.typeActeur!;
       type = typeActeurData.map((data) => data.libelle).join(', ');
     }
-    
   }
 
   @override
@@ -139,7 +137,7 @@ late Acteur acteur =
     super.initState();
     _searchController = TextEditingController();
     // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-   
+
     verify();
     if (categorieProduit.isEmpty) {
       fetchCategorie();
@@ -165,11 +163,11 @@ late Acteur acteur =
           appBar: AppBar(
               centerTitle: true,
               toolbarHeight: 100,
-              leading: IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+              // leading: IconButton(
+              //     onPressed: () {
+              //     Get.off(Acceui)
+              //     },
+              //     icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
               title: Text(
                 'Produits',
                 style: const TextStyle(

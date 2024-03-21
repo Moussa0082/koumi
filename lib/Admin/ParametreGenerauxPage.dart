@@ -177,31 +177,31 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                     .updateParametre(
                                         idParametreGeneraux:
                                             param.idParametreGeneraux!,
-                                        sigleStructure: param.sigleStructure,
-                                        nomStructure: param.nomStructure,
-                                        sigleSysteme: param.sigleSysteme,
-                                        nomSysteme: param.nomSysteme,
+                                        sigleStructure: param.sigleStructure!,
+                                        nomStructure: param.nomStructure!,
+                                        sigleSysteme: param.sigleSysteme!,
+                                        nomSysteme: param.nomSysteme!,
                                         descriptionSysteme:
-                                            param.descriptionSysteme,
-                                        sloganSysteme: param.sloganSysteme,
+                                            param.descriptionSysteme!,
+                                        sloganSysteme: param.sloganSysteme!,
                                         adresseStructure:
-                                            param.adresseStructure,
-                                        emailStructure: param.emailStructure,
+                                            param.adresseStructure!,
+                                        emailStructure: param.emailStructure!,
                                         telephoneStructure:
-                                            param.telephoneStructure,
+                                            param.telephoneStructure!,
                                         monnaie: param.monnaie!,
                                         tauxDollar: param.tauxDollar!,
                                         tauxYuan: param.tauxYuan!,
                                         whattsAppStructure:
-                                            param.whattsAppStructure,
+                                            param.whattsAppStructure!,
                                         libelleNiveau1Pays:
-                                            param.libelleNiveau1Pays,
+                                            param.libelleNiveau1Pays!,
                                         libelleNiveau2Pays:
-                                            param.libelleNiveau2Pays,
+                                            param.libelleNiveau2Pays!,
                                         libelleNiveau3Pays:
-                                            param.libelleNiveau3Pays,
+                                            param.libelleNiveau3Pays!,
                                         localiteStructure:
-                                            param.localiteStructure)
+                                            param.localiteStructure!)
                                     .then((value) => {
                                           print("Modifier avec succèss"),
                                           Provider.of<ParametreGenerauxService>(
@@ -216,32 +216,32 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                     .updateParametre(
                                         idParametreGeneraux:
                                             param.idParametreGeneraux!,
-                                        sigleStructure: param.sigleStructure,
-                                        nomStructure: param.nomStructure,
-                                        sigleSysteme: param.sigleSysteme,
-                                        nomSysteme: param.nomSysteme,
+                                        nomStructure: param.nomStructure!,
+                                        sigleStructure: param.sigleStructure!,
+                                        sigleSysteme: param.sigleSysteme!,
+                                        nomSysteme: param.nomSysteme!,
                                         logoSysteme: photo,
                                         monnaie: param.monnaie!,
                                         tauxDollar: param.tauxDollar!,
                                         tauxYuan: param.tauxYuan!,
                                         descriptionSysteme:
-                                            param.descriptionSysteme,
-                                        sloganSysteme: param.sloganSysteme,
+                                            param.descriptionSysteme!,
+                                        sloganSysteme: param.sloganSysteme!,
                                         adresseStructure:
-                                            param.adresseStructure,
-                                        emailStructure: param.emailStructure,
+                                            param.adresseStructure!,
+                                        emailStructure: param.emailStructure!,
                                         telephoneStructure:
-                                            param.telephoneStructure,
+                                            param.telephoneStructure!,
                                         whattsAppStructure:
-                                            param.whattsAppStructure,
+                                            param.whattsAppStructure!,
                                         libelleNiveau1Pays:
-                                            param.libelleNiveau1Pays,
+                                            param.libelleNiveau1Pays!,
                                         libelleNiveau2Pays:
-                                            param.libelleNiveau2Pays,
+                                            param.libelleNiveau2Pays!,
                                         libelleNiveau3Pays:
-                                            param.libelleNiveau3Pays,
+                                            param.libelleNiveau3Pays!,
                                         localiteStructure:
-                                            param.localiteStructure)
+                                            param.localiteStructure!)
                                     .then((value) => {
                                           print("Modifier avec succèss"),
                                           Provider.of<ParametreGenerauxService>(
@@ -395,7 +395,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                               param.nomSysteme = value;
                                             })
                                         : Text(
-                                            param.nomSysteme,
+                                            param.nomSysteme!,
                                             style: const TextStyle(
                                               fontSize: 22,
                                               color: Colors.black,
@@ -411,7 +411,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                             },
                                           )
                                         : Text(
-                                            param.sloganSysteme,
+                                            param.sloganSysteme!,
                                             style: const TextStyle(
                                               fontSize: 17,
                                               overflow: TextOverflow.ellipsis,
@@ -443,7 +443,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                           //     descriptionSystemeController,
                                         )
                                       : Text(
-                                          param.descriptionSysteme,
+                                          param.descriptionSysteme!,
                                           textAlign: TextAlign.justify,
                                           style: const TextStyle(
                                             fontSize: 17,
@@ -505,7 +505,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     nomStructureController
                                                 ),
                                               )
-                                            : Text(param.nomStructure,
+                                            : Text(param.nomStructure!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -549,7 +549,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     sigleStructureController,
                                                 ),
                                               )
-                                            : Text(param.sigleStructure,
+                                            : Text(param.sigleStructure!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -615,7 +615,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     adresseStructureController,
                                                 ),
                                               )
-                                            : Text(param.adresseStructure,
+                                            : Text(param.adresseStructure!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -659,7 +659,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     telephoneStructureController,
                                                 ),
                                               )
-                                            : Text(param.telephoneStructure,
+                                            : Text(param.telephoneStructure!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -703,7 +703,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     whattsAppStructureController,
                                                 ),
                                               )
-                                            : Text(param.whattsAppStructure,
+                                            : Text(param.whattsAppStructure!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -747,7 +747,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     localiteStructureController,
                                                 ),
                                               )
-                                            : Text(param.localiteStructure,
+                                            : Text(param.localiteStructure!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -793,7 +793,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     libelleNiveau1PaysController
                                                 ),
                                               )
-                                            : Text(param.libelleNiveau1Pays,
+                                            : Text(param.libelleNiveau1Pays!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -837,7 +837,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     libelleNiveau2PaysController
                                                 ),
                                               )
-                                            : Text(param.libelleNiveau2Pays,
+                                            : Text(param.libelleNiveau2Pays!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -881,7 +881,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     libelleNiveau3PaysController
                                                 ),
                                               )
-                                            : Text(param.libelleNiveau3Pays,
+                                            : Text(param.libelleNiveau3Pays!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,

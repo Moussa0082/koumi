@@ -12,6 +12,7 @@ import 'package:koumi_app/screens/PageTransporteur.dart';
 import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Transport extends StatefulWidget {
   const Transport({super.key});
@@ -32,13 +33,34 @@ class _TransportState extends State<Transport> {
   TypeVoiture? selectedType;
   String? typeValue;
   late Future _typeList;
+  bool isExist = false;
+  String? email = "";
+
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      typeActeurData = acteur.typeActeur!;
+      type = typeActeurData.map((data) => data.libelle).join(', ');
+      setState(() {
+        isExist = true;
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
+  }
 
   @override
   void initState() {
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    typeActeurData = acteur.typeActeur!;
-    // selectedType == null;
-    type = typeActeurData.map((data) => data.libelle).join(', ');
+    // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    // typeActeurData = acteur.typeActeur!;
+    // // selectedType == null;
+    // type = typeActeurData.map((data) => data.libelle).join(', ');
+    verify();
     _searchController = TextEditingController();
     // _typeList = http.get(Uri.parse('https://koumi.ml/api-koumi/TypeVoiture/read'));
     _typeList =
@@ -70,89 +92,92 @@ class _TransportState extends State<Transport> {
             style: const TextStyle(
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
-          actions: [
-            (type.toLowerCase() == 'admin' ||
-                    type.toLowerCase() == 'transporteur')
-                ? PopupMenuButton<String>(
-                    padding: EdgeInsets.zero,
-                    itemBuilder: (context) {
-                      return <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.remove_red_eye,
-                              color: Colors.green,
-                            ),
-                            title: const Text(
-                              "Transporteurs",
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
+          actions: !isExist
+              ? null
+              : [
+                  (type.toLowerCase() == 'admin' ||
+                          type.toLowerCase() == 'transporteur')
+                      ? PopupMenuButton<String>(
+                          padding: EdgeInsets.zero,
+                          itemBuilder: (context) {
+                            return <PopupMenuEntry<String>>[
+                              PopupMenuItem<String>(
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.remove_red_eye,
+                                    color: Colors.green,
+                                  ),
+                                  title: const Text(
+                                    "Transporteurs",
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                PageTransporteur()));
+                                  },
+                                ),
                               ),
-                            ),
-                            onTap: () async {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          PageTransporteur()));
-                            },
-                          ),
-                        ),
-                        PopupMenuItem<String>(
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.remove_red_eye,
-                              color: Colors.green,
-                            ),
-                            title: const Text(
-                              "Mes véhicules",
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            onTap: () async {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => VehiculeActeur()));
-                            },
-                          ),
+                              PopupMenuItem<String>(
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.remove_red_eye,
+                                    color: Colors.green,
+                                  ),
+                                  title: const Text(
+                                    "Mes véhicules",
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                VehiculeActeur()));
+                                  },
+                                ),
+                              )
+                            ];
+                          },
                         )
-                      ];
-                    },
-                  )
-                : PopupMenuButton<String>(
-                    padding: EdgeInsets.zero,
-                    itemBuilder: (context) {
-                      return <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.remove_red_eye,
-                              color: Colors.green,
-                            ),
-                            title: const Text(
-                              "Transporteurs",
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
+                      : PopupMenuButton<String>(
+                          padding: EdgeInsets.zero,
+                          itemBuilder: (context) {
+                            return <PopupMenuEntry<String>>[
+                              PopupMenuItem<String>(
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.remove_red_eye,
+                                    color: Colors.green,
+                                  ),
+                                  title: const Text(
+                                    "Transporteurs",
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                PageTransporteur()));
+                                  },
+                                ),
                               ),
-                            ),
-                            onTap: () async {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          PageTransporteur()));
-                            },
-                          ),
-                        ),
-                      ];
-                    },
-                  )
-          ]),
+                            ];
+                          },
+                        )
+                ]),
       body: SingleChildScrollView(
         child: Column(children: [
           const SizedBox(height: 10),

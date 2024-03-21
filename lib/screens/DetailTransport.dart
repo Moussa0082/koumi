@@ -20,6 +20,7 @@ import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailTransport extends StatefulWidget {
@@ -35,7 +36,7 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _DetailTransportState extends State<DetailTransport> {
   late Vehicule vehicules;
-  late Acteur acteur;
+  late Acteur acteur = Acteur();
   late List<TypeActeur> typeActeurData = [];
   late String type;
   String? imageSrc;
@@ -43,7 +44,7 @@ class _DetailTransportState extends State<DetailTransport> {
   late TypeVoiture typeVoiture;
   late Map<String, int> prixParDestinations;
   List<ParametreGeneraux> paraList = [];
-  late ParametreGeneraux para;
+  late ParametreGeneraux para = ParametreGeneraux();
   late ValueNotifier<bool> isDialOpenNotifier;
   TextEditingController _prixController = TextEditingController();
   TextEditingController _nomController = TextEditingController();
@@ -68,6 +69,27 @@ class _DetailTransportState extends State<DetailTransport> {
   List<String> selectedDestinations = [];
   Map<String, int> newPrixParDestinations = {};
   List<String?> selectedDestinationsList = [];
+
+  bool isExist = false;
+  String? email = "";
+
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      typeActeurData = acteur.typeActeur!;
+      type = typeActeurData.map((data) => data.libelle).join(', ');
+      setState(() {
+        isExist = true;
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
+  }
 
   // Méthode pour ajouter une nouvelle destination et prix
   void addDestinationAndPrix() {
@@ -97,19 +119,30 @@ class _DetailTransportState extends State<DetailTransport> {
     }
   }
 
+  void verifyParam() {
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+
+    if (paraList != null && paraList.isNotEmpty) {
+      para = paraList[0];
+    } else {
+      // Gérer le cas où la liste est null ou vide, par exemple :
+      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+    }
+  }
+
   @override
   void initState() {
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    typeActeurData = acteur.typeActeur!;
-    type = typeActeurData.map((data) => data.libelle).join(', ');
+    verify();
+    // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+    //     .parametreList!;
+    // para = paraList[0];
+    verifyParam();
     _niveau3List =
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
     vehicules = widget.vehicule;
     typeVoiture = vehicules.typeVoiture;
     prixParDestinations = vehicules.prixParDestination;
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
-    para = paraList[0];
     _nomController.text = vehicules.nomVehicule;
     _capaciteController.text = vehicules.capaciteVehicule;
     _etatController.text = vehicules.etatVehicule.toString();
@@ -281,11 +314,11 @@ class _DetailTransportState extends State<DetailTransport> {
                       acteur: acteur,
                       statutVehicule: vehicules.statutVehicule,
                     );
-                   
+
                     _isLoading = false;
                   }),
-                   Provider.of<VehiculeService>(context, listen: false)
-                        .applyChange()
+                  Provider.of<VehiculeService>(context, listen: false)
+                      .applyChange()
                 })
             .catchError((onError) => {print(onError.toString())});
       } else {
@@ -321,8 +354,8 @@ class _DetailTransportState extends State<DetailTransport> {
                     );
                     _isLoading = false;
                   }),
-                    Provider.of<VehiculeService>(context, listen: false)
-                        .applyChange()
+                  Provider.of<VehiculeService>(context, listen: false)
+                      .applyChange()
                 })
             .catchError((onError) => {print(onError.toString())});
       }
@@ -907,9 +940,11 @@ class _DetailTransportState extends State<DetailTransport> {
             "${vehicules.nbKilometrage.toString()} Km"),
         _buildItem('Statut: : ',
             '${vehicules.statutVehicule ? 'Disponible' : 'Non disponible'}'),
-        acteur.nomActeur != vehicules.acteur.nomActeur
-            ? _buildItem('Propriètaire : ', vehicules.acteur.nomActeur!)
-            : Container(),
+        !isExist
+            ? Container()
+            : acteur.nomActeur != vehicules.acteur.nomActeur
+                ? _buildItem('Propriètaire : ', vehicules.acteur.nomActeur!)
+                : Container(),
         // _buildItem('Description : ', vehicules.description!),
       ],
     );

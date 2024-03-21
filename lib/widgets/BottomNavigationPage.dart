@@ -40,7 +40,8 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
   List pages = <Widget>[
     const Accueil(),
     ProduitScreen(),
-    Panier(),
+
+     Panier(),
     const Profil()
   ];
 
@@ -78,65 +79,59 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      // canPop: true,
-      onWillPop: () async {
-        return false;
-      },
-      child: Scaffold(
-        backgroundColor: d_colorPage,
-        appBar: AppBar(
-          toolbarHeight: 0,
-          elevation: 0,
-        ),
-        body: Consumer<BottomNavigationService>(
-          builder: (context, bottomService, child) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              _changeActivePageValue(bottomService.pageIndex);
-            });
-            return Stack(
-              children: [
-                _buildOffstageNavigator(0),
-                _buildOffstageNavigator(1),
-                _buildOffstageNavigator(2),
-                _buildOffstageNavigator(3)
-              ],
-            );
-          },
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Colors.white,
-          elevation: 5.0,
-          items: const [
-            BottomNavigationBarItem(
-              backgroundColor: d_color,
-              icon: Icon(Icons.home_filled),
-              label: "Accueil",
-            ),
-            BottomNavigationBarItem(
-              backgroundColor: d_color,
-              icon: Icon(Icons.agriculture),
-              label: "Produit",
-            ),
-            BottomNavigationBarItem(
-              backgroundColor: d_color,
-              icon: Icon(Icons.shopping_cart),
-              label: "Panier",
-            ),
-            BottomNavigationBarItem(
-              backgroundColor: d_color,
-              icon: Icon(Icons.person_pin),
-              label: "Profil",
-            ),
-          ],
-          unselectedItemColor: Colors.black,
-          selectedItemColor: Colors.green[800],
-          iconSize: 30,
-          showUnselectedLabels: true,
-          selectedLabelStyle: const TextStyle(color: Colors.black),
-          currentIndex: activePageIndex,
-          onTap: _onItemTap,
-        ),
+    return Scaffold(
+      backgroundColor: d_colorPage,
+      appBar: AppBar(
+        toolbarHeight: 0,
+        elevation: 0,
+      ),
+      body: Consumer<BottomNavigationService>(
+        builder: (context, bottomService, child) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _changeActivePageValue(bottomService.pageIndex);
+          });
+          return Stack(
+            children: [
+              _buildOffstageNavigator(0),
+              _buildOffstageNavigator(1),
+              _buildOffstageNavigator(2),
+              _buildOffstageNavigator(3)
+            ],
+          );
+        },
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        elevation: 5.0,
+        items: const [
+          BottomNavigationBarItem(
+            backgroundColor: d_color,
+            icon: Icon(Icons.home_filled),
+            label: "Accueil",
+          ),
+          BottomNavigationBarItem(
+            backgroundColor: d_color,
+            icon: Icon(Icons.agriculture),
+            label: "Produit",
+          ),
+          BottomNavigationBarItem(
+            backgroundColor: d_color,
+            icon: Icon(Icons.shopping_cart),
+            label: "Panier",
+          ),
+          BottomNavigationBarItem(
+            backgroundColor: d_color,
+            icon: Icon(Icons.person_pin),
+            label: "Profil",
+          ),
+        ],
+        unselectedItemColor: Colors.black,
+        selectedItemColor: Colors.green[800],
+        iconSize: 30,
+        showUnselectedLabels: true,
+        selectedLabelStyle: const TextStyle(color: Colors.black),
+        currentIndex: activePageIndex,
+        onTap: _onItemTap,
       ),
     );
   }
@@ -144,8 +139,13 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
   Map<String, WidgetBuilder> _routeBuilders(BuildContext context, int index) {
     return {
       '/': (context) {
-        return [const Accueil(), ProduitScreen(), Panier(), const Profil()]
-            .elementAt(index);
+
+        return [
+          const Accueil(),
+          ProduitScreen(),
+           Panier(),
+          const Profil()
+        ].elementAt(index);
       },
     };
   }

@@ -1,10 +1,13 @@
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:koumi_app/Admin/NotificationPage.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/MessageWa.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/LoginScreen.dart';
+import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/MessageService.dart';
 import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
@@ -58,7 +61,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Widget build(BuildContext context) {
     return !isExist
         ? Padding(
-            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 15),
+            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 25),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -73,10 +76,21 @@ class _CustomAppBarState extends State<CustomAppBar> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                     Future.microtask(() {
+                      Provider.of<BottomNavigationService>(context,
+                              listen: false)
+                          .changeIndex(0);
+                    });
+                    Get.to(LoginScreen(),
+                        duration: Duration(
+                            seconds:
+                                1), //duration of transitions, default 1 sec
+                        transition: Transition.leftToRight);
+                  },
                   icon: Icon(
                     Icons.login,
-                    color: Colors.blue, // Ajout d'une couleur à l'icône
+                    color: d_colorGreen, // Ajout d'une couleur à l'icône
                     size: 30, // Ajout d'une taille à l'icône
                   ),
                 ),
@@ -91,7 +105,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 builder: (context, acteurProvider, child) {
                   final ac = acteurProvider.acteur;
                   if (ac == null) {
-                    return CircularProgressIndicator();
+                    return SizedBox();
                   }
 
                   List<TypeActeur> typeActeurData = ac.typeActeur!;

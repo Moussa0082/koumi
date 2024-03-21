@@ -13,6 +13,7 @@ import 'package:koumi_app/screens/Location.dart';
 import 'package:koumi_app/screens/MagasinActeur.dart';
 import 'package:koumi_app/screens/MagasinScreen.dart';
 import 'package:koumi_app/screens/Meteo.dart';
+import 'package:koumi_app/screens/Produit.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
@@ -122,7 +123,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const MagasinActeurScreen()));
+                      builder: (context) =>  ProduitScreen()));
             } else if (index == 8) {
               Navigator.push(
                   context,

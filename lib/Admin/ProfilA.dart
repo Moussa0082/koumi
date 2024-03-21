@@ -7,16 +7,17 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
+import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilA extends StatefulWidget {
   const ProfilA({super.key});
-  
+
   @override
   State<ProfilA> createState() => _ProfilAState();
-}    
+}
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
@@ -70,37 +71,36 @@ class _ProfilAState extends State<ProfilA> {
                         return Column(
                           children: [
                             ListTile(
-                              leading: ac.logoActeur == null ||
-                                      ac.logoActeur!.isEmpty
-                                  ? ProfilePhoto(
-                                      totalWidth: 50,
-                                      cornerRadius: 50,
+                                leading: ac.logoActeur == null ||
+                                        ac.logoActeur!.isEmpty
+                                    ? ProfilePhoto(
+                                        totalWidth: 50,
+                                        cornerRadius: 50,
+                                        color: Colors.black,
+                                        image: const AssetImage(
+                                            'assets/images/profil.jpg'),
+                                      )
+                                    : ProfilePhoto(
+                                        totalWidth: 50,
+                                        cornerRadius: 50,
+                                        color: Colors.black,
+                                        image: NetworkImage(
+                                            "http:10.0.2.2/${ac.logoActeur!}"),
+                                      ),
+                                title: Text(
+                                  ac.nomActeur!.toUpperCase(),
+                                  style: const TextStyle(
                                       color: Colors.black,
-                                      image: const AssetImage(
-                                          'assets/images/profil.jpg'),
-                                    )
-                                  : ProfilePhoto(
-                                      totalWidth: 50,
-                                      cornerRadius: 50,
-                                      color: Colors.black,
-                                      image: NetworkImage(
-                                          "http:10.0.2.2/${ac.logoActeur!}"),
-                                    ),
-                              title: Text(
-                                ac.nomActeur!.toUpperCase(),
-                                style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w800),
-                              ),
-                              subtitle: Text(
-                                type,
-                                style: const TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w400),
-                              )
-                            ),
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w800),
+                                ),
+                                subtitle: Text(
+                                  type,
+                                  style: const TextStyle(
+                                      color: Colors.black54,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w400),
+                                )),
                             const SizedBox(
                               height: 10,
                             ),
@@ -131,7 +131,8 @@ class _ProfilAState extends State<ProfilA> {
                                     _buildProfile('Adresse', ac.adresseActeur!),
                                     _buildProfile(
                                         'Localité', ac.localiteActeur!),
-                                    _buildProfile('Pays', ac.niveau3PaysActeur!),
+                                    _buildProfile(
+                                        'Pays', ac.niveau3PaysActeur!),
                                   ],
                                 ),
                               ),
@@ -311,18 +312,19 @@ class _ProfilAState extends State<ProfilA> {
 
                       // Déconnexion avec le provider
                       await acteurProvider.logout();
-                       SharedPreferences prefs = await SharedPreferences.getInstance();
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
                       await prefs.clear();
-    //                   Navigator.pushReplacement(
-    // context,
-    // MaterialPageRoute(builder: (context) => LoginScreen()),
-    //                        );
-     Get.off(LoginScreen(),
+
+                      Get.off(LoginScreen(),
                           duration: Duration(
                               seconds:
                                   1), //duration of transitions, default 1 sec
                           transition: Transition.leftToRight);
 
+                      Provider.of<BottomNavigationService>(context,
+                              listen: false)
+                          .changeIndex(0);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,

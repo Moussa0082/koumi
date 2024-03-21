@@ -96,7 +96,7 @@ class _ParametreState extends State<Parametre> {
                               ),
                             ),
                   title: Text(
-                    params.nomSysteme,
+                    params.nomSysteme!,
                     style: const TextStyle(
                       fontSize: 22,
                       color: Colors.black,
@@ -105,7 +105,7 @@ class _ParametreState extends State<Parametre> {
                     ),
                   ),
                   subtitle: Text(
-                    params.sloganSysteme,
+                    params.sloganSysteme!,
                     textAlign: TextAlign.justify,
                     style: const TextStyle(
                       fontSize: 17,
@@ -183,7 +183,7 @@ class _ParametreState extends State<Parametre> {
                     ),
                     getList(
                         "region.png",
-                        params.libelleNiveau1Pays,
+                        params.libelleNiveau1Pays!,
                         const Niveau1Page(),
                         const Icon(
                           Icons.chevron_right_sharp,
@@ -198,7 +198,7 @@ class _ParametreState extends State<Parametre> {
                     ),
                     getList(
                         "region.png",
-                        params.libelleNiveau2Pays,
+                        params.libelleNiveau2Pays!,
                         const Niveau2Page(),
                         const Icon(
                           Icons.chevron_right_sharp,
@@ -213,7 +213,7 @@ class _ParametreState extends State<Parametre> {
                     ),
                     getList(
                         "region.png",
-                        params.libelleNiveau3Pays,
+                        params.libelleNiveau3Pays!,
                         const Niveau3Page(),
                         const Icon(
                           Icons.chevron_right_sharp,

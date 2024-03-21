@@ -14,7 +14,7 @@ class Stock {
   String? idStock;
   final String? codeStock;
   final String? nomProduit;
-   String? formeProduit;
+  final String? formeProduit;
   final String? dateProduction;
   final double? quantiteStock;
   final int? prix;
@@ -24,7 +24,7 @@ class Stock {
   final ZoneProduction? zoneProduction;
   final String? dateAjout;
   final String? dateModif;
-   String? personneModif;
+  final String? personneModif;
   final bool? statutSotck;
   final Speculation? speculation;
   final Unite? unite;
@@ -86,11 +86,11 @@ class Stock {
 
   factory Stock.fromMap(Map<String, dynamic> map) {
     return Stock(
-      idStock: map['idStock'] as String?,
-      codeStock: map['codeStock'] as String?,
+      idStock: map['idStock'] as String,
+      codeStock: map['codeStock'] as String,
       nomProduit: map['nomProduit'] as String,
-      formeProduit: map['formeProduit'] as String? ?? '',
-      dateProduction: map['dateProduction'] as String?,
+      formeProduit: map['formeProduit'] as String,
+      dateProduction: map['dateProduction'] as String,
       quantiteStock: (map['quantiteStock'] as num?)?.toDouble() ?? 0.0,
       prix: (map['prix'] as num?)?.toInt() ?? 0,
       typeProduit: map['typeProduit'] as String,

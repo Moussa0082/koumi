@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:koumi_app/Admin/ParametreGenerauxPage.dart';
 import 'package:koumi_app/Admin/Zone.dart';
 import 'package:koumi_app/models/Acteur.dart';
@@ -8,10 +11,16 @@ import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
+
 import 'package:koumi_app/screens/Surface.dart';
 import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
+
+import 'package:koumi_app/screens/TypeVehicule.dart';
+import 'package:koumi_app/service/BottomNavigationService.dart';
+import 'package:koumi_app/service/TypeVoitureService.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
+import 'package:koumi_app/widgets/BottomNavBarAdmin.dart';
 import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -69,9 +78,9 @@ class _ProfilState extends State<Profil> {
         appBar: AppBar(
           centerTitle: true,
           toolbarHeight: 100,
-          leading: IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+          // leading: IconButton(
+          //     onPressed: () {},
+          //     icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: const Text(
             "Mon Profil",
             style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
@@ -590,7 +599,9 @@ class _ProfilState extends State<Profil> {
                     )
                   ],
                 ),
+
               ));
+
   }
 
   Widget _buildProfile(String title, String value) {
