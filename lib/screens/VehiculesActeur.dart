@@ -3,7 +3,7 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/AddVehiculeTransport.dart';
+import 'package:koumi_app/screens/AddVehicule.dart';
 import 'package:koumi_app/screens/DetailTransport.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:provider/provider.dart';
@@ -25,11 +25,13 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
   late TextEditingController _searchController;
   List<Vehicule> vehiculeListe = [];
   late Future<List<Vehicule>> _liste;
+  // late Future liste;
 
-  // Future<List<Vehicule>> getVehicule(String id) async {
-  //   final response = await VehiculeService().fetchVehiculeByActeur(id);
-  //   return response;
-  // }
+  Future<List<Vehicule>> getVehicule(String id) async {
+    final response = await VehiculeService().fetchVehiculeByActeur(id);
+
+    return response;
+  }
 
   @override
   void initState() {
@@ -37,7 +39,8 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
     typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
-    // _liste = getVehicule(acteur.idActeur!);
+    _liste = getVehicule(acteur.idActeur!);
+
     super.initState();
   }
 
@@ -86,7 +89,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => AddVehiculeTransport()));
+                              builder: (context) => AddVehicule()));
                     },
                   ),
                 ),
@@ -133,7 +136,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
           const SizedBox(height: 10),
           Consumer<VehiculeService>(builder: (context, vehiculeService, child) {
             return FutureBuilder(
-                future: vehiculeService.fetchVehiculeByActeur(acteur.idActeur!),
+                future: _liste,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -235,7 +238,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                             ),
                                           ),
                                           _buildItem("Statut:",
-                                              '${e.statutVehicule! ? 'Disponible' : 'Non disponible'}'),
+                                              '${e.statutVehicule ? 'Disponible' : 'Non disponible'}'),
                                           _buildItem(
                                               "Localité :", e.localisation),
                                           SizedBox(height: 10),
@@ -248,7 +251,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                _buildEtat(e.statutVehicule!),
+                                                _buildEtat(e.statutVehicule),
                                                 PopupMenuButton<String>(
                                                   padding: EdgeInsets.zero,
                                                   itemBuilder: (context) =>
@@ -270,14 +273,19 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                         onTap: () async {
                                                           await VehiculeService()
                                                               .activerVehicules(
-                                                                  e.idVehicule!)
+                                                                  e.idVehicule)
                                                               .then((value) => {
                                                                     Provider.of<VehiculeService>(
                                                                             context,
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
-                                                                    
+                                                                    setState(
+                                                                        () {
+                                                                      _liste = getVehicule(
+                                                                          acteur
+                                                                              .idActeur!);
+                                                                    }),
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop(),
@@ -337,19 +345,19 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                         onTap: () async {
                                                           await VehiculeService()
                                                               .desactiverVehicules(
-                                                                  e.idVehicule!)
+                                                                  e.idVehicule)
                                                               .then((value) => {
                                                                     Provider.of<VehiculeService>(
                                                                             context,
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
-                                                                    // setState(
-                                                                    //     () {
-                                                                    //   _liste = getVehicule(
-                                                                    //       acteur
-                                                                    //           .idActeur!);
-                                                                    // }),
+                                                                    setState(
+                                                                        () {
+                                                                      _liste = getVehicule(
+                                                                          acteur
+                                                                              .idActeur!);
+                                                                    }),
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop(),
@@ -409,14 +417,19 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                         onTap: () async {
                                                           await VehiculeService()
                                                               .deleteVehicule(
-                                                                  e.idVehicule!)
+                                                                  e.idVehicule)
                                                               .then((value) => {
                                                                     Provider.of<VehiculeService>(
                                                                             context,
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
-                                                                   
+                                                                    setState(
+                                                                        () {
+                                                                      _liste = getVehicule(
+                                                                          acteur
+                                                                              .idActeur!);
+                                                                    }),
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop(),

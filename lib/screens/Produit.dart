@@ -13,6 +13,7 @@ import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/ProduitActeur.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProduitScreen extends StatefulWidget {
@@ -30,11 +31,12 @@ class _ProduitScreenState extends State<ProduitScreen>
   late TextEditingController _searchController;
 
   List<Stock> stock = [];
-    late Acteur acteur;
+late Acteur acteur =
+      Acteur(); // Initialisez acteur avec une valeur par défaut  Acteur acteurs = new Acteur();
   late List<TypeActeur> typeActeurData = [];
   late String type;
-    
-   bool? isEditable = false;
+
+  bool? isEditable = false;
   List<CategorieProduit> categorieProduit = [];
   String selectedCategorieProduit = "";
   String selectedCategorieProduitNom = "";
@@ -73,7 +75,8 @@ class _ProduitScreenState extends State<ProduitScreen>
     try {
       final response = await http
           // .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
-          .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
+          .get(Uri.parse(
+              'http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {
@@ -117,14 +120,27 @@ class _ProduitScreenState extends State<ProduitScreen>
     }
   }
 
+  String? email = "";
+
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+       typeActeurData = acteur.typeActeur!;
+      type = typeActeurData.map((data) => data.libelle).join(', ');
+    }
+    
+  }
+
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController();
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    typeActeurData = acteur.typeActeur!;
-    type = typeActeurData.map((data) => data.libelle).join(', ');
-
+    // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+   
+    verify();
     if (categorieProduit.isEmpty) {
       fetchCategorie();
       // fetchProduitByCategorie(selectedCategorieProduit);
@@ -140,122 +156,127 @@ class _ProduitScreenState extends State<ProduitScreen>
 
   @override
   Widget build(BuildContext context) {
-           const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
+    const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
     return Container(
       child: DefaultTabController(
         length: categorieProduit.length,
         child: Scaffold(
-
-       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
-      appBar: AppBar(
-          centerTitle: true,
-          toolbarHeight: 100,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-          title: Text(
-            'Produits',
-            style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
-          ),
-          actions: [
-            PopupMenuButton<String>(
-              padding: EdgeInsets.zero,
-              itemBuilder: (context) {
-                print("Type: $type");
-                return acteur.idActeur! == stock.map((element) => element.acteur!.idActeur!)
-                    ? <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.remove_red_eye,
-                              color: Colors.green,
-                            ),
-                            title: const Text(
-                              "Mes Produits",
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            onTap: () async {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ProduitActeurScreen()));
-                            },
-                          ),
-                        ),
-                      ]
-                    : <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.add,
-                              color: Colors.green,
-                            ),
-                            title: const Text(
-                              "Ajouter produit",
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            onTap: () async {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          AddAndUpdateProductScreen(isEditable: isEditable,)));
-                            },
-                          ),
-                        ),
-                      ];
-              },
-            )
-          ]),
-
+          backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+          appBar: AppBar(
+              centerTitle: true,
+              toolbarHeight: 100,
+              leading: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+              title: Text(
+                'Produits',
+                style: const TextStyle(
+                    color: d_colorGreen, fontWeight: FontWeight.bold),
+              ),
+              actions: email == null
+                  ? null
+                  : [
+                      PopupMenuButton<String>(
+                        padding: EdgeInsets.zero,
+                        itemBuilder: (context) {
+                          print("Type: $type");
+                          return acteur.idActeur! ==
+                                  stock.map(
+                                      (element) => element.acteur!.idActeur!)
+                              ? <PopupMenuEntry<String>>[
+                                  PopupMenuItem<String>(
+                                    child: ListTile(
+                                      leading: const Icon(
+                                        Icons.remove_red_eye,
+                                        color: Colors.green,
+                                      ),
+                                      title: const Text(
+                                        "Mes Produits",
+                                        style: TextStyle(
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      onTap: () async {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ProduitActeurScreen()));
+                                      },
+                                    ),
+                                  ),
+                                ]
+                              : <PopupMenuEntry<String>>[
+                                  PopupMenuItem<String>(
+                                    child: ListTile(
+                                      leading: const Icon(
+                                        Icons.add,
+                                        color: Colors.green,
+                                      ),
+                                      title: const Text(
+                                        "Ajouter produit",
+                                        style: TextStyle(
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      onTap: () async {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    AddAndUpdateProductScreen(
+                                                      isEditable: isEditable,
+                                                    )));
+                                      },
+                                    ),
+                                  ),
+                                ];
+                        },
+                      )
+                    ]),
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
                 const SizedBox(height: 10),
                 Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.search,
-                      color: Colors.blueGrey[400]), // Couleur de l'icône
-                  SizedBox(
-                      width:
-                          10), // Espacement entre l'icône et le champ de recherche
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Rechercher',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(
-                            color: Colors
-                                .blueGrey[400]), // Couleur du texte d'aide
-                      ),
+                  padding: const EdgeInsets.all(10.0),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.search,
+                            color: Colors.blueGrey[400]), // Couleur de l'icône
+                        SizedBox(
+                            width:
+                                10), // Espacement entre l'icône et le champ de recherche
+                        Expanded(
+                          child: TextField(
+                            controller: _searchController,
+                            onChanged: (value) {
+                              setState(() {});
+                            },
+                            decoration: InputDecoration(
+                              hintText: 'Rechercher',
+                              border: InputBorder.none,
+                              hintStyle: TextStyle(
+                                  color: Colors.blueGrey[
+                                      400]), // Couleur du texte d'aide
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
+                ),
                 const SizedBox(height: 10),
                 // Flexible(
                 //   child: GestureDetector(
@@ -279,35 +300,36 @@ class _ProduitScreenState extends State<ProduitScreen>
   Widget buildGridView(String idCategorie, String? idMagasin) {
     List<Stock> filteredStocks = stock;
     String searchText = "";
-  
- 
+
     if (filteredStocks.isEmpty) {
-       return
-    SingleChildScrollView(
-          child: Padding(
-                            padding: EdgeInsets.all(2),
-                            child: Center(
-                              child: Column(
-                                children: [
-                                  Image.asset('assets/images/notif.jpg'),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                
-    Padding(
-     padding: const EdgeInsets.all(8.0),
-     child: Center(
-          child: Text( textAlign:TextAlign.justify,
-            'Aucun produit trouvé dans le magasin ' + widget.nom!.toUpperCase() + " dans la categorie " +  selectedCategorieProduitNom.toUpperCase(),
-            style: TextStyle(fontSize: 16),
+      return SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(2),
+          child: Center(
+            child: Column(
+              children: [
+                Image.asset('assets/images/notif.jpg'),
+                SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Text(
+                      textAlign: TextAlign.justify,
+                      'Aucun produit trouvé dans le magasin ' +
+                          widget.nom!.toUpperCase() +
+                          " dans la categorie " +
+                          selectedCategorieProduitNom.toUpperCase(),
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
-   )
-                                ],
-                              ),
-                            ),
-                          ),
-        );
+      );
     } else {
       List<Stock> filteredStocksSearch = filteredStocks.where((stock) {
         String nomProduit = stock.nomProduit!.toLowerCase();
@@ -316,149 +338,149 @@ class _ProduitScreenState extends State<ProduitScreen>
       }).toList();
 
       if (filteredStocksSearch.isEmpty) {
-        return 
-        
-      
-    SingleChildScrollView(
+        return SingleChildScrollView(
           child: Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Center(
-                              child: Column(
-                                children: [
-                                  Image.asset('assets/images/notif.jpg'),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                
-   
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: Text(
-              textAlign: TextAlign.justify,
-              'Aucun produit trouvé avec le nom ' +
-                  searchText.toUpperCase() +
-                  " dans la categorie " +
-                  selectedCategorieProduitNom.toUpperCase(),
-              style: TextStyle(fontSize: 16),
+            padding: EdgeInsets.all(10),
+            child: Center(
+              child: Column(
+                children: [
+                  Image.asset('assets/images/notif.jpg'),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(
+                      child: Text(
+                        textAlign: TextAlign.justify,
+                        'Aucun produit trouvé avec le nom ' +
+                            searchText.toUpperCase() +
+                            " dans la categorie " +
+                            selectedCategorieProduitNom.toUpperCase(),
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
-        )
-                                ],
-                              ),
-                            ),
-                          ),
         );
       }
 
-     
- return Container(
-  color: Colors.white,
-   child: GridView.builder(
-    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2,
-      mainAxisSpacing: 10,
-      crossAxisSpacing: 10,
-    ),
-    itemCount: filteredStocks.length,
-    itemBuilder: (context, index) {
       return Container(
-        decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-
-        color: const Color.fromARGB(255, 247, 235, 218),
-          boxShadow: [
-            BoxShadow(
-              color: const Color.fromARGB(255, 240, 238, 238).withOpacity(0.2),
-              offset: const Offset(0, 2),
-              blurRadius: 5,
-              spreadRadius: 2,
-            ),
-          ],
-        ),
-        margin: EdgeInsets.all(5),
-        child: GestureDetector(
-          onTap: () {
-            // Action à effectuer lorsqu'un produit est cliqué
-          },
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: double.infinity,
-                height: 120, // Taille de la photo
-                child: Image.network(
-                  filteredStocks[index].photo ?? 'assets/images/produit.png',
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Image.asset(
-                      'assets/images/produit.png',
-                      fit: BoxFit.cover,
-                    );
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      filteredStocks[index].nomProduit ?? 'Pas de nom défini',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.grey[200],
-                      ),
-                      child: Text(
-                        filteredStocks[index].quantiteStock.toString(),
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 3,),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '${filteredStocks[index].prix!.toInt()} €', // Convertir en entier
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                    ),
-                    RatingBar.builder(
-                      initialRating: 3, // Rating initial du produit
-                      minRating: 0,
-                      maxRating: 5,
-                      direction: Axis.horizontal,
-                      allowHalfRating: false,
-                      itemCount: 5,
-                      itemSize: 20, // Taille du rating augmentée
-                      itemBuilder: (context, _) => Icon(
-                        Icons.star,
-                        color: Colors.amber,
-                      ),
-                      onRatingUpdate: (rating) {
-                        // Fonction appelée lorsque l'utilisateur met à jour le rating
-                        // Vous pouvez implémenter ici la logique pour mettre à jour le rating dans la base de données
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ],
+        color: Colors.white,
+        child: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
           ),
+          itemCount: filteredStocks.length,
+          itemBuilder: (context, index) {
+            return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+                color: const Color.fromARGB(255, 247, 235, 218),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color.fromARGB(255, 240, 238, 238)
+                        .withOpacity(0.2),
+                    offset: const Offset(0, 2),
+                    blurRadius: 5,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              margin: EdgeInsets.all(5),
+              child: GestureDetector(
+                onTap: () {
+                  // Action à effectuer lorsqu'un produit est cliqué
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: 120, // Taille de la photo
+                      child: Image.network(
+                        filteredStocks[index].photo ??
+                            'assets/images/produit.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/images/produit.png',
+                            fit: BoxFit.cover,
+                          );
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            filteredStocks[index].nomProduit ??
+                                'Pas de nom défini',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.grey[200],
+                            ),
+                            child: Text(
+                              filteredStocks[index].quantiteStock.toString(),
+                              style: TextStyle(fontSize: 14),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 3,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${filteredStocks[index].prix!.toInt()} €', // Convertir en entier
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
+                          RatingBar.builder(
+                            initialRating: 3, // Rating initial du produit
+                            minRating: 0,
+                            maxRating: 5,
+                            direction: Axis.horizontal,
+                            allowHalfRating: false,
+                            itemCount: 5,
+                            itemSize: 20, // Taille du rating augmentée
+                            itemBuilder: (context, _) => Icon(
+                              Icons.star,
+                              color: Colors.amber,
+                            ),
+                            onRatingUpdate: (rating) {
+                              // Fonction appelée lorsque l'utilisateur met à jour le rating
+                              // Vous pouvez implémenter ici la logique pour mettre à jour le rating dans la base de données
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       );
-    },
-   ),
- );
-
     }
   }
 

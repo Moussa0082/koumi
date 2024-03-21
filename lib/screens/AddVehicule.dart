@@ -9,6 +9,9 @@ import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/NextAddVehicule.dart';
+import 'package:koumi_app/screens/Transport.dart';
+import 'package:koumi_app/screens/VehiculesActeur.dart';
+import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:provider/provider.dart';
 
@@ -41,6 +44,7 @@ class _AddVehiculeState extends State<AddVehicule> {
   bool _isLoading = false;
   final formkey = GlobalKey<FormState>();
 
+
   void _handleButtonPress() async {
     // Afficher l'indicateur de chargement
     setState(() {
@@ -70,7 +74,13 @@ class _AddVehiculeState extends State<AddVehicule> {
           toolbarHeight: 100,
           leading: IconButton(
               onPressed: () {
+                Provider.of<VehiculeService>(context, listen: false)
+                    .applyChange();
                 Navigator.of(context).pop();
+                
+
+                // Navigator.pushReplacement(context,
+                //     MaterialPageRoute(builder: (context) => Transport()));
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
@@ -509,7 +519,11 @@ class _AddVehiculeState extends State<AddVehicule> {
                                     _descriptionController.clear(),
                                     _localiteController.clear(),
                                     _nbKilometrageController.clear(),
-                                    _capaciteController.clear()
+                                    _capaciteController.clear(),
+                                    setState(() {
+                                      typeValue = null;
+                                      n3Value = null;
+                                    })
                                   });
                             }
                           },

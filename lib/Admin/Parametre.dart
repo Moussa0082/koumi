@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:koumi_app/Admin/ContinentPage.dart';
 import 'package:koumi_app/Admin/Niveau1Page.dart';
 import 'package:koumi_app/Admin/Niveau2Page.dart';
 import 'package:koumi_app/Admin/Niveau3Page.dart';
 import 'package:koumi_app/Admin/PaysPage.dart';
-import 'package:koumi_app/Admin/ProfilA.dart';
 import 'package:koumi_app/Admin/SousRegionPage.dart';
+import 'package:koumi_app/Admin/TypeMaterielPage.dart';
 import 'package:koumi_app/Admin/UnitePage.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
@@ -246,6 +245,21 @@ class _ParametreState extends State<Parametre> {
                         "car.png",
                         'Type de véhicule',
                         const TypeVehicule(),
+                        const Icon(
+                          Icons.chevron_right_sharp,
+                          size: 30,
+                        )),
+                    const Divider(
+                      color: Colors.grey,
+                      height: 4,
+                      thickness: 1,
+                      indent: 50,
+                      endIndent: 0,
+                    ),
+                    getList(
+                        "car.png",
+                        'Type de matériel',
+                        const TypeMaterielPage(),
                         const Icon(
                           Icons.chevron_right_sharp,
                           size: 30,

@@ -1,13 +1,13 @@
 import 'dart:convert';
 
-import 'package:meta/meta.dart';
-
+import 'package:flutter/foundation.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/TypeMateriel.dart';
 
 class Materiel {
   final String? idMateriel;
   final String codeMateriel;
-  final String prix;
+  Map<String, int> prixParDestination;
   final String nom;
   final String description;
   final String? photoMateriel;
@@ -19,11 +19,12 @@ class Materiel {
   final String? dateModif;
   final Acteur acteur;
   final String etatMateriel;
-  
+  TypeMateriel typeMateriel;
+
   Materiel({
     this.idMateriel,
     required this.codeMateriel,
-    required this.prix,
+    required this.prixParDestination,
     required this.nom,
     required this.description,
     this.photoMateriel,
@@ -35,13 +36,15 @@ class Materiel {
     this.dateModif,
     required this.acteur,
     required this.etatMateriel,
+    required this.typeMateriel,
   });
-
+  
+ 
 
   Materiel copyWith({
     String? idMateriel,
     String? codeMateriel,
-    String? prix,
+    Map<String, int>? prixParDestination,
     String? nom,
     String? description,
     String? photoMateriel,
@@ -53,11 +56,12 @@ class Materiel {
     String? dateModif,
     Acteur? acteur,
     String? etatMateriel,
+    TypeMateriel? typeMateriel,
   }) {
     return Materiel(
       idMateriel: idMateriel ?? this.idMateriel,
       codeMateriel: codeMateriel ?? this.codeMateriel,
-      prix: prix ?? this.prix,
+      prixParDestination: prixParDestination ?? this.prixParDestination,
       nom: nom ?? this.nom,
       description: description ?? this.description,
       photoMateriel: photoMateriel ?? this.photoMateriel,
@@ -69,6 +73,7 @@ class Materiel {
       dateModif: dateModif ?? this.dateModif,
       acteur: acteur ?? this.acteur,
       etatMateriel: etatMateriel ?? this.etatMateriel,
+      typeMateriel: typeMateriel ?? this.typeMateriel,
     );
   }
 
@@ -76,7 +81,7 @@ class Materiel {
     return <String, dynamic>{
       'idMateriel': idMateriel,
       'codeMateriel': codeMateriel,
-      'prix': prix,
+      'prixParDestination': prixParDestination,
       'nom': nom,
       'description': description,
       'photoMateriel': photoMateriel,
@@ -88,6 +93,7 @@ class Materiel {
       'dateModif': dateModif,
       'acteur': acteur.toMap(),
       'etatMateriel': etatMateriel,
+      'typeMateriel': typeMateriel.toMap(),
     };
   }
 
@@ -95,7 +101,7 @@ class Materiel {
     return Materiel(
       idMateriel: map['idMateriel'] != null ? map['idMateriel'] as String : null,
       codeMateriel: map['codeMateriel'] as String,
-      prix: map['prix'] as String,
+      prixParDestination: Map<String, int>.from(map['prixParDestination'] as Map<String, int>),
       nom: map['nom'] as String,
       description: map['description'] as String,
       photoMateriel: map['photoMateriel'] != null ? map['photoMateriel'] as String : null,
@@ -107,6 +113,7 @@ class Materiel {
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
       acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
       etatMateriel: map['etatMateriel'] as String,
+      typeMateriel: TypeMateriel.fromMap(map['typeMateriel'] as Map<String,dynamic>),
     );
   }
 
@@ -116,7 +123,7 @@ class Materiel {
 
   @override
   String toString() {
-    return 'Materiel(idMateriel: $idMateriel, codeMateriel: $codeMateriel, prix: $prix, nom: $nom, description: $description, photoMateriel: $photoMateriel, localisation: $localisation, personneModif: $personneModif, statut: $statut, statutCommande: $statutCommande, dateAjout: $dateAjout, dateModif: $dateModif, acteur: $acteur, etatMateriel: $etatMateriel)';
+    return 'Materiel(idMateriel: $idMateriel, codeMateriel: $codeMateriel, prixParDestination: $prixParDestination, nom: $nom, description: $description, photoMateriel: $photoMateriel, localisation: $localisation, personneModif: $personneModif, statut: $statut, statutCommande: $statutCommande, dateAjout: $dateAjout, dateModif: $dateModif, acteur: $acteur, etatMateriel: $etatMateriel, typeMateriel: $typeMateriel)';
   }
 
   @override
@@ -126,7 +133,7 @@ class Materiel {
     return 
       other.idMateriel == idMateriel &&
       other.codeMateriel == codeMateriel &&
-      other.prix == prix &&
+      mapEquals(other.prixParDestination, prixParDestination) &&
       other.nom == nom &&
       other.description == description &&
       other.photoMateriel == photoMateriel &&
@@ -137,14 +144,15 @@ class Materiel {
       other.dateAjout == dateAjout &&
       other.dateModif == dateModif &&
       other.acteur == acteur &&
-      other.etatMateriel == etatMateriel;
+      other.etatMateriel == etatMateriel &&
+      other.typeMateriel == typeMateriel;
   }
 
   @override
   int get hashCode {
     return idMateriel.hashCode ^
       codeMateriel.hashCode ^
-      prix.hashCode ^
+      prixParDestination.hashCode ^
       nom.hashCode ^
       description.hashCode ^
       photoMateriel.hashCode ^
@@ -155,6 +163,7 @@ class Materiel {
       dateAjout.hashCode ^
       dateModif.hashCode ^
       acteur.hashCode ^
-      etatMateriel.hashCode;
+      etatMateriel.hashCode ^
+      typeMateriel.hashCode;
   }
 }

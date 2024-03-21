@@ -58,7 +58,8 @@ class Acteur {
 
 
 
-
+// Constructeur vide
+  // Acteur();
 
  // Méthode pour créer une instance d'Acteur à partir des données de SharedPreferences
   factory Acteur.fromSharedPreferencesData(String emailActeur, String password, 

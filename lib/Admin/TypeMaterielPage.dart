@@ -1,39 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:koumi_app/Admin/UpdateTypeVehicule.dart';
-import 'package:koumi_app/models/Acteur.dart';
-import 'package:koumi_app/models/TypeVoiture.dart';
-import 'package:koumi_app/models/Vehicule.dart';
-import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/ListeVehiculeByType.dart';
-import 'package:koumi_app/service/TypeVoitureService.dart';
-import 'package:koumi_app/service/VehiculeService.dart';
+import 'package:koumi_app/models/Materiel.dart';
+import 'package:koumi_app/models/TypeMateriel.dart';
+import 'package:koumi_app/service/MaterielService.dart';
+import 'package:koumi_app/service/TypeMaterielService.dart';
 import 'package:provider/provider.dart';
 
-class TypeVehicule extends StatefulWidget {
-  const TypeVehicule({super.key});
+class TypeMaterielPage extends StatefulWidget {
+  const TypeMaterielPage({super.key});
 
   @override
-  State<TypeVehicule> createState() => _TypeVehiculeState();
+  State<TypeMaterielPage> createState() => _TypeMaterielPageState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _TypeVehiculeState extends State<TypeVehicule> {
-  late Acteur acteur;
+class _TypeMaterielPageState extends State<TypeMaterielPage> {
   late TextEditingController _searchController;
-  List<TypeVoiture> typeListe = [];
-
-  late List<Vehicule> vehiculeList = [];
+  List<TypeMateriel> typeListe = [];
+  late List<Materiel> materielList = [];
   final formkey = GlobalKey<FormState>();
   TextEditingController nomController = TextEditingController();
-  TextEditingController nombreSiegesController = TextEditingController();
   TextEditingController descController = TextEditingController();
 
   @override
   void initState() {
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _searchController = TextEditingController();
     super.initState();
   }
@@ -58,7 +49,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
-            'Type de véhicule',
+            'Materiel',
             style: const TextStyle(
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
@@ -74,7 +65,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                         color: Colors.green,
                       ),
                       title: const Text(
-                        "Ajouter un type de véhicule",
+                        "Type matériel ",
                         style: TextStyle(
                           color: Colors.green,
                           fontSize: 18,
@@ -86,7 +77,6 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                       },
                     ),
                   ),
-                 
                 ];
               },
             )
@@ -130,10 +120,10 @@ class _TypeVehiculeState extends State<TypeVehicule> {
               ),
             ),
             const SizedBox(height: 10),
-            Consumer<TypeVoitureService>(
+            Consumer<TypeMaterielService>(
                 builder: (context, typeService, child) {
               return FutureBuilder(
-                  future: typeService.fetchTypeVoiture(),
+                  future: typeService.fetchTypeMateriel(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
@@ -142,6 +132,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                         ),
                       );
                     }
+
                     if (!snapshot.hasData) {
                       return const Padding(
                         padding: EdgeInsets.all(10),
@@ -150,7 +141,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                     } else {
                       typeListe = snapshot.data!;
                       String searchText = "";
-                      List<TypeVoiture> filtereSearch =
+                      List<TypeMateriel> filtereSearch =
                           typeListe.where((search) {
                         String libelle = search.nom!.toLowerCase();
                         searchText = _searchController.text.toLowerCase();
@@ -161,34 +152,23 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                               .map((e) => Padding(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 15),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ListeVehiculeByType(
-                                                        typeVoitures: e)));
-                                      },
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.9,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color:
-                                                  Colors.grey.withOpacity(0.2),
-                                              offset: const Offset(0, 2),
-                                              blurRadius: 5,
-                                              spreadRadius: 2,
-                                            ),
-                                          ],
-                                        ),
-                                        child: Column(children: [
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.9,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(15),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.2),
+                                            offset: const Offset(0, 2),
+                                            blurRadius: 5,
+                                            spreadRadius: 2,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        children: [
                                           ListTile(
                                               leading: Image.asset(
                                                 "assets/images/trans.png",
@@ -202,33 +182,19 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                   )),
-                                              subtitle: e.nombreSieges != 0
-                                                  ? Text(
-                                                      "Nombre de sièges : ${e.nombreSieges.toString().trim()}",
-                                                      style: const TextStyle(
-                                                        color: Colors.black87,
-                                                        fontSize: 17,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontStyle:
-                                                            FontStyle.italic,
-                                                      ))
-                                                  : Text(
-                                                      "Nombre de sièges : Non renseigné",
-                                                      style: const TextStyle(
-                                                        color: Colors.black87,
-                                                        fontSize: 17,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontStyle:
-                                                            FontStyle.italic,
-                                                      ))),
-                                          Consumer<VehiculeService>(builder:
+                                              subtitle: Text(e.description!,
+                                                  style: const TextStyle(
+                                                    color: Colors.black87,
+                                                    fontSize: 17,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontStyle: FontStyle.italic,
+                                                  ))),
+                                          Consumer<MaterielService>(builder:
                                               (context, typeService, child) {
                                             return FutureBuilder(
                                                 future: typeService
-                                                    .fetchVehiculeByTypeVehicule(
-                                                        e.idTypeVoiture!),
+                                                    .fetchMaterielByType(
+                                                        e.idTypeMateriel!),
                                                 builder: (context, snapshot) {
                                                   if (snapshot
                                                           .connectionState ==
@@ -252,7 +218,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                                 .spaceBetween,
                                                         children: [
                                                           Text(
-                                                              "Nombres de véhicule",
+                                                              "Nombres de matériel",
                                                               style: TextStyle(
                                                                 color: Colors
                                                                     .black87,
@@ -277,7 +243,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                       ),
                                                     );
                                                   } else {
-                                                    vehiculeList =
+                                                    materielList =
                                                         snapshot.data!;
                                                     return Padding(
                                                       padding:
@@ -289,7 +255,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                                 .spaceBetween,
                                                         children: [
                                                           Text(
-                                                              "Nombres de véhicule",
+                                                              "Nombres de matériel",
                                                               style: TextStyle(
                                                                 color: Colors
                                                                     .black87,
@@ -302,7 +268,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                                         .italic,
                                                               )),
                                                           Text(
-                                                              vehiculeList
+                                                              materielList
                                                                   .length
                                                                   .toString(),
                                                               style: TextStyle(
@@ -348,11 +314,11 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                           ),
                                                         ),
                                                         onTap: () async {
-                                                          await TypeVoitureService()
+                                                          await TypeMaterielService()
                                                               .activerType(e
-                                                                  .idTypeVoiture!)
+                                                                  .idTypeMateriel!)
                                                               .then((value) => {
-                                                                    Provider.of<TypeVoitureService>(
+                                                                    Provider.of<TypeMaterielService>(
                                                                             context,
                                                                             listen:
                                                                                 false)
@@ -383,7 +349,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                                             content:
                                                                                 Row(
                                                                               children: [
-                                                                                Text("Une erreur s'est produit : $onError"),
+                                                                                Text("Une erreur s'est produit"),
                                                                               ],
                                                                             ),
                                                                             duration:
@@ -414,11 +380,11 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                           ),
                                                         ),
                                                         onTap: () async {
-                                                          await TypeVoitureService()
+                                                          await TypeMaterielService()
                                                               .desactiverType(e
-                                                                  .idTypeVoiture!)
+                                                                  .idTypeMateriel!)
                                                               .then((value) => {
-                                                                    Provider.of<TypeVoitureService>(
+                                                                    Provider.of<TypeMaterielService>(
                                                                             context,
                                                                             listen:
                                                                                 false)
@@ -435,7 +401,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                                             content:
                                                                                 Row(
                                                                               children: [
-                                                                                Text("Une erreur s'est produit : $onError"),
+                                                                                Text("Une erreur s'est produit"),
                                                                               ],
                                                                             ),
                                                                             duration:
@@ -485,17 +451,19 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                               builder: (BuildContext
                                                                       context) =>
                                                                   AlertDialog(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      shape:
-                                                                          RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(16),
-                                                                      ),
-                                                                      content: UpdateTypeVehicule(
-                                                                          typeVoiture:
-                                                                              e)));
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .white,
+                                                                    shape:
+                                                                        RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              16),
+                                                                    ),
+                                                                    // content: UpdateTypeVehicule(
+                                                                    //     typeVoiture:
+                                                                    //         e)
+                                                                  ));
                                                           Navigator.of(context)
                                                               .pop();
                                                         },
@@ -516,11 +484,11 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                           ),
                                                         ),
                                                         onTap: () async {
-                                                          await TypeVoitureService()
+                                                          await TypeMaterielService()
                                                               .deleteType(e
-                                                                  .idTypeVoiture!)
+                                                                  .idTypeMateriel!)
                                                               .then((value) => {
-                                                                    Provider.of<TypeVoitureService>(
+                                                                    Provider.of<TypeMaterielService>(
                                                                             context,
                                                                             listen:
                                                                                 false)
@@ -539,7 +507,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                                             content:
                                                                                 Row(
                                                                               children: [
-                                                                                Text("Ce type de vehicule est déjà associer à un véhicule"),
+                                                                                Text("Ce type de materiel est déjà associer à un materiel"),
                                                                               ],
                                                                             ),
                                                                             duration:
@@ -555,7 +523,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                               ],
                                             ),
                                           )
-                                        ]),
+                                        ],
                                       ),
                                     ),
                                   ))
@@ -596,7 +564,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
               children: [
                 ListTile(
                   title: Text(
-                    "Ajouter un type de véhicule ",
+                    "Ajouter un type matériel ",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -632,29 +600,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                         },
                         controller: nomController,
                         decoration: InputDecoration(
-                          hintText: "Nom type vehicule",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: nombreSiegesController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                        decoration: InputDecoration(
-                          hintText: "nombre siège facultatif",
+                          hintText: "Nom type matériel",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -683,62 +629,52 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                       ElevatedButton.icon(
                         onPressed: () async {
                           final String nom = nomController.text;
-                          final String siege = nombreSiegesController.text;
                           final String description = descController.text;
-                          // if (formkey.currentState != null &&
-                          //     formkey.currentState!.validate()) {
-                          // Votre code ici
 
-                          print(nom);
-                          print(siege);
-                          print(description);
-                          try {
-                            await TypeVoitureService()
-                                .addTypeVoiture(
-                                    nom: nom,
-                                    nombreSieges: siege,
-                                    description: description,
-                                    acteur: acteur)
-                                .then((value) => {
-                                      Provider.of<TypeVoitureService>(context,
-                                              listen: false)
-                                          .applyChange(),
-                                      nomController.clear(),
-                                      descController.clear(),
-                                      nombreSiegesController.clear(),
-                                      Navigator.of(context).pop()
-                                    })
-                                .catchError((onError) => {
-                                      print(onError.toString()),
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Row(
-                                            children: [
-                                              Text(
-                                                  "Ce type de véhicule existe déjà"),
-                                            ],
+                          if (formkey.currentState!.validate()) {
+                            try {
+                              await TypeMaterielService()
+                                  .addTypeMateriel(
+                                      nom: nom, description: description)
+                                  .then((value) => {
+                                        Provider.of<TypeMaterielService>(
+                                                context,
+                                                listen: false)
+                                            .applyChange(),
+                                        nomController.clear(),
+                                        descController.clear(),
+                                        Navigator.of(context).pop()
+                                      })
+                                  .catchError((onError) => {
+                                        print(onError.toString()),
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Row(
+                                              children: [
+                                                Text(
+                                                    "Ce type de matériel existe déjà"),
+                                              ],
+                                            ),
+                                            duration: Duration(seconds: 5),
                                           ),
-                                          duration: Duration(seconds: 5),
-                                        ),
-                                      )
-                                    });
-                          } catch (e) {
-                            final String errorMessage = e.toString();
-                            print(errorMessage);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Row(
-                                  children: [
-                                    Text(
-                                        "Une erreur s'est produit : $errorMessage"),
-                                  ],
+                                        )
+                                      });
+                            } catch (e) {
+                              final String errorMessage = e.toString();
+                              print(errorMessage);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Text("Une erreur s'est produit"),
+                                    ],
+                                  ),
+                                  duration: const Duration(seconds: 5),
                                 ),
-                                duration: const Duration(seconds: 5),
-                              ),
-                            );
+                              );
+                            }
                           }
-                          // }
                           // }
                         },
                         style: ElevatedButton.styleFrom(

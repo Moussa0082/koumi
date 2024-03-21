@@ -13,8 +13,8 @@ class MaterielService extends ChangeNotifier {
 
   List<Materiel> materielList = [];
 
-  Future<void> creerMateriel({
-    required String prix,
+  Future<void> addMateriel({
+    required Map<String, int> prixParDestination,
     required String nom,
     required String description,
     File? photoMateriel,
@@ -33,7 +33,7 @@ class MaterielService extends ChangeNotifier {
       }
 
       requete.fields['materiel'] = jsonEncode({
-        'prix': int.tryParse(prix),
+       'prixParDestination': prixParDestination,
         'nom': nom,
         'description': description,
         'photoMateriel': "",
@@ -60,7 +60,7 @@ class MaterielService extends ChangeNotifier {
  
   Future<void> updateMateriel({
     required String idMateriel,
-    required String prix,
+    required Map<String, int> prixParDestination,
     required String nom,
     required String description,
     File? photoMateriel,
@@ -80,7 +80,7 @@ class MaterielService extends ChangeNotifier {
 
       requete.fields['materiel'] = jsonEncode({
         'idMateriel': idMateriel,
-        'prix': int.tryParse(prix),
+       'prixParDestination': prixParDestination,
         'nom': nom,
         'description': description,
         'photoMateriel': "",
@@ -136,6 +136,22 @@ class MaterielService extends ChangeNotifier {
     }
   }
 
+  Future<List<Materiel>> fetchMaterielByType(String id) async {
+    final response =
+        await http.get(Uri.parse('$baseUrl/readByTypeMateriel/$id'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      materielList = body.map((item) => Materiel.fromMap(item)).toList();
+      debugPrint(response.body);
+      return materielList;
+    } else {
+      materielList = [];
+      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+    }
+  }
+
   Future<void> deleteMateriel(String idMateriel) async {
     final response =
         await http.delete(Uri.parse("$baseUrl/delete/$idMateriel"));
@@ -149,7 +165,7 @@ class MaterielService extends ChangeNotifier {
   }
 
   Future<void> activerMateriel(String idMateriel) async {
-    final response = await http.post(Uri.parse("$baseUrl/activer/$idMateriel"));
+    final response = await http.put(Uri.parse("$baseUrl/activer/$idMateriel"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -161,7 +177,7 @@ class MaterielService extends ChangeNotifier {
 
   Future<void> desactiverMateriel(String idMateriel) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/desactiver/$idMateriel"));
+        await http.put(Uri.parse("$baseUrl/desactiver/$idMateriel"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
 

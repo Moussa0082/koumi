@@ -45,7 +45,7 @@ class _SplashScreenState extends State<SplashScreen> {
       Timer(
         const Duration(seconds: 5),
         () => Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          MaterialPageRoute(builder: (_) => const BottomNavigationPage()),
         ),
       );
       // Si l'email de l'acteur n'est pas présent, redirige directement vers l'écran de connexion
@@ -67,7 +67,7 @@ if (Provider.of<ActeurProvider>(context, listen: false).acteur != null) {
       Timer(
         const Duration(seconds: 5),
         () => Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          MaterialPageRoute(builder: (_) => const BottomNavigationPage()),
         ),
       );
     }
