@@ -257,7 +257,7 @@ class _ParametreState extends State<Parametre> {
                       endIndent: 0,
                     ),
                     getList(
-                        "car.png",
+                        "typeMateriel.png",
                         'Type de matériel',
                         const TypeMaterielPage(),
                         const Icon(

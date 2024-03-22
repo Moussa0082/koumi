@@ -4,70 +4,138 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
-import 'package:koumi_app/models/TypeVoiture.dart';
-import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/ListeVehiculeByType.dart';
-import 'package:koumi_app/screens/NextAddVehicule.dart';
-import 'package:koumi_app/service/VehiculeService.dart';
+import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
-import 'package:provider/provider.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 
-class AddVehiculeTransport extends StatefulWidget {
-  final TypeVoiture? typeVoitures;
-
-  const AddVehiculeTransport({
-    Key? key,
-    this.typeVoitures, // Paramètre avec une valeur par défaut
-  }) : super(key: key);
+class AddMaterielByType extends StatefulWidget {
+  final TypeMateriel typeMateriel;
+  const AddMaterielByType({super.key, required this.typeMateriel});
 
   @override
-  State<AddVehiculeTransport> createState() => _AddVehiculeTransportState();
+  State<AddMaterielByType> createState() => _AddMaterielByTypeState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
+class _AddMaterielByTypeState extends State<AddMaterielByType> {
+  late TypeMateriel type;
   TextEditingController _nomController = TextEditingController();
   TextEditingController _localiteController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
-  TextEditingController _nbKilometrageController = TextEditingController();
-  TextEditingController _capaciteController = TextEditingController();
-
-  String? typeValue;
-  String? n3Value;
-  late Future _typeList;
-  late Future _niveau3List;
-  String niveau3 = '';
-  late TypeVoiture typeVoiture;
-  late TypeVoiture type;
+  TextEditingController _etatController = TextEditingController();
+  late Map<String, int> prixParDestinations;
+  List<Widget> heurePrixFields = [];
+  List<TextEditingController> heureControllers = [];
+  List<TextEditingController> prixControllers = [];
+  final formkey = GlobalKey<FormState>();
+  String? imageSrc;
   File? photo;
   late Acteur acteur;
   bool _isLoading = false;
-  final formkey = GlobalKey<FormState>();
+  late Future _niveau3List;
+  String? n3Value;
+  String niveau3 = '';
 
-  void _handleButtonPress() async {
-    // Afficher l'indicateur de chargement
+  void addDestinationAndPrix() {
+    // Créer un nouveau contrôleur pour chaque champ
+    TextEditingController newDestinationController = TextEditingController();
+    TextEditingController newPrixController = TextEditingController();
+
     setState(() {
-      _isLoading = true;
+      // Ajouter les nouveaux contrôleurs aux listes
+      heureControllers.add(newDestinationController);
+      prixControllers.add(newPrixController);
     });
   }
 
   @override
   void initState() {
-    super.initState();
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    type = widget.typeVoitures!;
-    // _typeList =
-    //     http.get(Uri.parse('https://koumi.ml/api-koumi/TypeVoiture/read'));
-    // _niveau3List =
-    //     http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
-    _typeList =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
+    type = widget.typeMateriel;
     _niveau3List =
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+    super.initState();
+  }
+
+
+  Future<File> saveImagePermanently(String imagePath) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final name = path.basename(imagePath);
+    final image = File('${directory.path}/$name');
+    return image;
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final image = await getImage(source);
+    if (image != null) {
+      setState(() {
+        photo = image;
+        imageSrc = image.path;
+      });
+    }
+  }
+
+  Future<File?> getImage(ImageSource source) async {
+    final image = await ImagePicker().pickImage(source: source);
+    if (image == null) return null;
+
+    return File(image.path);
+  }
+
+  Future<void> _showImageSourceDialog() async {
+    final BuildContext context = this.context;
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: 150,
+          child: AlertDialog(
+            title: const Text('Choisir une source'),
+            content: Wrap(
+              alignment: WrapAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context); // Fermer le dialogue
+                    _pickImage(ImageSource.camera);
+                  },
+                  child: const Column(
+                    children: [
+                      Icon(Icons.camera_alt, size: 40),
+                      Text('Camera'),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 40),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context); // Fermer le dialogue
+                    _pickImage(ImageSource.gallery);
+                  },
+                  child: const Column(
+                    children: [
+                      Icon(Icons.image, size: 40),
+                      Text('Galerie photo'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+  void _handleButtonPress() async {
+    // Afficher l'indicateur de chargement
+    setState(() {
+      _isLoading = true;
+    });
   }
 
   @override
@@ -79,16 +147,13 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
         appBar: AppBar(
           centerTitle: true,
           toolbarHeight: 100,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Provider.of<VehiculeService>(context, listen: false)
-                    .applyChange();
-                
-              },
-              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+          // leading: IconButton(
+          //     onPressed: () {
+          //       Navigator.of(context).pop();
+          //     },
+          //     icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
-            'Ajout de véhicule',
+            "Ajout matériel",
             style: const TextStyle(
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
@@ -107,7 +172,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Text(
-                            "Nom du véhicule",
+                            "Nom du matériel",
                             style:
                                 TextStyle(color: (Colors.black), fontSize: 18),
                           ),
@@ -172,48 +237,6 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 22,
-                        ),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            "Nombre de kilométrage",
-                            style:
-                                TextStyle(color: (Colors.black), fontSize: 18),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        child: TextFormField(
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Veuillez remplir les champs";
-                            }
-                            return null;
-                          },
-                          controller: _nbKilometrageController,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          decoration: InputDecoration(
-                            hintText: "Nombre de kilometrage",
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ),
-
                       SizedBox(
                         height: 10,
                       ),
@@ -340,28 +363,6 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                           },
                         ),
                       ),
-                      // Padding(
-                      //   padding: const EdgeInsets.symmetric(
-                      //       vertical: 10, horizontal: 20),
-                      //   child: TextFormField(
-                      //     validator: (value) {
-                      //       if (value == null || value.isEmpty) {
-                      //         return "Veuillez remplir les champs";
-                      //       }
-                      //       return null;
-                      //     },
-                      //     controller: _localiteController,
-                      //     maxLines: null,
-                      //     decoration: InputDecoration(
-                      //       hintText: "Ex : Bamako, segou",
-                      //       contentPadding: const EdgeInsets.symmetric(
-                      //           vertical: 10, horizontal: 20),
-                      //       border: OutlineInputBorder(
-                      //         borderRadius: BorderRadius.circular(8),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
                       SizedBox(
                         height: 10,
                       ),
@@ -372,7 +373,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Text(
-                            "Capacité de la véhicule",
+                            "Etat matériel",
                             style:
                                 TextStyle(color: (Colors.black), fontSize: 18),
                           ),
@@ -388,9 +389,10 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                             }
                             return null;
                           },
-                          controller: _capaciteController,
+                          controller: _etatController,
+                          maxLines: null,
                           decoration: InputDecoration(
-                            hintText: "capacité",
+                            hintText: "Etat du matériel",
                             contentPadding: const EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 20),
                             border: OutlineInputBorder(
@@ -399,44 +401,100 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                           ),
                         ),
                       ),
-                      ElevatedButton(
-                          onPressed: () {
-                            if (formkey.currentState!.validate()) {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => NextAddVehicule(
-                                          typeVoiture: type,
-                                          nomV: _nomController.text,
-                                          localite: niveau3,
-                                          description:
-                                              _descriptionController.text,
-                                          nbKilo: _nbKilometrageController.text,
-                                          capacite: _capaciteController
-                                              .text))).then((value) => {
-                                    _nomController.clear(),
-                                    _descriptionController.clear(),
-                                    _localiteController.clear(),
-                                    _nbKilometrageController.clear(),
-                                    _capaciteController.clear()
-                                  });
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange, // Orange color code
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
+                       Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 22,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Destination et prix",
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 18),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    // Appeler la méthode pour ajouter une destination et un prix
+                                    addDestinationAndPrix();
+                                  },
+                                  icon: Icon(Icons.add),
+                                ),
+                              ],
                             ),
-                            minimumSize: const Size(290, 45),
+                            SizedBox(height: 10),
+                            Column(
+                              children: List.generate(
+                                heureControllers.length,
+                                (index) => Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: heureControllers[index],
+                      
+                                          decoration: InputDecoration(
+                                            hintText: "Prix",
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                              vertical: 10,
+                                              horizontal: 20,
+                                            ),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: prixControllers[index],
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: <TextInputFormatter>[
+                                            FilteringTextInputFormatter
+                                                .digitsOnly,
+                                          ],
+                                          decoration: InputDecoration(
+                                            hintText: "Prix",
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                              vertical: 10,
+                                              horizontal: 20,
+                                            ),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        children: heurePrixFields,
+                      ),
+                      SizedBox(
+                        child: IconButton(
+                          onPressed: _showImageSourceDialog,
+                          icon: const Icon(
+                            Icons.add_a_photo_rounded,
+                            size: 60,
                           ),
-                          child: Text(
-                            "Suivant",
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ))
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                     ],
                   ))
             ],

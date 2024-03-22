@@ -86,6 +86,7 @@ class _MagasinScreenState extends State<MagasinScreen>
   void fetchMagasinsByRegion(String id) async {
     try {
       final response = await http.get(Uri.parse(
+          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
           'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
@@ -419,8 +420,8 @@ class _MagasinScreenState extends State<MagasinScreen>
                                   cornerRadius: 50,
                                   color: Colors.black,
                                   image: NetworkImage(
-                                      "https://koumi.ml/api-koumi/${magasin.photo}"),
-                                  // "https://koumi.ml/api-koumi/${magasin.photo}"),
+                                      // "https://koumi.ml/api-koumi/${magasin.photo}"),
+                                  "http://10.0.2.2:9000/api-koumi/${magasin.photo}"),
                                 ),
                           title: Text(
                               magasin.acteur!.nomActeur != null

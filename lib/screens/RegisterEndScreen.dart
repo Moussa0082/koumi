@@ -426,6 +426,7 @@ Future<void> _pickImage(ImageSource source) async {
   padding: const EdgeInsets.symmetric(horizontal: 16),
   child: MultiSelectDropDown.network(
     networkConfig: NetworkConfig(
+      // url: 'https://koumi.ml/api-koumi/typeActeur/read',
       url: 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
       method: RequestMethod.get,
       headers: {
@@ -482,6 +483,7 @@ Future<void> _pickImage(ImageSource source) async {
   padding: const EdgeInsets.symmetric(horizontal: 16),
   child: MultiSelectDropDown.network(
     networkConfig: NetworkConfig(
+      // url: 'https://koumi.ml/api-koumi/Categorie/allCategorie',
       url: 'http://10.0.2.2:9000/api-koumi/Categorie/allCategorie',
       method: RequestMethod.get,
       headers: {
@@ -514,6 +516,7 @@ Future<void> _pickImage(ImageSource source) async {
       //  idsCategorieProduitAsString = idsCategorieProduit.isEmpty ? idsCategorieProduit.join(',') : "e40ijxd5k0n0yrzj5f80";
            idsJson = jsonEncode(idsCategorieProduit.join(','));
             //  speculationUrl = "e40ijxd5k0n0yrzj5f80";
+            //  speculationUrl = 'https://koumi.ml/api-koumi/Speculation/by-categories/${idsJson}';
              speculationUrl = 'http://10.0.2.2:9000/api-koumi/Speculation/by-categories/${idsJson}';
 
 

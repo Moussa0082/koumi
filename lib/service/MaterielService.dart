@@ -14,7 +14,7 @@ class MaterielService extends ChangeNotifier {
   List<Materiel> materielList = [];
 
   Future<void> addMateriel({
-    required Map<String, int> prixParDestination,
+    required Map<String, int> prixParHeure,
     required String nom,
     required String description,
     File? photoMateriel,
@@ -33,7 +33,7 @@ class MaterielService extends ChangeNotifier {
       }
 
       requete.fields['materiel'] = jsonEncode({
-       'prixParDestination': prixParDestination,
+       'prixParHeure': prixParHeure,
         'nom': nom,
         'description': description,
         'photoMateriel': "",
@@ -60,7 +60,7 @@ class MaterielService extends ChangeNotifier {
  
   Future<void> updateMateriel({
     required String idMateriel,
-    required Map<String, int> prixParDestination,
+    required Map<String, int> prixParHeure,
     required String nom,
     required String description,
     File? photoMateriel,
@@ -80,7 +80,7 @@ class MaterielService extends ChangeNotifier {
 
       requete.fields['materiel'] = jsonEncode({
         'idMateriel': idMateriel,
-       'prixParDestination': prixParDestination,
+       'prixParHeure': prixParHeure,
         'nom': nom,
         'description': description,
         'photoMateriel': "",
@@ -140,17 +140,18 @@ class MaterielService extends ChangeNotifier {
     final response =
         await http.get(Uri.parse('$baseUrl/readByTypeMateriel/$id'));
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      debugPrint("Body : ${response.body.toString()}");
       materielList = body.map((item) => Materiel.fromMap(item)).toList();
       debugPrint(response.body);
       return materielList;
     } else {
-      materielList = [];
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
-      throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+       return  materielList = [];
     }
   }
+ 
 
   Future<void> deleteMateriel(String idMateriel) async {
     final response =

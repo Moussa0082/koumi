@@ -38,7 +38,7 @@ class _UpdateTypeMaterielState extends State<UpdateTypeMateriel> {
           children: [
             ListTile(
               title: Text(
-                "Ajouter un type matériel ",
+                "Modification ",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -108,7 +108,8 @@ class _UpdateTypeMaterielState extends State<UpdateTypeMateriel> {
                       if (formkey.currentState!.validate()) {
                         try {
                           await TypeMaterielService()
-                              .addTypeMateriel(
+                              .updateTypeVoiture(
+                                idTypeMateriel: widget.typeMateriel.idTypeMateriel! ,
                                   nom: nom, description: description)
                               .then((value) => {
                                     Provider.of<TypeMaterielService>(context,

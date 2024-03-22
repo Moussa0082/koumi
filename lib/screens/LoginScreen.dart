@@ -294,7 +294,7 @@ Navigator.pushReplacement(
     final String password = passwordController.text;
 
     // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
-//
+
     const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
     ActeurProvider acteurProvider =
@@ -449,18 +449,18 @@ Navigator.pushReplacement(
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.arrow_back_ios))),
-      backgroundColor: const Color(0xFFFFFFFF),
-      body: LoadingOverlay(
+    return LoadingOverlay(
         isLoading: _isLoading,
-        child: SingleChildScrollView(
-
+      child: Scaffold(
+        appBar: AppBar(
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.arrow_back_ios))),
+        backgroundColor: const Color(0xFFFFFFFF),
+        body: SingleChildScrollView(
+        
           child: Container(
             child: Padding(
               padding: const EdgeInsets.all(20.0),

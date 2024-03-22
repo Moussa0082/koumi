@@ -74,7 +74,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
   //     prixControllers.add(newPrixController);
   //   });
   // }
-
+  
 // Méthode pour ajouter une nouvelle destination et prix
   // void addDestinationAndPrix() {
   //   // Créer un nouveau contrôleur pour chaque champ
@@ -125,6 +125,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     prixParDestinations = {};
     _niveau3List =
+        // http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
   }
 

@@ -914,7 +914,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                            _categorieList = http.
                                            get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
                                           // get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
-                                          filiere == null;
+                                          filiereValue = null;
                                         }),
                                         libelleController.clear(),
                                         descriptionController.clear(),
