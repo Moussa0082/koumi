@@ -31,6 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    // clearCart();
     // Vérifie d'abord si l'email de l'acteur est présent dans SharedPreferences
     checkEmailInSharedPreferences();
   }
@@ -66,7 +67,11 @@ class _SplashScreenState extends State<SplashScreen> {
       // Si l'email de l'acteur n'est pas présent, redirige directement vers l'écran de connexion
     }
   }
- 
+ Future<void> clearCart() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.remove('cart');
+}
+
   void checkLoggedIn() async {
     // Initialise les données de l'utilisateur à partir de SharedPreferences
     await Provider.of<ActeurProvider>(context, listen: false)

@@ -158,7 +158,7 @@ class _SpeculationPageState extends State<SpeculationPage> {
                           List<Speculation> filtereSearch =
                               speculationList.where((search) {
                             String libelle =
-                                search.nomSpeculation.toLowerCase();
+                                search.nomSpeculation!.toLowerCase();
                             searchText = _searchController.text.toLowerCase();
                             return libelle.contains(searchText);
                           }).toList();
@@ -194,7 +194,7 @@ class _SpeculationPageState extends State<SpeculationPage> {
                                                       .filiere!
                                                       .libelleFiliere),
                                                   title: Text(
-                                                      e.nomSpeculation
+                                                      e.nomSpeculation!
                                                           .toUpperCase(),
                                                       style: const TextStyle(
                                                         color: Colors.black,
@@ -203,7 +203,7 @@ class _SpeculationPageState extends State<SpeculationPage> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      e.descriptionSpeculation
+                                                      e.descriptionSpeculation!
                                                           .trim(),
                                                       style: const TextStyle(
                                                         color: Colors.black87,
@@ -353,7 +353,7 @@ class _SpeculationPageState extends State<SpeculationPage> {
                                                           .spaceBetween,
                                                   children: [
                                                     _buildEtat(
-                                                        e.statutSpeculation),
+                                                        e.statutSpeculation!),
                                                     PopupMenuButton<String>(
                                                       padding: EdgeInsets.zero,
                                                       itemBuilder: (context) =>

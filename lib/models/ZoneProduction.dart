@@ -6,27 +6,27 @@ import 'package:koumi_app/models/Acteur.dart';
 class ZoneProduction {
   String? idZoneProduction;
   final String? codeZone;
-  final String nomZoneProduction;
+  final String? nomZoneProduction;
   String? personneModif;
   String? latitude;
   String? longitude;
   String? photoZone;
   String? dateAjout;
   String? dateModif;
-  final bool statutZone;
+  final bool? statutZone;
   final Acteur? acteur;
   
   ZoneProduction({
     this.idZoneProduction,
     this.codeZone,
-    required this.nomZoneProduction,
+     this.nomZoneProduction,
     this.personneModif,
     this.latitude,
     this.longitude,
     this.photoZone,
     this.dateAjout,
     this.dateModif,
-    required this.statutZone,
+     this.statutZone,
     this.acteur,
   });
 

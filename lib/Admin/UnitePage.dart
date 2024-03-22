@@ -130,7 +130,7 @@ class _UnitePageState extends State<UnitePage> {
                         uniteList = snapshot.data!;
                         String searchText = "";
                         List<Unite> filtereSearch = uniteList.where((search) {
-                          String libelle = search.sigleUnite.toLowerCase();
+                          String libelle = search.sigleUnite!.toLowerCase();
                           searchText = _searchController.text.toLowerCase();
                           return libelle.contains(searchText);
                         }).toList();
@@ -161,14 +161,14 @@ class _UnitePageState extends State<UnitePage> {
                                           children: [
                                             ListTile(
                                                 title: Text(
-                                                    e.sigleUnite.toUpperCase(),
+                                                    e.sigleUnite!.toUpperCase(),
                                                     style: const TextStyle(
                                                       color: Colors.black,
                                                       fontSize: 20,
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                     )),
-                                                subtitle: Text(e.description.trim(),
+                                                subtitle: Text(e.description!.trim(),
                                                     style: const TextStyle(
                                                       color: Colors.black87,
                                                       fontSize: 17,

@@ -5,9 +5,9 @@ import 'package:koumi_app/models/Acteur.dart';
 class Unite {
    String? idUnite;
   final String? codeUnite;
-  final String nomUnite;
-  final String sigleUnite;
-  final String description;
+  final String? nomUnite;
+  final String? sigleUnite;
+  final String? description;
    String? dateAjout;
    String? dateModif;
   final bool?  statutUnite;
@@ -16,9 +16,9 @@ class Unite {
   Unite({
     this.idUnite,
     this.codeUnite,
-    required this.nomUnite,
-    required this.sigleUnite,
-    required this.description,
+     this.nomUnite,
+     this.sigleUnite,
+     this.description,
     this.dateAjout,
     this.dateModif,
      this.statutUnite,

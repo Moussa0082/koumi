@@ -8,6 +8,7 @@ import 'package:koumi_app/widgets/CustomText.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -27,47 +28,61 @@ class _PanierState extends State<Panier> {
 
     
 
-   List<Map<String, dynamic>> _cartItems = [];
+   List<Stock> _cartItems = [];
+   List<Stock> cartItems = [];
+
+   late Future<List<Stock>> cart ;
+     Future<List<Stock>> getListe() async {
+    return await ShoppingCart().loadCartItems();
+  }
 
   @override
   void initState() {
     super.initState();
-    _loadCartItems();
+    // _loadCartItems();
+    cart = getListe();
   }
 
-  Future<void> _loadCartItems() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String cartString = prefs.getString('cart') ?? '[]';
-    List<Map<String, dynamic>> cart = List<Map<String, dynamic>>.from(jsonDecode(cartString));
-    setState(() {
-      _cartItems = cart;
-    });
-  }
-
-  void _incrementQuantity(int index) {
-    setState(() {
-      _cartItems[index]['quantiteProduit']++;
-    });
-    _saveCart();
-  }
-
- void _decrementQuantity(int index) {
-  if (_cartItems[index]['quantiteProduit'] >= 1) {
-    setState(() {
-      _cartItems[index]['quantiteProduit']--;
-    });
-    _saveCart();
-  } else {
-    // Si la quantité est égale à 1, supprimer le produit du panier
-    setState(() {
-      _cartItems.removeAt(index);
-      
-    });
-    _saveCart();
-      _loadCartItems(); // Charger à nouveau les éléments du panier après la mise à jour
-
-  }
+  // Future<void> _loadCartItems() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String cartString = prefs.getString('cart') ?? '[]';
+  //   List<Map<String, dynamic>> cart = List<Map<String, dynamic>>.from(jsonDecode(cartString));
+  //   setState(() {
+  //     _cartItems = cart;
+  //   });
+  // }
+  void _loadCartItems() async {
+  List<Stock> cart = await ShoppingCart().loadCartItems();
+  // Faites quelque chose avec la liste des produits récupérée, par exemple :
+  setState(() {
+    _cartItems = cart;
+  });
 }
+
+  // void _incrementQuantity(int index) {
+  //   setState(() {
+  //     _cartItems[index].quantiteStock ++;
+  //   });
+  //   _saveCart();
+  // }
+
+//  void _decrementQuantity(int index) {
+//   if (_cartItems[index]['quantiteProduit'] >= 1) {
+//     setState(() {
+//       _cartItems[index]['quantiteProduit']--;
+//     });
+//     _saveCart();
+//   } else {
+//     // Si la quantité est égale à 1, supprimer le produit du panier
+//     setState(() {
+//       _cartItems.removeAt(index);
+      
+//     });
+//     _saveCart();
+//       _loadCartItems(); // Charger à nouveau les éléments du panier après la mise à jour
+
+//   }
+// }
 
 
   Future<void> _saveCart() async {
@@ -81,101 +96,111 @@ class _PanierState extends State<Panier> {
 
     // Calcul du total des produits
  // Calcul du total des produits
-num total = 0;
-_cartItems.forEach((item) {
-  total += item['prix'] * item['quantiteProduit'];
-});
+// num total = 0;
+// _cartItems.forEach((item) {
+//   total += item['prix'] * item['quantiteProduit'];
+// });
 
 // Calcul du total final incluant les frais de livraison
-num totalWithDelivery = total + 1000;
+// num totalWithDelivery = total + 1000;
     
     return Scaffold(
       appBar: AppBar(
         title: Text('Panier'),
         centerTitle:true,
       ),
-      body: _cartItems.length<1 ?
-      Column(
-          mainAxisAlignment:MainAxisAlignment.center,
-        children: [
-          Center(
-            child: Center(
-              child: Column(
-                children: [
-                  Image.asset('assets/images/notif.jpg'),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text('Panier vide ',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 17,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      )
-      :
-       ListView.builder(
-        itemCount: _cartItems.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2,
-                    blurRadius: 3,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: GestureDetector(
-                onTap:(){
-                  Get.to(DetailProduits(cartItems:_cartItems[index]));
-                },
-                child: ListTile(
-                  leading: Image.asset("assets/images/mang.jpg") ,
-                  // leading: Image.network(_cartItems[index]['image'] ?? "assets/images/mang.jpg") ,
-                  title: Text(_cartItems[index]['nomProduit']),
-                  subtitle: Row(
-                      mainAxisAlignment :MainAxisAlignment.spaceBetween,
+      body:
+Consumer<ShoppingCart>(
+        builder: (context, card, child) {
+          return FutureBuilder(
+            future: cart,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        children:[
-                
-                      IconButton(
-                        icon: Icon(Icons.remove),
-                        onPressed: () => _decrementQuantity(index),
+                      Image.asset('assets/images/notif.jpg'),
+                      SizedBox(height: 10),
+                      Text(
+                        'Panier vide',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 17,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      Text('${_cartItems[index]['quantiteProduit']}', style:TextStyle(fontWeight:FontWeight.bold)),
-                      IconButton(
-                        icon: Icon(Icons.add),
-                        onPressed: () => _incrementQuantity(index),
-                      ),
-                        ]
-                      ),
-                    Text('${_cartItems[index]['prix']} FCFA', style:TextStyle(fontSize:18, fontStyle:FontStyle.italic))
-                
-                      
                     ],
-                    
                   ),
-                  // trailing: Text('${_cartItems[index]['prix']} FCFA'),
-                ),
-              ),
-            ),
+                );
+              } else {
+             cartItems = snapshot.data! ;
+                return ListView.builder(
+                  itemCount: cartItems.length,
+                  itemBuilder: (context, index) {
+                    Stock item = cartItems[index];
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 2,
+                              blurRadius: 3,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: GestureDetector(
+                          onTap: () {
+                            Get.to(DetailProduits());
+                          },
+                          child: ListTile(
+                            leading: Image.asset("assets/images/mang.jpg"),
+                            title: Text(item.nomProduit ?? ''),
+                            subtitle: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(Icons.remove),
+                              onPressed: () => null,
+                              // onPressed: () => _decrementQuantity(index),
+                                    ),
+                                    Text('${item.quantiteStock!.toInt() ?? 0}', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    IconButton(
+                                      icon: Icon(Icons.add),
+                onPressed: () => null
+                                ),
+                // onPressed: () => _incrementQuantity(index)                                    ),
+                                  ],
+                                ),
+                                Text('${item.prix ?? 0} FCFA', style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic))
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }
+            },
           );
         },
       ),
+    
+//                     }
+//   });
+// })
       //   Container(
       //        padding: EdgeInsets.all(20),
       //        decoration: BoxDecoration(

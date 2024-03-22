@@ -17,8 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailProduits extends StatefulWidget {
   late Stock? stock;
-  Map<String, dynamic>? cartItems;
-   DetailProduits({super.key,  this.stock, this.cartItems});
+   DetailProduits({super.key,  this.stock});
 
   @override
   State<DetailProduits> createState() => _DetailProduitsState();
@@ -200,7 +199,7 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
                       Text("Speculation : ", style: TextStyle(fontSize: 20,fontStyle:FontStyle.italic)),
               
                         Text(
-                          widget.stock!.speculation!.nomSpeculation,
+                          widget.stock!.speculation!.nomSpeculation!,
                           style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -235,7 +234,7 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
                      Text("Unité Produit : ", style: TextStyle(fontSize: 20,fontStyle:FontStyle.italic)),
                      
                        Text(
-                         widget.stock!.unite!.nomUnite,
+                         widget.stock!.unite!.nomUnite!,
                          style: TextStyle(
                      fontSize: 20,
                      fontWeight: FontWeight.bold,
