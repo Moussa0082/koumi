@@ -9,12 +9,13 @@
 
 
 import 'dart:convert';
+import 'package:flutter/material.dart';
 
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ShoppingCart {
+class ShoppingCart  extends ChangeNotifier{
   static final ShoppingCart _instance = ShoppingCart._internal();
 
   factory ShoppingCart() {
@@ -48,6 +49,7 @@ class ShoppingCart {
       Snack.success(titre: "Succès",
         message:"Produit ajouté au panier"
       );
+   notifyListeners();
     }
   }
 

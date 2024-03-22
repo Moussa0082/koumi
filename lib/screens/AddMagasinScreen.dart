@@ -247,7 +247,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                   contactMagasinController.clear(),
                   localiteMagasinController.clear(),
                   setState(() {
-                    niveau1Pays == null;
+                    niveauPaysValue == "Sélectionner un sous région";
                   }),
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -356,14 +356,15 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
   @override
   void initState() {
     super.initState();
-    if(widget.isEditable == true){
+    if(widget.isEditable! == true){
     nomMagasinController.text = widget.nomMagasin!;
     contactMagasinController.text = widget.contactMagasin!;
     localiteMagasinController.text = widget.localiteMagasin!;
     // photos = widget.photo!;
     niveauPaysValue = widget.niveau1Pays!.idNiveau1Pays;
-    debugPrint ("Id Magasin "+ widget.idMagasin!);
+    debugPrint ("Id Magasin "+ widget.idMagasin! + "bool"  + widget.isEditable!.toString());
     }
+    debugPrint ("bool"  + widget.isEditable!.toString());
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     niveau1PaysList =
         // http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
@@ -501,69 +502,69 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                         height: 15,
                       ),
                       FutureBuilder(
-                        future: niveau1PaysList,
-                        builder: (_, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return CircularProgressIndicator();
-                          }
-                          if (snapshot.hasError) {
-                            return Text("${snapshot.error}");
-                          }
-                          if (snapshot.hasData) {
-                            final response =
-                                json.decode(snapshot.data.body) as List;
-                            final niveau1PaysList = response
-                                .map((e) => Niveau1Pays.fromMap(e))
-                                .where((con) => con.statutN1 == true)
-                                .toList();
-                            if (niveau1PaysList.isEmpty) {
-                              return Text(
-                                'Aucun pays disponible',
-                                style:
-                                    TextStyle(overflow: TextOverflow.ellipsis),
-                              );
-                            }
-              
-                            return DropdownButtonFormField<String>(
-                              items: niveau1PaysList
-                                  .map(
-                                    (e) => DropdownMenuItem(
-                                      value:  e.idNiveau1Pays  ,
-                                      child: Text(e.nomN1!),
-                                    ),
-                                  )
-                                  .toList(),
-                              value: niveauPaysValue,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  niveauPaysValue = newValue;
-                                  if (newValue != null) {
-                                    niveau1Pays = niveau1PaysList.firstWhere(
-                                        (element) =>
-                                            element.idNiveau1Pays == newValue);
-                                    debugPrint(
-                                        "con select ${niveau1Pays.toString()}");
-                                    // typeSelected = true;
-                                  }else{
-                                    niveauPaysValue = "Aucun pays disponible";
-                                  }
-                                });
-                              },
-                              decoration: InputDecoration(
-                                labelText:widget.isEditable! == false ? 'Sélectionner un sous région' : widget.niveau1Pays!.nomN1!,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            );
-                          }
-                          return Text(
-                            'Aucune donnée disponible',
-                            style: TextStyle(overflow: TextOverflow.ellipsis),
-                          );
-                        },
-                      ),
+  future: niveau1PaysList,
+  builder: (_, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return CircularProgressIndicator();
+    }
+    if (snapshot.hasError) {
+      return Text("Sous region non trouvé");
+      // return Text("${snapshot.error}");
+    }
+    if (snapshot.hasData) {
+      final response = json.decode(snapshot.data.body) as List;
+      final niveau1PaysList = response
+          .map((e) => Niveau1Pays.fromMap(e))
+          .where((con) => con.statutN1 == true)
+          .toList();
+      if (niveau1PaysList.isEmpty) {
+        return Text(
+          'Aucun pays disponible',
+          style: TextStyle(overflow: TextOverflow.ellipsis),
+        );
+      }
+
+      return DropdownButtonFormField<String>(
+        items: niveau1PaysList.isNotEmpty ? niveau1PaysList
+            .map(
+              (e) => DropdownMenuItem(
+                value: e.idNiveau1Pays,
+                child: Text(e.nomN1!),
+              ),
+            )
+            .toList() : [],
+        value: niveauPaysValue,
+        onChanged: (newValue) {
+          setState(() {
+            niveauPaysValue = newValue;
+            if (newValue != null) {
+              niveau1Pays = niveau1PaysList.firstWhere(
+                  (element) => element.idNiveau1Pays == newValue);
+              debugPrint("con select ${niveau1Pays.toString()}");
+              // typeSelected = true;
+            } else {
+              // niveauPaysValue = "Aucun pays disponible";
+            }
+          });
+        },
+        decoration: InputDecoration(
+          labelText: widget.isEditable!
+              ? widget.niveau1Pays!.nomN1!
+              : 'Sélectionner un sous région',
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      );
+    }
+    // Gérer le cas où snapshot.hasData est false
+    return Text(
+      'Aucune donnée disponible',
+      style: TextStyle(overflow: TextOverflow.ellipsis),
+    );
+  },
+),
+
                       const SizedBox(
                         height: 10,
                       ),

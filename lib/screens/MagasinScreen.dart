@@ -25,9 +25,7 @@ class MagasinScreen extends StatefulWidget {
 class _MagasinScreenState extends State<MagasinScreen>
     with TickerProviderStateMixin {
   // Déclarez une variable pour suivre si le chargement est terminé
-  bool _loadingFinished = false;
-  bool isEditable = true;
-  bool isEditableAdd = false;
+  
 
   TabController? _tabController;
   late TextEditingController _searchController;
@@ -102,6 +100,9 @@ class _MagasinScreenState extends State<MagasinScreen>
                   acteur: Acteur(
                     idActeur: item['acteur']['idActeur'] ?? 'manquant',
                     nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
+                    typeActeur: (item['acteur']['typeActeur'] 
+                    as List<dynamic>).map((type) => 
+                    TypeActeur(libelle: type['libelle'])).toList(),
                     // Autres champs de l'acteur...
                   ),
                   niveau1Pays: Niveau1Pays(
@@ -196,7 +197,7 @@ class _MagasinScreenState extends State<MagasinScreen>
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => AddMagasinScreen(isEditable: isEditableAdd,)));
+                                builder: (context) => AddMagasinScreen(isEditable: false,)));
                       },
                     ),
                   ),
@@ -362,11 +363,8 @@ class _MagasinScreenState extends State<MagasinScreen>
   ),
 );
 
-
                 },
-       
-                      
-       
+   
         child:
         Container(
                                       width: MediaQuery.of(context).size.width *
@@ -398,14 +396,12 @@ class _MagasinScreenState extends State<MagasinScreen>
                                                   : ProfilePhoto(
                                                       totalWidth: 50,
                                                       cornerRadius: 50,
-                                                      color: Colors.black,
+                                                      color: Colors.white,
                                                       image: NetworkImage(
                                                           "https://koumi.ml/api-koumi/${magasin.photo}"),
                                                           // "https://koumi.ml/api-koumi/${magasin.photo}"),
                                                     ),
-                                              title: Text(
-                   magasin.acteur!.nomActeur != null ? 
-                   magasin.acteur!.nomActeur!.toUpperCase() : 'USER' ,
+                                              title: Text(magasin.nomMagasin! ,
                                                  style: const TextStyle(
                                                     color: Colors.black,
                                                     fontSize: 20,
@@ -413,7 +409,11 @@ class _MagasinScreenState extends State<MagasinScreen>
                                                         TextOverflow.ellipsis,
                                                   )),
                                               subtitle: Text(
-                                              magasin.nomMagasin!,
+  magasin.acteur!.typeActeur!.isNotEmpty
+    ? magasin.acteur!.typeActeur!
+        .map((e) => e.libelle ?? '') // Utilisation de ?? '' pour éviter les erreurs si libelle est null
+        .join(', ')
+    : 'type',
                                               // filteredMagasins[index].acteur!.typeActeur.map((e) => e.libelle!).join(', '),
                                                   // filteredMagasins[index]['acteur']['typeActeur']
                                                   //     .map((data) =>
@@ -426,33 +426,33 @@ class _MagasinScreenState extends State<MagasinScreen>
                                                     fontWeight: FontWeight.w500,
                                                     fontStyle: FontStyle.italic,
                                                   ))),
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 15),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text("Date d'adhésion :",
-                                                    style: TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 15,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                    )),
-                                                Text(typeActeurList.toUpperCase(),
-                                                    style: TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w800,
-                                                    ))
-                                              ],
-                                            ),
-                                          ),
+                                          // Padding(
+                                          //   padding: EdgeInsets.symmetric(
+                                          //       horizontal: 15),
+                                          //   child: Row(
+                                          //     mainAxisAlignment:
+                                          //         MainAxisAlignment
+                                          //             .spaceBetween,
+                                          //     children: [
+                                          //       Text("",
+                                          //           style: TextStyle(
+                                          //             color: Colors.black87,
+                                          //             fontSize: 15,
+                                          //             fontWeight:
+                                          //                 FontWeight.w500,
+                                          //             fontStyle:
+                                          //                 FontStyle.italic,
+                                          //           )),
+                                          //       Text(typeActeurList.toUpperCase(),
+                                          //           style: TextStyle(
+                                          //             color: Colors.black87,
+                                          //             fontSize: 16,
+                                          //             fontWeight:
+                                          //                 FontWeight.w800,
+                                          //           ))
+                                          //     ],
+                                          //   ),
+                                          // ),
                                           Container(
                                             alignment: Alignment.bottomRight,
                                             padding: const EdgeInsets.symmetric(
@@ -618,7 +618,7 @@ class _MagasinScreenState extends State<MagasinScreen>
           scale: animation,
           child: AddMagasinScreen(
             idMagasin: magasin.idMagasin,
-            isEditable: isEditable,
+            isEditable: true,
             nomMagasin:magasin.nomMagasin,
             contactMagasin: magasin.contactMagasin,
             localiteMagasin:magasin.localiteMagasin,

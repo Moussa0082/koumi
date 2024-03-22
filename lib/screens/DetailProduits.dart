@@ -17,7 +17,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailProduits extends StatefulWidget {
   late Stock? stock;
-   DetailProduits({super.key,  this.stock});
+  Map<String, dynamic>? cartItems;
+   DetailProduits({super.key,  this.stock, this.cartItems});
 
   @override
   State<DetailProduits> createState() => _DetailProduitsState();
@@ -37,15 +38,7 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
   late String type;
 
 
-  // List<CartItem> _cartItems = [];
-  //  void _handleAddToCart() {
-  //   CartItem cartItem = CartItem(stock: widget.stock!, quantity: 1);
-  //   _cartItems.add(cartItem);
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(builder: (context) => Panier(cartItems: _cartItems)),
-  //   );
-  // }
+ 
 
 
 

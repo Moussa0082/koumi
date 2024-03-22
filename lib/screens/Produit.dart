@@ -1,15 +1,12 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CartItem.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
-import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -17,7 +14,6 @@ import 'package:koumi_app/models/Unite.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
-import 'package:koumi_app/screens/DetailsProduit.dart';
 import 'package:koumi_app/screens/ProduitActeur.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
