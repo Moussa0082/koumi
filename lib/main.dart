@@ -58,12 +58,17 @@ void main() {
     ChangeNotifierProvider(create: (context) => FiliereService()),
     ChangeNotifierProvider(create: (context) => Niveau3Service()),
     ChangeNotifierProvider(create: (context) => BottomNavigationService())
-  ], child: const MyApp()));
+  ], child:  MyApp()));
 }
 
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+   MyApp({super.key});
+  // static Future init () async { 
+  //   prefs = wait SharedPreferences. getInstance (); 
+  // } 
+
+
 
   // This widget is the root of your application.
   @override

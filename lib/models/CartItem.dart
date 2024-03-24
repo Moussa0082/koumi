@@ -26,32 +26,8 @@ class ShoppingCart  extends ChangeNotifier{
     return _cartItems;
   }
 
-  // Méthode pour ajouter un produit au panier
-  // Future<void> addToCart(Stock product) async {
-  //   // Vérifier si le produit existe déjà dans le panier
-  //   bool productExists = await _checkProductExistence(product);
 
-  //   if (productExists) {
-  //     // Afficher un message d'erreur si le produit existe déjà dans le panier
-  //     Snack.error(
-  //       titre: "Alerte",
-  //       message: "Le produit existe déjà dans le panier",
-  //     );
-  //   } else {
-  //     // Ajouter le produit au panier avec une quantité initiale de 1
-  //     List<Stock> cart = await loadCartItems();
-  //     cart.add(product);
-  //     await _saveCart(cart);
-  //     // Afficher un message de succès ou autre action après l'ajout au panier
-  //     Snack.success(
-  //       titre: "Succès",
-  //       message: "Produit ajouté au panier",
-  //     );
-  //   }
-  //   loadCartItems();
-  //   applyChanges();
-  // }
-Future<void> addToCart(Stock product) async {
+   Future<void> addToCart(Stock product) async {
   // Vérifier si le produit existe déjà dans le panier
   bool productExists = await _checkProductExistence(product);
 
@@ -66,6 +42,7 @@ Future<void> addToCart(Stock product) async {
     Stock cartItem = Stock(
       idStock: product.idStock!,
       nomProduit: product.nomProduit!,
+      prix: product.prix!,
       photo: product.photo ?? '', // Utiliser l'image du produit s'il existe, sinon une chaîne vide
       quantiteStock: 1, // Quantité initiale de 1
     );
@@ -73,7 +50,7 @@ Future<void> addToCart(Stock product) async {
     // Ajouter le CartItem au panier
     List<Stock> cart = await loadCartItems();
     cart.add(cartItem);
-    await _saveCart(cart);
+    await saveCart(cart);
 
     // Afficher un message de succès après l'ajout au panier
     Snack.success(
@@ -83,7 +60,6 @@ Future<void> addToCart(Stock product) async {
   }
 
   // Charger à nouveau les éléments du panier
-  loadCartItems();
   applyChanges();
 }
 
@@ -97,11 +73,10 @@ List<Stock> cart = await loadCartItems();
     }
 
   // Méthode pour sauvegarder le panier dans les SharedPreferences
-  Future<void> _saveCart(List<Stock> cart) async {
+  Future<void> saveCart(List<Stock> stock) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String cartString = jsonEncode(cart);
+    String cartString = jsonEncode(stock);
     prefs.setString('cart', cartString);
-    loadCartItems();
   }
 
 

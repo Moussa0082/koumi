@@ -32,9 +32,30 @@ class _PanierState extends State<Panier> {
    List<Stock> cartItems = [];
 
    late Future<List<Stock>> cart ;
-     Future<List<Stock>> getListe() async {
-    return await ShoppingCart().loadCartItems();
+
+  Future<List<Stock>> getListe() async {
+  List<Stock> cartItems = await ShoppingCart().loadCartItems();
+  setState(() {
+    cart = Future.value(cartItems);
+  });
+  debugPrint("Nombre de produits: ${cartItems.length}");
+  return cartItems;
   }
+
+//  Future<List<Stock>> getListe() async {
+//   List<Stock> cartItems = await ShoppingCart().loadCartItems();
+//   // setState(() {
+//   //   cart = Future.value(cartItems);
+//   // });
+//                                    setState(
+//                                           () {
+//                                         cart =cartItems as Future<List<Stock>>;
+                                             
+//                                       });
+//   debugPrint("Nombre de produits: ${cartItems.length}");
+//   return cartItems;
+// }
+
 
   @override
   void initState() {
@@ -58,6 +79,60 @@ class _PanierState extends State<Panier> {
     _cartItems = cart;
   });
 }
+
+
+ void _removeFromCart(int index) async {
+  List<Stock> cart = await ShoppingCart().loadCartItems();
+    setState(() {
+    cartItems[index].quantiteStock = (_cartItems[index].quantiteStock as int) + 1;
+    
+  });
+  if(cartItems[index].quantiteStock as int < 1){
+    
+  cart.removeAt(index); // Supprimer l'élément du panier
+  }
+  await ShoppingCart().saveCart(cart); // Sauvegarder le panier mis à jour
+
+  // Mettre à jour les préférences partagées
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('cart', jsonEncode(cart.map((stock) => stock.toJson()).toList()));
+
+  // Afficher un message de succès ou autre action après la suppression de l'élément du panier
+  Snack.success(
+    titre: "Succès",
+    message: "Produit supprimé du panier",
+  );
+}
+
+
+ void _incrementQuantity(int index) {
+  setState(() {
+    _cartItems[index].quantiteStock = (_cartItems[index].quantiteStock as int) + 1;
+    
+  });
+  _saveCart();
+}
+
+  void _decrementQuantity(int index) {
+    if (_cartItems[index].quantiteStock!.toInt() >= 1) {
+      setState(() {
+    _cartItems[index].quantiteStock = (_cartItems[index].quantiteStock as int) - 1;
+      });
+      _saveCart();
+    } else {
+      // Si la quantité est égale à 1, supprimer le produit du panier
+      setState(() {
+        _cartItems.removeAt(index);
+      });
+      ShoppingCart().loadCartItems(); // Charger à nouveau les éléments du panier après la mise à jour
+    }
+     Snack.success(
+    titre: "Succès",
+    message: "Produit supprimé du panier",
+  );
+  }
+
+
 
   // void _incrementQuantity(int index) {
   //   setState(() {
@@ -119,12 +194,32 @@ Consumer<ShoppingCart>(
                 return Center(
                   child: CircularProgressIndicator(),
                 );
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              } 
+               if (!snapshot.hasData) {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset('assets/images/notif.jpg'),
+                      // Image.asset('assets/images/notif.jpg'),
+                      SizedBox(height: 10),
+                      Text(
+                        'Panier vide erreur',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 17,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              } 
+               if (snapshot.data!.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Image.asset('assets/images/notif.jpg'),
                       SizedBox(height: 10),
                       Text(
                         'Panier vide',
@@ -137,8 +232,9 @@ Consumer<ShoppingCart>(
                     ],
                   ),
                 );
-              } else {
-             cartItems = snapshot.data! ;
+              } 
+              else {
+             cartItems = snapshot.data!;
                 return ListView.builder(
                   itemCount: cartItems.length,
                   itemBuilder: (context, index) {
@@ -160,7 +256,7 @@ Consumer<ShoppingCart>(
                         ),
                         child: GestureDetector(
                           onTap: () {
-                            Get.to(DetailProduits());
+                            // Get.to(DetailProduits());
                           },
                           child: ListTile(
                             leading: Image.asset("assets/images/mang.jpg"),
@@ -172,7 +268,7 @@ Consumer<ShoppingCart>(
                                   children: [
                                     IconButton(
                                       icon: Icon(Icons.remove),
-                              onPressed: () => null,
+                              onPressed: () => _removeFromCart(index),
                               // onPressed: () => _decrementQuantity(index),
                                     ),
                                     Text('${item.quantiteStock!.toInt() ?? 0}', style: TextStyle(fontWeight: FontWeight.bold)),

@@ -3,6 +3,8 @@ import 'package:koumi_app/Admin/ActeurScreen.dart';
 import 'package:koumi_app/Admin/AlerteScreen.dart';
 import 'package:koumi_app/Admin/CategoriePage.dart';
 import 'package:koumi_app/Admin/FiliereScreen.dart';
+import 'package:koumi_app/Admin/ProduitA.dart';
+import 'package:koumi_app/Admin/ProfilA.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
@@ -13,6 +15,7 @@ import 'package:koumi_app/screens/Location.dart';
 import 'package:koumi_app/screens/MagasinScreen.dart';
 import 'package:koumi_app/screens/Meteo.dart';
 import 'package:koumi_app/screens/MagasinActeur.dart';
+import 'package:koumi_app/screens/Panier.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
@@ -201,4 +204,22 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
           )),
     );
   }
+
+
+ Widget buildPageView(){
+    return SizedBox(
+      // height:MediaQuery.of(context).size.height,
+      height:MediaQuery.of(context).size.height * 0.90,
+      child: PageView(
+        children: [
+          const AcceuilAdmin(),
+            const ProduitA(),
+             Panier(),
+            const ProfilA()
+        ],
+      ),
+    );
+  }
+
+
 }

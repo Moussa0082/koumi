@@ -84,7 +84,7 @@ Future<void> fetchSpeculationsByCategories(List<String> idsCategorieProduit) asy
   String confirmPassword = "";
   
   String filiere = "";
-   String idsJson = "";
+    String idsJson = "" ;
   bool _obscureText = true;
     List<String> libelleCategorie = [];
     List<String> libelleSpeculation = [];
@@ -97,7 +97,7 @@ String idsCategorieProduitAsString = "";
   String? image2Src;
   File? image2;
 
-   String speculationUrl = "";
+   String url = "";
 
 
     
@@ -512,15 +512,15 @@ Future<void> _pickImage(ImageSource source) async {
             .toList());
         idsCategorieProduit = _controllerCategorie.selectedOptions.map((item) => item.value.toString()).toList();
       //  idsCategorieProduitAsString = idsCategorieProduit.isEmpty ? idsCategorieProduit.join(',') : "e40ijxd5k0n0yrzj5f80";
-           idsJson = jsonEncode(idsCategorieProduit.join(','));
-            //  speculationUrl = "e40ijxd5k0n0yrzj5f80";
-             speculationUrl = 'http://10.0.2.2:9000/api-koumi/Speculation/by-categories/${idsJson}';
+           idsJson = idsCategorieProduit.join(',');
+            //  url = "e40ijxd5k0n0yrzj5f80";
+             url = 'http://10.0.2.2:9000/api-koumi/Speculation/by-categories/${idsJson}';
 
 
-        print("categorie sélectionné ${libelleCategorie.toString()+ " speculationJson  "+ speculationUrl +" id " + idsJson}");
+        print("categorie sélectionné ${libelleCategorie.toString()+ " speculationJson  "+ url }");
       });
       
-  print("id s "+ idsJson);
+  // print("id s "+ idsJson);
       // Fermer automatiquement le dialogue
       FocusScope.of(context).unfocus();
     },
@@ -548,7 +548,7 @@ Future<void> _pickImage(ImageSource source) async {
   child: MultiSelectDropDown.network(
     networkConfig: NetworkConfig(
       // Endpoint pour récupérer les spéculations en fonction des catégories sélectionnées
-      url: speculationUrl , //e40ijxd5k0n0yrzj5f80,
+      url:url , //e40ijxd5k0n0yrzj5f80,
       // url: 'http://10.0.2.2:9000/api-koumi/Speculation/by-categories/${idsCategorieProduit.join(',')}', //e40ijxd5k0n0yrzj5f80,
       method: RequestMethod.get,
       headers: {'Content-Type': 'application/json'},
@@ -556,8 +556,11 @@ Future<void> _pickImage(ImageSource source) async {
     chipConfig: const ChipConfig(wrapType: WrapType.wrap),
     responseParser: (response) {
       final list = (response as List<dynamic>)
+                .where((data) =>
+              (data as Map<String, dynamic>)['statutSpeculation']== true)
           .map((e) {
             final item = e as Map<String, dynamic>;
+            debugPrint("data " + item['nomSpeculation']);
             return ValueItem(
               label: item['nomSpeculation'] as String,
               value: item['idSpeculation'],

@@ -41,18 +41,6 @@ class _SplashScreenState extends State<SplashScreen> {
     String? emailActeur = prefs.getString('emailActeur');
     if (emailActeur != null) {
       checkLoggedIn();
-// Timer(Duration(seconds: 10), () async {
-//     // Supprimer les données de l'utilisateur dans SharedPreferences
-//     SharedPreferences prefs = await SharedPreferences.getInstance();
-//     await prefs.clear();
-
-//     // Naviguer vers l'écran de connexion
-//     Navigator.of(context).pushReplacement(
-//       MaterialPageRoute(
-//         builder: (_) => const LoginScreen(),
-//       ),
-//     );
-//   });
 
       
     } 
