@@ -23,16 +23,25 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _ParametreState extends State<Parametre> {
-  late ParametreGeneraux params;
+  late ParametreGeneraux params = ParametreGeneraux();
   List<ParametreGeneraux> paramList = [];
+
+  void verifyParam() {
+    paramList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+
+    if (paramList != null && paramList.isNotEmpty) {
+      params = paramList[0];
+    } else {
+      // Gérer le cas où la liste est null ou vide, par exemple :
+      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-
-    paramList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
-    params = paramList[0];
+    verifyParam();
   }
 
   @override

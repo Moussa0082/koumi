@@ -567,7 +567,11 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                                 content: Row(
                                                   children: [
                                                     Text(
-                                                        "vehicule ajouté avec succèss"),
+                                                        "vehicule ajouté avec succèss",
+                                                      style: TextStyle(
+                                                          overflow: TextOverflow
+                                                              .ellipsis),
+                                                    ),
                                                   ],
                                                 ),
                                                 duration: Duration(seconds: 5),
@@ -610,7 +614,11 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                                 content: Row(
                                                   children: [
                                                     Text(
-                                                        "vehicule ajouté avec succèss"),
+                                                        "vehicule ajouté avec succèss",
+                                                      style: TextStyle(
+                                                          overflow: TextOverflow
+                                                              .ellipsis),
+                                                    ),
                                                   ],
                                                 ),
                                                 duration: Duration(seconds: 5),
@@ -627,7 +635,10 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                   const SnackBar(
                                     content: Row(
                                       children: [
-                                        Text("Une erreur s'est produit"),
+                                        Text("Une erreur s'est produit",
+                                          style: TextStyle(
+                                              overflow: TextOverflow.ellipsis),
+                                        ),
                                       ],
                                     ),
                                     duration: Duration(seconds: 5),

@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:koumi_app/Admin/AddMaterielByType.dart';
+import 'package:koumi_app/Admin/DetailMateriel.dart';
 import 'package:koumi_app/models/Materiel.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:provider/provider.dart';
 
 class ListeMaterielByType extends StatefulWidget {
-  final TypeMateriel typeMateriel;
-  const ListeMaterielByType({super.key, required this.typeMateriel});
+  final TypeMateriel? typeMateriel;
+  const ListeMaterielByType({super.key, this.typeMateriel});
 
   @override
   State<ListeMaterielByType> createState() => _ListeMaterielByTypeState();
@@ -29,7 +30,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
 
   @override
   void initState() {
-    type = widget.typeMateriel;
+    type = widget.typeMateriel!;
     futureListe = getListe(type.idTypeMateriel!);
     super.initState();
   }
@@ -118,286 +119,303 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                   .size
                                                   .width *
                                               0.45,
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.grey
-                                                      .withOpacity(0.3),
-                                                  offset: const Offset(0, 2),
-                                                  blurRadius: 8,
-                                                  spreadRadius: 2,
-                                                ),
-                                              ],
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.stretch,
-                                              children: [
-                                                ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          8.0),
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          DetailMateriel(
+                                                              materiel: e)));
+                                            },
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.grey
+                                                        .withOpacity(0.3),
+                                                    offset: const Offset(0, 2),
+                                                    blurRadius: 8,
+                                                    spreadRadius: 2,
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.stretch,
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
                                                             8.0),
-                                                    child: e.photoMateriel ==
-                                                            null
-                                                        ? Image.asset(
-                                                            "assets/images/camion.png",
-                                                            fit: BoxFit.cover,
-                                                            height: 90,
-                                                          )
-                                                        : Image.network(
-                                                            "http://10.0.2.2/${e.photoMateriel}",
-                                                            fit: BoxFit.cover,
-                                                            height: 90,
-                                                            errorBuilder:
-                                                                (BuildContext
-                                                                        context,
-                                                                    Object
-                                                                        exception,
-                                                                    StackTrace?
-                                                                        stackTrace) {
-                                                              return Image
-                                                                  .asset(
-                                                                'assets/images/camion.png',
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                                height: 90,
-                                                              );
-                                                            },
-                                                          ),
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 10,
-                                                      vertical: 5),
-                                                  child: Text(
-                                                    e.nom,
-                                                    style: TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: d_colorGreen),
-                                                  ),
-                                                ),
-                                                _buildItem("Statut:",
-                                                    '${e.statut ? 'Disponible' : 'Non disponible'}'),
-                                                _buildItem("Localité :",
-                                                    e.localisation),
-                                                SizedBox(height: 10),
-                                                Container(
-                                                  alignment:
-                                                      Alignment.bottomRight,
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 10),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      _buildEtat(e.statut),
-                                                      PopupMenuButton<String>(
-                                                        padding:
-                                                            EdgeInsets.zero,
-                                                        itemBuilder:
-                                                            (context) =>
-                                                                <PopupMenuEntry<
-                                                                    String>>[
-                                                          PopupMenuItem<String>(
-                                                            child: ListTile(
-                                                              leading:
-                                                                  const Icon(
-                                                                Icons.check,
-                                                                color: Colors
-                                                                    .green,
-                                                              ),
-                                                              title: const Text(
-                                                                "Activer",
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .green,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                              onTap: () async {
-                                                                await MaterielService()
-                                                                    .activerMateriel(type
-                                                                        .idTypeMateriel!)
-                                                                    .then(
-                                                                        (value) =>
-                                                                            {
-                                                                              Provider.of<MaterielService>(context, listen: false).applyChange(),
-                                                                              setState(() {
-                                                                                futureListe = getListe(type.idTypeMateriel!);
-                                                                              }),
-                                                                              Navigator.of(context).pop(),
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Activer avec succèss "),
-                                                                                    ],
-                                                                                  ),
-                                                                                  duration: Duration(seconds: 2),
-                                                                                ),
-                                                                              )
-                                                                            })
-                                                                    .catchError(
-                                                                        (onError) =>
-                                                                            {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Une erreur s'est produit"),
-                                                                                    ],
-                                                                                  ),
-                                                                                  duration: Duration(seconds: 5),
-                                                                                ),
-                                                                              ),
-                                                                              Navigator.of(context).pop(),
-                                                                            });
-                                                              },
-                                                            ),
-                                                          ),
-                                                          PopupMenuItem<String>(
-                                                            child: ListTile(
-                                                              leading: Icon(
-                                                                Icons
-                                                                    .disabled_visible,
-                                                                color: Colors
-                                                                        .orange[
-                                                                    400],
-                                                              ),
-                                                              title: Text(
-                                                                "Désactiver",
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                          .orange[
-                                                                      400],
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                              onTap: () async {
-                                                                await MaterielService()
-                                                                    .desactiverMateriel(type
-                                                                        .idTypeMateriel!)
-                                                                    .then(
-                                                                        (value) =>
-                                                                            {
-                                                                              Provider.of<MaterielService>(context, listen: false).applyChange(),
-                                                                              setState(() {
-                                                                                futureListe = getListe(type.idTypeMateriel!);
-                                                                              }),
-                                                                              Navigator.of(context).pop(),
-                                                                            })
-                                                                    .catchError(
-                                                                        (onError) =>
-                                                                            {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Une erreur s'est produit"),
-                                                                                    ],
-                                                                                  ),
-                                                                                  duration: Duration(seconds: 5),
-                                                                                ),
-                                                                              ),
-                                                                              Navigator.of(context).pop(),
-                                                                            });
-
-                                                                ScaffoldMessenger.of(
-                                                                        context)
-                                                                    .showSnackBar(
-                                                                  const SnackBar(
-                                                                    content:
-                                                                        Row(
-                                                                      children: [
-                                                                        Text(
-                                                                            "Désactiver avec succèss "),
-                                                                      ],
-                                                                    ),
-                                                                    duration: Duration(
-                                                                        seconds:
-                                                                            2),
-                                                                  ),
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: e.photoMateriel ==
+                                                              null
+                                                          ? Image.asset(
+                                                              "assets/images/camion.png",
+                                                              fit: BoxFit.cover,
+                                                              height: 90,
+                                                            )
+                                                          : Image.network(
+                                                              "http://10.0.2.2/${e.photoMateriel}",
+                                                              fit: BoxFit.cover,
+                                                              height: 90,
+                                                              errorBuilder: (BuildContext
+                                                                      context,
+                                                                  Object
+                                                                      exception,
+                                                                  StackTrace?
+                                                                      stackTrace) {
+                                                                return Image
+                                                                    .asset(
+                                                                  'assets/images/camion.png',
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                  height: 90,
                                                                 );
                                                               },
                                                             ),
-                                                          ),
-                                                          PopupMenuItem<String>(
-                                                            child: ListTile(
-                                                              leading:
-                                                                  const Icon(
-                                                                Icons.delete,
-                                                                color:
-                                                                    Colors.red,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 10,
+                                                        vertical: 5),
+                                                    child: Text(
+                                                      e.nom,
+                                                      style: TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: d_colorGreen),
+                                                    ),
+                                                  ),
+                                                  _buildItem("Statut:",
+                                                      '${e.statut ? 'Disponible' : 'Non disponible'}'),
+                                                  _buildItem("Localité :",
+                                                      e.localisation),
+                                                  SizedBox(height: 10),
+                                                  Container(
+                                                    alignment:
+                                                        Alignment.bottomRight,
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 10),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        _buildEtat(e.statut),
+                                                        PopupMenuButton<String>(
+                                                          padding:
+                                                              EdgeInsets.zero,
+                                                          itemBuilder:
+                                                              (context) =>
+                                                                  <PopupMenuEntry<
+                                                                      String>>[
+                                                            PopupMenuItem<
+                                                                String>(
+                                                              child: ListTile(
+                                                                leading:
+                                                                    const Icon(
+                                                                  Icons.check,
+                                                                  color: Colors
+                                                                      .green,
+                                                                ),
+                                                                title:
+                                                                    const Text(
+                                                                  "Activer",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .green,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
+                                                                onTap:
+                                                                    () async {
+                                                                  await MaterielService()
+                                                                      .activerMateriel(e
+                                                                          .idMateriel!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Provider.of<MaterielService>(context, listen: false).applyChange(),
+                                                                                setState(() {
+                                                                                  futureListe = getListe(type.idTypeMateriel!);
+                                                                                }),
+                                                                                Navigator.of(context).pop(),
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Activer avec succèss "),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 2),
+                                                                                  ),
+                                                                                )
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Une erreur s'est produit"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
+                                                                                ),
+                                                                                Navigator.of(context).pop(),
+                                                                              });
+                                                                },
                                                               ),
-                                                              title: const Text(
-                                                                "Supprimer",
-                                                                style:
-                                                                    TextStyle(
+                                                            ),
+                                                            PopupMenuItem<
+                                                                String>(
+                                                              child: ListTile(
+                                                                leading: Icon(
+                                                                  Icons
+                                                                      .disabled_visible,
+                                                                  color: Colors
+                                                                          .orange[
+                                                                      400],
+                                                                ),
+                                                                title: Text(
+                                                                  "Désactiver",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                            .orange[
+                                                                        400],
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
+                                                                onTap:
+                                                                    () async {
+                                                                  await MaterielService()
+                                                                      .desactiverMateriel(e
+                                                                          .idMateriel!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Provider.of<MaterielService>(context, listen: false).applyChange(),
+                                                                                setState(() {
+                                                                                  futureListe = getListe(type.idTypeMateriel!);
+                                                                                }),
+                                                                                Navigator.of(context).pop(),
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Une erreur s'est produit"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
+                                                                                ),
+                                                                                Navigator.of(context).pop(),
+                                                                              });
+
+                                                                  ScaffoldMessenger.of(
+                                                                          context)
+                                                                      .showSnackBar(
+                                                                    const SnackBar(
+                                                                      content:
+                                                                          Row(
+                                                                        children: [
+                                                                          Text(
+                                                                              "Désactiver avec succèss "),
+                                                                        ],
+                                                                      ),
+                                                                      duration: Duration(
+                                                                          seconds:
+                                                                              2),
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ),
+                                                            PopupMenuItem<
+                                                                String>(
+                                                              child: ListTile(
+                                                                leading:
+                                                                    const Icon(
+                                                                  Icons.delete,
                                                                   color: Colors
                                                                       .red,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
                                                                 ),
-                                                              ),
-                                                              onTap: () async {
-                                                                await MaterielService()
-                                                                    .deleteMateriel(type
-                                                                        .idTypeMateriel!)
-                                                                    .then(
-                                                                        (value) =>
-                                                                            {
-                                                                              Provider.of<MaterielService>(context, listen: false).applyChange(),
-                                                                              // setState(
-                                                                              //     () {
-                                                                              //   futureListe =
-                                                                              //       getListe(type.idTypeMateriel!);
-                                                                              // }),
-                                                                              Navigator.of(context).pop(),
-                                                                            })
-                                                                    .catchError(
-                                                                        (onError) =>
-                                                                            {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Impossible de supprimer"),
-                                                                                    ],
+                                                                title:
+                                                                    const Text(
+                                                                  "Supprimer",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .red,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
+                                                                onTap:
+                                                                    () async {
+                                                                  await MaterielService()
+                                                                      .deleteMateriel(e
+                                                                          .idMateriel!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Provider.of<MaterielService>(context, listen: false).applyChange(),
+                                                                                // setState(
+                                                                                //     () {
+                                                                                //   futureListe =
+                                                                                //       getListe(type.idTypeMateriel!);
+                                                                                // }),
+                                                                                Navigator.of(context).pop(),
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Impossible de supprimer"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 2),
                                                                                   ),
-                                                                                  duration: Duration(seconds: 2),
-                                                                                ),
-                                                                              )
-                                                                            });
-                                                              },
+                                                                                )
+                                                                              });
+                                                                },
+                                                              ),
                                                             ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
-                                              ],
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         )))
