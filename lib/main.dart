@@ -8,6 +8,7 @@ import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/ContinentService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
+import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:koumi_app/service/MessageService.dart';
 import 'package:koumi_app/service/Niveau1Service.dart';
@@ -44,6 +45,7 @@ void main() {
     ChangeNotifierProvider(create: (context) => ZoneProductionService()),
     ChangeNotifierProvider(create: (context) => PaysService()),
     ChangeNotifierProvider(create: (context) => TypeMaterielService()),
+    ChangeNotifierProvider(create: (context) => IntrantService()),
                                                                                                                                                                                                                                                                                                                                               ChangeNotifierProvider(create: (context) => TypeVoitureService()),
     ChangeNotifierProvider(create: (context) => MessageService()),
     ChangeNotifierProvider(create: (context) => MaterielService()),

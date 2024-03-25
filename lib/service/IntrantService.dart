@@ -15,8 +15,9 @@ class IntrantService extends ChangeNotifier {
 
   Future<void> creerIntrant({
     required String nomIntrant,
-    required String quantiteIntrant,
+    required double quantiteIntrant,
     required String descriptionIntrant,
+    required int prixIntrant,
     File? photoIntrant,
     required Acteur acteur,
   }) async {
@@ -34,6 +35,7 @@ class IntrantService extends ChangeNotifier {
       requete.fields['intrant'] = jsonEncode({
         'nomIntrant':nomIntrant,
         'quantiteIntrant' : quantiteIntrant,
+        'prixIntrant' : prixIntrant,
         'descriptionIntrant': descriptionIntrant,
         'photoIntrant': "",
         'acteur': acteur.toMap()
@@ -58,8 +60,9 @@ class IntrantService extends ChangeNotifier {
     Future<void> updateIntrant({
     required String idIntrant,
     required String nomIntrant,
-    required String quantiteIntrant,
+    required double quantiteIntrant,
     required String descriptionIntrant,
+    required int prixIntrant,
     File? photoIntrant,
     required Acteur acteur,
   }) async {
@@ -75,7 +78,8 @@ class IntrantService extends ChangeNotifier {
       requete.fields['intrant'] = jsonEncode({
         'idIntrant' : idIntrant,
         'nomIntrant': nomIntrant,
-        'quantiteIntrant': int.tryParse(quantiteIntrant),
+        'quantiteIntrant': quantiteIntrant,
+        'prixIntrant': prixIntrant,
         'descriptionIntrant': descriptionIntrant,
         'photoIntrant': "",
         'acteur': acteur.toMap()
@@ -151,7 +155,7 @@ class IntrantService extends ChangeNotifier {
   }
 
   Future activerIntrant(String idActeur) async {
-    final response = await http.post(Uri.parse('$baseUrl/activer/$idActeur'));
+    final response = await http.put(Uri.parse('$baseUrl/activer/$idActeur'));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
@@ -162,7 +166,7 @@ class IntrantService extends ChangeNotifier {
   }
 
   Future desactiverIntrant(String idIntrant) async {
-    final response = await http.post(Uri.parse('$baseUrl/desactiver/$idIntrant'));
+    final response = await http.put(Uri.parse('$baseUrl/desactiver/$idIntrant'));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();

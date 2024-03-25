@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:koumi_app/models/Acteur.dart';
@@ -6,36 +7,40 @@ import 'package:koumi_app/models/Superficie.dart';
 class Intrant {
   final String? idIntrant;
   final String nomIntrant;
-  final int quantiteIntrant;
-  final String condeIntrant;
+  final double quantiteIntrant;
+  final int prixIntrant;
+  final String? codeIntrant;
   final String descriptionIntrant;
   final String? photoIntrant;
-  final bool statutIntrant;
+  final bool? statutIntrant;
   final String? dateAjout;
   final String? dateModif;
   final String? personneModif;
   final Acteur acteur;
-  final Superficie superficie;
+  
   Intrant({
     this.idIntrant,
     required this.nomIntrant,
     required this.quantiteIntrant,
-    required this.condeIntrant,
+    required this.prixIntrant,
+    this.codeIntrant,
     required this.descriptionIntrant,
     this.photoIntrant,
-    required this.statutIntrant,
+    this.statutIntrant,
     this.dateAjout,
     this.dateModif,
     this.personneModif,
     required this.acteur,
-    required this.superficie,
   });
+
+  
 
   Intrant copyWith({
     String? idIntrant,
     String? nomIntrant,
-    int? quantiteIntrant,
-    String? condeIntrant,
+    double? quantiteIntrant,
+    int? prixIntrant,
+    String? codeIntrant,
     String? descriptionIntrant,
     String? photoIntrant,
     bool? statutIntrant,
@@ -43,13 +48,13 @@ class Intrant {
     String? dateModif,
     String? personneModif,
     Acteur? acteur,
-    Superficie? superficie,
   }) {
     return Intrant(
       idIntrant: idIntrant ?? this.idIntrant,
       nomIntrant: nomIntrant ?? this.nomIntrant,
       quantiteIntrant: quantiteIntrant ?? this.quantiteIntrant,
-      condeIntrant: condeIntrant ?? this.condeIntrant,
+      prixIntrant: prixIntrant ?? this.prixIntrant,
+      codeIntrant: codeIntrant ?? this.codeIntrant,
       descriptionIntrant: descriptionIntrant ?? this.descriptionIntrant,
       photoIntrant: photoIntrant ?? this.photoIntrant,
       statutIntrant: statutIntrant ?? this.statutIntrant,
@@ -57,7 +62,6 @@ class Intrant {
       dateModif: dateModif ?? this.dateModif,
       personneModif: personneModif ?? this.personneModif,
       acteur: acteur ?? this.acteur,
-      superficie: superficie ?? this.superficie,
     );
   }
 
@@ -66,7 +70,8 @@ class Intrant {
       'idIntrant': idIntrant,
       'nomIntrant': nomIntrant,
       'quantiteIntrant': quantiteIntrant,
-      'condeIntrant': condeIntrant,
+      'prixIntrant': prixIntrant,
+      'codeIntrant': codeIntrant,
       'descriptionIntrant': descriptionIntrant,
       'photoIntrant': photoIntrant,
       'statutIntrant': statutIntrant,
@@ -74,7 +79,6 @@ class Intrant {
       'dateModif': dateModif,
       'personneModif': personneModif,
       'acteur': acteur.toMap(),
-      'superficie': superficie.toMap(),
     };
   }
 
@@ -82,16 +86,16 @@ class Intrant {
     return Intrant(
       idIntrant: map['idIntrant'] != null ? map['idIntrant'] as String : null,
       nomIntrant: map['nomIntrant'] as String,
-      quantiteIntrant: map['quantiteIntrant'] as int,
-      condeIntrant: map['condeIntrant'] as String,
+      quantiteIntrant: map['quantiteIntrant'] as double,
+      prixIntrant: map['prixIntrant'] as int,
+      codeIntrant: map['codeIntrant'] != null ? map['codeIntrant'] as String : null,
       descriptionIntrant: map['descriptionIntrant'] as String,
       photoIntrant: map['photoIntrant'] != null ? map['photoIntrant'] as String : null,
-      statutIntrant: map['statutIntrant'] as bool,
+      statutIntrant: map['statutIntrant'] != null ? map['statutIntrant'] as bool : null,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
       personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
-      superficie: Superficie.fromMap(map['superficie'] as Map<String,dynamic>),
     );
   }
 
@@ -101,7 +105,7 @@ class Intrant {
 
   @override
   String toString() {
-    return 'Intrant(idIntrant: $idIntrant, nomIntrant: $nomIntrant, quantiteIntrant: $quantiteIntrant, condeIntrant: $condeIntrant, descriptionIntrant: $descriptionIntrant, photoIntrant: $photoIntrant, statutIntrant: $statutIntrant, dateAjout: $dateAjout, dateModif: $dateModif, personneModif: $personneModif, acteur: $acteur, superficie: $superficie)';
+    return 'Intrant(idIntrant: $idIntrant, nomIntrant: $nomIntrant, quantiteIntrant: $quantiteIntrant, prixIntrant: $prixIntrant, codeIntrant: $codeIntrant, descriptionIntrant: $descriptionIntrant, photoIntrant: $photoIntrant, statutIntrant: $statutIntrant, dateAjout: $dateAjout, dateModif: $dateModif, personneModif: $personneModif, acteur: $acteur)';
   }
 
   @override
@@ -112,15 +116,15 @@ class Intrant {
       other.idIntrant == idIntrant &&
       other.nomIntrant == nomIntrant &&
       other.quantiteIntrant == quantiteIntrant &&
-      other.condeIntrant == condeIntrant &&
+      other.prixIntrant == prixIntrant &&
+      other.codeIntrant == codeIntrant &&
       other.descriptionIntrant == descriptionIntrant &&
       other.photoIntrant == photoIntrant &&
       other.statutIntrant == statutIntrant &&
       other.dateAjout == dateAjout &&
       other.dateModif == dateModif &&
       other.personneModif == personneModif &&
-      other.acteur == acteur &&
-      other.superficie == superficie;
+      other.acteur == acteur;
   }
 
   @override
@@ -128,14 +132,14 @@ class Intrant {
     return idIntrant.hashCode ^
       nomIntrant.hashCode ^
       quantiteIntrant.hashCode ^
-      condeIntrant.hashCode ^
+      prixIntrant.hashCode ^
+      codeIntrant.hashCode ^
       descriptionIntrant.hashCode ^
       photoIntrant.hashCode ^
       statutIntrant.hashCode ^
       dateAjout.hashCode ^
       dateModif.hashCode ^
       personneModif.hashCode ^
-      acteur.hashCode ^
-      superficie.hashCode;
+      acteur.hashCode;
   }
 }

@@ -650,7 +650,8 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),
-                          ))
+                          )
+                          )
                     ],
                   ))
             ],
