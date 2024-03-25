@@ -4,13 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Materiel.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/service/MaterielService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -83,8 +87,168 @@ class _DetailMaterielState extends State<DetailMateriel> {
     }
   }
 
+  Future<File> saveImagePermanently(String imagePath) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final name = path.basename(imagePath);
+    final image = File('${directory.path}/$name');
+    return image;
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final image = await getImage(source);
+    if (image != null) {
+      setState(() {
+        photo = image;
+        imageSrc = image.path;
+      });
+    }
+  }
+
+  Future<File?> getImage(ImageSource source) async {
+    final image = await ImagePicker().pickImage(source: source);
+    if (image == null) return null;
+
+    return File(image.path);
+  }
+
+  Future<void> _showImageSourceDialog() async {
+    final BuildContext context = this.context;
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: 150,
+          child: AlertDialog(
+            title: const Text('Choisir une source'),
+            content: Wrap(
+              alignment: WrapAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context); // Fermer le dialogue
+                    _pickImage(ImageSource.camera);
+                  },
+                  child: const Column(
+                    children: [
+                      Icon(Icons.camera_alt, size: 40),
+                      Text('Camera'),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 40),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context); // Fermer le dialogue
+                    _pickImage(ImageSource.gallery);
+                  },
+                  child: const Column(
+                    children: [
+                      Icon(Icons.image, size: 40),
+                      Text('Galerie photo'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> updateMethode() async {
+    setState(() {
+      // Afficher l'indicateur de chargement pendant l'opération
+      _isLoading = true;
+    });
+
+    try {
+      final String nom = _nomController.text;
+      final String description = _descriptionController.text;
+      final String etat = _etatController.text;
+      final String localisation = _localiteController.text;
+      final int prixParHeures = int.tryParse(_prixController.text) ?? 0;
+
+      if (photo != null) {
+        await MaterielService()
+            .updateMateriel(
+                idMateriel: materiels.idMateriel!,
+                prixParHeure: prixParHeures,
+                nom: nom,
+                description: description,
+                localisation: localisation,
+                etatMateriel: etat,
+                photoMateriel: photo,
+                acteur: acteur,
+                typeMateriel: materiels.typeMateriel)
+            .then((value) => {
+                  Provider.of<MaterielService>(context, listen: false)
+                      .applyChange(),
+                  setState(() {
+                    materiels = Materiel(
+                        prixParHeure: prixParHeures,
+                        nom: nom,
+                        description: description,
+                        localisation: localisation,
+                        statut: materiels.statut,
+                        acteur: acteur,
+                        dateAjout: materiels.dateAjout,
+                        etatMateriel: etat,
+                        typeMateriel: materiels.typeMateriel);
+                    _isLoading = false;
+                  })
+                })
+            .catchError((onError) => {print(onError.toString())});
+      } else {
+        await MaterielService()
+            .updateMateriel(
+                idMateriel: materiels.idMateriel!,
+                prixParHeure: prixParHeures,
+                nom: nom,
+                description: description,
+                localisation: localisation,
+                etatMateriel: etat,
+                acteur: acteur,
+                typeMateriel: materiels.typeMateriel)
+            .then((value) => {
+                  Provider.of<MaterielService>(context, listen: false)
+                      .applyChange(),
+                  setState(() {
+                    materiels = Materiel(
+                        prixParHeure: prixParHeures,
+                        nom: nom,
+                        description: description,
+                        localisation: localisation,
+                        statut: materiels.statut,
+                        acteur: acteur,
+                        dateAjout: materiels.dateAjout,
+                        etatMateriel: etat,
+                        typeMateriel: materiels.typeMateriel);
+                    _isLoading = false;
+                  })
+                })
+            .catchError((onError) => {print(onError.toString())});
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Text(
+                "Une erreur est survenu lors de la modification",
+                style: TextStyle(overflow: TextOverflow.ellipsis),
+              ),
+            ],
+          ),
+          duration: Duration(seconds: 5),
+        ),
+      );
+    }
+  }
+
   @override
   void initState() {
+    super.initState();
     verify();
     verifyParam();
     _niveau3List =
@@ -96,8 +260,6 @@ class _DetailMaterielState extends State<DetailMateriel> {
     _localiteController.text = materiels.localisation;
     _prixController.text = materiels.prixParHeure.toString();
     isDialOpenNotifier = ValueNotifier<bool>(false);
-
-    super.initState();
   }
 
   @override
@@ -111,7 +273,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
               leading: _isEditing
                   ? IconButton(
                       onPressed: () {
-                        // _showImageSourceDialog
+                        _showImageSourceDialog();
                       },
                       icon: const Icon(
                         Icons.camera_alt,
@@ -138,7 +300,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
                                 setState(() {
                                   _isEditing = false;
                                 });
-                                // updateMethode();
+                                updateMethode();
                               },
                               icon: Icon(Icons.check),
                             )
@@ -175,7 +337,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
                                 fit: BoxFit.cover,
                               )
                             : Image.asset(
-                                "assets/images/camion.png",
+                                "assets/images/default_image.png",
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                                 height: 200,
@@ -245,7 +407,10 @@ class _DetailMaterielState extends State<DetailMateriel> {
         _buildItem('Type matériel: ', materiels.typeMateriel.nom!),
         _buildItem('Localité : ', materiels.localisation),
         _buildItem('Etat du matériel : ', materiels.etatMateriel),
-        _buildItem('Prix par heure : ', materiels.prixParHeure.toString()),
+        // !isExist ? _buildItem('Prix par heure : ',
+        //     "${materiels.prixParHeure.toString()} ${para.monnaie}"):
+        _buildItem('Prix par heure : ',
+            "${materiels.prixParHeure.toString()} ${para.monnaie}"),
         _buildItem('Date d\'ajout : ', materiels.dateAjout!),
         _buildDescription('Description : ', materiels.description)
       ],

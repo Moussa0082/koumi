@@ -2,51 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:koumi_app/Admin/AddMaterielByType.dart';
 import 'package:koumi_app/Admin/DetailMateriel.dart';
+import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Materiel.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/AddMateriel.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:provider/provider.dart';
 
-class ListeMaterielByType extends StatefulWidget {
-  final TypeMateriel? typeMateriel;
-  const ListeMaterielByType({super.key, this.typeMateriel});
+class ListeMaterielByActeur extends StatefulWidget {
+  const ListeMaterielByActeur({super.key});
 
   @override
-  State<ListeMaterielByType> createState() => _ListeMaterielByTypeState();
+  State<ListeMaterielByActeur> createState() => _ListeMaterielByActeurState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
+class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
   late TypeMateriel type = TypeMateriel();
   List<Materiel> materielListe = [];
   late Future<List<Materiel>> futureListe;
   bool isExist = false;
+  late Acteur acteur = Acteur();
+  late Future futureList;
 
   Future<List<Materiel>> getListe(String id) async {
-    final response = await MaterielService().fetchMaterielByType(id);
+    final response = await MaterielService().fetchMaterielByActeur(id);
     return response;
-  }
-
-  void verifyTypeMateriel() {
-    if (widget.typeMateriel != null) {
-      type = widget.typeMateriel!;
-      setState(() {
-        isExist = true;
-      });
-    } else {
-      setState(() {
-        isExist = false;
-      });
-    }
   }
 
   @override
   void initState() {
-    verifyTypeMateriel();
-    // futureListe = getListe(type.idTypeMateriel!);
-      
+   
+
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    futureListe = getListe(acteur.idActeur!);
     super.initState();
   }
 
@@ -55,52 +47,49 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
-          centerTitle: true,
-          toolbarHeight: 100,
-        
-          title:  Text(
-                  type.nom!.toUpperCase(),
-                  style: const TextStyle(
-                      color: d_colorGreen, fontWeight: FontWeight.bold),
-                )
-              ,
-          actions: [
-            PopupMenuButton<String>(
-              padding: EdgeInsets.zero,
-              itemBuilder: (context) {
-                return <PopupMenuEntry<String>>[
-                  PopupMenuItem<String>(
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.add,
-                        color: Colors.green,
-                      ),
-                      title: const Text(
-                        "Ajouter matériel ",
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onTap: () async {
-                        Get.to(AddMaterielByType(typeMateriel: type));
-                      },
-                    ),
-                  ),
-                ];
-              },
-            )
-          ]),
+        centerTitle: true,
+        toolbarHeight: 100,
+        title: Text(
+          "Mes Matériels",
+          style:
+              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+        ),
+        // actions: [
+        //   PopupMenuButton<String>(
+        //     padding: EdgeInsets.zero,
+        //     itemBuilder: (context) {
+        //       return <PopupMenuEntry<String>>[
+        //         PopupMenuItem<String>(
+        //           child: ListTile(
+        //             leading: const Icon(
+        //               Icons.add,
+        //               color: Colors.green,
+        //             ),
+        //             title: const Text(
+        //               "Ajouter matériel ",
+        //               style: TextStyle(
+        //                 color: Colors.green,
+        //                 fontSize: 18,
+        //                 fontWeight: FontWeight.bold,
+        //               ),
+        //             ),
+        //             onTap: () async {
+        //               Get.to(AddMateriel());
+        //             },
+        //           ),
+        //         ),
+        //       ];
+        //     },
+        //   )
+        // ]
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             Consumer<MaterielService>(
               builder: (context, materielService, child) {
                 return FutureBuilder(
-                    future:materielService.
-                            fetchMaterielByType(type.idTypeMateriel!),
-                        
+                    future: futureListe,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(

@@ -118,12 +118,12 @@ class _DetailTransportState extends State<DetailTransport> {
       }
     }
   }
- 
+
   void verifyParam() {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
 
-    if (paraList != null && paraList.isNotEmpty) {
+    if (paraList.isNotEmpty) {
       para = paraList[0];
     } else {
       // Gérer le cas où la liste est null ou vide, par exemple :
@@ -625,7 +625,7 @@ class _DetailTransportState extends State<DetailTransport> {
                                 fit: BoxFit.cover,
                               )
                             : Image.asset(
-                                "assets/images/camion.png",
+                                "assets/images/transport.png",
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                                 height: 200,
@@ -689,9 +689,7 @@ class _DetailTransportState extends State<DetailTransport> {
                         .value; // Inverser la valeur du ValueNotifier
                   },
                 )
-              : Container()
-              )
-              ,
+              : Container()),
     );
   }
 

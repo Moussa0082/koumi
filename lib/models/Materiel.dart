@@ -1,44 +1,48 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
-
 
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 
 class Materiel {
   final String? idMateriel;
-  final String codeMateriel;
+  final String? codeMateriel;
   final int prixParHeure;
   final String nom;
   final String description;
   final String? photoMateriel;
   final String localisation;
   final String? personneModif;
-  final bool statut;
-  final bool statutCommande;
+  final bool? statut;
+  final bool? statutCommande;
   final String? dateAjout;
   final String? dateModif;
   final Acteur acteur;
   final String etatMateriel;
   TypeMateriel typeMateriel;
-
+  
   Materiel({
     this.idMateriel,
-    required this.codeMateriel,
+    this.codeMateriel,
     required this.prixParHeure,
     required this.nom,
     required this.description,
     this.photoMateriel,
     required this.localisation,
     this.personneModif,
-    required this.statut,
-    required this.statutCommande,
+    this.statut,
+    this.statutCommande,
     this.dateAjout,
     this.dateModif,
     required this.acteur,
     required this.etatMateriel,
     required this.typeMateriel,
   });
+
  
+ 
+
+  
 
   Materiel copyWith({
     String? idMateriel,
@@ -99,15 +103,15 @@ class Materiel {
   factory Materiel.fromMap(Map<String, dynamic> map) {
     return Materiel(
       idMateriel: map['idMateriel'] != null ? map['idMateriel'] as String : null,
-      codeMateriel: map['codeMateriel'] as String,
+      codeMateriel: map['codeMateriel'] != null ? map['codeMateriel'] as String : null,
       prixParHeure: map['prixParHeure'] as int,
       nom: map['nom'] as String,
       description: map['description'] as String,
       photoMateriel: map['photoMateriel'] != null ? map['photoMateriel'] as String : null,
       localisation: map['localisation'] as String,
       personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
-      statut: map['statut'] as bool,
-      statutCommande: map['statutCommande'] as bool,
+      statut: map['statut'] != null ? map['statut'] as bool : null,
+      statutCommande: map['statutCommande'] != null ? map['statutCommande'] as bool : null,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
       acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),

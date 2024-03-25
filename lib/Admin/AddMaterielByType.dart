@@ -16,8 +16,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class AddMaterielByType extends StatefulWidget {
-  final TypeMateriel typeMateriel;
-  const AddMaterielByType({super.key, required this.typeMateriel});
+  final TypeMateriel? typeMateriel;
+  const AddMaterielByType({super.key, this.typeMateriel});
 
   @override
   State<AddMaterielByType> createState() => _AddMaterielByTypeState();
@@ -27,9 +27,7 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _AddMaterielByTypeState extends State<AddMaterielByType> {
-  late TypeMateriel type;
   TextEditingController _nomController = TextEditingController();
-  TextEditingController _localiteController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _etatController = TextEditingController();
   TextEditingController _prixController = TextEditingController();
@@ -45,6 +43,11 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
   late Future _niveau3List;
   String? n3Value;
   String niveau3 = '';
+  late Future _typeList;
+  String? typeValue;
+  late TypeMateriel typeMateriel;
+  late TypeMateriel type;
+  bool isExist = false;
 
   // void addDestinationAndPrix() {
   //   // Créer un nouveau contrôleur pour chaque champ
@@ -60,12 +63,26 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
 
   @override
   void initState() {
-    type = widget.typeMateriel;
+    super.initState();
+    verifyTypeMateriel();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-
+    _typeList =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
     _niveau3List =
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
-    super.initState();
+  }
+
+  void verifyTypeMateriel() {
+    if (widget.typeMateriel != null) {
+      type = widget.typeMateriel!;
+      setState(() {
+        isExist = true;
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
   }
 
   Future<File> saveImagePermanently(String imagePath) async {
@@ -448,12 +465,24 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
                         ),
                       ),
                       SizedBox(
-                        child: IconButton(
-                          onPressed: _showImageSourceDialog,
-                          icon: const Icon(
-                            Icons.add_a_photo_rounded,
-                            size: 60,
-                          ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 10.0),
+                          child: photo != null
+                              ? Image.file(
+                                  photo!,
+                                  fit: BoxFit.fitWidth,
+                                  height: 150,
+                                  width: 300,
+                                )
+                              : SizedBox(
+                                  child: IconButton(
+                                    onPressed: _showImageSourceDialog,
+                                    icon: const Icon(
+                                      Icons.add_a_photo_rounded,
+                                      size: 60,
+                                    ),
+                                  ),
+                                ),
                         ),
                       ),
                       const SizedBox(height: 20),
