@@ -84,7 +84,12 @@ class _IntrantScreenState extends State<IntrantScreen> {
               },
               icon: const Icon(Icons.arrow_back_ios)),
           title: const Text(
-            "Intrant agricoles",
+            "Intrant agricole ",
+            style: TextStyle(
+              color: d_colorGreen,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           actions: !isExist
               ? null
@@ -100,12 +105,12 @@ class _IntrantScreenState extends State<IntrantScreen> {
                               child: ListTile(
                                 leading: const Icon(
                                   Icons.add,
-                                  color: Colors.green,
+                                  color: d_colorGreen,
                                 ),
                                 title: const Text(
                                   "Ajouter intrant ",
                                   style: TextStyle(
-                                    color: Colors.green,
+                                    color: d_colorGreen,
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -122,12 +127,12 @@ class _IntrantScreenState extends State<IntrantScreen> {
                               child: ListTile(
                                 leading: const Icon(
                                   Icons.remove_red_eye,
-                                  color: Colors.green,
+                                  color: d_colorGreen,
                                 ),
                                 title: const Text(
                                   "Mes intrants ",
                                   style: TextStyle(
-                                    color: Colors.green,
+                                    color: d_colorGreen,
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),

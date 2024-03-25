@@ -275,38 +275,41 @@ class _DetailIntrantState extends State<DetailIntrant> {
                     ),
                   ),
                   _buildDescription(intrants.descriptionIntrant),
-                acteur.nomActeur != intrants.acteur.nomActeur ?
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Container(
-                      height: 40,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: const BoxDecoration(
-                        color: Colors.orangeAccent,
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Fournisseur',
-                          style: const TextStyle(
-                              overflow: TextOverflow.ellipsis,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                  ): Container(),
-acteur.nomActeur != intrants.acteur.nomActeur ?
-                  _buildFournissuer() : Container(),
+                  acteur.nomActeur != intrants.acteur.nomActeur
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Container(
+                            height: 40,
+                            width: MediaQuery.of(context).size.width,
+                            decoration: const BoxDecoration(
+                              color: Colors.orangeAccent,
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Fournisseur',
+                                style: const TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        )
+                      : Container(),
+                  acteur.nomActeur != intrants.acteur.nomActeur
+                      ? _buildFournissuer()
+                      : Container(),
                 ],
               ),
             ),
             floatingActionButton: acteur.nomActeur != intrants.acteur.nomActeur
                 ? SpeedDial(
                     // animatedIcon: AnimatedIcons.close_menu,
+
                     backgroundColor: d_colorGreen,
                     foregroundColor: Colors.white,
                     overlayColor: Colors.black,
-                    overlayOpacity: 0.4,
+                    overlayOpacity: 0.7,
                     spacing: 12,
                     icon: Icons.phone,
 
