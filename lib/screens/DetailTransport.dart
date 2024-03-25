@@ -625,7 +625,7 @@ class _DetailTransportState extends State<DetailTransport> {
                                 fit: BoxFit.cover,
                               )
                             : Image.asset(
-                                "assets/images/transport.png",
+                                "assets/images/default_image.png",
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                                 height: 200,

@@ -6,6 +6,7 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddIntrant.dart';
+import 'package:koumi_app/screens/DetailIntrant.dart';
 import 'package:koumi_app/screens/ListeIntrantByActeur.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:provider/provider.dart';
@@ -227,12 +228,13 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                                 0.45,
                                         child: GestureDetector(
                                           onTap: () {
-                                            // Navigator.push(
-                                            //     context,
-                                            //     MaterialPageRoute(
-                                            //         builder: (context) =>
-                                            //             DetailTransport(
-                                            //                 vehicule: e)));
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        DetailIntrant(
+                                                          intrant: e,
+                                                        )));
                                           },
                                           child: Container(
                                             decoration: BoxDecoration(
