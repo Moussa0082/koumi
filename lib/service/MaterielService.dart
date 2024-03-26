@@ -8,13 +8,13 @@ import 'package:koumi_app/models/Materiel.dart';
 import 'package:path/path.dart';
 
 class MaterielService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/Materiel';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Materiel';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/Materiel';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Materiel';
 
   List<Materiel> materielList = [];
 
-  Future<void> creerMateriel({
-    required String prix,
+  Future<void> addMateriel({
+    required Map<String, int> prixParHeure,
     required String nom,
     required String description,
     File? photoMateriel,
@@ -33,7 +33,7 @@ class MaterielService extends ChangeNotifier {
       }
 
       requete.fields['materiel'] = jsonEncode({
-        'prix': int.tryParse(prix),
+       'prixParHeure': prixParHeure,
         'nom': nom,
         'description': description,
         'photoMateriel': "",
@@ -60,7 +60,7 @@ class MaterielService extends ChangeNotifier {
  
   Future<void> updateMateriel({
     required String idMateriel,
-    required String prix,
+    required Map<String, int> prixParHeure,
     required String nom,
     required String description,
     File? photoMateriel,
@@ -80,7 +80,7 @@ class MaterielService extends ChangeNotifier {
 
       requete.fields['materiel'] = jsonEncode({
         'idMateriel': idMateriel,
-        'prix': int.tryParse(prix),
+       'prixParHeure': prixParHeure,
         'nom': nom,
         'description': description,
         'photoMateriel': "",
@@ -136,6 +136,23 @@ class MaterielService extends ChangeNotifier {
     }
   }
 
+  Future<List<Materiel>> fetchMaterielByType(String id) async {
+    final response =
+        await http.get(Uri.parse('$baseUrl/readByTypeMateriel/$id'));
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      debugPrint("Body : ${response.body.toString()}");
+      materielList = body.map((item) => Materiel.fromMap(item)).toList();
+      debugPrint(response.body);
+      return materielList;
+    } else {
+      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+       return  materielList = [];
+    }
+  }
+ 
+
   Future<void> deleteMateriel(String idMateriel) async {
     final response =
         await http.delete(Uri.parse("$baseUrl/delete/$idMateriel"));
@@ -149,7 +166,7 @@ class MaterielService extends ChangeNotifier {
   }
 
   Future<void> activerMateriel(String idMateriel) async {
-    final response = await http.post(Uri.parse("$baseUrl/activer/$idMateriel"));
+    final response = await http.put(Uri.parse("$baseUrl/activer/$idMateriel"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -161,7 +178,7 @@ class MaterielService extends ChangeNotifier {
 
   Future<void> desactiverMateriel(String idMateriel) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/desactiver/$idMateriel"));
+        await http.put(Uri.parse("$baseUrl/desactiver/$idMateriel"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
 

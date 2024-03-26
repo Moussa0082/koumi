@@ -96,6 +96,9 @@ class ParametreGenerauxService extends ChangeNotifier {
     required String nomSysteme,
     required String descriptionSysteme,
     required String sloganSysteme,
+    required String monnaie,
+    required String tauxDollar,
+    required String tauxYuan,
     File? logoSysteme,
     required String adresseStructure,
     required String emailStructure,
@@ -110,8 +113,8 @@ class ParametreGenerauxService extends ChangeNotifier {
       var requete = http.MultipartRequest(
           'PUT',
           Uri.parse(
-              'https://koumi.ml/api-koumi/parametreGeneraux/update/$idParametreGeneraux'));
-              // 'http://10.0.2.2:9000/api-koumi/parametreGeneraux/update/$idParametreGeneraux'));
+              // 'https://koumi.ml/api-koumi/parametreGeneraux/update/$idParametreGeneraux'));
+              'http://10.0.2.2:9000/api-koumi/parametreGeneraux/update/$idParametreGeneraux'));
 
       if (logoSysteme != null) {
         requete.files.add(http.MultipartFile('image',
@@ -130,6 +133,9 @@ class ParametreGenerauxService extends ChangeNotifier {
         'logoSysteme': "",
         'adresseStructure': adresseStructure,
         'emailStructure': emailStructure,
+        'tauxDollar': tauxDollar,
+        'tauxYuan' : tauxYuan,
+        'monnaie' : monnaie,
         'telephoneStructure': telephoneStructure,
         'whattsAppStructure': whattsAppStructure,
         'libelleNiveau1Pays': libelleNiveau1Pays,

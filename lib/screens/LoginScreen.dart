@@ -294,7 +294,7 @@ Navigator.pushReplacement(
     final String password = passwordController.text;
 
     // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
-//
+
     const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
     ActeurProvider acteurProvider =
@@ -449,12 +449,18 @@ Navigator.pushReplacement(
 
   @override
   Widget build(BuildContext context) {
-    return 
-    LoadingOverlay(
-      isLoading: _isLoading,
+    return LoadingOverlay(
+        isLoading: _isLoading,
       child: Scaffold(
+        appBar: AppBar(
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.arrow_back_ios))),
         backgroundColor: const Color(0xFFFFFFFF),
         body: SingleChildScrollView(
+        
           child: Container(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -479,14 +485,14 @@ Navigator.pushReplacement(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                  
-                    Text('LAT: ${_currentPosition?.latitude ?? ""}'),
-              Text('LNG: ${_currentPosition?.longitude ?? ""}'),
-              Text('ADDRESS: ${_currentAddress ?? ""}'),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: _getCurrentPosition,
-                child: const Text("Get Current Location"),
-              ),
+              //       Text('LAT: ${_currentPosition?.latitude ?? ""}'),
+              // Text('LNG: ${_currentPosition?.longitude ?? ""}'),
+              // Text('ADDRESS: ${_currentAddress ?? ""}'),
+              // const SizedBox(height: 32),
+              // ElevatedButton(
+              //   onPressed: _getCurrentPosition,
+              //   child: const Text("Get Current Location"),
+              // ),
                       const SizedBox(
                         height: 10,
                       ),
@@ -575,61 +581,58 @@ Navigator.pushReplacement(
                       // fin mot de pass
               
                       const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 50,
-                                  height: 30,
-                                  child: FittedBox(
-                                    fit: BoxFit.contain,
-                                    child: Switch(
-                                      value: isActive,
-                                      activeColor: Colors.orange,
-                                      onChanged: (bool value) {
-                                        setState(() {
-                                          isActive = value;
-                                        });
-                                      },
-                                    ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 50,
+                                height: 30,
+                                child: FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: Switch(
+                                    value: isActive,
+                                    activeColor: Colors.orange,
+                                    onChanged: (bool value) {
+                                      setState(() {
+                                        isActive = value;
+                                      });
+                                    },
                                   ),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                const Text(
-                                  "Se souvenir de moi",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                print("ho");
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ForgetPassScreen(),
-                                  ),
-                                );
-                              },
-                              child: const Text(
-                                "Mot de passe oublié ",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  decoration: TextDecoration.underline,
-                                  color: Colors.blue,
                                 ),
                               ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              const Text(
+                                "Se souvenir de moi",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ],
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              print("ho");
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ForgetPassScreen(),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "Mot de passe oublié ",
+                              style: TextStyle(
+                                fontSize: 15,
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue,
+                              ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
               
                       const SizedBox(
@@ -678,7 +681,7 @@ Navigator.pushReplacement(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Text(
-                                "Je n'ai pas de compte .",
+                                "Pas de compte ?.",
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 18,
@@ -696,7 +699,7 @@ Navigator.pushReplacement(
                                               RegisterScreen()));
                                 },
                                 child: const Text(
-                                  "M'inscrire",
+                                  "S'inscrire",
                                   style: TextStyle(
                                       color: Colors.blue,
                                       fontSize: 18,

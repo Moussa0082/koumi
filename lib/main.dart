@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:koumi_app/models/CartItem.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/CartProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/SplashScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
@@ -21,6 +22,7 @@ import 'package:koumi_app/service/SousRegionService.dart';
 import 'package:koumi_app/service/SpeculationService.dart';
 import 'package:koumi_app/service/StockService.dart';
 import 'package:koumi_app/service/TypeActeurService.dart';
+import 'package:koumi_app/service/TypeMaterielService.dart';
 import 'package:koumi_app/service/TypeVoitureService.dart';
 import 'package:koumi_app/service/UniteService.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
@@ -30,10 +32,10 @@ import 'package:provider/provider.dart';
 
 
 
-void main() { 
+void main() {
   runApp(MultiProvider(providers: [
 
-    ChangeNotifierProvider(create: (context) => ShoppingCart()),
+    ChangeNotifierProvider(create: (context) => CartProvider()),
     ChangeNotifierProvider(create: (context) => ActeurService()),
     ChangeNotifierProvider(create: (context) => TypeActeurService()),
     ChangeNotifierProvider(create: (context) => ActeurProvider()),
@@ -42,10 +44,10 @@ void main() {
     ChangeNotifierProvider(create: (context) => ParametreGenerauxProvider()),
     ChangeNotifierProvider(create: (context) => UniteService()),
     ChangeNotifierProvider(create: (context) => ParametreFicheService()),
-
     ChangeNotifierProvider(create: (context) => ZoneProductionService()),
     ChangeNotifierProvider(create: (context) => PaysService()),
-    ChangeNotifierProvider(create: (context) => TypeVoitureService()),
+    ChangeNotifierProvider(create: (context) => TypeMaterielService()),
+                                                                                                                                                                                                                                                                                                                                              ChangeNotifierProvider(create: (context) => TypeVoitureService()),
     ChangeNotifierProvider(create: (context) => MessageService()),
     ChangeNotifierProvider(create: (context) => MaterielService()),
     ChangeNotifierProvider(create: (context) => VehiculeService()),
@@ -61,12 +63,9 @@ void main() {
   ], child:  MyApp()));
 }
 
-
+ 
 class MyApp extends StatelessWidget {
    MyApp({super.key});
-  // static Future init () async { 
-  //   prefs = wait SharedPreferences. getInstance (); 
-  // } 
 
 
 
@@ -76,7 +75,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange.shade400),
         useMaterial3: true,
       ),
       routes: {

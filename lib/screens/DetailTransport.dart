@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -7,15 +8,19 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Niveau3Pays.dart';
+import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailTransport extends StatefulWidget {
@@ -31,53 +36,121 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _DetailTransportState extends State<DetailTransport> {
   late Vehicule vehicules;
-  late Acteur acteur;
+  late Acteur acteur = Acteur();
   late List<TypeActeur> typeActeurData = [];
   late String type;
   String? imageSrc;
   File? photo;
   late TypeVoiture typeVoiture;
   late Map<String, int> prixParDestinations;
-
+  List<ParametreGeneraux> paraList = [];
+  late ParametreGeneraux para = ParametreGeneraux();
   late ValueNotifier<bool> isDialOpenNotifier;
   TextEditingController _prixController = TextEditingController();
   TextEditingController _nomController = TextEditingController();
   TextEditingController _destinationController = TextEditingController();
+  TextEditingController _descriptionController = TextEditingController();
+  TextEditingController _nbKiloController = TextEditingController();
   TextEditingController _capaciteController = TextEditingController();
   TextEditingController _etatController = TextEditingController();
   TextEditingController _localiteController = TextEditingController();
   List<TextEditingController> _destinationControllers = [];
   List<TextEditingController> _prixControllers = [];
+  List<TextEditingController> destinationControllers = [];
+  List<TextEditingController> prixControllers = [];
+  List<Widget> destinationPrixFields = [];
   bool _isEditing = false;
   bool _isLoading = false;
   bool active = false;
   String? typeValue;
-  late Future _typeList;
+  late Future _niveau3List;
+  String? n3Value;
+  String niveau3 = '';
+  List<String> selectedDestinations = [];
   Map<String, int> newPrixParDestinations = {};
+  List<String?> selectedDestinationsList = [];
+
+  bool isExist = false;
+  String? email = "";
+
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      typeActeurData = acteur.typeActeur!;
+      type = typeActeurData.map((data) => data.libelle).join(', ');
+      setState(() {
+        isExist = true;
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
+  }
+
+  // Méthode pour ajouter une nouvelle destination et prix
+  void addDestinationAndPrix() {
+    // Créer un nouveau contrôleur pour chaque champ
+    TextEditingController newDestinationController = TextEditingController();
+    TextEditingController newPrixController = TextEditingController();
+
+    setState(() {
+      // Ajouter les nouveaux contrôleurs aux listes
+      destinationControllers.add(newDestinationController);
+      prixControllers.add(newPrixController);
+
+      // Ajouter une valeur nulle à la liste des destinations sélectionnées
+      selectedDestinationsList.add(null);
+    });
+  }
+
+  void ajouterPrixDestination() {
+    for (int i = 0; i < selectedDestinationsList.length; i++) {
+      String destination = selectedDestinations[i];
+      int prix = int.tryParse(prixControllers[i].text) ?? 0;
+
+      // Ajouter la destination et le prix à la nouvelle map
+      if (destination.isNotEmpty && prix > 0) {
+        newPrixParDestinations.addAll({destination: prix});
+      }
+    }
+  }
+
+  void verifyParam() {
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+
+    if (paraList != null && paraList.isNotEmpty) {
+      para = paraList[0];
+    } else {
+      // Gérer le cas où la liste est null ou vide, par exemple :
+      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+    }
+  }
 
   @override
   void initState() {
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    typeActeurData = acteur.typeActeur!;
-    type = typeActeurData.map((data) => data.libelle).join(', ');
-    _typeList = http.get(Uri.parse(
-        'http://10.0.2.2:9000/api-koumi/TypeVoiture/listeByActeur/${acteur.idActeur!}'));
+    verify();
+    // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+    //     .parametreList!;
+    // para = paraList[0];
+    verifyParam();
+    // _niveau3List =
+    //     http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
+    _niveau3List =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
     vehicules = widget.vehicule;
     typeVoiture = vehicules.typeVoiture;
     prixParDestinations = vehicules.prixParDestination;
-
     _nomController.text = vehicules.nomVehicule;
-    // _prixController.text = vehicules.prix.toString();
     _capaciteController.text = vehicules.capaciteVehicule;
     _etatController.text = vehicules.etatVehicule.toString();
     _localiteController.text = vehicules.localisation;
-    // Récupérer les destinations et les prix du véhicule
-    // vehicules.prixParDestination.forEach((destination, prix) {
-    //   if (destination.isNotEmpty && prix > 0) {
-    //     // Ajouter la destination et le prix à la liste prixParDestinations
-    //     prixParDestinations.addAll({destination: prix});
-    //   }
-    // });
+    _descriptionController.text = vehicules.description!;
+    _nbKiloController.text = vehicules.nbKilometrage.toString();
     vehicules.prixParDestination.forEach((destination, prix) {
       TextEditingController destinationController =
           TextEditingController(text: destination);
@@ -87,7 +160,7 @@ class _DetailTransportState extends State<DetailTransport> {
       _destinationControllers.add(destinationController);
       _prixControllers.add(prixController);
     });
-   
+
     isDialOpenNotifier = ValueNotifier<bool>(false);
     super.initState();
   }
@@ -173,46 +246,121 @@ class _DetailTransportState extends State<DetailTransport> {
       final String capacite = _capaciteController.text;
       final String etat = _etatController.text;
       final String localite = _localiteController.text;
-
-      // Création d'une nouvelle map pour stocker les prix par destination mis à jour
-
-      // Parcourir les destinations et les prix modifiés simultanément
-      for (int i = 0; i < _destinationControllers.length; i++) {
-        String destination = _destinationControllers[i].text;
-        int prix = int.tryParse(_prixControllers[i].text) ?? 0;
-
-        // Ajouter la destination et le prix à la nouvelle map
-        if (destination.isNotEmpty && prix > 0) {
-          newPrixParDestinations[destination] = prix;
-        }
-      }
-
-      await VehiculeService().updateVehicule(
-        idVehicule: vehicules.idVehicule!,
-        nomVehicule: nom,
-        capaciteVehicule: capacite,
-        prixParDestination: newPrixParDestinations,
-        etatVehicule: etat,
-        localisation: localite,
-        typeVoiture: typeVoiture,
-        acteur: acteur,
-      );
+      final String description = _descriptionController.text;
+      final String nbKil = _nbKiloController.text;
+      final int? nb = int.tryParse(nbKil);
 
       setState(() {
-        vehicules = Vehicule(
-          idVehicule: vehicules.idVehicule,
-          nomVehicule: nom,
-          capaciteVehicule: capacite,
-          prixParDestination: newPrixParDestinations,
-          etatVehicule: etat,
-          localisation: localite,
-          typeVoiture: typeVoiture,
-          acteur: acteur,
-          statutVehicule: vehicules.statutVehicule,
-        );
+        // Parcourir les destinations et les prix modifiés simultanément
+        for (int i = 0; i < _destinationControllers.length; i++) {
+          String destination = _destinationControllers[i].text;
+          int prix = int.tryParse(_prixControllers[i].text) ?? 0;
 
-        _isLoading = false;
+          // Ajouter la destination et le prix à la nouvelle map
+          if (destination.isNotEmpty && prix > 0) {
+            newPrixParDestinations[destination] = prix;
+          }
+        }
+
+        // Parcourir pour ajouter les nouvelles destinations
+        for (int i = 0; i < selectedDestinationsList.length; i++) {
+          String destination = selectedDestinations[i];
+          int prix = int.tryParse(prixControllers[i].text) ?? 0;
+
+          // Ajouter la destination et le prix à la nouvelle map
+          if (destination.isNotEmpty && prix > 0) {
+            // Si la destination n'existe pas déjà dans la nouvelle map, l'ajouter
+            if (!newPrixParDestinations.containsKey(destination)) {
+              newPrixParDestinations[destination] = prix;
+            } else {
+              // Si la destination existe déjà, mettre à jour le prix
+              newPrixParDestinations[destination] = prix;
+              // Réinitialiser les contrôleurs de destination et de prix
+            }
+          }
+        }
+        // Réinitialiser les listes de destinations sélectionnées
+        selectedDestinationsList.clear();
+        selectedDestinations.clear();
       });
+
+      if (photo != null) {
+        await VehiculeService()
+            .updateVehicule(
+              idVehicule: vehicules.idVehicule,
+              nomVehicule: nom,
+              capaciteVehicule: capacite,
+              prixParDestination: newPrixParDestinations,
+              etatVehicule: etat,
+              photoVehicule: photo,
+              localisation: localite,
+              description: description,
+              nbKilometrage: nb.toString(),
+              typeVoiture: typeVoiture,
+              acteur: acteur,
+            )
+            .then((value) => {
+                  setState(() {
+                    vehicules = Vehicule(
+                      idVehicule: vehicules.idVehicule,
+                      nomVehicule: nom,
+                      photoVehicule: vehicules.photoVehicule,
+                      capaciteVehicule: capacite,
+                      prixParDestination: newPrixParDestinations,
+                      etatVehicule: etat,
+                      codeVehicule: vehicules.codeVehicule,
+                      description: vehicules.description,
+                      nbKilometrage: nb,
+                      localisation: localite,
+                      typeVoiture: typeVoiture,
+                      acteur: acteur,
+                      statutVehicule: vehicules.statutVehicule,
+                    );
+
+                    _isLoading = false;
+                  }),
+                  Provider.of<VehiculeService>(context, listen: false)
+                      .applyChange()
+                })
+            .catchError((onError) => {print(onError.toString())});
+      } else {
+        await VehiculeService()
+            .updateVehicule(
+              idVehicule: vehicules.idVehicule,
+              nomVehicule: nom,
+              capaciteVehicule: capacite,
+              prixParDestination: newPrixParDestinations,
+              etatVehicule: etat,
+              localisation: localite,
+              description: description,
+              nbKilometrage: nb.toString(),
+              typeVoiture: typeVoiture,
+              acteur: acteur,
+            )
+            .then((value) => {
+                  setState(() {
+                    vehicules = Vehicule(
+                      idVehicule: vehicules.idVehicule,
+                      nomVehicule: nom,
+                      capaciteVehicule: capacite,
+                      prixParDestination: newPrixParDestinations,
+                      etatVehicule: etat,
+                      photoVehicule: vehicules.photoVehicule,
+                      codeVehicule: vehicules.codeVehicule,
+                      description: description,
+                      nbKilometrage: nb,
+                      localisation: localite,
+                      typeVoiture: typeVoiture,
+                      acteur: acteur,
+                      statutVehicule: vehicules.statutVehicule,
+                    );
+                    _isLoading = false;
+                  }),
+                  Provider.of<VehiculeService>(context, listen: false)
+                      .applyChange()
+                })
+            .catchError((onError) => {print(onError.toString())});
+      }
     } catch (e) {
       print(e.toString());
       setState(() {
@@ -238,7 +386,13 @@ class _DetailTransportState extends State<DetailTransport> {
               centerTitle: true,
               toolbarHeight: 100,
               leading: _isEditing
-                  ? Container()
+                  ? IconButton(
+                      onPressed: _showImageSourceDialog,
+                      icon: const Icon(
+                        Icons.camera_alt,
+                        // size: 60,
+                      ),
+                    )
                   : IconButton(
                       onPressed: () {
                         Navigator.of(context).pop();
@@ -453,27 +607,36 @@ class _DetailTransportState extends State<DetailTransport> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                  child: vehicules.photoVehicule != null
-                      ? Image.network(
-                          "http://10.0.2.2/${vehicules.photoVehicule!}",
-                          width: double.infinity,
-                          height: 200,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.asset(
-                          "assets/images/camion.png",
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: 200,
-                        ),
-                ),
+                photo != null
+                    ? Center(
+                        child: Image.file(
+                        photo!,
+                        width: double.infinity,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ))
+                    : Center(
+                        child: vehicules.photoVehicule != null &&
+                                !vehicules.photoVehicule!.isEmpty
+                            ? Image.network(
+                                "http://10.0.2.2/${vehicules.photoVehicule!}",
+                                width: double.infinity,
+                                height: 200,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.asset(
+                                "assets/images/camion.png",
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: 200,
+                              ),
+                      ),
                 SizedBox(height: 30),
                 _isEditing ? _buildEditing() : _buildData(),
                 !_isEditing ? _buildPanel() : Container(),
                 !_isEditing
                     ? _buildDescription(
-                        'Description : ', vehicules.typeVoiture.description!)
+                        'Description : ', vehicules.description!)
                     : Container(),
               ],
             ),
@@ -503,7 +666,6 @@ class _DetailTransportState extends State<DetailTransport> {
                         _makePhoneWa(whatsappNumber);
                       },
                     ),
-
                     SpeedDialChild(
                       child: Icon(Icons.phone),
                       label: 'Par téléphone ',
@@ -565,6 +727,8 @@ class _DetailTransportState extends State<DetailTransport> {
         _buildEditableDetailItem('Capacité : ', _capaciteController),
         _buildEditableDetailItem('Localisation : ', _localiteController),
         _buildEditableDetailItem('Etat du véhicule : ', _etatController),
+        _buildEditableDetailItem('Description : ', _descriptionController),
+        _buildEditableDetailItem('Nombre kilometrage : ', _nbKiloController),
         _buildDestinationPriceFields(),
         SizedBox(
           height: 15,
@@ -573,67 +737,187 @@ class _DetailTransportState extends State<DetailTransport> {
           padding: EdgeInsets.symmetric(
             horizontal: 22,
           ),
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: Text(
-              "Ajouter d'autre prix",
-              style: TextStyle(color: (Colors.black), fontSize: 18),
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: TextFormField(
-                  controller: _destinationController,
-                  decoration: InputDecoration(
-                    hintText: "Destination",
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Ajouter prix",
+                    style: TextStyle(color: Colors.black, fontSize: 18),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      // Appeler la méthode pour ajouter une destination et un prix
+                      addDestinationAndPrix();
+                    },
+                    icon: Icon(Icons.add),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              Column(
+                children: destinationPrixFields,
+              ),
+              Column(
+                children: List.generate(
+                  destinationControllers.length,
+                  (index) => Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: FutureBuilder(
+                            future: _niveau3List,
+                            builder: (_, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Destination',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10,
+                                      horizontal: 20,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                              if (snapshot.hasError) {
+                                return Text("${snapshot.error}");
+                              }
+                              if (snapshot.hasData) {
+                                dynamic responseData =
+                                    json.decode(snapshot.data.body);
+                                if (responseData is List) {
+                                  final reponse = responseData;
+                                  final niveau3List = reponse
+                                      .map((e) => Niveau3Pays.fromMap(e))
+                                      .where((con) => con.statutN3 == true)
+                                      .toList();
+
+                                  if (niveau3List.isEmpty) {
+                                    return DropdownButtonFormField(
+                                      items: [],
+                                      onChanged: null,
+                                      decoration: InputDecoration(
+                                        labelText: 'Destination',
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                          vertical: 10,
+                                          horizontal: 20,
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  return DropdownButtonFormField<String>(
+                                    items: niveau3List
+                                        .map(
+                                          (e) => DropdownMenuItem(
+                                            value: e.idNiveau3Pays,
+                                            child: Text(e.nomN3),
+                                          ),
+                                        )
+                                        .toList(),
+
+                                    value: selectedDestinationsList[
+                                        index], // Utilisez l'index pour accéder à la valeur sélectionnée correspondante dans selectedDestinationsList
+                                    onChanged: (newValue) {
+                                      setState(() {
+                                        selectedDestinationsList[index] =
+                                            newValue; // Mettre à jour avec l'ID de la destination
+                                        String selectedDestinationName =
+                                            niveau3List
+                                                .firstWhere((element) =>
+                                                    element.idNiveau3Pays ==
+                                                    newValue)
+                                                .nomN3;
+                                        selectedDestinations.add(
+                                            selectedDestinationName); // Ajouter le nom de la destination à la liste
+                                        print(
+                                            "niveau 3 : $selectedDestinationsList");
+                                        print(
+                                            "niveau 3 nom  : $selectedDestinations");
+                                      });
+                                    },
+                                    decoration: InputDecoration(
+                                      labelText: 'Destination',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                        horizontal: 20,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Destination',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                        horizontal: 20,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Destination',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: TextFormField(
+                            controller: prixControllers[index],
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            decoration: InputDecoration(
+                              hintText: "Prix",
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: TextFormField(
-                  controller: _prixController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly,
-                  ],
-                  decoration: InputDecoration(
-                    hintText: "Prix",
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    String destination = _destinationController.text;
-                    int prix = int.tryParse(_prixController.text) ?? 0;
-
-                    if (destination.isNotEmpty && prix > 0) {
-                      // Ajouter la destination et le prix à la liste prixParDestinations
-                      newPrixParDestinations.addAll({destination: prix});
-
-                      print(prixParDestinations.toString());
-
-                      _destinationController.clear();
-                      _prixController.clear();
-                    }
-                  });
-                },
-                icon: Icon(Icons.add),
               ),
             ],
           ),
@@ -646,7 +930,7 @@ class _DetailTransportState extends State<DetailTransport> {
     return Column(
       children: [
         _buildItem('Nom du véhicule : ', vehicules.nomVehicule),
-        _buildItem('Type de véhicule : ', vehicules.typeVoiture.nom),
+        _buildItem('Type de véhicule : ', vehicules.typeVoiture.nom!),
         vehicules.typeVoiture.nombreSieges != 0
             ? _buildItem('Nombre de siège : ',
                 vehicules.typeVoiture.nombreSieges.toString())
@@ -654,13 +938,16 @@ class _DetailTransportState extends State<DetailTransport> {
         _buildItem('Capacité : ', vehicules.capaciteVehicule),
         // _buildItem('Prix / voyage: ', vehicules.prix.toString()),
         _buildItem('Localisation : ', vehicules.localisation),
+        _buildItem('Nombre de kilometrage : ',
+            "${vehicules.nbKilometrage.toString()} Km"),
         _buildItem('Statut: : ',
             '${vehicules.statutVehicule ? 'Disponible' : 'Non disponible'}'),
-        acteur.nomActeur != vehicules.acteur.nomActeur
-            ? _buildItem('Propriètaire : ', vehicules.acteur.nomActeur!)
-
-            : Container(),
-        // _buildItem('Description : ', vehicules.typeVoiture.description!),
+        !isExist
+            ? Container()
+            : acteur.nomActeur != vehicules.acteur.nomActeur
+                ? _buildItem('Propriètaire : ', vehicules.acteur.nomActeur!)
+                : Container(),
+        // _buildItem('Description : ', vehicules.description!),
       ],
     );
   }
@@ -844,7 +1131,8 @@ class _DetailTransportState extends State<DetailTransport> {
                         vehicules.prixParDestination.keys.elementAt(index);
                     int prix =
                         vehicules.prixParDestination.values.elementAt(index);
-                    return _buildItem(destination, "${prix.toString()} FCFA");
+                    return _buildItem(
+                        destination, "${prix.toString()} ${para.monnaie}");
                   }),
                 ),
               ),

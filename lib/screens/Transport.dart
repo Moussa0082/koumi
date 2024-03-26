@@ -9,8 +9,10 @@ import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/DetailTransport.dart';
 import 'package:koumi_app/screens/PageTransporteur.dart';
+import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Transport extends StatefulWidget {
   const Transport({super.key});
@@ -31,18 +33,38 @@ class _TransportState extends State<Transport> {
   TypeVoiture? selectedType;
   String? typeValue;
   late Future _typeList;
+  bool isExist = false;
+  String? email = "";
 
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      typeActeurData = acteur.typeActeur!;
+      type = typeActeurData.map((data) => data.libelle).join(', ');
+      setState(() {
+        isExist = true;
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
+  }
 
   @override
   void initState() {
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    typeActeurData = acteur.typeActeur!;
-
-    // selectedType == null;
-    type = typeActeurData.map((data) => data.libelle).join(', ');
+    // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    // typeActeurData = acteur.typeActeur!;
+    // // selectedType == null;
+    // type = typeActeurData.map((data) => data.libelle).join(', ');
+    verify();
     _searchController = TextEditingController();
-    _typeList = http.get(Uri.parse(
-        'http://10.0.2.2:9000/api-koumi/TypeVoiture/listeByActeur/${acteur.idActeur!}'));
+    // _typeList = http.get(Uri.parse('https://koumi.ml/api-koumi/TypeVoiture/read'));
+    _typeList =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
     super.initState();
   }
 
@@ -66,90 +88,157 @@ class _TransportState extends State<Transport> {
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
-            'Véhicule de transport',
+            'Transport',
             style: const TextStyle(
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
-          actions: [
-            PopupMenuButton<String>(
-              padding: EdgeInsets.zero,
-              itemBuilder: (context) {
-                return <PopupMenuEntry<String>>[
-                  PopupMenuItem<String>(
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.remove_red_eye,
-                        color: Colors.green,
-                      ),
-                      title: const Text(
-                        "Transporteurs",
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onTap: () async {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => PageTransporteur()));
-                      },
-                    ),
-                  ),
-                ];
-              },
-            )
-          ]),
+          actions: !isExist
+              ? null
+              : [
+                  (type.toLowerCase() == 'admin' ||
+                          type.toLowerCase() == 'transporteur')
+                      ? PopupMenuButton<String>(
+                          padding: EdgeInsets.zero,
+                          itemBuilder: (context) {
+                            return <PopupMenuEntry<String>>[
+                              PopupMenuItem<String>(
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.remove_red_eye,
+                                    color: Colors.green,
+                                  ),
+                                  title: const Text(
+                                    "Transporteurs",
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                PageTransporteur()));
+                                  },
+                                ),
+                              ),
+                              PopupMenuItem<String>(
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.remove_red_eye,
+                                    color: Colors.green,
+                                  ),
+                                  title: const Text(
+                                    "Mes véhicules",
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                VehiculeActeur()));
+                                  },
+                                ),
+                              )
+                            ];
+                          },
+                        )
+                      : PopupMenuButton<String>(
+                          padding: EdgeInsets.zero,
+                          itemBuilder: (context) {
+                            return <PopupMenuEntry<String>>[
+                              PopupMenuItem<String>(
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.remove_red_eye,
+                                    color: Colors.green,
+                                  ),
+                                  title: const Text(
+                                    "Transporteurs",
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                PageTransporteur()));
+                                  },
+                                ),
+                              ),
+                            ];
+                          },
+                        )
+                ]),
       body: SingleChildScrollView(
         child: Column(children: [
           const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.search,
-                      color: Colors.blueGrey[400],
-                      size: 28), // Utiliser une icône de recherche plus grande
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Rechercher',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(color: Colors.blueGrey[400]),
-                      ),
-                    ),
-                  ),
-                  // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
-                  IconButton(
-                    icon: Icon(Icons.clear),
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() {});
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
+          // Padding(
+          //   padding: const EdgeInsets.all(10.0),
+          //   child: Container(
+          //     padding: EdgeInsets.symmetric(horizontal: 10),
+          //     decoration: BoxDecoration(
+          //       color: Colors.blueGrey[50], // Couleur d'arrière-plan
+          //       borderRadius: BorderRadius.circular(25),
+          //     ),
+          //     child: Row(
+          //       children: [
+          //         Icon(Icons.search,
+          //             color: Colors.blueGrey[400],
+          //             size: 28), // Utiliser une icône de recherche plus grande
+          //         SizedBox(width: 10),
+          //         Expanded(
+          //           child: TextField(
+          //             controller: _searchController,
+          //             onChanged: (value) {
+          //               setState(() {});
+          //             },
+          //             decoration: InputDecoration(
+          //               hintText: 'Rechercher',
+          //               border: InputBorder.none,
+          //               hintStyle: TextStyle(color: Colors.blueGrey[400]),
+          //             ),
+          //           ),
+          //         ),
+          //         // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
+          //         IconButton(
+          //           icon: Icon(Icons.clear),
+          //           onPressed: () {
+          //             _searchController.clear();
+          //             setState(() {});
+          //           },
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
+          // const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: FutureBuilder(
               future: _typeList,
               builder: (_, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
+                  return DropdownButtonFormField(
+                    items: [],
+                    onChanged: null,
+                    decoration: InputDecoration(
+                      labelText: '-- Aucun type de véhicule trouvé --',
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  );
                 }
                 if (snapshot.hasError) {
                   return Text("${snapshot.error}");
@@ -183,7 +272,7 @@ class _TransportState extends State<Transport> {
                           .map(
                             (e) => DropdownMenuItem(
                               value: e.idTypeVoiture,
-                              child: Text(e.nom),
+                              child: Text(e.nom!),
                             ),
                           )
                           .toList(),
@@ -242,7 +331,7 @@ class _TransportState extends State<Transport> {
             return FutureBuilder<List<Vehicule>>(
                 future: selectedType != null
                     ? vehiculeService.fetchVehiculeByTypeVehicule(
-                        selectedType!.idTypeVoiture)
+                        selectedType!.idTypeVoiture!)
                     : vehiculeService.fetchVehicule(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {

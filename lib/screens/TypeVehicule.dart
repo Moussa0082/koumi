@@ -5,7 +5,6 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/AddVehiculeTransport.dart';
 import 'package:koumi_app/screens/ListeVehiculeByType.dart';
 import 'package:koumi_app/service/TypeVoitureService.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
@@ -35,7 +34,6 @@ class _TypeVehiculeState extends State<TypeVehicule> {
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    // print(acteur.toString());
     _searchController = TextEditingController();
     super.initState();
   }
@@ -88,28 +86,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                       },
                     ),
                   ),
-                  PopupMenuItem<String>(
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.add,
-                        color: Colors.green,
-                      ),
-                      title: const Text(
-                        "Ajouter un véhicule",
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onTap: () async {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AddVehiculeTransport()));
-                      },
-                    ),
-                  ),
+                 
                 ];
               },
             )
@@ -156,8 +133,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
             Consumer<TypeVoitureService>(
                 builder: (context, typeService, child) {
               return FutureBuilder(
-                  future:
-                      typeService.fetchTypeVoitureByActeur(acteur.idActeur!),
+                  future: typeService.fetchTypeVoiture(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
@@ -176,7 +152,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                       String searchText = "";
                       List<TypeVoiture> filtereSearch =
                           typeListe.where((search) {
-                        String libelle = search.nom.toLowerCase();
+                        String libelle = search.nom!.toLowerCase();
                         searchText = _searchController.text.toLowerCase();
                         return libelle.contains(searchText);
                       }).toList();
@@ -219,7 +195,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                 width: 80,
                                                 height: 80,
                                               ),
-                                              title: Text(e.nom.toUpperCase(),
+                                              title: Text(e.nom!.toUpperCase(),
                                                   style: const TextStyle(
                                                     color: Colors.black,
                                                     fontSize: 20,
@@ -252,7 +228,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                             return FutureBuilder(
                                                 future: typeService
                                                     .fetchVehiculeByTypeVehicule(
-                                                        e.idTypeVoiture),
+                                                        e.idTypeVoiture!),
                                                 builder: (context, snapshot) {
                                                   if (snapshot
                                                           .connectionState ==
@@ -352,7 +328,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                _buildEtat(e.statutType),
+                                                _buildEtat(e.statutType!),
                                                 PopupMenuButton<String>(
                                                   padding: EdgeInsets.zero,
                                                   itemBuilder: (context) =>
@@ -374,7 +350,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                         onTap: () async {
                                                           await TypeVoitureService()
                                                               .activerType(e
-                                                                  .idTypeVoiture)
+                                                                  .idTypeVoiture!)
                                                               .then((value) => {
                                                                     Provider.of<TypeVoitureService>(
                                                                             context,
@@ -440,7 +416,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                         onTap: () async {
                                                           await TypeVoitureService()
                                                               .desactiverType(e
-                                                                  .idTypeVoiture)
+                                                                  .idTypeVoiture!)
                                                               .then((value) => {
                                                                     Provider.of<TypeVoitureService>(
                                                                             context,
@@ -542,7 +518,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                         onTap: () async {
                                                           await TypeVoitureService()
                                                               .deleteType(e
-                                                                  .idTypeVoiture)
+                                                                  .idTypeVoiture!)
                                                               .then((value) => {
                                                                     Provider.of<TypeVoitureService>(
                                                                             context,

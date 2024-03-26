@@ -1,5 +1,3 @@
-
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Niveau1Pays.dart';
@@ -26,6 +24,8 @@ class MagasinService extends ChangeNotifier{
     required Niveau1Pays niveau1Pays,
   }) async {
     try {
+      //    // Convertir chaque TypeActeur en un objet JSON et les ajouter à une liste JSON
+      // List<String> typeActeurJsonList = typeActeur.map((typeActeur) => typeActeur.toJson()).toList();
 
     //    // Convertir chaque TypeActeur en un objet JSON et les ajouter à une liste JSON
     // List<String> typeActeurJsonList = typeActeur.map((typeActeur) => typeActeur.toJson()).toList();
@@ -103,27 +103,27 @@ class MagasinService extends ChangeNotifier{
       var response = await requete.send();
       var responsed = await http.Response.fromStream(response);
 
-      if (response.statusCode == 200 || responsed.statusCode == 201 || responsed.statusCode == 202) {
+      if (response.statusCode == 200 || responsed.statusCode == 201) {
         final donneesResponse = json.decode(responsed.body);
         debugPrint('magasin service ${donneesResponse.toString()}');
       } else {
-        throw Exception(
-            'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
+        final errorMessage =
+            json.decode(utf8.decode(responsed.bodyBytes))['message'];
+        throw Exception(' ${errorMessage}');
       }
-        }catch(e){
-        debugPrint('magasin service erreur catch ${e.toString()}');
- throw Exception(
-          'Une erreur s\'est produite lors de la modification du magasin : $e');
+    } catch (e) {
+      throw Exception(
+          'Une erreur s\'est produite lors de l\'ajout du magasin : $e');
     }
-        
-
   }
 
+  
 
-    Future<void> deleteMagasin(String idMagasin) async {
-    final response =
-        await http.delete(Uri.parse('$baseUrl/delete/$idMagasin'));
-    if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+  Future<void> deleteMagasin(String idMagasin) async {
+    final response = await http.delete(Uri.parse('$baseUrl/delete/$idMagasin'));
+    if (response.statusCode == 200 ||
+        response.statusCode == 201 ||
+        response.statusCode == 202) {
       applyChange();
       debugPrint(response.body.toString());
     } else {
@@ -156,9 +156,7 @@ class MagasinService extends ChangeNotifier{
     }
   }
 
-   void applyChange() {
+  void applyChange() {
     notifyListeners();
   }
-
-  
 }

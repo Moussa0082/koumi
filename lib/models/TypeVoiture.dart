@@ -4,26 +4,29 @@ import 'dart:convert';
 import 'package:koumi_app/models/Acteur.dart';
 
 class TypeVoiture {
-  final String idTypeVoiture;
-  final String codeTypeVoiture;
-  final String nom;
+  final String? idTypeVoiture;
+  final String? codeTypeVoiture;
+  final String? nom;
   final int? nombreSieges;
   final String? description;
   final String? dateAjout;
   final String? dateModif;
-  final bool statutType;
+  final bool? statutType;
   final Acteur acteur;
+  
   TypeVoiture({
-    required this.idTypeVoiture,
-    required this.codeTypeVoiture,
-    required this.nom,
+    this.idTypeVoiture,
+    this.codeTypeVoiture,
+    this.nom,
     this.nombreSieges,
     this.description,
     this.dateAjout,
     this.dateModif,
-    required this.statutType,
+    this.statutType,
     required this.acteur,
   });
+
+  
 
   TypeVoiture copyWith({
     String? idTypeVoiture,
@@ -65,24 +68,21 @@ class TypeVoiture {
 
   factory TypeVoiture.fromMap(Map<String, dynamic> map) {
     return TypeVoiture(
-      idTypeVoiture: map['idTypeVoiture'] as String,
-      codeTypeVoiture: map['codeTypeVoiture'] as String,
-      nom: map['nom'] as String,
-      nombreSieges:
-          map['nombreSieges'] != null ? map['nombreSieges'] as int : null,
-      description:
-          map['description'] != null ? map['description'] as String : null,
+      idTypeVoiture: map['idTypeVoiture'] != null ? map['idTypeVoiture'] as String : null,
+      codeTypeVoiture: map['codeTypeVoiture'] != null ? map['codeTypeVoiture'] as String : null,
+      nom: map['nom'] != null ? map['nom'] as String : null,
+      nombreSieges: map['nombreSieges'] != null ? map['nombreSieges'] as int : null,
+      description: map['description'] != null ? map['description'] as String : null,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
-      statutType: map['statutType'] as bool,
-      acteur: Acteur.fromMap(map['acteur'] as Map<String, dynamic>),
+      statutType: map['statutType'] != null ? map['statutType'] as bool : null,
+      acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory TypeVoiture.fromJson(String source) =>
-      TypeVoiture.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory TypeVoiture.fromJson(String source) => TypeVoiture.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -92,28 +92,29 @@ class TypeVoiture {
   @override
   bool operator ==(covariant TypeVoiture other) {
     if (identical(this, other)) return true;
-
-    return other.idTypeVoiture == idTypeVoiture &&
-        other.codeTypeVoiture == codeTypeVoiture &&
-        other.nom == nom &&
-        other.nombreSieges == nombreSieges &&
-        other.description == description &&
-        other.dateAjout == dateAjout &&
-        other.dateModif == dateModif &&
-        other.statutType == statutType &&
-        other.acteur == acteur;
+  
+    return 
+      other.idTypeVoiture == idTypeVoiture &&
+      other.codeTypeVoiture == codeTypeVoiture &&
+      other.nom == nom &&
+      other.nombreSieges == nombreSieges &&
+      other.description == description &&
+      other.dateAjout == dateAjout &&
+      other.dateModif == dateModif &&
+      other.statutType == statutType &&
+      other.acteur == acteur;
   }
 
   @override
   int get hashCode {
     return idTypeVoiture.hashCode ^
-        codeTypeVoiture.hashCode ^
-        nom.hashCode ^
-        nombreSieges.hashCode ^
-        description.hashCode ^
-        dateAjout.hashCode ^
-        dateModif.hashCode ^
-        statutType.hashCode ^
-        acteur.hashCode;
+      codeTypeVoiture.hashCode ^
+      nom.hashCode ^
+      nombreSieges.hashCode ^
+      description.hashCode ^
+      dateAjout.hashCode ^
+      dateModif.hashCode ^
+      statutType.hashCode ^
+      acteur.hashCode;
   }
 }

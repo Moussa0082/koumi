@@ -6,8 +6,8 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 
 class TypeVoitureService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/typeActeur';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/TypeVoiture';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/TypeVoiture';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/TypeVoiture';
 
   List<TypeVoiture> typeList = [];
 

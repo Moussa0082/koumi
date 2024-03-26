@@ -6,14 +6,15 @@ import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart';
+import 'package:koumi_app/screens/MagasinActeur.dart';
 import 'package:koumi_app/screens/MagasinScreen.dart';
 import 'package:koumi_app/screens/Meteo.dart';
-import 'package:koumi_app/screens/MagasinActeur.dart';
+import 'package:koumi_app/screens/Produit.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
-import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Accueil extends StatefulWidget {
   const Accueil({super.key});
@@ -26,26 +27,39 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _AccueilState extends State<Accueil> {
-  
-       late Acteur acteur;
+  late Acteur acteur = Acteur();
+
+  String? email = "";
+  bool isExist = false;
+
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      setState(() {
+        isExist = true;
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-
-  //  Snack.info(message:'Connecté en tant que : ${acteur.nomActeur!.toUpperCase()}') ;
-  //   });
-
+    verify();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
-      appBar: const CustomAppBar(),
+      appBar: CustomAppBar(),
       body: ListView(
         children: [
           SizedBox(height: 200, child: Carrousel()),
@@ -57,19 +71,10 @@ class _AccueilState extends State<Accueil> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: 3,
-              children: [
-                _buildAccueilCard("Intrants", "intrant.png", 1),
-                _buildAccueilCard("Conseils", "conseil.png", 2),
-                _buildAccueilCard("Commandes", "commande.png", 3),
-                _buildAccueilCard("Magasin", "magasin.png", 4),
-                _buildAccueilCard("Meteo", "meteo.png", 5),
-                _buildAccueilCard("Transports", "transport.png", 6),
-                _buildAccueilCard("Locations", "location.png", 7),
-
-                _buildAccueilCard("Alertes", "alerte.png", 8),
-                _buildAccueilCard("Produits", "produit.png", 9),
-                // _buildAccueilCard("Statistique", "statistique_logo.png", 4)
-              ],
+              mainAxisSpacing: 2,
+              crossAxisSpacing: 5,
+              childAspectRatio: 0.9,
+              children: _buildCards(),
             ),
           ),
           const SizedBox(
@@ -80,16 +85,36 @@ class _AccueilState extends State<Accueil> {
     );
   }
 
+
+List<Widget> _buildCards() {
+    List<Widget> cards = [
+      _buildAccueilCard("Intrants", "intrant.png", 1),
+      _buildAccueilCard("Commandes", "commande.png", 3),
+      _buildAccueilCard("Magasin", "magasin.png", 4),
+      _buildAccueilCard("Transports", "transport.png", 6),
+      _buildAccueilCard("Locations", "location.png", 7),
+      _buildAccueilCard("Produits", "produit.png", 9),
+    ];
+
+    if (isExist) {
+      cards.insert(1, _buildAccueilCard("Conseils", "conseil.png", 2));
+      cards.insert(4, _buildAccueilCard("Meteo", "meteo.png", 5));
+      cards.insert(7, _buildAccueilCard("Alertes", "alerte.png", 8));
+    }
+
+    return cards;
+  }
+
   Widget _buildAccueilCard(String titre, String imgLocation, int index) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
       child: InkWell(
           onTap: () {
             if (index == 9) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const MagasinActeurScreen()));
+                      builder: (context) =>  ProduitScreen()));
             } else if (index == 8) {
               Navigator.push(
                   context,
@@ -130,8 +155,8 @@ class _AccueilState extends State<Accueil> {
           child: Padding(
             padding: const EdgeInsets.all(5.0),
             child: Container(
-              width:MediaQuery.of(context).size.width,
-              height: 155,
+              width: MediaQuery.of(context).size.width,
+              // height: 155,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: Colors.white,
@@ -157,7 +182,7 @@ class _AccueilState extends State<Accueil> {
                   Text(
                     titre,
                     style: const TextStyle(
-                      fontSize: 17,
+                      fontSize: 16,
                       overflow: TextOverflow.ellipsis,
                       fontWeight: FontWeight.bold,
                     ),

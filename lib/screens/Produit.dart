@@ -11,12 +11,17 @@ import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/Unite.dart';
+import 'package:koumi_app/providers/CartProvider.dart';
+import 'package:koumi_app/screens/Panier.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/screens/ProduitActeur.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
+import 'package:badges/badges.dart' as badges;
+
 import 'package:shimmer/shimmer.dart';
 
 class ProduitScreen extends StatefulWidget {
@@ -34,8 +39,9 @@ class _ProduitScreenState extends State<ProduitScreen>
   late TextEditingController _searchController;
 
   List<Stock> stock = [];
-    late Acteur acteur;
-  late List<TypeActeur> typeActeurData = [];
+ late Acteur acteur =
+      Acteur(); 
+        late List<TypeActeur> typeActeurData = [];
   late String type;
     
    bool? isEditable = false;
@@ -44,6 +50,20 @@ class _ProduitScreenState extends State<ProduitScreen>
   String selectedCategorieProduitNom = "";
 
   Set<String> loadedRegions = {};
+
+  String? email = "";
+
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      typeActeurData = acteur.typeActeur!;
+      type = typeActeurData.map((data) => data.libelle).join(', ');
+    }
+  }
+
 
   void fetchProduitByCategorie(String idCategorie, String idMagasin) async {
     try {
@@ -146,9 +166,7 @@ class _ProduitScreenState extends State<ProduitScreen>
   void initState() {
     super.initState();
     _searchController = TextEditingController();
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    typeActeurData = acteur.typeActeur!;
-    type = typeActeurData.map((data) => data.libelle).join(', ');
+      verify();
 
     if (categorieProduit.isEmpty) {
       fetchCategorie();
@@ -181,6 +199,43 @@ class _ProduitScreenState extends State<ProduitScreen>
               controller: _tabController, // Ajoutez le contrôleur TabBar
               tabs: categorieProduit.map((cat) => Tab(text: cat.libelleCategorie)).toList(),
             ),
+            actions: [
+          Row(
+            children: [
+              Consumer<CartProvider>(
+                builder: (context, cartProvider, child) {
+                  return badges.Badge(
+                    badgeStyle: badges.BadgeStyle(
+                      badgeColor: Colors.red,
+                    ),
+                    position: badges.BadgePosition.bottomEnd(bottom: 1, end: 1),
+                    badgeContent: Text(
+                      cartProvider.cartItems.length.toString(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    child: IconButton(
+                      color: Colors.blue,
+                      icon: const Icon(Icons.local_mall),
+                      iconSize: 25,
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext ctx) =>
+                                     Panier()));
+                      },
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(
+                width: 5,
+              )
+            ],
+          )
+        ],
           centerTitle: true,
           toolbarHeight: 100,
           leading: IconButton(
@@ -193,62 +248,63 @@ class _ProduitScreenState extends State<ProduitScreen>
             style: const TextStyle(
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
-          actions: [
-            PopupMenuButton<String>(
-              padding: EdgeInsets.zero,
-              itemBuilder: (context) {
-                print("Type: $type");
-                return acteur.idActeur! == stock.map((element) => element.acteur!.idActeur!)
-                    ? <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.remove_red_eye,
-                              color: Colors.green,
-                            ),
-                            title: const Text(
-                              "Mes Produits",
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            onTap: () async {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ProduitActeurScreen()));
-                            },
-                          ),
-                        ),
-                      ]
-                    : <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.add,
-                              color: Colors.green,
-                            ),
-                            title: const Text(
-                              "Ajouter produit",
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            onTap: () async {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          AddAndUpdateProductScreen(isEditable: isEditable,)));
-                            },
-                          ),
-                        ),
-                      ];
-              },
-            )
-          ]),
+          // actions: [
+          //   PopupMenuButton<String>(
+          //     padding: EdgeInsets.zero,
+          //     itemBuilder: (context) {
+          //       print("Type: $type");
+          //       return acteur.idActeur! == stock.map((element) => element.acteur!.idActeur!)
+          //           ? <PopupMenuEntry<String>>[
+          //               PopupMenuItem<String>(
+          //                 child: ListTile(
+          //                   leading: const Icon(
+          //                     Icons.remove_red_eye,
+          //                     color: Colors.green,
+          //                   ),
+          //                   title: const Text(
+          //                     "Mes Produits",
+          //                     style: TextStyle(
+          //                       color: Colors.green,
+          //                       fontWeight: FontWeight.bold,
+          //                     ),
+          //                   ),
+          //                   onTap: () async {
+          //                     Navigator.push(
+          //                         context,
+          //                         MaterialPageRoute(
+          //                             builder: (context) => ProduitActeurScreen()));
+          //                   },
+          //                 ),
+          //               ),
+          //             ]
+          //           : <PopupMenuEntry<String>>[
+          //               PopupMenuItem<String>(
+          //                 child: ListTile(
+          //                   leading: const Icon(
+          //                     Icons.add,
+          //                     color: Colors.green,
+          //                   ),
+          //                   title: const Text(
+          //                     "Ajouter produit",
+          //                     style: TextStyle(
+          //                       color: Colors.green,
+          //                       fontWeight: FontWeight.bold,
+          //                     ),
+          //                   ),
+          //                   onTap: () async {
+          //                     Navigator.push(
+          //                         context,
+          //                         MaterialPageRoute(
+          //                             builder: (context) =>
+          //                                 AddAndUpdateProductScreen(isEditable: isEditable,)));
+          //                   },
+          //                 ),
+          //               ),
+          //             ];
+          //     },
+          //   )
+          // ]
+          ),
 
           body: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -292,13 +348,13 @@ class _ProduitScreenState extends State<ProduitScreen>
                 const SizedBox(height: 10),
                 Flexible(
                   child: GestureDetector(
-                    child: TabBarView(
+                    child: categorieProduit.isNotEmpty && widget.id! != null ? TabBarView(
                       controller: _tabController,
-                      children: categorieProduit.map((categorie) {
+                      children:  categorieProduit.map((categorie) {
                         return buildGridView(
                             categorie.idCategorieProduit!,  widget.id!);
                       }).toList(),
-                    ),
+                    ) : SizedBox(),
                   ),
                 ),
               ],
@@ -455,7 +511,8 @@ Get.to(
             if (filteredStocksSearch[index].acteur!.idActeur! == acteur.idActeur!){
                         Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
                         }else{
-                          ShoppingCart().addToCart(filteredStocksSearch[index]);
+                          Provider.of<CartProvider>(context, listen: false)
+                        .addToCart(filteredStocksSearch[index], 1, "");
                         }
             // Par exemple, ajouter le produit au panier
           },

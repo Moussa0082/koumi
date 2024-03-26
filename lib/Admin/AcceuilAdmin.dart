@@ -12,15 +12,16 @@ import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart';
+import 'package:koumi_app/screens/MagasinActeur.dart';
 import 'package:koumi_app/screens/MagasinScreen.dart';
 import 'package:koumi_app/screens/Meteo.dart';
 import 'package:koumi_app/screens/MagasinActeur.dart';
 import 'package:koumi_app/screens/Panier.dart';
+import 'package:koumi_app/screens/Produit.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
-import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
 
 class AcceuilAdmin extends StatefulWidget {
@@ -41,11 +42,10 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
     // TODO: implement initState
     super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
 
-  //  Snack.info(message:'Connecté en tant que : ${acteur.nomActeur!.toUpperCase()}') ;
-  //   });
-
+    //  Snack.info(message:'Connecté en tant que : ${acteur.nomActeur!.toUpperCase()}') ;
+    //   });
   }
 
   @override
@@ -74,6 +74,9 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: 3,
+              mainAxisSpacing: 2,
+              crossAxisSpacing: 5,
+              childAspectRatio: 0.9,
               children: [
                 _buildAccueilCard("Intrants", "intrant.png", 1),
                 _buildAccueilCard("Conseils", "conseil.png", 2),
@@ -102,7 +105,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
 
   Widget _buildAccueilCard(String titre, String imgLocation, int index) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
       child: InkWell(
           onTap: () {
             if (index == 12) {
@@ -120,12 +123,11 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => const FiliereScreen()));
-            }
-            
-            else if (index == 9) {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const MagasinActeurScreen()));
-
+            } else if (index == 9) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>  ProduitScreen()));
             } else if (index == 8) {
               Navigator.push(
                   context,
@@ -166,8 +168,8 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
           child: Padding(
             padding: const EdgeInsets.all(5.0),
             child: Container(
-              width:MediaQuery.of(context).size.width,
-              height: 155,
+              width: MediaQuery.of(context).size.width,
+              // height: 155,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: Colors.white,
@@ -193,7 +195,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                   Text(
                     titre,
                     style: const TextStyle(
-                      fontSize: 17,
+                      fontSize: 16,
                       overflow: TextOverflow.ellipsis,
                       fontWeight: FontWeight.bold,
                     ),
@@ -223,3 +225,4 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
 
 
 }
+

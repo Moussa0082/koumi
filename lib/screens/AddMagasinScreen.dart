@@ -24,8 +24,15 @@ class AddMagasinScreen extends StatefulWidget {
   String? idMagasin = "";
   File? photo;
   late Niveau1Pays? niveau1Pays;
-   AddMagasinScreen({super.key, this.isEditable, this.idMagasin, this.nomMagasin, 
-   this.contactMagasin, this.localiteMagasin, this.photo,  this.niveau1Pays});
+  AddMagasinScreen(
+      {super.key,
+      this.isEditable,
+      this.idMagasin,
+      this.nomMagasin,
+      this.contactMagasin,
+      this.localiteMagasin,
+      this.photo,
+      this.niveau1Pays});
 
   @override
   State<AddMagasinScreen> createState() => _AddMagasinScreenState();
@@ -85,118 +92,114 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
 //   }
 // }
   Future<void> updateMagasin() async {
-  final nomMagasin = nomMagasinController.text;
-  final contactMagasin = contactMagasinController.text;
-  final localiteMagasin = localiteMagasinController.text;
-  MagasinService magasinService = MagasinService();
-  try {
-    if (photos != null) {
-      await magasinService
-          .updateMagasin(
-              idMagasin: widget.idMagasin!,
-              nomMagasin: nomMagasin,
-              contactMagasin: contactMagasin,
-              localiteMagasin: localiteMagasin,
-              photo: widget.photo,
-              acteur: acteur,
-              niveau1Pays: widget.niveau1Pays!
-              )
-          .then((value) => showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Center(child: Text('Succès')),
-                    content: const Text("Magasin mis à jour avec succès"),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                                        nomMagasinController.clear();
-         contactMagasinController.clear();
-         localiteMagasinController.clear();
-                        },
-                        child: const Text('OK'),
-                      ),
-                    ],
-                  );
+    final nomMagasin = nomMagasinController.text;
+    final contactMagasin = contactMagasinController.text;
+    final localiteMagasin = localiteMagasinController.text;
+    MagasinService magasinService = MagasinService();
+    try {
+      if (photos != null) {
+        await magasinService
+            .updateMagasin(
+                idMagasin: widget.idMagasin!,
+                nomMagasin: nomMagasin,
+                contactMagasin: contactMagasin,
+                localiteMagasin: localiteMagasin,
+                photo: widget.photo,
+                acteur: acteur,
+                niveau1Pays: widget.niveau1Pays!)
+            .then((value) => showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Center(child: Text('Succès')),
+                      content: const Text("Magasin mis à jour avec succès"),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            nomMagasinController.clear();
+                            contactMagasinController.clear();
+                            localiteMagasinController.clear();
+                          },
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    );
+                  },
+                ));
+      } else {
+        await magasinService
+            .updateMagasin(
+                idMagasin: widget.idMagasin!,
+                nomMagasin: nomMagasin,
+                contactMagasin: contactMagasin,
+                localiteMagasin: localiteMagasin,
+                acteur: acteur,
+                niveau1Pays: widget.niveau1Pays!)
+            .then((value) => showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Center(child: Text('Succès')),
+                      content: const Text("Magasin mis à jour avec succès"),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            nomMagasinController.clear();
+                            contactMagasinController.clear();
+                            localiteMagasinController.clear();
+                          },
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    );
+                  },
+                ));
+      }
+    } catch (e) {
+      debugPrint("Erreur : $e");
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Center(child: Text('Erreur')),
+            content: Text("Une erreur s'est produite veuiller réessayer $e"),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
                 },
-              ));
-    } else {
-      await magasinService
-          .updateMagasin(
-              idMagasin:widget.idMagasin!,
-              nomMagasin: nomMagasin,
-              contactMagasin: contactMagasin,
-              localiteMagasin: localiteMagasin,
-              acteur: acteur,
-              niveau1Pays: widget.niveau1Pays!)
-          .then((value) => showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Center(child: Text('Succès')),
-                    content: const Text("Magasin mis à jour avec succès"),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          nomMagasinController.clear();
-         contactMagasinController.clear();
-         localiteMagasinController.clear();
-                        },
-                        child: const Text('OK'),
-                      ),
-                    ],
-                  );
-                },
-              ));
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     }
-  } catch (e) {
-    debugPrint("Erreur : $e");
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Center(child: Text('Erreur')),
-          content: Text("Une erreur s'est produite veuiller réessayer $e"),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
   }
-}
-
 
   void _handleButtonPress() async {
     // Afficher l'indicateur de chargement
     setState(() {
       isLoading = true;
     });
-     
-     if(widget.isEditable! == false){
 
-    await addMagasin().then((_) {
-      // Cacher l'indicateur de chargement lorsque votre fonction est terminée
-      setState(() {
-        isLoading = false;
+    if (widget.isEditable! == false) {
+      await addMagasin().then((_) {
+        // Cacher l'indicateur de chargement lorsque votre fonction est terminée
+        setState(() {
+          isLoading = false;
+        });
       });
-    });
-     }else{
-       await updateMagasin().then((_) {
-      // Cacher l'indicateur de chargement lorsque votre fonction est terminée
-      setState(() {
-        isLoading = false;
+    } else {
+      await updateMagasin().then((_) {
+        // Cacher l'indicateur de chargement lorsque votre fonction est terminée
+        setState(() {
+          isLoading = false;
+        });
       });
-    });
-     }
-
+    }
   }
 
   Future<void> addMagasin() async {
@@ -363,17 +366,14 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
     // photos = widget.photo!;
     niveauPaysValue = widget.niveau1Pays!.idNiveau1Pays;
     debugPrint ("Id Magasin "+ widget.idMagasin! + "bool"  + widget.isEditable!.toString());
+
     }
     debugPrint ("bool"  + widget.isEditable!.toString());
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     niveau1PaysList =
         // http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
-    para = paraList[0];
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -392,7 +392,9 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
-            widget.isEditable! == false ? "Ajouter magasin" : "Modifier magasin",
+            widget.isEditable! == false
+                ? "Ajouter magasin"
+                : "Modifier magasin",
             style: TextStyle(
                 fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
           ),
@@ -429,14 +431,13 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                             return "Veillez entrez le nom du magasin";
                           } else {
                             return null;
-        
                           }
                         },
                         onSaved: (val) => nomMagasin = val!,
                       ),
                       // fin  nom magasin
                       const SizedBox(height: 10),
-              
+
                       //Contact magasin
                       Padding(
                         padding: const EdgeInsets.all(8),
@@ -466,9 +467,9 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                         onSaved: (val) => contactMagasin = val!,
                       ),
                       // fin contact magasin
-              
+
                       const SizedBox(height: 10),
-              
+
                       //Contact localiteMagasin
                       Padding(
                         padding: const EdgeInsets.all(8),
@@ -565,10 +566,11 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
   },
 ),
 
+
                       const SizedBox(
                         height: 10,
                       ),
-              
+
                       (photos == null)
                           ? IconButton(
                               onPressed: _showImageSourceDialog,
@@ -582,7 +584,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                               fit: BoxFit.cover,
                             ),
                       Text("Choisir une image"),
-              
+
                       const SizedBox(
                         height: 10,
                       ),
@@ -602,8 +604,10 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                             ),
                             minimumSize: const Size(250, 40),
                           ),
-                          child:  Text(
-                           widget.isEditable! == false ? " Ajouter " : " Modifier ",
+                          child: Text(
+                            widget.isEditable! == false
+                                ? " Ajouter "
+                                : " Modifier ",
                             style: TextStyle(
                               fontSize: 20,
                               color: Colors.white,

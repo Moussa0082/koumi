@@ -27,8 +27,8 @@ class _updateSousRegionsState extends State<updateSousRegions> {
     continents = widget.sousRegion.continent;
     continentValue = widget.sousRegion.continent.idContinent;
     _continentList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/continent/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/continent/read'));
+        // http.get(Uri.parse('https://koumi.ml/api-koumi/continent/read'));
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/continent/read'));
     super.initState();
   }
 

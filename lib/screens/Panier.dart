@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/CartItem.dart';
 import 'package:koumi_app/models/Stock.dart';
+import 'package:koumi_app/providers/CartProvider.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
+import 'package:koumi_app/widgets/CartListItem.dart';
 import 'package:koumi_app/widgets/CustomText.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,317 +30,248 @@ class _PanierState extends State<Panier> {
 
     
 
-   List<Stock> _cartItems = [];
-   List<Stock> cartItems = [];
-
-   late Future<List<Stock>> cart ;
-
-  Future<List<Stock>> getListe() async {
-  List<Stock> cartItems = await ShoppingCart().loadCartItems();
-  setState(() {
-    cart = Future.value(cartItems);
-  });
-  debugPrint("Nombre de produits: ${cartItems.length}");
-  return cartItems;
-  }
-
-//  Future<List<Stock>> getListe() async {
-//   List<Stock> cartItems = await ShoppingCart().loadCartItems();
-//   // setState(() {
-//   //   cart = Future.value(cartItems);
-//   // });
-//                                    setState(
-//                                           () {
-//                                         cart =cartItems as Future<List<Stock>>;
-                                             
-//                                       });
-//   debugPrint("Nombre de produits: ${cartItems.length}");
-//   return cartItems;
-// }
-
-
-  @override
-  void initState() {
-    super.initState();
-    // _loadCartItems();
-    cart = getListe();
-  }
-
-  // Future<void> _loadCartItems() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String cartString = prefs.getString('cart') ?? '[]';
-  //   List<Map<String, dynamic>> cart = List<Map<String, dynamic>>.from(jsonDecode(cartString));
-  //   setState(() {
-  //     _cartItems = cart;
-  //   });
-  // }
-  void _loadCartItems() async {
-  List<Stock> cart = await ShoppingCart().loadCartItems();
-  // Faites quelque chose avec la liste des produits récupérée, par exemple :
-  setState(() {
-    _cartItems = cart;
-  });
-}
-
-
- void _removeFromCart(int index) async {
-  List<Stock> cart = await ShoppingCart().loadCartItems();
-    setState(() {
-    cartItems[index].quantiteStock = (_cartItems[index].quantiteStock as int) + 1;
-    
-  });
-  if(cartItems[index].quantiteStock as int < 1){
-    
-  cart.removeAt(index); // Supprimer l'élément du panier
-  }
-  await ShoppingCart().saveCart(cart); // Sauvegarder le panier mis à jour
-
-  // Mettre à jour les préférences partagées
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setString('cart', jsonEncode(cart.map((stock) => stock.toJson()).toList()));
-
-  // Afficher un message de succès ou autre action après la suppression de l'élément du panier
-  Snack.success(
-    titre: "Succès",
-    message: "Produit supprimé du panier",
-  );
-}
-
-
- void _incrementQuantity(int index) {
-  setState(() {
-    _cartItems[index].quantiteStock = (_cartItems[index].quantiteStock as int) + 1;
-    
-  });
-  _saveCart();
-}
-
-  void _decrementQuantity(int index) {
-    if (_cartItems[index].quantiteStock!.toInt() >= 1) {
-      setState(() {
-    _cartItems[index].quantiteStock = (_cartItems[index].quantiteStock as int) - 1;
-      });
-      _saveCart();
-    } else {
-      // Si la quantité est égale à 1, supprimer le produit du panier
-      setState(() {
-        _cartItems.removeAt(index);
-      });
-      ShoppingCart().loadCartItems(); // Charger à nouveau les éléments du panier après la mise à jour
-    }
-     Snack.success(
-    titre: "Succès",
-    message: "Produit supprimé du panier",
-  );
-  }
-
-
-
-  // void _incrementQuantity(int index) {
-  //   setState(() {
-  //     _cartItems[index].quantiteStock ++;
-  //   });
-  //   _saveCart();
-  // }
-
-//  void _decrementQuantity(int index) {
-//   if (_cartItems[index]['quantiteProduit'] >= 1) {
-//     setState(() {
-//       _cartItems[index]['quantiteProduit']--;
-//     });
-//     _saveCart();
-//   } else {
-//     // Si la quantité est égale à 1, supprimer le produit du panier
-//     setState(() {
-//       _cartItems.removeAt(index);
-      
-//     });
-//     _saveCart();
-//       _loadCartItems(); // Charger à nouveau les éléments du panier après la mise à jour
-
-//   }
-// }
-
-
-  Future<void> _saveCart() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String cartString = jsonEncode(_cartItems);
-    prefs.setString('cart', cartString);
-  }
+  //  List<Stock> _cartItems = [];
+   List<Stock> cartItemss = [];
+ List<CartItem> cartItems = [];
+   String currency = "FCFA";
 
   @override
   Widget build(BuildContext context) {
-
-    // Calcul du total des produits
- // Calcul du total des produits
-// num total = 0;
-// _cartItems.forEach((item) {
-//   total += item['prix'] * item['quantiteProduit'];
-// });
-
-// Calcul du total final incluant les frais de livraison
-// num totalWithDelivery = total + 1000;
-    
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Panier'),
-        centerTitle:true,
-      ),
-      body:
-Consumer<ShoppingCart>(
-        builder: (context, card, child) {
-          return FutureBuilder(
-            future: cart,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              } 
-               if (!snapshot.hasData) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Image.asset('assets/images/notif.jpg'),
-                      SizedBox(height: 10),
-                      Text(
-                        'Panier vide erreur',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 17,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              } 
-               if (snapshot.data!.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Image.asset('assets/images/notif.jpg'),
-                      SizedBox(height: 10),
-                      Text(
-                        'Panier vide',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 17,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              } 
-              else {
-             cartItems = snapshot.data!;
-                return ListView.builder(
-                  itemCount: cartItems.length,
-                  itemBuilder: (context, index) {
-                    Stock item = cartItems[index];
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 2,
-                              blurRadius: 3,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: GestureDetector(
-                          onTap: () {
-                            // Get.to(DetailProduits());
-                          },
-                          child: ListTile(
-                            leading: Image.asset("assets/images/mang.jpg"),
-                            title: Text(item.nomProduit ?? ''),
-                            subtitle: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(Icons.remove),
-                              onPressed: () => _removeFromCart(index),
-                              // onPressed: () => _decrementQuantity(index),
-                                    ),
-                                    Text('${item.quantiteStock!.toInt() ?? 0}', style: TextStyle(fontWeight: FontWeight.bold)),
-                                    IconButton(
-                                      icon: Icon(Icons.add),
-                onPressed: () => null
-                                ),
-                // onPressed: () => _incrementQuantity(index)                                    ),
-                                  ],
-                                ),
-                                Text('${item.prix ?? 0} FCFA', style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic))
-                              ],
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Stack(
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: 500,
+                padding: const EdgeInsets.all(10),
+                color: Theme.of(context).colorScheme.primary,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Icon(
+                              Icons.arrow_back_ios_new_outlined,
+                              color: Colors.white,
                             ),
                           ),
-                        ),
+                          const Expanded(
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                "Cart",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                            ),
+                          ),
+                          Consumer<CartProvider>(
+                            builder: (context, cartProvider, child) {
+                              return badges.Badge(
+                                position: badges.BadgePosition.bottomEnd(
+                                    bottom: 1, end: 1),
+                                badgeContent: Text(
+                                  cartProvider.cartItems.length.toString(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                child: IconButton(
+                                  color: Colors.white,
+                                  icon: const Icon(Icons.local_mall),
+                                  iconSize: 25,
+                                  onPressed: () {},
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                );
-              }
-            },
-          );
-        },
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                padding: const EdgeInsets.only(
+                    left: 16, right: 16, bottom: 80, top: 20),
+                margin: const EdgeInsets.only(top: 70),
+                decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30))),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Consumer<CartProvider>(
+                        builder: (context, cartProvider, child) {
+                          final List<CartItem> cartItems =
+                              cartProvider.cartItems;
+
+                          if (cartItems.isEmpty) {
+                            return SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Center(
+              child: Column(
+                children: [
+                  Image.asset('assets/images/notif.jpg'),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Panier vide',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 17,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+                          }
+
+                          return ListView.builder(
+                            itemCount: cartItems.length,
+                            itemBuilder: (context, index) {
+                              final cartItem = cartItems[index];
+                              return Dismissible(
+                                key: Key(cartItem.stock.idStock!
+                                    ), // Use a unique key for each item
+                                background: Container(
+                                  color: Colors.red,
+                                  alignment: Alignment.centerRight,
+                                  padding: const EdgeInsets.only(right: 16.0),
+                                  child: const Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                direction: DismissDirection.endToStart,
+                                onDismissed: (direction) {
+                                  Provider.of<CartProvider>(context,
+                                          listen: false)
+                                      .removeCartItem(index);
+                                },
+                                child: GestureDetector(
+                                    onTap: () {},
+                                    child: CartListItem(
+                                      cartItem: cartItem,
+                                      index: index,
+                                    )),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    Consumer<CartProvider>(
+                      builder: (context, cartProvider, child) {
+                        return Container(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(child: Container()),
+                                 cartItems.isEmpty ? SizedBox() : ElevatedButton(
+                                    onPressed: () {
+                                      Provider.of<CartProvider>(context,
+                                              listen: false)
+                                          .clearCart();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        )),
+                                    child: const Text(
+                                      "Vider panier",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const Divider(
+                                color: Colors.grey,
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Prix Total:',
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                  Expanded(child: Container()),
+                                  Text(
+                                    '${cartProvider.totalPrice.toInt()}F',
+                                    style:
+                                        Theme.of(context).textTheme.titleLarge,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10)),
+                                height: 50,
+                                child: ElevatedButton(
+                                  onPressed: () {},
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.primary,
+                                    elevation: 10,
+                                  ),
+                                  child: const Text('Checkout',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                      )),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-    
-//                     }
-//   });
-// })
-      //   Container(
-      //        padding: EdgeInsets.all(20),
-      //        decoration: BoxDecoration(
-      //   boxShadow: [
-      //     BoxShadow(
-      //       color: Colors.grey.withOpacity(0.5),
-      //       spreadRadius: 2,
-      //       blurRadius: 5,
-      //       offset: Offset(0, -3),
-      //     ),
-      //   ],
-      //   color: Colors.white,
-      //        ),
-      //        child: Column(
-      //   mainAxisSize: MainAxisSize.min,
-      //   children: [
-      //     Row(
-      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //       children: [
-      //         Text('Total'),
-      //         Text('$total FCFA'),
-      //       ],
-      //     ),
-      //     SizedBox(height: 10),
-      //     Row(
-      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //       children: [
-      //         Text('Frais de livraison'),
-      //         Text('1000 FCFA'),
-      //       ],
-      //     ),
-      //     SizedBox(height: 20),
-      //     ElevatedButton(
-      //       onPressed: () {
-      //         // Logique pour le paiement
-      //       },
-      //       child: Text('Payer'),
-      //     ),
-      //   ],
-      //        ),
-      //      ),
     );
   }
+  
+    
+
+  
 
 }

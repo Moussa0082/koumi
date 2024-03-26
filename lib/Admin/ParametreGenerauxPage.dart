@@ -151,7 +151,10 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
           title: type.toLowerCase() == 'admin'
               ? Text(
                   "Parametre Généraux",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: d_colorGreen),
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: d_colorGreen),
                 )
               : Text(
                   "Information sur la structure",
@@ -174,28 +177,31 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                     .updateParametre(
                                         idParametreGeneraux:
                                             param.idParametreGeneraux!,
-                                        sigleStructure: param.sigleStructure,
-                                        nomStructure: param.nomStructure,
-                                        sigleSysteme: param.sigleSysteme,
-                                        nomSysteme: param.nomSysteme,
+                                        sigleStructure: param.sigleStructure!,
+                                        nomStructure: param.nomStructure!,
+                                        sigleSysteme: param.sigleSysteme!,
+                                        nomSysteme: param.nomSysteme!,
                                         descriptionSysteme:
-                                            param.descriptionSysteme,
-                                        sloganSysteme: param.sloganSysteme,
+                                            param.descriptionSysteme!,
+                                        sloganSysteme: param.sloganSysteme!,
                                         adresseStructure:
-                                            param.adresseStructure,
-                                        emailStructure: param.emailStructure,
+                                            param.adresseStructure!,
+                                        emailStructure: param.emailStructure!,
                                         telephoneStructure:
-                                            param.telephoneStructure,
+                                            param.telephoneStructure!,
+                                        monnaie: param.monnaie!,
+                                        tauxDollar: param.tauxDollar!,
+                                        tauxYuan: param.tauxYuan!,
                                         whattsAppStructure:
-                                            param.whattsAppStructure,
+                                            param.whattsAppStructure!,
                                         libelleNiveau1Pays:
-                                            param.libelleNiveau1Pays,
+                                            param.libelleNiveau1Pays!,
                                         libelleNiveau2Pays:
-                                            param.libelleNiveau2Pays,
+                                            param.libelleNiveau2Pays!,
                                         libelleNiveau3Pays:
-                                            param.libelleNiveau3Pays,
+                                            param.libelleNiveau3Pays!,
                                         localiteStructure:
-                                            param.localiteStructure)
+                                            param.localiteStructure!)
                                     .then((value) => {
                                           print("Modifier avec succèss"),
                                           Provider.of<ParametreGenerauxService>(
@@ -210,29 +216,32 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                     .updateParametre(
                                         idParametreGeneraux:
                                             param.idParametreGeneraux!,
-                                        sigleStructure: param.sigleStructure,
-                                        nomStructure: param.nomStructure,
-                                        sigleSysteme: param.sigleSysteme,
-                                        nomSysteme: param.nomSysteme,
+                                        nomStructure: param.nomStructure!,
+                                        sigleStructure: param.sigleStructure!,
+                                        sigleSysteme: param.sigleSysteme!,
+                                        nomSysteme: param.nomSysteme!,
                                         logoSysteme: photo,
+                                        monnaie: param.monnaie!,
+                                        tauxDollar: param.tauxDollar!,
+                                        tauxYuan: param.tauxYuan!,
                                         descriptionSysteme:
-                                            param.descriptionSysteme,
-                                        sloganSysteme: param.sloganSysteme,
+                                            param.descriptionSysteme!,
+                                        sloganSysteme: param.sloganSysteme!,
                                         adresseStructure:
-                                            param.adresseStructure,
-                                        emailStructure: param.emailStructure,
+                                            param.adresseStructure!,
+                                        emailStructure: param.emailStructure!,
                                         telephoneStructure:
-                                            param.telephoneStructure,
+                                            param.telephoneStructure!,
                                         whattsAppStructure:
-                                            param.whattsAppStructure,
+                                            param.whattsAppStructure!,
                                         libelleNiveau1Pays:
-                                            param.libelleNiveau1Pays,
+                                            param.libelleNiveau1Pays!,
                                         libelleNiveau2Pays:
-                                            param.libelleNiveau2Pays,
+                                            param.libelleNiveau2Pays!,
                                         libelleNiveau3Pays:
-                                            param.libelleNiveau3Pays,
+                                            param.libelleNiveau3Pays!,
                                         localiteStructure:
-                                            param.localiteStructure)
+                                            param.localiteStructure!)
                                     .then((value) => {
                                           print("Modifier avec succèss"),
                                           Provider.of<ParametreGenerauxService>(
@@ -316,17 +325,15 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                 children: [
                                   ListTile(
                                     leading: isEditing
-                                        ? param.logoSysteme!.isEmpty ||
-                                                param.logoSysteme == null
+                                        ? param.logoSysteme == null ||
+                                                param.logoSysteme!.isEmpty
                                             ? SizedBox(
                                                 width: 110,
                                                 height: 150,
-                                                child: Expanded(
-                                                  child: Image.asset(
-                                                    "assets/images/type.png",
-                                                    scale: 1,
-                                                    fit: BoxFit.fill,
-                                                  ),
+                                                child: Image.asset(
+                                                  "assets/images/logo.png",
+                                                  scale: 1,
+                                                  fit: BoxFit.fill,
                                                 ),
                                               )
                                             : SizedBox(
@@ -360,13 +367,13 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   ],
                                                 ),
                                               )
-                                        : param.logoSysteme!.isEmpty ||
-                                                param.logoSysteme == null
+                                        : param.logoSysteme == null ||
+                                                param.logoSysteme!.isEmpty
                                             ? SizedBox(
                                                 width: 110,
                                                 height: 150,
                                                 child: Image.asset(
-                                                  "assets/images/type.png",
+                                                  "assets/images/logo.png",
                                                   scale: 1,
                                                   fit: BoxFit.fill,
                                                 ),
@@ -375,7 +382,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                 width: 110,
                                                 height: 150,
                                                 child: Image.network(
-                                                  "http://10.0.2.2/${param.logoSysteme!}",
+                                                  "http://10.0.2.2/api-koumi/${param.logoSysteme!}",
                                                   scale: 1,
                                                   fit: BoxFit.fill,
                                                 ),
@@ -388,7 +395,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                               param.nomSysteme = value;
                                             })
                                         : Text(
-                                            param.nomSysteme,
+                                            param.nomSysteme!,
                                             style: const TextStyle(
                                               fontSize: 22,
                                               color: Colors.black,
@@ -404,7 +411,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                             },
                                           )
                                         : Text(
-                                            param.sloganSysteme,
+                                            param.sloganSysteme!,
                                             style: const TextStyle(
                                               fontSize: 17,
                                               overflow: TextOverflow.ellipsis,
@@ -436,7 +443,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                           //     descriptionSystemeController,
                                         )
                                       : Text(
-                                          param.descriptionSysteme,
+                                          param.descriptionSysteme!,
                                           textAlign: TextAlign.justify,
                                           style: const TextStyle(
                                             fontSize: 17,
@@ -498,7 +505,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     nomStructureController
                                                 ),
                                               )
-                                            : Text(param.nomStructure,
+                                            : Text(param.nomStructure!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -542,7 +549,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     sigleStructureController,
                                                 ),
                                               )
-                                            : Text(param.sigleStructure,
+                                            : Text(param.sigleStructure!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -608,7 +615,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     adresseStructureController,
                                                 ),
                                               )
-                                            : Text(param.adresseStructure,
+                                            : Text(param.adresseStructure!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -652,7 +659,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     telephoneStructureController,
                                                 ),
                                               )
-                                            : Text(param.telephoneStructure,
+                                            : Text(param.telephoneStructure!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -696,7 +703,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     whattsAppStructureController,
                                                 ),
                                               )
-                                            : Text(param.whattsAppStructure,
+                                            : Text(param.whattsAppStructure!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -740,7 +747,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     localiteStructureController,
                                                 ),
                                               )
-                                            : Text(param.localiteStructure,
+                                            : Text(param.localiteStructure!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -786,7 +793,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     libelleNiveau1PaysController
                                                 ),
                                               )
-                                            : Text(param.libelleNiveau1Pays,
+                                            : Text(param.libelleNiveau1Pays!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -830,7 +837,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     libelleNiveau2PaysController
                                                 ),
                                               )
-                                            : Text(param.libelleNiveau2Pays,
+                                            : Text(param.libelleNiveau2Pays!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -874,7 +881,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     libelleNiveau3PaysController
                                                 ),
                                               )
-                                            : Text(param.libelleNiveau3Pays,
+                                            : Text(param.libelleNiveau3Pays!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -886,7 +893,154 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                 ],
                               ),
                             ),
-                          )
+                          ),
+                          Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical:
+                                      MediaQuery.of(context).size.height * 0.01,
+                                  horizontal:
+                                      MediaQuery.of(context).size.width * 0.05),
+                              child: Container(
+                                // height: isEditing ? 150 : 110,
+                                width: MediaQuery.of(context).size.width * 0.9,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      offset: const Offset(0, 2),
+                                      blurRadius: 5,
+                                      spreadRadius: 2,
+                                    ),
+                                  ],
+                                ),
+                                child: Column(children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Expanded(
+                                          child: Text("Monnaie",
+                                              style: TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.w500,
+                                                fontStyle: FontStyle.italic,
+                                              )),
+                                        ),
+                                        isEditing
+                                            ? Expanded(
+                                                child: TextFormField(
+                                                  initialValue: param.monnaie,
+                                                  onChanged: (value) {
+                                                    param.monnaie = value;
+                                                  },
+                                                  // controller:
+                                                  //     nomStructureController
+                                                ),
+                                              )
+                                            : Text(param.monnaie!,
+                                                style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w800,
+                                                ))
+                                      ],
+                                    ),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.all(10.0),
+                                    child: Divider(
+                                      height: 2,
+                                      color: d_colorGreen,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Expanded(
+                                          child: Text("Taux en Dollars USA",
+                                              style: TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.w500,
+                                                fontStyle: FontStyle.italic,
+                                              )),
+                                        ),
+                                        isEditing
+                                            ? Expanded(
+                                                child: TextFormField(
+                                                  initialValue:
+                                                      param.tauxDollar,
+                                                  onChanged: (value) {
+                                                    param.tauxDollar = value;
+                                                  },
+                                                  // controller:
+                                                  //     sigleStructureController,
+                                                ),
+                                              )
+                                            : Text(
+                                                param.tauxDollar! != null
+                                                    ? param.tauxDollar!
+                                                    : '',
+                                                style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w800,
+                                                ))
+                                      ],
+                                    ),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.all(10.0),
+                                    child: Divider(
+                                      height: 2,
+                                      color: d_colorGreen,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Expanded(
+                                          child: Text("Taux en Yuan",
+                                              style: TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.w500,
+                                                fontStyle: FontStyle.italic,
+                                              )),
+                                        ),
+                                        isEditing
+                                            ? Expanded(
+                                                child: TextFormField(
+                                                  initialValue: param.tauxYuan,
+                                                  onChanged: (value) {
+                                                    param.tauxYuan = value;
+                                                  },
+                                                  // controller:
+                                                  //     sigleStructureController,
+                                                ),
+                                              )
+                                            : Text(param.tauxYuan! != null ? param.tauxYuan! : '' ,
+                                                style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w800,
+                                                ))
+                                      ],
+                                    ),
+                                  )
+                                ]),
+                              )),
                         ],
                       );
                     }

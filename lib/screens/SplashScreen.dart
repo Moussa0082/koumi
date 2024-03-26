@@ -31,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // clearCart();
+    clearCart();
     // Vérifie d'abord si l'email de l'acteur est présent dans SharedPreferences
     checkEmailInSharedPreferences();
   }
@@ -49,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen> {
       Timer(
         const Duration(seconds: 5),
         () => Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          MaterialPageRoute(builder: (_) => const BottomNavigationPage()),
         ),
       );
       // Si l'email de l'acteur n'est pas présent, redirige directement vers l'écran de connexion
@@ -75,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen> {
       Timer(
         const Duration(seconds: 5),
         () => Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          MaterialPageRoute(builder: (_) => const BottomNavigationPage()),
         ),
       );
     }

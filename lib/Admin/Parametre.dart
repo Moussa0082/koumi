@@ -5,9 +5,11 @@ import 'package:koumi_app/Admin/Niveau2Page.dart';
 import 'package:koumi_app/Admin/Niveau3Page.dart';
 import 'package:koumi_app/Admin/PaysPage.dart';
 import 'package:koumi_app/Admin/SousRegionPage.dart';
+import 'package:koumi_app/Admin/TypeMaterielPage.dart';
 import 'package:koumi_app/Admin/UnitePage.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/screens/TypeVehicule.dart';
 import 'package:provider/provider.dart';
 
 class Parametre extends StatefulWidget {
@@ -43,6 +45,7 @@ class _ParametreState extends State<Parametre> {
         leading: IconButton(
             onPressed: () {
               Navigator.of(context).pop();
+              // Get.back();
             },
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: const Text(
@@ -73,12 +76,12 @@ class _ParametreState extends State<Parametre> {
                 ),
                 child: ListTile(
                   leading:
-                      params.logoSysteme!.isEmpty || params.logoSysteme == null
+                      params.logoSysteme == null || params.logoSysteme!.isEmpty
                           ? SizedBox(
                               width: 110,
                               height: 150,
                               child: Image.asset(
-                                "assets/images/type.png",
+                                "assets/images/logo.png",
                                 scale: 1,
                                 fit: BoxFit.fill,
                               ),
@@ -87,13 +90,13 @@ class _ParametreState extends State<Parametre> {
                               width: 110,
                               height: 150,
                               child: Image.network(
-                                "http://10.0.2.2/${params.logoSysteme!}",
+                                "http://10.0.2.2/api-koumi/${params.logoSysteme!}",
                                 scale: 1,
                                 fit: BoxFit.fill,
                               ),
                             ),
                   title: Text(
-                    params.nomSysteme,
+                    params.nomSysteme!,
                     style: const TextStyle(
                       fontSize: 22,
                       color: Colors.black,
@@ -102,7 +105,7 @@ class _ParametreState extends State<Parametre> {
                     ),
                   ),
                   subtitle: Text(
-                    params.sloganSysteme,
+                    params.sloganSysteme!,
                     textAlign: TextAlign.justify,
                     style: const TextStyle(
                       fontSize: 17,
@@ -180,7 +183,7 @@ class _ParametreState extends State<Parametre> {
                     ),
                     getList(
                         "region.png",
-                        params.libelleNiveau1Pays,
+                        params.libelleNiveau1Pays!,
                         const Niveau1Page(),
                         const Icon(
                           Icons.chevron_right_sharp,
@@ -195,7 +198,7 @@ class _ParametreState extends State<Parametre> {
                     ),
                     getList(
                         "region.png",
-                        params.libelleNiveau2Pays,
+                        params.libelleNiveau2Pays!,
                         const Niveau2Page(),
                         const Icon(
                           Icons.chevron_right_sharp,
@@ -210,7 +213,7 @@ class _ParametreState extends State<Parametre> {
                     ),
                     getList(
                         "region.png",
-                        params.libelleNiveau3Pays,
+                        params.libelleNiveau3Pays!,
                         const Niveau3Page(),
                         const Icon(
                           Icons.chevron_right_sharp,
@@ -227,6 +230,36 @@ class _ParametreState extends State<Parametre> {
                         "unite.png",
                         'Unite de mesure',
                         const UnitePage(),
+                        const Icon(
+                          Icons.chevron_right_sharp,
+                          size: 30,
+                        )),
+                    const Divider(
+                      color: Colors.grey,
+                      height: 4,
+                      thickness: 1,
+                      indent: 50,
+                      endIndent: 0,
+                    ),
+                    getList(
+                        "car.png",
+                        'Type de véhicule',
+                        const TypeVehicule(),
+                        const Icon(
+                          Icons.chevron_right_sharp,
+                          size: 30,
+                        )),
+                    const Divider(
+                      color: Colors.grey,
+                      height: 4,
+                      thickness: 1,
+                      indent: 50,
+                      endIndent: 0,
+                    ),
+                    getList(
+                        "typeMateriel.png",
+                        'Type de matériel',
+                        const TypeMaterielPage(),
                         const Icon(
                           Icons.chevron_right_sharp,
                           size: 30,

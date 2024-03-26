@@ -41,7 +41,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
     typeVoiture = widget.typeVoitures;
-    futureListe = getListe(typeVoiture.idTypeVoiture);
+    futureListe = getListe(typeVoiture.idTypeVoiture!);
     super.initState();
   }
 
@@ -61,10 +61,11 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
           leading: IconButton(
               onPressed: () {
                 Navigator.of(context).pop();
+                // Get.to(TypeVehicule());
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
-            typeVoiture.nom.toUpperCase(),
+            typeVoiture.nom!.toUpperCase(),
             style: const TextStyle(
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
@@ -138,6 +139,8 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
           const SizedBox(height: 10),
           Consumer<VehiculeService>(builder: (context, vehiculeService, child) {
             return FutureBuilder(
+                // future: vehiculeService
+                //     .fetchVehiculeByTypeVehicule(typeVoiture.idTypeVoiture!),
                 future: futureListe,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -276,7 +279,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                                                         onTap: () async {
                                                           await VehiculeService()
                                                               .activerVehicules(
-                                                                  e.idVehicule!)
+                                                                  e.idVehicule)
                                                               .then((value) => {
                                                                     Provider.of<VehiculeService>(
                                                                             context,
@@ -287,7 +290,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                                                                         () {
                                                                       futureListe =
                                                                           getListe(
-                                                                              typeVoiture.idTypeVoiture);
+                                                                              typeVoiture.idTypeVoiture!);
                                                                     }),
                                                                     Navigator.of(
                                                                             context)
@@ -348,7 +351,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                                                         onTap: () async {
                                                           await VehiculeService()
                                                               .desactiverVehicules(
-                                                                  e.idVehicule!)
+                                                                  e.idVehicule)
                                                               .then((value) => {
                                                                     Provider.of<VehiculeService>(
                                                                             context,
@@ -359,7 +362,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                                                                         () {
                                                                       futureListe =
                                                                           getListe(
-                                                                              typeVoiture.idTypeVoiture);
+                                                                              typeVoiture.idTypeVoiture!);
                                                                     }),
                                                                     Navigator.of(
                                                                             context)
@@ -420,7 +423,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                                                         onTap: () async {
                                                           await VehiculeService()
                                                               .deleteVehicule(
-                                                                  e.idVehicule!)
+                                                                  e.idVehicule)
                                                               .then((value) => {
                                                                     Provider.of<VehiculeService>(
                                                                             context,
@@ -431,7 +434,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                                                                         () {
                                                                       futureListe =
                                                                           getListe(
-                                                                              typeVoiture.idTypeVoiture);
+                                                                              typeVoiture.idTypeVoiture!);
                                                                     }),
                                                                     Navigator.of(
                                                                             context)
