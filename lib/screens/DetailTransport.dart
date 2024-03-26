@@ -1024,8 +1024,6 @@ class _DetailTransportState extends State<DetailTransport> {
               ),
             ],
           )
-
-          // Divider(),
         ],
       ),
     );

@@ -10,6 +10,7 @@ import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -29,6 +30,10 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _DetailIntrantState extends State<DetailIntrant> {
+  TextEditingController _nomController = TextEditingController();
+  TextEditingController _descriptionController = TextEditingController();
+  TextEditingController _quantiteController = TextEditingController();
+  TextEditingController _prixController = TextEditingController();
   bool _isEditing = false;
   bool _isLoading = false;
   late Acteur acteur = Acteur();
@@ -40,7 +45,6 @@ class _DetailIntrantState extends State<DetailIntrant> {
   late ParametreGeneraux para = ParametreGeneraux();
   late ValueNotifier<bool> isDialOpenNotifier;
   late Intrant intrants;
-
   bool isExist = false;
   String? email = "";
 
@@ -83,6 +87,10 @@ class _DetailIntrantState extends State<DetailIntrant> {
     // para = paraList[0];
     verifyParam();
     intrants = widget.intrant;
+    _nomController.text = intrants.nomIntrant;
+    _descriptionController.text = intrants.descriptionIntrant;
+    _quantiteController.text = intrants.quantiteIntrant.toString();
+    _prixController.text = intrants.prixIntrant.toString();
     isDialOpenNotifier = ValueNotifier<bool>(false);
   }
 
@@ -155,6 +163,118 @@ class _DetailIntrantState extends State<DetailIntrant> {
     );
   }
 
+  Future<void> updateMethode() async {
+    setState(() {
+      // Afficher l'indicateur de chargement pendant l'opération
+      _isLoading = true;
+    });
+    try {
+      final String nom = _nomController.text;
+      final String description = _descriptionController.text;
+      final double quantite = double.tryParse(_quantiteController.text) ?? 0.0;
+      final int prix = int.tryParse(_prixController.text) ?? 0;
+
+      if (photo != null) {
+        await IntrantService()
+            .updateIntrant(
+                idIntrant: intrants.idIntrant!,
+                nomIntrant: nom,
+                quantiteIntrant: quantite,
+                descriptionIntrant: description,
+                prixIntrant: prix,
+                photoIntrant: photo,
+                acteur: acteur)
+            .then((value) => {
+                  Provider.of<IntrantService>(context, listen: false)
+                      .applyChange(),
+                  setState(() {
+                    intrants = Intrant(
+                        nomIntrant: nom,
+                        quantiteIntrant: quantite,
+                        prixIntrant: prix,
+                        descriptionIntrant: description,
+                        statutIntrant: intrants.statutIntrant,
+                        dateAjout: intrants.dateAjout,
+                        acteur: acteur);
+                    _isLoading = false;
+                  }),
+                })
+            .catchError((onError) => {
+                  print(onError.toString()),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Row(
+                        children: [
+                          Text(
+                            "Une erreur est survenu lors de la modification",
+                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                          ),
+                        ],
+                      ),
+                      duration: Duration(seconds: 5),
+                    ),
+                  )
+                });
+      } else {
+        await IntrantService()
+            .updateIntrant(
+                idIntrant: intrants.idIntrant!,
+                nomIntrant: nom,
+                quantiteIntrant: quantite,
+                descriptionIntrant: description,
+                prixIntrant: prix,
+                acteur: acteur)
+            .then((value) => {
+                  Provider.of<IntrantService>(context, listen: false)
+                      .applyChange(),
+                  setState(() {
+                    intrants = Intrant(
+                        nomIntrant: nom,
+                        quantiteIntrant: quantite,
+                        prixIntrant: prix,
+                        descriptionIntrant: description,
+                        statutIntrant: intrants.statutIntrant,
+                        dateAjout: intrants.dateAjout,
+                        photoIntrant: intrants.photoIntrant,
+                        acteur: acteur);
+                    _isLoading = false;
+                  }),
+                })
+            .catchError((onError) => {
+                  print(onError.toString()),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Row(
+                        children: [
+                          Text(
+                            "Une erreur est survenu lors de la modification",
+                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                          ),
+                        ],
+                      ),
+                      duration: Duration(seconds: 5),
+                    ),
+                  )
+                });
+      }
+    } catch (e) {
+      print(e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Text(
+                "Une erreur est survenu lors de la modification",
+                style: TextStyle(overflow: TextOverflow.ellipsis),
+              ),
+            ],
+          ),
+          duration: Duration(seconds: 5),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return LoadingOverlay(
@@ -192,7 +312,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                                   setState(() {
                                     _isEditing = false;
                                   });
-                                  // updateMethode();
+                                  updateMethode();
                                 },
                                 icon: Icon(Icons.check),
                               )
@@ -235,70 +355,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                                 ),
                         ),
                   SizedBox(height: 30),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Container(
-                      height: 40,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: const BoxDecoration(
-                        color: Colors.orangeAccent,
-                      ),
-                      child: Center(
-                        child: Text(
-                          intrants.nomIntrant.toUpperCase(),
-                          style: const TextStyle(
-                              overflow: TextOverflow.ellipsis,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                  ),
-                  _buildData(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Container(
-                      height: 40,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: const BoxDecoration(
-                        color: Colors.orangeAccent,
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Description',
-                          style: const TextStyle(
-                              overflow: TextOverflow.ellipsis,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                  ),
-                  _buildDescription(intrants.descriptionIntrant),
-                  acteur.nomActeur != intrants.acteur.nomActeur
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Container(
-                            height: 40,
-                            width: MediaQuery.of(context).size.width,
-                            decoration: const BoxDecoration(
-                              color: Colors.orangeAccent,
-                            ),
-                            child: Center(
-                              child: Text(
-                                'Fournisseur',
-                                style: const TextStyle(
-                                    overflow: TextOverflow.ellipsis,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                        )
-                      : Container(),
-                  acteur.nomActeur != intrants.acteur.nomActeur
-                      ? _buildFournissuer()
-                      : Container(),
+                  !_isEditing ? viewData() : _buildEditing()
                 ],
               ),
             ),
@@ -372,6 +429,86 @@ class _DetailIntrantState extends State<DetailIntrant> {
     await launchUrl(launchUri);
   }
 
+  Widget viewData() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Container(
+            height: 40,
+            width: MediaQuery.of(context).size.width,
+            decoration: const BoxDecoration(
+              color: Colors.orangeAccent,
+            ),
+            child: Center(
+              child: Text(
+                intrants.nomIntrant.toUpperCase(),
+                style: const TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ),
+        _buildData(),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Container(
+            height: 40,
+            width: MediaQuery.of(context).size.width,
+            decoration: const BoxDecoration(
+              color: Colors.orangeAccent,
+            ),
+            child: Center(
+              child: Text(
+                'Description',
+                style: const TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ),
+        _buildDescription(intrants.descriptionIntrant),
+        acteur.nomActeur != intrants.acteur.nomActeur
+            ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Container(
+                  height: 40,
+                  width: MediaQuery.of(context).size.width,
+                  decoration: const BoxDecoration(
+                    color: Colors.orangeAccent,
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Fournisseur',
+                      style: const TextStyle(
+                          overflow: TextOverflow.ellipsis,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              )
+            : Container(),
+        acteur.nomActeur != intrants.acteur.nomActeur
+            ? _buildFournissuer()
+            : Container(),
+      ],
+    );
+  }
+
+  _buildEditing() {
+    return Column(children: [
+      _buildEditableDetailItem('Nom intrant ', _nomController),
+      _buildEditableDetailItem('Description', _descriptionController),
+      _buildEditableDetailItem('Quantité ', _quantiteController),
+      _buildEditableDetailItem('Prix intrant ', _prixController),
+    ]);
+  }
+
   _buildData() {
     return Column(
       children: [
@@ -439,6 +576,46 @@ class _DetailIntrantState extends State<DetailIntrant> {
               overflow: TextOverflow.ellipsis,
               fontSize: 16,
             ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEditableDetailItem(
+      String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w500,
+                      fontStyle: FontStyle.italic,
+                      overflow: TextOverflow.ellipsis,
+                      fontSize: 18),
+                ),
+              ),
+              Expanded(
+                child: TextFormField(
+                  controller: controller,
+                  maxLines: null,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: Colors.black54,
+                  ),
+                  enabled: _isEditing,
+                ),
+              ),
+            ],
           )
         ],
       ),
