@@ -2,17 +2,24 @@ import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+// import 'package:audioplayers/audioplayers.dart' as audioplayers;
 
 class PlayerWidget extends StatefulWidget {
   final AudioPlayer player;
-  const PlayerWidget({super.key, required this.player,});
+  const PlayerWidget({
+    super.key,
+    required this.player,
+  });
 
   @override
   State<PlayerWidget> createState() => _PlayerWidgetState();
 }
 
+const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
+const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
+
 class _PlayerWidgetState extends State<PlayerWidget> {
-   PlayerState? _playerState;
+  PlayerState? _playerState;
   Duration? _duration;
   Duration? _position;
 
@@ -31,7 +38,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   AudioPlayer get player => widget.player;
 
-   @override
+  @override
   void initState() {
     super.initState();
     // Use initial values from player
@@ -69,65 +76,153 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(context).primaryColor;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Row(
-          mainAxisSize: MainAxisSize.min,
+    // final color = Theme.of(context).primaryColor;
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      constraints:
+          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.9),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            IconButton(
-              key: const Key('play_button'),
-              onPressed: _isPlaying ? null : _play,
-              iconSize: 48.0,
-              icon: const Icon(Icons.play_arrow),
-              color: color,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap: () => _play(),
+                  child: CircleAvatar(
+                    backgroundColor: d_colorOr,
+                    child: _isPlaying
+                        ? IconButton(
+                            // key: const Key('play_button'),
+                            onPressed: _pause,
+                            // iconSize: 35.0,
+                            icon: const Icon(Icons.pause),
+                          )
+                        : IconButton(
+                            // key: const Key('play_button'),
+                            onPressed: _play,
+                            // iconSize: 35.0,
+                            icon: const Icon(Icons.play_arrow),
+                          ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Slider(
+                      activeColor: d_colorOr,
+                      onChanged: (value) {
+                        final duration = _duration;
+                        if (duration == null) return;
+                        final position = value * duration.inMilliseconds;
+                        player.seek(Duration(milliseconds: position.round()));
+                      },
+                      value: (_position != null &&
+                              _duration != null &&
+                              _position!.inMilliseconds > 0 &&
+                              _position!.inMilliseconds <
+                                  _duration!.inMilliseconds)
+                          ? _position!.inMilliseconds /
+                              _duration!.inMilliseconds
+                          : 0.0,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            IconButton(
-              key: const Key('pause_button'),
-              onPressed: _isPlaying ? _pause : null,
-              iconSize: 48.0,
-              icon: const Icon(Icons.pause),
-              color: color,
-            ),
-            IconButton(
-              key: const Key('stop_button'),
-              onPressed: _isPlaying || _isPaused ? _stop : null,
-              iconSize: 48.0,
-              icon: const Icon(Icons.stop),
-              color: color,
-            ),
+            Row(
+              children: [
+                Expanded(child: Container()),
+                Text(
+                  _position != null
+                      ? '$_positionText / $_durationText'
+                      : _duration != null
+                          ? _durationText
+                          : '',
+                  style: TextStyle(fontSize: 14.0),
+                ),
+              ],
+            )
           ],
         ),
-        Slider(
-          onChanged: (value) {
-            final duration = _duration;
-            if (duration == null) {
-              return;
-            }
-            final position = value * duration.inMilliseconds;
-            player.seek(Duration(milliseconds: position.round()));
-          },
-          value: (_position != null &&
-                  _duration != null &&
-                  _position!.inMilliseconds > 0 &&
-                  _position!.inMilliseconds < _duration!.inMilliseconds)
-              ? _position!.inMilliseconds / _duration!.inMilliseconds
-              : 0.0,
-        ),
-        Text(
-          _position != null
-              ? '$_positionText / $_durationText'
-              : _duration != null
-                  ? _durationText
-                  : '',
-          style: const TextStyle(fontSize: 16.0),
-        ),
-      ],
+      ),
     );
   }
 
-   void _initStreams() {
+// audio_waveforms.AudioFileWaveforms(
+//                 size: Size(MediaQuery.of(context).size.width * 0.5, 25),
+//                 playerController: _isPlaying
+//                 )
+
+// Column(
+//       mainAxisSize: MainAxisSize.min,
+//       children: <Widget>[
+//         Row(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             IconButton(
+//               key: const Key('play_button'),
+//               onPressed: _isPlaying ? null : _play,
+//               iconSize: 48.0,
+//               icon: const Icon(Icons.play_arrow),
+//               color: color,
+//             ),
+//             IconButton(
+//               key: const Key('pause_button'),
+//               onPressed: _isPlaying ? _pause : null,
+//               iconSize: 48.0,
+//               icon: const Icon(Icons.pause),
+//               color: color,
+//             ),
+//             IconButton(
+//               key: const Key('stop_button'),
+//               onPressed: _isPlaying || _isPaused ? _stop : null,
+//               iconSize: 48.0,
+//               icon: const Icon(Icons.stop),
+//               color: color,
+//             ),
+//           ],
+//         ),
+//         Slider(
+//           onChanged: (value) {
+//             final duration = _duration;
+//             if (duration == null) {
+//               return;
+//             }
+//             final position = value * duration.inMilliseconds;
+//             player.seek(Duration(milliseconds: position.round()));
+//           },
+//           value: (_position != null &&
+//                   _duration != null &&
+//                   _position!.inMilliseconds > 0 &&
+//                   _position!.inMilliseconds < _duration!.inMilliseconds)
+//               ? _position!.inMilliseconds / _duration!.inMilliseconds
+//               : 0.0,
+//         ),
+//         Text(
+//           _position != null
+//               ? '$_positionText / $_durationText'
+//               : _duration != null
+//                   ? _durationText
+//                   : '',
+//           style: const TextStyle(fontSize: 16.0),
+//         ),
+//       ],
+//     );
+  void _initStreams() {
     _durationSubscription = player.onDurationChanged.listen((duration) {
       setState(() => _duration = duration);
     });
