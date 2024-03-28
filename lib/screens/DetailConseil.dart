@@ -25,14 +25,9 @@ class _DetailConseilState extends State<DetailConseil> {
   void initState() {
     super.initState();
     conseils = widget.conseil;
-    // Create the audio player.
 
+    verifyAudioSource();
     verifyVideoSource();
-    // flickManager = FlickManager(
-    //   videoPlayerController: VideoPlayerController.network(
-    //     'http://10.0.2.2/${conseils.videoConseil}',
-    //   ),
-    // );
   }
 
   void verifyAudioSource() {
@@ -74,73 +69,6 @@ class _DetailConseilState extends State<DetailConseil> {
       );
     }
   }
-
-  // Future<void> playSound() async {
-  //   player = AudioPlayer();
-
-  //   // Set the release mode to keep the source after playback has completed.
-  //   player.setReleaseMode(ReleaseMode.stop);
-
-  //   // Start the player as soon as the app is displayed.
-  //   WidgetsBinding.instance.addPostFrameCallback((_) async {
-  //     try {
-  //       if (conseils.audioConseil != null) {
-  //         String audioPath = 'http://10.0.2.2/${conseils.audioConseil}';
-
-  //         await player.setSource(UrlSource(audioPath));
-  //         // await player.setVolume(1.0);
-  //         await player.pause();
-  //         // await player.resume();
-  //       } else {
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           const SnackBar(
-  //             content: Row(
-  //               children: [
-  //                 Text("Audio non disponible"),
-  //               ],
-  //             ),
-  //             duration: Duration(seconds: 2),
-  //           ),
-  //         );
-  //       }
-  //     } catch (e) {
-  //       print("Erreur lors de la lecture de l'audio : $e");
-  //     }
-  //   });
-  // }
-  // Future<void> playSound() async {
-  //   player = AudioPlayer();
-
-  //   // Set the release mode to keep the source after playback has completed.
-  //   player.setReleaseMode(ReleaseMode.stop);
-
-  //   // Start the player as soon as the app is displayed.
-  //   WidgetsBinding.instance?.addPostFrameCallback((_) async {
-  //     try {
-  //       String? audioPath = conseils.audioConseil;
-  //       if (audioPath == null || audioPath.isEmpty) {
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           const SnackBar(
-  //             content: Row(
-  //               children: [
-  //                 Text("Audio non disponible"),
-  //               ],
-  //             ),
-  //             duration: Duration(seconds: 2),
-  //           ),
-  //         );
-  //       }
-
-  //         // String audioPath = 'http://10.0.2.2/${conseils.audioConseil!}';
-  //       await player.setSource(UrlSource(audioPath!));
-  //       await player.pause();
-  //     } catch (e) {
-  //       print("Erreur lors de la lecture de l'audio : $e");
-  //       // Affichez un message d'erreur à l'utilisateur.
-  //       // Vous pouvez également enregistrer cette erreur dans un fichier de logs.
-  //     }
-  //   });
-  // }
 
   @override
   void dispose() {
@@ -216,7 +144,9 @@ class _DetailConseilState extends State<DetailConseil> {
                     fontSize: 18),
               ),
             ),
-            conseils.videoConseil != null ? _videoBuild() : Container(),
+            conseils.videoConseil != null && conseils.videoConseil!.isNotEmpty
+                ? _videoBuild()
+                : Container(),
             _descriptionBuild(),
             conseils.audioConseil != null ? _audioBuild() : Container()
           ],

@@ -190,7 +190,7 @@ class _AddConseilState extends State<AddConseil> {
     _tokenAudioController.dispose();
     _tokenImageController.dispose();
   }
-
+  
   Future initRecoder() async {
     final status = await Permission.microphone.request();
 
@@ -212,12 +212,14 @@ class _AddConseilState extends State<AddConseil> {
     if (!isRecorderReady) return;
 
     final path = await recorder.stopRecorder();
+    print("Path audio : $path");
     final audioFile = File(path!);
     audiosUploaded = audioFile;
     _tokenAudioController.text = audiosUploaded!.path.toString();
     print('Recorded audio : $audioFile');
     print('AudiosUploaded : $audiosUploaded');
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -384,10 +386,12 @@ class _AddConseilState extends State<AddConseil> {
                         final twoDigiSeconds =
                             twoDigits(duration.inSeconds.remainder(60));
 
-                        return Text(
-                          '$twoDigiMinutes:$twoDigiSeconds',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                        return Expanded(
+                          child: Text(
+                            '$twoDigiMinutes:$twoDigiSeconds',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
                         );
                       }),
               Row(
@@ -439,7 +443,7 @@ class _AddConseilState extends State<AddConseil> {
                                 descriptionConseil: description,
                                 videoConseil: _videoUploaded,
                                 photoConseil: photoUploaded,
-                                // audioConseil: audiosUploaded,
+                                audioConseil: audiosUploaded,
                                 acteur: acteur)
                             .then((value) => {
                                   _titreController.clear(),
@@ -456,7 +460,7 @@ class _AddConseilState extends State<AddConseil> {
                                   Provider.of<ConseilService>(context,
                                           listen: false)
                                       .applyChange(),
-                                      Navigator.of(context).pop()
+                                  Navigator.of(context).pop()
                                 })
                             .catchError((onError) => {
                                   print("Error: " + onError.toString()),
@@ -489,7 +493,7 @@ class _AddConseilState extends State<AddConseil> {
                                   setState(() {
                                     _isLoading = false;
                                   }),
-                                   Provider.of<ConseilService>(context,
+                                  Provider.of<ConseilService>(context,
                                           listen: false)
                                       .applyChange(),
                                   Navigator.of(context).pop()
