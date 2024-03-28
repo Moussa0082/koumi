@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Conseil.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flick_video_player/flick_video_player.dart';
 import 'package:koumi_app/widgets/PlayerWidget.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flick_video_player/flick_video_player.dart';
 import 'package:video_player/video_player.dart';
+
 
 
 class DetailConseil extends StatefulWidget {
@@ -90,8 +92,14 @@ class _DetailConseilState extends State<DetailConseil> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         String audioPath = 'http://10.0.2.2/${conseils.audioConseil!}';
-        if (audioPath == null || audioPath.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
+        if (audioPath != null || audioPath.isNotEmpty) {
+         
+        await player.setSource(UrlSource(audioPath));
+        // await player.setVolume(1.0);
+        await player.pause();
+        // await player.resume();
+        }else{
+           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Row(
                 children: [
@@ -102,10 +110,6 @@ class _DetailConseilState extends State<DetailConseil> {
             ),
           );
         }
-        await player.setSource(UrlSource(audioPath));
-        // await player.setVolume(1.0);
-        await player.pause();
-        // await player.resume();
       } catch (e) {
         print("Erreur lors de la lecture de l'audio : $e");
       }
