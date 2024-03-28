@@ -1,15 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:koumi_app/models/Conseil.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:koumi_app/widgets/PlayerWidget.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flick_video_player/flick_video_player.dart';
+import 'package:flutter/material.dart';
+import 'package:koumi_app/models/Conseil.dart';
+import 'package:koumi_app/widgets/PlayerWidget.dart';
 import 'package:video_player/video_player.dart';
 
-
-
 class DetailConseil extends StatefulWidget {
-   final Conseil conseil;
+  final Conseil conseil;
   const DetailConseil({super.key, required this.conseil});
 
   @override
@@ -28,13 +25,43 @@ class _DetailConseilState extends State<DetailConseil> {
   void initState() {
     super.initState();
     conseils = widget.conseil;
-    playSound();
+    // Create the audio player.
+
     verifyVideoSource();
     // flickManager = FlickManager(
     //   videoPlayerController: VideoPlayerController.network(
     //     'http://10.0.2.2/${conseils.videoConseil}',
     //   ),
     // );
+  }
+
+  void verifyAudioSource() {
+    try {
+      if (conseils.audioConseil != null) {
+        player = AudioPlayer();
+
+        // Set the release mode to keep the source after playback has completed.
+        player.setReleaseMode(ReleaseMode.stop);
+
+        // Start the player as soon as the app is displayed.
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          String audioPath = 'http://10.0.2.2/${conseils.audioConseil}';
+          await player.play(UrlSource(audioPath));
+          await player.pause();
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Text("Audio non disponible"),
+            ],
+          ),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void verifyVideoSource() {
@@ -48,6 +75,39 @@ class _DetailConseilState extends State<DetailConseil> {
     }
   }
 
+  // Future<void> playSound() async {
+  //   player = AudioPlayer();
+
+  //   // Set the release mode to keep the source after playback has completed.
+  //   player.setReleaseMode(ReleaseMode.stop);
+
+  //   // Start the player as soon as the app is displayed.
+  //   WidgetsBinding.instance.addPostFrameCallback((_) async {
+  //     try {
+  //       if (conseils.audioConseil != null) {
+  //         String audioPath = 'http://10.0.2.2/${conseils.audioConseil}';
+
+  //         await player.setSource(UrlSource(audioPath));
+  //         // await player.setVolume(1.0);
+  //         await player.pause();
+  //         // await player.resume();
+  //       } else {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           const SnackBar(
+  //             content: Row(
+  //               children: [
+  //                 Text("Audio non disponible"),
+  //               ],
+  //             ),
+  //             duration: Duration(seconds: 2),
+  //           ),
+  //         );
+  //       }
+  //     } catch (e) {
+  //       print("Erreur lors de la lecture de l'audio : $e");
+  //     }
+  //   });
+  // }
   // Future<void> playSound() async {
   //   player = AudioPlayer();
 
@@ -81,40 +141,6 @@ class _DetailConseilState extends State<DetailConseil> {
   //     }
   //   });
   // }
-
-  Future<void> playSound() async {
-    player = AudioPlayer();
-
-    // Set the release mode to keep the source after playback has completed.
-    player.setReleaseMode(ReleaseMode.stop);
-
-    // Start the player as soon as the app is displayed.
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      try {
-        String audioPath = 'http://10.0.2.2/${conseils.audioConseil!}';
-        if (audioPath != null || audioPath.isNotEmpty) {
-         
-        await player.setSource(UrlSource(audioPath));
-        // await player.setVolume(1.0);
-        await player.pause();
-        // await player.resume();
-        }else{
-           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Row(
-                children: [
-                  Text("Audio non disponible"),
-                ],
-              ),
-              duration: Duration(seconds: 2),
-            ),
-          );
-        }
-      } catch (e) {
-        print("Erreur lors de la lecture de l'audio : $e");
-      }
-    });
-  }
 
   @override
   void dispose() {
@@ -192,7 +218,7 @@ class _DetailConseilState extends State<DetailConseil> {
             ),
             conseils.videoConseil != null ? _videoBuild() : Container(),
             _descriptionBuild(),
-            _audioBuild(),
+            conseils.audioConseil != null ? _audioBuild() : Container()
           ],
         ),
       ),
