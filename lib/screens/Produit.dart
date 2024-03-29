@@ -52,8 +52,10 @@ class _ProduitScreenState extends State<ProduitScreen>
   Set<String> loadedRegions = {};
 
   String? email = "";
+      bool isExist = false;
 
   void verify() async {
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     email = prefs.getString('emailActeur');
     if (email != null) {
@@ -61,6 +63,18 @@ class _ProduitScreenState extends State<ProduitScreen>
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
       typeActeurData = acteur.typeActeur!;
       type = typeActeurData.map((data) => data.libelle).join(', ');
+      
+    }
+    if(widget.id != null) {
+      setState(() {
+        isExist = true;
+      });
+    }else{
+      setState(() {
+        setState(() {
+          isExist = false;
+        });
+      });
     }
   }
 
@@ -157,7 +171,7 @@ class _ProduitScreenState extends State<ProduitScreen>
           categorieProduit[_tabController!.index].idCategorieProduit!;
       selectedCategorieProduitNom =
           categorieProduit[_tabController!.index].libelleCategorie;
-      fetchProduitByCategorie(selectedCategorieProduit, widget.id!);
+    isExist ? fetchProduitByCategorie(selectedCategorieProduit, widget.id!) : null;
       debugPrint("Cat id : " + selectedCategorieProduit);
     }
   }
@@ -346,15 +360,15 @@ class _ProduitScreenState extends State<ProduitScreen>
             ),
           ),
                 const SizedBox(height: 10),
-                Flexible(
+              !isExist ? SizedBox() :  Flexible(
                   child: GestureDetector(
-                    child: categorieProduit.isNotEmpty && widget.id! != null ? TabBarView(
+                    child:  TabBarView(
                       controller: _tabController,
                       children:  categorieProduit.map((categorie) {
                         return buildGridView(
                             categorie.idCategorieProduit!,  widget.id!);
                       }).toList(),
-                    ) : SizedBox(),
+                    ) ,
                   ),
                 ),
               ],
