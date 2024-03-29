@@ -22,12 +22,13 @@ import 'package:shimmer/shimmer.dart';
 
 class RegisterNextScreen extends StatefulWidget {
 
-  String nomActeur,telephone;
+  String nomActeur,telephone, whatsAppActeur;
   String? pays;
   // late List<TypeActeur> typeActeur;
    
 
    RegisterNextScreen({super.key, required this.nomActeur, 
+   required this.whatsAppActeur,
    required this.telephone,  this.pays});
 
   @override
@@ -190,7 +191,7 @@ Future<void> _pickImage(ImageSource source) async {
 //   typeActeurNames += typeActeur.libelle! + ', ';
 // }
 
-debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone},  Pays : ${widget.pays} ");
+debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone},  Téléphone : ${widget.whatsAppActeur}, Pays : ${widget.pays} ");
  
   // _mesPays  =
   //       http.get(Uri.parse('http://10.0.2.2:9000/pays/read'));
@@ -457,8 +458,8 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
               if(_formKey.currentState!.validate()){
               Navigator.push(context, MaterialPageRoute(builder: (context)=>  RegisterEndScreen(
                 nomActeur: widget.nomActeur, email: emailController.text, telephone: widget.telephone, 
-                 adresse:adresseController.text, maillon:maillonController.text, 
-                numeroWhatsApp: processedNumber, localistaion: localisationController.text,
+                 adresse:adresseController.text, 
+                numeroWhatsApp: widget.whatsAppActeur, localistaion: localisationController.text,
                  pays: widget.pays, typeActeur: typeActeur,
                 )));
               }

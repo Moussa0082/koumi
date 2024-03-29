@@ -108,6 +108,7 @@ Future<String?> getCurrentCountryFromLocation() async {
 }
 
   String processedNumber = "";
+  String processedNumberTel = "";
 
    @override
   void initState() {
@@ -210,7 +211,7 @@ Future<String?> getCurrentCountryFromLocation() async {
 
 
   IntlPhoneField(
-    
+     controller: telephoneController,
        invalidNumberMessage : "Numéro invalide",
     searchText: "Chercher un pays",
                    decoration: InputDecoration(
@@ -223,8 +224,8 @@ Future<String?> getCurrentCountryFromLocation() async {
                   languageCode: "en",
                   onChanged: (phone) {
                     print(phone.completeNumber);
-                    processedNumber = removePlus(phone.completeNumber.toString());
-          print(processedNumber);
+                    processedNumberTel = removePlus(phone.completeNumber.toString());
+          print(processedNumberTel);
                   },
                   onCountryChanged: (country) {
                     print('Country changed to: ' + country.name);
@@ -274,6 +275,7 @@ Future<String?> getCurrentCountryFromLocation() async {
                  
                 Navigator.push(context, MaterialPageRoute(builder: (context) =>  
                 RegisterNextScreen(nomActeur: nomActeurController.text,
+                whatsAppActeur: processedNumberTel,
                  telephone: processedNumber , pays: selectedCountry,) ));
               
                 }

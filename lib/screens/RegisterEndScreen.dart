@@ -26,7 +26,7 @@ import 'package:path_provider/path_provider.dart';
 
 class RegisterEndScreen extends StatefulWidget {
 
-    String nomActeur, email,telephone, adresse , maillon , localistaion;
+    String nomActeur, email,telephone, adresse  , localistaion;
     String?  telephoneActeur, numeroWhatsApp , pays;
     File? image1;
    late List<TypeActeur>? typeActeur;
@@ -37,7 +37,7 @@ class RegisterEndScreen extends StatefulWidget {
    this.image1,
    required this.email, required this.telephone, 
     this.typeActeur, required this.adresse, 
-   required this.maillon, required this.numeroWhatsApp,
+   required this.numeroWhatsApp,
    required this.localistaion,  this.pays});
 
   @override
@@ -154,7 +154,6 @@ Future<void> _pickImage(ImageSource source) async {
   );
 }
 
-  TextEditingController filiereController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
 
@@ -212,7 +211,7 @@ Future<void> _pickImage(ImageSource source) async {
       try {
       
             // String type = typeActeurList.toString();
-        if(widget.image1 != null && image2 != null || widget.image1!= null || image2 != null){
+        if(widget.image1 != null && image2 != null){
       
       await acteurService.creerActeur(
       logoActeur: widget.image1 as File,
@@ -252,16 +251,16 @@ Future<void> _pickImage(ImageSource source) async {
           );
         }else{
       await acteurService.creerActeur(
-      nomActeur: nomActeur,
+      nomActeur: nomActeur ?? "",
       adresseActeur: adresse,
-      telephoneActeur: widget.telephoneActeur!,
-      whatsAppActeur: widget.numeroWhatsApp!,
-      niveau3PaysActeur: widget.pays,
-      localiteActeur: localisation,
-      emailActeur: emailActeur,
-      typeActeur: typeActeur,
-      password: password,
-      speculations: listeSpeculations
+      telephoneActeur: widget.telephoneActeur ?? "",
+      whatsAppActeur: widget.numeroWhatsApp ?? "",
+      niveau3PaysActeur: widget.pays ?? "",
+      localiteActeur: localisation ?? "",
+      emailActeur: emailActeur ?? "",
+      typeActeur: typeActeur ?? [],
+      password: password ?? "",
+      speculations: listeSpeculations ?? [],
       
         );
          showDialog(
@@ -482,7 +481,7 @@ Future<void> _pickImage(ImageSource source) async {
     chipConfig: const ChipConfig(wrapType: WrapType.wrap),
  responseParser: (response) {
         // List<dynamic> decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
-
+ 
   listeSpeculations = (response as List<dynamic>).map((e) {
     return Speculation(
       idSpeculation: e['idSpeculation'] as String,
@@ -495,7 +494,7 @@ Future<void> _pickImage(ImageSource source) async {
 
   // Filtrer les types avec un libellé différent de "admin" et dont le statutTypeActeur est true
   final filteredTypes = listeSpeculations.where((speculation) => speculation.statutSpeculation == true).toList();
-
+ 
   // Créer des ValueItems pour les types filtrés
   final List<ValueItem<Speculation>> valueItems = filteredTypes.map((speculation) {
     return ValueItem<Speculation>(
