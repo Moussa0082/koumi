@@ -7,7 +7,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/MagasinService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
@@ -359,20 +358,22 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
   @override
   void initState() {
     super.initState();
-    if(widget.isEditable! == true){
-    nomMagasinController.text = widget.nomMagasin!;
-    contactMagasinController.text = widget.contactMagasin!;
-    localiteMagasinController.text = widget.localiteMagasin!;
-    // photos = widget.photo!;
-    niveauPaysValue = widget.niveau1Pays!.idNiveau1Pays;
-    debugPrint ("Id Magasin "+ widget.idMagasin! + "bool"  + widget.isEditable!.toString());
-
+    if (widget.isEditable! == true) {
+      nomMagasinController.text = widget.nomMagasin!;
+      contactMagasinController.text = widget.contactMagasin!;
+      localiteMagasinController.text = widget.localiteMagasin!;
+      // photos = widget.photo!;
+      niveauPaysValue = widget.niveau1Pays!.idNiveau1Pays;
+      debugPrint("Id Magasin " +
+          widget.idMagasin! +
+          "bool" +
+          widget.isEditable!.toString());
     }
-    debugPrint ("bool"  + widget.isEditable!.toString());
+    debugPrint("bool" + widget.isEditable!.toString());
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     niveau1PaysList =
         // http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+    http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
   }
 
   @override
@@ -421,8 +422,11 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                       TextFormField(
                         controller: nomMagasinController,
                         decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
                           border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                           hintText: "Entrez le nom du magasin",
                         ),
                         keyboardType: TextInputType.text,
@@ -452,8 +456,11 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                       TextFormField(
                         controller: contactMagasinController,
                         decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
                           border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                           hintText: "Entrez le contact du magasin",
                         ),
                         keyboardType: TextInputType.text,
@@ -484,8 +491,11 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                       TextFormField(
                         controller: localiteMagasinController,
                         decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
                           border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                           hintText: "Exemple : Bamako , Kayes , Segou",
                         ),
                         keyboardType: TextInputType.text,
@@ -499,73 +509,123 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                         onSaved: (val) => localiteMagasin = val!,
                       ),
                       // fin localite magasin
-                      const SizedBox(
-                        height: 15,
+                      const SizedBox(height: 10),
+
+                      //Contact magasin
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              "Region *",
+                              style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),
+                            )),
                       ),
                       FutureBuilder(
-  future: niveau1PaysList,
-  builder: (_, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return CircularProgressIndicator();
-    }
-    if (snapshot.hasError) {
-      return Text("Sous region non trouvé");
-      // return Text("${snapshot.error}");
-    }
-    if (snapshot.hasData) {
-      final response = json.decode(snapshot.data.body) as List;
-      final niveau1PaysList = response
-          .map((e) => Niveau1Pays.fromMap(e))
-          .where((con) => con.statutN1 == true)
-          .toList();
-      if (niveau1PaysList.isEmpty) {
-        return Text(
-          'Aucun pays disponible',
-          style: TextStyle(overflow: TextOverflow.ellipsis),
-        );
-      }
+                        future: niveau1PaysList,
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucun localité trouvé',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+                          if (snapshot.hasError) {
+                            return Text("${snapshot.error}");
+                          }
+                          if (snapshot.hasData) {
+                            dynamic responseData =
+                                json.decode(snapshot.data.body);
+                            if (responseData is List) {
+                              final reponse = responseData;
+                              final niveau3List = reponse
+                                  .map((e) => Niveau1Pays.fromMap(e))
+                                  .where((con) => con.statutN1 == true)
+                                  .toList();
 
-      return DropdownButtonFormField<String>(
-        items: niveau1PaysList.isNotEmpty ? niveau1PaysList
-            .map(
-              (e) => DropdownMenuItem(
-                value: e.idNiveau1Pays,
-                child: Text(e.nomN1!),
-              ),
-            )
-            .toList() : [],
-        value: niveauPaysValue,
-        onChanged: (newValue) {
-          setState(() {
-            niveauPaysValue = newValue;
-            if (newValue != null) {
-              niveau1Pays = niveau1PaysList.firstWhere(
-                  (element) => element.idNiveau1Pays == newValue);
-              debugPrint("con select ${niveau1Pays.toString()}");
-              // typeSelected = true;
-            } else {
-              // niveauPaysValue = "Aucun pays disponible";
-            }
-          });
-        },
-        decoration: InputDecoration(
-          labelText: widget.isEditable!
-              ? widget.niveau1Pays!.nomN1!
-              : 'Sélectionner un sous région',
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-      );
-    }
-    // Gérer le cas où snapshot.hasData est false
-    return Text(
-      'Aucune donnée disponible',
-      style: TextStyle(overflow: TextOverflow.ellipsis),
-    );
-  },
-),
+                              if (niveau3List.isEmpty) {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucun localité trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
 
+                              return DropdownButtonFormField<String>(
+                                items: niveau3List
+                                    .map(
+                                      (e) => DropdownMenuItem(
+                                        value: e.idNiveau1Pays,
+                                        child: Text(e.nomN1!),
+                                      ),
+                                    )
+                                    .toList(),
+                                value: niveauPaysValue,
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    niveauPaysValue = newValue;
+                                    if (newValue != null) {
+                                      niveauPaysValue =
+                                          niveau3List.map((e) => e.nomN1).first;
+                                      print("niveau 3 : ${niveau1Pays}");
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Selectionner une localité',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucun localité trouvé',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                          return DropdownButtonFormField(
+                            items: [],
+                            onChanged: null,
+                            decoration: InputDecoration(
+                              labelText: 'Aucun localité trouvé',
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 20),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
 
                       const SizedBox(
                         height: 10,
