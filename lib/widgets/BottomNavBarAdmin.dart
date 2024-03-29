@@ -6,6 +6,7 @@ import 'package:koumi_app/Admin/ProduitA.dart';
 import 'package:koumi_app/Admin/ProfilA.dart';
 import 'package:koumi_app/screens/Panier.dart';
 import 'package:koumi_app/screens/Produit.dart';
+import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:provider/provider.dart';
 
@@ -27,6 +28,8 @@ const d_colorOr = Color.fromRGBO(254, 243, 231, 1);
 class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
   int activePageIndex = 0;
 
+   PageController _pageController = PageController();
+  int selectedPage = 0;
   // void _onBackPressed(bool isBackPressed) async {
   //   if (!isBackPressed) {
   //     // Essayez de revenir en arrière dans la pile de navigation actuelle
@@ -48,7 +51,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
 
   List pages = <Widget>[
     const AcceuilAdmin(),
-    ProduitScreen(),
+    ProfilA(),
     Panier(),
     const ProfilA()
   ];
@@ -77,15 +80,27 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
   void initState() {
     // TODO: implement initState
     super.initState();
+        _pageController = PageController(initialPage: activePageIndex);
+
     Future.microtask(() {
       Provider.of<BottomNavigationService>(context, listen: false)
           .changeIndex(0);
     });
    
   }
+  @override
+  void dispose() {
+    super.dispose();
+
+   _pageController.dispose();
+      
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: d_colorPage,
       appBar: AppBar(
@@ -148,7 +163,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
       '/': (context) {
         return [
           const AcceuilAdmin(),
-          ProduitScreen(),
+          ProfilA(),
           Panier(),
           const ProfilA()
         ].elementAt(index);
@@ -168,6 +183,22 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
             builder: (context) => routeBuilders[routeSettings.name]!(context),
           );
         },
+      ),
+    );
+  }
+
+
+  Widget buildPageView(){
+    return SizedBox(
+      // height:MediaQuery.of(context).size.height,
+      height:MediaQuery.of(context).size.height * 0.90,
+      child: PageView(
+        children: [
+          const AcceuilAdmin(),
+            const ProduitA(),
+             Panier(),
+            const ProfilA()
+        ],
       ),
     );
   }

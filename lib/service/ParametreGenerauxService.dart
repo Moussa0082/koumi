@@ -173,7 +173,7 @@ class ParametreGenerauxService extends ChangeNotifier {
       parametreList = [];
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
        
-       throw Exception("Params vide");
+      throw Exception("Params vide");
       // throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }

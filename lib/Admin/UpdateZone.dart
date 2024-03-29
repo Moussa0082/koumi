@@ -35,7 +35,7 @@ class _UpdateZoneState extends State<UpdateZone> {
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     zoneProd = widget.zone;
-    nomController.text = zoneProd.nomZoneProduction;
+    nomController.text = zoneProd.nomZoneProduction!;
     latitudeController.text = zoneProd.latitude!;
     longitudeController.text = zoneProd.longitude!;
 

@@ -198,7 +198,7 @@ class _ActeurScreenState extends State<ActeurScreen> {
                                                       fontStyle:
                                                           FontStyle.italic,
                                                     )),
-                                                Text(e.dateAjout!,
+                                                Text(e.dateAjout! ?? "",
                                                     style: TextStyle(
                                                       color: Colors.black87,
                                                       fontSize: 16,

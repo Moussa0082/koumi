@@ -4,11 +4,11 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 
 class Speculation {
-final String idSpeculation;
-  final String codeSpeculation;
-  final String nomSpeculation;
-  final String descriptionSpeculation;
-  final bool statutSpeculation;
+final String? idSpeculation;
+  final String? codeSpeculation;
+  final String? nomSpeculation;
+  final String? descriptionSpeculation;
+  final bool? statutSpeculation;
   final CategorieProduit? categorieProduit;
   final String? dateAjout;
   final String? dateModif;
@@ -16,11 +16,11 @@ final String idSpeculation;
   final Acteur? acteur;
   
   Speculation({
-    required this.idSpeculation,
-    required this.codeSpeculation,
-    required this.nomSpeculation,
-    required this.descriptionSpeculation,
-    required this.statutSpeculation,
+     this.idSpeculation,
+     this.codeSpeculation,
+     this.nomSpeculation,
+     this.descriptionSpeculation,
+     this.statutSpeculation,
      this.categorieProduit,
     this.dateAjout,
     this.dateModif,

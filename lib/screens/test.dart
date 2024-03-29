@@ -296,3 +296,206 @@
 
 
 
+
+
+/*
+
+FutureBuilder<List<Map<String, dynamic>>>(
+      future: ShoppingCart().getCart(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset('assets/images/notif.jpg'),
+                SizedBox(height: 10),
+                Text(
+                  'Panier vide',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 17,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+      _cartItems = snapshot.data!;
+        return ListView.builder(
+          itemCount: _cartItems.length,
+          itemBuilder: (context, index) {
+            Map<String, dynamic> item = _cartItems[index];
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 3,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: GestureDetector(
+                  onTap: () {
+                    Get.to(DetailProduits());
+                  },
+                  child: ListTile(
+                    leading: Image.asset("assets/images/mang.jpg"),
+                    title: Text(item['nomProduit'] ?? ''),
+                    subtitle: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.remove),
+                              onPressed: () => _decrementQuantity(index),
+                            ),
+                            Text('${item['quantiteProduit']}', style: TextStyle(fontWeight: FontWeight.bold)),
+                            IconButton(
+                              icon: Icon(Icons.add),
+                              onPressed: () => _incrementQuantity(index),
+                            ),
+                          ],
+                        ),
+                        Text('${item['prix'] ?? 0} FCFA', style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ),
+    
+    
+    
+    
+    
+    
+    
+     static final ShoppingCart _instance = ShoppingCart._internal();
+
+  factory ShoppingCart() {
+    return _instance;
+  }
+
+  ShoppingCart._internal();
+
+
+     List<Map<String, dynamic>> _cartItems = [];
+
+     Future<void> loadCartItems() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String cartString = prefs.getString('cart') ?? '[]';
+    List<Map<String, dynamic>> cart = List<Map<String, dynamic>>.from(jsonDecode(cartString));
+      _cartItems = cart;
+  }
+
+  // Méthode pour ajouter un produit au panier
+  Future<void> addToCart(Stock product) async {
+    // Vérifier si le produit existe déjà dans le panier
+    bool productExists = await _checkProductExistence(product);
+
+    if (productExists) {
+      // Afficher un message d'erreur si le produit existe déjà dans le panier
+      Snack.error(titre: "Alerte",
+        message:"Le produit existe déjà dans le panier"
+      );
+    } else {
+      // Ajouter le produit au panier avec une quantité initiale de 1
+      Map<String, dynamic> cartItem = {
+        'idStock': product.idStock,
+        'nomProduit': product.nomProduit,
+        'prix': product.prix,
+        'quantiteProduit': 1,
+      };
+      List<Map<String, dynamic>> cart = await getCart();
+      cart.add(cartItem);
+      await _saveCart(cart);
+      // Afficher un message de succès ou autre action après l'ajout au panier
+      Snack.success(titre: "Succès",
+        message:"Produit ajouté au panier"
+      );
+    }
+    loadCartItems();
+    applyChanges();
+  }
+
+  // Méthode pour vérifier si le produit existe déjà dans le panier
+  Future<bool> _checkProductExistence(Stock product) async {
+    List<Map<String, dynamic>> cart = await getCart();
+    bool exists = cart.any((item) => item['idStock'] == product.idStock);
+    return exists;
+  }
+
+  // Méthode pour récupérer le panier depuis les SharedPreferences
+  Future<List<Map<String, dynamic>>> getCart() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String cartString = prefs.getString('cart') ?? '[]';
+    List<Map<String, dynamic>> cart = List<Map<String, dynamic>>.from(jsonDecode(cartString));
+    return cart;
+  }
+
+  // Méthode pour sauvegarder le panier dans les SharedPreferences
+  Future<void> _saveCart(List<Map<String, dynamic>> cart) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String cartString = jsonEncode(cart);
+    prefs.setString('cart', cartString);
+    loadCartItems();
+    getCart();
+  }
+
+  applyChanges(){
+    notifyListeners();
+  }
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+     */

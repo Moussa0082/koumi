@@ -462,37 +462,42 @@ Navigator.pushReplacement(
         body: SingleChildScrollView(
         
           child: Container(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                children: [
-                  Center(
-                      child: Image.asset(
-                    'assets/images/logo.png',
-                    height: 220,
-                    width: 110,
-                  )),
-                  // connexion
-                  const Text(
-                    " Connexion ",
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xfff2b6706)),
-                  ),
-                  Form(
+            child: Column(mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+               
+                   SizedBox(
+                    height:180,
+                    width:150,
+                    child: Center(
+                    child: Image.asset(
+                  'assets/images/logo.png',
+                  // height: MediaQuery.sizeOf(context).height * 0.45,
+                
+                )),
+                   ),
+                                const Text(
+                                  " Connexion ",
+                                  style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xfff2b6706)),
+                                ),
+                // connexion
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Form(
                       child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                 
-              //       Text('LAT: ${_currentPosition?.latitude ?? ""}'),
-              // Text('LNG: ${_currentPosition?.longitude ?? ""}'),
-              // Text('ADDRESS: ${_currentAddress ?? ""}'),
-              // const SizedBox(height: 32),
-              // ElevatedButton(
-              //   onPressed: _getCurrentPosition,
-              //   child: const Text("Get Current Location"),
-              // ),
+                                   
+                                //       Text('LAT: ${_currentPosition?.latitude ?? ""}'),
+                                // Text('LNG: ${_currentPosition?.longitude ?? ""}'),
+                                // Text('ADDRESS: ${_currentAddress ?? ""}'),
+                                // const SizedBox(height: 32),
+                                // ElevatedButton(
+                                //   onPressed: _getCurrentPosition,
+                                //   child: const Text("Get Current Location"),
+                                // ),
                       const SizedBox(
                         height: 10,
                       ),
@@ -528,11 +533,11 @@ Navigator.pushReplacement(
                         onSaved: (val) => email = val!,
                       ),
                       // fin  adresse email
-              
+                                
                       const SizedBox(
                         height: 10,
                       ),
-              
+                                
                       const Padding(
                         padding: EdgeInsets.only(left: 10.0),
                         child: Text(
@@ -579,7 +584,7 @@ Navigator.pushReplacement(
                         onSaved: (val) => password = val!,
                       ),
                       // fin mot de pass
-              
+                                
                       const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -634,9 +639,9 @@ Navigator.pushReplacement(
                           ),
                         ],
                       ),
-              
+                                
                       const SizedBox(
-                        height: 15,
+                        height: 10,
                       ),
                       Center(
                         child: ElevatedButton(
@@ -667,9 +672,9 @@ Navigator.pushReplacement(
                           ),
                         ),
                       ),
-              
+                                
                       const SizedBox(
-                        height: 40,
+                        height: 20,
                       ),
                       Container(
                         height: 40,
@@ -712,8 +717,8 @@ Navigator.pushReplacement(
                       ),
                     ],
                   )),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

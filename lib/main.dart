@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:koumi_app/models/CartItem.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/CartProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/SplashScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
@@ -10,6 +12,7 @@ import 'package:koumi_app/service/ConseilService.dart';
 import 'package:koumi_app/service/ContinentService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
 import 'package:koumi_app/service/IntrantService.dart';
+import 'package:koumi_app/service/MagasinService.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:koumi_app/service/MessageService.dart';
 import 'package:koumi_app/service/Niveau1Service.dart';
@@ -34,6 +37,10 @@ import 'package:provider/provider.dart';
 
 void main() {
   runApp(MultiProvider(providers: [
+
+
+    ChangeNotifierProvider(create: (context) => MagasinService()),
+    ChangeNotifierProvider(create: (context) => CartProvider()),
     ChangeNotifierProvider(create: (context) => ActeurService()),
     ChangeNotifierProvider(create: (context) => TypeActeurService()),
     ChangeNotifierProvider(create: (context) => ActeurProvider()),
@@ -47,6 +54,7 @@ void main() {
     ChangeNotifierProvider(create: (context) => ConseilService()),
     ChangeNotifierProvider(create: (context) => TypeMaterielService()),
     ChangeNotifierProvider(create: (context) => IntrantService()),                                                                                                                                                                                                                                                                                                                         ChangeNotifierProvider(create: (context) => TypeVoitureService()),
+    ChangeNotifierProvider(create: (context) => TypeMaterielService()),                                                                                                                                                                                                                                                                                                                                         ChangeNotifierProvider(create: (context) => TypeVoitureService()),
     ChangeNotifierProvider(create: (context) => MessageService()),
     ChangeNotifierProvider(create: (context) => MaterielService()),
     ChangeNotifierProvider(create: (context) => VehiculeService()),
@@ -59,12 +67,14 @@ void main() {
     ChangeNotifierProvider(create: (context) => FiliereService()),
     ChangeNotifierProvider(create: (context) => Niveau3Service()),
     ChangeNotifierProvider(create: (context) => BottomNavigationService())
-  ], child: const MyApp()));
+  ], child:  MyApp()));
 }
 
  
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+   MyApp({super.key});
+
+
 
   // This widget is the root of your application.
   @override
@@ -72,7 +82,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange.shade400),
         useMaterial3: true,
       ),
       routes: {

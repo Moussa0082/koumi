@@ -37,15 +37,7 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
   late String type;
 
 
-  List<CartItem> _cartItems = [];
-   void _handleAddToCart() {
-    CartItem cartItem = CartItem(stock: widget.stock!, quantity: 1);
-    _cartItems.add(cartItem);
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => Panier(cartItems: _cartItems)),
-    );
-  }
+ 
 
 
 
@@ -207,7 +199,7 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
                       Text("Speculation : ", style: TextStyle(fontSize: 20,fontStyle:FontStyle.italic)),
               
                         Text(
-                          widget.stock!.speculation!.nomSpeculation,
+                          widget.stock!.speculation!.nomSpeculation!,
                           style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -242,7 +234,7 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
                      Text("Unité Produit : ", style: TextStyle(fontSize: 20,fontStyle:FontStyle.italic)),
                      
                        Text(
-                         widget.stock!.unite!.nomUnite,
+                         widget.stock!.unite!.nomUnite!,
                          style: TextStyle(
                      fontSize: 20,
                      fontWeight: FontWeight.bold,
@@ -283,6 +275,8 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
                         if (widget.stock!.acteur!.idActeur! == acteur.idActeur!){
                         Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
                         }
+                        else{
+                        }
                         },
                         style: ElevatedButton.styleFrom(primary: Colors.orange, shape: const StadiumBorder()),
                         child:   Text(      
@@ -301,20 +295,20 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
     );
   }
 
-  void _addToCart(Stock stock) {
-    var existingItem = _cartItems.firstWhere(
-      (item) => item.stock == stock,
-      orElse: () => CartItem(stock: stock),
-    );
+  // void _addToCart(Stock stock) {
+  //   var existingItem = _cartItems.firstWhere(
+  //     (item) => item.stock == stock,
+  //     orElse: () => CartItem(stock: stock),
+  //   );
 
-    if (existingItem.quantity == 1) {
-      _cartItems.remove(existingItem);
-      Snack.error(titre: "Erreur", message: "Produit déjà existant au panier");
-    } else {
-      existingItem.quantity++;
-      Snack.success(titre: "Succès", message: "Produit déjà existant au panier qté " + existingItem.quantity.toString());
-    }
-  }
+  //   if (existingItem.quantity == 1) {
+  //     _cartItems.remove(existingItem);
+  //     Snack.error(titre: "Erreur", message: "Produit déjà existant au panier");
+  //   } else {
+  //     existingItem.quantity++;
+  //     Snack.success(titre: "Succès", message: "Produit déjà existant au panier qté " + existingItem.quantity.toString());
+  //   }
+  // }
  
 
 

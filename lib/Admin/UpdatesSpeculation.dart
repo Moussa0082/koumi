@@ -24,8 +24,8 @@ class _UpdatesSpeculationState extends State<UpdatesSpeculation> {
   void initState() {
     super.initState();
     speculations = widget.speculation;
-    libelleController.text = speculations.nomSpeculation;
-    descriptionController.text = speculations.descriptionSpeculation;
+    libelleController.text = speculations.nomSpeculation!;
+    descriptionController.text = speculations.descriptionSpeculation!;
   }
 
   @override

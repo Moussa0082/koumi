@@ -1,32 +1,37 @@
 import 'dart:convert';
 
+import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Stock.dart';
+
 class Commande {
   String? idCommande;
   String? codeCommande;
   String? dateCommande;
-  final List<dynamic> stock;
-  final List<dynamic> materielList;
+  final List<Stock>? stock;
+  final List<dynamic>? materielList;
   String? photoSignature;
   String? idClient;
   String? idCommercant;
   String? personneAjout;
   String? dateAjout;
   String? personneModif;
+   Acteur? acteur;
   String? dateModif;
 
   Commande({
     this.idCommande,
-    required this.codeCommande,
-    required this.dateCommande,
-    required this.stock,
-    required this.materielList,
-    required this.photoSignature,
-    required this.idClient,
-    required this.idCommercant,
-    required this.personneAjout,
-    required this.dateAjout,
-    required this.personneModif,
-    required this.dateModif,
+     this.codeCommande,
+     this.dateCommande,
+     this.stock,
+     this.materielList,
+     this.photoSignature,
+     this.idClient,
+     this.idCommercant,
+     this.personneAjout,
+     this.dateAjout,
+     this.personneModif,
+     this.acteur,
+     this.dateModif,
   });
 
   factory Commande.fromMap(Map<String, dynamic> map) {
@@ -34,7 +39,7 @@ class Commande {
       idCommande: map['idCommande'] as String?,
       codeCommande: map['codeCommande'] as String,
       dateCommande: map['dateCommande'] as String,
-      stock: List<dynamic>.from(map['stock'].map((x) => x)),
+      stock: List<Stock>.from(map['stock'].map((x) => x)),
       materielList: List<dynamic>.from(
           map['materielList'].map((x) => x)),
       photoSignature: map['photoSignature'] as String?,
@@ -43,6 +48,8 @@ class Commande {
       personneAjout: map['personneAjout'] as String?,
       dateAjout: map['dateAjout'] as String?,
       personneModif: map['personneModif'] as String?,
+      // acteur: map['acteur'] as String?,
+      acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
       dateModif: map['dateModif'] as String?,
     );
   }
@@ -60,6 +67,7 @@ class Commande {
       'personneAjout': personneAjout,
       'dateAjout': dateAjout,
       'personneModif': personneModif,
+       'acteur': acteur,
       'dateModif': dateModif,
     };
   }

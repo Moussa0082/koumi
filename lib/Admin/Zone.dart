@@ -145,7 +145,7 @@ class _ZoneState extends State<Zone> {
                     String searchText = "";
                     List<ZoneProduction> filtereSearch =
                         zoneList.where((search) {
-                      String libelle = search.nomZoneProduction.toLowerCase();
+                      String libelle = search.nomZoneProduction!.toLowerCase();
                       searchText = _searchController.text.toLowerCase();
                       return libelle.contains(searchText);
                     }).toList();
@@ -198,7 +198,7 @@ class _ZoneState extends State<Zone> {
                                                           FontWeight.w500,
                                                       overflow: TextOverflow
                                                           .ellipsis)),
-                                              Text(zone.nomZoneProduction,
+                                              Text(zone.nomZoneProduction!,
                                                   style: const TextStyle(
                                                       color: Colors.black87,
                                                       fontSize: 17,
@@ -245,7 +245,7 @@ class _ZoneState extends State<Zone> {
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                _buildEtat(zone.statutZone),
+                                                _buildEtat(zone.statutZone!),
                                                 PopupMenuButton<String>(
                                                   padding: EdgeInsets.zero,
                                                   itemBuilder: (context) =>

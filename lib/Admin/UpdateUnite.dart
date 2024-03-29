@@ -28,9 +28,9 @@ class _UpdateUniteState extends State<UpdateUnite> {
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
 
-    libelleController.text = widget.unite.nomUnite;
-    sigleController.text = widget.unite.sigleUnite;
-    descController.text = widget.unite.description;
+    libelleController.text = widget.unite.nomUnite!;
+    sigleController.text = widget.unite.sigleUnite!;
+    descController.text = widget.unite.description!;
     super.initState();
   }
 
