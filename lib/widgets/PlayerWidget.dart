@@ -76,91 +76,167 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // final color = Theme.of(context).primaryColor;
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      constraints:
-          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.9),
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                GestureDetector(
-                  onTap: () => _play(),
-                  child: CircleAvatar(
-                    backgroundColor: d_colorOr,
-                    child: _isPlaying
-                        ? IconButton(
-                            // key: const Key('play_button'),
-                            onPressed: _pause,
-                            // iconSize: 35.0,
-                            icon: const Icon(Icons.pause),
-                          )
-                        : IconButton(
-                            // key: const Key('play_button'),
-                            onPressed: _play,
-                            // iconSize: 35.0,
-                            icon: const Icon(Icons.play_arrow),
-                          ),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Slider(
-                      activeColor: d_colorOr,
-                      onChanged: (value) {
-                        final duration = _duration;
-                        if (duration == null) return;
-                        final position = value * duration.inMilliseconds;
-                        player.seek(Duration(milliseconds: position.round()));
-                      },
-                      value: (_position != null &&
-                              _duration != null &&
-                              _position!.inMilliseconds > 0 &&
-                              _position!.inMilliseconds <
-                                  _duration!.inMilliseconds)
-                          ? _position!.inMilliseconds /
-                              _duration!.inMilliseconds
-                          : 0.0,
+    final double maxWidth = MediaQuery.of(context).size.width * 0.9;
+    // final bool isPlaying = _isPlaying ?? false;
+    final String positionText = _positionText ?? '';
+    final String durationText = _durationText ?? '';
+    final double sliderValue = (_position != null &&
+            _duration != null &&
+            _position!.inMilliseconds > 0 &&
+            _position!.inMilliseconds < _duration!.inMilliseconds)
+        ? _position!.inMilliseconds / _duration!.inMilliseconds
+        : 0.0;
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        constraints: BoxConstraints(maxWidth: maxWidth),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () => _isPlaying ? _pause() : _play(),
+                    child: CircleAvatar(
+                      backgroundColor: d_colorOr,
+                      child: Icon(
+                        _isPlaying ? Icons.pause : Icons.play_arrow,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(child: Container()),
-                Text(
-                  _position != null
-                      ? '$_positionText / $_durationText'
-                      : _duration != null
-                          ? _durationText
-                          : '',
-                  style: TextStyle(fontSize: 14.0),
-                ),
-              ],
-            )
-          ],
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Slider(
+                        activeColor: d_colorOr,
+                        onChanged: (value) {
+                          final duration = _duration;
+                          if (duration == null) return;
+                          final position = value * duration.inMilliseconds;
+                          player.seek(Duration(milliseconds: position.round()));
+                        },
+                        value: sliderValue,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(child: Container()),
+                  Text(
+                    positionText.isNotEmpty
+                        ? '$positionText / $durationText'
+                        : durationText,
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+  // return Container(
+  //   decoration: BoxDecoration(
+  //     color: Colors.grey[200],
+  //     borderRadius: BorderRadius.circular(16),
+  //     boxShadow: [
+  //       BoxShadow(
+  //         color: Colors.grey.withOpacity(0.5),
+  //         spreadRadius: 2,
+  //         blurRadius: 5,
+  //         offset: Offset(0, 3),
+  //       ),
+  //     ],
+  //   ),
+  //   constraints:
+  //       BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.9),
+  //   child: Padding(
+  //     padding: EdgeInsets.all(16),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.stretch,
+  //       children: [
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             GestureDetector(
+  //               onTap: () => _play(),
+  //               child: CircleAvatar(
+  //                 backgroundColor: d_colorOr,
+  //                 child: _isPlaying
+  //                     ? IconButton(
+  //                         // key: const Key('play_button'),
+  //                         onPressed: _pause,
+  //                         // iconSize: 35.0,
+  //                         icon: const Icon(Icons.pause),
+  //                       )
+  //                     : IconButton(
+  //                         // key: const Key('play_button'),
+  //                         onPressed: _play,
+  //                         // iconSize: 35.0,
+  //                         icon: const Icon(Icons.play_arrow),
+  //                       ),
+  //               ),
+  //             ),
+  //             Expanded(
+  //               child: Padding(
+  //                 padding: EdgeInsets.symmetric(horizontal: 16),
+  //                 child: Slider(
+  //                   activeColor: d_colorOr,
+  //                   onChanged: (value) {
+  //                     final duration = _duration;
+  //                     if (duration == null) return;
+  //                     final position = value * duration.inMilliseconds;
+  //                     player.seek(Duration(milliseconds: position.round()));
+  //                   },
+  //                   value: (_position != null &&
+  //                           _duration != null &&
+  //                           _position!.inMilliseconds > 0 &&
+  //                           _position!.inMilliseconds <
+  //                               _duration!.inMilliseconds)
+  //                       ? _position!.inMilliseconds /
+  //                           _duration!.inMilliseconds
+  //                       : 0.0,
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         Row(
+  //           children: [
+  //             Expanded(child: Container()),
+  //             Text(
+  //               _position != null
+  //                   ? '$_positionText / $_durationText'
+  //                   : _duration != null
+  //                       ? _durationText
+  //                       : '',
+  //               style: TextStyle(fontSize: 14.0),
+  //             ),
+  //           ],
+  //         )
+  //       ],
+  //     ),
+  //   ),
+  // );
 
 // audio_waveforms.AudioFileWaveforms(
 //                 size: Size(MediaQuery.of(context).size.width * 0.5, 25),

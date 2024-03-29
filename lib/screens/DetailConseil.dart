@@ -155,20 +155,18 @@ class _DetailConseilState extends State<DetailConseil> {
     );
   }
 
-  _videoBuild() {
+  Widget _videoBuild() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: Text(
-              'Vidéo',
-              style: const TextStyle(
-                  color: d_colorGreen,
-                  fontWeight: FontWeight.w500,
-                  overflow: TextOverflow.ellipsis,
-                  fontSize: 20),
+          child: Text(
+            'Vidéo',
+            style: TextStyle(
+              color: d_colorGreen,
+              fontWeight: FontWeight.w500,
+              fontSize: 20,
             ),
           ),
         ),
@@ -183,55 +181,54 @@ class _DetailConseilState extends State<DetailConseil> {
     );
   }
 
-  _descriptionBuild() {
+  Widget _descriptionBuild() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
             'Description',
-            style: const TextStyle(
-                color: d_colorGreen,
-                fontWeight: FontWeight.w500,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 20),
+            style: TextStyle(
+              color: d_colorGreen,
+              fontWeight: FontWeight.w500,
+              fontSize: 20,
+            ),
           ),
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
             conseils.descriptionConseil,
-            style: const TextStyle(
-                color: Colors.black87,
-                fontWeight: FontWeight.w500,
-                fontStyle: FontStyle.italic,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 18),
+            style: TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.w500,
+              fontStyle: FontStyle.italic,
+              fontSize: 18,
+            ),
           ),
         ),
       ],
     );
   }
 
-  _audioBuild() {
+  Widget _audioBuild() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: Text(
-              'Vocal',
-              style: const TextStyle(
-                  color: d_colorGreen,
-                  fontWeight: FontWeight.w500,
-                  overflow: TextOverflow.ellipsis,
-                  fontSize: 20),
+          child: Text(
+            'Vocal',
+            style: TextStyle(
+              color: d_colorGreen,
+              fontWeight: FontWeight.w500,
+              fontSize: 20,
             ),
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.all(8.0),
           child: PlayerWidget(player: player),
         ),
       ],
