@@ -86,7 +86,18 @@ final String? idSpeculation;
     );
   }
 
-  String toJson() => json.encode(toMap());
+  // String toJson() => json.encode(toMap());
+    Map<String, dynamic> toJson() => {
+        "idSpeculation": idSpeculation,
+        "codeSpeculation": codeSpeculation,
+        "nomSpeculation": nomSpeculation,
+        "descriptionSpeculation": descriptionSpeculation,
+        "statutSpeculation": statutSpeculation,
+        "categorieProduit": categorieProduit?.toJson(),
+        "dateAjout": dateAjout,
+        "dateModif": dateModif,
+        "personneModif": personneModif,
+    };
 
   factory Speculation.fromJson(String source) => Speculation.fromMap(json.decode(source) as Map<String, dynamic>);
 

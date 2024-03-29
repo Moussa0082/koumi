@@ -234,7 +234,7 @@ class _MagasinScreenState extends State<MagasinScreen>
                   .map((region) => Tab(text: region.nomN1!))
                   .toList(),
             ),
-            actions: [
+             actions: !isExist ? null : [
               PopupMenuButton<String>(
                 padding: EdgeInsets.zero,
                 itemBuilder: (context) => <PopupMenuEntry<String>>[
@@ -546,7 +546,7 @@ class _MagasinScreenState extends State<MagasinScreen>
                                         //    ),
                                         //  ),
                                      
-                                          Container(
+                                        !isExist ? SizedBox() :  Container(
                                             child: 
                                              Container(
                                               alignment:
