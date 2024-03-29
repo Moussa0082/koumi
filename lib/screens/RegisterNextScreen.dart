@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_multi_formatter/formatters/phone_input_formatter.dart';
 import 'package:flutter_multi_formatter/widgets/country_dropdown.dart';
@@ -11,6 +12,7 @@ import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/screens/RegisterEndScreen.dart';
 import 'package:http/http.dart' as http;
+import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 import 'package:path/path.dart';
@@ -20,12 +22,13 @@ import 'package:shimmer/shimmer.dart';
 
 class RegisterNextScreen extends StatefulWidget {
 
-  String nomActeur, email,telephone;
+  String nomActeur,telephone;
+  String? pays;
   // late List<TypeActeur> typeActeur;
    
 
    RegisterNextScreen({super.key, required this.nomActeur, 
-   required this.email, required this.telephone});
+   required this.telephone,  this.pays});
 
   @override
   State<RegisterNextScreen> createState() => _RegisterNextScreenState();
@@ -43,24 +46,33 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
   String adresse = "";
   String localisation = "";
   bool _obscureText = true;
+   List<String> typeLibelle = [];
+   List<TypeActeur> typeActeur = [];
 
   String? paysValue;
   late Pays monPays;
   late Future _mesPays;
   File? image1;
   String? image1Src;
+      String _errorMessage = "";
+
 
   // Valeur par défaut
   late PhoneNumber _phoneNumber;
 
+    String email = "";
+   TextEditingController emailController = TextEditingController();
+
   String processedNumber = "";
   String initialCountry = 'ML';
   PhoneNumber number = PhoneNumber(isoCode: 'ML');
+
+     final MultiSelectController _controllerTypeActeur = MultiSelectController();
+
   
     final TextEditingController controller = TextEditingController();
   TextEditingController localisationController = TextEditingController();
   TextEditingController maillonController = TextEditingController();
-  TextEditingController whatsAppController = TextEditingController();
   TextEditingController paysController = TextEditingController();
   TextEditingController adresseController = TextEditingController();
    String selectedCountry = "";
@@ -70,6 +82,22 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
   Future<void> _getCurrentUserLocation() async {
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
 
+  }
+
+     void validateEmail(String val) {
+    if (val.isEmpty) {
+      setState(() {
+        _errorMessage = "Email ne doit pas être vide";
+      });
+    } else if (!EmailValidator.validate(val, true)) {
+      setState(() {
+        _errorMessage = "Email non valide";
+      });
+    } else {
+      setState(() {
+        _errorMessage = "";
+      });
+    }
   }
 
 
@@ -162,7 +190,7 @@ Future<void> _pickImage(ImageSource source) async {
 //   typeActeurNames += typeActeur.libelle! + ', ';
 // }
 
-debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}, Email : ${widget.email}");
+debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone},  Pays : ${widget.pays} ");
  
   // _mesPays  =
   //       http.get(Uri.parse('http://10.0.2.2:9000/pays/read'));
@@ -253,6 +281,43 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
                crossAxisAlignment: CrossAxisAlignment.start,
                children: [
              const SizedBox(height: 10,),
+
+                       //Email debut 
+                Padding(
+                  padding: const EdgeInsets.only(left:10.0),
+                  child: Text("Email *", style: TextStyle(color:  (Colors.black), fontSize: 18),),
+                ),
+                // Center(
+                //   child: Text(_errorMessage),
+                // ),
+                TextFormField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                        hintText: "Entrez votre email",
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (val) {
+                      if (val == null || val.isEmpty) {
+                        return "Veillez entrez votre email";
+                      } else if(_errorMessage == "Email non valide"){
+                        return "Veillez entrez une email valide";
+                      }
+                      else {
+                        return null;
+                      }
+                    },
+                    onChanged: (val) {
+                        validateEmail(val);
+                      },
+                    onSaved: (val) => email = val!,
+                  ),
+                  // fin  adresse email
+                      const SizedBox(height: 10,),
               // debut fullname 
               Padding(
                 padding: const EdgeInsets.only(left:10.0),
@@ -261,12 +326,13 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
               TextFormField(
                   controller: adresseController,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                      // labelText: "Votre adresse",
                       hintText: "Entrez votre adresse de residence",
-                      
-                      ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                   keyboardType: TextInputType.text,
                   validator: (val) {
                     if (val == null || val.isEmpty) {
@@ -279,31 +345,7 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
                 ),
                 // fin  adresse fullname
                
-                    const SizedBox(height: 10,),
-              //Email debut 
-              Padding(
-                padding: const EdgeInsets.only(left:10.0),
-                child: Text("Maillon ", style: TextStyle(color: (Colors.black), fontSize: 18),),
-              ),
-              TextFormField(
-                  controller: maillonController,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                      // labelText: "Maillon",
-                      hintText: "Entrez votre maillon",
-                     
-                      ),
-                  keyboardType: TextInputType.text,
-                  validator: (val) {
-                    if (val == null || val.isEmpty) {
-                      return "Veillez entrez votre maillon";
-                    } else {
-                      return null;
-                    }
-                  },
-                  onSaved: (val) => maillon = val!,
-                ),
+          
                 // fin  adresse email
                     const SizedBox(height: 10,),
              
@@ -313,13 +355,14 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
               ),
               TextFormField(
                   controller: localisationController,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                      // labelText: "Localisation",
+                   decoration: InputDecoration(
                       hintText: "Votre localisation ",
-                      
-                      ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                   keyboardType: TextInputType.text,
                   validator: (val) {
                     if (val == null || val.isEmpty) {
@@ -331,130 +374,92 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
                   onSaved: (val) => localisation = val!,
                 ),
                 // fin  localisation 
-                const SizedBox(height: 10,),
              
-                // debut whatsApp acteur 
-                
-                    Padding(
-                padding: const EdgeInsets.only(left:10.0),
-                child: Text("Numéro WhtasApp", style: TextStyle(color: (Colors.black), fontSize: 18),),
-              ),
-                const SizedBox(height: 4,),
-              // TextFormField(
-              //     controller: whatsAppController,
-              //     decoration: InputDecoration(
-              //         border: OutlineInputBorder(
-              //             borderRadius: BorderRadius.circular(15)),
-              //         // labelText: "Numero whatsApp",
-              //         hintText: "Votre numéro whtas app ",
-                      
-              //         ),
-              //     keyboardType: TextInputType.phone,
-              //     validator: (val) {
-              //        if (val == null || val.isEmpty ) {
-              //           return "Veillez entrez votre numéro de téléphone";
-              //         } 
-              //         else if (val.length< 8) {
-              //           return "Veillez entrez 8 au moins chiffres";
-              //         } 
-              //         else if (val.length> 11) {
-              //           return "Le numéro ne doit pas depasser 11 chiffres";
-              //         } 
-              //         else {
-              //           return null;
-              //         }
-              //     },
-              //     onSaved: (val) => localisation = val!,
-              //   ),
-              Container(
-  child: Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: <Widget>[
-      InternationalPhoneNumberInput(
-         initialValue: PhoneNumber(
-                      isoCode: Platform.localeName.split('_').last,
-                    ),
-        formatInput: true,
-        hintText: "Numéro de téléphone",
-        maxLength: 20,
-        errorMessage: "Numéro invalide",
-        onInputChanged: (PhoneNumber number) {
-           processedNumber = removePlus(number.phoneNumber!);
-          print(processedNumber);
-        },
-        onInputValidated: (bool value) {
-          print(value);
-        },
-        selectorConfig: SelectorConfig(
-          selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
-          useBottomSheetSafeArea: true,
-        ),
-        ignoreBlank: false,
-        autoValidateMode: AutovalidateMode.disabled,
-        selectorTextStyle: TextStyle(color: Colors.black),
-        keyboardType: TextInputType.phone,
-        inputDecoration: InputDecoration(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(20)),
-          ),
-        ),
-        onSaved: (PhoneNumber number) {
-          print('On Saved: $number');
-        },
-        textFieldController: controller,
-       
-      ),
-    ],
-  ),
-),
-                
-                // fin whatsApp acteur 
                    
                            const  SizedBox(height: 10,),
-                              Padding(
-                padding: const EdgeInsets.only(left:10.0),
-                child: Text("Pays", style: TextStyle(color: (Colors.black), fontSize: 18),),
-              ),
-             SizedBox(
-  width: double.infinity,
-  height: 50,
-  child: Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.all(Radius.circular(20)),
-      border: Border.all(
-        color: Colors.orange, // Couleur de la bordure
-        width: 2, // Largeur de la bordure
-      ),
-    ),
-    child: CountryCodePicker(
-      backgroundColor: Colors.transparent, // Fond transparent pour le picker
-      onChanged: (CountryCode countryCode) {
-        setState(() {
-          selectedCountry = countryCode.name!;
-          print("Pays : $selectedCountry");
-        });
+  
+    Padding(
+                  padding: const EdgeInsets.only(left:10.0),
+                  child: Text("Type Acteur", style: TextStyle(color: (Colors.black), fontSize: 18),),
+                ),
+                Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 16),
+  child: MultiSelectDropDown.network(
+    networkConfig: NetworkConfig(
+      // url: 'https://koumi.ml/api-koumi/typeActeur/read',
+      url: 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
+      method: RequestMethod.get,
+      headers: {
+        'Content-Type': 'application/json',
       },
-        initialSelection: selectedCountry, // Set initial selection based on detected country code
-      showCountryOnly: true,
-      showOnlyCountryWhenClosed: true,
-      alignLeft: true,
     ),
+    chipConfig: const ChipConfig(wrapType: WrapType.wrap),
+ responseParser: (response) {
+   typeActeur = (response as List<dynamic>).where((data)  =>
+              (data as Map<String, dynamic>)['libelle']
+                  .trim()
+                  .toLowerCase() !=
+              'admin')
+   .map((e) {
+    return TypeActeur(
+      idTypeActeur: e['idTypeActeur'] as String,
+      libelle: e['libelle'] as String,
+      statutTypeActeur: e['statutTypeActeur'] as bool,
+      // Assurez-vous de correspondre aux clés JSON avec les noms de propriétés de votre classe TypeActeur
+      // Ajoutez d'autres champs si nécessaire
+    );
+  }).toList();
+
+  // Filtrer les types avec un libellé différent de "admin" et dont le statutTypeActeur est true
+  final filteredTypes = typeActeur.where((typeActeur) => typeActeur.libelle != "admin" || typeActeur.libelle != "Admin" && typeActeur.statutTypeActeur == true).toList();
+
+  // Créer des ValueItems pour les types filtrés
+  final List<ValueItem<TypeActeur>> valueItems = filteredTypes.map((typeActeur) {
+    return ValueItem<TypeActeur>(
+      label: typeActeur.libelle!,
+      value: typeActeur,
+    );
+  }).toList();
+
+  return Future<List<ValueItem<TypeActeur>>>.value(valueItems);
+},
+
+    controller: _controllerTypeActeur,
+    hint: 'Sélectionner un type d\'acteur',
+    fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
+    onOptionSelected: (options) {
+      setState(() {
+        typeLibelle.clear();
+        typeLibelle.addAll(options
+            .map((data) => data.label)
+            .toList());
+        print("Libellé sélectionné ${typeLibelle.toString()}");
+      });
+      // Fermer automatiquement le dialogue
+      FocusScope.of(context).unfocus();
+    },
+    responseErrorBuilder: ((context, body) {
+      return const Padding(
+        padding: EdgeInsets.all(10.0),
+        child: Text('Aucun type disponible'),
+      );
+    }),
+    // Exemple de personnalisation des styles
   ),
 ),
-                           const  SizedBox(height: 10,),
 
+                           const  SizedBox(height: 20,),
 
-             
                 Center(
                   child: ElevatedButton(
                            onPressed: () {
               // Handle button press action here
               if(_formKey.currentState!.validate()){
               Navigator.push(context, MaterialPageRoute(builder: (context)=>  RegisterEndScreen(
-                nomActeur: widget.nomActeur, email: widget.email, telephone: widget.telephone, 
-                 adresse:adresseController.text, maillon:maillonController.text,
+                nomActeur: widget.nomActeur, email: emailController.text, telephone: widget.telephone, 
+                 adresse:adresseController.text, maillon:maillonController.text, 
                 numeroWhatsApp: processedNumber, localistaion: localisationController.text,
-                 pays: selectedCountry,
+                 pays: widget.pays, typeActeur: typeActeur,
                 )));
               }
                            },

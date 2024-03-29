@@ -2,22 +2,26 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/CartItem.dart';
 import 'package:koumi_app/models/Stock.dart';
+import 'package:koumi_app/widgets/SnackBar.dart';
 
 
 class CartProvider extends ChangeNotifier {
-  final List<CartItem> _cartItems = [];
+  final List<CartItem> cartItems = [];
 
-  List<CartItem> get cartItems => _cartItems;
+  List<CartItem> get cartItem => cartItems;
 
   void addToCart(Stock product, int quantity, String selectedVariant) {
-    var existingCartItem = _cartItems.firstWhereOrNull(
+    var existingCartItem = cartItem.firstWhereOrNull(
       (item) => item.stock.idStock == product.idStock,
     );
 
     if (existingCartItem != null) {
-      existingCartItem.quantiteStock += quantity;
+      // existingCartItem.quantiteStock += quantity;
+    Snack.error(titre:"Alerte", message:existingCartItem.stock.nomProduit! + " existe déjà au panier");
     } else {
-      _cartItems.add(CartItem(stock: product, quantiteStock: quantity));
+      cartItem.add(CartItem(stock: product, quantiteStock: quantity));
+    Snack.success(titre:"Alerte", message:product.nomProduit! + " a été ajouté au panier");
+
     }
 
     notifyListeners();
@@ -25,7 +29,7 @@ class CartProvider extends ChangeNotifier {
 
   int getProductQuantity(int productId) {
     int quantity = 0;
-    for (CartItem item in _cartItems) {
+    for (CartItem item in cartItem) {
       if (item.stock.idStock == productId) {
         quantity += item.quantiteStock;
       }
@@ -34,54 +38,54 @@ class CartProvider extends ChangeNotifier {
   }
 
   int get cartCount {
-    return _cartItems.fold(0, (sum, item) => sum + item.quantiteStock);
+    return cartItem.fold(0, (sum, item) => sum + item.quantiteStock);
   }
 
   double get totalPrice {
-    return _cartItems.fold(
+    return cartItem.fold(
         0.0, (sum, item) => sum + (item.stock.prix! * item.quantiteStock));
   }
 
   void updateCartItemQuantity(int index, int newQuantity) {
-    if (index >= 0 && index < _cartItems.length) {
-      _cartItems[index].quantiteStock = newQuantity;
+    if (index >= 0 && index < cartItem.length) {
+      cartItem[index].quantiteStock = newQuantity;
       notifyListeners();
     }
   }
 
   void increaseCartItemQuantity(int index) {
-    if (index >= 0 && index < _cartItems.length) {
-      _cartItems[index].quantiteStock++;
+    if (index >= 0 && index < cartItem.length) {
+      cartItem[index].quantiteStock++;
       notifyListeners();
     }
   }
 
   void decreaseCartItemQuantity(int index) {
-    if (index >= 0 && index < _cartItems.length) {
-      if (_cartItems[index].quantiteStock > 1) {
-        _cartItems[index].quantiteStock--;
+    if (index >= 0 && index < cartItem.length) {
+      if (cartItem[index].quantiteStock > 1) {
+        cartItem[index].quantiteStock--;
         notifyListeners();
       } else {
         // If the quantity is 1, remove the item from the cart
-        _cartItems.removeAt(index);
+        cartItem.removeAt(index);
         notifyListeners();
       }
     }
   }
 
   void removeCartItem(int index) {
-    if (index >= 0 && index < _cartItems.length) {
-      _cartItems.removeAt(index);
+    if (index >= 0 && index < cartItem.length) {
+      cartItem.removeAt(index);
       notifyListeners();
     }
   }
 
   void clearCart() {
-    _cartItems.clear();
+    cartItem.clear();
     notifyListeners();
   }
 
   List<CartItem> getCartItemsList() {
-    return List<CartItem>.from(_cartItems);
+    return List<CartItem>.from(cartItem);
   }
 }

@@ -51,7 +51,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
 
   List pages = <Widget>[
     const AcceuilAdmin(),
-    Transport(),
+    ProfilA(),
     Panier(),
     const ProfilA()
   ];
@@ -163,7 +163,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
       '/': (context) {
         return [
           const AcceuilAdmin(),
-          Transport(),
+          ProfilA(),
           Panier(),
           const ProfilA()
         ].elementAt(index);

@@ -80,7 +80,7 @@ class Stock {
       'unite': unite?.toMap(),
       'magasin': magasin?.toMap(),
       'acteur': acteur?.toMap(),
-      'commande': commande!.map((x) => x?.toMap()).toList(),
+      'commande': commande?.map((x) => x?.toMap()).toList(),
     };
   }
 

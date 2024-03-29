@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:path/path.dart';
 
@@ -23,12 +24,11 @@ class ActeurService extends ChangeNotifier {
     String? niveau3PaysActeur,
     required String localiteActeur,
     required String emailActeur,
-    required String filiereActeur,
     List<TypeActeur>? typeActeur,
+    List<Speculation>? speculations,
     File? photoSiegeActeur,
     File? logoActeur,
     required String password,
-    required String maillonActeur,
   }) async {
     try {
       //    // Convertir chaque TypeActeur en un objet JSON et les ajouter à une liste JSON
@@ -60,12 +60,11 @@ class ActeurService extends ChangeNotifier {
         'niveau3PaysActeur': niveau3PaysActeur,
         'localiteActeur': localiteActeur,
         'emailActeur': emailActeur,
-        'filiereActeur': filiereActeur,
+        'speculations': speculations,
         'typeActeur': typeActeur, // Convertir chaque objet TypeActeur en map
         'photoSiegeActeur': "",
         'logoActeur': "",
         'password': password,
-        'maillonActeur': maillonActeur,
       });
 
       var response = await requete.send();
@@ -98,6 +97,7 @@ class ActeurService extends ChangeNotifier {
     required String emailActeur,
     required String filiereActeur,
     required List<TypeActeur> typeActeur,
+    required List<Speculation> speculations,
     File? photoSiegeActeur,
     File? logoActeur,
     required String password,
@@ -134,6 +134,7 @@ class ActeurService extends ChangeNotifier {
         'emailActeur': emailActeur,
         'filiereActeur': filiereActeur,
         'typeActeur': typeActeur.toList(),
+        'speculations': speculations.toList(),
         'photoSiegeActeur': "",
         'logoActeur': "",
         'password': password,

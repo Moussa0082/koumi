@@ -26,7 +26,8 @@ import 'package:path_provider/path_provider.dart';
 
 class RegisterEndScreen extends StatefulWidget {
 
-    String nomActeur, email,telephone, adresse , maillon , localistaion, numeroWhatsApp , pays;
+    String nomActeur, email,telephone, adresse , maillon , localistaion;
+    String?  telephoneActeur, numeroWhatsApp , pays;
     File? image1;
    late List<TypeActeur>? typeActeur;
   //  late List<TypeActeur> idTypeActeur;
@@ -37,7 +38,7 @@ class RegisterEndScreen extends StatefulWidget {
    required this.email, required this.telephone, 
     this.typeActeur, required this.adresse, 
    required this.maillon, required this.numeroWhatsApp,
-   required this.localistaion, required this.pays});
+   required this.localistaion,  this.pays});
 
   @override
   State<RegisterEndScreen> createState() => _RegisterEndScreenState();
@@ -49,7 +50,6 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
    
  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     
-List<Speculation> _speculations = [];
   //  final MultiSelectController _controllerCategorie = MultiSelectController();
 
 final MultiSelectController _controllerCategorie = MultiSelectController();
@@ -58,38 +58,23 @@ final MultiSelectController _controllerSpeculation = MultiSelectController();
 
 
 
-// Définissez une fonction pour récupérer les spéculations en fonction des catégories sélectionnées
-Future<void> fetchSpeculationsByCategories(List<String> idsCategorieProduit) async {
-  try {
-    // Utilisez la méthode getSpeculationsByCategories pour récupérer les spéculations
-    
-    List<Speculation> speculations = await SpeculationService().getSpeculationsByCategories(idsCategorieProduit);
-    
-    // Mettez à jour l'état des spéculations avec les données récupérées
-    setState(() {
-      _speculations = speculations;
-    });
-  } catch (e) {
-    // Gérez les erreurs éventuelles
-    print('Erreur lors de la récupération des spéculations : $e');
-    // Affichez un message d'erreur à l'utilisateur ou gérez l'erreur selon votre logique
-  }
-}
+
 
 // Définissez la fonction onOptionSelected pour gérer la sélection des options dans MultiSelectDropDown
 
-   final MultiSelectController _controllerTypeActeur = MultiSelectController();
 
   String password = "";
   String confirmPassword = "";
   
   String filiere = "";
-    String idsJson = "" ;
+     String idsJson = "";
   bool _obscureText = true;
     List<String> libelleCategorie = [];
     List<String> libelleSpeculation = [];
     List<String> typeLibelle = [];
    List<String> selectedCategoryIds = [];
+   List<Speculation> listeSpeculations = [];
+
 
    List<String> idsCategorieProduit = [];
 String idsCategorieProduitAsString = "";
@@ -98,9 +83,6 @@ String idsCategorieProduitAsString = "";
   File? image2;
 
    String url = "";
-
-
-    
 
         Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
@@ -195,13 +177,8 @@ Future<void> _pickImage(ImageSource source) async {
    final nomActeur = widget.nomActeur;
         final emailActeur = widget.email;
         final adresse = widget.adresse;
-        final telephone = widget.telephone;
-        final whatsAppActeur = widget.numeroWhatsApp;
-        final maillon = widget.maillon;
         final localisation = widget.localistaion;
         final  typeActeur = widget.typeActeur;
-        final pays = widget.pays;
-        final filiere = filiereController.text;
         final password = passwordController.text;
         final confirmPassword = confirmPasswordController.text;
         
@@ -235,22 +212,22 @@ Future<void> _pickImage(ImageSource source) async {
       try {
       
             // String type = typeActeurList.toString();
-        if(widget.image1 != null && image2 != null){
+        if(widget.image1 != null && image2 != null || widget.image1!= null || image2 != null){
       
       await acteurService.creerActeur(
       logoActeur: widget.image1 as File,
       photoSiegeActeur: image2 as File,
       nomActeur: nomActeur,
       adresseActeur: adresse,
-      telephoneActeur: telephone,
-      whatsAppActeur: whatsAppActeur,
+      telephoneActeur: widget.telephoneActeur!,
+      whatsAppActeur: widget.numeroWhatsApp!,
       niveau3PaysActeur: widget.pays,
       localiteActeur: localisation,
       emailActeur: emailActeur,
-      filiereActeur: filiere,
       typeActeur: widget.typeActeur, // Convertir les IDs en chaînes de caractères
       password: password,
-      maillonActeur: maillon,
+      speculations: listeSpeculations
+
         );
          showDialog(
             context:  context,
@@ -265,7 +242,8 @@ Future<void> _pickImage(ImageSource source) async {
        Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const LoginSuccessScreen()),
-        );                  },
+        );                  
+        },
                     child:const  Text('OK'),
                   ),
                 ],
@@ -276,15 +254,15 @@ Future<void> _pickImage(ImageSource source) async {
       await acteurService.creerActeur(
       nomActeur: nomActeur,
       adresseActeur: adresse,
-      telephoneActeur: telephone,
-      whatsAppActeur: whatsAppActeur,
+      telephoneActeur: widget.telephoneActeur!,
+      whatsAppActeur: widget.numeroWhatsApp!,
       niveau3PaysActeur: widget.pays,
       localiteActeur: localisation,
       emailActeur: emailActeur,
-      filiereActeur: filiere,
       typeActeur: typeActeur,
       password: password,
-      maillonActeur: maillon,
+      speculations: listeSpeculations
+      
         );
          showDialog(
             context:  context,
@@ -339,8 +317,8 @@ Future<void> _pickImage(ImageSource source) async {
     // TODO: implement initState
     super.initState();
    
-    debugPrint("Adresse : " + widget.adresse + " Maillon : " + widget.maillon + " Type : ${widget.typeActeur}"+
-    " Localisation :  " + widget.localistaion + " Whats app : " + widget.numeroWhatsApp + "Email :" + widget.email
+    debugPrint("Adresse : " + widget.adresse +  " Type : ${widget.typeActeur}"+
+    " Localisation :  " + widget.localistaion + " Whats app : " + widget.numeroWhatsApp! + "Email :" + widget.email
   
     );
     
@@ -415,127 +393,71 @@ Future<void> _pickImage(ImageSource source) async {
                  key:_formKey,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-               const SizedBox(height: 10,),
+               const SizedBox(height: 20,),
    
- const SizedBox(height: 5,),
-   Padding(
-                  padding: const EdgeInsets.only(left:10.0),
-                  child: Text("Type Acteur", style: TextStyle(color: (Colors.black), fontSize: 18),),
-                ),
-                Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 16),
-  child: MultiSelectDropDown.network(
-    networkConfig: NetworkConfig(
-      // url: 'https://koumi.ml/api-koumi/typeActeur/read',
-      url: 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
-      method: RequestMethod.get,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    ),
-    chipConfig: const ChipConfig(wrapType: WrapType.wrap),
-    responseParser: (response) {
-      final list = (response as List<dynamic>)
-          .where((data) =>
-              (data as Map<String, dynamic>)['libelle']
-                  .trim()
-                  .toLowerCase() !=
-              'admin')
-          .map((e) {
-        final item = e as Map<String, dynamic>;
-        return ValueItem(
-          label: item['libelle'] as String,
-          value: item['idTypeActeur'],
-        );
-      }).toList();
-      return Future.value(list);
-    },
-    controller: _controllerTypeActeur,
-    hint: 'Sélectionner un type d\'acteur',
-    fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
-    onOptionSelected: (options) {
-      setState(() {
-        typeLibelle.clear();
-        typeLibelle.addAll(options
-            .map((data) => data.label)
-            .toList());
-        print("Libellé sélectionné ${typeLibelle.toString()}");
-      });
-      // Fermer automatiquement le dialogue
-      FocusScope.of(context).unfocus();
-    },
-    responseErrorBuilder: ((context, body) {
-      return const Padding(
-        padding: EdgeInsets.all(10.0),
-        child: Text('Aucun type disponible'),
-      );
-    }),
-    // Exemple de personnalisation des styles
-  ),
-),
-
+  
   const SizedBox(height: 5,),
-      Padding(
-                  padding: const EdgeInsets.only(left:10.0),
-                  child: Text("Categorie", style: TextStyle(color: (Colors.black), fontSize: 18),),
-                ),
-                Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 16),
-  child: MultiSelectDropDown.network(
-    networkConfig: NetworkConfig(
-      // url: 'https://koumi.ml/api-koumi/Categorie/allCategorie',
-      url: 'http://10.0.2.2:9000/api-koumi/Categorie/allCategorie',
-      method: RequestMethod.get,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    ),
-    chipConfig: const ChipConfig(wrapType: WrapType.wrap),
-    responseParser: (response) {
-      final list = (response as List<dynamic>)
+//       Padding(
+//                   padding: const EdgeInsets.only(left:10.0),
+//                   child: Text("Categorie", style: TextStyle(color: (Colors.black), fontSize: 18),),
+//                 ),
+//                 Padding(
+//   padding: const EdgeInsets.symmetric(horizontal: 16),
+//   child: MultiSelectDropDown.network(
+//     networkConfig: NetworkConfig(
+//       // url: 'https://koumi.ml/api-koumi/Categorie/allCategorie',
+//       url: 'http://10.0.2.2:9000/api-koumi/Categorie/allCategorie',
+//       method: RequestMethod.get,
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//     ),
+//     chipConfig: const ChipConfig(wrapType: WrapType.wrap),
+//     responseParser: (response) {
+//       final list = (response as List<dynamic>)
           
-          .map((e) {
-        final item = e as Map<String, dynamic>;
-        return ValueItem(
-          label: item['libelleCategorie'] as String,
-          value: item['idCategorieProduit'],
-        );
-      }).toList();
-      return Future.value(list);
-    },
-    controller: _controllerCategorie,
-    hint: 'Sélectionner une categorie produit',
-    fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
-    onOptionSelected: (options) async{
-      setState(() {
-        libelleCategorie.clear();
-        libelleCategorie.addAll(options
-            .map((data) => data.label)
-            .toList());
-        idsCategorieProduit = _controllerCategorie.selectedOptions.map((item) => item.value.toString()).toList();
-      //  idsCategorieProduitAsString = idsCategorieProduit.isEmpty ? idsCategorieProduit.join(',') : "e40ijxd5k0n0yrzj5f80";
-           idsJson = idsCategorieProduit.join(',');
-            //  url = "e40ijxd5k0n0yrzj5f80";
-             url = 'http://10.0.2.2:9000/api-koumi/Speculation/by-categories/${idsJson}';
+//           .map((e) {
+//         final item = e as Map<String, dynamic>;
+//         return ValueItem(
+//           label: item['libelleCategorie'] as String,
+//           value: item['idCategorieProduit'],
+//         );
+//       }).toList();
+//       return Future.value(list);
+//     },
+//     controller: _controllerCategorie,
+//     hint: 'Sélectionner une categorie produit',
+//     fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
+//     onOptionSelected: (options) {
+//       setState(() {
+//         libelleCategorie.clear();
+//         libelleCategorie.addAll(options
+//             .map((data) => data.label)
+//             .toList());
+//         idsCategorieProduit = _controllerCategorie.selectedOptions.map((item) => item.value.toString()).toList();
+//       //  idsCategorieProduitAsString = idsCategorieProduit.isEmpty ? idsCategorieProduit.join(',') : "e40ijxd5k0n0yrzj5f80";
+//            idsJson = idsCategorieProduit.join(',');
+//             //  url = "e40ijxd5k0n0yrzj5f80";
+//              url = 'http://10.0.2.2:9000/api-koumi/Speculation/by-categories/${idsJson}';
 
 
 
-        print("categorie sélectionné ${libelleCategorie.toString()+ " speculationJson  "+ url }");
-      });
+//         print("categorie sélectionné ${libelleCategorie.toString()+ " speculationJson  "+ url }");
+//       });
       
-  // print("id s "+ idsJson);
-      // Fermer automatiquement le dialogue
-      FocusScope.of(context).unfocus();
-    },
-    responseErrorBuilder: ((context, body) {
-      return const Padding(
-        padding: EdgeInsets.all(10.0),
-        child: Text('Aucun type disponible'),
-      );
-    }),
-    // Exemple de personnalisation des styles
-  ),
-),
+//   // print("id s "+ idsJson);
+//       // Fermer automatiquement le dialogue
+//       FocusScope.of(context).unfocus();
+//     },
+//     responseErrorBuilder: ((context, body) {
+//       return const Padding(
+//         padding: EdgeInsets.all(10.0),
+//         child: Text('Aucun type disponible'),
+//       );
+//     }),
+//     // Exemple de personnalisation des styles
+//   ),
+// ),
 
                 
                      // Deuxième widget MultiSelectDropDown pour sélectionner les spéculations
@@ -546,32 +468,47 @@ Future<void> _pickImage(ImageSource source) async {
           style: TextStyle(color: Colors.black, fontSize: 18),
         ),
       ),
+      const SizedBox(height:5),
    Padding(
   padding: const EdgeInsets.symmetric(horizontal: 16),
   child: MultiSelectDropDown.network(
     networkConfig: NetworkConfig(
       // Endpoint pour récupérer les spéculations en fonction des catégories sélectionnées
-      url:url , //e40ijxd5k0n0yrzj5f80,
-      // url: 'http://10.0.2.2:9000/api-koumi/Speculation/by-categories/${idsCategorieProduit.join(',')}', //e40ijxd5k0n0yrzj5f80,
+      // url:url , //e40ijxd5k0n0yrzj5f80,
+      url: 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
       method: RequestMethod.get,
       headers: {'Content-Type': 'application/json'},
     ),
     chipConfig: const ChipConfig(wrapType: WrapType.wrap),
-    responseParser: (response) {
-      final list = (response as List<dynamic>)
-                .where((data) =>
-              (data as Map<String, dynamic>)['statutSpeculation']== true)
-          .map((e) {
-            final item = e as Map<String, dynamic>;
-            debugPrint("data " + item['nomSpeculation']);
-            return ValueItem(
-              label: item['nomSpeculation'] as String,
-              value: item['idSpeculation'],
-            );
-          })
-          .toList();
-      return Future.value(list);
-    },
+ responseParser: (response) {
+        // List<dynamic> decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
+
+  listeSpeculations = (response as List<dynamic>).map((e) {
+    return Speculation(
+      idSpeculation: e['idSpeculation'] as String,
+      nomSpeculation: e['nomSpeculation'] as String,
+      statutSpeculation: e['statutSpeculation'] as bool,
+      // Assurez-vous de correspondre aux clés JSON avec les noms de propriétés de votre classe TypeActeur
+      // Ajoutez d'autres champs si nécessaire
+    );
+  }).toList();
+
+  // Filtrer les types avec un libellé différent de "admin" et dont le statutTypeActeur est true
+  final filteredTypes = listeSpeculations.where((speculation) => speculation.statutSpeculation == true).toList();
+
+  // Créer des ValueItems pour les types filtrés
+  final List<ValueItem<Speculation>> valueItems = filteredTypes.map((speculation) {
+    return ValueItem<Speculation>(
+      label: speculation.nomSpeculation!,
+      value: speculation,
+    );
+  }).toList();
+
+  return Future<List<ValueItem<Speculation>>>.value(valueItems);
+},
+
+
+
     controller: _controllerSpeculation,
     hint: 'Sélectionner une spéculation',
     fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
@@ -604,11 +541,8 @@ Future<void> _pickImage(ImageSource source) async {
                 // debut  mot de pass
                   TextFormField(
                     controller: passwordController,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15)),
-                        // labelText: "Nouveau mot de passe",
-                        hintText: "Entrez votre nouveau mot de passe",
+                decoration: InputDecoration(
+                            hintText: "Entrez votre mot de passe",
                         suffixIcon: IconButton(
                           onPressed: () {
                             setState(() {
@@ -624,19 +558,25 @@ Future<void> _pickImage(ImageSource source) async {
                             color: Colors.grey,
                           ),
                         ),
-                       
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            
+                          ),
                         ),
+                    
                     keyboardType: TextInputType.text,
                     obscureText: _obscureText,
                     validator: (val) {
                       if (val == null || val.isEmpty) {
                         return "Veillez entrez votre  mot de passe ";
                       }
-                      if (val.length < 4) {
-                        return 'Le mot de passe doit contenir au moins 4 caractères';
+                      if (val.length < 6) {
+                        return 'Le mot de passe doit contenir au moins 6 caractères';
                       } 
-                      else if (val.length > 4) {
-                        return 'Le mot de passe ne doit pas 4 caractères';
+                      else if (val.length > 6) {
+                        return 'Le mot de passe ne doit pas 6 caractères';
                       } 
                        else {
                         return null;
@@ -656,10 +596,8 @@ Future<void> _pickImage(ImageSource source) async {
                 // debut  mot de pass
                   TextFormField(
                     controller: confirmPasswordController,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15)),
-                        hintText: "Entrez votre confirmer votre mot de passe",
+                     decoration: InputDecoration(
+                            hintText: "Entrez votre confirmer votre mot de passe",
                         suffixIcon: IconButton(
                           onPressed: () {
                             setState(() {
@@ -675,19 +613,25 @@ Future<void> _pickImage(ImageSource source) async {
                             color: Colors.grey,
                           ),
                         ),
-                        
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            
+                          ),
                         ),
+                    
                     keyboardType: TextInputType.text,
                     obscureText: _obscureText,
                     validator: (val) {
                       if (val == null || val.isEmpty) {
                         return "Veillez entrez votre  mot de passe à nouveau";
                       }
-                      if (val.length < 4) {
-                        return 'Le mot de passe doit contenir au moins 4 caractères';
+                      if (val.length < 6) {
+                        return 'Le mot de passe doit contenir au moins 6 caractères';
                       } 
-                      else if (val.length > 4) {
-                        return 'Le mot de passe ne doit pas 4 caractères';
+                      else if (val.length > 6) {
+                        return 'Le mot de passe ne doit pas 6 caractères';
                       } 
                       else {
                         return null;
@@ -699,19 +643,12 @@ Future<void> _pickImage(ImageSource source) async {
       
                 // fin confirm password 
       
-                const SizedBox(height: 10,),
+                const SizedBox(height: 20,),
                   Center(
                     child: ElevatedButton(
       
-              onPressed: 
-              
-        //       isLoading
-        // ? null // Désactiver le bouton lorsque le chargement est en cours
-        // :
-         () async {
-          // setState(() {
-          //   isLoading = true; // Afficher le CircularProgressIndicator
-          // });
+              onPressed: () async {
+
           if(_formKey.currentState!.validate()){
       
        _handleButtonPress(context);

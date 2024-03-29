@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -29,7 +30,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   String nomActeur = "";
   String telephone = "";
-  String email = "";
+
   String? typeValue;
   String selectedCountry = '';
   // late TypeActeur monTypeActeur;
@@ -39,12 +40,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
 
     String? detectedCountry = "";
+    String dialCode ="";
 
     String _errorMessage = "";
 
     String dropdownvalue = 'Item 1';    
   
    final TextEditingController controller = TextEditingController();
+     TextEditingController whatsAppController = TextEditingController();
+
   String initialCountry = 'ML';
   PhoneNumber number = PhoneNumber(isoCode: 'ML');
   // List of items in our dropdown menu 
@@ -89,25 +93,11 @@ Future<String?> getCurrentCountryFromLocation() async {
 }
 
   TextEditingController nomActeurController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
+ 
   TextEditingController telephoneController = TextEditingController();
   TextEditingController typeActeurController = TextEditingController();
 
-   void validateEmail(String val) {
-    if (val.isEmpty) {
-      setState(() {
-        _errorMessage = "Email ne doit pas être vide";
-      });
-    } else if (!EmailValidator.validate(val, true)) {
-      setState(() {
-        _errorMessage = "Email non valide";
-      });
-    } else {
-      setState(() {
-        _errorMessage = "";
-      });
-    }
-  }
+ 
 
   String removePlus(String phoneNumber) {
   if (phoneNumber.startsWith('+')) {
@@ -190,12 +180,13 @@ Future<String?> getCurrentCountryFromLocation() async {
                 ),
                 TextFormField(
                     controller: nomActeurController,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15)),
-                        // labelText: "Nom Complet",
+                     decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
                         hintText: "Entrez votre prenom et nom",
-                       
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                     keyboardType: TextInputType.text,
                     validator: (val) {
@@ -209,145 +200,66 @@ Future<String?> getCurrentCountryFromLocation() async {
                   ),
                   // fin  adresse fullname
   
-                      const SizedBox(height: 10,),
-                //Email debut 
-                Padding(
-                  padding: const EdgeInsets.only(left:10.0),
-                  child: Text("Email *", style: TextStyle(color:  (Colors.black), fontSize: 18),),
-                ),
-                Center(
-                  child: Text(_errorMessage),
-                ),
-                TextFormField(
-                    controller: emailController,
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15)),
-                        // labelText: "Email",
-                        hintText: "Entrez votre email",
-                        ),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (val) {
-                      if (val == null || val.isEmpty) {
-                        return "Veillez entrez votre email";
-                      } else if(_errorMessage == "Email non valide"){
-                        return "Veillez entrez une email valide";
-                      }
-                      else {
-                        return null;
-                      }
-                    },
-                    onChanged: (val) {
-                        validateEmail(val);
-                      },
-                    onSaved: (val) => email = val!,
-                  ),
-                  // fin  adresse email
-                      const SizedBox(height: 10,),
-
-                     
-
+                      const SizedBox(height: 20,),
+       
                      Padding(
   padding: const EdgeInsets.only(left:10.0),
   child: Text("Téléphone *", style: TextStyle(color: (Colors.black), fontSize: 18),),
 ),
+                      const SizedBox(height: 5,),
 
-//  Container(
-//   child: Column(
-//     mainAxisAlignment: MainAxisAlignment.center,
-//     children: <Widget>[
-//       FutureBuilder<String?>(
-//         future: _currentPosition != null ? getCountryFromLatLng(_currentPosition!.latitude, _currentPosition!.longitude) : null,
-//         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-//           if (snapshot.connectionState == ConnectionState.waiting) {
-//             return CircularProgressIndicator(); // Loading indicator
-//           } else if (snapshot.hasError || !snapshot.hasData) {
-//             return Text("Erreur lors de la détection du pays"); // Error message
-//           } else {
-//             String detectedCountry = snapshot.data!;
-//             return InternationalPhoneNumberInput(
-//               // initialCountry: detectedCountry,
-//               formatInput: true,
-//               hintText: "Numéro de téléphone",
-//               maxLength: 20,
-//               errorMessage: "Numéro invalide",
-//               onInputChanged: (PhoneNumber number) {
-//                 print("Pays : $detectedCountry");
-//                 processedNumber = removePlus(number.phoneNumber!);
-//                 print(processedNumber);
-//               },
-//               onInputValidated: (bool value) {
-//                 print(value);
-//               },
-//               selectorConfig: SelectorConfig(
-//                 selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
-//                 useBottomSheetSafeArea: true,
-//               ),
-//               ignoreBlank: false,
-//               autoValidateMode: AutovalidateMode.disabled,
-//               selectorTextStyle: TextStyle(color: Colors.black),
-//               keyboardType: TextInputType.phone,
-//               inputDecoration: InputDecoration(
-//                 border: OutlineInputBorder(
-//                   borderRadius: BorderRadius.all(Radius.circular(20)),
-//                 ),
-//               ),
-//               onSaved: (PhoneNumber number) {
-//                 print('On Saved: $number');
-//               },
-//               textFieldController: controller,
-//               // Set the initialCountry based on the detected country
-//             );
-//           }
-//         },
-//       ),
-//     ],
-//   ),
-// ),
- //   ),
-                            Container(
-  child: Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: <Widget>[
-      InternationalPhoneNumberInput(
-         initialValue: PhoneNumber(
-                      isoCode: Platform.localeName.split('_').last,
-                    ),
-        formatInput: true,
-        hintText: "Numéro de téléphone",
-        maxLength: 20,
-        errorMessage: "Numéro invalide",
-        onInputChanged: (PhoneNumber number) {
-           processedNumber = removePlus(number.phoneNumber!);
+
+  IntlPhoneField(
+    
+       invalidNumberMessage : "Numéro invalide",
+    searchText: "Chercher un pays",
+                   decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                  languageCode: "en",
+                  onChanged: (phone) {
+                    print(phone.completeNumber);
+                    processedNumber = removePlus(phone.completeNumber.toString());
           print(processedNumber);
-        },
-        onInputValidated: (bool value) {
-          print(value);
-        },
-        selectorConfig: SelectorConfig(
-          selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
-          useBottomSheetSafeArea: true,
-        ),
-        ignoreBlank: false,
-        autoValidateMode: AutovalidateMode.disabled,
-        selectorTextStyle: TextStyle(color: Colors.black),
-        keyboardType: TextInputType.phone,
-        inputDecoration: InputDecoration(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(20)),
-          ),
-        ),
-        onSaved: (PhoneNumber number) {
-          print('On Saved: $number');
-        },
-        textFieldController: controller,
-       
-      ),
-    ],
-  ),
-),
-   
+                  },
+                  onCountryChanged: (country) {
+                    print('Country changed to: ' + country.name);
+                  },
+                ),
 
+//  const SizedBox(height: 5,),
+                    Padding(
+                padding: const EdgeInsets.only(left:10.0),
+                child: Text("Numéro WhtasApp", style: TextStyle(color: (Colors.black), fontSize: 18),),
+              ),
+                const SizedBox(height: 4,),
+       
+   IntlPhoneField(
+    controller: whatsAppController,
+    invalidNumberMessage : "Numéro invalide",
+    searchText: "Chercher un pays",
+                   decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                  languageCode: "en",
+                  onChanged: (phone) {
+                    print(phone.completeNumber);
+                    processedNumber = removePlus(phone.completeNumber.toString());
+          print(processedNumber);
+                  },
+                  onCountryChanged: (country) {
+                    selectedCountry = country.name.toString();
+                    print('Country changed to: ' + country.name);
+                  },
+                ),
 
                   // fin  téléphone            
 
@@ -361,8 +273,8 @@ Future<String?> getCurrentCountryFromLocation() async {
                 if(_formKey.currentState!.validate()){
                  
                 Navigator.push(context, MaterialPageRoute(builder: (context) =>  
-                RegisterNextScreen(nomActeur: nomActeurController.text, email: emailController.text,
-                 telephone: processedNumber ) ));
+                RegisterNextScreen(nomActeur: nomActeurController.text,
+                 telephone: processedNumber , pays: selectedCountry,) ));
               
                 }
                },

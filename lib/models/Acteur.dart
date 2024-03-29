@@ -196,38 +196,39 @@ class Acteur {
     );
   }
 
-  //  factory Acteur.fromJson(Map<String, dynamic> json) => Acteur(
-  //       idActeur: json["idActeur"],
-  //       resetToken: json["resetToken"],
-  //       tokenCreationDate: json["tokenCreationDate"],
-  //       codeActeur: json["codeActeur"],
-  //       nomActeur: json["nomActeur"],
-  //       adresseActeur: json["adresseActeur"],
-  //       telephoneActeur: json["telephoneActeur"],
-  //       whatsAppActeur: json["whatsAppActeur"],
-  //       latitude: json["latitude"],
-  //       longitude: json["longitude"],
-  //       photoSiegeActeur: json["photoSiegeActeur"],
-  //       logoActeur: json["logoActeur"],
-  //       niveau3PaysActeur: json["niveau3PaysActeur"],
-  //       password: json["password"],
-  //       dateAjout: json["dateAjout"],
-  //       dateModif: json["dateModif"],
-  //       personneModif: json["personneModif"],
-  //       localiteActeur: json["localiteActeur"],
-  //       emailActeur: json["emailActeur"],
-  //       filiereActeur: json["filiereActeur"],
-  //       statutActeur: json["statutActeur"],
-  //      typeActeur: (json['typeActeur'] as List)
-  //         .map((type) => TypeActeur.fromJson(type))
-  //         .toList(), 
-  //         // typeActeur: List<TypeActeur>.from(json["typeActeur"].map((x) => TypeActeur.fromJson(x))),
-  //       maillonActeur: json["maillonActeur"],
-  //   );
+   factory Acteur.fromJson(Map<String, dynamic> json) => Acteur(
+        idActeur: json["idActeur"],
+        resetToken: json["resetToken"],
+        tokenCreationDate: json["tokenCreationDate"],
+        codeActeur: json["codeActeur"],
+        nomActeur: json["nomActeur"],
+        adresseActeur: json["adresseActeur"],
+        telephoneActeur: json["telephoneActeur"],
+        whatsAppActeur: json["whatsAppActeur"],
+        latitude: json["latitude"],
+        longitude: json["longitude"],
+        photoSiegeActeur: json["photoSiegeActeur"],
+        logoActeur: json["logoActeur"],
+        niveau3PaysActeur: json["niveau3PaysActeur"],
+        password: json["password"],
+        dateAjout: json["dateAjout"],
+        dateModif: json["dateModif"],
+        personneModif: json["personneModif"],
+        localiteActeur: json["localiteActeur"],
+        emailActeur: json["emailActeur"],
+        statutActeur: json["statutActeur"],
+       typeActeur: (json['typeActeur'] as List)
+          .map((type) => TypeActeur.fromJson(type))
+          .toList(), 
+       speculations: (json['speculations'] as List)
+          .map((speculation) => Speculation.fromJson(speculation))
+          .toList(), 
+          // typeActeur: List<TypeActeur>.from(json["typeActeur"].map((x) => TypeActeur.fromJson(x))),
+    );
 
   String toJson() => json.encode(toMap());
 
-  factory Acteur.fromJson(String source) => Acteur.fromMap(json.decode(source) as Map<String, dynamic>);
+  // factory Acteur.fromJson(String source) => Acteur.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {

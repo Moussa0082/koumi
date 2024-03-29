@@ -88,7 +88,7 @@ class _CartListItemState extends State<CartListItem> {
                             height: 30,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(15),
-                              color: Theme.of(context).colorScheme.primary,
+                              // color: Theme.of(context).colorScheme.primary,
                               boxShadow: const [
                                 BoxShadow(
                                   color: Colors.grey,
@@ -126,7 +126,7 @@ class _CartListItemState extends State<CartListItem> {
                             height: 30,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(15),
-                              color: Theme.of(context).colorScheme.primary,
+                              // color: Theme.of(context).colorScheme.primary,
                               boxShadow: const [
                                 BoxShadow(
                                   color: Colors.grey,
