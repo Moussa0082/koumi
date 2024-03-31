@@ -3,11 +3,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Filiere.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/AddAndUpdateProductEndScreen.dart';
 import 'package:path_provider/path_provider.dart' ;
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
@@ -27,10 +29,10 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
 
      final formkey = GlobalKey<FormState>();
      TextEditingController _prixController = TextEditingController();
+     TextEditingController _quantiteController = TextEditingController();
   TextEditingController _nomController = TextEditingController();
   TextEditingController _formController = TextEditingController();
   TextEditingController _origineController = TextEditingController();
-  TextEditingController _quantiteController = TextEditingController();
 
   late Acteur acteur;
   late List<TypeActeur> typeActeurData = [];
@@ -112,9 +114,9 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
 
   @override
   void initState() {
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    typeActeurData = acteur.typeActeur!;
-    type = typeActeurData.map((data) => data.libelle).join(', ');
+    // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    // typeActeurData = acteur.typeActeur!;
+    // type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
 
     super.initState();
@@ -179,19 +181,19 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
           // const SizedBox(height: 10),
           Column(
             children: [
-              SizedBox(
-                // height: 150,
-                child: Padding(
-                    padding: const EdgeInsets.only(left: 10.0),
-                    child: photo != null
-                        ? Image.file(
-                            photo!,
-                            fit: BoxFit.fitWidth,
-                            height: 150,
-                            width: 300,
-                          )
-                        : Container()),
-              ),
+              // SizedBox(
+              //   // height: 150,
+              //   child: Padding(
+              //       padding: const EdgeInsets.only(left: 10.0),
+              //       child: photo != null
+              //           ? Image.file(
+              //               photo!,
+              //               fit: BoxFit.fitWidth,
+              //               height: 100,
+              //               width: 150,
+              //             )
+              //           : Container()),
+              // ),
               SizedBox(
                 height: 30,
               ),
@@ -350,12 +352,61 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                           ),
                         ),
                       ),
+                      
+                       SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 22,
+                        ),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            "Quantite Produit",
+                            style:
+                                TextStyle(color: (Colors.black), fontSize: 18),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez saisir la quantite du produit";
+                            }
+                            return null;
+                          },
+                          controller: _quantiteController,
+                          keyboardType: TextInputType.text,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          decoration: InputDecoration(
+                            hintText: "Quantite produit",
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
                       SizedBox(
                         height: 10,
                       ),
                       
                       SizedBox(
-                        child: IconButton(
+                        child: photo != null
+                        ? Image.file(
+                            photo!,
+                            fit: BoxFit.fitWidth,
+                            height: 100,
+                            width: 150,
+                          )
+                        :  IconButton(
                           onPressed: _showImageSourceDialog,
                           icon: const Icon(
                             Icons.add_a_photo_rounded,
@@ -374,9 +425,9 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                             // final String etat = _etatController.text;
                             // final String localite = _localiteController.text;
 
-                            if (formkey.currentState!.validate()) {
-                              
-                            }
+                            // if (formkey.currentState!.validate()) {
+                              Get.to(AddAndUpdateProductEndSreen(isEditable: false,));
+                            // }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange, // Orange color code

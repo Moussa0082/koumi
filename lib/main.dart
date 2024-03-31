@@ -4,6 +4,8 @@ import 'package:koumi_app/models/CartItem.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/screens/AddAndUpdateProductEndScreen.dart';
+import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/SplashScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
@@ -82,7 +84,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/BottomNavigationPage': (context) => const BottomNavigationPage()
       },
-      home: const SplashScreen(),
+      home:  AddAndUpdateProductScreen(isEditable: false,),
+      // home: const SplashScreen(),
     );
   }
 }
