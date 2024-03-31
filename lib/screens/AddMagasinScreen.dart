@@ -526,6 +526,12 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
       }
 
       return DropdownButtonFormField<String>(
+        validator: (value) {
+    if (value == null || value.isEmpty) {
+      return 'Veuillez sélectionner une region.';
+    }
+    return null;
+  },
         items: niveau1PaysList.isNotEmpty ? niveau1PaysList
             .map(
               (e) => DropdownMenuItem(

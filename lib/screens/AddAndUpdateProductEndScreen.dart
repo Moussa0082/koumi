@@ -4,18 +4,30 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Speculation.dart';
+import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/Unite.dart';
 import 'package:koumi_app/models/ZoneProduction.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/service/StockService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddAndUpdateProductEndSreen extends StatefulWidget {
   
      bool? isEditable;
+     late Stock? stock;
+     String? idStock,nomProduit, origine, forme, prix , quantite;
+     File? image;
 
-   AddAndUpdateProductEndSreen({super.key, this.isEditable});
+   AddAndUpdateProductEndSreen({super.key, this.isEditable, this.idStock, this.stock,
+   this.nomProduit, this.forme ,this.origine, this.prix, this.quantite, this.image
+   });
 
   @override
   State<AddAndUpdateProductEndSreen> createState() => _AddAndUpdateProductEndSreenState();
@@ -26,23 +38,47 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
    bool isLoading = false;
      TextEditingController uniteController = TextEditingController();
+     TextEditingController _descriptionController = TextEditingController();
      TextEditingController magasinController = TextEditingController();
      TextEditingController zoneController = TextEditingController();
      TextEditingController speculationController = TextEditingController();
      TextEditingController _typeController = TextEditingController();
       File? photos;
       String? specValue;
-     String speculation = '';
+     Speculation speculation = Speculation();
     late Future speculationListe;
       String? uniteValue;
-     String unite = '';
+    Unite unite = Unite(); // Initialisez l'objet unite
     late Future uniteListe;
       String? magasinValue;
-     String magasin = '';
+     Magasin magasin  = Magasin();
     late Future magasinListe;
       String? zoneValue;
-     String zoneProduction = '';
+     ZoneProduction zoneProduction = ZoneProduction();
     late Future zoneListe;
+
+
+       late Acteur acteur = Acteur();
+
+  String? email = "";
+  bool isExist = false;
+
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      setState(() {
+        isExist = true;
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
+  }
+
 
     @override
   void initState() {
@@ -56,7 +92,94 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/ZoneProduction/getAllZone'));
         
     super.initState();
+    if(!widget.isEditable!){
+     
+    }
+    verify();
   }
+
+  void handleButtonPress() async{
+    setState(() {
+      isLoading = true;
+    });
+    if(widget.isEditable!){
+
+     await ajouterStock().then((_) {
+      setState(() {
+        isLoading = false;
+      });
+     });
+    }else{
+  await updateProduit().then((_) {
+      setState(() {
+        isLoading = false;
+      });
+     });
+    }
+
+  }
+    
+   
+    Future<void> ajouterStock() async{
+    try {
+      
+    if(widget.image!= null){
+    await StockService().creerStock(nomProduit: widget.nomProduit!,
+     formeProduit: widget.forme!, quantiteStock: widget.quantite!, photo: widget.image!,
+     typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
+     zoneProduction: zoneProduction, speculation: speculation, unite: unite, 
+      magasin: magasin, acteur: acteur);
+    }else{
+    await StockService().creerStock(nomProduit: widget.nomProduit!,
+     formeProduit: widget.forme!, quantiteStock: widget.quantite!, 
+     typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
+     zoneProduction: zoneProduction, speculation: speculation, unite: unite, 
+      magasin: magasin, acteur: acteur);
+    
+   }
+    } catch (error) {
+        // Handle any exceptions that might occur during the request
+        final String errorMessage = error.toString();
+        debugPrint("no " + errorMessage);
+      Get.snackbar("Erreur", "Une erreur s'est produite veuiller réesayer ulterieurement",duration: Duration(seconds: 3));
+      } 
+
+   }
+   
+
+   Future<void> updateProduit() async{
+
+    try {
+      
+    if(widget.image!= null){
+    await StockService().updateStock(
+      idStock: widget.idStock!,
+      nomProduit: widget.nomProduit!,
+     formeProduit: widget.forme!, quantiteStock: widget.quantite!, photo: widget.image!,
+     typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
+     zoneProduction: widget.stock!.zoneProduction!, speculation: widget.stock!.speculation!,
+      unite: widget.stock!.unite!, 
+      magasin: widget.stock!.magasin!, acteur: acteur);
+    }else{
+    await StockService().updateStock(
+      idStock: widget.idStock!,
+      nomProduit: widget.nomProduit!,
+     formeProduit: widget.forme!, quantiteStock: widget.quantite!, 
+     typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
+      zoneProduction: widget.stock!.zoneProduction!, speculation: widget.stock!.speculation!,
+      unite: widget.stock!.unite!, 
+      magasin: widget.stock!.magasin!, acteur: acteur);
+    
+   }
+    } catch (error) {
+        // Handle any exceptions that might occur during the request
+        final String errorMessage = error.toString();
+        debugPrint("no " + errorMessage);
+      Get.snackbar("Erreur", "Une erreur s'est produite veuiller réesayer ulterieurement",duration: Duration(seconds: 3));
+      } 
+
+
+   } 
 
 
   @override
@@ -126,6 +249,39 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                           ),
                         ),
                         const SizedBox(height: 10),
+                    Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Text(
+                                "Description Produit *",
+                                style: TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.bold),
+                              )),
+                        ),
+                       
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez saisir la description du produit";
+                            }
+                            return null;
+                          },
+                          controller: _descriptionController,
+                          keyboardType: TextInputType.text,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          decoration: InputDecoration(
+                            hintText: "Description produit",
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
                     
                        Padding(
                           padding: const EdgeInsets.all(8),
@@ -139,6 +295,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                         ),
                       
                        FutureBuilder(
+                      
                             future: speculationListe,
                             builder: (_, snapshot) {
                               if (snapshot.connectionState ==
@@ -186,6 +343,12 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   }
                     
                                   return DropdownButtonFormField<String>(
+                                    validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Veuillez sélectionner une speculation.';
+                                  }
+                                  return null;
+                                },
                                     items: speculationListe
                                         .map(
                                           (e) => DropdownMenuItem(
@@ -199,14 +362,16 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                       setState(() {
                                         specValue = newValue;
                                         if (newValue != null) {
-                                          speculation = speculationListe
+                                          speculation.nomSpeculation = speculationListe
                                               .map((e) => e.nomSpeculation!)
                                               .first;
                                           print("speculation : ${speculation}");
                                         }
                                       });
                                     },
+                                  
                                     decoration: InputDecoration(
+                                      
                                       labelText: 'Selectionner une spéculation',
                                       contentPadding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
@@ -306,6 +471,12 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   }
                     
                                   return DropdownButtonFormField<String>(
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Veuillez sélectionner un magasin.';
+                                      }
+                                      return null;
+                                    },
                                     items: magasinListe
                                         .map(
                                           (e) => DropdownMenuItem(
@@ -314,15 +485,15 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                           ),
                                         )
                                         .toList(),
-                                    value: specValue,
+                                    value: magasinValue,
                                     onChanged: (newValue) {
                                       setState(() {
-                                        specValue = newValue;
+                                        magasinValue = newValue;
                                         if (newValue != null) {
-                                          magasin = magasinListe
+                                          magasin.nomMagasin = magasinListe
                                               .map((e) => e.nomMagasin!)
                                               .first;
-                                          print("magasin : ${speculation}");
+                                          print("magasin : ${magasin.nomMagasin}");
                                         }
                                       });
                                     },
@@ -426,6 +597,12 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   }
                     
                                   return DropdownButtonFormField<String>(
+                                    validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Veuillez sélectionner une unité.';
+                                    }
+                                    return null;
+                                  },
                                     items: uniteListe
                                         .map(
                                           (e) => DropdownMenuItem(
@@ -434,15 +611,15 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                           ),
                                         )
                                         .toList(),
-                                    value: specValue,
+                                    value: uniteValue,
                                     onChanged: (newValue) {
                                       setState(() {
-                                        specValue = newValue;
+                                        uniteValue = newValue;
                                         if (newValue != null) {
-                                          unite = uniteListe
+                                          unite.nomUnite = uniteListe
                                               .map((e) => e.nomUnite!)
                                               .first;
-                                          print("unité : ${speculation}");
+                                          print("unité : ${unite.nomUnite}");
                                         }
                                       });
                                     },
@@ -546,6 +723,12 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   }
                     
                                   return DropdownButtonFormField<String>(
+                                    validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Veuillez sélectionner une zone de production.';
+                                  }
+                                  return null;
+                                },
                                     items: zoneListe
                                         .map(
                                           (e) => DropdownMenuItem(
@@ -554,12 +737,12 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                           ),
                                         )
                                         .toList(),
-                                    value: specValue,
+                                    value: zoneValue,
                                     onChanged: (newValue) {
                                       setState(() {
-                                        specValue = newValue;
+                                        zoneValue = newValue;
                                         if (newValue != null) {
-                                          zoneProduction = zoneListe
+                                          zoneProduction.nomZoneProduction = zoneListe
                                               .map((e) => e.nomZoneProduction!)
                                               .first;
                                           print("zone de production : ${speculation}");
@@ -606,7 +789,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                           ),
                     
                       
-                    
+                  
                     
                         const SizedBox(
                           height: 20,
@@ -616,7 +799,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                             onPressed: () async {
                               // Handle button press action here
                               if (_formKey.currentState!.validate()) {
-                                // _handleButtonPress();
+                                handleButtonPress();
                               }
                             },
                             style: ElevatedButton.styleFrom(

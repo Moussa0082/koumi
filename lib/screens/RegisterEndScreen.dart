@@ -227,8 +227,8 @@ Future<void> _pickImage(ImageSource source) async {
       password: password,
       speculations: listeSpeculations
 
-        );
-         showDialog(
+        ).then((value) => 
+                 showDialog(
             context:  context,
             builder: (BuildContext context) {
               return AlertDialog(
@@ -248,7 +248,9 @@ Future<void> _pickImage(ImageSource source) async {
                 ],
               );
             },
-          );
+          )
+        );
+ 
         }else{
       await acteurService.creerActeur(
       nomActeur: nomActeur ?? "",
@@ -262,7 +264,7 @@ Future<void> _pickImage(ImageSource source) async {
       password: password ?? "",
       speculations: listeSpeculations ?? [],
       
-        );
+        ).then((value) => 
          showDialog(
             context:  context,
             builder: (BuildContext context) {
@@ -283,7 +285,9 @@ Future<void> _pickImage(ImageSource source) async {
                 ],
               );
             },
-          );
+          )
+        );
+        
         }
        
         // print("Demande envoyée avec succès: ${updatedDemande.toString()}");
@@ -512,6 +516,12 @@ Future<void> _pickImage(ImageSource source) async {
     hint: 'Sélectionner une spéculation',
     fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
     onOptionSelected: (options) {
+      if (options.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Veuillez sélectionner au moins une speculation.'),
+          ));
+          }
       setState(() {
         libelleSpeculation.clear();
         libelleSpeculation.addAll(options.map((data) => data.label).toList());

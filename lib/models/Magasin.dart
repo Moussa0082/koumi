@@ -6,7 +6,7 @@ import 'package:koumi_app/models/Niveau1Pays.dart';
 class Magasin {
    String? idMagasin;
   final String? codeMagasin;
-  final String? nomMagasin;
+   String? nomMagasin;
   // final String? niveau3PaysMagasin;
    String? latitude;
    String? longitude;

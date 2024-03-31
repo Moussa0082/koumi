@@ -12,25 +12,25 @@ import 'package:koumi_app/models/ZoneProduction.dart';
 
 class Stock {
   String? idStock;
-  final String? codeStock;
-  final String? nomProduit;
-  final String? formeProduit;
-  final String? dateProduction;
+   String? codeStock;
+   String? nomProduit;
+   String? formeProduit;
+   String? dateProduction;
    double? quantiteStock;
-  final int? prix;
-  final String? typeProduit;
-  final String? descriptionStock;
+   int? prix;
+   String? typeProduit;
+   String? descriptionStock;
    String? photo;
-  final ZoneProduction? zoneProduction;
-  final String? dateAjout;
-  final String? dateModif;
-  final String? personneModif;
-  final bool? statutSotck;
-  final Speculation? speculation;
-  final Unite? unite;
-  final Magasin? magasin;
-  final Acteur? acteur;
-  final List<Commande>? commande;
+   ZoneProduction? zoneProduction;
+   String? dateAjout;
+  String? dateModif;
+   String? personneModif;
+   bool? statutSotck;
+   Speculation? speculation;
+   Unite? unite;
+   Magasin? magasin;
+   Acteur? acteur;
+   List<Commande>? commande;
 
   Stock({
     this.idStock,

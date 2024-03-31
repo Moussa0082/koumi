@@ -426,7 +426,11 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                             // final String localite = _localiteController.text;
 
                             // if (formkey.currentState!.validate()) {
-                              Get.to(AddAndUpdateProductEndSreen(isEditable: false,));
+                              Get.to(AddAndUpdateProductEndSreen(isEditable: false,
+                              nomProduit: _nomController.text, forme: _formController.text,
+                              origine: _origineController.text, prix: _prixController.text,
+                              quantite: _quantiteController.text,
+                              ));
                             // }
                           },
                           style: ElevatedButton.styleFrom(

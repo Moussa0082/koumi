@@ -84,8 +84,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/BottomNavigationPage': (context) => const BottomNavigationPage()
       },
-      home:  AddAndUpdateProductScreen(isEditable: false,),
-      // home: const SplashScreen(),
+      home: const SplashScreen(),
     );
   }
 }

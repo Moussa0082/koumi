@@ -386,6 +386,7 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
                 Padding(
   padding: const EdgeInsets.symmetric(horizontal: 16),
   child: MultiSelectDropDown.network(
+    
     networkConfig: NetworkConfig(
       // url: 'https://koumi.ml/api-koumi/typeActeur/read',
       url: 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
@@ -429,6 +430,12 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
     hint: 'Sélectionner un type d\'acteur',
     fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
     onOptionSelected: (options) {
+      if (options.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Veuillez sélectionner au moins un type d\acteur.'),
+          ));
+          }
       setState(() {
         typeLibelle.clear();
         typeLibelle.addAll(options
