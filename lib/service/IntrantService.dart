@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Intrant.dart';
+import 'package:koumi_app/models/Speculation.dart';
 import 'package:path/path.dart';
 
 
@@ -20,6 +21,7 @@ class IntrantService extends ChangeNotifier {
     required int prixIntrant,
     File? photoIntrant,
     required Acteur acteur,
+    required Speculation speculation
   }) async {
     try {
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
@@ -36,6 +38,7 @@ class IntrantService extends ChangeNotifier {
         'nomIntrant':nomIntrant,
         'quantiteIntrant' : quantiteIntrant,
         'prixIntrant' : prixIntrant,
+        'speculation':speculation,
         'descriptionIntrant': descriptionIntrant,
         'photoIntrant': "",
         'acteur': acteur.toMap()

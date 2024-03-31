@@ -185,81 +185,104 @@ class _AddIntrantState extends State<AddIntrant> {
                 Form(
                   key: formkey,
                   child: Column(children: [
-                    Consumer<CategorieService>(
-      builder: (context, catService, child) {
-        return FutureBuilder(
-          future: _categorieList,
-          builder: (_, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            }
-            if (snapshot.hasError) {
-              return Text("${snapshot.error}");
-            }
-            if (snapshot.hasData) {
-              List<CategorieProduit> catList = snapshot.data as List<CategorieProduit>;
-
-              if (catList.isEmpty) {
-                return DropdownButtonFormField(
-                  items: [],
-                  onChanged: null,
-                  decoration: InputDecoration(
-                    labelText: 'Aucune catégorie trouvé',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                );
-              }
-
-              return DropdownButtonFormField<String>(
-                items: catList
-                    .map(
-                      (e) => DropdownMenuItem(
-                        value: e.idCategorieProduit,
-                        child: Text(e.libelleCategorie!),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 22,
                       ),
-                    )
-                    .toList(),
-                value: catValue,
-                onChanged: (newValue) {
-                  setState(() {
-                    speValue = null; // Réinitialisez la valeur de la spéculation sélectionnée
-                    catValue = newValue; // Assurez-vous que catValue contient l'ID de la catégorie sélectionnée
-                    if (newValue != null) {
-                      categorieProduit = catList.firstWhere(
-                            (element) => element.idCategorieProduit == newValue,
-                      );
-                      // Maintenant, vous pouvez récupérer les spéculations associées à cette catégorie
-                      // _speculationList = SpeculationService().fetchSpeculationByCategorie(newValue);
-                       _speculationList = http.get(Uri.parse(
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Chosir une catégorie de produit",
+                          style: TextStyle(color: (Colors.black), fontSize: 18),
+                        ),
+                      ),
+                    ),
+                    Consumer<CategorieService>(
+                      builder: (context, catService, child) {
+                        return FutureBuilder(
+                          future: _categorieList,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            }
+                            if (snapshot.hasError) {
+                              return Text("${snapshot.error}");
+                            }
+                            if (snapshot.hasData) {
+                              List<CategorieProduit> catList =
+                                  snapshot.data as List<CategorieProduit>;
+
+                              if (catList.isEmpty) {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucune catégorie trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              return DropdownButtonFormField<String>(
+                                items: catList
+                                    .map(
+                                      (e) => DropdownMenuItem(
+                                        value: e.idCategorieProduit,
+                                        child: Text(e.libelleCategorie!),
+                                      ),
+                                    )
+                                    .toList(),
+                                value: catValue,
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    speValue =
+                                        null; // Réinitialisez la valeur de la spéculation sélectionnée
+                                    catValue = newValue;
+                                    if (newValue != null) {
+                                      categorieProduit = catList.firstWhere(
+                                        (element) =>
+                                            element.idCategorieProduit ==
+                                            newValue,
+                                      );
+
+                                      // _speculationList = SpeculationService().fetchSpeculationByCategorie(newValue);
+                                      _speculationList = http.get(Uri.parse(
                                           'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculationByCategorie/${newValue}'));
-                    }
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: 'Sélectionner une catégorie',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              );
-            } else {
-              return DropdownButtonFormField(
-                items: [],
-                onChanged: null,
-                decoration: InputDecoration(
-                  labelText: 'Aucune catégorie trouvé',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              );
-            }
-          },
-        );
-      },
-    ),
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Sélectionner une catégorie',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucune catégorie trouvé',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        );
+                      },
+                    ),
                     // Consumer<CategorieService>(
                     //     builder: (context, catService, child) {
                     //   return FutureBuilder(
@@ -357,6 +380,18 @@ class _AddIntrantState extends State<AddIntrant> {
                     //     },
                     //   );
                     // }),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 22,
+                      ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Chosir une spéculation",
+                          style: TextStyle(color: (Colors.black), fontSize: 18),
+                        ),
+                      ),
+                    ),
                     Consumer<SpeculationService>(
                         builder: (context, speculationService, child) {
                       return FutureBuilder(
@@ -389,6 +424,8 @@ class _AddIntrantState extends State<AddIntrant> {
                                   onChanged: null,
                                   decoration: InputDecoration(
                                     labelText: 'Aucune speculation trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
@@ -420,6 +457,8 @@ class _AddIntrantState extends State<AddIntrant> {
                                 },
                                 decoration: InputDecoration(
                                   labelText: 'Sélectionner une speculation',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -432,19 +471,22 @@ class _AddIntrantState extends State<AddIntrant> {
                                 onChanged: null,
                                 decoration: InputDecoration(
                                   labelText: 'Aucune speculation trouvé',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
                               );
                             }
-                          }
- else {
+                          } else {
                             return DropdownButtonFormField(
                               items: [],
                               onChanged: null,
                               decoration: InputDecoration(
                                 labelText: 'Aucune speculation trouvé',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -745,6 +787,7 @@ class _AddIntrantState extends State<AddIntrant> {
                                         descriptionIntrant: description,
                                         prixIntrant: prix,
                                         photoIntrant: photo,
+                                         speculation: speculation,
                                         acteur: acteur)
                                     .then((value) => {
                                           Provider.of<IntrantService>(context,
@@ -756,6 +799,8 @@ class _AddIntrantState extends State<AddIntrant> {
                                           _prixController.clear(),
                                           setState(() {
                                             _isLoading = false;
+                                             speValue = null;
+                                            catValue = null;
                                           }),
                                           Navigator.pop(context),
                                           ScaffoldMessenger.of(context)
@@ -801,6 +846,7 @@ class _AddIntrantState extends State<AddIntrant> {
                                         quantiteIntrant: quantite,
                                         descriptionIntrant: description,
                                         prixIntrant: prix,
+                                        speculation: speculation,
                                         acteur: acteur)
                                     .then((value) => {
                                           Provider.of<IntrantService>(context,
@@ -812,6 +858,8 @@ class _AddIntrantState extends State<AddIntrant> {
                                           _prixController.clear(),
                                           setState(() {
                                             _isLoading = false;
+                                            speValue = null;
+                                            catValue = null;
                                           }),
                                           Navigator.pop(context),
                                           ScaffoldMessenger.of(context)
