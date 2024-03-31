@@ -30,7 +30,7 @@ class _UpdatesCategorieState extends State<UpdatesCategorie> {
     super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     cat = widget.categorieProduit;
-    libelleController.text = cat.libelleCategorie;
+    libelleController.text = cat.libelleCategorie!;
     descriptionController.text = cat.descriptionCategorie!;
     filiere = cat.filiere!;
   }

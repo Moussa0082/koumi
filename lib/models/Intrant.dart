@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/Superficie.dart';
 
 class Intrant {
@@ -17,6 +18,7 @@ class Intrant {
   final String? dateModif;
   final String? personneModif;
   final Acteur acteur;
+  final Speculation? speculation;
   
   Intrant({
     this.idIntrant,
@@ -31,6 +33,7 @@ class Intrant {
     this.dateModif,
     this.personneModif,
     required this.acteur,
+    this.speculation,
   });
 
   
@@ -48,6 +51,7 @@ class Intrant {
     String? dateModif,
     String? personneModif,
     Acteur? acteur,
+    Speculation? speculation,
   }) {
     return Intrant(
       idIntrant: idIntrant ?? this.idIntrant,
@@ -62,6 +66,7 @@ class Intrant {
       dateModif: dateModif ?? this.dateModif,
       personneModif: personneModif ?? this.personneModif,
       acteur: acteur ?? this.acteur,
+      speculation: speculation ?? this.speculation,
     );
   }
 
@@ -79,6 +84,7 @@ class Intrant {
       'dateModif': dateModif,
       'personneModif': personneModif,
       'acteur': acteur.toMap(),
+      'speculation': speculation?.toMap(),
     };
   }
 
@@ -96,6 +102,7 @@ class Intrant {
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
       personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
+      speculation: map['speculation'] != null ? Speculation.fromMap(map['speculation'] as Map<String,dynamic>) : null,
     );
   }
 
@@ -105,7 +112,7 @@ class Intrant {
 
   @override
   String toString() {
-    return 'Intrant(idIntrant: $idIntrant, nomIntrant: $nomIntrant, quantiteIntrant: $quantiteIntrant, prixIntrant: $prixIntrant, codeIntrant: $codeIntrant, descriptionIntrant: $descriptionIntrant, photoIntrant: $photoIntrant, statutIntrant: $statutIntrant, dateAjout: $dateAjout, dateModif: $dateModif, personneModif: $personneModif, acteur: $acteur)';
+    return 'Intrant(idIntrant: $idIntrant, nomIntrant: $nomIntrant, quantiteIntrant: $quantiteIntrant, prixIntrant: $prixIntrant, codeIntrant: $codeIntrant, descriptionIntrant: $descriptionIntrant, photoIntrant: $photoIntrant, statutIntrant: $statutIntrant, dateAjout: $dateAjout, dateModif: $dateModif, personneModif: $personneModif, acteur: $acteur, speculation: $speculation)';
   }
 
   @override
@@ -124,7 +131,8 @@ class Intrant {
       other.dateAjout == dateAjout &&
       other.dateModif == dateModif &&
       other.personneModif == personneModif &&
-      other.acteur == acteur;
+      other.acteur == acteur &&
+      other.speculation == speculation;
   }
 
   @override
@@ -140,6 +148,7 @@ class Intrant {
       dateAjout.hashCode ^
       dateModif.hashCode ^
       personneModif.hashCode ^
-      acteur.hashCode;
+      acteur.hashCode ^
+      speculation.hashCode;
   }
 }

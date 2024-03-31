@@ -62,8 +62,8 @@ class _TransportState extends State<Transport> {
     // type = typeActeurData.map((data) => data.libelle).join(', ');
     verify();
     _searchController = TextEditingController();
-    // _typeList = http.get(Uri.parse('https://koumi.ml/api-koumi/TypeVoiture/read'));
-    _typeList =
+    _typeList = 
+    // http.get(Uri.parse('https://koumi.ml/api-koumi/TypeVoiture/read'));
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
     super.initState();
   }

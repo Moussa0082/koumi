@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:koumi_app/Admin/ParametreGenerauxPage.dart';
 import 'package:koumi_app/Admin/Zone.dart';
 import 'package:koumi_app/models/Acteur.dart';
@@ -11,16 +8,11 @@ import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
-
 import 'package:koumi_app/screens/Surface.dart';
 import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
-
-import 'package:koumi_app/screens/TypeVehicule.dart';
-import 'package:koumi_app/service/BottomNavigationService.dart';
-import 'package:koumi_app/service/TypeVoitureService.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
-import 'package:koumi_app/widgets/BottomNavBarAdmin.dart';
+import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -88,10 +80,10 @@ class _ProfilState extends State<Profil> {
         ),
         body: !isExist
             ? Center(
-              child: Container(
+                child: Container(
                   padding: EdgeInsets.all(
                       20), // Ajouter un padding pour l'espace autour du contenu
-              
+
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -117,7 +109,7 @@ class _ProfilState extends State<Profil> {
                               20), // Ajouter un espace entre le texte et le bouton
                       ElevatedButton(
                         onPressed: () {
-                             Future.microtask(() {
+                          Future.microtask(() {
                             Provider.of<BottomNavigationService>(context,
                                     listen: false)
                                 .changeIndex(0);
@@ -158,7 +150,7 @@ class _ProfilState extends State<Profil> {
                     ],
                   ),
                 ),
-            )
+              )
             : SingleChildScrollView(
                 child: Column(
                   children: [
@@ -572,7 +564,7 @@ class _ProfilState extends State<Profil> {
                             // context,
                             // MaterialPageRoute(builder: (context) => LoginScreen()),
                             //                        );
-                            Get.off(LoginScreen(),
+                            Get.off(BottomNavigationPage(),
                                 duration: Duration(
                                     seconds:
                                         1), //duration of transitions, default 1 sec
@@ -601,9 +593,7 @@ class _ProfilState extends State<Profil> {
                     )
                   ],
                 ),
-
               ));
-
   }
 
   Widget _buildProfile(String title, String value) {

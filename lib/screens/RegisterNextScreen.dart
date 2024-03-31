@@ -192,7 +192,7 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // _getCurrmarreroentUserLocation(); // Call the function to get location
+    // _getCurrentUserLocation(); // Call the function to get location
 
     Locale deviceLocale = Localizations.localeOf(context);
     String countryCode = deviceLocale.countryCode ?? '';

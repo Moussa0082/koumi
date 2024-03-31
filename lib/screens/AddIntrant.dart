@@ -1,11 +1,17 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/CategorieProduit.dart';
+import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/IntrantService.dart';
+import 'package:koumi_app/service/SpeculationService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -31,6 +37,16 @@ class _AddIntrantState extends State<AddIntrant> {
   late Acteur acteur;
   String? imageSrc;
   File? photo;
+  List<CategorieProduit> categorieList = [];
+  List<Speculation> speculationList = [];
+  String? speValue;
+  late Future _speculationList;
+  late Speculation speculation;
+  String? catValue;
+  late Future _categorieList;
+  // late CategorieProduit categorieProduit;
+  late CategorieProduit categorieProduit = CategorieProduit();
+  late Future<List<CategorieProduit>> _liste;
 
   Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
@@ -112,7 +128,36 @@ class _AddIntrantState extends State<AddIntrant> {
   void initState() {
     super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    _categorieList = fetchCategorieList(); // _categorieList = http.get(
+    //     Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
+    _speculationList = http.get(Uri.parse(
+        'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculationByCategorie/${categorieProduit.idCategorieProduit}'));
   }
+
+  Future<List<CategorieProduit>> fetchCategorieList() async {
+    final response = await CategorieService().fetchCategorie();
+    return response;
+  }
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+//     _fetchData();
+//   }
+
+// //  late List<dynamic> _categorieList;
+// //   late List<dynamic> _speculationList;
+
+//   Future<void> _fetchData() async {
+
+//     setState(() {
+
+//       _speculationList =  http.get(Uri.parse(
+//         'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculationByCategorie/${categorieProduit.idCategorieProduit}'));
+
+//     });
+//   }
 
   @override
   Widget build(BuildContext context) {
@@ -140,6 +185,365 @@ class _AddIntrantState extends State<AddIntrant> {
                 Form(
                   key: formkey,
                   child: Column(children: [
+                    Consumer<CategorieService>(
+      builder: (context, catService, child) {
+        return FutureBuilder(
+          future: _categorieList,
+          builder: (_, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            }
+            if (snapshot.hasError) {
+              return Text("${snapshot.error}");
+            }
+            if (snapshot.hasData) {
+              List<CategorieProduit> catList = snapshot.data as List<CategorieProduit>;
+
+              if (catList.isEmpty) {
+                return DropdownButtonFormField(
+                  items: [],
+                  onChanged: null,
+                  decoration: InputDecoration(
+                    labelText: 'Aucune catégorie trouvé',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                );
+              }
+
+              return DropdownButtonFormField<String>(
+                items: catList
+                    .map(
+                      (e) => DropdownMenuItem(
+                        value: e.idCategorieProduit,
+                        child: Text(e.libelleCategorie!),
+                      ),
+                    )
+                    .toList(),
+                value: catValue,
+                onChanged: (newValue) {
+                  setState(() {
+                    speValue = null; // Réinitialisez la valeur de la spéculation sélectionnée
+                    catValue = newValue; // Assurez-vous que catValue contient l'ID de la catégorie sélectionnée
+                    if (newValue != null) {
+                      categorieProduit = catList.firstWhere(
+                            (element) => element.idCategorieProduit == newValue,
+                      );
+                      // Maintenant, vous pouvez récupérer les spéculations associées à cette catégorie
+                      // _speculationList = SpeculationService().fetchSpeculationByCategorie(newValue);
+                       _speculationList = http.get(Uri.parse(
+                                          'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculationByCategorie/${newValue}'));
+                    }
+                  });
+                },
+                decoration: InputDecoration(
+                  labelText: 'Sélectionner une catégorie',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              );
+            } else {
+              return DropdownButtonFormField(
+                items: [],
+                onChanged: null,
+                decoration: InputDecoration(
+                  labelText: 'Aucune catégorie trouvé',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              );
+            }
+          },
+        );
+      },
+    ),
+                    // Consumer<CategorieService>(
+                    //     builder: (context, catService, child) {
+                    //   return FutureBuilder(
+                    //     future: _categorieList,
+                    //     builder: (_, snapshot) {
+                    //       if (snapshot.connectionState ==
+                    //           ConnectionState.waiting) {
+                    //         return CircularProgressIndicator();
+                    //       }
+                    //       if (snapshot.hasError) {
+                    //         return Text("${snapshot.error}");
+                    //       }
+                    //       if (snapshot.hasData) {
+                    //         dynamic responseData =
+                    //             json.decode(snapshot.data.body);
+                    //         if (responseData is List) {
+                    //           final reponse = responseData;
+                    //           final catList = reponse
+                    //               .map((e) => CategorieProduit.fromMap(e))
+                    //               .where((con) => con.statutCategorie == true)
+                    //               .toList();
+
+                    //           if (catList.isEmpty) {
+                    //             return DropdownButtonFormField(
+                    //               items: [],
+                    //               onChanged: null,
+                    //               decoration: InputDecoration(
+                    //                 labelText: 'Aucune catégorie trouvé',
+                    //                 border: OutlineInputBorder(
+                    //                   borderRadius: BorderRadius.circular(8),
+                    //                 ),
+                    //               ),
+                    //             );
+                    //           }
+
+                    //           return DropdownButtonFormField<String>(
+                    //             items: catList
+                    //                 .map(
+                    //                   (e) => DropdownMenuItem(
+                    //                     value: e.idCategorieProduit,
+                    //                     child: Text(e.libelleCategorie!),
+                    //                   ),
+                    //                 )
+                    //                 .toList(),
+                    //             value: catValue,
+                    //             onChanged: (newValue) {
+                    //               setState(() {
+                    //                 speValue =
+                    //                     null; // Réinitialisez la valeur de la spéculation sélectionnée
+                    //                 catValue =
+                    //                     newValue; // Assurez-vous que catValue contient l'ID de la catégorie sélectionnée
+                    //                 if (newValue != null) {
+                    //                   categorieProduit = catList.firstWhere(
+                    //                     (element) =>
+                    //                         element.idCategorieProduit ==
+                    //                         newValue,
+                    //                   );
+                    //                   // Maintenant, vous pouvez récupérer les spéculations associées à cette catégorie
+                    //                   _speculationList = SpeculationService()
+                    //                       .fetchSpeculationByCategorie(
+                    //                           newValue);
+                    //                 }
+                    //               });
+                    //             },
+                    //             decoration: InputDecoration(
+                    //               labelText: 'Sélectionner une catégorie',
+                    //               border: OutlineInputBorder(
+                    //                 borderRadius: BorderRadius.circular(8),
+                    //               ),
+                    //             ),
+                    //           );
+                    //         } else {
+                    //           return DropdownButtonFormField(
+                    //             items: [],
+                    //             onChanged: null,
+                    //             decoration: InputDecoration(
+                    //               labelText: 'Aucune catégorie trouvé',
+                    //               border: OutlineInputBorder(
+                    //                 borderRadius: BorderRadius.circular(8),
+                    //               ),
+                    //             ),
+                    //           );
+                    //         }
+                    //       }
+                    //       return DropdownButtonFormField(
+                    //         items: [],
+                    //         onChanged: null,
+                    //         decoration: InputDecoration(
+                    //           labelText: 'Aucune catégorie trouvé',
+                    //           border: OutlineInputBorder(
+                    //             borderRadius: BorderRadius.circular(8),
+                    //           ),
+                    //         ),
+                    //       );
+                    //     },
+                    //   );
+                    // }),
+                    Consumer<SpeculationService>(
+                        builder: (context, speculationService, child) {
+                      return FutureBuilder(
+                        future: _speculationList,
+                        // future: speculationService.fetchSpeculationByCategorie(categorieProduit.idCategorieProduit!),
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          }
+                          if (snapshot.hasError) {
+                            return Text("${snapshot.error}");
+                          }
+                          if (snapshot.hasData) {
+                            // Extract data from the HTTP response
+                            dynamic responseData =
+                                json.decode(snapshot.data.body);
+
+                            // Check if the response data is a list
+                            if (responseData is List) {
+                              // Convert response data to a list of Speculation objects
+                              List<Speculation> speList = responseData
+                                  .map((e) => Speculation.fromMap(e))
+                                  .toList();
+
+                              if (speList.isEmpty) {
+                                // Handle case when no speculations are found
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucune speculation trouvé',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              // Build DropdownButtonFormField with speculations
+                              return DropdownButtonFormField<String>(
+                                items: speList
+                                    .map(
+                                      (e) => DropdownMenuItem(
+                                        value: e.idSpeculation,
+                                        child: Text(e.nomSpeculation!),
+                                      ),
+                                    )
+                                    .toList(),
+                                value: speValue,
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    speValue = newValue;
+                                    if (newValue != null) {
+                                      speculation = speList.firstWhere(
+                                        (element) =>
+                                            element.idSpeculation == newValue,
+                                      );
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Sélectionner une speculation',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              // Handle case when response data is not a list
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucune speculation trouvé',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+ else {
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucune speculation trouvé',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                      );
+                    }),
+                    // Consumer<SpeculationService>(
+                    //     builder: (context, speculationService, child) {
+                    //   return FutureBuilder(
+                    //     future: _speculationList,
+                    //     // future: speculationService.fetchSpeculationByCategorie(categorieProduit.idCategorieProduit!),
+                    //     builder: (_, snapshot) {
+                    //       if (snapshot.connectionState ==
+                    //           ConnectionState.waiting) {
+                    //         return CircularProgressIndicator();
+                    //       }
+                    //       if (snapshot.hasError) {
+                    //         return Text("${snapshot.error}");
+                    //       }
+                    //       if (snapshot.hasData) {
+                    //         dynamic responseData = snapshot.data!.body;
+
+                    //         if (responseData is List) {
+                    //           final reponse = responseData;
+                    //           final specList = reponse
+                    //               .map((e) => Speculation.fromMap(e))
+                    //               .where((con) => con.statutSpeculation == true)
+                    //               .toList();
+
+                    //           if (specList.isEmpty) {
+                    //             return DropdownButtonFormField(
+                    //               items: [],
+                    //               onChanged: null,
+                    //               decoration: InputDecoration(
+                    //                 labelText: 'Aucune speculation trouvé',
+                    //                 border: OutlineInputBorder(
+                    //                   borderRadius: BorderRadius.circular(8),
+                    //                 ),
+                    //               ),
+                    //             );
+                    //           }
+
+                    //           return DropdownButtonFormField<String>(
+                    //             items: specList
+                    //                 .map(
+                    //                   (e) => DropdownMenuItem(
+                    //                     value: e.idSpeculation,
+                    //                     child: Text(e.nomSpeculation!),
+                    //                   ),
+                    //                 )
+                    //                 .toList(),
+                    //             value: speValue,
+                    //             onChanged: (newValue) {
+                    //               setState(() {
+                    //                 speValue = newValue;
+                    //                 if (newValue != null) {
+                    //                   speculation = specList.firstWhere(
+                    //                     (element) =>
+                    //                         element.idSpeculation == newValue,
+                    //                   );
+                    //                 }
+                    //               });
+                    //             },
+                    //             decoration: InputDecoration(
+                    //               labelText: 'Sélectionner une speculation',
+                    //               border: OutlineInputBorder(
+                    //                 borderRadius: BorderRadius.circular(8),
+                    //               ),
+                    //             ),
+                    //           );
+                    //         } else {
+                    //           return DropdownButtonFormField(
+                    //             items: [],
+                    //             onChanged: null,
+                    //             decoration: InputDecoration(
+                    //               labelText: 'Aucune speculation trouvé',
+                    //               border: OutlineInputBorder(
+                    //                 borderRadius: BorderRadius.circular(8),
+                    //               ),
+                    //             ),
+                    //           );
+                    //         }
+                    //       }
+                    //       return DropdownButtonFormField(
+                    //         items: [],
+                    //         onChanged: null,
+                    //         decoration: InputDecoration(
+                    //           labelText: 'Aucune speculation trouvé',
+                    //           border: OutlineInputBorder(
+                    //             borderRadius: BorderRadius.circular(8),
+                    //           ),
+                    //         ),
+                    //       );
+                    //     },
+                    //   );
+                    // }),
                     Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: 22,

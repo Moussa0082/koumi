@@ -7,7 +7,7 @@ import 'package:koumi_app/models/Filiere.dart';
 class CategorieProduit {
   final String? idCategorieProduit;
   String? codeCategorie;
-  final String libelleCategorie;
+  final String? libelleCategorie;
   final String? descriptionCategorie;
   final bool? statutCategorie;
   final String? dateAjout;
@@ -18,7 +18,7 @@ class CategorieProduit {
   CategorieProduit({
     this.idCategorieProduit,
     this.codeCategorie,
-    required this.libelleCategorie,
+    this.libelleCategorie,
     this.descriptionCategorie,
     this.statutCategorie,
     this.dateAjout,
@@ -26,7 +26,7 @@ class CategorieProduit {
     this.dateModif,
     this.filiere,
   });
-
+  
  
 
   CategorieProduit copyWith({
@@ -71,7 +71,7 @@ class CategorieProduit {
     return CategorieProduit(
       idCategorieProduit: map['idCategorieProduit'] != null ? map['idCategorieProduit'] as String : null,
       codeCategorie: map['codeCategorie'] != null ? map['codeCategorie'] as String : null,
-      libelleCategorie: map['libelleCategorie'] as String,
+      libelleCategorie: map['libelleCategorie'] != null ? map['libelleCategorie'] as String : null,
       descriptionCategorie: map['descriptionCategorie'] != null ? map['descriptionCategorie'] as String : null,
       statutCategorie: map['statutCategorie'] != null ? map['statutCategorie'] as bool : null,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,

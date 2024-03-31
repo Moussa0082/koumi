@@ -39,7 +39,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
   ];
   List pages = <Widget>[
     const Accueil(),
-    Profil(),
+    ProduitScreen(),
      Panier(),
     const Profil()
   ];
@@ -141,7 +141,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
 
         return [
           const Accueil(),
-          Profil(),
+          ProduitScreen(),
            Panier(),
           const Profil()
         ].elementAt(index);

@@ -251,9 +251,8 @@ class _DetailMaterielState extends State<DetailMateriel> {
     super.initState();
     verify();
     verifyParam();
-    // _niveau3List =
-    //     http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
     _niveau3List =
+        // http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
     materiels = widget.materiel;
     _nomController.text = materiels.nom;

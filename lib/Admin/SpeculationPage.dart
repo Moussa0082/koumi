@@ -72,7 +72,7 @@ class _SpeculationPageState extends State<SpeculationPage> {
               // ),
               // SizedBox(height: 10),
               Text(
-                cat.libelleCategorie.toUpperCase(),
+                cat.libelleCategorie!.toUpperCase(),
                 style: TextStyle(
                     color: d_colorGreen,
                     fontWeight: FontWeight.w600,

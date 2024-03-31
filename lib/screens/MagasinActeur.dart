@@ -392,7 +392,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
                               child: Image.network(
                                 // "https://koumi.ml/api-koumi/${magasin.photo}" ?? "assets/images/magasin.png",
                                 "http://10.0.2.2:9000/api-koumi/${magasin.photo}" ??
-                                    "assets/images/magasin.png",
+                                     "assets/images/magasin.png",
                                 height: 120,
                                 fit: BoxFit.cover,
                                 errorBuilder: (BuildContext context,
