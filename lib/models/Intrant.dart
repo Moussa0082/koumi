@@ -14,12 +14,13 @@ class Intrant {
   final String descriptionIntrant;
   final String? photoIntrant;
   final bool? statutIntrant;
+  final String? dateExpiration;
   final String? dateAjout;
   final String? dateModif;
   final String? personneModif;
   final Acteur acteur;
   final Speculation? speculation;
-  
+
   Intrant({
     this.idIntrant,
     required this.nomIntrant,
@@ -29,14 +30,15 @@ class Intrant {
     required this.descriptionIntrant,
     this.photoIntrant,
     this.statutIntrant,
+    this.dateExpiration,
     this.dateAjout,
     this.dateModif,
     this.personneModif,
     required this.acteur,
     this.speculation,
   });
-
   
+ 
 
   Intrant copyWith({
     String? idIntrant,
@@ -47,6 +49,7 @@ class Intrant {
     String? descriptionIntrant,
     String? photoIntrant,
     bool? statutIntrant,
+    String? dateExpiration,
     String? dateAjout,
     String? dateModif,
     String? personneModif,
@@ -62,6 +65,7 @@ class Intrant {
       descriptionIntrant: descriptionIntrant ?? this.descriptionIntrant,
       photoIntrant: photoIntrant ?? this.photoIntrant,
       statutIntrant: statutIntrant ?? this.statutIntrant,
+      dateExpiration: dateExpiration ?? this.dateExpiration,
       dateAjout: dateAjout ?? this.dateAjout,
       dateModif: dateModif ?? this.dateModif,
       personneModif: personneModif ?? this.personneModif,
@@ -80,6 +84,7 @@ class Intrant {
       'descriptionIntrant': descriptionIntrant,
       'photoIntrant': photoIntrant,
       'statutIntrant': statutIntrant,
+      'dateExpiration': dateExpiration,
       'dateAjout': dateAjout,
       'dateModif': dateModif,
       'personneModif': personneModif,
@@ -98,6 +103,7 @@ class Intrant {
       descriptionIntrant: map['descriptionIntrant'] as String,
       photoIntrant: map['photoIntrant'] != null ? map['photoIntrant'] as String : null,
       statutIntrant: map['statutIntrant'] != null ? map['statutIntrant'] as bool : null,
+      dateExpiration: map['dateExpiration'] != null ? map['dateExpiration'] as String : null,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
       personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
@@ -112,7 +118,7 @@ class Intrant {
 
   @override
   String toString() {
-    return 'Intrant(idIntrant: $idIntrant, nomIntrant: $nomIntrant, quantiteIntrant: $quantiteIntrant, prixIntrant: $prixIntrant, codeIntrant: $codeIntrant, descriptionIntrant: $descriptionIntrant, photoIntrant: $photoIntrant, statutIntrant: $statutIntrant, dateAjout: $dateAjout, dateModif: $dateModif, personneModif: $personneModif, acteur: $acteur, speculation: $speculation)';
+    return 'Intrant(idIntrant: $idIntrant, nomIntrant: $nomIntrant, quantiteIntrant: $quantiteIntrant, prixIntrant: $prixIntrant, codeIntrant: $codeIntrant, descriptionIntrant: $descriptionIntrant, photoIntrant: $photoIntrant, statutIntrant: $statutIntrant, dateExpiration: $dateExpiration, dateAjout: $dateAjout, dateModif: $dateModif, personneModif: $personneModif, acteur: $acteur, speculation: $speculation)';
   }
 
   @override
@@ -128,6 +134,7 @@ class Intrant {
       other.descriptionIntrant == descriptionIntrant &&
       other.photoIntrant == photoIntrant &&
       other.statutIntrant == statutIntrant &&
+      other.dateExpiration == dateExpiration &&
       other.dateAjout == dateAjout &&
       other.dateModif == dateModif &&
       other.personneModif == personneModif &&
@@ -145,6 +152,7 @@ class Intrant {
       descriptionIntrant.hashCode ^
       photoIntrant.hashCode ^
       statutIntrant.hashCode ^
+      dateExpiration.hashCode ^
       dateAjout.hashCode ^
       dateModif.hashCode ^
       personneModif.hashCode ^

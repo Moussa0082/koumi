@@ -7,8 +7,10 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
+import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
@@ -43,11 +45,15 @@ class _AddMaterielState extends State<AddMateriel> {
   String? typeValue;
   late TypeMateriel typeMateriel;
   bool isExist = false;
+   late ParametreGeneraux para;
+  List<ParametreGeneraux> paraList = [];
 
   @override
   void initState() {
     super.initState();
-  
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+    para = paraList[0];
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // _typeList =
     //     http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
@@ -544,7 +550,7 @@ class _AddMaterielState extends State<AddMateriel> {
                           child: Align(
                             alignment: Alignment.topLeft,
                             child: Text(
-                              "Prix par heure",
+                              "PrixPrix (${para.monnaie}) par heure",
                               style: TextStyle(
                                   color: (Colors.black), fontSize: 18),
                             ),

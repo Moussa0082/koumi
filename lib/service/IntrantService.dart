@@ -19,9 +19,11 @@ class IntrantService extends ChangeNotifier {
     required double quantiteIntrant,
     required String descriptionIntrant,
     required int prixIntrant,
+    required String dateExpiration,
     File? photoIntrant,
     required Acteur acteur,
     required Speculation speculation
+
   }) async {
     try {
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
@@ -38,7 +40,8 @@ class IntrantService extends ChangeNotifier {
         'nomIntrant':nomIntrant,
         'quantiteIntrant' : quantiteIntrant,
         'prixIntrant' : prixIntrant,
-        'speculation':speculation,
+        'dateExpiration': dateExpiration,
+        'speculation':speculation.toMap(),
         'descriptionIntrant': descriptionIntrant,
         'photoIntrant': "",
         'acteur': acteur.toMap()
@@ -46,7 +49,7 @@ class IntrantService extends ChangeNotifier {
 
       var response = await requete.send();
       var responsed = await http.Response.fromStream(response);
-
+      debugPrint('intrant avant if ${json.decode(responsed.body)}');
       if (response.statusCode == 200 || responsed.statusCode == 201) {
         final donneesResponse = json.decode(responsed.body);
         debugPrint('intrant service ${donneesResponse.toString()}');
@@ -66,6 +69,7 @@ class IntrantService extends ChangeNotifier {
     required double quantiteIntrant,
     required String descriptionIntrant,
     required int prixIntrant,
+    required  String dateExpiration,
     File? photoIntrant,
     required Acteur acteur,
   }) async {
@@ -83,6 +87,7 @@ class IntrantService extends ChangeNotifier {
         'nomIntrant': nomIntrant,
         'quantiteIntrant': quantiteIntrant,
         'prixIntrant': prixIntrant,
+        'dateExpiration': dateExpiration,
         'descriptionIntrant': descriptionIntrant,
         'photoIntrant': "",
         'acteur': acteur.toMap()
@@ -100,7 +105,7 @@ class IntrantService extends ChangeNotifier {
       }
     } catch (e) {
       throw Exception(
-          'Une erreur s\'est produite lors de l\'ajout de acteur : $e');
+          'Une erreur s\'est produite lors de l\'ajout  : $e');
     }
   }
 
@@ -128,6 +133,27 @@ class IntrantService extends ChangeNotifier {
     Future<List<Intrant>> fetchIntrantByActeur(String idActeur) async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/listeIntrantByActeur/$idActeur'));
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("Fetching data");
+        List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+        intrantList = body.map((e) => Intrant.fromMap(e)).toList();
+        debugPrint(intrantList.toString());
+        return intrantList;
+      } else {
+        intrantList = [];
+        print(
+            'Échec de la requête avec le code d\'état: ${response.statusCode}');
+        throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+    Future<List<Intrant>> fetchIntrantByCategorie(String idCategorie) async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/listeIntrantByCategorie/$idCategorie'));
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Fetching data");

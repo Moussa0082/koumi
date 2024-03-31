@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -10,6 +13,8 @@ import 'package:koumi_app/screens/DetailIntrant.dart';
 import 'package:koumi_app/screens/ListeIntrantByActeur.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class IntrantScreen extends StatefulWidget {
@@ -32,6 +37,10 @@ class _IntrantScreenState extends State<IntrantScreen> {
   List<Intrant> intrantListe = [];
   List<ParametreGeneraux> paraList = [];
   late ParametreGeneraux para = ParametreGeneraux();
+   String? catValue;
+  late Future _typeList;
+    CategorieProduit? selectedType;
+
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -62,6 +71,9 @@ class _IntrantScreenState extends State<IntrantScreen> {
       para = paraList[0];
     }
     _searchController = TextEditingController();
+     _typeList =
+        // http.get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
   }
 
   @override
@@ -153,49 +165,156 @@ class _IntrantScreenState extends State<IntrantScreen> {
                   : null),
       body: SingleChildScrollView(
         child: Column(children: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.search,
-                      color: Colors.blueGrey[400],
-                      size: 28), // Utiliser une icône de recherche plus grande
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Rechercher',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(color: Colors.blueGrey[400]),
+           Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            child: FutureBuilder(
+              future: _typeList,
+              builder: (_, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return DropdownButtonFormField(
+                    items: [],
+                    onChanged: null,
+                    decoration: InputDecoration(
+                      labelText: '-- Aucun categorie trouvé --',
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
+                  );
+                }
+                if (snapshot.hasError) {
+                  return Text("${snapshot.error}");
+                }
+                if (snapshot.hasData) {
+                  dynamic responseData = json.decode(snapshot.data.body);
+                  if (responseData is List) {
+                    final reponse = responseData;
+                    final typeList = reponse
+                        .map((e) => CategorieProduit.fromMap(e))
+                        .where((con) => con.statutCategorie == true)
+                        .toList();
+
+                    if (typeList.isEmpty) {
+                      return DropdownButtonFormField(
+                        items: [],
+                        onChanged: null,
+                        decoration: InputDecoration(
+                          labelText: '-- Aucun categorie trouvé --',
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      );
+                    }
+
+                    return DropdownButtonFormField<String>(
+                      items: typeList
+                          .map(
+                            (e) => DropdownMenuItem(
+                              value: e.idCategorieProduit,
+                              child: Text(e.libelleCategorie!),
+                            ),
+                          )
+                          .toList(),
+                      hint: Text("-- Filtre par type de categorie --"),
+                      value: catValue,
+                      onChanged: (newValue) {
+                        setState(() {
+                          catValue = newValue;
+                          if (newValue != null) {
+                            selectedType = typeList.firstWhere(
+                              (element) => element.idCategorieProduit == newValue,
+                            );
+                          }
+                        });
+                      },
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    );
+                  } else {
+                    return DropdownButtonFormField(
+                      items: [],
+                      onChanged: null,
+                      decoration: InputDecoration(
+                        labelText: '-- Aucun categorie trouvé --',
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    );
+                  }
+                }
+                return DropdownButtonFormField(
+                  items: [],
+                  onChanged: null,
+                  decoration: InputDecoration(
+                    labelText: '-- Aucun categorie trouvé --',
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
-                  // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
-                  IconButton(
-                    icon: Icon(Icons.clear),
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() {});
-                    },
-                  ),
-                ],
-              ),
+                );
+              },
             ),
           ),
-          const SizedBox(height: 10),
+          // Padding(
+          //   padding: const EdgeInsets.all(10.0),
+          //   child: Container(
+          //     padding: EdgeInsets.symmetric(horizontal: 10),
+          //     decoration: BoxDecoration(
+          //       color: Colors.blueGrey[50], // Couleur d'arrière-plan
+          //       borderRadius: BorderRadius.circular(25),
+          //     ),
+          //     child: Row(
+          //       children: [
+          //         Icon(Icons.search,
+          //             color: Colors.blueGrey[400],
+          //             size: 28), // Utiliser une icône de recherche plus grande
+          //         SizedBox(width: 10),
+          //         Expanded(
+          //           child: TextField(
+          //             controller: _searchController,
+          //             onChanged: (value) {
+          //               setState(() {});
+          //             },
+          //             decoration: InputDecoration(
+          //               hintText: 'Rechercher',
+          //               border: InputBorder.none,
+          //               hintStyle: TextStyle(color: Colors.blueGrey[400]),
+          //             ),
+          //           ),
+          //         ),
+          //         // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
+          //         IconButton(
+          //           icon: Icon(Icons.clear),
+          //           onPressed: () {
+          //             _searchController.clear();
+          //             setState(() {});
+          //           },
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
+          // const SizedBox(height: 10),
           Consumer<IntrantService>(builder: (context, intrantService, child) {
             return FutureBuilder(
-                future: intrantService.fetchIntrant(),
+                future: selectedType != null 
+                ?  intrantService.fetchIntrantByCategorie(selectedType!.idCategorieProduit!)
+                : intrantService.fetchIntrant(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
