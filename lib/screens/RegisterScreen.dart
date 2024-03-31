@@ -31,6 +31,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String nomActeur = "";
   String telephone = "";
 
+  String locale = Platform.localeName.split('_').last;
+
   String? typeValue;
   String selectedCountry = '';
   // late TypeActeur monTypeActeur;
@@ -211,6 +213,7 @@ Future<String?> getCurrentCountryFromLocation() async {
 
 
   IntlPhoneField(
+         initialCountryCode: locale,
      controller: telephoneController,
        invalidNumberMessage : "Numéro invalide",
     searchText: "Chercher un pays",
@@ -238,8 +241,52 @@ Future<String?> getCurrentCountryFromLocation() async {
                 child: Text("Numéro WhtasApp", style: TextStyle(color: (Colors.black), fontSize: 18),),
               ),
                 const SizedBox(height: 4,),
+//         Container(
+//   child: Column(
+//     mainAxisAlignment: MainAxisAlignment.center,
+//     children: <Widget>[
+//       InternationalPhoneNumberInput(
+//          initialValue: PhoneNumber(
+//                       isoCode: Platform.localeName.split('_').last,
+//                     ),
+//         formatInput: true,
+//         hintText: "Numéro de téléphone",
+//         maxLength: 20,
+//         errorMessage: "Numéro invalide",
+//         onInputChanged: (PhoneNumber number) {
+//            processedNumber = removePlus(number.phoneNumber!);
+//     // selectedCountry = phone.countryCode;
+//     // print('Country changed to: $selectedCountry');
+//           print(processedNumber);
+//         },
+  
+//         onInputValidated: (bool value) {
+//           print(value);
+//         },
+//         selectorConfig: SelectorConfig(
+//           selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+//           useBottomSheetSafeArea: true,
+//         ),
+//         ignoreBlank: false,
+//         autoValidateMode: AutovalidateMode.disabled,
+//         selectorTextStyle: TextStyle(color: Colors.black),
+//         keyboardType: TextInputType.phone,
+//         inputDecoration: InputDecoration(
+//           border: OutlineInputBorder(
+//             borderRadius: BorderRadius.all(Radius.circular(20)),
+//           ),
+//         ),
+//         onSaved: (PhoneNumber number) {
+//           print('On Saved: $number');
+//         },
+//         textFieldController: controller,
        
+//       ),
+//     ],
+//   ),
+// ),
    IntlPhoneField(
+     initialCountryCode: locale,
     controller: whatsAppController,
     invalidNumberMessage : "Numéro invalide",
     searchText: "Chercher un pays",
