@@ -31,6 +31,24 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
     return true; // Indiquez que l'application peut se fermer
   }
 
+  late PageController pageController;
+
+
+Widget buildPageView() {
+  return PageView(
+    controller: pageController,
+    onPageChanged: (index) {
+      _changeActivePageValue(index);
+    },
+    children: <Widget>[
+   const Accueil(),
+          ProduitScreen(),
+           Panier(),
+          const Profil(),
+    ],
+  );
+}
+
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
@@ -39,7 +57,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
   ];
   List pages = <Widget>[
     const Accueil(),
-    Profil(),
+    ProduitScreen(),
      Panier(),
     const Profil()
   ];
@@ -53,6 +71,8 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
   void _onItemTap(int index) {
     Provider.of<BottomNavigationService>(context, listen: false)
         .changeIndex(index);
+    //  pageController.animateToPage(index, duration: Duration(milliseconds: 500), curve: Curves.ease);
+
   }
 
   @override
@@ -63,6 +83,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
       Provider.of<BottomNavigationService>(context, listen: false)
           .changeIndex(0);
     });
+    pageController = PageController(initialPage: activePageIndex);
   }
   // void _onBackPressed(bool isBackPressed) async {
   //   if (!isBackPressed) {
@@ -84,53 +105,57 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
         toolbarHeight: 0,
         elevation: 0,
       ),
-      body: Consumer<BottomNavigationService>(
-        builder: (context, bottomService, child) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _changeActivePageValue(bottomService.pageIndex);
+      body: PageView(
+        controller: pageController,
+        onPageChanged: (index) {
+          setState(() {
+            activePageIndex = index;
           });
-          return Stack(
-            children: [
-              _buildOffstageNavigator(0),
-              _buildOffstageNavigator(1),
-              _buildOffstageNavigator(2),
-              _buildOffstageNavigator(3)
-            ],
-          );
         },
+        children: [
+          Accueil(),
+          ProduitScreen(),
+          Panier(),
+          Profil(),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        elevation: 5.0,
+        currentIndex: activePageIndex,
+        unselectedItemColor: Colors.black,
+          showUnselectedLabels : true,
+        selectedItemColor: Colors.green[800],
+        onTap: (index) {
+          setState(() {
+            activePageIndex = index;
+            pageController.animateToPage(
+              index,
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          });
+        },
         items: const [
           BottomNavigationBarItem(
-            backgroundColor: d_color,
             icon: Icon(Icons.home_filled),
             label: "Accueil",
+            backgroundColor: d_color
           ),
           BottomNavigationBarItem(
-            backgroundColor: d_color,
             icon: Icon(Icons.agriculture),
             label: "Produit",
+            backgroundColor: d_color
           ),
           BottomNavigationBarItem(
-            backgroundColor: d_color,
             icon: Icon(Icons.shopping_cart),
             label: "Panier",
+            backgroundColor: d_color
           ),
           BottomNavigationBarItem(
-            backgroundColor: d_color,
             icon: Icon(Icons.person_pin),
             label: "Profil",
+            backgroundColor: d_color
           ),
         ],
-        unselectedItemColor: Colors.black,
-        selectedItemColor: Colors.green[800],
-        iconSize: 30,
-        showUnselectedLabels: true,
-        selectedLabelStyle: const TextStyle(color: Colors.black),
-        currentIndex: activePageIndex,
-        onTap: _onItemTap,
       ),
     );
   }
@@ -141,7 +166,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
 
         return [
           const Accueil(),
-          Profil(),
+          ProduitScreen(),
            Panier(),
           const Profil()
         ].elementAt(index);

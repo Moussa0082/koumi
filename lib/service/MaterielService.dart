@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Materiel.dart';
+import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:path/path.dart';
 
 class MaterielService extends ChangeNotifier {
@@ -14,13 +15,14 @@ class MaterielService extends ChangeNotifier {
   List<Materiel> materielList = [];
 
   Future<void> addMateriel({
-    required Map<String, int> prixParHeure,
+    required int prixParHeure,
     required String nom,
     required String description,
     File? photoMateriel,
     required String localisation,
     required String etatMateriel,
     required Acteur acteur,
+    required TypeMateriel typeMateriel,
   }) async {
     try {
       var requete =
@@ -40,6 +42,7 @@ class MaterielService extends ChangeNotifier {
         'localisation': localisation,
         'etatMateriel': etatMateriel,
         'acteur': acteur.toMap(),
+        'typeMateriel': typeMateriel.toMap(),
       });
 
       var response = await requete.send();
@@ -57,16 +60,17 @@ class MaterielService extends ChangeNotifier {
           'Une erreur s\'est produite lors de l\'ajout de acteur : $e');
     }
   }
- 
+
   Future<void> updateMateriel({
     required String idMateriel,
-    required Map<String, int> prixParHeure,
+    required int prixParHeure,
     required String nom,
     required String description,
     File? photoMateriel,
     required String localisation,
     required String etatMateriel,
     required Acteur acteur,
+      required TypeMateriel typeMateriel,
   }) async {
     try {
       var requete = http.MultipartRequest(
@@ -87,6 +91,7 @@ class MaterielService extends ChangeNotifier {
         'localisation': localisation,
         'etatMateriel': etatMateriel,
         'acteur': acteur.toMap(),
+        'typeMateriel': typeMateriel.toMap(),
       });
 
       var response = await requete.send();

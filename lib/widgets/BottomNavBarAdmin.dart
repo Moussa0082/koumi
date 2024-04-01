@@ -51,7 +51,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
 
   List pages = <Widget>[
     const AcceuilAdmin(),
-    ProfilA(),
+    ProduitScreen(),
     Panier(),
     const ProfilA()
   ];
@@ -61,6 +61,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
       activePageIndex = index;
     });
   }
+  
 
 
   void resetIndex(int index) {
@@ -195,7 +196,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
       child: PageView(
         children: [
           const AcceuilAdmin(),
-            const ProduitA(),
+             ProduitScreen(),
              Panier(),
             const ProfilA()
         ],

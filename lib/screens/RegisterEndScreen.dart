@@ -253,16 +253,16 @@ Future<void> _pickImage(ImageSource source) async {
  
         }else{
       await acteurService.creerActeur(
-      nomActeur: nomActeur ?? "",
+      nomActeur: nomActeur,
       adresseActeur: adresse,
-      telephoneActeur: widget.telephoneActeur ?? "",
-      whatsAppActeur: widget.numeroWhatsApp ?? "",
-      niveau3PaysActeur: widget.pays ?? "",
-      localiteActeur: localisation ?? "",
-      emailActeur: emailActeur ?? "",
-      typeActeur: typeActeur ?? [],
-      password: password ?? "",
-      speculations: listeSpeculations ?? [],
+      telephoneActeur: widget.telephoneActeur!,
+      whatsAppActeur: widget.numeroWhatsApp!,
+      niveau3PaysActeur: widget.pays!,
+      localiteActeur: localisation,
+      emailActeur: emailActeur,
+      typeActeur: typeActeur,
+      password: password,
+      speculations: listeSpeculations,
       
         ).then((value) => 
          showDialog(

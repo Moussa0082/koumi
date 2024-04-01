@@ -397,11 +397,12 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
     ),
     chipConfig: const ChipConfig(wrapType: WrapType.wrap),
  responseParser: (response) {
-   typeActeur = (response as List<dynamic>).where((data)  =>
-              (data as Map<String, dynamic>)['libelle']
-                  .trim()
-                  .toLowerCase() !=
-              'admin')
+   typeActeur = (response as List<dynamic>)
+  //  .where((data)  =>
+  //             (data as Map<String, dynamic>)['libelle'].trim().toLowerCase())
+              //     .trim()
+              //     .toLowerCase() !=
+              // 'admin')
    .map((e) {
     return TypeActeur(
       idTypeActeur: e['idTypeActeur'] as String,

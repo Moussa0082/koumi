@@ -1,10 +1,11 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:koumi_app/models/Acteur.dart';
 
 class Conseil {
   final String? idConseil;
-  final String codeConseil;
+  final String? codeConseil;
   final String titreConseil;
   final String? videoConseil;
   final String? photoConseil;
@@ -15,10 +16,9 @@ class Conseil {
   final String? audioConseil;
   final bool statutConseil;
   final Acteur acteur;
-
   Conseil({
     this.idConseil,
-    required this.codeConseil,
+    this.codeConseil,
     required this.titreConseil,
     this.videoConseil,
     this.photoConseil,
@@ -30,6 +30,7 @@ class Conseil {
     required this.statutConseil,
     required this.acteur,
   });
+
 
   Conseil copyWith({
     String? idConseil,
@@ -81,7 +82,7 @@ class Conseil {
   factory Conseil.fromMap(Map<String, dynamic> map) {
     return Conseil(
       idConseil: map['idConseil'] != null ? map['idConseil'] as String : null,
-      codeConseil: map['codeConseil'] as String,
+      codeConseil: map['codeConseil'] != null ? map['codeConseil'] as String : null,
       titreConseil: map['titreConseil'] as String,
       videoConseil: map['videoConseil'] != null ? map['videoConseil'] as String : null,
       photoConseil: map['photoConseil'] != null ? map['photoConseil'] as String : null,

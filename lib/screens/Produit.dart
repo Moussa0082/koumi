@@ -149,7 +149,7 @@ class _ProduitScreenState extends State<ProduitScreen>
               ? categorieProduit.first.idCategorieProduit!
               : '';
           selectedCategorieProduitNom = categorieProduit.isNotEmpty
-              ? categorieProduit[_tabController!.index].libelleCategorie
+              ? categorieProduit[_tabController!.index].libelleCategorie!
               : '';
           fetchProduitByCategorie(selectedCategorieProduit, widget.id!);
         });
@@ -170,7 +170,7 @@ class _ProduitScreenState extends State<ProduitScreen>
       selectedCategorieProduit =
           categorieProduit[_tabController!.index].idCategorieProduit!;
       selectedCategorieProduitNom =
-          categorieProduit[_tabController!.index].libelleCategorie;
+categorieProduit[_tabController!.index].libelleCategorie!;
     isExist ? fetchProduitByCategorie(selectedCategorieProduit, widget.id!) : null;
       debugPrint("Cat id : " + selectedCategorieProduit);
     }
@@ -252,11 +252,11 @@ class _ProduitScreenState extends State<ProduitScreen>
         ],
           centerTitle: true,
           toolbarHeight: 100,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+          // leading: IconButton(
+          //     onPressed: () {
+          //       Navigator.of(context).pop();
+          //     },
+          //     icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
             'Produits',
             style: const TextStyle(

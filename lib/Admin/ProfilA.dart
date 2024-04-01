@@ -8,6 +8,7 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
+import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -316,7 +317,7 @@ class _ProfilAState extends State<ProfilA> {
                           await SharedPreferences.getInstance();
                       await prefs.clear();
 
-                      Get.off(LoginScreen(),
+                      Get.off(BottomNavigationPage(),
                           duration: Duration(
                               seconds:
                                   1), //duration of transitions, default 1 sec

@@ -10,8 +10,10 @@ import 'package:koumi_app/screens/SplashScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/CategorieService.dart';
+import 'package:koumi_app/service/ConseilService.dart';
 import 'package:koumi_app/service/ContinentService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
+import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/service/MagasinService.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:koumi_app/service/MessageService.dart';
@@ -50,6 +52,9 @@ void main() {
     ChangeNotifierProvider(create: (context) => ParametreFicheService()),
     ChangeNotifierProvider(create: (context) => ZoneProductionService()),
     ChangeNotifierProvider(create: (context) => PaysService()),
+    ChangeNotifierProvider(create: (context) => ConseilService()),
+    ChangeNotifierProvider(create: (context) => TypeMaterielService()),
+    ChangeNotifierProvider(create: (context) => IntrantService()),                                                                                                                                                                                                                                                                                                                         ChangeNotifierProvider(create: (context) => TypeVoitureService()),
     ChangeNotifierProvider(create: (context) => TypeMaterielService()),                                                                                                                                                                                                                                                                                                                                         ChangeNotifierProvider(create: (context) => TypeVoitureService()),
     ChangeNotifierProvider(create: (context) => MessageService()),
     ChangeNotifierProvider(create: (context) => MaterielService()),

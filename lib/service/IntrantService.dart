@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Intrant.dart';
+import 'package:koumi_app/models/Speculation.dart';
 import 'package:path/path.dart';
 
 
@@ -15,10 +16,12 @@ class IntrantService extends ChangeNotifier {
 
   Future<void> creerIntrant({
     required String nomIntrant,
-    required String quantiteIntrant,
+    required double quantiteIntrant,
     required String descriptionIntrant,
+    required int prixIntrant,
     File? photoIntrant,
     required Acteur acteur,
+    required Speculation speculation
   }) async {
     try {
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
@@ -34,6 +37,8 @@ class IntrantService extends ChangeNotifier {
       requete.fields['intrant'] = jsonEncode({
         'nomIntrant':nomIntrant,
         'quantiteIntrant' : quantiteIntrant,
+        'prixIntrant' : prixIntrant,
+        'speculation':speculation,
         'descriptionIntrant': descriptionIntrant,
         'photoIntrant': "",
         'acteur': acteur.toMap()
@@ -58,8 +63,9 @@ class IntrantService extends ChangeNotifier {
     Future<void> updateIntrant({
     required String idIntrant,
     required String nomIntrant,
-    required String quantiteIntrant,
+    required double quantiteIntrant,
     required String descriptionIntrant,
+    required int prixIntrant,
     File? photoIntrant,
     required Acteur acteur,
   }) async {
@@ -75,7 +81,8 @@ class IntrantService extends ChangeNotifier {
       requete.fields['intrant'] = jsonEncode({
         'idIntrant' : idIntrant,
         'nomIntrant': nomIntrant,
-        'quantiteIntrant': int.tryParse(quantiteIntrant),
+        'quantiteIntrant': quantiteIntrant,
+        'prixIntrant': prixIntrant,
         'descriptionIntrant': descriptionIntrant,
         'photoIntrant': "",
         'acteur': acteur.toMap()
@@ -151,7 +158,7 @@ class IntrantService extends ChangeNotifier {
   }
 
   Future activerIntrant(String idActeur) async {
-    final response = await http.post(Uri.parse('$baseUrl/activer/$idActeur'));
+    final response = await http.put(Uri.parse('$baseUrl/activer/$idActeur'));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
@@ -162,7 +169,7 @@ class IntrantService extends ChangeNotifier {
   }
 
   Future desactiverIntrant(String idIntrant) async {
-    final response = await http.post(Uri.parse('$baseUrl/desactiver/$idIntrant'));
+    final response = await http.put(Uri.parse('$baseUrl/desactiver/$idIntrant'));
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();

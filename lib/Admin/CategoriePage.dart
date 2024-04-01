@@ -13,7 +13,7 @@ import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
 import 'package:koumi_app/service/SpeculationService.dart';
 import 'package:provider/provider.dart';
-
+ 
 class CategoriPage extends StatefulWidget {
   const CategoriPage({super.key});
 
@@ -207,7 +207,7 @@ class _CategoriPageState extends State<CategoriPage> {
                         String searchText = "";
                         List<CategorieProduit> filteredCatSearch =
                             categorieList.where((cate) {
-                          String nomCat = cate.libelleCategorie.toLowerCase();
+                          String nomCat = cate.libelleCategorie!.toLowerCase();
                           searchText = _searchController.text.toLowerCase();
                           return nomCat.contains(searchText);
                         }).toList();
@@ -277,7 +277,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                                               .filiere!
                                                               .libelleFiliere),
                                                       title: Text(
-                                                          e.libelleCategorie
+                                                          e.libelleCategorie!
                                                               .toUpperCase(),
                                                           style:
                                                               const TextStyle(
@@ -1132,7 +1132,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                       .map(
                                         (e) => DropdownMenuItem(
                                           value: e.idCategorieProduit,
-                                          child: Text(e.libelleCategorie),
+                                          child: Text(e.libelleCategorie!),
                                         ),
                                       )
                                       .toList(),

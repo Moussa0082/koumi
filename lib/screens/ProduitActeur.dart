@@ -85,7 +85,7 @@ class _ProduitActeurScreenState extends State<ProduitActeurScreen>  with TickerP
           selectedCategorieProduit =
               categorieProduit.isNotEmpty ? categorieProduit.first.idCategorieProduit! : '';
           selectedCategorieProduitNom =
-              categorieProduit.isNotEmpty ? categorieProduit[_tabController!.index].libelleCategorie : '';
+              categorieProduit.isNotEmpty ? categorieProduit[_tabController!.index].libelleCategorie! : '';
           fetchProduitByCategorie(selectedCategorieProduit, widget.id!, acteur.idActeur!);
         });
         debugPrint("Id Cat : ${categorieProduit.map((e) => e.idCategorieProduit)}");
@@ -104,7 +104,7 @@ class _ProduitActeurScreenState extends State<ProduitActeurScreen>  with TickerP
       selectedCategorieProduit =
           categorieProduit[_tabController!.index].idCategorieProduit!;
       selectedCategorieProduitNom =
-          categorieProduit[_tabController!.index].libelleCategorie;
+          categorieProduit[_tabController!.index].libelleCategorie!;
       fetchProduitByCategorie(selectedCategorieProduit, widget.id!, acteur.idActeur!);
       debugPrint("Cat id : " + selectedCategorieProduit);
     }

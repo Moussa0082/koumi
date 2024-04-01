@@ -33,6 +33,7 @@ dependencies:
   image_picker: ^1.0.4
   path_provider: ^2.1.1
   fluttertoast: ^8.2.4
+  sim_data_plus: ^0.1.4
   permission_handler: ^11.0.1
   flutter_launcher_icons: ^0.13.1
   flutter_pin_code_widget: ^0.1.0
@@ -83,6 +84,11 @@ dependencies:
   readmore: ^2.2.0
   url_launcher: ^6.2.5
   font_awesome_flutter: ^10.7.0
+  flutter_sound: ^9.2.13
+  audioplayers: ^5.2.1
+  video_player: ^2.8.3
+  flick_video_player: ^0.5.0
+  video_uploader: ^1.2.1
 
 dev_dependencies:
   flutter_test:

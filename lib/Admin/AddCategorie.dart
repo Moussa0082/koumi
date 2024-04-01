@@ -153,7 +153,7 @@ class _AddCategorieState extends State<AddCategorie> {
                           String searchText = "";
                           List<CategorieProduit> filteredCatSearch =
                               categorieList.where((cate) {
-                            String nomCat = cate.libelleCategorie.toLowerCase();
+                            String nomCat = cate.libelleCategorie!.toLowerCase();
                             searchText = _searchController.text.toLowerCase();
                             return nomCat.contains(searchText);
                           }).toList();
@@ -187,7 +187,7 @@ class _AddCategorieState extends State<AddCategorie> {
                                                   leading: _getIconForFiliere(e
                                                       .filiere!.libelleFiliere),
                                                   title: Text(
-                                                      e.libelleCategorie
+                                                      e.libelleCategorie!
                                                           .toUpperCase(),
                                                       style: const TextStyle(
                                                         color: Colors.black,

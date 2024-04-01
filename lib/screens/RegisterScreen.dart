@@ -4,12 +4,15 @@ import 'dart:io';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:sim_data_plus/sim_data.dart';
+
 // import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:http/http.dart' as http;
 
@@ -59,6 +62,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     
   ]; 
 
+  
+
    void getPhoneNumber(String phoneNumber) async {
     PhoneNumber number =
         await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber, 'US');
@@ -100,6 +105,9 @@ Future<String?> getCurrentCountryFromLocation() async {
   TextEditingController typeActeurController = TextEditingController();
 
  
+
+ 
+
 
   String removePlus(String phoneNumber) {
   if (phoneNumber.startsWith('+')) {
@@ -208,13 +216,12 @@ Future<String?> getCurrentCountryFromLocation() async {
                      Padding(
   padding: const EdgeInsets.only(left:10.0),
   child: Text("Téléphone *", style: TextStyle(color: (Colors.black), fontSize: 18),),
-),
+     ),
                       const SizedBox(height: 5,),
 
 
   IntlPhoneField(
-         initialCountryCode: locale,
-     controller: telephoneController,
+           initialCountryCode: number.isoCode, // Automatically detect user's country
        invalidNumberMessage : "Numéro invalide",
     searchText: "Chercher un pays",
                    decoration: InputDecoration(
@@ -286,7 +293,7 @@ Future<String?> getCurrentCountryFromLocation() async {
 //   ),
 // ),
    IntlPhoneField(
-     initialCountryCode: locale,
+  initialCountryCode: number.isoCode, // Automatically detect user's country
     controller: whatsAppController,
     invalidNumberMessage : "Numéro invalide",
     searchText: "Chercher un pays",
@@ -323,7 +330,7 @@ Future<String?> getCurrentCountryFromLocation() async {
                 Navigator.push(context, MaterialPageRoute(builder: (context) =>  
                 RegisterNextScreen(nomActeur: nomActeurController.text,
                 whatsAppActeur: processedNumberTel,
-                 telephone: processedNumber , pays: selectedCountry,) ));
+                 telephone: processedNumberTel, pays: selectedCountry,) ));
               
                 }
                },

@@ -13,8 +13,8 @@ class ConseilService extends ChangeNotifier {
 
   List<Conseil> conseilList = [];
 
-  static Future<void> creerConseil(
-      {required String titreConseil,
+   Future<void> creerConseil({
+      required String titreConseil,
       required String descriptionConseil,
       File? audioConseil,
       File? photoConseil,
@@ -42,9 +42,9 @@ class ConseilService extends ChangeNotifier {
       requete.fields['conseil'] = jsonEncode({
         'titreConseil': titreConseil,
         'descriptionConseil': descriptionConseil,
-        'audioConseil' : audioConseil,
-        'photoConseil' : photoConseil,
-        'videoConseil' : videoConseil,
+        'audioConseil' : '',
+        'photoConseil' : '',
+        'videoConseil' : '',
         'acteur' : acteur.toMap(),
       });
 

@@ -6,35 +6,33 @@ import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 
 class Acteur {
-
-     final String? idActeur;
-    final String? resetToken;
-    final String? tokenCreationDate;
-    final String? codeActeur;
-    final String? nomActeur;
-    final String? adresseActeur;
-    final String? telephoneActeur;
-    final String? whatsAppActeur;
-    final String? latitude;
-    final String? longitude;
-    final String? photoSiegeActeur;
-    final String? logoActeur;
-    final String? niveau3PaysActeur;
-    final String? password;
-    final String? dateAjout;
-    final String? dateModif;
-    final String? personneModif;
-    final String? localiteActeur;
-    final String? emailActeur;
-    final bool? statutActeur;
-    final List<Speculation>? speculations;
-    final List<TypeActeur>? typeActeur;
+  final String? idActeur;
+  final String? resetToken;
+  final String? tokenCreationDate;
+  final String? codeActeur;
+  final String? nomActeur;
+  final String? adresseActeur;
+  final String? telephoneActeur;
+  final String? whatsAppActeur;
+  final String? latitude;
+  final String? longitude;
+  final String? photoSiegeActeur;
+  final String? logoActeur;
+  final String? niveau3PaysActeur;
+  final String? password;
+  final String? dateAjout;
+  final String? dateModif;
+  final String? personneModif;
+  final String? localiteActeur;
+  final String? emailActeur;
+  final bool? statutActeur;
+  final List<Speculation>? speculations;
+  final List<TypeActeur>? typeActeur;
 
   Acteur({
     this.idActeur,
     this.resetToken,
     this.tokenCreationDate,
-
     this.codeActeur,
     this.nomActeur,
     this.adresseActeur,
@@ -56,31 +54,38 @@ class Acteur {
     this.typeActeur,
   });
 
-
-
 // Constructeur vide
   // Acteur();
 
- // Méthode pour créer une instance d'Acteur à partir des données de SharedPreferences
-  factory Acteur.fromSharedPreferencesData(String emailActeur, String password, 
-  List<String> userTypeList, String idActeur, String nomActeur, String telephoneActeur,
-   String adressActeur, String whatsAppActeur, String niveau3PaysActeur,
-    String localiteActeur) {
+  // Méthode pour créer une instance d'Acteur à partir des données de SharedPreferences
+  factory Acteur.fromSharedPreferencesData(
+      String emailActeur,
+      String password,
+      List<String> userTypeList,
+      String idActeur,
+      String nomActeur,
+      String telephoneActeur,
+      String adressActeur,
+      String whatsAppActeur,
+      String niveau3PaysActeur,
+      String localiteActeur) {
     // Créez une liste de TypeActeur à partir de la liste de chaînes userTypeList
-    List<TypeActeur> typeActeurList = userTypeList.map((libelle) => TypeActeur(libelle: libelle)).toList();
+    List<TypeActeur> typeActeurList =
+        userTypeList.map((libelle) => TypeActeur(libelle: libelle)).toList();
 
     // Retournez une nouvelle instance d'Acteur avec les données fournies
     return Acteur(
-      // Initialiser les autres propriétés de l'acteur selon vos besoins
-      emailActeur: emailActeur,
-      password: password,
-      typeActeur: typeActeurList, 
-      idActeur:idActeur,
-      nomActeur: nomActeur, 
-      adresseActeur: adressActeur,telephoneActeur: telephoneActeur,
-      whatsAppActeur:whatsAppActeur, niveau3PaysActeur: niveau3PaysActeur, 
-      localiteActeur:localiteActeur 
-    );
+        // Initialiser les autres propriétés de l'acteur selon vos besoins
+        emailActeur: emailActeur,
+        password: password,
+        typeActeur: typeActeurList,
+        idActeur: idActeur,
+        nomActeur: nomActeur,
+        adresseActeur: adressActeur,
+        telephoneActeur: telephoneActeur,
+        whatsAppActeur: whatsAppActeur,
+        niveau3PaysActeur: niveau3PaysActeur,
+        localiteActeur: localiteActeur);
   }
 
   Acteur copyWith({
@@ -108,7 +113,6 @@ class Acteur {
     List<TypeActeur>? typeActeur,
   }) {
     return Acteur(
-
       idActeur: idActeur ?? this.idActeur,
       resetToken: resetToken ?? this.resetToken,
       tokenCreationDate: tokenCreationDate ?? this.tokenCreationDate,
@@ -134,7 +138,7 @@ class Acteur {
     );
   }
 
- Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'idActeur': idActeur,
       'resetToken': resetToken,
@@ -161,9 +165,7 @@ class Acteur {
     };
   }
 
-
-
-   factory Acteur.fromMap(Map<String, dynamic> map) {
+  factory Acteur.fromMap(Map<String, dynamic> map) {
     return Acteur(
       idActeur: map['idActeur'],
       resetToken: map['resetToken'],
@@ -196,7 +198,7 @@ class Acteur {
     );
   }
 
-   factory Acteur.fromJson(Map<String, dynamic> json) => Acteur(
+  factory Acteur.fromJson(Map<String, dynamic> json) => Acteur(
         idActeur: json["idActeur"],
         resetToken: json["resetToken"],
         tokenCreationDate: json["tokenCreationDate"],
@@ -217,14 +219,14 @@ class Acteur {
         localiteActeur: json["localiteActeur"],
         emailActeur: json["emailActeur"],
         statutActeur: json["statutActeur"],
-       typeActeur: (json['typeActeur'] as List)
-          .map((type) => TypeActeur.fromJson(type))
-          .toList(), 
-       speculations: (json['speculations'] as List)
-          .map((speculation) => Speculation.fromJson(speculation))
-          .toList(), 
-          // typeActeur: List<TypeActeur>.from(json["typeActeur"].map((x) => TypeActeur.fromJson(x))),
-    );
+        typeActeur: (json['typeActeur'] as List)
+            .map((type) => TypeActeur.fromJson(type))
+            .toList(),
+        speculations: (json['speculations'] as List)
+            .map((speculation) => Speculation.fromJson(speculation))
+            .toList(),
+        // typeActeur: List<TypeActeur>.from(json["typeActeur"].map((x) => TypeActeur.fromJson(x))),
+      );
 
   String toJson() => json.encode(toMap());
 
@@ -238,55 +240,54 @@ class Acteur {
   @override
   bool operator ==(covariant Acteur other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.idActeur == idActeur &&
-      other.resetToken == resetToken &&
-      other.tokenCreationDate == tokenCreationDate &&
-      other.codeActeur == codeActeur &&
-      other.nomActeur == nomActeur &&
-      other.adresseActeur == adresseActeur &&
-      other.telephoneActeur == telephoneActeur &&
-      other.whatsAppActeur == whatsAppActeur &&
-      other.latitude == latitude &&
-      other.longitude == longitude &&
-      other.photoSiegeActeur == photoSiegeActeur &&
-      other.logoActeur == logoActeur &&
-      other.niveau3PaysActeur == niveau3PaysActeur &&
-      other.password == password &&
-      other.dateAjout == dateAjout &&
-      other.dateModif == dateModif &&
-      other.personneModif == personneModif &&
-      other.localiteActeur == localiteActeur &&
-      other.emailActeur == emailActeur &&
-      other.statutActeur == statutActeur &&
-      listEquals(other.speculations, speculations) &&
-      listEquals(other.typeActeur, typeActeur);
+
+    return other.idActeur == idActeur &&
+        other.resetToken == resetToken &&
+        other.tokenCreationDate == tokenCreationDate &&
+        other.codeActeur == codeActeur &&
+        other.nomActeur == nomActeur &&
+        other.adresseActeur == adresseActeur &&
+        other.telephoneActeur == telephoneActeur &&
+        other.whatsAppActeur == whatsAppActeur &&
+        other.latitude == latitude &&
+        other.longitude == longitude &&
+        other.photoSiegeActeur == photoSiegeActeur &&
+        other.logoActeur == logoActeur &&
+        other.niveau3PaysActeur == niveau3PaysActeur &&
+        other.password == password &&
+        other.dateAjout == dateAjout &&
+        other.dateModif == dateModif &&
+        other.personneModif == personneModif &&
+        other.localiteActeur == localiteActeur &&
+        other.emailActeur == emailActeur &&
+        other.statutActeur == statutActeur &&
+        listEquals(other.speculations, speculations) &&
+        listEquals(other.typeActeur, typeActeur);
   }
 
   @override
   int get hashCode {
     return idActeur.hashCode ^
-      resetToken.hashCode ^
-      tokenCreationDate.hashCode ^
-      codeActeur.hashCode ^
-      nomActeur.hashCode ^
-      adresseActeur.hashCode ^
-      telephoneActeur.hashCode ^
-      whatsAppActeur.hashCode ^
-      latitude.hashCode ^
-      longitude.hashCode ^
-      photoSiegeActeur.hashCode ^
-      logoActeur.hashCode ^
-      niveau3PaysActeur.hashCode ^
-      password.hashCode ^
-      dateAjout.hashCode ^
-      dateModif.hashCode ^
-      personneModif.hashCode ^
-      localiteActeur.hashCode ^
-      emailActeur.hashCode ^
-      statutActeur.hashCode ^
-      speculations.hashCode ^
-      typeActeur.hashCode;
+        resetToken.hashCode ^
+        tokenCreationDate.hashCode ^
+        codeActeur.hashCode ^
+        nomActeur.hashCode ^
+        adresseActeur.hashCode ^
+        telephoneActeur.hashCode ^
+        whatsAppActeur.hashCode ^
+        latitude.hashCode ^
+        longitude.hashCode ^
+        photoSiegeActeur.hashCode ^
+        logoActeur.hashCode ^
+        niveau3PaysActeur.hashCode ^
+        password.hashCode ^
+        dateAjout.hashCode ^
+        dateModif.hashCode ^
+        personneModif.hashCode ^
+        localiteActeur.hashCode ^
+        emailActeur.hashCode ^
+        statutActeur.hashCode ^
+        speculations.hashCode ^
+        typeActeur.hashCode;
   }
 }

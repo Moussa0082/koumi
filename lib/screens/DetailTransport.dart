@@ -123,7 +123,7 @@ class _DetailTransportState extends State<DetailTransport> {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
 
-    if (paraList != null && paraList.isNotEmpty) {
+    if (paraList.isNotEmpty) {
       para = paraList[0];
     } else {
       // Gérer le cas où la liste est null ou vide, par exemple :
@@ -138,9 +138,9 @@ class _DetailTransportState extends State<DetailTransport> {
     //     .parametreList!;
     // para = paraList[0];
     verifyParam();
-    // _niveau3List =
-    //     http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
     _niveau3List =
+        // http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
+
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
     vehicules = widget.vehicule;
     typeVoiture = vehicules.typeVoiture;
@@ -625,7 +625,7 @@ class _DetailTransportState extends State<DetailTransport> {
                                 fit: BoxFit.cover,
                               )
                             : Image.asset(
-                                "assets/images/camion.png",
+                                "assets/images/default_image.png",
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                                 height: 200,
@@ -1024,8 +1024,6 @@ class _DetailTransportState extends State<DetailTransport> {
               ),
             ],
           )
-
-          // Divider(),
         ],
       ),
     );
