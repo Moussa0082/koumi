@@ -343,7 +343,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             child: Center(child: Text("Aucun donné trouvé")),
                           )
                         : Wrap(
-                            children: filtereSearch
+                            children: filtereSearch.where((element) => element.statutIntrant! == true)
                                 .map((e) => Padding(
                                       padding: EdgeInsets.all(10),
                                       child: SizedBox(
