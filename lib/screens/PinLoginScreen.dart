@@ -53,26 +53,27 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
   setState(() {
     isLoading = true;
   });
-  await connexionActeurWithPin().then((_){
+  await loginUser().then((_){
    setState(() {
      isLoading = false;
    });
   });
  }
 
- Future connexionActeurWithPin() async {
+
+   Future<void> loginUser() async {
+
 
     // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
     const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/pinLogin';
 
     const String defaultProfileImage = 'assets/images/profil.jpg';
 
-
-     ActeurProvider acteurProvider =
+    ActeurProvider acteurProvider =
         Provider.of<ActeurProvider>(context, listen: false);
-   
-     prefs = await SharedPreferences.getInstance();
-  // Récupérer le codeActeur depuis SharedPreferences
+        prefs = await SharedPreferences.getInstance();
+
+   // Récupérer le codeActeur depuis SharedPreferences
   String? codeActeur = prefs.getString('codeActeur');
 
   // Vérifier si le codeActeur est présent dans SharedPreferences
@@ -116,10 +117,24 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
       if (response.statusCode == 200) {
        
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
-        debugPrint("Acteur : $responseBody");
-           final nomActeur = responseBody['nomActeur'];  
-           final password = responseBody['password'];  
-           final emailActeur = responseBody['emailActeur'];
+
+
+        // Sauvegarder les données de l'utilisateur dans shared preferences
+       prefs = await SharedPreferences.getInstance();
+        final password = responseBody['password'];
+        final emailActeur = responseBody['emailActeur'];
+        prefs.setString('emailActeur', emailActeur);
+        prefs.setString('password', password);
+        // prefs.setString('nomActeur', responseBody['nomActeur']);
+        // Vérifier si l'image de profil est présente, sinon, enregistrer l'image par défaut dans SharedPreferences
+
+        // if (logoActeur == null) {
+        //   prefs.setString('logoActeur', defaultProfileImage);
+        // }
+        // if (photoSiegeActeur == null) {
+        //   prefs.setString('photoSiegeActeur', defaultProfileImage);
+        // }
+        final nomActeur = responseBody['nomActeur'];
         final idActeur = responseBody['idActeur'];
         final adresseActeur = responseBody['adresseActeur'];
         final telephoneActeur = responseBody['telephoneActeur'];
@@ -130,7 +145,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
 
         prefs.setString('nomActeur', nomActeur);
         prefs.setString('idActeur', idActeur);
-                prefs.setString('password', password);
+        //  prefs.setString('resetToken', responseBody['resetToken']);
         //  prefs.setString('codeActeur', responseBody['codeActeur']);
         prefs.setString('adresseActeur', adresseActeur);
         prefs.setString('telephoneActeur', telephoneActeur);
@@ -138,6 +153,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
 
         prefs.setString('niveau3PaysActeur', niveau3PaysActeur);
         prefs.setString('localiteActeur', localiteActeur);
+        // Enregistrer la liste des types d'utilisateur dans SharedPreferences
 
         // Enregistrer la liste des types d'utilisateur dans SharedPreferences
 
@@ -148,16 +164,8 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         List<String> userTypeLabels =
             typeActeurList.map((typeActeur) => typeActeur.libelle!).toList();
 
-//         List<dynamic> speculationActeurData = responseBody['typeActeur'];
-//         List<Speculation> speculationActeurList =
-//             speculationActeurData.map((data) => Speculation.fromMap(data)).toList();
-// // Extraire les libellés des types d'utilisateur et les ajouter à une nouvelle liste de chaînes
-//         List<String> userSpecLabels =
-//             speculationActeurList.map((speculation) => speculation.nomSpeculation!).toList();
-
 // Enregistrer la liste des libellés des types d'utilisateur dans SharedPreferences
         prefs.setStringList('userType', userTypeLabels);
-        // prefs.setStringList('speculations', userSpecLabels);
         Acteur acteur = Acteur(
           idActeur: responseBody['idActeur'],
           nomActeur: responseBody['nomActeur'],
@@ -173,8 +181,6 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
           typeActeur: typeActeurList,
           password: password,
         );
-
-
 
         acteurProvider.setActeur(acteur);
 
@@ -204,7 +210,7 @@ Navigator.pushReplacement(
             return AlertDialog(
               title: const Center(child: Text('Connexion échouée !')),
               content: Text(
-                'Code pin incorrect',
+                'Coe pin incorrect',
                 // errorMessage,
                 textAlign: TextAlign.justify,
                 style: const TextStyle(color: Colors.black, fontSize: 20),
@@ -247,6 +253,7 @@ Navigator.pushReplacement(
       );
     }
   }
+
 
   /// this widget will be use for each digit
   Widget numButton(int number) {
