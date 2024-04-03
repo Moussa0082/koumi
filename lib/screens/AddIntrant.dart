@@ -12,6 +12,7 @@ import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/screens/NextAddIntrat.dart';
 import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/service/SpeculationService.dart';
@@ -230,9 +231,7 @@ class _AddIntrantState extends State<AddIntrant> {
                                   ),
                                 );
                               }
-                              if (snapshot.hasError) {
-                                return Text("${snapshot.error}");
-                              }
+
                               if (snapshot.hasData) {
                                 List<CategorieProduit> catList =
                                     snapshot.data as List<CategorieProduit>;
@@ -514,63 +513,6 @@ class _AddIntrantState extends State<AddIntrant> {
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: Text(
-                          "Date de péremption",
-                          style: TextStyle(color: (Colors.black), fontSize: 18),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      child: TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: _dateController,
-                        decoration: InputDecoration(
-                          hintText: 'Sélectionner la date',
-                          prefixIcon: const Icon(
-                            Icons.date_range,
-                            color: d_colorGreen,
-                            size: 30.0,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        onTap: () async {
-                          DateTime? pickedDate = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(1950),
-                              lastDate: DateTime(2100));
-                          if (pickedDate != null) {
-                            print(pickedDate);
-                            String formattedDate =
-                                DateFormat('yyyy-MM-dd').format(pickedDate);
-                            print(formattedDate);
-                            setState(() {
-                              _dateController.text = formattedDate;
-                            });
-                          } else {}
-                        },
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 22,
-                      ),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
                           "Quantite (paquets)",
                           style: TextStyle(color: (Colors.black), fontSize: 18),
                         ),
@@ -601,73 +543,6 @@ class _AddIntrantState extends State<AddIntrant> {
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 22,
-                      ),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          "Prix (${para.monnaie}) intrant",
-                          style: TextStyle(color: (Colors.black), fontSize: 18),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      child: TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: _prixController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                        decoration: InputDecoration(
-                          hintText: "Prix intrant",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    SizedBox(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 10.0),
-                        child: photo != null
-                            ? GestureDetector(
-                                onTap: _showImageSourceDialog,
-                                child: Image.file(
-                                  photo!,
-                                  fit: BoxFit.fitWidth,
-                                  height: 150,
-                                  width: 300,
-                                ),
-                              )
-                            : SizedBox(
-                                child: IconButton(
-                                  onPressed: _showImageSourceDialog,
-                                  icon: const Icon(
-                                    Icons.add_a_photo_rounded,
-                                    size: 60,
-                                  ),
-                                ),
-                              ),
-                      ),
-                    ),
                     const SizedBox(height: 20),
                     ElevatedButton(
                         onPressed: () async {
@@ -676,154 +551,25 @@ class _AddIntrantState extends State<AddIntrant> {
                               _descriptionController.text;
                           final double quantite =
                               double.tryParse(_quantiteController.text) ?? 0.0;
-                          final int prix =
-                              int.tryParse(_prixController.text) ?? 0;
-                          final String date = _dateController.text;
 
                           if (formkey.currentState!.validate()) {
-                            try {
-                              setState(() {
-                                _isLoading = true;
-                              });
-                              if (photo != null) {
-                                await IntrantService()
-                                    .creerIntrant(
-                                        nomIntrant: nom,
-                                        quantiteIntrant: quantite,
-                                        descriptionIntrant: description,
-                                        prixIntrant: prix,
-                                        photoIntrant: photo,
-                                        dateExpiration: date,
-                                        speculation: speculation,
-                                        acteur: acteur)
-                                    .then((value) => {
-                                          Provider.of<IntrantService>(context,
-                                                  listen: false)
-                                              .applyChange(),
-                                          _nomController.clear(),
-                                          _descriptionController.clear(),
-                                          _quantiteController.clear(),
-                                          _prixController.clear(),
-                                          setState(() {
-                                            _isLoading = false;
-                                            speValue = null;
-                                            catValue = null;
-                                          }),
-                                          Navigator.pop(context),
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  Text(
-                                                    "Intant ajouté avec succèss",
-                                                    style: TextStyle(
-                                                        overflow: TextOverflow
-                                                            .ellipsis),
-                                                  ),
-                                                ],
-                                              ),
-                                              duration: Duration(seconds: 5),
-                                            ),
-                                          )
-                                        })
-                                    .catchError((onError) => {
-                                          print('Erreur :${onError.message}'),
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  Text(
-                                                    "Une erreur s'est produite",
-                                                    style: TextStyle(
-                                                        overflow: TextOverflow
-                                                            .ellipsis),
-                                                  ),
-                                                ],
-                                              ),
-                                              duration: Duration(seconds: 5),
-                                            ),
-                                          )
-                                        });
-                              } else {
-                                await IntrantService()
-                                    .creerIntrant(
-                                        nomIntrant: nom,
-                                        quantiteIntrant: quantite,
-                                        descriptionIntrant: description,
-                                        prixIntrant: prix,
-                                        dateExpiration: date,
-                                        speculation: speculation,
-                                        acteur: acteur)
-                                    .then((value) => {
-                                          Provider.of<IntrantService>(context,
-                                                  listen: false)
-                                              .applyChange(),
-                                          _nomController.clear(),
-                                          _descriptionController.clear(),
-                                          _quantiteController.clear(),
-                                          _prixController.clear(),
-                                          setState(() {
-                                            _isLoading = false;
-                                            speValue = null;
-                                            catValue = null;
-                                          }),
-                                          Navigator.pop(context),
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  Text(
-                                                    "Intant ajouté avec succèss",
-                                                    style: TextStyle(
-                                                        overflow: TextOverflow
-                                                            .ellipsis),
-                                                  ),
-                                                ],
-                                              ),
-                                              duration: Duration(seconds: 5),
-                                            ),
-                                          )
-                                        })
-                                    .catchError((onError) => {
-                                          print('Erreur :${onError.message}'),
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  Text(
-                                                    "Une erreur s'est produite",
-                                                    style: TextStyle(
-                                                        overflow: TextOverflow
-                                                            .ellipsis),
-                                                  ),
-                                                ],
-                                              ),
-                                              duration: Duration(seconds: 5),
-                                            ),
-                                          )
-                                        });
-                              }
-                            } catch (e) {
-                              print('Erreur :${e.toString()}');
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text(
-                                        "Une erreur s'est produite",
-                                        style: TextStyle(
-                                            overflow: TextOverflow.ellipsis),
-                                      ),
-                                    ],
-                                  ),
-                                  duration: Duration(seconds: 5),
-                                ),
-                              );
-                            }
+                            Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => NextAddIntrat(
+                                            nom: nom,
+                                            description: description,
+                                            quantite: quantite,
+                                            speculation: speculation)))
+                                .then((value) => {
+                                      _nomController.clear(),
+                                      _descriptionController.clear(),
+                                      _quantiteController.clear(),
+                                      setState(() {
+                                        speValue = null;
+                                        catValue = null;
+                                      }),
+                                    });
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -834,7 +580,7 @@ class _AddIntrantState extends State<AddIntrant> {
                           minimumSize: const Size(290, 45),
                         ),
                         child: Text(
-                          "Ajouter",
+                          "Suivant",
                           style: TextStyle(
                             fontSize: 20,
                             color: Colors.white,

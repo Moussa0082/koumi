@@ -560,8 +560,10 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                             setState(() {
                                               _isLoading = false;
                                             }),
-                                            // Navigator.pop(context),
-                                            Get.off(VehiculeActeur()),
+                                            Navigator.pop(context),
+                                            // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => VehiculeActeur())),
+
+                                            // Get.off(VehiculeActeur()),
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
@@ -599,13 +601,18 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                                     context,
                                                     listen: false)
                                                 .applyChange(),
-                                            Get.to(VehiculeActeur()),
+                                            // Get.to(VehiculeActeur()),
                                             _etatController.clear(),
                                             setState(() {
                                               _isLoading = false;
                                               // typeVoiture == null;
                                             }),
                                             Navigator.pop(context),
+                                              // Navigator.pushReplacement(
+                                              //   context,
+                                              //   MaterialPageRoute(
+                                              //       builder: (context) =>
+                                              //           VehiculeActeur())), 
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(

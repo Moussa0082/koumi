@@ -70,6 +70,16 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
           actions: [
+            IconButton(
+                onPressed: () {
+                  setState(() {
+                    futureListe = getListe(typeVoiture.idTypeVoiture!);
+                  });
+                },
+                icon: Icon(
+                  Icons.refresh,
+                  // color: Colors.green,
+                )),
             PopupMenuButton<String>(
               padding: EdgeInsets.zero,
               itemBuilder: (context) => <PopupMenuEntry<String>>[
@@ -210,7 +220,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                                                   const EdgeInsets.all(8.0),
                                               child: e.photoVehicule == null
                                                   ? Image.asset(
-                                                      "assets/images/camion.png",
+                                                      "assets/images/trans.png",
                                                       fit: BoxFit.cover,
                                                       height: 90,
                                                     )
@@ -224,7 +234,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                                                               StackTrace?
                                                                   stackTrace) {
                                                         return Image.asset(
-                                                          'assets/images/camion.png',
+                                                          "assets/images/trans.png",
                                                           fit: BoxFit.cover,
                                                           height: 90,
                                                         );

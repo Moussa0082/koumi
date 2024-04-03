@@ -20,7 +20,6 @@ class Intrant {
   final String? personneModif;
   final Acteur acteur;
   final Speculation? speculation;
-
   Intrant({
     this.idIntrant,
     required this.nomIntrant,
@@ -37,7 +36,7 @@ class Intrant {
     required this.acteur,
     this.speculation,
   });
-  
+
  
 
   Intrant copyWith({

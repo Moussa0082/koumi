@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
@@ -7,41 +8,36 @@ import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:path/path.dart';
 
-
 class IntrantService extends ChangeNotifier {
   static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/intrant';
   // static const String baseUrl = 'https://koumi.ml/api-koumi/intrant';
 
   List<Intrant> intrantList = [];
 
-  Future<void> creerIntrant({
-    required String nomIntrant,
-    required double quantiteIntrant,
-    required String descriptionIntrant,
-    required int prixIntrant,
-    required String dateExpiration,
-    File? photoIntrant,
-    required Acteur acteur,
-    required Speculation speculation
-
-  }) async {
+  Future<void> creerIntrant(
+      {required String nomIntrant,
+      required double quantiteIntrant,
+      required String descriptionIntrant,
+      required int prixIntrant,
+      required String dateExpiration,
+      File? photoIntrant,
+      required Acteur acteur,
+      required Speculation speculation}) async {
     try {
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
 
       if (photoIntrant != null) {
-        requete.files.add(http.MultipartFile(
-            'image',
-            photoIntrant.readAsBytes().asStream(),
-            photoIntrant.lengthSync(),
+        requete.files.add(http.MultipartFile('image',
+            photoIntrant.readAsBytes().asStream(), photoIntrant.lengthSync(),
             filename: basename(photoIntrant.path)));
       }
 
       requete.fields['intrant'] = jsonEncode({
-        'nomIntrant':nomIntrant,
-        'quantiteIntrant' : quantiteIntrant,
-        'prixIntrant' : prixIntrant,
+        'nomIntrant': nomIntrant,
+        'quantiteIntrant': quantiteIntrant,
+        'prixIntrant': prixIntrant,
         'dateExpiration': dateExpiration,
-        'speculation':speculation.toMap(),
+        'speculation': speculation.toMap(),
         'descriptionIntrant': descriptionIntrant,
         'photoIntrant': "",
         'acteur': acteur.toMap()
@@ -63,18 +59,19 @@ class IntrantService extends ChangeNotifier {
     }
   }
 
-    Future<void> updateIntrant({
+  Future<void> updateIntrant({
     required String idIntrant,
     required String nomIntrant,
     required double quantiteIntrant,
     required String descriptionIntrant,
     required int prixIntrant,
-    required  String dateExpiration,
+    required String dateExpiration,
     File? photoIntrant,
     required Acteur acteur,
   }) async {
     try {
-      var requete = http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idIntrant'));
+      var requete =
+          http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idIntrant'));
 
       if (photoIntrant != null) {
         requete.files.add(http.MultipartFile('image',
@@ -83,7 +80,7 @@ class IntrantService extends ChangeNotifier {
       }
 
       requete.fields['intrant'] = jsonEncode({
-        'idIntrant' : idIntrant,
+        'idIntrant': idIntrant,
         'nomIntrant': nomIntrant,
         'quantiteIntrant': quantiteIntrant,
         'prixIntrant': prixIntrant,
@@ -104,12 +101,11 @@ class IntrantService extends ChangeNotifier {
             'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
       }
     } catch (e) {
-      throw Exception(
-          'Une erreur s\'est produite lors de l\'ajout  : $e');
+      throw Exception('Une erreur s\'est produite lors de l\'ajout  : $e');
     }
   }
 
-   Future<List<Intrant>> fetchIntrant() async {
+  Future<List<Intrant>> fetchIntrant() async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/read'));
 
@@ -130,9 +126,10 @@ class IntrantService extends ChangeNotifier {
     }
   }
 
-    Future<List<Intrant>> fetchIntrantByActeur(String idActeur) async {
+  Future<List<Intrant>> fetchIntrantByActeur(String idActeur) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/listeIntrantByActeur/$idActeur'));
+      final response =
+          await http.get(Uri.parse('$baseUrl/listeIntrantByActeur/$idActeur'));
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Fetching data");
@@ -151,9 +148,10 @@ class IntrantService extends ChangeNotifier {
     }
   }
 
-    Future<List<Intrant>> fetchIntrantByCategorie(String idCategorie) async {
+  Future<List<Intrant>> fetchIntrantByCategorie(String idCategorie) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/listeIntrantByCategorie/$idCategorie'));
+      final response = await http
+          .get(Uri.parse('$baseUrl/listeIntrantByCategorie/$idCategorie'));
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Fetching data");
@@ -184,9 +182,9 @@ class IntrantService extends ChangeNotifier {
   }
 
   Future activerIntrant(String idActeur) async {
-    final response = await http.put(Uri.parse('$baseUrl/activer/$idActeur'));
+    final response = await http.put(Uri.parse('$baseUrl/enable/$idActeur'));
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200 || response.statusCode == 202) {
       applyChange();
     } else {
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
@@ -195,9 +193,9 @@ class IntrantService extends ChangeNotifier {
   }
 
   Future desactiverIntrant(String idIntrant) async {
-    final response = await http.put(Uri.parse('$baseUrl/desactiver/$idIntrant'));
+    final response = await http.put(Uri.parse('$baseUrl/disable/$idIntrant'));
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200 || response.statusCode == 202) {
       applyChange();
     } else {
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
@@ -205,7 +203,7 @@ class IntrantService extends ChangeNotifier {
     }
   }
 
-   void applyChange() {
+  void applyChange() {
     notifyListeners();
   }
 }
