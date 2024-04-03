@@ -6,7 +6,7 @@ import 'package:koumi_app/models/Acteur.dart';
 class ZoneProduction {
   String? idZoneProduction;
   final String? codeZone;
-  final String? nomZoneProduction;
+   String? nomZoneProduction;
   String? personneModif;
   String? latitude;
   String? longitude;

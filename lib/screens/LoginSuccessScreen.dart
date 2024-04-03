@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/RegisterScreen.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
@@ -44,7 +45,7 @@ class _LoginSuccessScreenState extends State<LoginSuccessScreen> {
             children: [
               GestureDetector(
                 onTap:(){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> const LoginScreen()));
+              Get.offAll(BottomNavigationPage());
                 },
                 child: Container(
                 // padding: EdgeInsets.only(left: 350),

@@ -58,7 +58,7 @@ class _AccueilState extends State<Accueil> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
-      appBar: CustomAppBar(),
+      appBar: const CustomAppBar(),
       body: ListView(
         children: [
           SizedBox(height: 200, child: Carrousel()),

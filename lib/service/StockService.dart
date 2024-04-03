@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Magasin.dart';
@@ -19,10 +20,9 @@ class StockService extends ChangeNotifier {
   List<dynamic> stockListe = [];
   // addStock
 
-  static Future<void> creerStock({
+   Future<void> creerStock({
     required String nomProduit,
     required String formeProduit,
-    required String dateProduction,
     required String quantiteStock,
     required String typeProduit,
     required String descriptionStock,
@@ -45,7 +45,6 @@ class StockService extends ChangeNotifier {
       requete.fields['stock'] = jsonEncode({
         'nomProduit': nomProduit,
         'formeProduit': formeProduit,
-        'dateProduction': dateProduction,
         'quantiteStock': int.tryParse(quantiteStock),
         'typeProduit': typeProduit,
         'descriptionStock': descriptionStock,
@@ -62,22 +61,24 @@ class StockService extends ChangeNotifier {
 
       if (response.statusCode == 200 || responsed.statusCode == 201) {
         final donneesResponse = json.decode(responsed.body);
+              Get.snackbar("Succès", "Produit ajouté avec succès",duration: Duration(seconds: 3));
         debugPrint('stock service ${donneesResponse.toString()}');
       } else {
+           Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
         throw Exception(
             'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
       }
     } catch (e) {
+      Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
       throw Exception(
           'Une erreur s\'est produite lors de l\'ajout de acteur : $e');
     }
   }
 
-  static Future<void> updateStock({
+   Future<void> updateStock({
     required String idStock,
     required String nomProduit,
     required String formeProduit,
-    required String dateProduction,
     required String quantiteStock,
     required String typeProduit,
     required String descriptionStock,
@@ -101,7 +102,6 @@ class StockService extends ChangeNotifier {
       requete.fields['stock'] = jsonEncode({
         'nomProduit': nomProduit,
         'formeProduit': formeProduit,
-        'dateProduction': dateProduction,
         'quantiteStock': int.tryParse(quantiteStock),
         'typeProduit': typeProduit,
         'descriptionStock': descriptionStock,
@@ -117,13 +117,16 @@ class StockService extends ChangeNotifier {
       var responsed = await http.Response.fromStream(response);
 
       if (response.statusCode == 200 || responsed.statusCode == 201) {
+        Get.snackbar("Succès", "Produit modifier avec succès",duration: Duration(seconds: 3));
         final donneesResponse = json.decode(responsed.body);
         debugPrint('stock service ${donneesResponse.toString()}');
       } else {
+           Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
         throw Exception(
             'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
       }
     } catch (e) {
+                Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
       throw Exception(
           'Une erreur s\'est produite lors de l\'ajout de acteur : $e');
     }
@@ -141,6 +144,8 @@ class StockService extends ChangeNotifier {
       return stockList;
     } else {
       stockList = [];
+            Get.snackbar("Erreur", "Une erreur s'est produite lors de la recuperation des produits",duration: Duration(seconds: 3));
+
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
@@ -156,6 +161,7 @@ class StockService extends ChangeNotifier {
     if (response.statusCode == 200) {
       return Stock.fromJson(json.decode(response.body));
     } else {
+     Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
       throw Exception(
           'Impossible de mettre à jour la quantite : ${response.statusCode}');
     }
@@ -238,6 +244,7 @@ class StockService extends ChangeNotifier {
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
     } else {
+      Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
@@ -249,6 +256,7 @@ class StockService extends ChangeNotifier {
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
     } else {
+      Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
@@ -260,6 +268,7 @@ class StockService extends ChangeNotifier {
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
     } else {
+      Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }

@@ -5,14 +5,14 @@ import 'package:koumi_app/models/Acteur.dart';
 class Unite {
    String? idUnite;
   final String? codeUnite;
-  final String? nomUnite;
+   String? nomUnite;
   final String? sigleUnite;
   final String? description;
    String? dateAjout;
    String? dateModif;
   final bool?  statutUnite;
    String? personneModif;
-  final Acteur? acteur;
+   Acteur? acteur;
   Unite({
     this.idUnite,
     this.codeUnite,
@@ -68,20 +68,21 @@ class Unite {
     };
   }
 
-  factory Unite.fromMap(Map<String, dynamic> map) {
-    return Unite(
-      idUnite: map['idUnite'] != null ? map['idUnite'] as String : null,
-      codeUnite: map['codeUnite'] != null ? map['codeUnite'] as String : null,
-      nomUnite: map['nomUnite'] as String,
-      sigleUnite: map['sigleUnite'] as String,
-      description: map['description'] as String,
-      dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
-      dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
-      statutUnite: map['statutUnite'] as bool,
-      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
-      acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
-    );
-  }
+factory Unite.fromMap(Map<String, dynamic> map) {
+  return Unite(
+    idUnite: map['idUnite'] != null ? map['idUnite'] as String : null,
+    codeUnite: map['codeUnite'] != null ? map['codeUnite'] as String : null,
+    nomUnite: map['nomUnite'] as String,
+    sigleUnite: map['sigleUnite'] as String,
+    description: map['description'] as String,
+    dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
+    dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
+    statutUnite: map['statutUnite'] as bool,
+    personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
+    acteur: map['acteur'] != null ? Acteur.fromMap(map['acteur'] as Map<String,dynamic>) : null,
+  );
+}
+
 
   String toJson() => json.encode(toMap());
 

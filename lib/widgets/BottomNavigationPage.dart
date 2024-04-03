@@ -31,6 +31,24 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
     return true; // Indiquez que l'application peut se fermer
   }
 
+  late PageController pageController;
+
+
+Widget buildPageView() {
+  return PageView(
+    controller: pageController,
+    onPageChanged: (index) {
+      _changeActivePageValue(index);
+    },
+    children: <Widget>[
+   const Accueil(),
+          ProduitScreen(),
+           Panier(),
+          const Profil(),
+    ],
+  );
+}
+
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
@@ -53,7 +71,16 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
   void _onItemTap(int index) {
     Provider.of<BottomNavigationService>(context, listen: false)
         .changeIndex(index);
+     pageController.animateToPage(index, duration: Duration(milliseconds: 500), curve: Curves.ease);
+
   }
+
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
+  }
+
 
   @override
   void initState() {
@@ -63,6 +90,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
       Provider.of<BottomNavigationService>(context, listen: false)
           .changeIndex(0);
     });
+    pageController = PageController(initialPage: activePageIndex);
   }
   // void _onBackPressed(bool isBackPressed) async {
   //   if (!isBackPressed) {
@@ -78,28 +106,36 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: d_colorPage,
-      appBar: AppBar(
-        toolbarHeight: 0,
-        elevation: 0,
-      ),
-      body: Consumer<BottomNavigationService>(
-        builder: (context, bottomService, child) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _changeActivePageValue(bottomService.pageIndex);
-          });
-          return Stack(
+    return
+      
+ Scaffold(
+        backgroundColor: d_colorPage,
+        appBar: AppBar(
+          toolbarHeight: 0,
+          elevation: 0,
+        ),
+        body:  
+           PageView(
+            controller: pageController,
+            onPageChanged: (index) {
+              setState(() {
+                activePageIndex = index;
+                pageController.animateToPage(
+        index,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+              });
+            },
             children: [
-              _buildOffstageNavigator(0),
-              _buildOffstageNavigator(1),
-              _buildOffstageNavigator(2),
-              _buildOffstageNavigator(3)
+              Accueil(),
+              ProduitScreen(),
+              Panier(),
+              Profil(),
             ],
-          );
-        },
-      ),
-      bottomNavigationBar: BottomNavigationBar(
+          ),
+        
+       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         elevation: 5.0,
         items: const [

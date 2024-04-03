@@ -7,6 +7,7 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ActeurService extends ChangeNotifier {
   // static const String baseUrl = 'https://koumi.ml/api-koumi/acteur';
@@ -71,7 +72,11 @@ class ActeurService extends ChangeNotifier {
       var responsed = await http.Response.fromStream(response);
 
       if (response.statusCode == 200 || responsed.statusCode == 201) {
-        final donneesResponse = json.decode(responsed.body);
+        final donneesResponse = json.decode(utf8.decode(responsed.bodyBytes));
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                final codeActeur = donneesResponse['codeActeur'];
+                await prefs.setString('codeActeur', codeActeur);
+
         debugPrint('acteur service ${donneesResponse.toString()}');
       } else {
         final errorMessage =

@@ -4,6 +4,9 @@ import 'package:koumi_app/models/CartItem.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/screens/AddAndUpdateProductEndScreen.dart';
+import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
+import 'package:koumi_app/screens/PinLoginScreen.dart';
 import 'package:koumi_app/screens/SplashScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/AlerteService.dart';
@@ -38,7 +41,6 @@ import 'package:provider/provider.dart';
 
 void main() {
   runApp(MultiProvider(providers: [
-
 
     ChangeNotifierProvider(create: (context) => MagasinService()),
     ChangeNotifierProvider(create: (context) => CartProvider()),

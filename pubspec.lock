@@ -1152,6 +1152,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  sim_data_plus:
+    dependency: "direct main"
+    description:
+      name: sim_data_plus
+      sha256: bc2136ec8f9292f8959063e78fd9fdf9425b308762b48db1db2ce749b28f7955
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.4"
   sky_engine:
     dependency: transitive
     description: flutter

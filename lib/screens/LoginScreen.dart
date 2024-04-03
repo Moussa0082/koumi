@@ -183,6 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
           idActeur: responseBody['idActeur'],
           nomActeur: responseBody['nomActeur'],
           adresseActeur: responseBody['adresseActeur'],
+          // codeActeur: responseBody['codeActeur'],
           telephoneActeur: responseBody['telephoneActeur'],
           whatsAppActeur: responseBody['whatsAppActeur'],
           niveau3PaysActeur: responseBody['niveau3PaysActeur'],
