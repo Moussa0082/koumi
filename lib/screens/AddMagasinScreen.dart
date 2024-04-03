@@ -38,7 +38,7 @@ class AddMagasinScreen extends StatefulWidget {
 }
 
 class _AddMagasinScreenState extends State<AddMagasinScreen> {
-  late Acteur acteur;
+  late Acteur acteur = Acteur();
   String nomMagasin = "";
   String contactMagasin = "";
   // String niveau3PaysMagasin = "";
@@ -47,7 +47,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
   File? photos;
   String? imageSrc;
 
-  late Niveau1Pays niveau1Pays;
+   Niveau1Pays niveau1Pays = Niveau1Pays();
 
   List<String> regions = [];
   String? niveauPaysValue;
@@ -249,7 +249,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                   contactMagasinController.clear(),
                   localiteMagasinController.clear(),
                   setState(() {
-                    niveauPaysValue == "Sélectionner un sous région";
+                    niveauPaysValue == "Sélectionner une région";
                   }),
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -531,7 +531,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                               items: [],
                               onChanged: null,
                               decoration: InputDecoration(
-                                labelText: 'Aucun localité trouvé',
+                                labelText: 'Aucune region trouvé',
                                 contentPadding: const EdgeInsets.symmetric(
                                     vertical: 10, horizontal: 20),
                                 border: OutlineInputBorder(
@@ -541,24 +541,24 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                             );
                           }
                           if (snapshot.hasError) {
-                            return Text("${snapshot.error}");
+                            return Text("Une erreur s'est produite veuillez réessayer plus tard");
                           }
                           if (snapshot.hasData) {
                             dynamic responseData =
                                 json.decode(snapshot.data.body);
                             if (responseData is List) {
                               final reponse = responseData;
-                              final niveau3List = reponse
+                              final niveau1List = reponse
                                   .map((e) => Niveau1Pays.fromMap(e))
                                   .where((con) => con.statutN1 == true)
                                   .toList();
 
-                              if (niveau3List.isEmpty) {
+                              if (niveau1List.isEmpty) {
                                 return DropdownButtonFormField(
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Aucun localité trouvé',
+                                    labelText: 'Aucun  region trouvé',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -570,12 +570,12 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
 
                               return DropdownButtonFormField<String>(
                                 validator: (value) {
-    if (value == null || value.isEmpty) {
-      return 'Veuillez sélectionner une region.';
-    }
-    return null;
-  },
-        items: niveau3List
+                              if (value == null || value.isEmpty) {
+                                return 'Veuillez sélectionner une region.';
+                              }
+                              return null;
+                            },
+                                 items: niveau1List
                                     .map(
                                       (e) => DropdownMenuItem(
                                         value: e.idNiveau1Pays,
@@ -583,19 +583,19 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                                       ),
                                     )
                                     .toList(),
-                                value: niveauPaysValue,
+                                value: niveau1Pays.idNiveau1Pays,
                                 onChanged: (newValue) {
                                   setState(() {
-                                    niveauPaysValue = newValue;
+                                    niveau1Pays.idNiveau1Pays = newValue;
                                     if (newValue != null) {
-                                      niveauPaysValue =
-                                          niveau3List.map((e) => e.nomN1).first;
-                                      print("niveau 3 : ${niveau1Pays}");
+                                      niveau1Pays.nomN1 =
+                                          niveau1List.map((e) => e.nomN1).first;
+                                      print("niveau 1 : ${niveau1Pays}");
                                     }
                                   });
                                 },
                                 decoration: InputDecoration(
-                                  labelText: 'Selectionner une localité',
+                                  labelText: 'Selectionner une region',
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(
@@ -608,7 +608,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                                 items: [],
                                 onChanged: null,
                                 decoration: InputDecoration(
-                                  labelText: 'Aucun localité trouvé',
+                                  labelText: 'Aucune region trouvé',
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(
@@ -622,7 +622,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                             items: [],
                             onChanged: null,
                             decoration: InputDecoration(
-                              labelText: 'Aucun localité trouvé',
+                              labelText: 'Aucune region trouvé',
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 20),
                               border: OutlineInputBorder(

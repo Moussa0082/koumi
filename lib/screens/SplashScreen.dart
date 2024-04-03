@@ -76,7 +76,7 @@ String? emailActeur = prefs.getString('emailActeur');
 if (codeActeur == null || codeActeur.isEmpty) {
   // Gérer le cas où le codeActeur est manquant
   // Sauvegarder le codeActeur avant de nettoyer les SharedPreferences
-  String savedCodeActeur = "UD744";
+  String savedCodeActeur = "VF212";
   // String savedCodeActeur = codeActeur;
 
   // Nettoyer toutes les données de SharedPreferences
@@ -86,14 +86,14 @@ if (codeActeur == null || codeActeur.isEmpty) {
   prefs.setString('codeActeur', savedCodeActeur);
 } else {
   // Sauvegarder le codeActeur avant de nettoyer les SharedPreferences
-  // String savedCodeActeur = "UD744";
+  String savedCodeActeur = "VF212";
   
 
   // // Nettoyer toutes les données de SharedPreferences
-  // await prefs.clear();
+  await prefs.clear();
 
   // // Réenregistrer le codeActeur dans SharedPreferences
-  // prefs.setString('codeActeur', savedCodeActeur);
+  prefs.setString('codeActeur', savedCodeActeur);
 }
 
 }

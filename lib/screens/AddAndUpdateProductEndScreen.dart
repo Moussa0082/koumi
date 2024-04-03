@@ -304,7 +304,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Aucun localité trouvé',
+                                    labelText: 'Aucune speculation trouvé',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -314,7 +314,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                 );
                               }
                               if (snapshot.hasError) {
-                                return Text("${snapshot.error}");
+                            return Text("Une erreur s'est produite veuillez réessayer");
                               }
                               if (snapshot.hasData) {
                                 dynamic responseData =
@@ -442,7 +442,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                 );
                               }
                               if (snapshot.hasError) {
-                                return Text("${snapshot.error}");
+                            return Text("Une erreur s'est produite veuillez réessayer plus tard");
                               }
                               if (snapshot.hasData) {
                                 dynamic responseData =
@@ -568,7 +568,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                 );
                               }
                               if (snapshot.hasError) {
-                                return Text("${snapshot.error}");
+                            return Text("Une erreur s'est produite veuillez réessayer plus tard");
                               }
                               if (snapshot.hasData) {
                                 dynamic responseData =
@@ -694,7 +694,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                 );
                               }
                               if (snapshot.hasError) {
-                                return Text("${snapshot.error}");
+                            return Text("Une erreur s'est produite veuillez réessayer plus tard");
                               }
                               if (snapshot.hasData) {
                                 dynamic responseData =

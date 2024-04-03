@@ -78,7 +78,7 @@ final String? idSpeculation;
       nomSpeculation: map['nomSpeculation'] as String,
       descriptionSpeculation: map['descriptionSpeculation'] as String,
       statutSpeculation: map['statutSpeculation'] as bool,
-      categorieProduit: CategorieProduit.fromMap(map['categorieProduit'] as Map<String,dynamic>),
+      categorieProduit: map['categorieProduit'] != null  ? CategorieProduit.fromMap(map['categorieProduit'] as Map<String,dynamic>) : null,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
       personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
