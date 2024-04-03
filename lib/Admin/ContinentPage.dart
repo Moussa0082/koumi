@@ -663,7 +663,7 @@ class _ContinentPageState extends State<ContinentPage> {
                                   content: Row(
                                     children: [
                                       Text(
-                                          "Une erreur s'est produit : $errorMessage"),
+                                          "Une erreur s'est produit"),
                                     ],
                                   ),
                                   duration: const Duration(seconds: 5),

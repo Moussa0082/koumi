@@ -18,11 +18,13 @@ class CampagneService extends ChangeNotifier {
       {
       required String nomCampagne,
       required String description,
+      required Acteur acteur,
      }) async {
     var addCampagnes = jsonEncode({
       'idCampagne': null,
       'nomCampagne': nomCampagne,
       'description': description,
+      'acteur': acteur
     });
 
     final response = await http.post(Uri.parse("$baseUrl/addCampagne"),
@@ -58,6 +60,20 @@ class CampagneService extends ChangeNotifier {
 
   Future<List<Campagne>> fetchCampagne() async {
     final response = await http.get(Uri.parse('$baseUrl/getAllCampagne'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+      campagneList = body.map((item) => Campagne.fromMap(item)).toList();
+      debugPrint(response.body);
+      return campagneList;
+    } else {
+      campagneList = [];
+      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+    }
+  }
+  Future<List<Campagne>> fetchCampagneByActeur(String idActeur) async {
+    final response = await http.get(Uri.parse('$baseUrl/getAllCampagneByActeur/$idActeur'));
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
