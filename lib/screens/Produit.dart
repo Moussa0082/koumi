@@ -79,6 +79,54 @@ class _ProduitScreenState extends State<ProduitScreen>
   }
 
 
+  void fetchProduitByCategorieProduit(String idCategorie) async {
+    try {
+      final response = await http.get(Uri.parse(
+          // 'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
+          'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie'));
+      if (response.statusCode == 200) {
+        final String jsonString = utf8.decode(response.bodyBytes);
+        List<dynamic> data = json.decode(jsonString);
+        setState(() {
+          stock = data
+              .where((stock) => stock['statutSotck'] == true)
+              .map((item) => Stock(
+                    idStock: item['idStock'] as String,
+                    nomProduit: item['nomProduit'] as String,
+                    photo: item['photo'] ?? '',
+                    quantiteStock: item['quantiteStock'] ?? 0,
+                    prix: item['prix'] ?? 0,
+                    formeProduit: item['formeProduit'] as String,
+                    typeProduit: item['typeProduit'] as String,
+                    descriptionStock: item['descriptionStock'] as String,
+                    speculation: Speculation(
+                      idSpeculation: item['speculation']['idSpeculation'], 
+                      codeSpeculation: item['speculation']['codeSpeculation'], 
+                      nomSpeculation: item['speculation']['nomSpeculation'],
+                       descriptionSpeculation: item['speculation']['descriptionSpeculation'], 
+                       statutSpeculation: item['speculation']['statutSpeculation'],
+                        ),
+                        acteur:Acteur(
+                        idActeur:item['acteur']['idActeur'],
+                        nomActeur:item['acteur']['nomActeur'],
+                        ),
+                       unite: Unite(
+                        nomUnite: item['unite']['nomUnite'],
+                        sigleUnite: item['unite']['sigleUnite'],
+                        description: item['unite']['description'],
+                        statutUnite: item['unite']['statutUnite'],
+                       ), 
+                  ))
+              .toList();
+        });
+        debugPrint("Produit : ${stock.map((e) => e.nomProduit)}");
+      } else {
+        throw Exception('Failed to load stock');
+      }
+    } catch (e) {
+      print('Error fetching stock: $e');
+    }
+  }
   void fetchProduitByCategorie(String idCategorie, String idMagasin) async {
     try {
       final response = await http.get(Uri.parse(
@@ -151,7 +199,7 @@ class _ProduitScreenState extends State<ProduitScreen>
           selectedCategorieProduitNom = categorieProduit.isNotEmpty
               ? categorieProduit[_tabController!.index].libelleCategorie!
               : '';
-          fetchProduitByCategorie(selectedCategorieProduit, widget.id!);
+         isExist ?  fetchProduitByCategorie(selectedCategorieProduit, widget.id!) : fetchProduitByCategorieProduit(selectedCategorieProduit);
         });
         debugPrint(
             "Id Cat : ${categorieProduit.map((e) => e.idCategorieProduit)}");
@@ -171,7 +219,7 @@ class _ProduitScreenState extends State<ProduitScreen>
           categorieProduit[_tabController!.index].idCategorieProduit!;
       selectedCategorieProduitNom =
 categorieProduit[_tabController!.index].libelleCategorie!;
-    isExist ? fetchProduitByCategorie(selectedCategorieProduit, widget.id!) : null;
+    isExist ? fetchProduitByCategorie(selectedCategorieProduit, widget.id!) : fetchProduitByCategorieProduit(selectedCategorieProduit);
       debugPrint("Cat id : " + selectedCategorieProduit);
     }
   }
@@ -360,7 +408,17 @@ categorieProduit[_tabController!.index].libelleCategorie!;
             ),
           ),
                 const SizedBox(height: 10),
-              !isExist ? SizedBox() :  Flexible(
+              !isExist ? Flexible(
+                  child: GestureDetector(
+                    child:  TabBarView(
+                      controller: _tabController,
+                      children:  categorieProduit.map((categorie) {
+                        return buildGridViews(
+                            categorie.idCategorieProduit!);
+                      }).toList(),
+                    ) ,
+                  ),
+                ) :  Flexible(
                   child: GestureDetector(
                     child:  TabBarView(
                       controller: _tabController,
@@ -379,7 +437,181 @@ categorieProduit[_tabController!.index].libelleCategorie!;
     );
   }
 
-  Widget buildGridView(String idCategorie, String? idMagasin) {
+  
+  Widget buildGridView(String idCategorie, String idMagasin) {
+    List<Stock> filteredStocks = stock;
+    String searchText = "";
+  
+ 
+    if (filteredStocks.isEmpty) {
+       return _buildShimmerEffect();
+   
+    } else {
+      List<Stock> filteredStocksSearch = filteredStocks.where((stock) {
+        String nomProduit = stock.nomProduit!.toLowerCase();
+        searchText = _searchController.text.toLowerCase();
+        return nomProduit.contains(searchText);
+      }).toList();
+
+      if (filteredStocksSearch.isEmpty) {
+        return  
+    SingleChildScrollView(
+          child: Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  Image.asset('assets/images/notif.jpg'),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Text(
+              textAlign: TextAlign.justify,
+              'Aucun produit trouvé avec le nom ' +
+                  searchText.toUpperCase() +
+                  " dans la categorie " +
+                  selectedCategorieProduitNom.toUpperCase(),
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+        )
+                                ],
+                              ),
+                            ),
+                          ),
+        );
+      }
+
+     
+ return Container(
+  color: Colors.white,
+   child: GridView.builder(
+    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 2,
+      mainAxisSpacing: 10,
+      crossAxisSpacing: 10,
+    ),
+    itemCount: filteredStocks.length,
+    itemBuilder: (context, index) {
+      return Container(
+        decoration: BoxDecoration(
+         color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              offset: const Offset(0, 2),
+              blurRadius: 5,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        margin: EdgeInsets.all(5),
+        child: GestureDetector(
+          onTap: () {
+            // Action à effectuer lorsqu'un produit est cliqué
+            Stock stock = filteredStocksSearch[index];
+ 
+Get.to(
+  () => DetailProduits(
+    stock: stock,
+  ),
+  duration: const Duration(seconds: 1), // Duration of transition
+  transition: Transition.leftToRight, // Transition effect
+);       },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: double.infinity,
+                height: 120, // Taille de la photo
+                child: Image.network(
+                  filteredStocks[index].photo ?? 'assets/images/mang.jpg',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/images/mang.jpg',
+                      fit: BoxFit.cover,
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      filteredStocksSearch[index].nomProduit!,
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold , overflow:TextOverflow.ellipsis),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(40),
+                        color: Colors.grey[200],
+                      ),
+                      child: Text(
+                        filteredStocksSearch[index].quantiteStock!.toInt().toString(),
+                        style: TextStyle(fontSize: 14,  overflow:TextOverflow.ellipsis),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 3,),
+              Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text(
+        '${filteredStocksSearch[index].prix!.toInt()} FCFA', // Convertir en entier
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, overflow:TextOverflow.ellipsis),
+      ),
+      Container(
+        width: 30, // Largeur du conteneur réduite
+        height: 30, // Hauteur du conteneur réduite
+        decoration: BoxDecoration(
+          color: Colors.blue, // Couleur de fond du bouton
+          borderRadius: BorderRadius.circular(15), // Coins arrondis du bouton
+        ),
+        child: IconButton(
+          onPressed: () {
+            // Action à effectuer lorsque le bouton est pressé
+            if (filteredStocksSearch[index].acteur!.idActeur! == acteur.idActeur!){
+                        Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
+                        }else{
+                          Provider.of<CartProvider>(context, listen: false)
+                        .addToCart(filteredStocksSearch[index], 1, "");
+                        }
+            // Par exemple, ajouter le produit au panier
+          },
+          icon: Icon(Icons.add), // Icône du panier
+          color: Colors.white, // Couleur de l'icône
+          iconSize: 20, // Taille de l'icône réduite
+          padding: EdgeInsets.zero, // Aucune marge intérieure
+          splashRadius: 15, // Rayon de l'effet de pression réduit
+          tooltip: 'Ajouter au panier', // Info-bulle au survol de l'icône
+        ),
+      ),
+    ],
+  ),
+),
+
+            ],
+          ),
+        ),
+      );
+    },
+   ),
+ );
+
+    }
+  }
+  Widget buildGridViews(String idCategorie) {
     List<Stock> filteredStocks = stock;
     String searchText = "";
   

@@ -23,13 +23,13 @@ import 'package:shimmer/shimmer.dart';
 class RegisterNextScreen extends StatefulWidget {
 
   String nomActeur,telephone, whatsAppActeur;
-  String? pays;
+  String pays;
   // late List<TypeActeur> typeActeur;
    
 
    RegisterNextScreen({super.key, required this.nomActeur, 
    required this.whatsAppActeur,
-   required this.telephone,  this.pays});
+   required this.telephone, required this.pays});
 
   @override
   State<RegisterNextScreen> createState() => _RegisterNextScreenState();
@@ -398,11 +398,11 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
     chipConfig: const ChipConfig(wrapType: WrapType.wrap),
  responseParser: (response) {
    typeActeur = (response as List<dynamic>)
-  //  .where((data)  =>
-  //             (data as Map<String, dynamic>)['libelle'].trim().toLowerCase())
-              //     .trim()
-              //     .toLowerCase() !=
-              // 'admin')
+   .where((data)  =>
+              (data ['libelle'])
+                  .trim()
+                  .toLowerCase() !=
+              'admin')
    .map((e) {
     return TypeActeur(
       idTypeActeur: e['idTypeActeur'] as String,
@@ -465,10 +465,12 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
               // Handle button press action here
               if(_formKey.currentState!.validate()){
               Navigator.push(context, MaterialPageRoute(builder: (context)=>  RegisterEndScreen(
-                nomActeur: widget.nomActeur, email: emailController.text, telephone: widget.telephone, 
+                nomActeur: widget.nomActeur, email: emailController.text, 
+                telephoneActeur: widget.telephone, 
                  adresse:adresseController.text, 
                 numeroWhatsApp: widget.whatsAppActeur, localistaion: localisationController.text,
                  pays: widget.pays, typeActeur: typeActeur,
+                 image1: image1,
                 )));
               }
                            },

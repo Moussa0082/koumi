@@ -6,6 +6,7 @@ import 'package:koumi_app/providers/CartProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductEndScreen.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
+import 'package:koumi_app/screens/PinLoginScreen.dart';
 import 'package:koumi_app/screens/SplashScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';

@@ -26,8 +26,8 @@ import 'package:path_provider/path_provider.dart';
 
 class RegisterEndScreen extends StatefulWidget {
 
-    String nomActeur, email,telephone, adresse  , localistaion;
-    String?  telephoneActeur, numeroWhatsApp , pays;
+    String nomActeur, email, adresse  , localistaion;
+    String  telephoneActeur, numeroWhatsApp , pays;
     File? image1;
    late List<TypeActeur>? typeActeur;
   //  late List<TypeActeur> idTypeActeur;
@@ -35,10 +35,10 @@ class RegisterEndScreen extends StatefulWidget {
    RegisterEndScreen({
    super.key, required this.nomActeur, 
    this.image1,
-   required this.email, required this.telephone, 
+   required this.email, required this.telephoneActeur, 
     this.typeActeur, required this.adresse, 
    required this.numeroWhatsApp,
-   required this.localistaion,  this.pays});
+   required this.localistaion, required this.pays});
 
   @override
   State<RegisterEndScreen> createState() => _RegisterEndScreenState();
@@ -173,7 +173,7 @@ Future<void> _pickImage(ImageSource source) async {
   }
 
    registerUser(BuildContext context) async {
-   final nomActeur = widget.nomActeur;
+        final nomActeur = widget.nomActeur;
         final emailActeur = widget.email;
         final adresse = widget.adresse;
         final localisation = widget.localistaion;
@@ -237,11 +237,13 @@ Future<void> _pickImage(ImageSource source) async {
                 actions: <Widget>[
                   TextButton(
                     onPressed: () {
-                      Navigator.of(context).pop();
-       Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginSuccessScreen()),
-        );                  
+                      Get.back();
+                      // Navigator.of(context).pop();
+      //  Navigator.push(
+      // context,
+      // MaterialPageRoute(builder: (context) => const LoginSuccessScreen()),
+      //   );       
+      Get.offAll(LoginSuccessScreen());           
         },
                     child:const  Text('OK'),
                   ),
@@ -255,9 +257,9 @@ Future<void> _pickImage(ImageSource source) async {
       await acteurService.creerActeur(
       nomActeur: nomActeur,
       adresseActeur: adresse,
-      telephoneActeur: widget.telephoneActeur!,
-      whatsAppActeur: widget.numeroWhatsApp!,
-      niveau3PaysActeur: widget.pays!,
+      telephoneActeur: widget.telephoneActeur,
+      whatsAppActeur: widget.numeroWhatsApp,
+      niveau3PaysActeur: widget.pays,
       localiteActeur: localisation,
       emailActeur: emailActeur,
       typeActeur: typeActeur,
@@ -320,8 +322,8 @@ Future<void> _pickImage(ImageSource source) async {
     // TODO: implement initState
     super.initState();
    
-    debugPrint("Adresse : " + widget.adresse +  " Type : ${widget.typeActeur}"+
-    " Localisation :  " + widget.localistaion + " Whats app : " + widget.numeroWhatsApp! + "Email :" + widget.email
+    debugPrint("Adresse : " + widget.adresse +  " Type : ${widget.typeActeur}"+   " Tel : ${widget.telephoneActeur}"+
+    " Localisation :  " + widget.localistaion + " Whats app : " + widget.numeroWhatsApp + "Email :" + widget.email
   
     );
     
@@ -660,8 +662,8 @@ Future<void> _pickImage(ImageSource source) async {
 
           if(_formKey.currentState!.validate()){
       
-       _handleButtonPress(context);
-         }
+            _handleButtonPress(context);
+          }
                 // Handle button press action here
               },
               child: Text(

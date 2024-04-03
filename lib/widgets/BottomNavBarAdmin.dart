@@ -28,7 +28,7 @@ const d_colorOr = Color.fromRGBO(254, 243, 231, 1);
 class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
   int activePageIndex = 0;
 
-   PageController _pageController = PageController();
+  late PageController _pageController;
   int selectedPage = 0;
   // void _onBackPressed(bool isBackPressed) async {
   //   if (!isBackPressed) {
@@ -61,7 +61,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
       activePageIndex = index;
     });
   }
-  
+
 
 
   void resetIndex(int index) {
@@ -92,9 +92,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
   @override
   void dispose() {
     super.dispose();
-
-   _pageController.dispose();
-      
+    _pageController = PageController(initialPage: activePageIndex);
   }
 
 
@@ -108,53 +106,57 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
         toolbarHeight: 0,
         elevation: 0,
       ),
-      body: Consumer<BottomNavigationService>(
-        builder: (context, bottomService, child) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _changeActivePageValue(bottomService.pageIndex);
+         body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            activePageIndex = index;
           });
-          return Stack(
-            children: [
-              _buildOffstageNavigator(0),
-              _buildOffstageNavigator(1),
-              _buildOffstageNavigator(2),
-              _buildOffstageNavigator(3)
-            ],
-          );
         },
+        children: [
+          AcceuilAdmin(),
+          ProduitScreen(),
+          Panier(),
+          ProfilA(),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        elevation: 5.0,
+        currentIndex: activePageIndex,
+        unselectedItemColor: Colors.black,
+          showUnselectedLabels : true,
+        selectedItemColor: Colors.green[800],
+        onTap: (index) {
+          setState(() {
+            activePageIndex = index;
+            _pageController.animateToPage(
+              index,
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          });
+        },
         items: const [
           BottomNavigationBarItem(
-            backgroundColor: d_color,
             icon: Icon(Icons.home_filled),
             label: "Accueil",
+            backgroundColor: d_color
           ),
           BottomNavigationBarItem(
-            backgroundColor: d_color,
             icon: Icon(Icons.agriculture),
             label: "Produit",
+            backgroundColor: d_color
           ),
           BottomNavigationBarItem(
-            backgroundColor: d_color,
             icon: Icon(Icons.shopping_cart),
             label: "Panier",
+            backgroundColor: d_color
           ),
           BottomNavigationBarItem(
-            backgroundColor: d_color,
             icon: Icon(Icons.person_pin),
             label: "Profil",
+            backgroundColor: d_color
           ),
         ],
-        unselectedItemColor: Colors.black,
-        selectedItemColor: Colors.green[800],
-        iconSize: 30,
-        showUnselectedLabels: true,
-        selectedLabelStyle: const TextStyle(color: Colors.black),
-        currentIndex: activePageIndex,
-        onTap: _onItemTap,
       ),
     );
   }

@@ -46,9 +46,9 @@ class _FiliereScreenState extends State<FiliereScreen> {
     super.initState();
     _searchController = TextEditingController();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
-    para = paraList[0];
+    // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+    //     .parametreList!;
+    // para = paraList[0];
     _filiereList = http
         // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
         .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));

@@ -27,15 +27,21 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _CustomAppBarState extends State<CustomAppBar> {
   late Acteur acteur = Acteur();
+    late List<TypeActeur> typeActeurData = [];
+  String type = '';
   List<MessageWa> messageList = [];
   String? email = "";
   bool isExist = false;
-  void verify() async {
+ 
+
+    void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     email = prefs.getString('emailActeur');
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      typeActeurData = acteur.typeActeur!;
+      type = typeActeurData.map((data) => data.libelle).join(', ');
       setState(() {
         isExist = true;
       });
@@ -109,7 +115,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                   }
 
                   List<TypeActeur> typeActeurData = ac.typeActeur!;
-                  String type =
+                   type =
                       typeActeurData.map((data) => data.libelle).join(', ');
                   return ListTile(
                     leading: ac.logoActeur == null || ac.logoActeur!.isEmpty

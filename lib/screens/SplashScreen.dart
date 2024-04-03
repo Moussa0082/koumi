@@ -41,7 +41,6 @@ class _SplashScreenState extends State<SplashScreen> {
     String? emailActeur = prefs.getString('emailActeur');
     if (emailActeur != null) {
       checkLoggedIn();
-
       
     } 
     else {
@@ -58,6 +57,45 @@ class _SplashScreenState extends State<SplashScreen> {
  Future<void> clearCart() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.remove('cart');
+  // Récupérer le codeActeur depuis SharedPreferences
+String? codeActeur = prefs.getString('codeActeur');
+String? emailActeur = prefs.getString('emailActeur');
+
+ if (emailActeur == null || emailActeur.isEmpty) {
+ 
+
+  // Nettoyer toutes les données de SharedPreferences
+  // await prefs.clear();
+  debugPrint("Email shared : $emailActeur");
+}else{
+  debugPrint("Email shared isExist : $emailActeur");
+
+}
+
+// Vérifier si le codeActeur est présent dans SharedPreferences
+if (codeActeur == null || codeActeur.isEmpty) {
+  // Gérer le cas où le codeActeur est manquant
+  // Sauvegarder le codeActeur avant de nettoyer les SharedPreferences
+  String savedCodeActeur = "UD744";
+  // String savedCodeActeur = codeActeur;
+
+  // Nettoyer toutes les données de SharedPreferences
+  await prefs.clear();
+
+  // Réenregistrer le codeActeur dans SharedPreferences
+  prefs.setString('codeActeur', savedCodeActeur);
+} else {
+  // Sauvegarder le codeActeur avant de nettoyer les SharedPreferences
+  // String savedCodeActeur = "UD744";
+  
+
+  // // Nettoyer toutes les données de SharedPreferences
+  // await prefs.clear();
+
+  // // Réenregistrer le codeActeur dans SharedPreferences
+  // prefs.setString('codeActeur', savedCodeActeur);
+}
+
 }
 
   void checkLoggedIn() async {

@@ -23,6 +23,7 @@ import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AcceuilAdmin extends StatefulWidget {
   const AcceuilAdmin({super.key});
@@ -35,15 +36,33 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _AcceuilAdminState extends State<AcceuilAdmin> {
-  late Acteur acteur;
+  late Acteur acteur = Acteur();
+
+  String? email = "";
+  bool isExist = false;
+
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      setState(() {
+        isExist = true;
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     //   WidgetsBinding.instance.addPostFrameCallback((_) {
-
+  verify();
     //  Snack.info(message:'Connecté en tant que : ${acteur.nomActeur!.toUpperCase()}') ;
     //   });
   }

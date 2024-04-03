@@ -71,9 +71,16 @@ Widget buildPageView() {
   void _onItemTap(int index) {
     Provider.of<BottomNavigationService>(context, listen: false)
         .changeIndex(index);
-    //  pageController.animateToPage(index, duration: Duration(milliseconds: 500), curve: Curves.ease);
+     pageController.animateToPage(index, duration: Duration(milliseconds: 500), curve: Curves.ease);
 
   }
+
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
+  }
+
 
   @override
   void initState() {
@@ -99,63 +106,67 @@ Widget buildPageView() {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: d_colorPage,
-      appBar: AppBar(
-        toolbarHeight: 0,
-        elevation: 0,
-      ),
-      body: PageView(
-        controller: pageController,
-        onPageChanged: (index) {
-          setState(() {
-            activePageIndex = index;
-          });
-        },
-        children: [
-          Accueil(),
-          ProduitScreen(),
-          Panier(),
-          Profil(),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: activePageIndex,
-        unselectedItemColor: Colors.black,
-          showUnselectedLabels : true,
-        selectedItemColor: Colors.green[800],
-        onTap: (index) {
-          setState(() {
-            activePageIndex = index;
-            pageController.animateToPage(
-              index,
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
-          });
-        },
+    return
+      
+ Scaffold(
+        backgroundColor: d_colorPage,
+        appBar: AppBar(
+          toolbarHeight: 0,
+          elevation: 0,
+        ),
+        body:  
+           PageView(
+            controller: pageController,
+            onPageChanged: (index) {
+              setState(() {
+                activePageIndex = index;
+                pageController.animateToPage(
+        index,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+              });
+            },
+            children: [
+              Accueil(),
+              ProduitScreen(),
+              Panier(),
+              Profil(),
+            ],
+          ),
+        
+       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        elevation: 5.0,
         items: const [
           BottomNavigationBarItem(
+            backgroundColor: d_color,
             icon: Icon(Icons.home_filled),
             label: "Accueil",
-            backgroundColor: d_color
           ),
           BottomNavigationBarItem(
+            backgroundColor: d_color,
             icon: Icon(Icons.agriculture),
             label: "Produit",
-            backgroundColor: d_color
           ),
           BottomNavigationBarItem(
+            backgroundColor: d_color,
             icon: Icon(Icons.shopping_cart),
             label: "Panier",
-            backgroundColor: d_color
           ),
           BottomNavigationBarItem(
+            backgroundColor: d_color,
             icon: Icon(Icons.person_pin),
             label: "Profil",
-            backgroundColor: d_color
           ),
         ],
+        unselectedItemColor: Colors.black,
+        selectedItemColor: Colors.green[800],
+        iconSize: 30,
+        showUnselectedLabels: true,
+        selectedLabelStyle: const TextStyle(color: Colors.black),
+        currentIndex: activePageIndex,
+        onTap: _onItemTap,
       ),
     );
   }

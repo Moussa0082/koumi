@@ -8,6 +8,7 @@ import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
+import 'package:koumi_app/screens/PinLoginScreen.dart';
 import 'package:koumi_app/screens/Surface.dart';
 import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
@@ -114,7 +115,7 @@ class _ProfilState extends State<Profil> {
                                     listen: false)
                                 .changeIndex(0);
                           });
-                          Get.to(LoginScreen(),
+                          Get.to(PinLoginScreen(),
                               duration: Duration(
                                   seconds:
                                       1), //duration of transitions, default 1 sec
@@ -168,7 +169,7 @@ class _ProfilState extends State<Profil> {
                               }
 
                               List<TypeActeur> typeActeurData = ac.typeActeur!;
-                              String type = typeActeurData
+                               type = typeActeurData
                                   .map((data) => data.libelle)
                                   .join(', ');
                               return Column(

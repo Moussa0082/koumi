@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -7,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:country_code_picker/country_code_picker.dart';
@@ -34,7 +36,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String nomActeur = "";
   String telephone = "";
 
-  String locale = Platform.localeName.split('_').last;
+  PhoneNumber locale = 
+  PhoneNumber(
+isoCode: Platform.localeName.split('_').last
+  );
+  
 
   String? typeValue;
   String selectedCountry = '';
@@ -44,7 +50,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
 
-    String? detectedCountry = "";
+    var detectedCountry = "";
+    String? detectedC = "";
     String dialCode ="";
 
     String _errorMessage = "";
@@ -55,18 +62,126 @@ class _RegisterScreenState extends State<RegisterScreen> {
      TextEditingController whatsAppController = TextEditingController();
 
   String initialCountry = 'ML';
-  PhoneNumber number = PhoneNumber(isoCode: 'ML');
+  String detectedCountryCode = '';
+  PhoneNumber number = PhoneNumber();
   // List of items in our dropdown menu 
   var items = [     
     'Item 2', 
     
   ]; 
+    void getLocationNew() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        await Geolocator.openLocationSettings();
+        return Future.error('Location services are disabled.');
+      }
 
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return Future.error('Location permissions are denied');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        return Future.error('Location permissions are permanently denied.');
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      Placemark placemark = placemarks.first;
+      setState(() {
+        detectedCountryCode = placemark.isoCountryCode!;
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+  var latitude = 'Getting Latitude..'.obs;
+  var longitude = 'Getting Longitude..'.obs;
+  var address = 'Getting Address..'.obs;
+  late StreamSubscription<Position> streamSubscription;
+
+   getLocation() async {
+    bool serviceEnabled;
+
+    LocationPermission permission;
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      await Geolocator.openLocationSettings();
+      return Future.error('Location services are disabled.');
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    streamSubscription =
+        Geolocator.getPositionStream().listen((Position position) {
+      latitude.value = 'Latitude : ${position.latitude}';
+      longitude.value = 'Longitude : ${position.longitude}';
+      getAddressFromLatLang(position);
+    });
+  }
+
+  Future<void> getAddressFromLatLang(Position position) async {
+    List<Placemark> placemark =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+    Placemark place = placemark[0];
+    debugPrint("Address ISO: $detectedC"  );
+    address.value = 'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
+    detectedC = place.isoCountryCode;
+            detectedCountryCode = place.isoCountryCode!;
+
+    debugPrint("Address:   ${place.locality},${place.country},${place.isoCountryCode}"  );
+  }
+
+  //    void _detectInitialCountryCode() {
+  //   // Obtenir la locale du périphérique
+  //   String locale = Platform.localeName;
+
+  //   // Extraire le code de pays de la locale
+  //   String countryCode = locale.split('_').last;
+
+  //   // Mettre à jour l'état avec le code de pays détecté
+  //   setState(() {
+  //     detectedCountry = countryCode;
+  //     debugPrint("Iso : $detectedCountry");
+  //   });
+  // }
+   
   
 
    void getPhoneNumber(String phoneNumber) async {
     PhoneNumber number =
-        await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber, 'US');
+        await PhoneNumber.getRegionInfoFromPhoneNumber(phoneNumber, Platform.localeName.split('_').last);
 
     setState(() {
       this.number = number;
@@ -104,10 +219,6 @@ Future<String?> getCurrentCountryFromLocation() async {
   TextEditingController telephoneController = TextEditingController();
   TextEditingController typeActeurController = TextEditingController();
 
- 
-
- 
-
 
   String removePlus(String phoneNumber) {
   if (phoneNumber.startsWith('+')) {
@@ -127,7 +238,8 @@ Future<String?> getCurrentCountryFromLocation() async {
     _mesTypeActeur  =
         // http.get(Uri.parse('https://koumi.ml/api-koumi/typeActeur/read'));
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/typeActeur/read'));
-    
+    // getLocation();
+    getLocationNew();
   }
 
    @override
@@ -221,7 +333,7 @@ Future<String?> getCurrentCountryFromLocation() async {
 
 
   IntlPhoneField(
-           initialCountryCode: number.isoCode, // Automatically detect user's country
+           initialCountryCode: detectedCountryCode.toUpperCase(), // Automatically detect user's country
        invalidNumberMessage : "Numéro invalide",
     searchText: "Chercher un pays",
                    decoration: InputDecoration(
@@ -287,13 +399,12 @@ Future<String?> getCurrentCountryFromLocation() async {
 //           print('On Saved: $number');
 //         },
 //         textFieldController: controller,
-       
 //       ),
 //     ],
 //   ),
 // ),
    IntlPhoneField(
-  initialCountryCode: number.isoCode, // Automatically detect user's country
+  initialCountryCode: Platform.localeName.split('_').last, // Automatically detect user's country
     controller: whatsAppController,
     invalidNumberMessage : "Numéro invalide",
     searchText: "Chercher un pays",
