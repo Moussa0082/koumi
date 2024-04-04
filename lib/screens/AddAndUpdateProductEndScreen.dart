@@ -143,7 +143,6 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
         // Handle any exceptions that might occur during the request
         final String errorMessage = error.toString();
         debugPrint("no " + errorMessage);
-      Get.snackbar("Erreur", "Une erreur s'est produite veuiller réesayer ulterieurement",duration: Duration(seconds: 3));
       } 
 
    }
@@ -177,7 +176,6 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
         // Handle any exceptions that might occur during the request
         final String errorMessage = error.toString();
         debugPrint("no " + errorMessage);
-      Get.snackbar("Erreur", "Une erreur s'est produite veuiller réesayer ulterieurement",duration: Duration(seconds: 3));
       } 
 
 
