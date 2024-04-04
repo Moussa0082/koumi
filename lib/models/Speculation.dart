@@ -4,7 +4,7 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 
 class Speculation {
-final String? idSpeculation;
+ String? idSpeculation;
   final String? codeSpeculation;
    String? nomSpeculation;
   final String? descriptionSpeculation;

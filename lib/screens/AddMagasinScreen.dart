@@ -583,10 +583,10 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                                       ),
                                     )
                                     .toList(),
-                                value: niveau1Pays.idNiveau1Pays,
+                                value:  niveau1Pays.idNiveau1Pays,
                                 onChanged: (newValue) {
                                   setState(() {
-                                    niveau1Pays.idNiveau1Pays = newValue;
+                       widget.isEditable! == false ? niveau1Pays.idNiveau1Pays : widget.niveau1Pays!.idNiveau1Pays = newValue;
                                     if (newValue != null) {
                                       niveau1Pays.nomN1 =
                                           niveau1List.map((e) => e.nomN1).first;
@@ -595,7 +595,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                                   });
                                 },
                                 decoration: InputDecoration(
-                                  labelText: 'Selectionner une region',
+                                  labelText: widget.isEditable! == false ? 'Selectionner une region' : widget.niveau1Pays!.nomN1,
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(

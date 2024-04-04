@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Filiere.dart';
+import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductEndScreen.dart';
@@ -35,6 +36,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
   TextEditingController _origineController = TextEditingController();
 
   late Acteur acteur;
+   Stock stock = Stock();
   late List<TypeActeur> typeActeurData = [];
   late String type;
   late TextEditingController _searchController;
@@ -417,21 +419,16 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                       const SizedBox(height: 20),
                       ElevatedButton(
                           onPressed: () async {
-                            // final String nom = _nomController.text;
-                            // final String description =
-                            //     _descriptionController.text;
-                            // final String prix = _prixController.text;
-                            // final String capacite = _capaciteController.text;
-                            // final String etat = _etatController.text;
-                            // final String localite = _localiteController.text;
+                   
 
-                            // if (formkey.currentState!.validate()) {
+                            if (formkey.currentState!.validate()) {
                               Get.to(AddAndUpdateProductEndSreen(isEditable: false,
                               nomProduit: _nomController.text, forme: _formController.text,
                               origine: _origineController.text, prix: _prixController.text,
-                              quantite: _quantiteController.text,
+                              image: photo,
+                              quantite: _quantiteController.text, idStock: stock.idStock, stock: stock,
                               ));
-                            // }
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange, // Orange color code

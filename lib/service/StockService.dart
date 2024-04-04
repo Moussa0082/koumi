@@ -34,7 +34,7 @@ class StockService extends ChangeNotifier {
     required Acteur acteur,
   }) async {
     try {
-      var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
+      var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/addStock'));
 
       if (photo != null) {
         requete.files.add(http.MultipartFile(
@@ -59,16 +59,19 @@ class StockService extends ChangeNotifier {
       var response = await requete.send();
       var responsed = await http.Response.fromStream(response);
 
-      if (response.statusCode == 200 || responsed.statusCode == 201) {
+      if (response.statusCode == 200 || responsed.statusCode == 201 || responsed.statusCode == 202) {
         final donneesResponse = json.decode(responsed.body);
               Get.snackbar("Succès", "Produit ajouté avec succès",duration: Duration(seconds: 3));
         debugPrint('stock service ${donneesResponse.toString()}');
       } else {
-           Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
+           Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer plus tard",duration: Duration(seconds: 3));
+         
         throw Exception(
             'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
       }
     } catch (e) {
+              debugPrint('stock service erreur $e');
+
       Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
       throw Exception(
           'Une erreur s\'est produite lors de l\'ajout de acteur : $e');
