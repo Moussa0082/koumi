@@ -4,11 +4,13 @@ import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/CartProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddIntrant.dart';
 import 'package:koumi_app/screens/DetailIntrant.dart';
 import 'package:koumi_app/screens/ListeIntrantByActeur.dart';
 import 'package:koumi_app/service/IntrantService.dart';
+import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -336,7 +338,14 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                                                         15), // Coins arrondis du bouton
                                                           ),
                                                           child: IconButton(
-                                                            onPressed: () {},
+                                                            onPressed: () {
+                                                               if (e.acteur.idActeur! == acteur.idActeur!){
+                        Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un intrant qui vous appartient");
+                        }else{
+                          Provider.of<CartProvider>(context, listen: false)
+                        .addToCartInt(e, 1, "");
+                        }
+                                                            },
                                                             icon: Icon(Icons
                                                                 .add), // Icône du panier
                                                             color: Colors
