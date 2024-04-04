@@ -339,12 +339,12 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                                           ),
                                                           child: IconButton(
                                                             onPressed: () {
-                                                               if (e.acteur.idActeur! == acteur.idActeur!){
-                        Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un intrant qui vous appartient");
-                        }else{
-                          Provider.of<CartProvider>(context, listen: false)
-                        .addToCartInt(e, 1, "");
-                        }
+                        //                                        if (e.acteur.idActeur! == acteur.idActeur!){
+                        // Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un intrant qui vous appartient");
+                        // }else{
+                        //   Provider.of<CartProvider>(context, listen: false)
+                        // .addToCartInt(e, 1, "");
+                        // }
                                                             },
                                                             icon: Icon(Icons
                                                                 .add), // Icône du panier

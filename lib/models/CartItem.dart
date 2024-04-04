@@ -8,15 +8,17 @@ import 'package:provider/provider.dart';
 
 // Modèle de panier
 class CartItem {
-  final Stock stock;
-  int quantiteStock;
-  CartItem({required this.stock,  this.quantiteStock = 1});
-
-}
-
-class CartItemIntrant {
-  final Intrant intrant;
+  final Stock? stock;
+  final Intrant? intrant;
   int quantiteIntrant;
-  CartItemIntrant({required this.intrant,  this.quantiteIntrant = 1});
+  int quantiteStock;
+  CartItem({ this.stock, this.intrant, this.quantiteIntrant = 1, this.quantiteStock = 1});
 
 }
+
+// class CartItemIntrant {
+//   final Intrant intrant;
+//   int quantiteIntrant;
+//   CartItemIntrant({required this.intrant,  this.quantiteIntrant = 1});
+
+// }
