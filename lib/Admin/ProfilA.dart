@@ -313,9 +313,7 @@ class _ProfilAState extends State<ProfilA> {
 
                       // Déconnexion avec le provider
                       await acteurProvider.logout();
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      await prefs.clear();
+    
 
                       Get.off(BottomNavigationPage(),
                           duration: Duration(

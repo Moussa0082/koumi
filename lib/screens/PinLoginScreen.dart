@@ -202,6 +202,12 @@ Navigator.pushReplacement(
       } else {
         // Traitement en cas d'échec
                             enteredPin = '';
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              const SnackBar(
+                                                                                content: Center(child: Text("Code pin incorrecte ")),
+                                                                                duration: Duration(seconds: 2),
+                                                                              ),
+                                                                            );
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
         final errorMessage = responseBody['message'];
         print(errorMessage);

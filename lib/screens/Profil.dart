@@ -558,9 +558,7 @@ class _ProfilState extends State<Profil> {
 
                             // Déconnexion avec le provider
                             await acteurProvider.logout();
-                            SharedPreferences prefs =
-                                await SharedPreferences.getInstance();
-                            await prefs.clear();
+                     
                             //                   Navigator.pushReplacement(
                             // context,
                             // MaterialPageRoute(builder: (context) => LoginScreen()),

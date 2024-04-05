@@ -65,33 +65,37 @@ class ActeurProvider with ChangeNotifier {
   }
 
 // Vérifier si le codeActeur est présent dans SharedPreferences
-if (codeActeur.isEmpty) {
-  // Gérer le cas où le codeActeur est manquant
-  // Sauvegarder le codeActeur avant de nettoyer les SharedPreferences
-  // String savedCodeActeur = "VF212";
-
-  // Nettoyer toutes les données de SharedPreferences
   await prefs.clear();
 
   // Réenregistrer le codeActeur dans SharedPreferences
   prefs.setString('codeActeur', savedCodeActeur);
-} else {
-  // // Sauvegarder le codeActeur avant de nettoyer les SharedPreferences
-  // String savedCodeActeur = "VF212";
-  //   String savedCodeActeur = codeActeur;
+// if (codeActeur.isEmpty) {
+//   // Gérer le cas où le codeActeur est manquant
+//   // Sauvegarder le codeActeur avant de nettoyer les SharedPreferences
+//   // String savedCodeActeur = "VF212";
 
-  // // Nettoyer toutes les données de SharedPreferences
-  // await prefs.clear();
+//   // Nettoyer toutes les données de SharedPreferences
+//   await prefs.clear();
 
-  // // Réenregistrer le codeActeur dans SharedPreferences
-  // prefs.setString('codeActeur', savedCodeActeur);
+//   // Réenregistrer le codeActeur dans SharedPreferences
+//   prefs.setString('codeActeur', savedCodeActeur);
+// } else {
+//   // // Sauvegarder le codeActeur avant de nettoyer les SharedPreferences
+//   // String savedCodeActeur = "VF212";
+//   //   String savedCodeActeur = codeActeur;
 
-  // // // Nettoyer toutes les données de SharedPreferences
-  // await prefs.clear();
+//   // // Nettoyer toutes les données de SharedPreferences
+//   // await prefs.clear();
 
-  // // // Réenregistrer le codeActeur dans SharedPreferences
-  // prefs.setString('codeActeur', savedCodeActeur);
-}
+//   // // Réenregistrer le codeActeur dans SharedPreferences
+//   // prefs.setString('codeActeur', savedCodeActeur);
+
+//   // // // Nettoyer toutes les données de SharedPreferences
+//   // await prefs.clear();
+
+//   // // // Réenregistrer le codeActeur dans SharedPreferences
+//   // prefs.setString('codeActeur', savedCodeActeur);
+// }
 
     notifyListeners();
     // Rediriger vers la page de connexion
