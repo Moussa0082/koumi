@@ -54,7 +54,12 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
             },
             icon: const Icon(Icons.arrow_back_ios)),
         title: const Text(
-          "Mes intrants",
+          "Mes intrants ",
+          style: TextStyle(
+            color: d_colorGreen,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -125,9 +130,10 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                       return libelle.contains(searchText);
                     }).toList();
                     return Wrap(
-                      children: filtereSearch.map((e) => Padding(
-                         padding: EdgeInsets.all(10),
-                         child: SizedBox(
+                      children: filtereSearch
+                          .map((e) => Padding(
+                                padding: EdgeInsets.all(10),
+                                child: SizedBox(
                                   width:
                                       MediaQuery.of(context).size.width * 0.45,
                                   child: GestureDetector(
@@ -201,10 +207,10 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                           ),
                                           _buildItem("Statut:",
                                               '${e.statutIntrant! ? 'Disponible' : 'Non disponible'}'),
-                                          _buildItem(
-                                              "Prix :", e.prixIntrant.toString()),
+                                          _buildItem("Prix :",
+                                              e.prixIntrant.toString()),
                                           SizedBox(height: 10),
-                                           Container(
+                                          Container(
                                             alignment: Alignment.bottomRight,
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 10),
@@ -235,8 +241,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                         onTap: () async {
                                                           await IntrantService()
                                                               .activerIntrant(
-                                                                  acteur
-                                                                      .idActeur!)
+                                                                  e.idIntrant!)
                                                               .then((value) => {
                                                                     Provider.of<IntrantService>(
                                                                             context,
@@ -308,8 +313,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                         onTap: () async {
                                                           await IntrantService()
                                                               .desactiverIntrant(
-                                                                  acteur
-                                                                      .idActeur!)
+                                                                  e.idIntrant!)
                                                               .then((value) => {
                                                                     Provider.of<IntrantService>(
                                                                             context,
@@ -379,9 +383,9 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                           ),
                                                         ),
                                                         onTap: () async {
-                                                          await IntrantService().deleteIntrant(
-                                                                  acteur
-                                                                      .idActeur!)
+                                                          await IntrantService()
+                                                              .deleteIntrant(
+                                                                  e.idIntrant!)
                                                               .then((value) => {
                                                                     Provider.of<IntrantService>(
                                                                             context,
@@ -391,7 +395,8 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                                     setState(
                                                                         () {
                                                                       futureList =
-                                                                          getListe(acteur.idActeur!);
+                                                                          getListe(
+                                                                              acteur.idActeur!);
                                                                     }),
                                                                     Navigator.of(
                                                                             context)
@@ -426,7 +431,8 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                     ),
                                   ),
                                 ),
-                        )).toList() ,
+                              ))
+                          .toList(),
                     );
                   }
                 });

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:koumi_app/admin/AlerteScreen.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/AlerteScreen.dart';
 import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart';
-import 'package:koumi_app/screens/MagasinActeur.dart';
 import 'package:koumi_app/screens/MagasinScreen.dart';
 import 'package:koumi_app/screens/Meteo.dart';
 import 'package:koumi_app/screens/Produit.dart';
@@ -85,8 +84,7 @@ class _AccueilState extends State<Accueil> {
     );
   }
 
-
-List<Widget> _buildCards() {
+  List<Widget> _buildCards() {
     List<Widget> cards = [
       _buildAccueilCard("Intrants", "intrant.png", 1),
       _buildAccueilCard("Commandes", "commande.png", 3),
@@ -111,10 +109,8 @@ List<Widget> _buildCards() {
       child: InkWell(
           onTap: () {
             if (index == 9) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>  ProduitScreen()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ProduitScreen()));
             } else if (index == 8) {
               Navigator.push(
                   context,

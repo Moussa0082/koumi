@@ -3,12 +3,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/NextAddVehicule.dart';
+import 'package:koumi_app/screens/NextAddVehiculeActeur.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
@@ -510,7 +512,7 @@ class _AddVehiculeState extends State<AddVehicule> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => NextAddVehicule(
+                                      builder: (context) => NextAddVehiculeActeur(
                                           typeVoiture: typeVoiture,
                                           nomV: _nomController.text,
                                           localite: niveau3,
@@ -524,6 +526,7 @@ class _AddVehiculeState extends State<AddVehicule> {
                                     _localiteController.clear(),
                                     _nbKilometrageController.clear(),
                                     _capaciteController.clear(),
+                                   
                                     setState(() {
                                       typeValue = null;
                                       n3Value = null;

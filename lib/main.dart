@@ -9,6 +9,7 @@ import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/PinLoginScreen.dart';
 import 'package:koumi_app/screens/SplashScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
+import 'package:koumi_app/service/AlerteService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/ConseilService.dart';
@@ -40,7 +41,6 @@ import 'package:provider/provider.dart';
 
 void main() {
   runApp(MultiProvider(providers: [
-
     ChangeNotifierProvider(create: (context) => MagasinService()),
     ChangeNotifierProvider(create: (context) => CartProvider()),
     ChangeNotifierProvider(create: (context) => ActeurService()),
@@ -55,6 +55,7 @@ void main() {
     ChangeNotifierProvider(create: (context) => PaysService()),
     ChangeNotifierProvider(create: (context) => ConseilService()),
     ChangeNotifierProvider(create: (context) => TypeMaterielService()),
+    ChangeNotifierProvider(create: (context) => AlertesService()),
     ChangeNotifierProvider(create: (context) => IntrantService()),                                                                                                                                                                                                                                                                                                                         ChangeNotifierProvider(create: (context) => TypeVoitureService()),
     ChangeNotifierProvider(create: (context) => TypeMaterielService()),                                                                                                                                                                                                                                                                                                                                         ChangeNotifierProvider(create: (context) => TypeVoitureService()),
     ChangeNotifierProvider(create: (context) => MessageService()),

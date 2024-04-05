@@ -5,10 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
+import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/screens/NextAddIntrat.dart';
 import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/service/SpeculationService.dart';
@@ -32,6 +36,8 @@ class _AddIntrantState extends State<AddIntrant> {
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _quantiteController = TextEditingController();
   TextEditingController _prixController = TextEditingController();
+  TextEditingController _dateController = TextEditingController();
+  DateTime selectedDate = DateTime.now();
   bool _isLoading = false;
   final formkey = GlobalKey<FormState>();
   late Acteur acteur;
@@ -44,6 +50,8 @@ class _AddIntrantState extends State<AddIntrant> {
   late Speculation speculation;
   String? catValue;
   late Future _categorieList;
+  late ParametreGeneraux para;
+  List<ParametreGeneraux> paraList = [];
   // late CategorieProduit categorieProduit;
   late CategorieProduit categorieProduit = CategorieProduit();
   late Future<List<CategorieProduit>> _liste;
@@ -127,6 +135,9 @@ class _AddIntrantState extends State<AddIntrant> {
   @override
   void initState() {
     super.initState();
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+    para = paraList[0];
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _categorieList = fetchCategorieList(); // _categorieList = http.get(
     //     Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
@@ -197,23 +208,88 @@ class _AddIntrantState extends State<AddIntrant> {
                         ),
                       ),
                     ),
-                    Consumer<CategorieService>(
-                      builder: (context, catService, child) {
-                        return FutureBuilder(
-                          future: _categorieList,
-                          builder: (_, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return CircularProgressIndicator();
-                            }
-                            if (snapshot.hasError) {
-                              return Text("${snapshot.error}");
-                            }
-                            if (snapshot.hasData) {
-                              List<CategorieProduit> catList =
-                                  snapshot.data as List<CategorieProduit>;
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      child: Consumer<CategorieService>(
+                        builder: (context, catService, child) {
+                          return FutureBuilder(
+                            future: _categorieList,
+                            builder: (_, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Chargement...',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
 
-                              if (catList.isEmpty) {
+                              if (snapshot.hasData) {
+                                List<CategorieProduit> catList =
+                                    snapshot.data as List<CategorieProduit>;
+
+                                if (catList.isEmpty) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Aucune catégorie trouvé',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return DropdownButtonFormField<String>(
+                                  items: catList
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idCategorieProduit,
+                                          child: Text(e.libelleCategorie!),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: catValue,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      speValue =
+                                          null; // Réinitialisez la valeur de la spéculation sélectionnée
+                                      catValue = newValue;
+                                      if (newValue != null) {
+                                        categorieProduit = catList.firstWhere(
+                                          (element) =>
+                                              element.idCategorieProduit ==
+                                              newValue,
+                                        );
+
+                                        // _speculationList = SpeculationService().fetchSpeculationByCategorie(newValue);
+                                        _speculationList = http.get(Uri.parse(
+                                            'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculationByCategorie/${newValue}'));
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Sélectionner une catégorie',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              } else {
                                 return DropdownButtonFormField(
                                   items: [],
                                   onChanged: null,
@@ -227,37 +303,39 @@ class _AddIntrantState extends State<AddIntrant> {
                                   ),
                                 );
                               }
-
-                              return DropdownButtonFormField<String>(
-                                items: catList
-                                    .map(
-                                      (e) => DropdownMenuItem(
-                                        value: e.idCategorieProduit,
-                                        child: Text(e.libelleCategorie!),
-                                      ),
-                                    )
-                                    .toList(),
-                                value: catValue,
-                                onChanged: (newValue) {
-                                  setState(() {
-                                    speValue =
-                                        null; // Réinitialisez la valeur de la spéculation sélectionnée
-                                    catValue = newValue;
-                                    if (newValue != null) {
-                                      categorieProduit = catList.firstWhere(
-                                        (element) =>
-                                            element.idCategorieProduit ==
-                                            newValue,
-                                      );
-
-                                      // _speculationList = SpeculationService().fetchSpeculationByCategorie(newValue);
-                                      _speculationList = http.get(Uri.parse(
-                                          'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculationByCategorie/${newValue}'));
-                                    }
-                                  });
-                                },
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 22,
+                      ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Chosir une spéculation",
+                          style: TextStyle(color: (Colors.black), fontSize: 18),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      child: Consumer<SpeculationService>(
+                          builder: (context, speculationService, child) {
+                        return FutureBuilder(
+                          future: _speculationList,
+                          // future: speculationService.fetchSpeculationByCategorie(categorieProduit.idCategorieProduit!),
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
                                 decoration: InputDecoration(
-                                  labelText: 'Sélectionner une catégorie',
+                                  labelText: 'Chargement...',
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(
@@ -265,12 +343,84 @@ class _AddIntrantState extends State<AddIntrant> {
                                   ),
                                 ),
                               );
+                            }
+
+                            if (snapshot.hasData) {
+                              dynamic responseData =
+                                  json.decode(snapshot.data.body);
+
+                              if (responseData is List) {
+                                List<Speculation> speList = responseData
+                                    .map((e) => Speculation.fromMap(e))
+                                    .toList();
+
+                                if (speList.isEmpty) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Aucune speculation trouvé',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return DropdownButtonFormField<String>(
+                                  items: speList
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idSpeculation,
+                                          child: Text(e.nomSpeculation!),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: speValue,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      speValue = newValue;
+                                      if (newValue != null) {
+                                        speculation = speList.firstWhere(
+                                          (element) =>
+                                              element.idSpeculation == newValue,
+                                        );
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Sélectionner une speculation',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                // Handle case when response data is not a list
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucune speculation trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
                             } else {
                               return DropdownButtonFormField(
                                 items: [],
                                 onChanged: null,
                                 decoration: InputDecoration(
-                                  labelText: 'Aucune catégorie trouvé',
+                                  labelText: 'Aucune speculation trouvé',
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(
@@ -281,9 +431,173 @@ class _AddIntrantState extends State<AddIntrant> {
                             }
                           },
                         );
-                      },
+                      }),
                     ),
-                    // Consumer<CategorieService>(
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 22,
+                      ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Nom de l'intrant",
+                          style: TextStyle(color: (Colors.black), fontSize: 18),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      child: TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir les champs";
+                          }
+                          return null;
+                        },
+                        controller: _nomController,
+                        decoration: InputDecoration(
+                          hintText: "nom",
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 22,
+                      ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Description",
+                          style: TextStyle(color: (Colors.black), fontSize: 18),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      child: TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir les champs";
+                          }
+                          return null;
+                        },
+                        controller: _descriptionController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          hintText: "Description",
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 22,
+                      ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Quantite (paquets)",
+                          style: TextStyle(color: (Colors.black), fontSize: 18),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      child: TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir les champs";
+                          }
+                          return null;
+                        },
+                        controller: _quantiteController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        decoration: InputDecoration(
+                          hintText: "Quantité intant",
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                        onPressed: () async {
+                          final String nom = _nomController.text;
+                          final String description =
+                              _descriptionController.text;
+                          final double quantite =
+                              double.tryParse(_quantiteController.text) ?? 0.0;
+
+                          if (formkey.currentState!.validate()) {
+                            Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => NextAddIntrat(
+                                            nom: nom,
+                                            description: description,
+                                            quantite: quantite,
+                                            speculation: speculation)))
+                                .then((value) => {
+                                      _nomController.clear(),
+                                      _descriptionController.clear(),
+                                      _quantiteController.clear(),
+                                      setState(() {
+                                        speValue = null;
+                                        catValue = null;
+                                      }),
+                                    });
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange, // Orange color code
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          minimumSize: const Size(290, 45),
+                        ),
+                        child: Text(
+                          "Suivant",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ))
+                  ]),
+                )
+              ],
+            ),
+          ),
+        ));
+  }
+}
+
+
+ // Consumer<CategorieService>(
                     //     builder: (context, catService, child) {
                     //   return FutureBuilder(
                     //     future: _categorieList,
@@ -380,123 +694,8 @@ class _AddIntrantState extends State<AddIntrant> {
                     //     },
                     //   );
                     // }),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 22,
-                      ),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          "Chosir une spéculation",
-                          style: TextStyle(color: (Colors.black), fontSize: 18),
-                        ),
-                      ),
-                    ),
-                    Consumer<SpeculationService>(
-                        builder: (context, speculationService, child) {
-                      return FutureBuilder(
-                        future: _speculationList,
-                        // future: speculationService.fetchSpeculationByCategorie(categorieProduit.idCategorieProduit!),
-                        builder: (_, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return CircularProgressIndicator();
-                          }
-                          if (snapshot.hasError) {
-                            return Text("${snapshot.error}");
-                          }
-                          if (snapshot.hasData) {
-                            // Extract data from the HTTP response
-                            dynamic responseData =
-                                json.decode(snapshot.data.body);
 
-                            // Check if the response data is a list
-                            if (responseData is List) {
-                              // Convert response data to a list of Speculation objects
-                              List<Speculation> speList = responseData
-                                  .map((e) => Speculation.fromMap(e))
-                                  .toList();
-
-                              if (speList.isEmpty) {
-                                // Handle case when no speculations are found
-                                return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Aucune speculation trouvé',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                              }
-
-                              // Build DropdownButtonFormField with speculations
-                              return DropdownButtonFormField<String>(
-                                items: speList
-                                    .map(
-                                      (e) => DropdownMenuItem(
-                                        value: e.idSpeculation,
-                                        child: Text(e.nomSpeculation!),
-                                      ),
-                                    )
-                                    .toList(),
-                                value: speValue,
-                                onChanged: (newValue) {
-                                  setState(() {
-                                    speValue = newValue;
-                                    if (newValue != null) {
-                                      speculation = speList.firstWhere(
-                                        (element) =>
-                                            element.idSpeculation == newValue,
-                                      );
-                                    }
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                  labelText: 'Sélectionner une speculation',
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              );
-                            } else {
-                              // Handle case when response data is not a list
-                              return DropdownButtonFormField(
-                                items: [],
-                                onChanged: null,
-                                decoration: InputDecoration(
-                                  labelText: 'Aucune speculation trouvé',
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              );
-                            }
-                          } else {
-                            return DropdownButtonFormField(
-                              items: [],
-                              onChanged: null,
-                              decoration: InputDecoration(
-                                labelText: 'Aucune speculation trouvé',
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                      );
-                    }),
-                    // Consumer<SpeculationService>(
+                     // Consumer<SpeculationService>(
                     //     builder: (context, speculationService, child) {
                     //   return FutureBuilder(
                     //     future: _speculationList,
@@ -586,358 +785,3 @@ class _AddIntrantState extends State<AddIntrant> {
                     //     },
                     //   );
                     // }),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 22,
-                      ),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          "Nom de l'intrant",
-                          style: TextStyle(color: (Colors.black), fontSize: 18),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      child: TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: _nomController,
-                        decoration: InputDecoration(
-                          hintText: "nom",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 22,
-                      ),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          "Description",
-                          style: TextStyle(color: (Colors.black), fontSize: 18),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      child: TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: _descriptionController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          hintText: "Description",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 22,
-                      ),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          "Quantite",
-                          style: TextStyle(color: (Colors.black), fontSize: 18),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      child: TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: _quantiteController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                        decoration: InputDecoration(
-                          hintText: "Quantité intant",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 22,
-                      ),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          "Prix intrant",
-                          style: TextStyle(color: (Colors.black), fontSize: 18),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      child: TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: _prixController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                        decoration: InputDecoration(
-                          hintText: "Prix intrant",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    SizedBox(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 10.0),
-                        child: photo != null
-                            ? GestureDetector(
-                                onTap: _showImageSourceDialog,
-                                child: Image.file(
-                                  photo!,
-                                  fit: BoxFit.fitWidth,
-                                  height: 150,
-                                  width: 300,
-                                ),
-                              )
-                            : SizedBox(
-                                child: IconButton(
-                                  onPressed: _showImageSourceDialog,
-                                  icon: const Icon(
-                                    Icons.add_a_photo_rounded,
-                                    size: 60,
-                                  ),
-                                ),
-                              ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                        onPressed: () async {
-                          final String nom = _nomController.text;
-                          final String description =
-                              _descriptionController.text;
-                          final double quantite =
-                              double.tryParse(_quantiteController.text) ?? 0.0;
-                          final int prix =
-                              int.tryParse(_prixController.text) ?? 0;
-
-                          if (formkey.currentState!.validate()) {
-                            try {
-                              setState(() {
-                                _isLoading = true;
-                              });
-                              if (photo != null) {
-                                await IntrantService()
-                                    .creerIntrant(
-                                        nomIntrant: nom,
-                                        quantiteIntrant: quantite,
-                                        descriptionIntrant: description,
-                                        prixIntrant: prix,
-                                        photoIntrant: photo,
-                                         speculation: speculation,
-                                        acteur: acteur)
-                                    .then((value) => {
-                                          Provider.of<IntrantService>(context,
-                                                  listen: false)
-                                              .applyChange(),
-                                          _nomController.clear(),
-                                          _descriptionController.clear(),
-                                          _quantiteController.clear(),
-                                          _prixController.clear(),
-                                          setState(() {
-                                            _isLoading = false;
-                                             speValue = null;
-                                            catValue = null;
-                                          }),
-                                          Navigator.pop(context),
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  Text(
-                                                    "Intant ajouté avec succèss",
-                                                    style: TextStyle(
-                                                        overflow: TextOverflow
-                                                            .ellipsis),
-                                                  ),
-                                                ],
-                                              ),
-                                              duration: Duration(seconds: 5),
-                                            ),
-                                          )
-                                        })
-                                    .catchError((onError) => {
-                                          print('Erreur :${onError.message}'),
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  Text(
-                                                    "Une erreur s'est produite",
-                                                    style: TextStyle(
-                                                        overflow: TextOverflow
-                                                            .ellipsis),
-                                                  ),
-                                                ],
-                                              ),
-                                              duration: Duration(seconds: 5),
-                                            ),
-                                          )
-                                        });
-                              } else {
-                                await IntrantService()
-                                    .creerIntrant(
-                                        nomIntrant: nom,
-                                        quantiteIntrant: quantite,
-                                        descriptionIntrant: description,
-                                        prixIntrant: prix,
-                                        speculation: speculation,
-                                        acteur: acteur)
-                                    .then((value) => {
-                                          Provider.of<IntrantService>(context,
-                                                  listen: false)
-                                              .applyChange(),
-                                          _nomController.clear(),
-                                          _descriptionController.clear(),
-                                          _quantiteController.clear(),
-                                          _prixController.clear(),
-                                          setState(() {
-                                            _isLoading = false;
-                                            speValue = null;
-                                            catValue = null;
-                                          }),
-                                          Navigator.pop(context),
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  Text(
-                                                    "Intant ajouté avec succèss",
-                                                    style: TextStyle(
-                                                        overflow: TextOverflow
-                                                            .ellipsis),
-                                                  ),
-                                                ],
-                                              ),
-                                              duration: Duration(seconds: 5),
-                                            ),
-                                          )
-                                        })
-                                    .catchError((onError) => {
-                                          print('Erreur :${onError.message}'),
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  Text(
-                                                    "Une erreur s'est produite",
-                                                    style: TextStyle(
-                                                        overflow: TextOverflow
-                                                            .ellipsis),
-                                                  ),
-                                                ],
-                                              ),
-                                              duration: Duration(seconds: 5),
-                                            ),
-                                          )
-                                        });
-                              }
-                            } catch (e) {
-                              print('Erreur :${e.toString()}');
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text(
-                                        "Une erreur s'est produite",
-                                        style: TextStyle(
-                                            overflow: TextOverflow.ellipsis),
-                                      ),
-                                    ],
-                                  ),
-                                  duration: Duration(seconds: 5),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange, // Orange color code
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          minimumSize: const Size(290, 45),
-                        ),
-                        child: Text(
-                          "Ajouter",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ))
-                  ]),
-                )
-              ],
-            ),
-          ),
-        ));
-  }
-}

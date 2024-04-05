@@ -33,52 +33,48 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
- String? _currentAddress;
+  String? _currentAddress;
   Position? _currentPosition;
 
+  Future<bool> _handleLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
 
- Future<bool> _handleLocationPermission() async {
-  bool serviceEnabled;
-  LocationPermission permission;
-  
-  serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Location services are disabled. Please enable the services')));
-    return false;
-  }
-  permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {   
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Location permissions are denied')));
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location services are disabled. Please enable the services')));
       return false;
     }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permissions are denied')));
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location permissions are permanently denied, we cannot request permissions.')));
+      return false;
+    }
+    return true;
   }
-  if (permission == LocationPermission.deniedForever) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Location permissions are permanently denied, we cannot request permissions.')));
-    return false;
+
+  Future<void> _getCurrentPosition() async {
+    final hasPermission = await _handleLocationPermission();
+    if (!hasPermission) return;
+    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+        .then((Position position) {
+      setState(() => _currentPosition = position);
+    }).catchError((e) {
+      debugPrint(e);
+    });
   }
-  return true;
-}
-
- Future<void> _getCurrentPosition() async {
-  final hasPermission = await _handleLocationPermission();
-  if (!hasPermission) return;
-  await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high)
-      .then((Position position) {
-    setState(() => _currentPosition = position);
-  }).catchError((e) {
-    debugPrint(e);
-  });
-}
- 
-
- 
-
 
   // TextEditingController Controller = TextEditingController();
 
@@ -129,7 +125,6 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (response.statusCode == 200) {
-       
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
         emailController.clear();
         passwordController.clear();
@@ -200,11 +195,10 @@ class _LoginScreenState extends State<LoginScreen> {
         final List<String> type =
             acteur.typeActeur!.map((e) => e.libelle!).toList();
         if (type.contains('admin') || type.contains('Admin')) {
-Navigator.pushReplacement(
-  context,
-  MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
-);
-
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
+          );
         } else {
           Navigator.pushReplacement(
             context,
@@ -451,7 +445,7 @@ Navigator.pushReplacement(
   @override
   Widget build(BuildContext context) {
     return LoadingOverlay(
-        isLoading: _isLoading,
+      isLoading: _isLoading,
       child: Scaffold(
         appBar: AppBar(
             leading: IconButton(
@@ -461,28 +455,26 @@ Navigator.pushReplacement(
                 icon: const Icon(Icons.arrow_back_ios))),
         backgroundColor: const Color(0xFFFFFFFF),
         body: SingleChildScrollView(
-        
           child: Container(
-            child: Column(mainAxisAlignment: MainAxisAlignment.start,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-               
-                   SizedBox(
-                    height:180,
-                    width:150,
-                    child: Center(
-                    child: Image.asset(
-                  'assets/images/logo.png',
-                  // height: MediaQuery.sizeOf(context).height * 0.45,
-                
-                )),
-                   ),
-                                const Text(
-                                  " Connexion ",
-                                  style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xfff2b6706)),
-                                ),
+                SizedBox(
+                  height: 180,
+                  width: 150,
+                  child: Center(
+                      child: Image.asset(
+                    'assets/images/logo.png',
+                    // height: MediaQuery.sizeOf(context).height * 0.45,
+                  )),
+                ),
+                const Text(
+                  " Connexion ",
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xfff2b6706)),
+                ),
                 // connexion
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -490,15 +482,14 @@ Navigator.pushReplacement(
                       child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                                   
-                                //       Text('LAT: ${_currentPosition?.latitude ?? ""}'),
-                                // Text('LNG: ${_currentPosition?.longitude ?? ""}'),
-                                // Text('ADDRESS: ${_currentAddress ?? ""}'),
-                                // const SizedBox(height: 32),
-                                // ElevatedButton(
-                                //   onPressed: _getCurrentPosition,
-                                //   child: const Text("Get Current Location"),
-                                // ),
+                      //       Text('LAT: ${_currentPosition?.latitude ?? ""}'),
+                      // Text('LNG: ${_currentPosition?.longitude ?? ""}'),
+                      // Text('ADDRESS: ${_currentAddress ?? ""}'),
+                      // const SizedBox(height: 32),
+                      // ElevatedButton(
+                      //   onPressed: _getCurrentPosition,
+                      //   child: const Text("Get Current Location"),
+                      // ),
                       const SizedBox(
                         height: 10,
                       ),
@@ -534,11 +525,11 @@ Navigator.pushReplacement(
                         onSaved: (val) => email = val!,
                       ),
                       // fin  adresse email
-                                
+
                       const SizedBox(
                         height: 10,
                       ),
-                                
+
                       const Padding(
                         padding: EdgeInsets.only(left: 10.0),
                         child: Text(
@@ -585,7 +576,7 @@ Navigator.pushReplacement(
                         onSaved: (val) => password = val!,
                       ),
                       // fin mot de pass
-                                
+
                       const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -640,7 +631,7 @@ Navigator.pushReplacement(
                           ),
                         ],
                       ),
-                                
+
                       const SizedBox(
                         height: 10,
                       ),
@@ -673,7 +664,7 @@ Navigator.pushReplacement(
                           ),
                         ),
                       ),
-                                
+
                       const SizedBox(
                         height: 20,
                       ),

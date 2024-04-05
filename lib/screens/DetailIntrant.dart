@@ -34,6 +34,8 @@ class _DetailIntrantState extends State<DetailIntrant> {
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _quantiteController = TextEditingController();
   TextEditingController _prixController = TextEditingController();
+  TextEditingController _dateController = TextEditingController();
+
   bool _isEditing = false;
   bool _isLoading = false;
   late Acteur acteur = Acteur();
@@ -91,6 +93,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
     _descriptionController.text = intrants.descriptionIntrant;
     _quantiteController.text = intrants.quantiteIntrant.toString();
     _prixController.text = intrants.prixIntrant.toString();
+    _dateController.text = intrants.dateExpiration!;
     isDialOpenNotifier = ValueNotifier<bool>(false);
   }
 
@@ -173,6 +176,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
       final String description = _descriptionController.text;
       final double quantite = double.tryParse(_quantiteController.text) ?? 0.0;
       final int prix = int.tryParse(_prixController.text) ?? 0;
+      final String date = _dateController.text;
 
       if (photo != null) {
         await IntrantService()
@@ -182,6 +186,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                 quantiteIntrant: quantite,
                 descriptionIntrant: description,
                 prixIntrant: prix,
+                dateExpiration: date,
                 photoIntrant: photo,
                 acteur: acteur)
             .then((value) => {
@@ -195,6 +200,8 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         descriptionIntrant: description,
                         statutIntrant: intrants.statutIntrant,
                         dateAjout: intrants.dateAjout,
+                        dateExpiration: date,
+                        speculation: intrants.speculation,
                         acteur: acteur);
                     _isLoading = false;
                   }),
@@ -223,6 +230,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                 quantiteIntrant: quantite,
                 descriptionIntrant: description,
                 prixIntrant: prix,
+                dateExpiration: date,
                 acteur: acteur)
             .then((value) => {
                   Provider.of<IntrantService>(context, listen: false)
@@ -235,6 +243,8 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         descriptionIntrant: description,
                         statutIntrant: intrants.statutIntrant,
                         dateAjout: intrants.dateAjout,
+                        dateExpiration: date,
+                         speculation: intrants.speculation,
                         photoIntrant: intrants.photoIntrant,
                         acteur: acteur);
                     _isLoading = false;
@@ -247,7 +257,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                       content: Row(
                         children: [
                           Text(
-                            "Une erreur est survenu lors de la modification",
+                            "Erreur lors de la modification",
                             style: TextStyle(overflow: TextOverflow.ellipsis),
                           ),
                         ],
@@ -264,7 +274,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
           content: Row(
             children: [
               Text(
-                "Une erreur est survenu lors de la modification",
+                "Erreur lors de la modification",
                 style: TextStyle(overflow: TextOverflow.ellipsis),
               ),
             ],
@@ -493,6 +503,29 @@ class _DetailIntrantState extends State<DetailIntrant> {
                 ),
               )
             : Container(),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Container(
+            height: 40,
+            width: MediaQuery.of(context).size.width,
+            decoration: const BoxDecoration(
+              color: Colors.orangeAccent,
+            ),
+            child: Center(
+              child: Text(
+                'Autre information',
+                style: const TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ),
+        _buildItem('Spéculation ', intrants.speculation!.nomSpeculation!),
+        _buildItem('Catégorie  ',
+            intrants.speculation!.categorieProduit!.libelleCategorie!),
+        _buildItem('Date d\'ajout ', '${intrants.dateAjout}' ?? 'N/A'),
         acteur.nomActeur != intrants.acteur.nomActeur
             ? _buildFournissuer()
             : Container(),
@@ -504,6 +537,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
     return Column(children: [
       _buildEditableDetailItem('Nom intrant ', _nomController),
       _buildEditableDetailItem('Description', _descriptionController),
+      _buildEditableDetailItem('Date péremption ', _dateController),
       _buildEditableDetailItem('Quantité ', _quantiteController),
       _buildEditableDetailItem('Prix intrant ', _prixController),
     ]);
@@ -514,9 +548,9 @@ class _DetailIntrantState extends State<DetailIntrant> {
       children: [
         _buildItem('Nom intrant ', intrants.nomIntrant),
         _buildItem('Quantité ', intrants.quantiteIntrant.toString()),
+        _buildItem('Date péremption ', intrants.dateExpiration!),
         _buildItem(
             'Prix ', '${intrants.prixIntrant.toString()} ${para.monnaie}'),
-        _buildItem('Date d\'ajout ', '${intrants.dateAjout}' ?? 'N/A'),
         _buildItem('Statut ',
             '${intrants.statutIntrant! ? 'Disponible' : 'Non disponible'}'),
       ],

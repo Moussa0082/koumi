@@ -242,7 +242,9 @@ class _LocationState extends State<Location> {
             Consumer<MaterielService>(
               builder: (context, materielService, child) {
                 return FutureBuilder(
-                    future: materielService.fetchMateriel(),
+                    future: selectedType != null
+                    ? materielService.fetchMaterielByType(selectedType!.idTypeMateriel!)
+                    :materielService.fetchMateriel(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(
@@ -353,7 +355,7 @@ class _LocationState extends State<Location> {
                                                     ),
                                                   ),
                                                   _buildItem("Statut:",
-                                                      '${e.statut! ? 'Disponible' : 'Non disponible'}'),
+                                                       '${e.statut! ? 'Disponible' : 'Non disponible'}'),
                                                   _buildItem("Localité :",
                                                       e.localisation),
                                                   SizedBox(height: 10),

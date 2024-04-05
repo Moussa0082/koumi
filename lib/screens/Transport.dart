@@ -7,6 +7,7 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/AddVehicule.dart';
 import 'package:koumi_app/screens/DetailTransport.dart';
 import 'package:koumi_app/screens/PageTransporteur.dart';
 import 'package:koumi_app/screens/VehiculesActeur.dart';
@@ -62,8 +63,8 @@ class _TransportState extends State<Transport> {
     // type = typeActeurData.map((data) => data.libelle).join(', ');
     verify();
     _searchController = TextEditingController();
-    _typeList = 
-    // http.get(Uri.parse('https://koumi.ml/api-koumi/TypeVoiture/read'));
+    _typeList =
+        // http.get(Uri.parse('https://koumi.ml/api-koumi/TypeVoiture/read'));
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
     super.initState();
   }
@@ -144,7 +145,29 @@ class _TransportState extends State<Transport> {
                                                 VehiculeActeur()));
                                   },
                                 ),
-                              )
+                              ),
+                              PopupMenuItem<String>(
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.add,
+                                    color: Colors.green,
+                                  ),
+                                  title: const Text(
+                                    "Ajouter un vehicule",
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AddVehicule()));
+                                  },
+                                ),
+                              ),
                             ];
                           },
                         )

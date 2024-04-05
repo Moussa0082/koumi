@@ -3,20 +3,21 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/ListeVehiculeByType.dart';
+import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
-class NextAddVehicule extends StatefulWidget {
+class NextAddVehiculeActeur extends StatefulWidget {
   final TypeVoiture typeVoiture;
   final String nomV;
   final String localite;
@@ -24,7 +25,7 @@ class NextAddVehicule extends StatefulWidget {
   final String nbKilo;
   final String capacite;
 
-  const NextAddVehicule({
+  const NextAddVehiculeActeur({
     super.key,
     required this.typeVoiture,
     required this.nomV,
@@ -35,13 +36,13 @@ class NextAddVehicule extends StatefulWidget {
   });
 
   @override
-  State<NextAddVehicule> createState() => _NextAddVehiculeState();
+  State<NextAddVehiculeActeur> createState() => _NextAddVehiculeActeurState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _NextAddVehiculeState extends State<NextAddVehicule> {
+class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
   TextEditingController _etatController = TextEditingController();
   TextEditingController _prixController = TextEditingController();
   TextEditingController newDestinationController = TextEditingController();
@@ -74,7 +75,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
   //     prixControllers.add(newPrixController);
   //   });
   // }
-  
+
 // Méthode pour ajouter une nouvelle destination et prix
   // void addDestinationAndPrix() {
   //   // Créer un nouveau contrôleur pour chaque champ
@@ -152,7 +153,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
 
     return File(image.path);
   }
-  
+
   Future<void> _showImageSourceDialog() async {
     final BuildContext context = this.context;
     return showDialog<void>(
@@ -519,8 +520,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                               for (int i = 0;
                                   i < selectedDestinationsList.length;
                                   i++) {
-                                String destination =
-                                    selectedDestinations[i];
+                                String destination = selectedDestinations[i];
                                 int prix =
                                     int.tryParse(prixControllers[i].text) ?? 0;
 
@@ -561,13 +561,16 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                               _isLoading = false;
                                             }),
                                             Navigator.pop(context),
+                                            // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => VehiculeActeur())),
+
+                                            // Get.off(VehiculeActeur()),
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
                                                 content: Row(
                                                   children: [
                                                     Text(
-                                                        "vehicule ajouté avec succèss",
+                                                      "vehicule ajouté avec succèss",
                                                       style: TextStyle(
                                                           overflow: TextOverflow
                                                               .ellipsis),
@@ -598,23 +601,25 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                                     context,
                                                     listen: false)
                                                 .applyChange(),
-                                            // _nomController.clear(),
-                                            // _descriptionController.clear(),
-                                            // _prixController.clear(),
-                                            // _capaciteController.clear(),
+                                            // Get.to(VehiculeActeur()),
                                             _etatController.clear(),
                                             setState(() {
                                               _isLoading = false;
                                               // typeVoiture == null;
                                             }),
-                                           Navigator.pop(context),
+                                            Navigator.pop(context),
+                                              // Navigator.pushReplacement(
+                                              //   context,
+                                              //   MaterialPageRoute(
+                                              //       builder: (context) =>
+                                              //           VehiculeActeur())), 
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
                                                 content: Row(
                                                   children: [
                                                     Text(
-                                                        "vehicule ajouté avec succèss",
+                                                      "vehicule ajouté avec succèss",
                                                       style: TextStyle(
                                                           overflow: TextOverflow
                                                               .ellipsis),
@@ -635,7 +640,8 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                   const SnackBar(
                                     content: Row(
                                       children: [
-                                        Text("Une erreur s'est produit",
+                                        Text(
+                                          "Une erreur s'est produit",
                                           style: TextStyle(
                                               overflow: TextOverflow.ellipsis),
                                         ),

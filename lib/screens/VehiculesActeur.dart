@@ -204,7 +204,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                   const EdgeInsets.all(8.0),
                                               child: e.photoVehicule == null
                                                   ? Image.asset(
-                                                      "assets/images/camion.png",
+                                                     'assets/images/transport.png',
                                                       fit: BoxFit.cover,
                                                       height: 90,
                                                     )
@@ -218,7 +218,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                               StackTrace?
                                                                   stackTrace) {
                                                         return Image.asset(
-                                                          'assets/images/camion.png',
+                                                          'assets/images/transport.png',
                                                           fit: BoxFit.cover,
                                                           height: 90,
                                                         );
