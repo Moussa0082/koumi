@@ -31,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    clearCart();
+    // clearCart();
     // Vérifie d'abord si l'email de l'acteur est présent dans SharedPreferences
     checkEmailInSharedPreferences();
   }

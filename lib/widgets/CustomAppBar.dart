@@ -7,6 +7,7 @@ import 'package:koumi_app/models/MessageWa.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
+import 'package:koumi_app/screens/PinLoginScreen.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/MessageService.dart';
 import 'package:profile_photo/profile_photo.dart';
@@ -88,7 +89,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                               listen: false)
                           .changeIndex(0);
                     });
-                    Get.to(LoginScreen(),
+                    Get.to(PinLoginScreen(),
                         duration: Duration(
                             seconds:
                                 1), //duration of transitions, default 1 sec

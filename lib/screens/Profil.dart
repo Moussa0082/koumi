@@ -9,6 +9,7 @@ import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/PinLoginScreen.dart';
+import 'package:koumi_app/screens/RegisterScreen.dart';
 import 'package:koumi_app/screens/Surface.dart';
 import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
@@ -115,7 +116,7 @@ class _ProfilState extends State<Profil> {
                                     listen: false)
                                 .changeIndex(0);
                           });
-                          Get.to(PinLoginScreen(),
+                          Get.to(RegisterScreen(),
                               duration: Duration(
                                   seconds:
                                       1), //duration of transitions, default 1 sec
@@ -143,7 +144,7 @@ class _ProfilState extends State<Profil> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 10),
                           child: Text(
-                            "Se connecter",
+                            "S'inscire",
                             style: TextStyle(fontSize: 16, color: d_colorGreen),
                           ),
                         ),
