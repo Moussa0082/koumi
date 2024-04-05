@@ -201,31 +201,32 @@ Navigator.pushReplacement(
         }
       } else {
         // Traitement en cas d'échec
+                            enteredPin = '';
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
         final errorMessage = responseBody['message'];
         print(errorMessage);
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Center(child: Text('Connexion échouée !')),
-              content: Text(
-                'Coe pin incorrect',
-                // errorMessage,
-                textAlign: TextAlign.justify,
-                style: const TextStyle(color: Colors.black, fontSize: 20),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+        // showDialog(
+        //   context: context,
+        //   builder: (BuildContext context) {
+        //     return AlertDialog(
+        //       title: const Center(child: Text('Connexion échouée !')),
+        //       content: Text(
+        //         'Coe pin incorrect',
+        //         // errorMessage,
+        //         textAlign: TextAlign.justify,
+        //         style: const TextStyle(color: Colors.black, fontSize: 20),
+        //       ),
+        //       actions: <Widget>[
+        //         TextButton(
+        //           onPressed: () {
+        //             Navigator.of(context).pop();
+        //           },
+        //           child: const Text('OK'),
+        //         ),
+        //       ],
+        //     );
+        //   },
+        // );
       }
     } catch (e) {
       // Gérer les exceptionn
@@ -290,7 +291,13 @@ Navigator.pushReplacement(
     return LoadingOverlay(
       isLoading: isLoading,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        appBar: AppBar(
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.arrow_back_ios))),
+        backgroundColor: const Color(0xFFFFFFFF),
         body: SafeArea(
       minimum: EdgeInsets.only(top: 20),
           child: ListView(

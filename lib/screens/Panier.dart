@@ -157,7 +157,7 @@ class _PanierState extends State<Panier> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.orange,
-          title: Text("Panier"),
+          title: Text("Panier", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
           centerTitle: true,
           actions: [
             Consumer<CartProvider>(

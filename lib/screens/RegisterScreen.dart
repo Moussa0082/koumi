@@ -333,7 +333,7 @@ Future<String?> getCurrentCountryFromLocation() async {
 
 
   IntlPhoneField(
-           initialCountryCode: detectedCountryCode.toUpperCase(), // Automatically detect user's country
+           initialCountryCode: "ML", // Automatically detect user's country
        invalidNumberMessage : "Numéro invalide",
     searchText: "Chercher un pays",
                    decoration: InputDecoration(
@@ -404,7 +404,7 @@ Future<String?> getCurrentCountryFromLocation() async {
 //   ),
 // ),
    IntlPhoneField(
-  initialCountryCode: Platform.localeName.split('_').last, // Automatically detect user's country
+  initialCountryCode: "ML", // Automatically detect user's country
     controller: whatsAppController,
     invalidNumberMessage : "Numéro invalide",
     searchText: "Chercher un pays",
