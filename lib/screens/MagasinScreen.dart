@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/AcceuilAdmin.dart';
 import 'package:koumi_app/models/Acteur.dart';
@@ -85,7 +86,7 @@ class _MagasinScreenState extends State<MagasinScreen>
   }
 
 
-  void fetchMagasinsByRegion(String id) async {
+  Future<void> fetchMagasinsByRegion(String id) async {
     try {
       final response = await http.get(Uri.parse(
           // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
@@ -213,137 +214,141 @@ class _MagasinScreenState extends State<MagasinScreen>
   @override
   Widget build(BuildContext context) {
     const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
-    return Container(
-      child: DefaultTabController(
-        length: niveau1Pays.length,
-        child: Scaffold(
-          backgroundColor: const Color.fromARGB(255, 250, 250, 250),
-          appBar: AppBar(
-            centerTitle: true,
-            toolbarHeight: 100,
-            leading: IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-            title: Text('Tous les boutiques'),
-            bottom: TabBar(
-              isScrollable: niveau1Pays.length > 4,
-              labelColor: Colors.black,
-              controller: _tabController, // Ajoutez le contrôleur TabBar
-              tabs: niveau1Pays
-                  .map((region) => Tab(text: region.nomN1!))
-                  .toList(),
-            ),
-             actions: !isExist ? null : [
-              PopupMenuButton<String>(
-                padding: EdgeInsets.zero,
-                itemBuilder: (context) => <PopupMenuEntry<String>>[
-                  PopupMenuItem<String>(
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.add,
-                        color: Colors.green,
-                      ),
-                      title: const Text(
-                        "Ajouter Magasin",
-                        style: TextStyle(
+return Consumer<MagasinService>(
+      builder: (context, magasinProvider, _) {
+        return 
+       Container(
+        child: DefaultTabController(
+          length: niveau1Pays.length,
+          child: Scaffold(
+            backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+            appBar: AppBar(
+              centerTitle: true,
+              toolbarHeight: 100,
+              leading: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+              title: Text('Tous les boutiques'),
+              bottom: TabBar(
+                isScrollable: niveau1Pays.length > 4,
+                labelColor: Colors.black,
+                controller: _tabController, // Ajoutez le contrôleur TabBar
+                tabs: niveau1Pays
+                    .map((region) => Tab(text: region.nomN1!))
+                    .toList(),
+              ),
+               actions: !isExist ? null : [
+                PopupMenuButton<String>(
+                  padding: EdgeInsets.zero,
+                  itemBuilder: (context) => <PopupMenuEntry<String>>[
+                    PopupMenuItem<String>(
+                      child: ListTile(
+                        leading: const Icon(
+                          Icons.add,
                           color: Colors.green,
-                          fontWeight: FontWeight.bold,
                         ),
+                        title: const Text(
+                          "Ajouter Magasin",
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onTap: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => AddMagasinScreen(isEditable: false,)));
+      
+                        },
                       ),
-                      onTap: () async {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AddMagasinScreen(isEditable: false,)));
-
-                      },
+                    ),
+                    PopupMenuItem<String>(
+                      child: ListTile(
+                        leading: const Icon(
+                          Icons.add,
+                          color: Colors.green,
+                        ),
+                        title: const Text(
+                          "Ajouter Produit",
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onTap: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => AddAndUpdateProductScreen(isEditable: false,)));
+                        },
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.search,
+                              color: Colors.blueGrey[400]), // Couleur de l'icône
+                          SizedBox(
+                              width:
+                                  10), // Espacement entre l'icône et le champ de recherche
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              onChanged: (value) {
+                                setState(() {});
+                              },
+                              decoration: InputDecoration(
+                                hintText: 'Rechercher',
+                                border: InputBorder.none,
+                                hintStyle: TextStyle(
+                                    color: Colors.blueGrey[
+                                        400]), // Couleur du texte d'aide
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  PopupMenuItem<String>(
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.add,
-                        color: Colors.green,
+                  const SizedBox(height: 10),
+                  // const SizedBox(height:10),
+                  Flexible(
+                    child: GestureDetector(
+                      child: TabBarView(
+                        controller:
+                            _tabController, // Ajoutez le contrôleur TabBarView
+                        children: niveau1Pays.map((region) {
+                          return buildGridView(region.idNiveau1Pays!);
+                        }).toList(),
                       ),
-                      title: const Text(
-                        "Ajouter Produit",
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onTap: () async {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AddAndUpdateProductScreen(isEditable: false,)));
-
-                      },
                     ),
                   ),
                 ],
-              )
-            ],
-          ),
-          body: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.search,
-                            color: Colors.blueGrey[400]), // Couleur de l'icône
-                        SizedBox(
-                            width:
-                                10), // Espacement entre l'icône et le champ de recherche
-                        Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            onChanged: (value) {
-                              setState(() {});
-                            },
-                            decoration: InputDecoration(
-                              hintText: 'Rechercher',
-                              border: InputBorder.none,
-                              hintStyle: TextStyle(
-                                  color: Colors.blueGrey[
-                                      400]), // Couleur du texte d'aide
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                // const SizedBox(height:10),
-                Flexible(
-                  child: GestureDetector(
-                    child: TabBarView(
-                      controller:
-                          _tabController, // Ajoutez le contrôleur TabBarView
-                      children: niveau1Pays.map((region) {
-                        return buildGridView(region.idNiveau1Pays!);
-                      }).toList(),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
-      ),
+      );
+      }
     );
   }
 
@@ -891,4 +896,184 @@ class _MagasinScreenState extends State<MagasinScreen>
     );
   }
 
+  
+
 }
+
+
+
+//   class MagasinController extends GetxController {
+//   var isLoading = false.obs;
+ 
+//   TabController? _tabController;
+//   late TextEditingController _searchController;
+
+//   List<Magasin> magasin = [];
+//   late Acteur acteur = Acteur();
+//   late List<TypeActeur> typeActeurData = [];
+//   late String type;
+//   List<Niveau1Pays> niveau1Pays = [];
+//   String selectedRegionId =
+//       ''; // Ajoutez une variable pour stocker l'ID de la région sélectionnée
+
+//   double scaleFactor = 1;
+//   bool isVisible = true;
+
+//   String localiteMagasin = "";
+//   String contactMagasin = "";
+//   File? photo;
+//   String searchText = "";
+
+//   Set<String> loadedRegions =
+//       {}; // Ensemble pour garder une trace des régions pour lesquelles les magasins ont déjà été chargés
+
+//   void fetchRegions() async {
+//     try {
+//       final response = await http
+//           // .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+//           .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+//       if (response.statusCode == 200) {
+//         List<dynamic> data = json.decode(response.body);
+
+//           niveau1Pays = data
+//               .where((niveau1Pays) => niveau1Pays['statutN1'] == true)
+//               .map((item) => Niveau1Pays(
+//                   idNiveau1Pays: item['idNiveau1Pays'] as String,
+//                   nomN1: item['nomN1']))
+//               .toList();
+
+//         _tabController = TabController(length: niveau1Pays.length, vsync: );
+//         _tabController!.addListener(_handleTabChange);
+
+//         // Fetch les magasins pour la première région
+//         fetchMagasinsByRegion(
+//             niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '');
+//       } else {
+//         throw Exception('Failed to load regions');
+//       }
+//     } catch (e) {
+//       print('Error fetching regions: $e');
+//     }
+//   }
+
+
+//   Future<void> fetchMagasinsByRegion(String id) async {
+//     try {
+//       final response = await http.get(Uri.parse(
+//           // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+//           'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+//       if (response.statusCode == 200) {
+//         List<dynamic> data = json.decode(response.body);
+//           magasin = data
+//               .where((magasin) => magasin['statutMagasin'] == true)
+//               .map((item) => Magasin(
+//                     nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
+//                     idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
+//                     contactMagasin:
+//                         item['contactMagasin'] ?? 'Contact manquant',
+//                     photo: item['photo'] ?? '',
+//                     // ou utilisez une URL par défaut
+//                     acteur: Acteur(
+//                       idActeur: item['acteur']['idActeur'] ?? 'manquant',
+//                       nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
+//                       // Autres champs de l'acteur...
+//                     ),
+//                     niveau1Pays: Niveau1Pays(
+//                       nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
+//                       // Autres champs de l'acteur...
+//                     ),
+//                     dateAjout: item['dateAjout'] ?? 'manquante',
+//                     localiteMagasin: item['localiteMagasin'] ?? 'manquante',
+//                     statutMagasin: item['statutMagasin'] ??
+//                         false, // ou une valeur par défaut
+//                   ))
+//               .toList();
+//       } else {
+//         throw Exception('Failed to load magasins for region $id');
+//       }
+//     } catch (e) {
+//       print('Error fetching magasins for region $id: $e');
+//     }
+//   }
+//   Future<void> fetchMagasinByRegion(String id) async {
+//     try {
+//       final response = await http.get(Uri.parse(
+//           // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+//           'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+//       if (response.statusCode == 200) {
+//         List<dynamic> data = json.decode(response.body);
+        
+//           magasin = data
+//               .where((magasin) => magasin['statutMagasin'] == true)
+//               .map((item) => Magasin(
+//                     nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
+//                     idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
+//                     contactMagasin:
+//                         item['contactMagasin'] ?? 'Contact manquant',
+//                     photo: item['photo'] ?? '',
+//                     // ou utilisez une URL par défaut
+//                     acteur: Acteur(
+//                       idActeur: item['acteur']['idActeur'] ?? 'manquant',
+//                       nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
+//                       // Autres champs de l'acteur...
+//                     ),
+//                     niveau1Pays: Niveau1Pays(
+//                       nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
+//                       // Autres champs de l'acteur...
+//                     ),
+//                     dateAjout: item['dateAjout'] ?? 'manquante',
+//                     localiteMagasin: item['localiteMagasin'] ?? 'manquante',
+//                     statutMagasin: item['statutMagasin'] ??
+//                         false, // ou une valeur par défaut
+//                   ))
+//               .toList();
+//       } else {
+//         throw Exception('Failed to load magasins for region $id');
+//       }
+//     } catch (e) {
+//       print('Error fetching magasins for region $id: $e');
+//     }
+//   }
+
+//   void _handleTabChange() {
+//     if (_tabController != null &&
+//         _tabController!.index >= 0 &&
+//         _tabController!.index < niveau1Pays.length) {
+//       selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
+//       fetchMagasinsByRegion(selectedRegionId);
+//     }
+//   }
+
+//   bool isExist = false;
+//   String? email = "";
+
+//   void verify() async {
+//     SharedPreferences prefs = await SharedPreferences.getInstance();
+//     email = prefs.getString('emailActeur');
+//     if (email != null) {
+//     //   // Si l'email de l'acteur est présent, exécute checkLoggedIn
+//     //   acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+//     //   typeActeurData = acteur.typeActeur!;
+//     //   type = typeActeurData.map((data) => data.libelle).join(', ');
+//     //     isExist = true;
+//     // } else {
+//     //     isExist = false;
+//     // }
+//       if (niveau1Pays.isNotEmpty) {
+//       selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
+//       // fetchMagasinsByRegion(selectedRegionId);
+//     }
+//     fetchRegions();
+//   }
+
+
+
+//   @override
+//   Future<void> onInit() async {
+//     super.onInit();
+//   }
+
+  
+  
+// }
+//   }

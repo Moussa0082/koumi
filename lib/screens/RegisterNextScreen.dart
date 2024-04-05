@@ -402,7 +402,7 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
               (data ['libelle'])
                   .trim()
                   .toLowerCase() !=
-              'admin')
+              'admin' && data['acteur']['statutActeur'] == true)
    .map((e) {
     return TypeActeur(
       idTypeActeur: e['idTypeActeur'] as String,

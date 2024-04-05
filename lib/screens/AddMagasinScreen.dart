@@ -228,7 +228,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                     const SnackBar(
                       content: Row(
                         children: [
-                          Text("Activer avec succèss "),
+                          Text("Ajouté avec succèss "),
                         ],
                       ),
                       duration: Duration(seconds: 2),
@@ -586,7 +586,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                                 value:  niveau1Pays.idNiveau1Pays,
                                 onChanged: (newValue) {
                                   setState(() {
-                       widget.isEditable! == false ? niveau1Pays.idNiveau1Pays : widget.niveau1Pays!.idNiveau1Pays = newValue;
+           niveau1Pays.idNiveau1Pays = newValue;
                                     if (newValue != null) {
                                       niveau1Pays.nomN1 =
                                           niveau1List.map((e) => e.nomN1).first;
