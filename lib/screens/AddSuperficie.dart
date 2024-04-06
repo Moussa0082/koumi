@@ -39,7 +39,9 @@ class _AddSuperficieState extends State<AddSuperficie> {
   String niveau3 = '';
   String? n3Value;
   late Future _niveau3List;
-  late Future _campagneList;
+  // late Future<List<Campagne>> _liste;
+  late Future _liste;
+
   late Future _speculationList;
   late Speculation speculation;
   late Campagne campagne;
@@ -52,8 +54,7 @@ class _AddSuperficieState extends State<AddSuperficie> {
     super.initState();
 
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    _campagneList =
-        fetchcampagneList(acteur.idActeur!); // _categorieList = http.get(
+    _liste = getCampListe(); // _categorieList = http.get(
     //     Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
     _speculationList = fetchSpeculationList();
     _niveau3List = fetchniveauList();
@@ -78,8 +79,9 @@ class _AddSuperficieState extends State<AddSuperficie> {
     return response;
   }
 
-  Future<List<Campagne>> fetchcampagneList(String id) async {
-    final response = await CampagneService().fetchCampagneByActeur(id);
+  Future<List<Campagne>> getCampListe() async {
+    final response =
+        await CampagneService().fetchCampagneByActeur(acteur.idActeur!);
     return response;
   }
 
@@ -299,17 +301,14 @@ class _AddSuperficieState extends State<AddSuperficie> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(
+                        padding:  EdgeInsets.symmetric(
                             vertical: 10, horizontal: 20),
-                        child: Consumer<CampagneService>(
-                            builder: (context, caService, child) {
-                          return FutureBuilder(
-                            future: _campagneList,
-                            // future: speculationService.fetchSpeculationByCategorie(categorieProduit.idCategorieProduit!),
-                            builder: (_, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return DropdownButtonFormField(
+                        child: FutureBuilder(
+                          future: _liste,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return DropdownButtonFormField(
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
@@ -321,56 +320,54 @@ class _AddSuperficieState extends State<AddSuperficie> {
                                     ),
                                   ),
                                 );
-                              }
+                            }
+                           
+                            if (snapshot.hasData) {
+                              dynamic responseData =
+                                  json.decode(snapshot.data);
 
-                              if (snapshot.hasData) {
-                                dynamic responseData =
-                                    json.decode(snapshot.data!.body);
-
-                                if (responseData is List) {
-                                  List<Campagne> speList = responseData
-                                      .map((e) => Campagne.fromMap(e))
-                                      .toList();
-
-                                  if (speList.isEmpty) {
-                                    return DropdownButtonFormField(
-                                      items: [],
-                                      onChanged: null,
-                                      decoration: InputDecoration(
-                                        labelText: 'Aucune campagne trouvé',
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 10, horizontal: 20),
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
+                              if (responseData is List) {
+                                final reponse = responseData;
+                                final campListe = reponse
+                                    .map((e) =>   Campagne.fromMap(e))
+                                    .where((con) => con.statutCampagne == true)
+                                    .toList();
+                        
+                                if (campListe.isEmpty) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Aucun campagne trouvé',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
-                                    );
-                                  }
-
-                                  return DropdownButtonFormField<String>(
-                                    items: speList
-                                        .map(
-                                          (e) => DropdownMenuItem(
-                                            value: e.idCampagne,
-                                            child: Text(e.nomCampagne),
-                                          ),
-                                        )
-                                        .toList(),
-                                    value: catValue,
-                                    onChanged: (newValue) {
+                                    ),
+                                  );
+                                }
+                        
+                                return DropdownButtonFormField<String>(
+                                  items: campListe
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idCampagne,
+                                          child: Text(e.nomCampagne),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: catValue,
+                                  onChanged: (newValue) {
                                       setState(() {
                                         catValue = newValue;
                                         if (newValue != null) {
-                                          campagne = speList.firstWhere(
+                                          campagne = campListe.firstWhere(
                                             (element) =>
                                                 element.idCampagne == newValue,
                                           );
                                         }
                                       });
                                     },
-                                    decoration: InputDecoration(
+                                  decoration: InputDecoration(
                                       labelText: 'Sélectionner une campagne',
                                       contentPadding:
                                           const EdgeInsets.symmetric(
@@ -379,23 +376,7 @@ class _AddSuperficieState extends State<AddSuperficie> {
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                     ),
-                                  );
-                                } else {
-                                  // Handle case when response data is not a list
-                                  return DropdownButtonFormField(
-                                    items: [],
-                                    onChanged: null,
-                                    decoration: InputDecoration(
-                                      labelText: 'Aucune campagne trouvé',
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 20),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
-                                }
+                                );
                               } else {
                                 return DropdownButtonFormField(
                                   items: [],
@@ -410,9 +391,21 @@ class _AddSuperficieState extends State<AddSuperficie> {
                                   ),
                                 );
                               }
-                            },
-                          );
-                        }),
+                            }
+                            return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucune campagne trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                          },
+                        ),
                       ),
                       SizedBox(
                         height: 10,

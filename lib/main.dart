@@ -42,7 +42,8 @@ import 'package:provider/provider.dart';
 
 
 void main() {
-  runApp(MultiProvider(providers: [
+  runApp(MultiProvider(
+    providers: [
     ChangeNotifierProvider(create: (context) => MagasinService()),
     ChangeNotifierProvider(create: (context) => CartProvider()),
     ChangeNotifierProvider(create: (context) => ActeurService()),
