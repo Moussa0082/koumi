@@ -384,7 +384,7 @@ class _TransportState extends State<Transport> {
                       // runSpacing:
                       //     10, // Espacement vertical entre les lignes de conteneurs
                       children: filtereSearch
-                          // .where((element) => element.statutVehicule == true)
+                         .where((element) => element.statutVehicule == true)
                           .map((e) => Padding(
                                 padding: EdgeInsets.all(10),
                                 child: SizedBox(

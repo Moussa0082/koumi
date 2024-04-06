@@ -17,6 +17,7 @@ class SuperficieService extends ChangeNotifier {
       {required String localite,
       required String superficieHa,
       required String dateSemi,
+      // required String description,
       required Acteur acteur,
       required List<String> intrants,
       required Speculation speculation,
@@ -25,9 +26,10 @@ class SuperficieService extends ChangeNotifier {
       'idSuperficie': null,
       'localite': localite,
       'superficieHa': superficieHa,
+      //  'description': description,
       'dateSemi': dateSemi,
       'acteur': acteur.toMap(),
-      'intrants': intrants.toList(),
+      'intrants': intrants,
       'speculation': speculation.toMap(),
       'campagne': campagne.toMap()
     });
@@ -49,6 +51,7 @@ class SuperficieService extends ChangeNotifier {
       required String dateSemi,
       required String personneModif,
       required Acteur acteur,
+      // required String description,
       required List<String> intrants,
       required Speculation speculation,
       required Campagne campagne}) async {
@@ -58,8 +61,9 @@ class SuperficieService extends ChangeNotifier {
       'personneModif': personneModif,
       'superficieHa': superficieHa,
       'dateSemi': dateSemi,
+      // 'description': description,
       'acteur': acteur.toMap(),
-      'intrants': intrants.toList(),
+      'intrants': intrants,
       'speculation': speculation.toMap(),
       'campagne': campagne.toMap()
     });

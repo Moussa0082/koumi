@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -13,6 +14,7 @@ class Superficie {
   final String localite;
   final String? personneModif;
   final String superficieHa;
+  final String? description;
   final bool statutSuperficie;
   final String? dateSemi;
   final String? dateAjout;
@@ -28,6 +30,7 @@ class Superficie {
     required this.localite,
     this.personneModif,
     required this.superficieHa,
+    this.description,
     required this.statutSuperficie,
     this.dateSemi,
     this.dateAjout,
@@ -37,6 +40,8 @@ class Superficie {
     required this.speculation,
     required this.campagne,
   });
+  
+ 
 
   Superficie copyWith({
     String? idSuperficie,
@@ -44,6 +49,7 @@ class Superficie {
     String? localite,
     String? personneModif,
     String? superficieHa,
+    String? description,
     bool? statutSuperficie,
     String? dateSemi,
     String? dateAjout,
@@ -59,6 +65,7 @@ class Superficie {
       localite: localite ?? this.localite,
       personneModif: personneModif ?? this.personneModif,
       superficieHa: superficieHa ?? this.superficieHa,
+      description: description ?? this.description,
       statutSuperficie: statutSuperficie ?? this.statutSuperficie,
       dateSemi: dateSemi ?? this.dateSemi,
       dateAjout: dateAjout ?? this.dateAjout,
@@ -77,6 +84,7 @@ class Superficie {
       'localite': localite,
       'personneModif': personneModif,
       'superficieHa': superficieHa,
+      'description': description,
       'statutSuperficie': statutSuperficie,
       'dateSemi': dateSemi,
       'dateAjout': dateAjout,
@@ -90,68 +98,68 @@ class Superficie {
 
   factory Superficie.fromMap(Map<String, dynamic> map) {
     return Superficie(
-      idSuperficie:
-          map['idSuperficie'] != null ? map['idSuperficie'] as String : null,
+      idSuperficie: map['idSuperficie'] != null ? map['idSuperficie'] as String : null,
       codeSuperficie: map['codeSuperficie'] as String,
       localite: map['localite'] as String,
-      personneModif:
-          map['personneModif'] != null ? map['personneModif'] as String : null,
+      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       superficieHa: map['superficieHa'] as String,
+      description: map['description'] != null ? map['description'] as String : null,
       statutSuperficie: map['statutSuperficie'] as bool,
       dateSemi: map['dateSemi'] != null ? map['dateSemi'] as String : null,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
-      acteur: Acteur.fromMap(map['acteur'] as Map<String, dynamic>),
-      intrants:  List<String>.from(map['intrants'] as List<String>),
-      speculation:
-          Speculation.fromMap(map['speculation'] as Map<String, dynamic>),
-      campagne: Campagne.fromMap(map['campagne'] as Map<String, dynamic>),
+      acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
+      intrants: List<String>.from(map['intrants'] as List<String>),
+      speculation: Speculation.fromMap(map['speculation'] as Map<String,dynamic>),
+      campagne: Campagne.fromMap(map['campagne'] as Map<String,dynamic>),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Superficie.fromJson(String source) =>
-      Superficie.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Superficie.fromJson(String source) => Superficie.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
-    return 'Superficie(idSuperficie: $idSuperficie, codeSuperficie: $codeSuperficie, localite: $localite, personneModif: $personneModif, superficieHa: $superficieHa, statutSuperficie: $statutSuperficie, dateSemi: $dateSemi, dateAjout: $dateAjout, dateModif: $dateModif, acteur: $acteur, intrants: $intrants, speculation: $speculation, campagne: $campagne)';
+    return 'Superficie(idSuperficie: $idSuperficie, codeSuperficie: $codeSuperficie, localite: $localite, personneModif: $personneModif, superficieHa: $superficieHa, description: $description, statutSuperficie: $statutSuperficie, dateSemi: $dateSemi, dateAjout: $dateAjout, dateModif: $dateModif, acteur: $acteur, intrants: $intrants, speculation: $speculation, campagne: $campagne)';
   }
 
   @override
   bool operator ==(covariant Superficie other) {
     if (identical(this, other)) return true;
-
-    return other.idSuperficie == idSuperficie &&
-        other.codeSuperficie == codeSuperficie &&
-        other.localite == localite &&
-        other.personneModif == personneModif &&
-        other.superficieHa == superficieHa &&
-        other.statutSuperficie == statutSuperficie &&
-        other.dateSemi == dateSemi &&
-        other.dateAjout == dateAjout &&
-        other.dateModif == dateModif &&
-        other.acteur == acteur &&
-        listEquals(other.intrants, intrants) &&
-        other.speculation == speculation &&
-        other.campagne == campagne;
+  
+    return 
+      other.idSuperficie == idSuperficie &&
+      other.codeSuperficie == codeSuperficie &&
+      other.localite == localite &&
+      other.personneModif == personneModif &&
+      other.superficieHa == superficieHa &&
+      other.description == description &&
+      other.statutSuperficie == statutSuperficie &&
+      other.dateSemi == dateSemi &&
+      other.dateAjout == dateAjout &&
+      other.dateModif == dateModif &&
+      other.acteur == acteur &&
+      listEquals(other.intrants, intrants) &&
+      other.speculation == speculation &&
+      other.campagne == campagne;
   }
 
   @override
   int get hashCode {
     return idSuperficie.hashCode ^
-        codeSuperficie.hashCode ^
-        localite.hashCode ^
-        personneModif.hashCode ^
-        superficieHa.hashCode ^
-        statutSuperficie.hashCode ^
-        dateSemi.hashCode ^
-        dateAjout.hashCode ^
-        dateModif.hashCode ^
-        acteur.hashCode ^
-        intrants.hashCode ^
-        speculation.hashCode ^
-        campagne.hashCode;
+      codeSuperficie.hashCode ^
+      localite.hashCode ^
+      personneModif.hashCode ^
+      superficieHa.hashCode ^
+      description.hashCode ^
+      statutSuperficie.hashCode ^
+      dateSemi.hashCode ^
+      dateAjout.hashCode ^
+      dateModif.hashCode ^
+      acteur.hashCode ^
+      intrants.hashCode ^
+      speculation.hashCode ^
+      campagne.hashCode;
   }
 }

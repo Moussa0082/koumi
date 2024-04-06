@@ -11,6 +11,7 @@ import 'package:koumi_app/screens/SplashScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/AlerteService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
+import 'package:koumi_app/service/CampagneService.dart';
 import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/ConseilService.dart';
 import 'package:koumi_app/service/ContinentService.dart';
@@ -28,6 +29,7 @@ import 'package:koumi_app/service/PaysService.dart';
 import 'package:koumi_app/service/SousRegionService.dart';
 import 'package:koumi_app/service/SpeculationService.dart';
 import 'package:koumi_app/service/StockService.dart';
+import 'package:koumi_app/service/SuperficieService.dart';
 import 'package:koumi_app/service/TypeActeurService.dart';
 import 'package:koumi_app/service/TypeMaterielService.dart';
 import 'package:koumi_app/service/TypeVoitureService.dart';
@@ -55,8 +57,10 @@ void main() {
     ChangeNotifierProvider(create: (context) => PaysService()),
     ChangeNotifierProvider(create: (context) => ConseilService()),
     ChangeNotifierProvider(create: (context) => TypeMaterielService()),
+    ChangeNotifierProvider(create: (context) => SuperficieService()),
     ChangeNotifierProvider(create: (context) => AlertesService()),
     ChangeNotifierProvider(create: (context) => IntrantService()),                                                                                                                                                                                                                                                                                                                         ChangeNotifierProvider(create: (context) => TypeVoitureService()),
+    ChangeNotifierProvider(create: (context) => CampagneService()),                                                                                                                                                                                                                                                                                                                         ChangeNotifierProvider(create: (context) => TypeVoitureService()),
     ChangeNotifierProvider(create: (context) => TypeMaterielService()),                                                                                                                                                                                                                                                                                                                                         ChangeNotifierProvider(create: (context) => TypeVoitureService()),
     ChangeNotifierProvider(create: (context) => MessageService()),
     ChangeNotifierProvider(create: (context) => MaterielService()),

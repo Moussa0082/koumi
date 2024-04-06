@@ -12,18 +12,18 @@ class Campagne {
   final bool statutCampagne;
   final String? dateAjout;
   final String? dateModif;
-  
+  final Acteur acteur;
   Campagne({
     this.idCampagne,
     required this.codeCampagne,
     required this.nomCampagne,
     required this.description,
-    required this.personneModif,
+    this.personneModif,
     required this.statutCampagne,
     this.dateAjout,
     this.dateModif,
+    required this.acteur,
   });
-  
 
   Campagne copyWith({
     String? idCampagne,
@@ -34,6 +34,7 @@ class Campagne {
     bool? statutCampagne,
     String? dateAjout,
     String? dateModif,
+    Acteur? acteur,
   }) {
     return Campagne(
       idCampagne: idCampagne ?? this.idCampagne,
@@ -44,6 +45,7 @@ class Campagne {
       statutCampagne: statutCampagne ?? this.statutCampagne,
       dateAjout: dateAjout ?? this.dateAjout,
       dateModif: dateModif ?? this.dateModif,
+      acteur: acteur ?? this.acteur,
     );
   }
 
@@ -57,6 +59,7 @@ class Campagne {
       'statutCampagne': statutCampagne,
       'dateAjout': dateAjout,
       'dateModif': dateModif,
+      'acteur': acteur.toMap(),
     };
   }
 
@@ -66,10 +69,11 @@ class Campagne {
       codeCampagne: map['codeCampagne'] as String,
       nomCampagne: map['nomCampagne'] as String,
       description: map['description'] as String,
-      personneModif: map['personneModif'] as String,
+      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       statutCampagne: map['statutCampagne'] as bool,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
+      acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
     );
   }
 
@@ -79,7 +83,7 @@ class Campagne {
 
   @override
   String toString() {
-    return 'Campagne(idCampagne: $idCampagne, codeCampagne: $codeCampagne, nomCampagne: $nomCampagne, description: $description, personneModif: $personneModif, statutCampagne: $statutCampagne, dateAjout: $dateAjout, dateModif: $dateModif)';
+    return 'Campagne(idCampagne: $idCampagne, codeCampagne: $codeCampagne, nomCampagne: $nomCampagne, description: $description, personneModif: $personneModif, statutCampagne: $statutCampagne, dateAjout: $dateAjout, dateModif: $dateModif, acteur: $acteur)';
   }
 
   @override
@@ -94,7 +98,8 @@ class Campagne {
       other.personneModif == personneModif &&
       other.statutCampagne == statutCampagne &&
       other.dateAjout == dateAjout &&
-      other.dateModif == dateModif;
+      other.dateModif == dateModif &&
+      other.acteur == acteur;
   }
 
   @override
@@ -106,6 +111,7 @@ class Campagne {
       personneModif.hashCode ^
       statutCampagne.hashCode ^
       dateAjout.hashCode ^
-      dateModif.hashCode;
+      dateModif.hashCode ^
+      acteur.hashCode;
   }
 }
