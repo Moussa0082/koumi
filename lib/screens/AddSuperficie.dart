@@ -1,19 +1,18 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Campagne.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/Speculation.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/service/CampagneService.dart';
 import 'package:koumi_app/service/Niveau3Service.dart';
 import 'package:koumi_app/service/SpeculationService.dart';
 import 'package:koumi_app/service/SuperficieService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/material.dart';
-import 'package:koumi_app/models/Acteur.dart';
-import 'package:koumi_app/models/Campagne.dart';
-import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/service/CampagneService.dart';
-import 'package:http/http.dart' as http;
 
 class AddSuperficie extends StatefulWidget {
   const AddSuperficie({super.key});
@@ -301,133 +300,10 @@ class _AddSuperficieState extends State<AddSuperficie> {
                         ),
                       ),
                       Padding(
-                        padding:  EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                         child: FutureBuilder(
                           future: _liste,
-                          builder: (_, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Chargement...',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                            }
-                           
-                            if (snapshot.hasData) {
-                              dynamic responseData =
-                                  json.decode(snapshot.data);
-
-                              if (responseData is List) {
-                                final reponse = responseData;
-                                final campListe = reponse
-                                    .map((e) =>   Campagne.fromMap(e))
-                                    .where((con) => con.statutCampagne == true)
-                                    .toList();
-                        
-                                if (campListe.isEmpty) {
-                                  return DropdownButtonFormField(
-                                    items: [],
-                                    onChanged: null,
-                                    decoration: InputDecoration(
-                                      labelText: 'Aucun campagne trouvé',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
-                                }
-                        
-                                return DropdownButtonFormField<String>(
-                                  items: campListe
-                                      .map(
-                                        (e) => DropdownMenuItem(
-                                          value: e.idCampagne,
-                                          child: Text(e.nomCampagne),
-                                        ),
-                                      )
-                                      .toList(),
-                                  value: catValue,
-                                  onChanged: (newValue) {
-                                      setState(() {
-                                        catValue = newValue;
-                                        if (newValue != null) {
-                                          campagne = campListe.firstWhere(
-                                            (element) =>
-                                                element.idCampagne == newValue,
-                                          );
-                                        }
-                                      });
-                                    },
-                                  decoration: InputDecoration(
-                                      labelText: 'Sélectionner une campagne',
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 20),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                );
-                              } else {
-                                return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Aucune campagne trouvé',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                              }
-                            }
-                            return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Aucune campagne trouvé',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                          },
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 22,
-                        ),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            "Localité",
-                            style:
-                                TextStyle(color: (Colors.black), fontSize: 18),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        child: FutureBuilder(
-                          future: _niveau3List,
                           builder: (_, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
@@ -435,7 +311,7 @@ class _AddSuperficieState extends State<AddSuperficie> {
                                 items: [],
                                 onChanged: null,
                                 decoration: InputDecoration(
-                                  labelText: 'Aucun commune trouvé',
+                                  labelText: 'Chargement...',
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(
@@ -446,88 +322,65 @@ class _AddSuperficieState extends State<AddSuperficie> {
                             }
 
                             if (snapshot.hasData) {
-                              dynamic responseData =
-                                  json.decode(snapshot.data.body);
-                              if (responseData is List) {
-                                final reponse = responseData;
-                                final niveau3List = reponse
-                                    .map((e) => Niveau3Pays.fromMap(e))
-                                    .where((con) => con.statutN3 == true)
-                                    .toList();
+                              List<Campagne> campListe = snapshot.data;
 
-                                if (niveau3List.isEmpty) {
-                                  return DropdownButtonFormField(
-                                    items: [],
-                                    onChanged: null,
-                                    decoration: InputDecoration(
-                                      labelText: 'Aucun commune trouvé',
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 20),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
-                                }
-
-                                return DropdownButtonFormField<String>(
-                                  items: niveau3List
-                                      .map(
-                                        (e) => DropdownMenuItem(
-                                          value: e.idNiveau3Pays,
-                                          child: Text(e.nomN3),
-                                        ),
-                                      )
-                                      .toList(),
-                                  value: n3Value,
-                                  onChanged: (newValue) {
-                                    setState(() {
-                                      n3Value = newValue;
-                                      if (newValue != null) {
-                                        niveau3 = niveau3List
-                                            .map((e) => e.nomN3)
-                                            .first;
-                                        print("niveau 3 : ${niveau3}");
-                                      }
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                    labelText: 'Selectionner une localité',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                              } else {
+                              if (campListe.isEmpty) {
                                 return DropdownButtonFormField(
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Aucun commune trouvé',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
+                                    labelText: 'Aucune campagne trouvé',
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
                                 );
                               }
-                            }
-                            return DropdownButtonFormField(
-                              items: [],
-                              onChanged: null,
-                              decoration: InputDecoration(
-                                labelText: 'Aucun commune trouvé',
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
+
+                              return DropdownButtonFormField<String>(
+                                items: campListe
+                                    .map(
+                                      (e) => DropdownMenuItem(
+                                        value: e.idCampagne,
+                                        child: Text(e.nomCampagne),
+                                      ),
+                                    )
+                                    .toList(),
+                                value: catValue,
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    catValue = newValue;
+                                    if (newValue != null) {
+                                      campagne = campListe.firstWhere(
+                                        (element) =>
+                                            element.idCampagne == newValue,
+                                      );
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Sélectionner une campagne',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            } else {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucune campagne trouvé',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
                           },
                         ),
                       ),
