@@ -471,7 +471,7 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
                 numeroWhatsApp: widget.whatsAppActeur, localistaion: localisationController.text,
                  pays: widget.pays, typeActeur: typeActeur,
                  image1: image1,
-                )));
+                ))); 
               }
                            },
            child: Text(
