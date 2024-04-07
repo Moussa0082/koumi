@@ -13,6 +13,7 @@ import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/Unite.dart';
 import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/service/StockService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
@@ -122,6 +123,19 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
 
   }
     
+
+    // Fonction pour traiter les données du QR code scanné
+  Future<void> processScannedQRCode(Stock scannedData) async {
+    // Ici, vous pouvez décoder les données du QR code et effectuer les actions nécessaires
+    // Par exemple, naviguer vers la page de détail du produit avec les données du produit
+    // Veuillez remplacer DetailProduits avec le nom de votre widget de détail du produit
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DetailProduits(stock: scannedData),
+      ),
+    );
+  }
    
     Future<void> ajouterStock() async{
     try {

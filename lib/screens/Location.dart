@@ -59,8 +59,8 @@ class _LocationState extends State<Location> {
     super.initState();
     verify();
     _typeList =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
   }
 
   @override

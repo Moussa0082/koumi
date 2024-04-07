@@ -39,8 +39,8 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
   void fetchRegions() async {
     try {
       final response = await http
-          // .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-          .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+          .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+          // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
 
@@ -72,8 +72,8 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
       String idActeur, String idNiveau1Pays) async {
     try {
       final response = await http.get(Uri.parse(
-          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeurAndNieau1Pay/${idActeur}/${idNiveau1Pays}'));
-          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pay/${idActeur}/${idNiveau1Pays}'));
+          'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeurAndNieau1Pay/${idActeur}/${idNiveau1Pays}'));
+          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pay/${idActeur}/${idNiveau1Pays}'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
 

@@ -45,7 +45,7 @@ isoCode: Platform.localeName.split('_').last
   String? typeValue;
   String selectedCountry = '';
   // late TypeActeur monTypeActeur;
-  late Future _mesTypeActeur;
+  // late Future _mesTypeActeur;
   Position? _currentPosition;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -235,9 +235,9 @@ Future<String?> getCurrentCountryFromLocation() async {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _mesTypeActeur  =
+    // _mesTypeActeur  =
         // http.get(Uri.parse('https://koumi.ml/api-koumi/typeActeur/read'));
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/typeActeur/read'));
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/typeActeur/read'));
     // getLocation();
     getLocationNew();
   }

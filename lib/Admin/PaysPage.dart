@@ -48,8 +48,8 @@ class _PaysPageState extends State<PaysPage> {
         .parametreList!;
     para = paraList[0];
     _sousRegionList =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/sousRegion/read'));
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/sousRegion/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/sousRegion/read'));
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/sousRegion/read'));
     _searchController = TextEditingController();
   }
 

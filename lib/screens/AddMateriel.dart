@@ -55,14 +55,14 @@ class _AddMaterielState extends State<AddMateriel> {
         .parametreList!;
     para = paraList[0];
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    // _typeList =
-    //     http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
-    // _niveau3List =
-    //     http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
     _typeList =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
     _niveau3List =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
+    // _typeList =
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
+    // _niveau3List =
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
   }
 
   Future<File> saveImagePermanently(String imagePath) async {

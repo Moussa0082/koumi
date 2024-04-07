@@ -82,8 +82,8 @@ class _ProduitScreenState extends State<ProduitScreen>
   void fetchProduitByCategorieProduit(String idCategorie) async {
     try {
       final response = await http.get(Uri.parse(
-          // 'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
-          'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie'));
+          'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie'));
+          // 'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie'));
       if (response.statusCode == 200) {
         final String jsonString = utf8.decode(response.bodyBytes);
         List<dynamic> data = json.decode(jsonString);
@@ -130,8 +130,8 @@ class _ProduitScreenState extends State<ProduitScreen>
   void fetchProduitByCategorie(String idCategorie, String idMagasin) async {
     try {
       final response = await http.get(Uri.parse(
-          // 'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
-          'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
+          'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
+          // 'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
       if (response.statusCode == 200) {
         final String jsonString = utf8.decode(response.bodyBytes);
         List<dynamic> data = json.decode(jsonString);
@@ -179,8 +179,8 @@ class _ProduitScreenState extends State<ProduitScreen>
   void fetchCategorie() async {
     try {
       final response = await http
-          // .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
-          .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
+          .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
+          // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {

@@ -8,8 +8,8 @@ import 'package:path/path.dart';
 
 class MessageService extends ChangeNotifier{
 
-  // static const String baseUrl = 'https://koumi.ml/api-koumi/send';
-  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/send';
+  static const String baseUrl = 'https://koumi.ml/api-koumi/send';
+  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/send';
   List<MessageWa> messageList = [];
   
   Future<void> SendMessageWa({

@@ -217,6 +217,10 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                 acteur: acteur,
                 niveau1Pays: niveau1Pays)
             .then((value) => {
+                      Provider.of<MagasinService>(
+                                                                                   context,
+                                                                                   listen: false)
+                                                                               .applyChange(),
                   nomMagasinController.clear(),
                   contactMagasinController.clear(),
                   localiteMagasinController.clear(),
@@ -245,6 +249,10 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                 acteur: acteur,
                 niveau1Pays: niveau1Pays)
             .then((value) => {
+                      Provider.of<MagasinService>(
+                                                                                   context,
+                                                                                   listen: false)
+                                                                               .applyChange(),
                   nomMagasinController.clear(),
                   contactMagasinController.clear(),
                   localiteMagasinController.clear(),
@@ -372,8 +380,8 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
     debugPrint("bool" + widget.isEditable!.toString());
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     niveau1PaysList =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-    http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
   }
 
   @override
@@ -569,24 +577,24 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                               }
 
                               return DropdownButtonFormField<String>(
-                                validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Veuillez sélectionner une region.';
-                              }
-                              return null;
-                            },
+                            //     validator: (value) {
+                            //   if (value == null || value.isEmpty) {
+                            //     return 'Veuillez sélectionner une region.';
+                            //   }
+                            //   return null;
+                            // },
                                  items: niveau1List
                                     .map(
                                       (e) => DropdownMenuItem(
-                                        value: e.idNiveau1Pays,
+                                        value:widget.isEditable! == false ? e.idNiveau1Pays : widget.niveau1Pays!.idNiveau1Pays,
                                         child: Text(e.nomN1!),
                                       ),
                                     )
                                     .toList(),
-                                value:  niveau1Pays.idNiveau1Pays,
-                                onChanged: (newValue) {
+                                value: niveau1Pays.idNiveau1Pays  ,        
+                                       onChanged: (newValue) {
                                   setState(() {
-           niveau1Pays.idNiveau1Pays = newValue;
+                                  niveau1Pays.idNiveau1Pays = newValue;
                                     if (newValue != null) {
                                       niveau1Pays.nomN1 =
                                           niveau1List.map((e) => e.nomN1).first;
