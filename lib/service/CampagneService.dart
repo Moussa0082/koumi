@@ -24,7 +24,7 @@ class CampagneService extends ChangeNotifier {
       'idCampagne': null,
       'nomCampagne': nomCampagne,
       'description': description,
-      'acteur': acteur
+      'acteur': acteur.toMap()
     });
 
     final response = await http.post(Uri.parse("$baseUrl/addCampagne"),

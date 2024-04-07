@@ -203,7 +203,7 @@ class _AddIntrantState extends State<AddIntrant> {
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: Text(
-                          "Chosir une catégorie de produit",
+                          "Chosir une catégorie",
                           style: TextStyle(color: (Colors.black), fontSize: 18),
                         ),
                       ),
