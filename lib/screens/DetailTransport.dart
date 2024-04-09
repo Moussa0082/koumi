@@ -118,7 +118,7 @@ class _DetailTransportState extends State<DetailTransport> {
       }
     }
   }
-
+  
   void verifyParam() {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;

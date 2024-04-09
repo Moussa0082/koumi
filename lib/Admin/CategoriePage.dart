@@ -13,7 +13,7 @@ import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
 import 'package:koumi_app/service/SpeculationService.dart';
 import 'package:provider/provider.dart';
- 
+
 class CategoriPage extends StatefulWidget {
   const CategoriPage({super.key});
 

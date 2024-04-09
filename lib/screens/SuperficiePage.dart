@@ -3,6 +3,7 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Superficie.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddSuperficie.dart';
+import 'package:koumi_app/screens/DetailSuperficie.dart';
 import 'package:koumi_app/service/SuperficieService.dart';
 import 'package:provider/provider.dart';
 
@@ -20,13 +21,12 @@ class _SuperficiePageState extends State<SuperficiePage> {
   TextEditingController descriptionController = TextEditingController();
   late TextEditingController _searchController;
   late Acteur acteur;
-   List<Superficie> superficieList = [];
+  List<Superficie> superficieList = [];
 
   late Future<List<Superficie>> _liste;
 
-  Future<List<Superficie>> getCampListe() async {
-    final response =
-        await SuperficieService().fetchSuperficieByActeur(acteur.idActeur!);
+  Future<List<Superficie>> getCampListe(String id) async {
+    final response = await SuperficieService().fetchSuperficieByActeur(id);
     return response;
   }
 
@@ -34,7 +34,7 @@ class _SuperficiePageState extends State<SuperficiePage> {
   void initState() {
     _searchController = TextEditingController();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    _liste = getCampListe();
+    _liste = getCampListe(acteur.idActeur!);
     super.initState();
   }
 
@@ -58,10 +58,15 @@ class _SuperficiePageState extends State<SuperficiePage> {
             },
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: const Text(
-          "Campagne agricole",
+          "Superficie cultiver",
           style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
         actions: [
+          IconButton(
+              onPressed: () {
+                _liste = getCampListe(acteur.idActeur!);
+              },
+              icon: Icon(Icons.refresh)),
           PopupMenuButton<String>(
             padding: EdgeInsets.zero,
             itemBuilder: (context) => <PopupMenuEntry<String>>[
@@ -129,42 +134,51 @@ class _SuperficiePageState extends State<SuperficiePage> {
               ),
             ),
             const SizedBox(height: 10),
-            Consumer<SuperficieService>(builder: (context, camp, child) {
-              return FutureBuilder(
-                  future: _liste,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.orange,
-                        ),
-                      );
-                    }
+            FutureBuilder(
+                future: _liste,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.orange,
+                      ),
+                    );
+                  }
 
-                    if (!snapshot.hasData) {
-                      return const Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Center(child: Text("Aucun donné trouvé")),
-                      );
-                    } else {
-                      superficieList = snapshot.data!;
-                      String searchText = "";
-                      List<Superficie> filtereSearch =
-                          superficieList.where((search) {
-                        String libelle = search.localite.toLowerCase();
-                        searchText = _searchController.text.toLowerCase();
-                        return libelle.contains(searchText);
-                      }).toList();
-                      return filtereSearch.isEmpty
-                          ? Padding(
-                              padding: EdgeInsets.all(10),
-                              child: Center(child: Text("Aucune donné trouvé")),
-                            )
-                          : Column(
-                              children: filtereSearch
-                                  .map((e) => Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 10, horizontal: 15),
+                  if (!snapshot.hasData) {
+                    return const Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Center(child: Text("Aucun donné trouvé")),
+                    );
+                  } else {
+                    superficieList = snapshot.data!;
+                    debugPrint(superficieList.toString());
+                    String searchText = "";
+                    List<Superficie> filtereSearch =
+                        superficieList.where((search) {
+                      String libelle = search.localite!.toLowerCase();
+                      searchText = _searchController.text.toLowerCase();
+                      return libelle.contains(searchText);
+                    }).toList();
+                    return filtereSearch.isEmpty
+                        ? Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Center(child: Text("Aucune donné trouvé")),
+                          )
+                        : Column(
+                            children: filtereSearch
+                                .map((e) => Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 15),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      DetailSuperficie(
+                                                          suerficie: e)));
+                                        },
                                         child: Container(
                                           width: MediaQuery.of(context)
                                                   .size
@@ -192,14 +206,14 @@ class _SuperficiePageState extends State<SuperficiePage> {
                                                   height: 80,
                                                 ),
                                                 title: Text(
-                                                    e.localite.toUpperCase(),
+                                                    e.localite!.toUpperCase(),
                                                     style: const TextStyle(
                                                       color: Colors.black,
                                                       fontSize: 20,
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                     )),
-                                                subtitle: Text(e.superficieHa,
+                                                subtitle: Text(e.superficieHa!,
                                                     style: const TextStyle(
                                                       color: Colors.black87,
                                                       fontSize: 17,
@@ -219,7 +233,8 @@ class _SuperficiePageState extends State<SuperficiePage> {
                                                     MainAxisAlignment
                                                         .spaceBetween,
                                                 children: [
-                                                  _buildEtat(e.statutSuperficie),
+                                                  _buildEtat(
+                                                      e.statutSuperficie),
                                                   PopupMenuButton<String>(
                                                     padding: EdgeInsets.zero,
                                                     itemBuilder: (context) =>
@@ -242,7 +257,9 @@ class _SuperficiePageState extends State<SuperficiePage> {
                                                             ),
                                                           ),
                                                           onTap: () async {
-                                                            await SuperficieService().activerSuperficie(e.idSuperficie!)
+                                                            await SuperficieService()
+                                                                .activerSuperficie(e
+                                                                    .idSuperficie!)
                                                                 .then(
                                                                     (value) => {
                                                                           Provider.of<SuperficieService>(context, listen: false)
@@ -252,7 +269,7 @@ class _SuperficiePageState extends State<SuperficiePage> {
                                                                           setState(
                                                                               () {
                                                                             _liste =
-                                                                                getCampListe();
+                                                                                getCampListe(acteur.idActeur!);
                                                                           }),
                                                                           ScaffoldMessenger.of(context)
                                                                               .showSnackBar(
@@ -305,8 +322,9 @@ class _SuperficiePageState extends State<SuperficiePage> {
                                                             ),
                                                           ),
                                                           onTap: () async {
-                                                            await SuperficieService().desactiverSuperficie(e.idSuperficie!)
-                                                               
+                                                            await SuperficieService()
+                                                                .desactiverSuperficie(e
+                                                                    .idSuperficie!)
                                                                 .then(
                                                                     (value) => {
                                                                           Provider.of<SuperficieService>(context, listen: false)
@@ -316,7 +334,7 @@ class _SuperficiePageState extends State<SuperficiePage> {
                                                                           setState(
                                                                               () {
                                                                             _liste =
-                                                                                getCampListe();
+                                                                                getCampListe(acteur.idActeur!);
                                                                             ScaffoldMessenger.of(context).showSnackBar(
                                                                               const SnackBar(
                                                                                 content: Row(
@@ -382,9 +400,7 @@ class _SuperficiePageState extends State<SuperficiePage> {
                                                                       .bold,
                                                             ),
                                                           ),
-                                                          onTap: () async {
-                                                         
-                                                          },
+                                                          onTap: () async {},
                                                         ),
                                                       ),
                                                       PopupMenuItem<String>(
@@ -404,7 +420,8 @@ class _SuperficiePageState extends State<SuperficiePage> {
                                                           ),
                                                           onTap: () async {
                                                             await SuperficieService()
-                                                                .deleteSuperficie(e.idSuperficie!)
+                                                                .deleteSuperficie(e
+                                                                    .idSuperficie!)
                                                                 .then(
                                                                     (value) => {
                                                                           Provider.of<SuperficieService>(context, listen: false)
@@ -437,12 +454,12 @@ class _SuperficiePageState extends State<SuperficiePage> {
                                             )
                                           ]),
                                         ),
-                                      ))
-                                  .toList(),
-                            );
-                    }
-                  });
-            })
+                                      ),
+                                    ))
+                                .toList(),
+                          );
+                  }
+                })
           ],
         ),
       ),

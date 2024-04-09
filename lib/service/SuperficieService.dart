@@ -50,7 +50,7 @@ class SuperficieService extends ChangeNotifier {
       required String superficieHa,
       required String dateSemi,
       required String personneModif,
-      required Acteur acteur,
+      // required Acteur acteur,
       // required String description,
       required List<String> intrants,
       required Speculation speculation,
@@ -62,13 +62,13 @@ class SuperficieService extends ChangeNotifier {
       'superficieHa': superficieHa,
       'dateSemi': dateSemi,
       // 'description': description,
-      'acteur': acteur.toMap(),
+      // 'acteur': acteur.toMap(),
       'intrants': intrants,
       'speculation': speculation.toMap(),
       'campagne': campagne.toMap()
     });
 
-    final response = await http.post(Uri.parse("$baseUrl/update/$idSuperficie"),
+    final response = await http.put(Uri.parse("$baseUrl/update/$idSuperficie"),
         headers: {'Content-Type': 'application/json'}, body: addSuperficies);
     debugPrint(addSuperficies.toString());
     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -96,11 +96,11 @@ class SuperficieService extends ChangeNotifier {
   Future<List<Superficie>> fetchSuperficieByActeur(String idActeur) async {
     final response =
         await http.get(Uri.parse('$baseUrl/getSuperficieByActeur/$idActeur'));
-
-    if (response.statusCode == 200) {
+    debugPrint("Response ${response.body}");
+    if (response.statusCode == 200 || response.statusCode == 201) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
       superficieList = body.map((item) => Superficie.fromMap(item)).toList();
-      debugPrint(response.body);
+      debugPrint("liste ${superficieList.toString()}");
       return superficieList;
     } else {
       superficieList = [];
