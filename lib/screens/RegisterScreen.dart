@@ -43,7 +43,7 @@ isoCode: Platform.localeName.split('_').last
   
 
   String? typeValue;
-  String selectedCountry = '';
+  String selectedCountry = 'Mali';
   // late TypeActeur monTypeActeur;
   // late Future _mesTypeActeur;
   Position? _currentPosition;
@@ -70,6 +70,7 @@ isoCode: Platform.localeName.split('_').last
     
   ]; 
     void getLocationNew() async {
+       
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
@@ -240,6 +241,7 @@ Future<String?> getCurrentCountryFromLocation() async {
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/typeActeur/read'));
     // getLocation();
     getLocationNew();
+  
   }
 
    @override
@@ -421,8 +423,11 @@ Future<String?> getCurrentCountryFromLocation() async {
                     processedNumber = removePlus(phone.completeNumber.toString());
           print(processedNumber);
                   },
-                  onCountryChanged: (country) {
+                  onCountryChanged: (country) {    
+              setState(() {
                     selectedCountry = country.name.toString();
+                 });
+    
                     print('Country changed to: ' + country.name);
                   },
                 ),

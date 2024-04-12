@@ -181,6 +181,8 @@ Future<void> _pickImage(ImageSource source) async {
   );
 }
 
+  List<TypeActeur> selectedTypes = [];
+
 
     @override
   void initState() {
@@ -398,20 +400,22 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
     chipConfig: const ChipConfig(wrapType: WrapType.wrap),
  responseParser: (response) {
    typeActeur = (response as List<dynamic>)
-   .where((data)  =>
-              (data ['libelle'])
-                  .trim()
-                  .toLowerCase() !=
-              'admin' && data['acteur']['statutActeur'] == true)
-   .map((e) {
-    return TypeActeur(
-      idTypeActeur: e['idTypeActeur'] as String,
-      libelle: e['libelle'] as String,
-      statutTypeActeur: e['statutTypeActeur'] as bool,
-      // Assurez-vous de correspondre aux clés JSON avec les noms de propriétés de votre classe TypeActeur
-      // Ajoutez d'autres champs si nécessaire
-    );
-  }).toList();
+    .where((data) =>
+        (data['libelle']).trim().toLowerCase() !=
+            'admin' 
+        //     &&
+        // data['acteur'] != null && // Add null check here
+        // data['acteur']['statutActeur'] == true
+        )
+    .map((e) {
+  return TypeActeur(
+    idTypeActeur: e['idTypeActeur'] as String,
+    libelle: e['libelle'] as String,
+    statutTypeActeur: e['statutTypeActeur'] as bool,
+    // Assurez-vous de correspondre aux clés JSON avec les noms de propriétés de votre classe TypeActeur
+    // Ajoutez d'autres champs si nécessaire
+  );
+}).toList();
 
   // Filtrer les types avec un libellé différent de "admin" et dont le statutTypeActeur est true
   final filteredTypes = typeActeur.where((typeActeur) => typeActeur.libelle != "admin" || typeActeur.libelle != "Admin" && typeActeur.statutTypeActeur == true).toList();
@@ -421,6 +425,7 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
     return ValueItem<TypeActeur>(
       label: typeActeur.libelle!,
       value: typeActeur,
+
     );
   }).toList();
 
@@ -431,20 +436,19 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
     hint: 'Sélectionner un type d\'acteur',
     fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
     onOptionSelected: (options) {
-      if (options.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Veuillez sélectionner au moins un type d\acteur.'),
-          ));
-          }
+ if (mounted) {
       setState(() {
         typeLibelle.clear();
         typeLibelle.addAll(options
             .map((data) => data.label)
             .toList());
+       selectedTypes = options.map<TypeActeur>((item) => item.value!).toList();
+    print("Types sélectionnés : $selectedTypes");
+
         print("Libellé sélectionné ${typeLibelle.toString()}");
       });
       // Fermer automatiquement le dialogue
+    }
       FocusScope.of(context).unfocus();
     },
     responseErrorBuilder: ((context, body) {
@@ -464,14 +468,37 @@ debugPrint("Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone}
                            onPressed: () {
               // Handle button press action here
               if(_formKey.currentState!.validate()){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>  RegisterEndScreen(
-                nomActeur: widget.nomActeur, email: emailController.text, 
-                telephoneActeur: widget.telephone, 
-                 adresse:adresseController.text, 
-                numeroWhatsApp: widget.whatsAppActeur, localistaion: localisationController.text,
-                 pays: widget.pays, typeActeur: typeActeur,
-                 image1: image1,
-                ))); 
+              // Navigator.push(context, MaterialPageRoute(builder: (context)=>  RegisterEndScreen(
+              //   nomActeur: widget.nomActeur, email: emailController.text, 
+              //   telephoneActeur: widget.telephone, 
+              //    adresse:adresseController.text, 
+              //   numeroWhatsApp: widget.whatsAppActeur, localistaion: localisationController.text,
+              //    pays: widget.pays, typeActeur: typeActeur,
+              //    image1: image1,
+              //   ))); 
+
+  // Vérifier si au moins un type d'acteur est sélectionné
+  if (selectedTypes.isNotEmpty) {
+    // Naviguer vers l'écran suivant en passant les types d'acteurs sélectionnés
+    Navigator.push(context, MaterialPageRoute(builder: (context)=>  RegisterEndScreen(
+      nomActeur: widget.nomActeur, 
+      email: emailController.text, 
+      telephoneActeur: widget.telephone, 
+      adresse: adresseController.text, 
+      numeroWhatsApp: widget.whatsAppActeur, 
+      localistaion: localisationController.text,
+      pays: widget.pays, 
+      typeActeur: selectedTypes, // Passer les types d'acteurs sélectionnés ici
+      image1: image1,
+    )));
+  } else {
+    // Afficher un message indiquant que l'utilisateur doit sélectionner au moins un type d'acteur
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Veuillez sélectionner au moins un type d\'acteur.'),
+      )
+    );
+  }
               }
                            },
            child: Text(

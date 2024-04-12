@@ -19,6 +19,7 @@ import 'package:koumi_app/screens/MagasinActeur.dart';
 import 'package:koumi_app/screens/Panier.dart';
 import 'package:koumi_app/screens/Produit.dart';
 import 'package:koumi_app/screens/Transport.dart';
+import 'package:koumi_app/screens/Weather.dart';
 import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
@@ -160,7 +161,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                   MaterialPageRoute(builder: (context) => const Transport()));
             } else if (index == 5) {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Meteo()));
+                  MaterialPageRoute(builder: (context) => const WeatherScreen()));
             } else if (index == 4) {
               Navigator.push(
                   context,

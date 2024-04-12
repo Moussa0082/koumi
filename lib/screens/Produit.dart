@@ -182,7 +182,8 @@ class _ProduitScreenState extends State<ProduitScreen>
           .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
           // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
       if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body);
+        final String jsonString = utf8.decode(response.bodyBytes);
+        List<dynamic> data = json.decode(jsonString);
         setState(() {
           categorieProduit = data
               .map((item) => CategorieProduit(
