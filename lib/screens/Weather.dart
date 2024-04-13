@@ -179,21 +179,21 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
   String getDay(final day){
     DateTime time = DateTime.fromMillisecondsSinceEpoch(day * 1000);
-    final dayName = DateFormat('EEEE', 'fr_FR').format(time);
+    final dayName = DateFormat('EEEE').format(time);
     days.add(dayName);
     return dayName;
   }
 
   String getDate(final day){
     DateTime time = DateTime.fromMillisecondsSinceEpoch(day * 1000);
-    final date = DateFormat('dd/MM', 'fr_FR').format(time);
+    final date = DateFormat('dd/MM').format(time);
     dates.add(date);
     return date;
   }
 
   getTime(final day) {
     DateTime time = DateTime.fromMillisecondsSinceEpoch(day * 1000);
-    final hourTime = DateFormat('jm', 'fr_FR').format(time);
+    final hourTime = DateFormat.Hm().format(time);
     return hourTime;
   }
 

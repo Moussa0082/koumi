@@ -13,6 +13,7 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/AddMagasinScreen.dart';
+import 'package:koumi_app/screens/MagasinActeur.dart';
 import 'package:koumi_app/screens/Produit.dart';
 import 'package:koumi_app/service/MagasinService.dart';
 import 'package:profile_photo/profile_photo.dart';
@@ -102,8 +103,9 @@ class _MagasinScreenState extends State<MagasinScreen>
           'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
           // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
       if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body);
-        setState(() {
+        final String jsonString = utf8.decode(response.bodyBytes);
+        List<dynamic> data = json.decode(jsonString);
+                setState(() {
           magasin = data
               .where((magasin) => magasin['statutMagasin'] == true)
               .map((item) => Magasin(
@@ -245,7 +247,7 @@ return Consumer<MagasinService>(
                     Navigator.of(context).pop();
                   },
                   icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-              title: Text('Tous les boutiques'),
+              title: Text('Tous les magasins'),
               bottom: TabBar(
                 isScrollable: niveau1Pays.length > 4,
                 labelColor: Colors.black,
@@ -254,8 +256,8 @@ return Consumer<MagasinService>(
                     .map((region) => Tab(text: region.nomN1!))
                     .toList(),
               ),
-               actions: !isExist ? null : [
-                PopupMenuButton<String>(
+               actions: !isExist ? null :  [
+               PopupMenuButton<String>(
                   padding: EdgeInsets.zero,
                   itemBuilder: (context) => <PopupMenuEntry<String>>[
                     PopupMenuItem<String>(
@@ -301,6 +303,28 @@ return Consumer<MagasinService>(
                         },
                       ),
                     ),
+                    PopupMenuItem<String>(
+                      child: ListTile(
+                        leading: const Icon(
+                          Icons.add,
+                          color: Colors.green,
+                        ),
+                        title: const Text(
+                          "Mes magasins",
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onTap: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => MagasinActeurScreen()));
+                        },
+                      ),
+                    ),
+                    
                   ],
                 )
               ],

@@ -48,6 +48,7 @@ class _ProduitScreenState extends State<ProduitScreen>
   List<CategorieProduit> categorieProduit = [];
   String selectedCategorieProduit = "";
   String selectedCategorieProduitNom = "";
+    List<CartItem> cartItems = [];
 
   Set<String> loadedRegions = {};
 
@@ -63,7 +64,7 @@ class _ProduitScreenState extends State<ProduitScreen>
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
       typeActeurData = acteur.typeActeur!;
       type = typeActeurData.map((data) => data.libelle).join(', ');
-      
+      cartItems = Provider.of<CartProvider>(context, listen: false).cartItems;
     }
     if(widget.id != null) {
       setState(() {
@@ -262,8 +263,64 @@ categorieProduit[_tabController!.index].libelleCategorie!;
               controller: _tabController, // Ajoutez le contrôleur TabBar
               tabs: categorieProduit.map((cat) => Tab(text: cat.libelleCategorie)).toList(),
             ),
-            actions: [
-          Row(
+            actions:  !isExist ? null : [
+               cartItems.isEmpty ?
+              PopupMenuButton<String>(
+              padding: EdgeInsets.zero,
+              itemBuilder: (context) {
+                print("Type: $type");
+        return stock.any((element) => element.acteur!.idActeur == acteur.idActeur)
+                    ? <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.remove_red_eye,
+                              color: Colors.green,
+                            ),
+                            title: const Text(
+                              "Mes Produits",
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onTap: () async {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ProduitActeurScreen(id:widget.id!, nom:widget.nom!)));
+                            },
+                          ),
+                        ),
+                      ]
+                    : <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.add,
+                              color: Colors.green,
+                            ),
+                            title: const Text(
+                              "Ajouter produit",
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onTap: () async {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          AddAndUpdateProductScreen(isEditable: isEditable,)));
+                            },
+                          ),
+                        ),
+                      ];
+              },
+            )
+              
+       : Row(
             children: [
               Consumer<CartProvider>(
                 builder: (context, cartProvider, child) {
@@ -297,7 +354,7 @@ categorieProduit[_tabController!.index].libelleCategorie!;
                 width: 5,
               )
             ],
-          )
+          ) 
         ],
           centerTitle: true,
           toolbarHeight: 100,
@@ -311,62 +368,7 @@ categorieProduit[_tabController!.index].libelleCategorie!;
             style: const TextStyle(
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
-          // actions: [
-          //   PopupMenuButton<String>(
-          //     padding: EdgeInsets.zero,
-          //     itemBuilder: (context) {
-          //       print("Type: $type");
-          //       return acteur.idActeur! == stock.map((element) => element.acteur!.idActeur!)
-          //           ? <PopupMenuEntry<String>>[
-          //               PopupMenuItem<String>(
-          //                 child: ListTile(
-          //                   leading: const Icon(
-          //                     Icons.remove_red_eye,
-          //                     color: Colors.green,
-          //                   ),
-          //                   title: const Text(
-          //                     "Mes Produits",
-          //                     style: TextStyle(
-          //                       color: Colors.green,
-          //                       fontWeight: FontWeight.bold,
-          //                     ),
-          //                   ),
-          //                   onTap: () async {
-          //                     Navigator.push(
-          //                         context,
-          //                         MaterialPageRoute(
-          //                             builder: (context) => ProduitActeurScreen()));
-          //                   },
-          //                 ),
-          //               ),
-          //             ]
-          //           : <PopupMenuEntry<String>>[
-          //               PopupMenuItem<String>(
-          //                 child: ListTile(
-          //                   leading: const Icon(
-          //                     Icons.add,
-          //                     color: Colors.green,
-          //                   ),
-          //                   title: const Text(
-          //                     "Ajouter produit",
-          //                     style: TextStyle(
-          //                       color: Colors.green,
-          //                       fontWeight: FontWeight.bold,
-          //                     ),
-          //                   ),
-          //                   onTap: () async {
-          //                     Navigator.push(
-          //                         context,
-          //                         MaterialPageRoute(
-          //                             builder: (context) =>
-          //                                 AddAndUpdateProductScreen(isEditable: isEditable,)));
-          //                   },
-          //                 ),
-          //               ),
-          //             ];
-          //     },
-          //   )
-          // ]
+        
           ),
 
           body: Padding(
@@ -618,7 +620,27 @@ Get.to(
   
  
     if (filteredStocks.isEmpty) {
-       return _buildShimmerEffect();
+       return  SingleChildScrollView(
+          child: Center(
+            child: Column(
+              children: [
+                Image.asset('assets/images/notif.jpg'),
+                SizedBox(
+                  height: 10,
+                ),
+                  Center(
+                    child: Text(
+                      textAlign: TextAlign.justify,
+                      'Aucun produit trouvé ' +
+                          " dans la categorie " +
+                          selectedCategorieProduitNom.toUpperCase(),
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  )
+              ],
+            ),
+          ),
+        );
    
     } else {
       List<Stock> filteredStocksSearch = filteredStocks.where((stock) {
