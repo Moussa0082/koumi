@@ -42,8 +42,8 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
           .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
           // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
       if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body);
-
+        final String jsonString = utf8.decode(response.bodyBytes);
+        List<dynamic> data = json.decode(jsonString);
         setState(() {
           niveau1Pays = data
               .where((niveau1Pays) => niveau1Pays['statutN1'] == true)

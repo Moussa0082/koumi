@@ -447,7 +447,27 @@ categorieProduit[_tabController!.index].libelleCategorie!;
   
  
     if (filteredStocks.isEmpty) {
-       return _buildShimmerEffect();
+             return  SingleChildScrollView(
+          child: Center(
+            child: Column(
+              children: [
+                Image.asset('assets/images/notif.jpg'),
+                SizedBox(
+                  height: 10,
+                ),
+                  Center(
+                    child: Text(
+                      textAlign: TextAlign.justify,
+                      'Aucun produit trouvé ' +
+                          " dans la categorie " +
+                          selectedCategorieProduitNom.toUpperCase(),
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  )
+              ],
+            ),
+          ),
+        );
    
     } else {
       List<Stock> filteredStocksSearch = filteredStocks.where((stock) {

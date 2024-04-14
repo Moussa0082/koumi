@@ -62,7 +62,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
 
 
        late Acteur acteur = Acteur();
-
+       String? id = "";
   String? email = "";
   bool isExist = false;
 
@@ -72,6 +72,9 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+            id = acteur.idActeur;
+    magasinListe =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
       setState(() {
         isExist = true;
       });
@@ -85,20 +88,24 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
 
     @override
   void initState() {
+
+    verify();
+    magasinListe =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
     speculationListe =
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation'));
     uniteListe =
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Unite/getAllUnite'));
-    magasinListe =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagagin'));
     zoneListe =
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/ZoneProduction/getAllZone'));
+
+          debugPrint("id : $id, acteur : $acteur");
+        
         
     super.initState();
     if(!widget.isEditable){
      
     }
-    verify();
     debugPrint("nom : ${widget.nomProduit}, forme: ${widget.forme}, origine : ${widget.origine}, qte : ${widget.quantite}, prix : ${widget.prix}");
   }
 
@@ -314,7 +321,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Aucune speculation trouvé',
+                                    labelText: 'En cours de chargement',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -442,7 +449,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Aucun magasin trouvé',
+                                    labelText: 'En cours de chargement',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -568,7 +575,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Aucune unité trouvé',
+                                    labelText: 'En cours de chargement',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -694,7 +701,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Aucune zone de production trouvé',
+                                    labelText: 'En cours de chargement',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
