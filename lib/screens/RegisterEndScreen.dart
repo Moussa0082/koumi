@@ -75,6 +75,8 @@ final MultiSelectController _controllerSpeculation = MultiSelectController();
    List<String> selectedCategoryIds = [];
    List<Speculation> listeSpeculations = [];
 
+    List<Speculation> selectedSpec = [];
+
 
    List<String> idsCategorieProduit = [];
 String idsCategorieProduitAsString = "";
@@ -218,14 +220,14 @@ Future<void> _pickImage(ImageSource source) async {
       photoSiegeActeur: image2 as File,
       nomActeur: nomActeur,
       adresseActeur: adresse,
-      telephoneActeur: widget.telephoneActeur!,
-      whatsAppActeur: widget.numeroWhatsApp!,
+      telephoneActeur: widget.telephoneActeur,
+      whatsAppActeur: widget.numeroWhatsApp,
       niveau3PaysActeur: widget.pays,
       localiteActeur: localisation,
       emailActeur: emailActeur,
       typeActeur: widget.typeActeur, // Convertir les IDs en chaînes de caractères
       password: password,
-      speculations: listeSpeculations
+      speculations: selectedSpec
 
         ).then((value) => 
                  showDialog(
@@ -264,7 +266,7 @@ Future<void> _pickImage(ImageSource source) async {
       emailActeur: emailActeur,
       typeActeur: typeActeur,
       password: password,
-      speculations: listeSpeculations,
+      speculations: selectedSpec,
       
         ).then((value) => 
          showDialog(
@@ -480,7 +482,8 @@ Future<void> _pickImage(ImageSource source) async {
     networkConfig: NetworkConfig(
       // Endpoint pour récupérer les spéculations en fonction des catégories sélectionnées
       // url:url , //e40ijxd5k0n0yrzj5f80,
-      url: 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
+      url: 'https://koumi.ml/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
+      // url: 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
       method: RequestMethod.get,
       headers: {'Content-Type': 'application/json'},
     ),
@@ -518,13 +521,10 @@ Future<void> _pickImage(ImageSource source) async {
     hint: 'Sélectionner une spéculation',
     fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
     onOptionSelected: (options) {
-      if (options.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Veuillez sélectionner au moins une speculation.'),
-          ));
-          }
+    
       setState(() {
+         selectedSpec = options.map<Speculation>((item) => item.value!).toList();
+    print("Types sélectionnés : $selectedSpec");
         libelleSpeculation.clear();
         libelleSpeculation.addAll(options.map((data) => data.label).toList());
         print("Spéculation sélectionnée ${libelleSpeculation.toString()}");
@@ -661,8 +661,17 @@ Future<void> _pickImage(ImageSource source) async {
               onPressed: () async {
 
           if(_formKey.currentState!.validate()){
-      
+            if(selectedSpec.isEmpty){
+               ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Veuillez sélectionner au moins une speculation.'),
+      )
+    );
+            }else{
+
             _handleButtonPress(context);
+            }
+      
           }
                 // Handle button press action here
               },

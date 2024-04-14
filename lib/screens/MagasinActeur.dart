@@ -75,8 +75,8 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
           'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeurAndNieau1Pay/${idActeur}/${idNiveau1Pays}'));
           // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pay/${idActeur}/${idNiveau1Pays}'));
       if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body);
-
+        final String jsonString = utf8.decode(response.bodyBytes);
+        List<dynamic> data = json.decode(jsonString);
         setState(() {
           magasin = data
               .where((magasin) => magasin['statutMagasin'] == true)

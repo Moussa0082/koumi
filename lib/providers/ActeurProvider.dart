@@ -52,7 +52,6 @@ class ActeurProvider with ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? emailActeur = prefs.getString('emailActeur');
     String? codeActeur = prefs.getString('codeActeur');
-   String savedCodeActeur = codeActeur!;
     _acteur = null;
 
  if (emailActeur == null || emailActeur.isEmpty) {
@@ -68,7 +67,11 @@ class ActeurProvider with ChangeNotifier {
   await prefs.clear();
 
   // Réenregistrer le codeActeur dans SharedPreferences
+  if(codeActeur != null){
+
+   String savedCodeActeur = codeActeur;
   prefs.setString('codeActeur', savedCodeActeur);
+  }
 // if (codeActeur.isEmpty) {
 //   // Gérer le cas où le codeActeur est manquant
 //   // Sauvegarder le codeActeur avant de nettoyer les SharedPreferences

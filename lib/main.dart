@@ -8,6 +8,7 @@ import 'package:koumi_app/screens/AddAndUpdateProductEndScreen.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/PinLoginScreen.dart';
 import 'package:koumi_app/screens/SplashScreen.dart';
+import 'package:koumi_app/screens/Weather.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/AlerteService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
@@ -90,6 +91,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        // colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange.shade400),
         useMaterial3: true,
       ),
