@@ -58,7 +58,9 @@ class _DetailsActeurState extends State<DetailsActeur> {
                         cornerRadius: 185,
                         color: Colors.black,
                         image: NetworkImage(
-                            "http://10.0.2.2/${acteurs.logoActeur!}"),
+                             'https://koumi.ml/api-koumi/acteur/${acteurs.idActeur}/image',
+                        ),
+                            
                       ),
               ),
             ),

@@ -139,9 +139,9 @@ class _DetailTransportState extends State<DetailTransport> {
     // para = paraList[0];
     verifyParam();
     _niveau3List =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
 
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
     vehicules = widget.vehicule;
     typeVoiture = vehicules.typeVoiture;
     prixParDestinations = vehicules.prixParDestination;
@@ -427,179 +427,7 @@ class _DetailTransportState extends State<DetailTransport> {
                               },
                               icon: Icon(Icons.edit),
                             ),
-                      // PopupMenuButton<String>(
-                      //   padding: EdgeInsets.zero,
-                      //   itemBuilder: (context) => <PopupMenuEntry<String>>[
-                      //     PopupMenuItem<String>(
-                      //       child: ListTile(
-                      //         leading: const Icon(
-                      //           Icons.check,
-                      //           color: Colors.green,
-                      //         ),
-                      //         title: const Text(
-                      //           "Activer",
-                      //           style: TextStyle(
-                      //             color: Colors.green,
-                      //             fontWeight: FontWeight.bold,
-                      //           ),
-                      //         ),
-                      //         onTap: () async {
-                      //           await VehiculeService()
-                      //               .activerVehicules(vehicules.idVehicule!)
-                      //               .then((value) => {
-                      //                     Provider.of<VehiculeService>(context,
-                      //                             listen: false)
-                      //                         .applyChange(),
-                      //                     setState(() {
-                      //                       vehicules = Vehicule(
-                      //                         idVehicule: vehicules.idVehicule,
-                      //                         nomVehicule:
-                      //                             vehicules.nomVehicule,
-                      //                         capaciteVehicule:
-                      //                             vehicules.capaciteVehicule,
-                      //                         prixParDestination:
-                      //                             prixParDestinations,
-                      //                         etatVehicule:
-                      //                             vehicules.etatVehicule,
-                      //                         localisation:
-                      //                             vehicules.localisation,
-                      //                         typeVoiture: typeVoiture,
-                      //                         acteur: acteur,
-                      //                         statutVehicule:
-                      //                             vehicules.statutVehicule,
-                      //                       );
-                      //                     }),
-                      //                     Navigator.of(context).pop(),
-                      //                     ScaffoldMessenger.of(context)
-                      //                         .showSnackBar(
-                      //                       const SnackBar(
-                      //                         content: Row(
-                      //                           children: [
-                      //                             Text("Activer avec succèss "),
-                      //                           ],
-                      //                         ),
-                      //                         duration: Duration(seconds: 2),
-                      //                       ),
-                      //                     )
-                      //                   })
-                      //               .catchError((onError) => {
-                      //                     ScaffoldMessenger.of(context)
-                      //                         .showSnackBar(
-                      //                       const SnackBar(
-                      //                         content: Row(
-                      //                           children: [
-                      //                             Text(
-                      //                                 "Une erreur s'est produit"),
-                      //                           ],
-                      //                         ),
-                      //                         duration: Duration(seconds: 5),
-                      //                       ),
-                      //                     ),
-                      //                     Navigator.of(context).pop(),
-                      //                   });
-                      //         },
-                      //       ),
-                      //     ),
-                      //     PopupMenuItem<String>(
-                      //       child: ListTile(
-                      //         leading: Icon(
-                      //           Icons.disabled_visible,
-                      //           color: Colors.orange[400],
-                      //         ),
-                      //         title: Text(
-                      //           "Désactiver",
-                      //           style: TextStyle(
-                      //             color: Colors.orange[400],
-                      //             fontWeight: FontWeight.bold,
-                      //           ),
-                      //         ),
-                      //         onTap: () async {
-                      //           await VehiculeService()
-                      //               .desactiverVehicules(vehicules.idVehicule!)
-                      //               .then((value) => {
-                      //                     Provider.of<VehiculeService>(context,
-                      //                             listen: false)
-                      //                         .applyChange(),
-                      //                     // setState(() {
-                      //                     //   futureListe = getListe(
-                      //                     //       typeVoiture.idTypeVoiture);
-                      //                     // }),
-                      //                     Navigator.of(context).pop(),
-                      //                   })
-                      //               .catchError((onError) => {
-                      //                     ScaffoldMessenger.of(context)
-                      //                         .showSnackBar(
-                      //                       const SnackBar(
-                      //                         content: Row(
-                      //                           children: [
-                      //                             Text(
-                      //                                 "Une erreur s'est produit"),
-                      //                           ],
-                      //                         ),
-                      //                         duration: Duration(seconds: 5),
-                      //                       ),
-                      //                     ),
-                      //                     Navigator.of(context).pop(),
-                      //                   });
-
-                      //           ScaffoldMessenger.of(context).showSnackBar(
-                      //             const SnackBar(
-                      //               content: Row(
-                      //                 children: [
-                      //                   Text("Désactiver avec succèss "),
-                      //                 ],
-                      //               ),
-                      //               duration: Duration(seconds: 2),
-                      //             ),
-                      //           );
-                      //         },
-                      //       ),
-                      //     ),
-                      //     PopupMenuItem<String>(
-                      //       child: ListTile(
-                      //         leading: const Icon(
-                      //           Icons.delete,
-                      //           color: Colors.red,
-                      //         ),
-                      //         title: const Text(
-                      //           "Supprimer",
-                      //           style: TextStyle(
-                      //             color: Colors.red,
-                      //             fontWeight: FontWeight.bold,
-                      //           ),
-                      //         ),
-                      //         onTap: () async {
-                      //           await VehiculeService()
-                      //               .deleteVehicule(vehicules.idVehicule!)
-                      //               .then((value) => {
-                      //                     Provider.of<VehiculeService>(context,
-                      //                             listen: false)
-                      //                         .applyChange(),
-                      //                     // setState(() {
-                      //                     //   futureListe = getListe(
-                      //                     //       typeVoiture.idTypeVoiture);
-                      //                     // }),
-                      //                     Navigator.of(context).pop(),
-                      //                   })
-                      //               .catchError((onError) => {
-                      //                     ScaffoldMessenger.of(context)
-                      //                         .showSnackBar(
-                      //                       const SnackBar(
-                      //                         content: Row(
-                      //                           children: [
-                      //                             Text(
-                      //                                 "Impossible de supprimer"),
-                      //                           ],
-                      //                         ),
-                      //                         duration: Duration(seconds: 2),
-                      //                       ),
-                      //                     )
-                      //                   });
-                      //         },
-                      //       ),
-                      //     ),
-                      //   ],
-                      // )
+                     
                     ]
                   : null),
           body: SingleChildScrollView(
@@ -619,11 +447,23 @@ class _DetailTransportState extends State<DetailTransport> {
                         child: vehicules.photoVehicule != null &&
                                 !vehicules.photoVehicule!.isEmpty
                             ? Image.network(
-                                "http://10.0.2.2/${vehicules.photoVehicule!}",
-                                width: double.infinity,
-                                height: 200,
-                                fit: BoxFit.cover,
-                              )
+                                                              "https://koumi.ml/api-koumi/vehicule/${vehicules.idVehicule}/image",
+                                                              // "http://10.0.2.2/${e.photoIntrant}",
+                                                              fit: BoxFit.cover,
+                                                              errorBuilder: (BuildContext
+                                                                      context,
+                                                                  Object
+                                                                      exception,
+                                                                  StackTrace?
+                                                                      stackTrace) {
+                                                                return Image
+                                                                    .asset(
+                                                                  'assets/images/default_image.png',
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                );
+                                                              },
+                                                            )
                             : Image.asset(
                                 "assets/images/default_image.png",
                                 fit: BoxFit.cover,

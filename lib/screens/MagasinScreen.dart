@@ -55,8 +55,8 @@ class _MagasinScreenState extends State<MagasinScreen>
   void fetchRegions() async {
     try {
       final response = await http
-          // .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-          .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+          .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+          // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
 
@@ -87,8 +87,8 @@ class _MagasinScreenState extends State<MagasinScreen>
   void fetchMagasinsByRegion(String id) async {
     try {
       final response = await http.get(Uri.parse(
-          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+          'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {
@@ -127,8 +127,8 @@ class _MagasinScreenState extends State<MagasinScreen>
   Future<void> fetchMagasinByRegion(String id) async {
     try {
       final response = await http.get(Uri.parse(
-          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+          'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {

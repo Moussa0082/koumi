@@ -44,7 +44,7 @@ class _ConseilScreenState extends State<ConseilScreen> {
   //     });
   //   }
   // }
-
+  
   @override
   void initState() {
     super.initState();
@@ -248,7 +248,16 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                                             FontStyle.italic,
                                                       ))),
                                               SizedBox(height: 10),
-                                              type.toLowerCase() != 'admin'
+                                             type.toLowerCase() ==
+                                                          'fournisseur' ||
+                                                      type.toLowerCase() ==
+                                                          'commerçant' ||
+                                                      type.toLowerCase() ==
+                                                          'transporteur' ||
+                                                      type.toLowerCase() ==
+                                                          'transformeur' ||
+                                                      type.toLowerCase() ==
+                                                          'producteur'
                                                   ? Container()
                                                   : Container(
                                                       alignment:

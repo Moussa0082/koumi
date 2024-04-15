@@ -129,7 +129,14 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                       searchText = _searchController.text.toLowerCase();
                       return libelle.contains(searchText);
                     }).toList();
-                    return Wrap(
+                    return 
+                                  GridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 2,
+                      crossAxisSpacing: 5,
+                      childAspectRatio: 0.9,
                       children: filtereSearch
                           .map((e) => Padding(
                                 padding: EdgeInsets.all(10),
@@ -175,7 +182,8 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                         fit: BoxFit.cover,
                                                       )
                                                     : Image.network(
-                                                        "http://10.0.2.2/${e.photoIntrant}",
+                                                       "https://koumi.ml/api-koumi/intrant/${e.idIntrant}/image",
+                                                        // "http://10.0.2.2/${e.photoIntrant}",
                                                         fit: BoxFit.cover,
                                                         errorBuilder:
                                                             (BuildContext

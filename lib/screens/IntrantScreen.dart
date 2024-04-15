@@ -69,10 +69,10 @@ class _IntrantScreenState extends State<IntrantScreen> {
       para = paraList[0];
     }
     _searchController = TextEditingController();
-    _typeList =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
-        http.get(
-            Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
+    _typeList = http
+        .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
+    // http.get(
+    //     Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
   }
 
   @override
@@ -154,7 +154,6 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                       MaterialPageRoute(
                                           builder: (context) =>
                                               ListeIntrantByActeur()));
-                                              
                                 },
                               ),
                             )
@@ -175,7 +174,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                     items: [],
                     onChanged: null,
                     decoration: InputDecoration(
-                      labelText: '-- Aucun categorie trouvé --',
+                      labelText: 'Chargement...',
                       contentPadding: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 20),
                       border: OutlineInputBorder(
@@ -184,11 +183,12 @@ class _IntrantScreenState extends State<IntrantScreen> {
                     ),
                   );
                 }
-                if (snapshot.hasError) {
-                  return Text("${snapshot.error}");
-                }
+
                 if (snapshot.hasData) {
-                  dynamic responseData = json.decode(snapshot.data.body);
+                  dynamic jsonString = utf8.decode(snapshot.data.bodyBytes);
+                  dynamic responseData = json.decode(jsonString);
+
+                  // dynamic responseData = json.decode(snapshot.data.body);
                   if (responseData is List) {
                     final reponse = responseData;
                     final typeList = reponse
@@ -220,7 +220,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             ),
                           )
                           .toList(),
-                      hint: Text("-- Filtre par type de categorie --"),
+                      hint: Text("-- Filtre par categorie --"),
                       value: catValue,
                       onChanged: (newValue) {
                         setState(() {
@@ -305,7 +305,14 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             padding: EdgeInsets.all(10),
                             child: Center(child: Text("Aucun donné trouvé")),
                           )
-                        : Wrap(
+                        : 
+                                  GridView.count(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 2,
+                            crossAxisSpacing: 5,
+                            childAspectRatio: 0.9,
                             children: intrantListe
                                 .where(
                                     (element) => element.statutIntrant == true)
@@ -360,7 +367,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                                               fit: BoxFit.cover,
                                                             )
                                                           : Image.network(
-                                                              "http://10.0.2.2/${e.photoIntrant}",
+                                                              "https://koumi.ml/api-koumi/intrant/${e.idIntrant}/image",
+                                                              // "http://10.0.2.2/${e.photoIntrant}",
                                                               fit: BoxFit.cover,
                                                               errorBuilder: (BuildContext
                                                                       context,

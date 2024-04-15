@@ -244,7 +244,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         statutIntrant: intrants.statutIntrant,
                         dateAjout: intrants.dateAjout,
                         dateExpiration: date,
-                         speculation: intrants.speculation,
+                        speculation: intrants.speculation,
                         photoIntrant: intrants.photoIntrant,
                         acteur: acteur);
                     _isLoading = false;
@@ -352,11 +352,23 @@ class _DetailIntrantState extends State<DetailIntrant> {
                           child: intrants.photoIntrant != null &&
                                   !intrants.photoIntrant!.isEmpty
                               ? Image.network(
-                                  "http://10.0.2.2/${intrants.photoIntrant!}",
-                                  width: double.infinity,
-                                  height: 200,
+                                  "https://koumi.ml/api-koumi/intrant/${intrants.idIntrant}/image",
                                   fit: BoxFit.cover,
+                                  errorBuilder: (BuildContext context,
+                                      Object exception,
+                                      StackTrace? stackTrace) {
+                                    return Image.asset(
+                                      'assets/images/default_image.png',
+                                      fit: BoxFit.cover,
+                                    );
+                                  },
                                 )
+                              // ? Image.network(
+                              //     "http://10.0.2.2/${intrants.photoIntrant!}",
+                              //     width: double.infinity,
+                              //     height: 200,
+                              //     fit: BoxFit.cover,
+                              //   )
                               : Image.asset(
                                   "assets/images/default_image.png",
                                   fit: BoxFit.cover,

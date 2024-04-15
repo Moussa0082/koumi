@@ -252,8 +252,8 @@ class _DetailMaterielState extends State<DetailMateriel> {
     verify();
     verifyParam();
     _niveau3List =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
+    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
     materiels = widget.materiel;
     _nomController.text = materiels.nom;
     _descriptionController.text = materiels.description;
@@ -332,10 +332,16 @@ class _DetailMaterielState extends State<DetailMateriel> {
                         child: materiels.photoMateriel != null &&
                                 materiels.photoMateriel!.isNotEmpty
                             ? Image.network(
-                                "http://10.0.2.2/${materiels.photoMateriel}",
-                                width: double.infinity,
-                                height: 200,
+                                'https://koumi.ml/api-koumi/Materiel/${materiels.idMateriel}/image',
+                                // "http://10.0.2.2/${e.photoIntrant}",
                                 fit: BoxFit.cover,
+                                errorBuilder: (BuildContext context,
+                                    Object exception, StackTrace? stackTrace) {
+                                  return Image.asset(
+                                    'assets/images/default_image.png',
+                                    fit: BoxFit.cover,
+                                  );
+                                },
                               )
                             : Image.asset(
                                 "assets/images/default_image.png",

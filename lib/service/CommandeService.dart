@@ -9,8 +9,8 @@ import 'package:koumi_app/models/Stock.dart';
 
  class CommandeService{
 
-    // final String apiUrl = 'https://koumi.ml/api-koumi/commande/'; // Replace with your API URL
-    final String apiUrl = 'http://10.0.2.2:9000/api-koumi/commande/'; // Replace with your API URL
+    final String apiUrl = 'https://koumi.ml/api-koumi/commande/'; // Replace with your API URL
+    // final String apiUrl = 'http://10.0.2.2:9000/api-koumi/commande/'; // Replace with your API URL
 
 
 Future<Commande> createCommande(CommandeAvecStocks commandeAvecStocks) async {

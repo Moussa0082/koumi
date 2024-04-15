@@ -54,11 +54,12 @@ class _CategoriPageState extends State<CategoriPage> {
 
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _filiereList = http
-        // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
-        .get( Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
-        
-    _categorieList = http.get( Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
-    // _categorieList = http.get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
+        .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+    // .get( Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+
+    // _categorieList = http.get( Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
+    _categorieList = http
+        .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
     _liste = getCat();
     _searchController = TextEditingController();
   }
@@ -682,13 +683,11 @@ class _CategoriPageState extends State<CategoriPage> {
                                                                             {
                                                                               Provider.of<CategorieService>(context, listen: false).applyChange(),
                                                                               setState(() {
-                                                                                _categorieList = http.
-                                                                                get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
+                                                                                _categorieList = http
+                                                                                    .
+                                                                                    // get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
 
-                                                                                // _categorieList = http.
-                                                                                // get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
-                                                                                
-                                                                            
+                                                                                    get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
                                                                               }),
                                                                               Navigator.of(context).pop(),
                                                                             })
@@ -795,22 +794,24 @@ class _CategoriPageState extends State<CategoriPage> {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
                               return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Chargement...',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Chargement...',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                );
+                                ),
+                              );
                             }
-                            
+
                             if (snapshot.hasData) {
-                              dynamic responseData =
-                                  json.decode(snapshot.data.body);
+                              dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+
                               if (responseData is List) {
                                 final reponse = responseData;
                                 final filiereList = reponse
@@ -911,18 +912,20 @@ class _CategoriPageState extends State<CategoriPage> {
                             try {
                               await CategorieService()
                                   .addCategorie(
-                                      libelleCategorie: libelle,
-                                      descriptionCategorie: description,
-                                      filiere: filiere,
-                                      )
+                                    libelleCategorie: libelle,
+                                    descriptionCategorie: description,
+                                    filiere: filiere,
+                                  )
                                   .then((value) => {
                                         Provider.of<CategorieService>(context,
                                                 listen: false)
                                             .applyChange(),
                                         setState(() {
-                                           _categorieList = http.
-                                           get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
-                                          // get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
+                                          _categorieList = http
+                                              .
+                                              //  get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
+                                              get(Uri.parse(
+                                                  'https://koumi.ml/api-koumi/Categorie/allCategorie'));
                                           filiereValue = null;
                                         }),
                                         libelleController.clear(),
@@ -1009,6 +1012,7 @@ class _CategoriPageState extends State<CategoriPage> {
       case 'bétail':
       case 'betails':
       case 'betail':
+      case 'animale':
         return Image.asset(
           "assets/images/betail.png",
           width: 80,
@@ -1018,6 +1022,7 @@ class _CategoriPageState extends State<CategoriPage> {
       case 'légume':
       case 'legumes':
       case 'legume':
+      case 'végétale':
         return Image.asset(
           "assets/images/legumes.png",
           width: 80,
@@ -1108,14 +1113,25 @@ class _CategoriPageState extends State<CategoriPage> {
                           builder: (_, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return CircularProgressIndicator();
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Chargement...',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
                             }
-                            if (snapshot.hasError) {
-                              return Text("${snapshot.error}");
-                            }
+
                             if (snapshot.hasData) {
-                              dynamic responseData =
-                                  json.decode(snapshot.data.body);
+                              dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+
                               if (responseData is List) {
                                 final reponse = responseData;
                                 final filiereList = reponse
@@ -1218,10 +1234,10 @@ class _CategoriPageState extends State<CategoriPage> {
                             try {
                               await SpeculationService()
                                   .addSpeculation(
-                                      nomSpeculation: libelle,
-                                      descriptionSpeculation: description,
-                                      categorieProduit: categorieProduit,
-                                      )
+                                    nomSpeculation: libelle,
+                                    descriptionSpeculation: description,
+                                    categorieProduit: categorieProduit,
+                                  )
                                   .then((value) => {
                                         Provider.of<SpeculationService>(context,
                                                 listen: false)

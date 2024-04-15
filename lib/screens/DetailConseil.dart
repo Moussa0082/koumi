@@ -40,7 +40,9 @@ class _DetailConseilState extends State<DetailConseil> {
 
         // Start the player as soon as the app is displayed.
         WidgetsBinding.instance.addPostFrameCallback((_) async {
-          String audioPath = 'http://10.0.2.2/${conseils.audioConseil}';
+          // String audioPath = 'http://10.0.2.2/${conseils.audioConseil}';
+                    String audioPath = 'https://koumi.ml/api-koumi/conseil/${conseils.idConseil}/audio';
+
           await player.play(UrlSource(audioPath));
           await player.pause();
         });
@@ -64,7 +66,8 @@ class _DetailConseilState extends State<DetailConseil> {
       flickManager = FlickManager(
         autoPlay: false,
         videoPlayerController: VideoPlayerController.networkUrl(
-          Uri.parse('http://10.0.2.2/${conseils.videoConseil}'),
+          Uri.parse('https://koumi.ml/api-koumi/conseil/${conseils.idConseil}/video'),
+          // Uri.parse('http://10.0.2.2/${conseils.videoConseil}'),
         ),
       );
     }

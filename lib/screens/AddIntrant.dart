@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
@@ -14,7 +13,6 @@ import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/NextAddIntrat.dart';
 import 'package:koumi_app/service/CategorieService.dart';
-import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/service/SpeculationService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
@@ -140,9 +138,9 @@ class _AddIntrantState extends State<AddIntrant> {
     para = paraList[0];
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _categorieList = fetchCategorieList(); // _categorieList = http.get(
-    //     Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
     _speculationList = http.get(Uri.parse(
-        'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculationByCategorie/${categorieProduit.idCategorieProduit}'));
+        // 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculationByCategorie/${categorieProduit.idCategorieProduit}'));
+        'https://koumi.ml/api-koumi/Speculation/getAllSpeculationByCategorie/${categorieProduit.idCategorieProduit}'));
   }
 
   Future<List<CategorieProduit>> fetchCategorieList() async {
@@ -276,7 +274,8 @@ class _AddIntrantState extends State<AddIntrant> {
 
                                         // _speculationList = SpeculationService().fetchSpeculationByCategorie(newValue);
                                         _speculationList = http.get(Uri.parse(
-                                            'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculationByCategorie/${newValue}'));
+                                            'https://koumi.ml/api-koumi/Speculation/getAllSpeculationByCategorie/${newValue}'));
+                                        // 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculationByCategorie/${newValue}'));
                                       }
                                     });
                                   },
@@ -346,8 +345,11 @@ class _AddIntrantState extends State<AddIntrant> {
                             }
 
                             if (snapshot.hasData) {
-                              dynamic responseData =
-                                  json.decode(snapshot.data.body);
+                              dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+                              // dynamic responseData =
+                              //     json.decode(snapshot.data.body);
 
                               if (responseData is List) {
                                 List<Speculation> speList = responseData

@@ -42,8 +42,8 @@ class _Niveau3PageState extends State<Niveau3Page> {
         .parametreList!;
     para = paraList[0];
     _niveauList =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/niveau2Pays/read'));
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau2Pays/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau2Pays/read'));
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau2Pays/read'));
     super.initState();
   }
 
@@ -598,13 +598,23 @@ class _Niveau3PageState extends State<Niveau3Page> {
                             builder: (_, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
-                                return CircularProgressIndicator();
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Chargement...',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
                               }
-                              if (snapshot.hasError) {
-                                return Text("${snapshot.error}");
-                              }
+                              
                               if (snapshot.hasData) {
-                                final reponse = json.decode(snapshot.data.body);
+                                // final reponse = json.decode(snapshot.data.body);
+                                dynamic jsonString =
+                                    utf8.decode(snapshot.data.bodyBytes);
+                                dynamic reponse = json.decode(jsonString);
                                 if (reponse is List) {
                                   final niveauList = reponse
                                       .map((e) => Niveau2Pays.fromMap(e))

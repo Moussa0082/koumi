@@ -64,8 +64,8 @@ class _TransportState extends State<Transport> {
     verify();
     _searchController = TextEditingController();
     _typeList =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/TypeVoiture/read'));
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/TypeVoiture/read'));
+    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
     super.initState();
   }
 
@@ -254,7 +254,7 @@ class _TransportState extends State<Transport> {
                     items: [],
                     onChanged: null,
                     decoration: InputDecoration(
-                      labelText: '-- Aucun type de véhicule trouvé --',
+                      labelText: 'Chargement...',
                       contentPadding: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 20),
                       border: OutlineInputBorder(
@@ -263,11 +263,11 @@ class _TransportState extends State<Transport> {
                     ),
                   );
                 }
-                if (snapshot.hasError) {
-                  return Text("${snapshot.error}");
-                }
+
                 if (snapshot.hasData) {
-                  dynamic responseData = json.decode(snapshot.data.body);
+                  dynamic jsonString = utf8.decode(snapshot.data.bodyBytes);
+                  dynamic responseData = json.decode(jsonString);
+                  // dynamic responseData = json.decode(snapshot.data.body);
                   if (responseData is List) {
                     final reponse = responseData;
                     final vehiculeList = reponse
@@ -379,12 +379,15 @@ class _TransportState extends State<Transport> {
                       searchText = _searchController.text.toLowerCase();
                       return libelle.contains(searchText);
                     }).toList();
-                    return Wrap(
-                      // spacing: 10, // Espacement horizontal entre les conteneurs
-                      // runSpacing:
-                      //     10, // Espacement vertical entre les lignes de conteneurs
+                    return GridView.count(
+                    shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 2,
+                      crossAxisSpacing: 5,
+                      childAspectRatio: 0.9,
                       children: filtereSearch
-                         .where((element) => element.statutVehicule == true)
+                          .where((element) => element.statutVehicule == true)
                           .map((e) => Padding(
                                 padding: EdgeInsets.all(10),
                                 child: SizedBox(
@@ -425,11 +428,11 @@ class _TransportState extends State<Transport> {
                                                 height: 90,
                                                 child: e.photoVehicule == null
                                                     ? Image.asset(
-                                                        "assets/images/transport.png",
+                                                        'assets/images/default_image.png',
                                                         fit: BoxFit.cover,
                                                       )
                                                     : Image.network(
-                                                        "http://10.0.2.2/${e.photoVehicule}",
+                                                        "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
                                                         fit: BoxFit.cover,
                                                         errorBuilder:
                                                             (BuildContext
@@ -439,7 +442,7 @@ class _TransportState extends State<Transport> {
                                                                 StackTrace?
                                                                     stackTrace) {
                                                           return Image.asset(
-                                                            'assets/images/transport.png',
+                                                            'assets/images/default_image.png',
                                                             fit: BoxFit.cover,
                                                           );
                                                         },

@@ -44,8 +44,8 @@ class _Niveau1PageState extends State<Niveau1Page> {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
     para = paraList[0];
-    // _paysList = http.get(Uri.parse('https://koumi.ml/api-koumi/pays/read'));
-    _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
+    _paysList = http.get(Uri.parse('https://koumi.ml/api-koumi/pays/read'));
+    // _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
     _searchController = TextEditingController();
   }
 
@@ -627,15 +627,28 @@ class _Niveau1PageState extends State<Niveau1Page> {
                             builder: (_, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
-                                return CircularProgressIndicator();
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Chargement...',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
                               }
-                              if (snapshot.hasError) {
-                                return Text("${snapshot.error}");
-                              }
+                              // if (snapshot.hasError) {
+                              //   return Text("${snapshot.error}");
+                              // }
                               if (snapshot.hasData) {
-                                final reponse = json.decode(snapshot.data.body);
-                                if (reponse is List) {
-                                  final paysList = reponse
+                                dynamic jsonString =
+                                    utf8.decode(snapshot.data.bodyBytes);
+                                dynamic responseData = json.decode(jsonString);
+
+                                // final reponse = json.decode(snapshot.data.body);
+                                if (responseData is List) {
+                                  final paysList = responseData
                                       .map((e) => Pays.fromMap(e))
                                       .where((con) => con.statutPays == true)
                                       .toList();

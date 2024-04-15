@@ -236,8 +236,8 @@ Future<String?> getCurrentCountryFromLocation() async {
     // TODO: implement initState
     super.initState();
     _mesTypeActeur  =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/typeActeur/read'));
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/typeActeur/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/typeActeur/read'));
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/typeActeur/read'));
     // getLocation();
     getLocationNew();
   }

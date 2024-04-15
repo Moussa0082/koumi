@@ -8,7 +8,6 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Filiere.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
 import 'package:provider/provider.dart';
@@ -50,8 +49,8 @@ class _FiliereScreenState extends State<FiliereScreen> {
     //     .parametreList!;
     // para = paraList[0];
     _filiereList = http
-        // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
-        .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+        .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+    // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
     _liste = getFil();
   }
 
@@ -506,9 +505,8 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                                             Provider.of<FiliereService>(context, listen: false).applyChange(),
                                                                             Navigator.of(context).pop(),
                                                                             setState(() {
-                                                                              _filiereList = http
-                                                                                  // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
-                                                                                  .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+                                                                              _filiereList = http.get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+                                                                              // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
                                                                             })
                                                                           })
                                                                   .catchError(
@@ -574,7 +572,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
       case 'bétail':
       case 'betails':
       case 'betail':
-      case 'animal':
+      case 'animale':
         return Image.asset(
           "assets/images/betail.png",
           width: 80,
@@ -584,6 +582,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
       case 'légume':
       case 'legumes':
       case 'legume':
+      case 'végétale':
         return Image.asset(
           "assets/images/legumes.png",
           width: 80,
@@ -703,9 +702,9 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                 listen: false)
                                             .applyChange(),
                                         setState(() {
-                                          _filiereList = http
-                                              // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
-                                              .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+                                          _filiereList = http.get(Uri.parse(
+                                              'https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+                                          // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
                                         }),
                                         libelleController.clear(),
                                         descriptionController.clear(),
@@ -828,7 +827,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                             //   return Text("${snapshot.error}");
                             // }
                             if (snapshot.hasData) {
-                             dynamic jsonString =
+                              dynamic jsonString =
                                   utf8.decode(snapshot.data.bodyBytes);
                               dynamic responseData = json.decode(jsonString);
 

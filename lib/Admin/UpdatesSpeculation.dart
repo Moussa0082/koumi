@@ -30,14 +30,14 @@ class _UpdatesSpeculationState extends State<UpdatesSpeculation> {
 
   @override
   Widget build(BuildContext context) {
-    return  Container(
+    return Container(
       padding: const EdgeInsets.all(16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Center(
-            child: Text(
-              "Modifier une spéculation",
+          ListTile(
+            title: Text(
+              "Modification",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
@@ -46,8 +46,17 @@ class _UpdatesSpeculationState extends State<UpdatesSpeculation> {
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
             ),
+            trailing: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(
+                  Icons.close,
+                  color: Colors.red,
+                  size: 30,
+                )),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 10),
           Form(
             key: formkey,
             child: Column(
@@ -99,79 +108,56 @@ class _UpdatesSpeculationState extends State<UpdatesSpeculation> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          final String libelle = libelleController.text;
-                          final String description = descriptionController.text;
-                          if (formkey.currentState!.validate()) {
-                            try {
-                              await SpeculationService()
-                                  .updateSpeculation(idSpeculation: speculations.idSpeculation!, nomSpeculation: libelle, descriptionSpeculation: description)
-                                  .then((value) => {
-                                        Provider.of<SpeculationService>(context,
-                                                listen: false)
-                                            .applyChange(),
-                                        libelleController.clear(),
-                                        descriptionController.clear(),
-                                        Navigator.of(context).pop()
-                                      });
-                            } catch (e) {
-                              final String errorMessage = e.toString();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text("Une erreur s'est produite"),
-                                    ],
-                                  ),
-                                  duration: Duration(seconds: 5),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                        ),
-                        child: const Text(
-                          "Modifier",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    final String libelle = libelleController.text;
+                    final String description = descriptionController.text;
+                    if (formkey.currentState!.validate()) {
+                      try {
+                        await SpeculationService()
+                            .updateSpeculation(
+                                idSpeculation: speculations.idSpeculation!,
+                                nomSpeculation: libelle,
+                                descriptionSpeculation: description)
+                            .then((value) => {
+                                  Provider.of<SpeculationService>(context,
+                                          listen: false)
+                                      .applyChange(),
+                                  libelleController.clear(),
+                                  descriptionController.clear(),
+                                  Navigator.of(context).pop()
+                                });
+                      } catch (e) {
+                        final String errorMessage = e.toString();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Row(
+                              children: [
+                                Text("Une erreur s'est produite"),
+                              ],
+                            ),
+                            duration: Duration(seconds: 5),
                           ),
-                        ),
-                      ),
+                        );
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                  ),
+                  icon: Icon(
+                    Icons.edit,
+                    color: Colors.white,
+                  ),
+                  label: const Text(
+                    "Modifier",
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
                     ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pop(); // Ferme la boîte de dialogue
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                        ),
-                       child: const Text(
-                          "Annuler",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 )
               ],
             ),

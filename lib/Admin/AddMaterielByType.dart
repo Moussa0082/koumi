@@ -66,14 +66,14 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
     super.initState();
     verifyTypeMateriel();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    // _typeList =
-    //     http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
-    // _niveau3List =
-    //     http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
     _typeList =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
     _niveau3List =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
+    // _typeList =
+    //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
+    // _niveau3List =
+    //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
   }
 
   void verifyTypeMateriel() {
@@ -292,7 +292,7 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
                                 items: [],
                                 onChanged: null,
                                 decoration: InputDecoration(
-                                  labelText: 'Aucun localité trouvé',
+                                  labelText: 'Chargement...',
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(
@@ -301,12 +301,14 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
                                 ),
                               );
                             }
-                            if (snapshot.hasError) {
-                              return Text("${snapshot.error}");
-                            }
+                          
                             if (snapshot.hasData) {
-                              dynamic responseData =
-                                  json.decode(snapshot.data.body);
+                               dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+
+                              // dynamic responseData =
+                              //     json.decode(snapshot.data.body);
                               if (responseData is List) {
                                 final reponse = responseData;
                                 final niveau3List = reponse

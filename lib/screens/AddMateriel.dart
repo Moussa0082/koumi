@@ -55,14 +55,14 @@ class _AddMaterielState extends State<AddMateriel> {
         .parametreList!;
     para = paraList[0];
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    // _typeList =
-    //     http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
-    // _niveau3List =
-    //     http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
     _typeList =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
     _niveau3List =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
+    // _typeList =
+    //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
+    // _niveau3List =
+    //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
   }
 
   Future<File> saveImagePermanently(String imagePath) async {
@@ -268,7 +268,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Aucun localité trouvé',
+                                    labelText: 'Chargement...',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -277,12 +277,14 @@ class _AddMaterielState extends State<AddMateriel> {
                                   ),
                                 );
                               }
-                              if (snapshot.hasError) {
-                                return Text("${snapshot.error}");
-                              }
+                              
                               if (snapshot.hasData) {
-                                dynamic responseData =
-                                    json.decode(snapshot.data.body);
+                                // dynamic responseData =
+                                //     json.decode(snapshot.data.body);
+                                 dynamic jsonString =
+                                    utf8.decode(snapshot.data.bodyBytes);
+                                dynamic responseData = json.decode(jsonString);
+
                                 if (responseData is List) {
                                   final reponse = responseData;
                                   final niveau3List = reponse
@@ -397,7 +399,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Aucun type de matériel trouvé',
+                                    labelText: 'Chargement...',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -406,12 +408,14 @@ class _AddMaterielState extends State<AddMateriel> {
                                   ),
                                 );
                               }
-                              if (snapshot.hasError) {
-                                return Text("${snapshot.error}");
-                              }
+                              
                               if (snapshot.hasData) {
-                                dynamic responseData =
-                                    json.decode(snapshot.data.body);
+                                // dynamic responseData =
+                                //     json.decode(snapshot.data.body);
+                                 dynamic jsonString =
+                                    utf8.decode(snapshot.data.bodyBytes);
+                                dynamic responseData = json.decode(jsonString);
+
                                 if (responseData is List) {
                                   final reponse = responseData;
                                   final materielList = reponse

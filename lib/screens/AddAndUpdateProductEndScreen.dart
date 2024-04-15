@@ -83,13 +83,21 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
     @override
   void initState() {
     speculationListe =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/Speculation/getAllSpeculation'));
     uniteListe =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Unite/getAllUnite'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/Unite/getAllUnite'));
     magasinListe =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagagin'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/Magasin/getAllMagagin'));
     zoneListe =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/ZoneProduction/getAllZone'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/ZoneProduction/getAllZone'));
+    // speculationListe =
+    //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation'));
+    // uniteListe =
+    //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Unite/getAllUnite'));
+    // magasinListe =
+    //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagagin'));
+    // zoneListe =
+    //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/ZoneProduction/getAllZone'));
         
     super.initState();
     if(!widget.isEditable!){

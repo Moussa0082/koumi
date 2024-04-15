@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:koumi_app/Admin/AddMaterielByType.dart';
 import 'package:koumi_app/Admin/DetailMateriel.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Materiel.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/AddMateriel.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:provider/provider.dart';
 
@@ -35,8 +32,6 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
 
   @override
   void initState() {
-   
-
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     futureListe = getListe(acteur.idActeur!);
     super.initState();
@@ -112,7 +107,14 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
                                 child: Center(
                                     child: Text("Aucun matériel trouvé")),
                               )
-                            : Wrap(
+                            : 
+                                  GridView.count(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 2,
+                                crossAxisSpacing: 5,
+                                childAspectRatio: 0.9,
                                 children: materielListe
                                     .map((e) => Padding(
                                         padding: EdgeInsets.all(10),
@@ -165,7 +167,7 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
                                                               height: 90,
                                                             )
                                                           : Image.network(
-                                                              "http://10.0.2.2/${e.photoMateriel}",
+                                                              "https://koumi.ml/api-koumi/Materiel/${e.idMateriel}/image",
                                                               fit: BoxFit.cover,
                                                               height: 90,
                                                               errorBuilder: (BuildContext

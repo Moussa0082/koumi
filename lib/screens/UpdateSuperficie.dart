@@ -61,11 +61,12 @@ class _UpdateSuperficieState extends State<UpdateSuperficie> {
     _liste = getCampListe(); // _categorieList = http.get(
     //     Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
     _speculationList = http.get(Uri.parse(
-        'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation'));
+        'https://koumi.ml/api-koumi/Speculation/getAllSpeculation'));
+        // 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation'));
     // _speculationList = fetchSpeculationList();
     _niveau3List =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
     superficies = widget.superficie;
     _localiteController.text = superficies.localite!;
     _superficieHaController.text = superficies.superficieHa!;

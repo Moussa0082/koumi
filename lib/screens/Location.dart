@@ -59,8 +59,8 @@ class _LocationState extends State<Location> {
     super.initState();
     verify();
     _typeList =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
+    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
   }
 
   @override
@@ -144,7 +144,7 @@ class _LocationState extends State<Location> {
                       items: [],
                       onChanged: null,
                       decoration: InputDecoration(
-                        labelText: '-- Aucun type de matériel trouvé --',
+                        labelText: 'Chargement...',
                         contentPadding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 20),
                         border: OutlineInputBorder(
@@ -153,11 +153,10 @@ class _LocationState extends State<Location> {
                       ),
                     );
                   }
-                  if (snapshot.hasError) {
-                    return Text("${snapshot.error}");
-                  }
+
                   if (snapshot.hasData) {
-                    dynamic responseData = json.decode(snapshot.data.body);
+                    dynamic jsonString = utf8.decode(snapshot.data.bodyBytes);
+                    dynamic responseData = json.decode(jsonString);
                     if (responseData is List) {
                       final reponse = responseData;
                       final typeList = reponse
@@ -243,8 +242,9 @@ class _LocationState extends State<Location> {
               builder: (context, materielService, child) {
                 return FutureBuilder(
                     future: selectedType != null
-                    ? materielService.fetchMaterielByType(selectedType!.idTypeMateriel!)
-                    :materielService.fetchMateriel(),
+                        ? materielService
+                            .fetchMaterielByType(selectedType!.idTypeMateriel!)
+                        : materielService.fetchMateriel(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(
@@ -254,13 +254,12 @@ class _LocationState extends State<Location> {
                         );
                       }
 
-                      if (!snapshot.hasData) {
-                        return const Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Center(child: Text("Aucun matériel trouvé")),
-                        );
-                      } else {
+                      if (snapshot.hasData) {
+                        // dynamic jsonString =
+                        //     utf8.decode(snapshot.data!.bodyBytes);
+                        // dynamic responseData = json.decode(jsonString);
                         materielListe = snapshot.data!;
+
                         return materielListe.isEmpty
                             ? Padding(
                                 padding: EdgeInsets.all(10),
@@ -320,7 +319,7 @@ class _LocationState extends State<Location> {
                                                               height: 90,
                                                             )
                                                           : Image.network(
-                                                              "http://10.0.2.2/${e.photoMateriel}",
+                                                              "https://koumi.ml/api-koumi/Materiel/${e.idMateriel}/image",
                                                               fit: BoxFit.cover,
                                                               height: 90,
                                                               errorBuilder: (BuildContext
@@ -355,7 +354,7 @@ class _LocationState extends State<Location> {
                                                     ),
                                                   ),
                                                   _buildItem("Statut:",
-                                                       '${e.statut! ? 'Disponible' : 'Non disponible'}'),
+                                                      '${e.statut! ? 'Disponible' : 'Non disponible'}'),
                                                   _buildItem("Localité :",
                                                       e.localisation),
                                                   SizedBox(height: 10),
@@ -365,6 +364,16 @@ class _LocationState extends State<Location> {
                                           ),
                                         )))
                                     .toList());
+                      } else {
+                        return Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Text('Aucun matériel trouvé ',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 17,
+                                overflow: TextOverflow.ellipsis,
+                              )),
+                        );
                       }
                     });
               },

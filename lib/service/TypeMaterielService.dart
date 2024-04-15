@@ -7,8 +7,8 @@ import 'package:koumi_app/models/TypeMateriel.dart';
 
 
 class TypeMaterielService extends ChangeNotifier {
-// static const String baseUrl = 'https://koumi.ml/api-koumi/TypeMateriel';
-  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/TypeMateriel';
+static const String baseUrl = 'https://koumi.ml/api-koumi/TypeMateriel';
+  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/TypeMateriel';
 
   List<TypeMateriel> typeList = [];
 
