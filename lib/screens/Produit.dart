@@ -263,7 +263,7 @@ categorieProduit[_tabController!.index].libelleCategorie!;
               controller: _tabController, // Ajoutez le contrôleur TabBar
               tabs: categorieProduit.map((cat) => Tab(text: cat.libelleCategorie)).toList(),
             ),
-            actions:  !isExist ? null : [
+            actions:  isExist ? null : [
                cartItems.isEmpty ?
               PopupMenuButton<String>(
               padding: EdgeInsets.zero,

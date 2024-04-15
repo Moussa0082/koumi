@@ -39,8 +39,8 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
   void fetchRegions() async {
     try {
       final response = await http
-          .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-          // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+          // .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+          .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
       if (response.statusCode == 200) {
         final String jsonString = utf8.decode(response.bodyBytes);
         List<dynamic> data = json.decode(jsonString);
@@ -72,8 +72,8 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
       String idActeur, String idNiveau1Pays) async {
     try {
       final response = await http.get(Uri.parse(
-          'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeurAndNieau1Pay/${idActeur}/${idNiveau1Pays}'));
-          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pay/${idActeur}/${idNiveau1Pays}'));
+          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeurAndNieau1Pay/${idActeur}/${idNiveau1Pays}'));
+          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/${idActeur}/${idNiveau1Pays}'));
       if (response.statusCode == 200) {
         final String jsonString = utf8.decode(response.bodyBytes);
         List<dynamic> data = json.decode(jsonString);
@@ -93,6 +93,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
                       // Autres champs de l'acteur...
                     ),
                     niveau1Pays: Niveau1Pays(
+                      idNiveau1Pays: item['niveau1Pays']['idNiveau1Pays'] ?? 'manquant',
                       nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
                       // Autres champs de l'acteur...
                     ),
@@ -108,7 +109,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
         //   loadedRegions.add(idNiveau1Pays);
         // }
       } else {
-        throw Exception('Failed to load magasins for acteur $idActeur');
+        throw Exception('Failed to load magasins for acteur $idActeur et region $idNiveau1Pays');
       }
     } catch (e) {
       print('Error fetching magasins for acteur $idActeur: $e');
@@ -315,7 +316,29 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
       if (magasins.isEmpty) {
         // Si les données ne sont pas encore chargées, affichez l'effet Shimmer
 
-        return _buildShimmerEffect();
+             return SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(10),
+              child: Center(
+                child: Column(
+                  children: [
+                    Image.asset('assets/images/notif.jpg'),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'Aucun magasin trouvé ',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 17,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
       } else {
         // Filtrer les magasins en fonction du texte de recherche
         List<Magasin> filteredMagasins = magasins.where((magasin) {
@@ -389,10 +412,10 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
                           Container(
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8.0),
-                              child: Image.network(
+                              child: magasin.photo!.isNotEmpty ? Image.network(
                                 // "https://koumi.ml/api-koumi/${magasin.photo}" ?? "assets/images/magasin.png",
-                                "http://10.0.2.2:9000/api-koumi/${magasin.photo}" ??
-                                     "assets/images/magasin.png",
+                                "http://10.0.2.2:9000/api-koumi/${magasin.photo}" ,
+                                     
                                 height: 120,
                                 fit: BoxFit.cover,
                                 errorBuilder: (BuildContext context,
@@ -403,7 +426,8 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
                                     fit: BoxFit.cover,
                                   );
                                 },
-                              ),
+                              ) : Image.asset("assets/images/magasin.png",height: 120,
+                                    fit: BoxFit.cover,),
                             ),
                           ),
                           const SizedBox(height: 10),

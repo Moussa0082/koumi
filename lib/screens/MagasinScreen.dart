@@ -65,8 +65,8 @@ class _MagasinScreenState extends State<MagasinScreen>
   void fetchRegions() async {
     try {
       final response = await http
-          .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-          // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+          // .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+          .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
       if (response.statusCode == 200) {
         final String jsonString = utf8.decode(response.bodyBytes);
         List<dynamic> data = json.decode(jsonString);
@@ -100,8 +100,8 @@ class _MagasinScreenState extends State<MagasinScreen>
   Future<void> fetchMagasinsByRegion(String id) async {
     try {
       final response = await http.get(Uri.parse(
-          'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
       if (response.statusCode == 200) {
         final String jsonString = utf8.decode(response.bodyBytes);
         List<dynamic> data = json.decode(jsonString);
@@ -140,14 +140,17 @@ class _MagasinScreenState extends State<MagasinScreen>
     }
   }
   
+
+  //Pour charger les magasin auto apres suppression ou ajout not finish
   Future<List<Magasin>> fetchMagasinByRegion(String id) async {
     try {
       final response = await http.get(Uri.parse(
-          'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
       if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body);
-        setState(() {
+  final String jsonString = utf8.decode(response.bodyBytes);
+        List<dynamic> data = json.decode(jsonString);
+                setState(() {
           magasin = data
               .where((magasin) => magasin['statutMagasin'] == true)
               .map((item) => Magasin(
@@ -306,7 +309,7 @@ return Consumer<MagasinService>(
                     PopupMenuItem<String>(
                       child: ListTile(
                         leading: const Icon(
-                          Icons.add,
+                          Icons.remove_red_eye,
                           color: Colors.green,
                         ),
                         title: const Text(

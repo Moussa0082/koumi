@@ -147,7 +147,6 @@ class StockService extends ChangeNotifier {
       return stockList;
     } else {
       stockList = [];
-            Get.snackbar("Erreur", "Une erreur s'est produite lors de la recuperation des produits",duration: Duration(seconds: 3));
 
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
