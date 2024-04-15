@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/MagasinScreen.dart';
 import 'package:koumi_app/service/MagasinService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
@@ -90,6 +91,28 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
 //     print('Error fetching regions: $e');
 //   }
 // }
+
+
+//   Future<void> fetchNiveau1PaysList() async {
+//   try {
+//     final response = await http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+//     if (response.statusCode == 200) {
+//         final String jsonString = utf8.decode(response.bodyBytes);
+//        Future<List<dynamic>> data = json.decode(jsonString);
+//       setState(() {
+//         niveau1PaysList = data;
+//       });
+//     } else {
+//       // Gérer les erreurs de requête HTTP
+//       print('Erreur de récupération des données: ${response.statusCode}');
+//     }
+//   } catch (e) {
+//     // Gérer les erreurs autres que les erreurs HTTP
+//     print('Erreur: $e');
+//   }
+// }
+
+
   Future<void> updateMagasin() async {
     final nomMagasin = nomMagasinController.text;
     final contactMagasin = contactMagasinController.text;
@@ -190,6 +213,9 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
         setState(() {
           isLoading = false;
         });
+        Provider.of<MagasinService>(context,
+                                                  listen: false)
+                                              .applyChange();
       });
     } else {
       await updateMagasin().then((_) {
@@ -253,6 +279,28 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                                                                                    context,
                                                                                    listen: false)
                                                                                .applyChange(),
+                                                                                      Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) =>
+                                MagasinScreen(),
+                            transitionsBuilder:
+                                (context, animation, secondaryAnimation, child) {
+                              var begin =
+                                  Offset(0.0, 1.0); // Commencer en bas de l'écran
+                              var end = Offset.zero; // Finir en haut de l'écran
+                              var curve = Curves.ease;
+                              var tween = Tween(begin: begin, end: end)
+                                  .chain(CurveTween(curve: curve));
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                            transitionDuration: const Duration(
+                                milliseconds: 1900), // Durée de la transition
+                          ),
+                        ),
                   nomMagasinController.clear(),
                   contactMagasinController.clear(),
                   localiteMagasinController.clear(),
@@ -379,9 +427,10 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
     }
     debugPrint("bool" + widget.isEditable!.toString());
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    // fetchNiveau1PaysList();
     niveau1PaysList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+        // http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+    http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
   }
 
   @override
@@ -539,7 +588,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                               items: [],
                               onChanged: null,
                               decoration: InputDecoration(
-                                labelText: 'Aucune region trouvé',
+                                labelText: 'En cours de chargement',
                                 contentPadding: const EdgeInsets.symmetric(
                                     vertical: 10, horizontal: 20),
                                 border: OutlineInputBorder(

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'dart:io';
 import 'package:path/path.dart';
@@ -13,8 +14,8 @@ class MagasinService extends ChangeNotifier{
 
     // static const String baseUrl = 'https://koumi.ml/api-koumi/Magasin';
     static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Magasin';
-
-
+    List<Magasin> magasin = [];
+ 
   Future<void> creerMagasin({
     required String nomMagasin,
     required String contactMagasin,
@@ -118,7 +119,27 @@ class MagasinService extends ChangeNotifier{
     }
   }
 
-  
+   Future<List<Magasin>> fetchMagasinByRegion(String id) async {
+    try {
+      final response = await http.get(Uri.parse(
+          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+      if (response.statusCode == 200) {
+  final String jsonString = utf8.decode(response.bodyBytes);
+        List<dynamic> data = json.decode(jsonString);
+        
+      magasin = data.map((item) => Magasin.fromMap(item)).toList();
+      
+      } else {
+        throw Exception('Failed to load magasins for region $id');
+      }
+    } catch (e) {
+      print('Error fetching magasins for region $id: $e');
+    }
+        return magasin;
+        
+  }
+
 
   Future<void> deleteMagasin(String idMagasin) async {
     final response = await http.delete(Uri.parse('$baseUrl/delete/$idMagasin'));
