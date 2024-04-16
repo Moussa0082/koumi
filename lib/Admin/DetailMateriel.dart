@@ -334,6 +334,8 @@ class _DetailMaterielState extends State<DetailMateriel> {
                             ? Image.network(
                                 'https://koumi.ml/api-koumi/Materiel/${materiels.idMateriel}/image',
                                 // "http://10.0.2.2/${e.photoIntrant}",
+                                width: double.infinity,
+                                height: 200,
                                 fit: BoxFit.cover,
                                 errorBuilder: (BuildContext context,
                                     Object exception, StackTrace? stackTrace) {

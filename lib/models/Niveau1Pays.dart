@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:koumi_app/models/Pays.dart';
 
 class Niveau1Pays {
-  final String? idNiveau1Pays;
+   String? idNiveau1Pays;
   final String? codeN1;
-  final String? nomN1;
+   String? nomN1;
   final String? descriptionN1;
   final bool? statutN1;
   final String? dateAjout;

@@ -248,12 +248,14 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.symmetric(
-                                                horizontal: 10, vertical: 5),
+                                                horizontal: 10, ),
                                             child: Text(
                                               e.nomVehicule,
                                               style: TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: 16,
                                                   fontWeight: FontWeight.bold,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   color: d_colorGreen),
                                             ),
                                           ),
@@ -507,7 +509,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
 
   Widget _buildItem(String title, String value) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -518,7 +520,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                 fontWeight: FontWeight.w500,
                 fontStyle: FontStyle.italic,
                 overflow: TextOverflow.ellipsis,
-                fontSize: 18),
+                fontSize: 16),
           ),
           Text(
             value,

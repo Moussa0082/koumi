@@ -118,7 +118,7 @@ class _DetailTransportState extends State<DetailTransport> {
       }
     }
   }
-  
+
   void verifyParam() {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
@@ -141,7 +141,7 @@ class _DetailTransportState extends State<DetailTransport> {
     _niveau3List =
         http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
 
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
     vehicules = widget.vehicule;
     typeVoiture = vehicules.typeVoiture;
     prixParDestinations = vehicules.prixParDestination;
@@ -427,7 +427,6 @@ class _DetailTransportState extends State<DetailTransport> {
                               },
                               icon: Icon(Icons.edit),
                             ),
-                     
                     ]
                   : null),
           body: SingleChildScrollView(
@@ -447,23 +446,19 @@ class _DetailTransportState extends State<DetailTransport> {
                         child: vehicules.photoVehicule != null &&
                                 !vehicules.photoVehicule!.isEmpty
                             ? Image.network(
-                                                              "https://koumi.ml/api-koumi/vehicule/${vehicules.idVehicule}/image",
-                                                              // "http://10.0.2.2/${e.photoIntrant}",
-                                                              fit: BoxFit.cover,
-                                                              errorBuilder: (BuildContext
-                                                                      context,
-                                                                  Object
-                                                                      exception,
-                                                                  StackTrace?
-                                                                      stackTrace) {
-                                                                return Image
-                                                                    .asset(
-                                                                  'assets/images/default_image.png',
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                );
-                                                              },
-                                                            )
+                                "https://koumi.ml/api-koumi/vehicule/${vehicules.idVehicule}/image",
+                                // "http://10.0.2.2/${e.photoIntrant}",
+                                width: double.infinity,
+                                height: 200,
+                                fit: BoxFit.cover,
+                                errorBuilder: (BuildContext context,
+                                    Object exception, StackTrace? stackTrace) {
+                                  return Image.asset(
+                                    'assets/images/default_image.png',
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                              )
                             : Image.asset(
                                 "assets/images/default_image.png",
                                 fit: BoxFit.cover,

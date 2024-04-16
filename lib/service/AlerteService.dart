@@ -149,9 +149,10 @@ class AlertesService extends ChangeNotifier {
   }
 
   Future activerAlertes(String idAlertes) async {
-    final response = await http.delete(Uri.parse('$baseUrl/enable/$idAlertes'));
+    final response =  await http.put(Uri.parse('$baseUrl/enable/$idAlertes'));
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200 || response.statusCode == 201 ||
+        response.statusCode == 202)    {
       applyChange();
     } else {
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
@@ -161,9 +162,9 @@ class AlertesService extends ChangeNotifier {
 
   Future desactiverAlertes(String idAlertes) async {
     final response =
-        await http.delete(Uri.parse('$baseUrl/disable/$idAlertes'));
-
-    if (response.statusCode == 200 || response.statusCode == 201) {
+ await http.put(Uri.parse('$baseUrl/disable/$idAlertes'));
+    if (response.statusCode == 200 || response.statusCode == 201 ||
+        response.statusCode == 202) {
       applyChange();
     } else {
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');

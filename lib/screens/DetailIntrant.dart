@@ -353,6 +353,8 @@ class _DetailIntrantState extends State<DetailIntrant> {
                                   !intrants.photoIntrant!.isEmpty
                               ? Image.network(
                                   "https://koumi.ml/api-koumi/intrant/${intrants.idIntrant}/image",
+                                  width: double.infinity,
+                                  height: 200,
                                   fit: BoxFit.cover,
                                   errorBuilder: (BuildContext context,
                                       Object exception,

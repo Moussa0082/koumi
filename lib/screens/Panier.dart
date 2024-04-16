@@ -62,7 +62,7 @@ class _PanierState extends State<Panier> {
     List<Stock> stocks = cartItems.map((cartItem) {
       return Stock(
         idStock:
-            cartItem.stock.idStock, // Assuming stock is a property in CartItem
+            cartItem.stock!.idStock, // Assuming stock is a property in CartItem
         quantiteStock: cartItem.quantiteStock
             .toDouble(), // Assuming quantiteStock is of type double
       );
@@ -155,36 +155,12 @@ class _PanierState extends State<Panier> {
     return LoadingOverlay(
       isLoading: isLoading,
       child: Scaffold(
-        // backgroundColor: Theme.of(context).colorScheme.primary,
-        body: SafeArea(
-          child: Column(
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 50,
-                padding: const EdgeInsets.all(10),
-                color: Theme.of(context).colorScheme.primary,
-                child: Row(
-                  children: [
-                    // GestureDetector(
-                    //   onTap: () {
-                    //     Navigator.pop(context);
-                    //   },
-                    //   child: const Icon(
-                    //     Icons.arrow_back_ios_new_outlined,
-                    //     color: Colors.white,
-                    //   ),
-                    // ),
-                    const Expanded(
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          "Cart",
-                          style: TextStyle(color: Colors.white, fontSize: 20),
-                        ),
-                      ),
-                    ),
-                    Consumer<CartProvider>(
+        appBar: AppBar(
+          backgroundColor: Colors.orange,
+          title: Text("Panier", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+          centerTitle: true,
+          actions: [
+            Consumer<CartProvider>(
                       builder: (context, cartProvider, child) {
                         return badges.Badge(
                           position:
@@ -204,9 +180,13 @@ class _PanierState extends State<Panier> {
                         );
                       },
                     ),
-                  ],
-                ),
-              ),
+          ],
+        ),
+        // backgroundColor: Theme.of(context).colorScheme.primary,
+        body: SafeArea(
+          child: Column(
+            children: [
+     
               Expanded(
                 child: ListView(
                   children: [
@@ -226,6 +206,7 @@ class _PanierState extends State<Panier> {
                         builder: (context, cartProvider, child) {
                           final List<CartItem> cartItems =
                               cartProvider.cartItems;
+                          
 
                           if (cartItems.isEmpty) {
                             return SingleChildScrollView(
@@ -260,7 +241,7 @@ class _PanierState extends State<Panier> {
                             itemBuilder: (context, index) {
                               final cartItem = cartItems[index];
                               return Dismissible(
-                                key: Key(cartItem.stock.idStock!),
+                                key: Key(cartItem.stock!.idStock!),
                                 // Use a unique key for each item
                                 background: Container(
                                   color: Colors.red,

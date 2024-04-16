@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Intrant.dart';
+import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/screens/DetailIntrant.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:provider/provider.dart';
 
@@ -21,6 +24,9 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
   List<Intrant> intrantListe = [];
   late Future futureList;
 
+  List<ParametreGeneraux> paraList = [];
+  late ParametreGeneraux para = ParametreGeneraux();
+
   Future<List<Intrant>> getListe(String id) async {
     final response = await IntrantService().fetchIntrantByActeur(id);
     return response;
@@ -32,6 +38,12 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
     _searchController = TextEditingController();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     futureList = getListe(acteur.idActeur!);
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+
+    if (paraList.isNotEmpty) {
+      para = paraList[0];
+    }
   }
 
   @override
@@ -129,8 +141,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                       searchText = _searchController.text.toLowerCase();
                       return libelle.contains(searchText);
                     }).toList();
-                    return 
-                                  GridView.count(
+                    return GridView.count(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       crossAxisCount: 2,
@@ -145,14 +156,14 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                       MediaQuery.of(context).size.width * 0.45,
                                   child: GestureDetector(
                                     onTap: () {
-                                      // Navigator.push(
-                                      //     context,
-                                      //     MaterialPageRoute(
-                                      //         builder: (context) =>
-                                      //             DetailTransport(
-                                      //                 vehicule: e)));
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DetailIntrant(intrant: e)));
                                     },
                                     child: Container(
+                                      height: 800,
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(15),
@@ -182,7 +193,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                         fit: BoxFit.cover,
                                                       )
                                                     : Image.network(
-                                                       "https://koumi.ml/api-koumi/intrant/${e.idIntrant}/image",
+                                                        "https://koumi.ml/api-koumi/intrant/${e.idIntrant}/image",
                                                         // "http://10.0.2.2/${e.photoIntrant}",
                                                         fit: BoxFit.cover,
                                                         errorBuilder:
@@ -203,21 +214,23 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.symmetric(
-                                                horizontal: 10, vertical: 5),
+                                              horizontal: 10,
+                                            ),
                                             child: Text(
                                               e.nomIntrant,
                                               style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: d_colorGreen,
-                                              ),
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  color: d_colorGreen),
                                             ),
                                           ),
-                                          _buildItem("Statut:",
-                                              '${e.statutIntrant! ? 'Disponible' : 'Non disponible'}'),
+                                          // _buildItem("Statut:",
+                                          //     '${e.statutIntrant! ? 'Disponible' : 'Non disponible'}'),
                                           _buildItem("Prix :",
-                                              e.prixIntrant.toString()),
-                                          SizedBox(height: 10),
+                                              "${e.prixIntrant.toString()} ${para.monnaie}"),
+                                          // SizedBox(height: 10),
                                           Container(
                                             alignment: Alignment.bottomRight,
                                             padding: const EdgeInsets.symmetric(
@@ -463,7 +476,9 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
 
   Widget _buildItem(String title, String value) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

@@ -13,20 +13,23 @@ import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/Unite.dart';
 import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/service/StockService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
+import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AddAndUpdateProductEndSreen extends StatefulWidget {
   
-     bool? isEditable;
+     bool isEditable;
      late Stock? stock;
-     String? idStock,nomProduit, origine, forme, prix , quantite;
+     String? idStock;
+     String nomProduit, origine, forme, prix , quantite;
      File? image;
 
-   AddAndUpdateProductEndSreen({super.key, this.isEditable, this.idStock, this.stock,
-   this.nomProduit, this.forme ,this.origine, this.prix, this.quantite, this.image
+   AddAndUpdateProductEndSreen({super.key,required this.isEditable, this.idStock, this.stock,
+   required this.nomProduit, required this.forme , required this.origine, required this.prix, required this.quantite, this.image
    });
 
   @override
@@ -59,7 +62,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
 
 
        late Acteur acteur = Acteur();
-
+       String? id = "";
   String? email = "";
   bool isExist = false;
 
@@ -69,6 +72,9 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+            id = acteur.idActeur;
+    magasinListe =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
       setState(() {
         isExist = true;
       });
@@ -82,12 +88,14 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
 
     @override
   void initState() {
+
+    verify();
+    magasinListe =
+        http.get(Uri.parse('https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
     speculationListe =
         http.get(Uri.parse('https://koumi.ml/api-koumi/Speculation/getAllSpeculation'));
     uniteListe =
         http.get(Uri.parse('https://koumi.ml/api-koumi/Unite/getAllUnite'));
-    magasinListe =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/Magasin/getAllMagagin'));
     zoneListe =
         http.get(Uri.parse('https://koumi.ml/api-koumi/ZoneProduction/getAllZone'));
     // speculationListe =
@@ -98,19 +106,24 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
     //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagagin'));
     // zoneListe =
     //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/ZoneProduction/getAllZone'));
+    // zoneListe =
+    //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/ZoneProduction/getAllZone'));
+
+          debugPrint("id : $id, acteur : $acteur");
+        
         
     super.initState();
-    if(!widget.isEditable!){
+    if(!widget.isEditable){
      
     }
-    verify();
+    debugPrint("nom : ${widget.nomProduit}, forme: ${widget.forme}, origine : ${widget.origine}, qte : ${widget.quantite}, prix : ${widget.prix}");
   }
 
   void handleButtonPress() async{
     setState(() {
       isLoading = true;
     });
-    if(widget.isEditable!){
+    if(widget.isEditable == false){
 
      await ajouterStock().then((_) {
       setState(() {
@@ -127,29 +140,40 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
 
   }
     
+
+    // Fonction pour traiter les données du QR code scanné
+  Future<void> processScannedQRCode(Stock scannedData) async {
+    // Ici, vous pouvez décoder les données du QR code et effectuer les actions nécessaires
+    // Par exemple, naviguer vers la page de détail du produit avec les données du produit
+    // Veuillez remplacer DetailProduits avec le nom de votre widget de détail du produit
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DetailProduits(stock: scannedData),
+      ),
+    );
+  }
    
     Future<void> ajouterStock() async{
     try {
       
-    if(widget.image!= null){
-    await StockService().creerStock(nomProduit: widget.nomProduit!,
-     formeProduit: widget.forme!, quantiteStock: widget.quantite!, photo: widget.image!,
+    if(widget.image != null){
+    await StockService().creerStock(nomProduit: widget.nomProduit,
+     formeProduit: widget.forme, quantiteStock: widget.quantite, photo: widget.image,
      typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
      zoneProduction: zoneProduction, speculation: speculation, unite: unite, 
       magasin: magasin, acteur: acteur);
     }else{
-    await StockService().creerStock(nomProduit: widget.nomProduit!,
-     formeProduit: widget.forme!, quantiteStock: widget.quantite!, 
+    await StockService().creerStock(nomProduit: widget.nomProduit,
+     formeProduit: widget.forme, quantiteStock: widget.quantite, 
      typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
      zoneProduction: zoneProduction, speculation: speculation, unite: unite, 
       magasin: magasin, acteur: acteur);
-    
    }
     } catch (error) {
         // Handle any exceptions that might occur during the request
         final String errorMessage = error.toString();
         debugPrint("no " + errorMessage);
-      Get.snackbar("Erreur", "Une erreur s'est produite veuiller réesayer ulterieurement",duration: Duration(seconds: 3));
       } 
 
    }
@@ -159,11 +183,11 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
 
     try {
       
-    if(widget.image!= null){
+    if(widget.image != null){
     await StockService().updateStock(
       idStock: widget.idStock!,
-      nomProduit: widget.nomProduit!,
-     formeProduit: widget.forme!, quantiteStock: widget.quantite!, photo: widget.image!,
+      nomProduit: widget.nomProduit,
+     formeProduit: widget.forme, quantiteStock: widget.quantite, photo: widget.image!,
      typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
      zoneProduction: widget.stock!.zoneProduction!, speculation: widget.stock!.speculation!,
       unite: widget.stock!.unite!, 
@@ -171,8 +195,8 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
     }else{
     await StockService().updateStock(
       idStock: widget.idStock!,
-      nomProduit: widget.nomProduit!,
-     formeProduit: widget.forme!, quantiteStock: widget.quantite!, 
+      nomProduit: widget.nomProduit,
+     formeProduit: widget.forme, quantiteStock: widget.quantite, 
      typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
       zoneProduction: widget.stock!.zoneProduction!, speculation: widget.stock!.speculation!,
       unite: widget.stock!.unite!, 
@@ -183,7 +207,6 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
         // Handle any exceptions that might occur during the request
         final String errorMessage = error.toString();
         debugPrint("no " + errorMessage);
-      Get.snackbar("Erreur", "Une erreur s'est produite veuiller réesayer ulterieurement",duration: Duration(seconds: 3));
       } 
 
 
@@ -207,7 +230,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
-            widget.isEditable! == false
+            widget.isEditable == false
                 ? "Ajouter produit"
                 : "Modifier produit",
             style: TextStyle(
@@ -244,9 +267,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                           },
                           controller: _typeController,
                           keyboardType: TextInputType.text,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
+                      
                           decoration: InputDecoration(
                             hintText: "Type produit",
                             contentPadding: const EdgeInsets.symmetric(
@@ -277,9 +298,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                           },
                           controller: _descriptionController,
                           keyboardType: TextInputType.text,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
+                       
                           decoration: InputDecoration(
                             hintText: "Description produit",
                             contentPadding: const EdgeInsets.symmetric(
@@ -312,7 +331,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Aucun localité trouvé',
+                                    labelText: 'En cours de chargement',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -322,7 +341,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                 );
                               }
                               if (snapshot.hasError) {
-                                return Text("${snapshot.error}");
+                            return Text("Une erreur s'est produite veuillez réessayer");
                               }
                               if (snapshot.hasData) {
                                 dynamic responseData =
@@ -365,10 +384,10 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                           ),
                                         )
                                         .toList(),
-                                    value: specValue,
+                                    value: speculation.idSpeculation,
                                     onChanged: (newValue) {
                                       setState(() {
-                                        specValue = newValue;
+                                        speculation.idSpeculation = newValue;
                                         if (newValue != null) {
                                           speculation.nomSpeculation = speculationListe
                                               .map((e) => e.nomSpeculation!)
@@ -440,7 +459,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Aucun magasin trouvé',
+                                    labelText: 'En cours de chargement',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -450,7 +469,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                 );
                               }
                               if (snapshot.hasError) {
-                                return Text("${snapshot.error}");
+                            return Text("Une erreur s'est produite veuillez réessayer plus tard");
                               }
                               if (snapshot.hasData) {
                                 dynamic responseData =
@@ -493,10 +512,10 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                           ),
                                         )
                                         .toList(),
-                                    value: magasinValue,
+                                    value: magasin.idMagasin,
                                     onChanged: (newValue) {
                                       setState(() {
-                                        magasinValue = newValue;
+                                        magasin.idMagasin = newValue;
                                         if (newValue != null) {
                                           magasin.nomMagasin = magasinListe
                                               .map((e) => e.nomMagasin!)
@@ -566,7 +585,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Aucune unité trouvé',
+                                    labelText: 'En cours de chargement',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -576,7 +595,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                 );
                               }
                               if (snapshot.hasError) {
-                                return Text("${snapshot.error}");
+                            return Text("Une erreur s'est produite veuillez réessayer plus tard");
                               }
                               if (snapshot.hasData) {
                                 dynamic responseData =
@@ -619,10 +638,10 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                           ),
                                         )
                                         .toList(),
-                                    value: uniteValue,
+                                    value: unite.idUnite,
                                     onChanged: (newValue) {
                                       setState(() {
-                                        uniteValue = newValue;
+                                        unite.idUnite = newValue;
                                         if (newValue != null) {
                                           unite.nomUnite = uniteListe
                                               .map((e) => e.nomUnite!)
@@ -692,7 +711,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Aucune zone de production trouvé',
+                                    labelText: 'En cours de chargement',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -702,7 +721,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                 );
                               }
                               if (snapshot.hasError) {
-                                return Text("${snapshot.error}");
+                            return Text("Une erreur s'est produite veuillez réessayer plus tard");
                               }
                               if (snapshot.hasData) {
                                 dynamic responseData =
@@ -745,10 +764,10 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                           ),
                                         )
                                         .toList(),
-                                    value: zoneValue,
+                                    value: zoneProduction.idZoneProduction,
                                     onChanged: (newValue) {
                                       setState(() {
-                                        zoneValue = newValue;
+                                        zoneProduction.idZoneProduction = newValue;
                                         if (newValue != null) {
                                           zoneProduction.nomZoneProduction = zoneListe
                                               .map((e) => e.nomZoneProduction!)
@@ -819,7 +838,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                               minimumSize: const Size(250, 40),
                             ),
                             child: Text(
-                              widget.isEditable! == false
+                              widget.isEditable == false
                                   ? " Ajouter "
                                   : " Modifier ",
                               style: TextStyle(

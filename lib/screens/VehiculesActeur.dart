@@ -232,12 +232,14 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.symmetric(
-                                                horizontal: 10, vertical: 5),
+                                                horizontal: 10,),
                                             child: Text(
                                               e.nomVehicule,
                                               style: TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: 16,
                                                   fontWeight: FontWeight.bold,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   color: d_colorGreen),
                                             ),
                                           ),

@@ -4,6 +4,7 @@ import 'package:koumi_app/models/Conseil.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddConseil.dart';
+import 'package:koumi_app/screens/ConseilDisable.dart';
 import 'package:koumi_app/screens/DetailConseil.dart';
 import 'package:koumi_app/service/ConseilService.dart';
 import 'package:provider/provider.dart';
@@ -91,7 +92,8 @@ class _ConseilScreenState extends State<ConseilScreen> {
                   PopupMenuButton<String>(
                     padding: EdgeInsets.zero,
                     itemBuilder: (context) {
-                      return <PopupMenuEntry<String>>[
+                      return type.toLowerCase() != 'admin'
+                          ? <PopupMenuEntry<String>>[
                         PopupMenuItem<String>(
                           child: ListTile(
                             leading: const Icon(
@@ -111,6 +113,55 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => AddConseil()));
+                            },
+                          ),
+                        ),
+                      
+  
+                      ]
+                          : <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.add,
+                              color: d_colorGreen,
+                            ),
+                            title: const Text(
+                              "Ajouter conseil ",
+                              style: TextStyle(
+                                color: d_colorGreen,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onTap: () async {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => AddConseil()));
+                            },
+                          ),
+                        ),
+                      
+                         PopupMenuItem<String>(
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.add,
+                              color: d_colorGreen,
+                            ),
+                            title: const Text(
+                              "Voir conseil désactiver ",
+                              style: TextStyle(
+                                color: d_colorGreen,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onTap: () async {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ConseilDisable()));
                             },
                           ),
                         ),
@@ -185,11 +236,12 @@ class _ConseilScreenState extends State<ConseilScreen> {
                       return filtereSearch.isEmpty
                           ? Padding(
                               padding: EdgeInsets.all(10),
-                              child:
-                                  Center(child: Text("Aucun conseil trouvé")),
+                              child: Center(child: Text("Aucun conseil trouvé")),
                             )
                           : Column(
                               children: filtereSearch
+                                  .where(
+                                      (element) => element.statutConseil == true)
                                   .map((e) => Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 10, horizontal: 15),
@@ -248,16 +300,7 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                                             FontStyle.italic,
                                                       ))),
                                               SizedBox(height: 10),
-                                             type.toLowerCase() ==
-                                                          'fournisseur' ||
-                                                      type.toLowerCase() ==
-                                                          'commerçant' ||
-                                                      type.toLowerCase() ==
-                                                          'transporteur' ||
-                                                      type.toLowerCase() ==
-                                                          'transformeur' ||
-                                                      type.toLowerCase() ==
-                                                          'producteur'
+                                             type.toLowerCase() != 'admin'
                                                   ? Container()
                                                   : Container(
                                                       alignment:

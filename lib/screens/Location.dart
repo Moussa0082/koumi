@@ -266,7 +266,13 @@ class _LocationState extends State<Location> {
                                 child: Center(
                                     child: Text("Aucun matériel trouvé")),
                               )
-                            : Wrap(
+                            : GridView.count(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 2,
+                                crossAxisSpacing: 5,
+                                childAspectRatio: 0.9,
                                 children: materielListe
                                     .map((e) => Padding(
                                         padding: EdgeInsets.all(10),
@@ -342,14 +348,16 @@ class _LocationState extends State<Location> {
                                                   Padding(
                                                     padding: const EdgeInsets
                                                         .symmetric(
-                                                        horizontal: 10,
-                                                        vertical: 5),
+                                                      horizontal: 10,
+                                                    ),
                                                     child: Text(
                                                       e.nom,
                                                       style: TextStyle(
-                                                          fontSize: 18,
+                                                          fontSize: 16,
                                                           fontWeight:
                                                               FontWeight.bold,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
                                                           color: d_colorGreen),
                                                     ),
                                                   ),
@@ -357,7 +365,7 @@ class _LocationState extends State<Location> {
                                                       '${e.statut! ? 'Disponible' : 'Non disponible'}'),
                                                   _buildItem("Localité :",
                                                       e.localisation),
-                                                  SizedBox(height: 10),
+                                                  // SizedBox(height: 10),
                                                 ],
                                               ),
                                             ),
@@ -397,7 +405,7 @@ class _LocationState extends State<Location> {
 
   Widget _buildItem(String title, String value) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -408,7 +416,7 @@ class _LocationState extends State<Location> {
                 fontWeight: FontWeight.w500,
                 fontStyle: FontStyle.italic,
                 overflow: TextOverflow.ellipsis,
-                fontSize: 18),
+                fontSize: 16),
           ),
           Text(
             value,

@@ -21,7 +21,7 @@ class MagasinService extends ChangeNotifier{
     required String localiteMagasin,
     File? photo,
     required Acteur acteur,
-    required Niveau1Pays niveau1Pays,
+    required Niveau1Pays niveau1Pays
   }) async {
     try {
       //    // Convertir chaque TypeActeur en un objet JSON et les ajouter à une liste JSON
@@ -41,13 +41,14 @@ class MagasinService extends ChangeNotifier{
       }
  
       requete.fields['magasin'] = jsonEncode({
-           'nomMagasin': nomMagasin,
-      'contactMagasin': contactMagasin,
-      'localiteMagasin': localiteMagasin,
-      'photo': "",
-      'acteur': acteur.toMap(),
-      'niveau1Pays': niveau1Pays.toMap()
-      });
+     'nomMagasin': nomMagasin,
+     'contactMagasin': contactMagasin,
+     'localiteMagasin': localiteMagasin,
+     'photo': "",
+     'acteur': acteur.toMap(),
+     'niveau1Pays': niveau1Pays.toMap()
+});
+
  
       var response = await requete.send();
       var responsed = await http.Response.fromStream(response);

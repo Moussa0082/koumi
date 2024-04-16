@@ -10,6 +10,7 @@ import 'package:koumi_app/screens/MagasinScreen.dart';
 import 'package:koumi_app/screens/Meteo.dart';
 import 'package:koumi_app/screens/Produit.dart';
 import 'package:koumi_app/screens/Transport.dart';
+import 'package:koumi_app/screens/Weather.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
 import 'package:provider/provider.dart';
@@ -89,14 +90,16 @@ class _AccueilState extends State<Accueil> {
       _buildAccueilCard("Intrants", "intrant.png", 1),
       _buildAccueilCard("Commandes", "commande.png", 3),
       _buildAccueilCard("Magasin", "magasin.png", 4),
-      _buildAccueilCard("Transports", "transport.png", 6),
+      _buildAccueilCard("Météo", "meteo.png", 5),
+      // _buildAccueilCard("Transports", "transport.png", 6),
       _buildAccueilCard("Locations", "location.png", 7),
       _buildAccueilCard("Produits", "produit.png", 9),
     ];
 
     if (isExist) {
       cards.insert(1, _buildAccueilCard("Conseils", "conseil.png", 2));
-      cards.insert(4, _buildAccueilCard("Meteo", "meteo.png", 5));
+      cards.insert(4, _buildAccueilCard("Transport", "transport.png", 6));
+      // cards.insert(4, _buildAccueilCard("Meteo", "meteo.png", 5));
       cards.insert(7, _buildAccueilCard("Alertes", "alerte.png", 8));
     }
 
@@ -124,7 +127,7 @@ class _AccueilState extends State<Accueil> {
                   MaterialPageRoute(builder: (context) => const Transport()));
             } else if (index == 5) {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Meteo()));
+                  MaterialPageRoute(builder: (context) => const WeatherScreen()));
             } else if (index == 4) {
               Navigator.push(
                   context,

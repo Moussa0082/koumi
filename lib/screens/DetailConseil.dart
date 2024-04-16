@@ -111,10 +111,17 @@ class _DetailConseilState extends State<DetailConseil> {
               child: conseils.photoConseil != null &&
                       !conseils.photoConseil!.isEmpty
                   ? Image.network(
-                      "http://10.0.2.2/${conseils.photoConseil!}",
-                      width: double.infinity,
+                      "https://koumi.ml/api-koumi/conseil/${conseils.idConseil}/image",
+                     width: double.infinity,
                       height: 200,
                       fit: BoxFit.cover,
+                      errorBuilder: (BuildContext context, Object exception,
+                          StackTrace? stackTrace) {
+                        return Image.asset(
+                          'assets/images/default_image.png',
+                          fit: BoxFit.cover,
+                        );
+                      },
                     )
                   : Image.asset(
                       "assets/images/default_image.png",

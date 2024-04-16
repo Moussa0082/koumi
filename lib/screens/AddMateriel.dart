@@ -28,8 +28,7 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _AddMaterielState extends State<AddMateriel> {
-
-   TextEditingController _nomController = TextEditingController();
+  TextEditingController _nomController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _etatController = TextEditingController();
   TextEditingController _prixController = TextEditingController();
@@ -45,7 +44,7 @@ class _AddMaterielState extends State<AddMateriel> {
   String? typeValue;
   late TypeMateriel typeMateriel;
   bool isExist = false;
-   late ParametreGeneraux para;
+  late ParametreGeneraux para;
   List<ParametreGeneraux> paraList = [];
 
   @override
@@ -144,8 +143,8 @@ class _AddMaterielState extends State<AddMateriel> {
   @override
   Widget build(BuildContext context) {
     return LoadingOverlay(
-       isLoading: _isLoading,
-      child: Scaffold(
+        isLoading: _isLoading,
+        child: Scaffold(
           backgroundColor: const Color.fromARGB(255, 250, 250, 250),
           appBar: AppBar(
             centerTitle: true,
@@ -277,11 +276,11 @@ class _AddMaterielState extends State<AddMateriel> {
                                   ),
                                 );
                               }
-                              
+
                               if (snapshot.hasData) {
                                 // dynamic responseData =
                                 //     json.decode(snapshot.data.body);
-                                 dynamic jsonString =
+                                dynamic jsonString =
                                     utf8.decode(snapshot.data.bodyBytes);
                                 dynamic responseData = json.decode(jsonString);
 
@@ -408,11 +407,11 @@ class _AddMaterielState extends State<AddMateriel> {
                                   ),
                                 );
                               }
-                              
+
                               if (snapshot.hasData) {
                                 // dynamic responseData =
                                 //     json.decode(snapshot.data.body);
-                                 dynamic jsonString =
+                                dynamic jsonString =
                                     utf8.decode(snapshot.data.bodyBytes);
                                 dynamic responseData = json.decode(jsonString);
 
@@ -586,12 +585,27 @@ class _AddMaterielState extends State<AddMateriel> {
                           ),
                         ),
                         SizedBox(
-                          child: IconButton(
-                            onPressed: _showImageSourceDialog,
-                            icon: const Icon(
-                              Icons.add_a_photo_rounded,
-                              size: 60,
-                            ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: photo != null
+                                ? GestureDetector(
+                                    onTap: _showImageSourceDialog,
+                                    child: Image.file(
+                                      photo!,
+                                      fit: BoxFit.fitWidth,
+                                      height: 150,
+                                      width: 300,
+                                    ),
+                                  )
+                                : SizedBox(
+                                    child: IconButton(
+                                      onPressed: _showImageSourceDialog,
+                                      icon: const Icon(
+                                        Icons.add_a_photo_rounded,
+                                        size: 60,
+                                      ),
+                                    ),
+                                  ),
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -775,7 +789,6 @@ class _AddMaterielState extends State<AddMateriel> {
               ],
             ),
           ),
-        )
-      );
+        ));
   }
 }

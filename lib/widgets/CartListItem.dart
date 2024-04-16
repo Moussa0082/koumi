@@ -41,9 +41,9 @@ class _CartListItemState extends State<CartListItem> {
         children: [
          ClipRRect(
   borderRadius: BorderRadius.circular(8),
-  child: widget.cartItem.stock.photo != null && widget.cartItem.stock.photo!.isNotEmpty
+  child: widget.cartItem.stock!.photo != null && widget.cartItem.stock!.photo!.isNotEmpty
       ? CachedNetworkImage(
-          imageUrl: widget.cartItem.stock.photo!,
+          imageUrl: widget.cartItem.stock!.photo!,
           fit: BoxFit.cover,
           width: 67,
           height: 100,
@@ -65,7 +65,7 @@ class _CartListItemState extends State<CartListItem> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.cartItem.stock.nomProduit!,
+                    widget.cartItem.stock!.nomProduit!,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.left,
@@ -77,7 +77,7 @@ class _CartListItemState extends State<CartListItem> {
                   Row(
                     children: [
                       Text(
-                        "${widget.cartItem.stock.prix!.toInt()} F",
+                        "${widget.cartItem.stock!.prix!.toInt()} F",
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       Expanded(child: Container()),
