@@ -278,7 +278,9 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
                         else{
                         }
                         },
-                        style: ElevatedButton.styleFrom(primary: Colors.orange, shape: const StadiumBorder()),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.orange,
+                          shape: const StadiumBorder()),
                         child:   Text(      
                            "Ajouter",
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

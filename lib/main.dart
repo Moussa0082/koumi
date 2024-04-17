@@ -1,5 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:koumi_app/Admin/NotificationPage.dart';
+import 'package:koumi_app/api/firebase_api.dart';
+import 'package:koumi_app/firebase_options.dart';
 import 'package:koumi_app/models/CartItem.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
@@ -40,11 +44,14 @@ import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:provider/provider.dart';
 
+final navigatorKey = GlobalKey<NavigatorState>();
 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FirebaseApi().initNotification();
 
-void main() {
-  runApp(MultiProvider(
-    providers: [
+  runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => MagasinService()),
     ChangeNotifierProvider(create: (context) => CartProvider()),
     ChangeNotifierProvider(create: (context) => ActeurService()),
@@ -61,9 +68,12 @@ void main() {
     ChangeNotifierProvider(create: (context) => TypeMaterielService()),
     ChangeNotifierProvider(create: (context) => SuperficieService()),
     ChangeNotifierProvider(create: (context) => AlertesService()),
-    ChangeNotifierProvider(create: (context) => IntrantService()),                                                                                                                                                                                                                                                                                                                         ChangeNotifierProvider(create: (context) => TypeVoitureService()),
-    ChangeNotifierProvider(create: (context) => CampagneService()),                                                                                                                                                                                                                                                                                                                         ChangeNotifierProvider(create: (context) => TypeVoitureService()),
-    ChangeNotifierProvider(create: (context) => TypeMaterielService()),                                                                                                                                                                                                                                                                                                                                         ChangeNotifierProvider(create: (context) => TypeVoitureService()),
+    ChangeNotifierProvider(create: (context) => IntrantService()),
+    ChangeNotifierProvider(create: (context) => TypeVoitureService()),
+    ChangeNotifierProvider(create: (context) => CampagneService()),
+    ChangeNotifierProvider(create: (context) => TypeVoitureService()),
+    ChangeNotifierProvider(create: (context) => TypeMaterielService()),
+    ChangeNotifierProvider(create: (context) => TypeVoitureService()),
     ChangeNotifierProvider(create: (context) => MessageService()),
     ChangeNotifierProvider(create: (context) => MaterielService()),
     ChangeNotifierProvider(create: (context) => VehiculeService()),
@@ -76,14 +86,11 @@ void main() {
     ChangeNotifierProvider(create: (context) => FiliereService()),
     ChangeNotifierProvider(create: (context) => Niveau3Service()),
     ChangeNotifierProvider(create: (context) => BottomNavigationService())
-  ], child:  MyApp()));
+  ], child: MyApp()));
 }
 
- 
 class MyApp extends StatelessWidget {
-   MyApp({super.key});
-
-
+  MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -95,13 +102,12 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange.shade400),
         useMaterial3: true,
       ),
+      navigatorKey: navigatorKey,
       routes: {
-        '/BottomNavigationPage': (context) => const BottomNavigationPage()
+        '/BottomNavigationPage': (context) => const BottomNavigationPage(),
+        '/notificationPage':(context) =>  NotificationPage(),
       },
       home: const SplashScreen(),
     );
   }
 }
-
-
-
