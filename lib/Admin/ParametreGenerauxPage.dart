@@ -343,11 +343,26 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   children: [
                                                     Flexible(
                                                       child: Image.network(
-                                                        "http://10.0.2.2/${param.logoSysteme!}",
+                                                       "https://koumi.ml/api-koumi/parametreGeneraux/${param.idParametreGeneraux}/image",
                                                         scale: 1,
                                                         width: 150,
                                                         height: 80,
                                                         fit: BoxFit.cover,
+                                                        errorBuilder:
+                                                            (BuildContext
+                                                                    context,
+                                                                Object
+                                                                    exception,
+                                                                StackTrace?
+                                                                    stackTrace) {
+                                                          return Image.asset(
+                                                            'assets/images/default_image.png',
+                                                            scale: 1,
+                                                            width: 150,
+                                                            height: 80,
+                                                            fit: BoxFit.cover,
+                                                          );
+                                                        },
                                                       ),
                                                     ),
                                                     SizedBox(
