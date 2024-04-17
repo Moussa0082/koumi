@@ -44,7 +44,7 @@ import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:provider/provider.dart';
 
-final navigatorKey = GlobalKey<NavigatorState>();
+// final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -102,10 +102,10 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange.shade400),
         useMaterial3: true,
       ),
-      navigatorKey: navigatorKey,
+      // navigatorKey: navigatorKey,
       routes: {
         '/BottomNavigationPage': (context) => const BottomNavigationPage(),
-        '/notificationPage':(context) =>  NotificationPage(),
+        // '/notificationPage':(context) =>  NotificationPage(),
       },
       home: const SplashScreen(),
     );

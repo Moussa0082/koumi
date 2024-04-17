@@ -2,12 +2,14 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:koumi_app/Admin/NotificationDetail.dart';
+import 'package:koumi_app/api/firebase_api.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/MessageWa.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/MessageService.dart';
+import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:provider/provider.dart';
 
@@ -35,6 +37,7 @@ class _NotificationPageState extends State<NotificationPage> {
   final MultiSelectController _controller = MultiSelectController();
   late List<TypeActeur> typeActeurData = [];
   late String type;
+  bool _isLoading = false;
 
   Future<List<MessageWa>> getMessage(String id) async {
     final response = await MessageService().fetchMessageByActeur(id);
@@ -63,7 +66,7 @@ class _NotificationPageState extends State<NotificationPage> {
 
   @override
   Widget build(BuildContext context) {
-    final message = ModalRoute.of(context)!.settings.arguments as RemoteMessage;
+    // final message = ModalRoute.of(context)!.settings.arguments as RemoteMessage;
     return Scaffold(
         backgroundColor: Color.fromARGB(255, 250, 250, 250),
         appBar: AppBar(
@@ -128,7 +131,7 @@ class _NotificationPageState extends State<NotificationPage> {
         ),
         body: SingleChildScrollView(
           child: Column(children: [
-            Text(message.notification!.title.toString()),
+            // Text(message.notification!.title.toString()),
             SizedBox(height: 10),
             Padding(
               padding: EdgeInsets.all(10.0),
@@ -554,10 +557,15 @@ class _NotificationPageState extends State<NotificationPage> {
                             List<String> type = typeLibelle;
                             if (formkey.currentState!.validate()) {
                               try {
+                                setState(() {
+                                  _isLoading = true;
+                                });
                                 await ActeurService()
                                     .sendMessageToActeurByTypeActeur(
                                         message, type)
                                     .then((value) => {
+                                          // Envoi de la notification push
+
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
                                             SnackBar(
@@ -566,14 +574,18 @@ class _NotificationPageState extends State<NotificationPage> {
                                               duration: Duration(seconds: 3),
                                             ),
                                           ),
+                                          //  FirebaseApi().sendPushNotification(
+                                          //     ),
                                           Navigator.of(context).pop(),
-                                          descriptionController.clear(),
+                                          // descriptionController.clear(),
                                           setState(() {
                                             typeLibelle.clear();
-                                          })
+                                            _isLoading = false;
+                                          }),
                                         })
                                     .catchError((onError) =>
                                         {print(onError.toString())});
+                                
                               } catch (e) {
                                 final String errorMessage = e.toString();
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -766,6 +778,9 @@ class _NotificationPageState extends State<NotificationPage> {
                             final String subject = sujetController.text;
                             if (formkey.currentState!.validate()) {
                               try {
+                                setState(() {
+                                  _isLoading = true;
+                                });
                                 await ActeurService()
                                     .sendEmailToActeurByTypeActeur(
                                         message, type, subject)
@@ -783,6 +798,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                           sujetController.clear(),
                                           setState(() {
                                             typeLibelle.clear();
+                                            _isLoading = false;
                                           })
                                         })
                                     .catchError((onError) =>
