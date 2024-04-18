@@ -1,4 +1,3 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:koumi_app/Admin/NotificationDetail.dart';
@@ -9,7 +8,6 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/MessageService.dart';
-import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:provider/provider.dart';
 
@@ -565,7 +563,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                         message, type)
                                     .then((value) => {
                                           // Envoi de la notification push
-
+                                          FirebaseApi().sendPushNotificationToTopic('Koumi', message),
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
                                             SnackBar(
@@ -585,7 +583,6 @@ class _NotificationPageState extends State<NotificationPage> {
                                         })
                                     .catchError((onError) =>
                                         {print(onError.toString())});
-                                
                               } catch (e) {
                                 final String errorMessage = e.toString();
                                 ScaffoldMessenger.of(context).showSnackBar(

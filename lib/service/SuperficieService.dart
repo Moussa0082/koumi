@@ -140,7 +140,7 @@ class SuperficieService extends ChangeNotifier {
 
   Future<void> activerSuperficie(String idSuperficie) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/activer/$idSuperficie"));
+        await http.put(Uri.parse("$baseUrl/activer/$idSuperficie"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
       debugPrint(response.body.toString());
@@ -152,7 +152,7 @@ class SuperficieService extends ChangeNotifier {
 
   Future<void> desactiverSuperficie(String idSuperficie) async {
     final response =
-        await http.post(Uri.parse("$baseUrl/desactiver/$idSuperficie"));
+        await http.put(Uri.parse("$baseUrl/desactiver/$idSuperficie"));
     if (response.statusCode == 200 || response.statusCode == 201) {
       applyChange();
 

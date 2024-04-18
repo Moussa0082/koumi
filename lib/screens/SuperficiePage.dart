@@ -64,7 +64,9 @@ class _SuperficiePageState extends State<SuperficiePage> {
         actions: [
           IconButton(
               onPressed: () {
-                _liste = getCampListe(acteur.idActeur!);
+                setState(() {
+                  _liste = getCampListe(acteur.idActeur!);
+                });
               },
               icon: Icon(Icons.refresh)),
           PopupMenuButton<String>(

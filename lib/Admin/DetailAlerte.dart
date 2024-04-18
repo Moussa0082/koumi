@@ -41,7 +41,7 @@ class _DetailAlerteState extends State<DetailAlerte> {
         // Start the player as soon as the app is displayed.
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           String audioPath =
-              'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/image';
+              'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/audio';
           await player.play(UrlSource(audioPath));
           await player.pause();
         });
