@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/api/firebase_api.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/AlerteService.dart';
@@ -483,6 +484,10 @@ class _AddAlerteState extends State<AddAlerte> {
                                               audioAlerte: audiosUploaded,
                                               photoAlerte: photoUploaded)
                                           .then((value) => {
+                                            FirebaseApi()
+                                                    .sendPushNotificationToTopic(
+                                                        'Nouvelle alerte',
+                                                        titre),
                                                 _titreController.clear(),
                                                 _descriptionController.clear(),
                                                 _tokenTextController.clear(),
@@ -528,6 +533,9 @@ class _AddAlerteState extends State<AddAlerte> {
                                               titreAlerte: titre,
                                               descriptionAlerte: description)
                                           .then((value) => {
+                                             FirebaseApi()
+                                                    .sendPushNotificationToTopic(
+                                                        'Nouvelle alerte', titre),
                                                 _titreController.clear(),
                                                 _descriptionController.clear(),
                                                 _tokenTextController.clear(),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/api/firebase_api.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/ConseilService.dart';
@@ -535,6 +536,9 @@ class _AddConseilState extends State<AddConseil> {
                                         audioConseil: audiosUploaded,
                                         acteur: acteur)
                                     .then((value) => {
+                                       FirebaseApi()
+                                              .sendPushNotificationToTopic(
+                                                  'Nouveau conseil', titre),
                                           _titreController.clear(),
                                           _descriptionController.clear(),
                                           _tokenTextController.clear(),
@@ -577,6 +581,9 @@ class _AddConseilState extends State<AddConseil> {
                                         descriptionConseil: description,
                                         acteur: acteur)
                                     .then((value) => {
+                                       FirebaseApi()
+                                              .sendPushNotificationToTopic(
+                                                  'Nouveau conseil', titre),
                                           _titreController.clear(),
                                           _descriptionController.clear(),
                                           _tokenTextController.clear(),

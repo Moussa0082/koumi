@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class FirebaseApi {
+  // final navigatorKey = GlobalKey<NavigatorState>();
   // création d'instance
   final _firebaseMessaging = FirebaseMessaging.instance;
   var fCMToken;

@@ -64,7 +64,7 @@ class _NotificationPageState extends State<NotificationPage> {
 
   @override
   Widget build(BuildContext context) {
-    // final message = ModalRoute.of(context)!.settings.arguments as RemoteMessage;
+    //  final message = ModalRoute.of(context)!.settings.arguments as RemoteMessage;
     return Scaffold(
         backgroundColor: Color.fromARGB(255, 250, 250, 250),
         appBar: AppBar(
