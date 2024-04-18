@@ -6,6 +6,7 @@ import 'package:koumi_app/models/CartItem.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/Panier.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
@@ -63,17 +64,14 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         centerTitle: true,
         title: const Text("Détail Produit"),
-        actions:
+        actions: acteur.idActeur! != widget.stock!.acteur!.idActeur! ? null :
          [
           IconButton(
-            onPressed: () {},
-            icon: CircleAvatar(
-              backgroundColor: Colors.white,
-              child: SvgPicture.asset(
-                "assets/Heart.svg",
-                height: 20,
-              ),
-            ),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder:
+               (context)=> AddAndUpdateProductScreen(isEditable: true, stock:widget.stock ,)));
+            },
+            icon: Icon(Icons.edit,),
           )
         ],
       ),

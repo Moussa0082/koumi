@@ -1,54 +1,61 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+
+ import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:koumi_app/Admin/CodePays.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
+import 'package:koumi_app/models/Niveau2Pays.dart';
+import 'package:koumi_app/models/Niveau3Pays.dart';
+import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/AddMagasinScreen.dart';
 import 'package:koumi_app/screens/Produit.dart';
-import 'package:koumi_app/screens/ProduitActeur.dart';
 import 'package:koumi_app/service/MagasinService.dart';
+import 'package:koumi_app/service/Niveau3Service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
-class MagasinActeurScreen extends StatefulWidget {
-  const MagasinActeurScreen({super.key});
+class AaaaScreen extends StatefulWidget {
+  const AaaaScreen({super.key});
 
   @override
-  State<MagasinActeurScreen> createState() => _MagasinActeurScreenState();
+  State<AaaaScreen> createState() => _AaaaScreenState();
 }
 
-class _MagasinActeurScreenState extends State<MagasinActeurScreen>
-    with TickerProviderStateMixin {
-  late Acteur acteur = Acteur();
-  TabController? _tabController;
+const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
+const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
+
+class _AaaaScreenState extends State<AaaaScreen>     with TickerProviderStateMixin{
+  late ParametreGeneraux para;
+  List<ParametreGeneraux> paraList = [];
   late TextEditingController _searchController;
+    late Acteur acteur = Acteur();
+  TabController? _tabController;
 
   List<Niveau1Pays> niveau1Pays = [];
-  List<Magasin> magasin = [];
-  late Future<List<Magasin>> magasinList;
+  List<Magasin> magasins = [];
     String searchText = "";
 
 
-  Future<List<Magasin>> getListe(String idActeur, String idNiveau1Pays) async {
-    final response = await  MagasinService().fetchMagasinByRegionAndActeur(idActeur, idNiveau1Pays);
-
-    return response;
-  }
-
+ 
 
   String selectedRegionId =
       ''; // Ajoutez une variable pour stocker l'ID de la région sélectionnée
 
   bool isAdmin = false;
 
-  Set<String> loadedRegions =
-      {}; // Ensemble pour garder une trace des régions pour lesquelles les magasins ont déjà été chargés
 
-  void fetchRegions() async {
+   MagasinController  
+   controller = Get.put(MagasinController());
+
+  Future<void> fetchRegions() async {
     try {
       final response = await http
           // .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
@@ -68,75 +75,78 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
         _tabController!.addListener(_handleTabChange);
 
         // Fetch les magasins pour la première région
+      // controller.fetchMagasinByRegionAndActeur(acteur.idActeur!,niveau1Pays.first.idNiveau1Pays!);
 
-        fetchMagasinssByRegionAndActeur(acteur.idActeur!,
-            niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '');
       } else {
         throw Exception('Failed to load regions');
       }
     } catch (e) {
       print('Error fetching regions: $e');
+     throw Exception('Error fetching regions: $e');
+
     }
   }
 
  
 
 
-  Future<List<Magasin>> fetchMagasinssByRegionAndActeur(
-      String idActeur, String idNiveau1Pays) async {
-    try {
-      final response = await http.get(Uri.parse(
-          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeurAndNieau1Pay/${idActeur}/${idNiveau1Pays}'));
-          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/${idActeur}/${idNiveau1Pays}'));
-      if (response.statusCode == 200) {
-        final String jsonString = utf8.decode(response.bodyBytes);
-        List<dynamic> data = json.decode(jsonString);
-        setState(() {
-          magasin = data
-              // .where((magasin) => magasin['statutMagasin'] == true)
-              .map((item) => Magasin(
-                    nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
-                    idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
-                    contactMagasin:
-                        item['contactMagasin'] ?? 'Contact manquant',
-                    photo: item['photo'] ?? '',
-                    // ou utilisez une URL par défaut
-                    acteur: Acteur(
-                      idActeur: item['acteur']['idActeur'] ?? 'manquant',
-                      nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
-                      // Autres champs de l'acteur...
-                    ),
-                    niveau1Pays: Niveau1Pays(
-                      idNiveau1Pays: item['niveau1Pays']['idNiveau1Pays'] ?? 'manquant',
-                      nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
-                      // Autres champs de l'acteur...
-                    ),
-                    dateAjout: item['dateAjout'] ?? 'manquante',
-                    localiteMagasin: item['localiteMagasin'] ?? 'manquante',
-                    statutMagasin: item['statutMagasin'] ??
-                        false, // ou une valeur par défaut
-                  ))
-              .toList();
-        });
+  // Future<List<Magasin>> fetchMagasinssByRegionAndActeur(
+  //     String idActeur, String idNiveau1Pays) async {
+  //   try {
+  //     final response = await http.get(Uri.parse(
+  //         // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeurAndNieau1Pay/${idActeur}/${idNiveau1Pays}'));
+  //         'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/${idActeur}/${idNiveau1Pays}'));
+  //     if (response.statusCode == 200) {
+  //       final String jsonString = utf8.decode(response.bodyBytes);
+  //       List<dynamic> data = json.decode(jsonString);
+  //       setState(() {
+  //         magasin = data
+  //             // .where((magasin) => magasin['statutMagasin'] == true)
+        //       .map((item) => Magasin(
+        //             nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
+        //             idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
+        //             contactMagasin:
+        //                 item['contactMagasin'] ?? 'Contact manquant',
+        //             photo: item['photo'] ?? '',
+        //             // ou utilisez une URL par défaut
+        //             acteur: Acteur(
+        //               idActeur: item['acteur']['idActeur'] ?? 'manquant',
+        //               nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
+        //               // Autres champs de l'acteur...
+        //             ),
+        //             niveau1Pays: Niveau1Pays(
+        //               idNiveau1Pays: item['niveau1Pays']['idNiveau1Pays'] ?? 'manquant',
+        //               nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
+        //               // Autres champs de l'acteur...
+        //             ),
+        //             dateAjout: item['dateAjout'] ?? 'manquante',
+        //             localiteMagasin: item['localiteMagasin'] ?? 'manquante',
+        //             statutMagasin: item['statutMagasin'] ??
+        //                 false, // ou une valeur par défaut
+        //           ))
+        //       .toList();
+        // });
 
     
-      } else {
-        throw Exception('Failed to load magasins for acteur $idActeur et region $idNiveau1Pays');
-      }
-    } catch (e) {
-      print('Error fetching magasins for acteur $idActeur and region : $idNiveau1Pays: $e');
-    }
-    return magasin;
-  }
+  //     } else {
+  //       throw Exception('Failed to load magasins for acteur $idActeur et region $idNiveau1Pays');
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching magasins for acteur $idActeur and region : $idNiveau1Pays: $e');
+  //   }
+  //   return magasin;
+  // }
 
-  void _handleTabChange() {
-    if (_tabController != null &&
-        _tabController!.index >= 0 &&
-        _tabController!.index < niveau1Pays.length) {
-      selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
-      fetchMagasinssByRegionAndActeur(acteur.idActeur!, selectedRegionId);
-    }
+  void _handleTabChange() async{
+  if (_tabController != null &&
+      _tabController!.index >= 0 &&
+      _tabController!.index < niveau1Pays.length) {
+    selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
+            controller.fetchMagasinByRegionAndActeur(acteur.idActeur!, selectedRegionId);
+
+
   }
+}
 
   bool isExist = false;
 
@@ -156,8 +166,8 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
         _tabController = TabController(length: niveau1Pays.length, vsync: this);
         _tabController!.addListener(_handleTabChange);
       }
-      // magasinList = getListe(acteur.idActeur!, selectedRegionId);
-      magasinList = fetchMagasinssByRegionAndActeur(acteur.idActeur!, selectedRegionId);
+    
+
    
       });
     } else {
@@ -165,24 +175,25 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
         isExist = false;
       });
     }
-        fetchRegions();
+        fetchRegions().then((value) => {
+         controller.fetchMagasinByRegionAndActeur(acteur.idActeur!, niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '')
+        });
+    //     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+    //     .parametreList!;
+    // para = paraList[0];
   }
 
+  
   @override
   void initState() {
     super.initState();
-    _searchController = TextEditingController();
     verify();
-    // if (niveau1Pays.isNotEmpty) {
-    //   selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
-    // }
-    // magasinList = fetchMagasinssByRegionAndActeur(acteur.idActeur!, selectedRegionId);
-    // fetchRegions();
+    _searchController = TextEditingController();
+          // magasinList = getListe(acteur.idActeur!, selectedRegionId); // itialise magasinList
   }
 
   @override
   void dispose() {
-    _tabController?.dispose();
     _searchController
         .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
     super.dispose();
@@ -190,7 +201,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
 
   @override
   Widget build(BuildContext context) {
-    const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
+ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
     return Container(
       child: DefaultTabController(
         length: niveau1Pays.length,
@@ -221,28 +232,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => AddAndUpdateProductScreen(isEditable:false)));
-                          },
-                        ),
-                      ),
-                      PopupMenuItem<String>(
-                        child: ListTile(
-                          leading: const Icon(
-                            Icons.remove_red_eye,
-                            color: Colors.green,
-                          ),
-                          title: const Text(
-                            "Mes produits",
-                            style: TextStyle(
-                              color: Colors.green,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          onTap: () async {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ProduitActeurScreen()));
+                                    builder: (context) => AddMagasinScreen(isEditable:false)));
                           },
                         ),
                       ),
@@ -272,10 +262,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
                     ],
                   )
                 ],
-              
-                             
-                          
-            
+       
             centerTitle: true,
             toolbarHeight: 100,
             leading: IconButton(
@@ -357,148 +344,193 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
     );
   }
 
-  Widget buildGridView(String idActeur, String idNiveau1Pays) {
+
+
+
+
+   Widget buildGridView(String idActeur, String idNiveau1Pays) {
  //  List<Magasin> magasinss = magasin;
   
       // Sinon, afficher la GridView avec les magasins filtrés
-return Consumer<MagasinService>(
-      builder: (context, magasinService, child) {
-  return FutureBuilder(
-                    future: magasinList,
-                    builder: (context, snapshot) {   
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Shimmer.fromColors(
-                           baseColor: Colors.grey.withOpacity(0.25),
-                           highlightColor: Colors.white.withOpacity(0.6),
-                           enabled: true,
-                           child: _buildShimmerEffect(),
+    //   return FutureBuilder(
+    //         future: MagasinService().fetchMagasinByRegionAndActeur(acteur.idActeur!, selectedRegionId),
+    //               // future: magasinList,
+    //               builder: (context, snapshot) {   
+    //                 if (snapshot.connectionState == ConnectionState.waiting) {
+    //                   return Shimmer.fromColors(
+    //                      baseColor: Colors.grey.withOpacity(0.25),
+    //                      highlightColor: Colors.white.withOpacity(0.6),
+    //                      enabled: true,
+    //                      child: _buildShimmerEffect(),
+    //                   );
+    //                 }  
+                 
+    //                                       if (!snapshot.hasData) {
+    //                                       return 
+    //   SingleChildScrollView(
+    //       child: Padding(
+    //         padding: EdgeInsets.all(10),
+    //         child: Center(
+    //           child: Column(
+    //             children: [
+    //               Image.asset('assets/images/notif.jpg'),
+    //               SizedBox(
+    //                 height: 10,
+    //               ),
+    //               Text(
+    //                 'Aucun magasin trouvé ' ,
+    //                 style: TextStyle(
+    //                   color: Colors.black,
+    //                   fontSize: 17,
+    //                   overflow: TextOverflow.ellipsis,
+    //                 ),
+    //               ),
+    //             ],
+    //           ),
+    //         ),
+    //       ),
+    //     );
+    // }      
+    //               else{ 
+    //                     magasins = snapshot.data!; // Assurez-vous que les données sont correctement récupérées
+    //                 debugPrint("Liste magasins : ${magasins.toString()}");
+    //                 // magasin = snapshot.data!;    
+    // // Si aucun magasin n'est trouvé après le filtrage
+    //     List<Magasin> filteredMagasins = magasins.where((magasin) {
+    //   String nomMagasin = magasin.nomMagasin!.toString().toLowerCase();
+    //   searchText = _searchController.text.toLowerCase();
+    //   return nomMagasin.contains(searchText);
+    // }).toList();
 
-                        );
-                      }  
-                   
-                                            if (!snapshot.hasData) {
-                                            return 
-        SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(10),
-              child: Center(
-                child: Column(
-                  children: [
-                    Image.asset('assets/images/notif.jpg'),
-                    SizedBox(
-                      height: 10,
+    //   if (filteredMagasins.isEmpty &&  _searchController.text.isNotEmpty) {
+    //   // Vous pouvez afficher une image ou un texte ici
+    //   return 
+    //   SingleChildScrollView(
+    //       child: Padding(
+    //         padding: EdgeInsets.all(10),
+    //         child: Center(
+    //           child: Column(
+    //             children: [
+    //               Image.asset('assets/images/notif.jpg'),
+    //               SizedBox(
+    //                 height: 10,
+    //               ),
+    //               Text(
+    //                 'Aucun magasin trouvé avec le nom ' + _searchController.text.toUpperCase(),
+    //                 style: TextStyle(
+    //                   color: Colors.black,
+    //                   fontSize: 17,
+    //                   overflow: TextOverflow.ellipsis,
+    //                 ),
+    //               ),
+    //             ],
+    //           ),
+    //         ),
+    //       ),
+    //     );
+
+    // }
+                 
+     
+     // Si aucun magasin n'est trouvé après le filtrage
+        List<Magasin> filteredMagasins = controller.magasinListe1.where((magasin) {
+      String nomMagasin = magasin.nomMagasin!.toString().toLowerCase();
+      searchText = _searchController.text.toLowerCase();
+      return nomMagasin.contains(searchText);
+    }).toList();
+
+      if (filteredMagasins.isEmpty &&  _searchController.text.isNotEmpty) {
+      // Vous pouvez afficher une image ou un texte ici
+      return 
+      SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Center(
+              child: Column(
+                children: [
+                  Image.asset('assets/images/notif.jpg'),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Aucun magasin trouvé avec le nom ' + _searchController.text.toUpperCase(),
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 17,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    Text(
-                      'Aucun magasin trouvé ' ,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 17,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          );
-      }
-                                           
-                                     else{ 
-                      // magasin = snapshot.data!;    
-      // Si aucun magasin n'est trouvé après le filtrage
-          List<Magasin> filteredMagasins = magasin.where((magasin) {
-        String nomMagasin = magasin.nomMagasin!.toString().toLowerCase();
-        searchText = _searchController.text.toLowerCase();
-        return nomMagasin.contains(searchText);
-      }).toList();
+          ),
+        );
 
-        if (filteredMagasins.isEmpty &&  _searchController.text.isNotEmpty) {
-        // Vous pouvez afficher une image ou un texte ici
-        return 
-        SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(10),
-              child: Center(
-                child: Column(
-                  children: [
-                    Image.asset('assets/images/notif.jpg'),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'Aucun magasin trouvé avec le nom ' + _searchController.text.toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 17,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-      }
-
-                                  return Container(
-                            child: GridView.builder(
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 10,
-                                crossAxisSpacing: 10,
-                              ),
-                              itemCount: filteredMagasins.length,
-                              itemBuilder: (context, index) {
-                                Magasin magasin = filteredMagasins[index];
-                                Magasin currentMagasin = magasin;
-                                String typeActeurList = '';
-                  
-                                // Vérifiez d'abord si l'acteur est disponible dans le magasin
-                                if (currentMagasin.acteur != null &&
-                    currentMagasin.acteur!.typeActeur != null) {
-                  // Parcourez la liste des types d'acteurs et extrayez les libellés
-                  typeActeurList = currentMagasin.acteur!.typeActeur!
-                      .map((type) => type
-                          .libelle) // Utilisez la propriété libelle pour récupérer le libellé
-                      .join(', '); // Joignez tous les libellés avec une virgule
-                                }
-                                // ici on a recuperer les details du  magasin
-                                // String magasin = filteredMagasins[index].photo!;
-                                return GestureDetector(
-                         onTap: () {
-                        String id = filteredMagasins[index].idMagasin!;
-                        String nom = filteredMagasins[index].nomMagasin!;
-                    
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) =>
-                                ProduitActeurScreen(
-                              id: id,
-                              nom: nom,
-                            ),
-                            transitionsBuilder:
-                                (context, animation, secondaryAnimation, child) {
-                              var begin =
+    }
+          
+                                return Obx(
+        () => controller.isLoading.value
+                                  ? _buildShimmerEffect() :
+                                   
+                                   Container(
+                                                            child: GridView.builder(
+                                                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                                                crossAxisCount: 2,
+                                                                mainAxisSpacing: 10,
+                                                                crossAxisSpacing: 10,
+                                                              ),
+                                                              itemCount: controller.magasinListe1.length,
+                                                              itemBuilder: (context, index) {
+                                                                Magasin magasinn = filteredMagasins[index];
+                                                                Magasin currentMagasin = magasinn;
+                                                                String typeActeurList = '';
+                                                  
+                                                                // Vérifiez d'abord si l'acteur est disponible dans le magasin
+                                                                if (currentMagasin.acteur != null &&
+                                                    currentMagasin.acteur!.typeActeur != null) {
+                                                  // Parcourez la liste des types d'acteurs et extrayez les libellés
+                                                  typeActeurList = currentMagasin.acteur!.typeActeur!
+                                                      .map((type) => type
+                                                          .libelle) // Utilisez la propriété libelle pour récupérer le libellé
+                                                      .join(', '); // Joignez tous les libellés avec une virgule
+                                                                }
+                                                                // ici on a recuperer les details du  magasin
+                                                                // String magasin = filteredMagasins[index].photo!;
+                                                                return GestureDetector(
+                                                         onTap: () {
+                                                        String id = magasinn.idMagasin!;
+                                                        String nom = magasinn.nomMagasin!;
+                                                    
+                                                        Navigator.push(
+                                                          context,
+                                                          PageRouteBuilder(
+                                                            pageBuilder: (context, animation, secondaryAnimation) =>
+                                                                ProduitScreen(
+                                                              id: id,
+                                                              nom: nom,
+                                                            ),
+                                                            transitionsBuilder:
+                                                                (context, animation, secondaryAnimation, child) {
+                                                              var begin =
                                   Offset(0.0, 1.0); // Commencer en bas de l'écran
-                              var end = Offset.zero; // Finir en haut de l'écran
-                              var curve = Curves.ease;
-                              var tween = Tween(begin: begin, end: end)
+                                                              var end = Offset.zero; // Finir en haut de l'écran
+                                                              var curve = Curves.ease;
+                                                              var tween = Tween(begin: begin, end: end)
                                   .chain(CurveTween(curve: curve));
-                              return SlideTransition(
-                                position: animation.drive(tween),
-                                child: child,
-                              );
-                            },
-                            transitionDuration: const Duration(
-                                milliseconds: 1900), // Durée de la transition
-                          ),
-                        );
-                      },
-                  child: Column(
-                    children: [
-                             Container(
-                              // height: MediaQuery.sizeOf(context).height,
+                                                              return SlideTransition(
+                                                                position: animation.drive(tween),
+                                                                child: child,
+                                                              );
+                                                            },
+                                                            transitionDuration: const Duration(
+                                                                milliseconds: 1900), // Durée de la transition
+                                                          ),
+                                                        );
+                                                      },
+                                                  child: Column(
+                                                    children: [
+                                                             Container(
+                                                              // height: MediaQuery.sizeOf(context).height,
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(15),
@@ -524,13 +556,13 @@ return Consumer<MagasinService>(
                                                     BorderRadius.circular(8.0),
                                                 child: SizedBox(
                                                   height: 80,
-                                                  child: magasin.photo == null
+                                                  child: magasinn.photo == null
                                                       ? Image.asset(
                                                           "assets/images/magasin.png",
                                                           fit: BoxFit.cover,
                                                         )
                                                       : Image.network(
-                                                          "http://10.0.2.2/${magasin.photo}",
+                                                          "http://10.0.2.2/${magasinn.photo}",
                                                           fit: BoxFit.cover,
                                                           errorBuilder:
                                                               (BuildContext
@@ -571,7 +603,7 @@ return Consumer<MagasinService>(
                                                    ),
                                                    Flexible(
                                                      child: Text(
-                                                       magasin.nomMagasin!.toUpperCase(),
+                                                       magasinn.nomMagasin!.toUpperCase(),
                                                        style: const TextStyle(
                                                            color: Colors.black,
                                                            fontWeight: FontWeight.w800,
@@ -587,14 +619,15 @@ return Consumer<MagasinService>(
                                            !isExist ? SizedBox() :  Container(
                                                 child: 
                                                  Container(
-                                                  
+                                                  alignment:
+                                                            Alignment.bottomRight,
                                                child: Padding(
                                                                                             padding: const EdgeInsets.symmetric(horizontal:8.0),
                                                                                             child: Row(
                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                    children: [
-                                                     _buildEtat(magasin.statutMagasin!),
-                                                     SizedBox(width: 130,),
+                                                     _buildEtat(magasinn.statutMagasin!),
+                                                     SizedBox(width: 120,),
                                                      Expanded(
                                                        child: PopupMenuButton<String>(
                                                          padding: EdgeInsets.zero,
@@ -615,14 +648,13 @@ return Consumer<MagasinService>(
                                                                ),
                                                                
                                                                onTap: () async {
-  // Changement d'état du magasin ici
-  await MagasinService().activerMagasin(filteredMagasins[index].idMagasin!).then((value) => {
-    Provider.of<MagasinService>(context, listen: false).applyChange(),
-    // Mettre à jour la liste des magasins après le changement d'état
-    setState(() {
-      magasinList = getListe(acteur.idActeur!, selectedRegionId);
-    }),
-    Navigator.of(context).pop(),
+                                  // Changement d'état du magasin ici
+                                  await MagasinService().activerMagasin(filteredMagasins[index].idMagasin!).then((value) => {
+                                    // Mettre à jour la liste des magasins après le changement d'état
+                                    setState(() {
+                                     controller.fetchMagasinByRegionAndActeur(acteur.idActeur!, niveau1Pays[_tabController!.index].idNiveau1Pays!);
+                                    }),
+                                    Navigator.of(context).pop(),
                                                                          })
                                                                      .catchError((onError) => {
                                                                            ScaffoldMessenger.of(context)
@@ -672,12 +704,9 @@ return Consumer<MagasinService>(
                                                                  await MagasinService()
                                                                      .desactiverMagasin(filteredMagasins[index].idMagasin!)
                                                                      .then((value) => {
-                                                                       Provider.of<MagasinService>(
-                                                                                   context,
-                                                                                   listen: false)
-                                                                               .applyChange(),
+                                                                       
                                                                                 setState(() {
-                                                                             magasinList = getListe(acteur.idActeur!, selectedRegionId);
+                                                      controller.fetchMagasinByRegionAndActeur(acteur.idActeur!, niveau1Pays[_tabController!.index].idNiveau1Pays!);
                                                                            }),
                                                                            Navigator.of(context).pop(),
                                                                          })
@@ -736,16 +765,16 @@ return Consumer<MagasinService>(
                                                                          child: ScaleTransition(
                                                                            scale: animation,
                                                                            child: AddMagasinScreen(
-                                                                             idMagasin: magasin.idMagasin,
+                                                                             idMagasin: magasinn.idMagasin,
                                                                              isEditable: true,
                                                                              nomMagasin:
-                                                                                 magasin.nomMagasin,
+                                                                                 magasinn.nomMagasin,
                                                                              contactMagasin:
-                                                                                 magasin.contactMagasin,
+                                                                                 magasinn.contactMagasin,
                                                                              localiteMagasin:
-                                                                                 magasin.localiteMagasin,
+                                                                                 magasinn.localiteMagasin,
                                                                              niveau1Pays:
-                                                                                 magasin.niveau1Pays!,
+                                                                                 magasinn.niveau1Pays!,
                                                                              // photo: filteredMagasins[index]['photo']!,
                                                                            ),
                                                                          ),
@@ -783,12 +812,9 @@ return Consumer<MagasinService>(
                                                                      .deleteMagasin(filteredMagasins[index]
                                                                          .idMagasin!)
                                                                      .then((value) => {
-                                                                           Provider.of<MagasinService>(
-                                                                                   context,
-                                                                                   listen: false)
-                                                                               .applyChange(),
+                                                                          
                                                                            setState(() {
-                                                                             magasinList = getListe(acteur.idActeur!, selectedRegionId);
+                                                                          controller.fetchMagasinByRegionAndActeur(acteur.idActeur!, niveau1Pays[_tabController!.index].idNiveau1Pays!);
                                                                            }),
                                                                            Navigator.of(context).pop(),
                                                                            ScaffoldMessenger.of(context)
@@ -838,23 +864,21 @@ return Consumer<MagasinService>(
                                         ),
                                       ),
                                     ),
-                  
+                                                  
                                     
-                     
-                    ],
-                  ),
+                                                     
+                                                    ],
+                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                        ),
                                 );
-                              },
-                            ),
-                        );
-                    }
-      }
-                );
-    }
-      );
+                  // } else 
+    // } 
+              // );
     
   }
-
 
   Widget _buildShimmerEffect() {
     return Shimmer.fromColors(
@@ -879,41 +903,7 @@ return Consumer<MagasinService>(
     );
   }
 
-
-   Widget _buildItem(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Flexible(
-            child: Text(
-              title,
-              style: const TextStyle(
-              
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w800,
-                  fontStyle: FontStyle.italic,
-                  overflow: TextOverflow.ellipsis,
-                  fontSize: 16),
-            ),
-          ),
-          Flexible(
-            child: Text(
-              value,
-              style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w800,
-                  overflow: TextOverflow.ellipsis,
-                  fontSize: 16),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEtat(bool isState) {
+   Widget _buildEtat(bool isState) {
     return Container(
       width: 15,
       height: 15,

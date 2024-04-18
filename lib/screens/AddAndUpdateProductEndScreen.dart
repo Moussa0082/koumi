@@ -24,11 +24,10 @@ class AddAndUpdateProductEndSreen extends StatefulWidget {
   
      bool isEditable;
      late Stock? stock;
-     String? idStock;
-     String nomProduit, origine, forme, prix , quantite;
+     String  nomProduit, origine, forme,prix , quantite;
      File? image;
 
-   AddAndUpdateProductEndSreen({super.key,required this.isEditable, this.idStock, this.stock,
+   AddAndUpdateProductEndSreen({super.key,required this.isEditable, this.stock, 
    required this.nomProduit, required this.forme , required this.origine, required this.prix, required this.quantite, this.image
    });
 
@@ -86,28 +85,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
   }
 
 
-    @override
-  void initState() {
-
-    verify();
-    magasinListe =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
-    speculationListe =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation'));
-    uniteListe =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Unite/getAllUnite'));
-    zoneListe =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/ZoneProduction/getAllZone'));
-
-          debugPrint("id : $id, acteur : $acteur");
-        
-        
-    super.initState();
-    if(!widget.isEditable){
-     
-    }
-    debugPrint("nom : ${widget.nomProduit}, forme: ${widget.forme}, origine : ${widget.origine}, qte : ${widget.quantite}, prix : ${widget.prix}");
-  }
+  
 
   void handleButtonPress() async{
     setState(() {
@@ -126,6 +104,8 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
         isLoading = false;
       });
      });
+     _typeController.clear();
+     _descriptionController.clear();
     }
 
   }
@@ -149,12 +129,14 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
       
     if(widget.image != null){
     await StockService().creerStock(nomProduit: widget.nomProduit,
+     origineProduit: widget.origine, prix: widget.prix,
      formeProduit: widget.forme, quantiteStock: widget.quantite, photo: widget.image,
      typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
      zoneProduction: zoneProduction, speculation: speculation, unite: unite, 
       magasin: magasin, acteur: acteur);
     }else{
     await StockService().creerStock(nomProduit: widget.nomProduit,
+         origineProduit: widget.origine, prix: widget.prix,
      formeProduit: widget.forme, quantiteStock: widget.quantite, 
      typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
      zoneProduction: zoneProduction, speculation: speculation, unite: unite, 
@@ -175,32 +157,56 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
       
     if(widget.image != null){
     await StockService().updateStock(
-      idStock: widget.idStock!,
-      nomProduit: widget.nomProduit,
+      idStock: widget.stock!.idStock!, nomProduit: widget.nomProduit,
+           origineProduit: widget.origine, prix: widget.prix,
      formeProduit: widget.forme, quantiteStock: widget.quantite, photo: widget.image!,
      typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
      zoneProduction: widget.stock!.zoneProduction!, speculation: widget.stock!.speculation!,
-      unite: widget.stock!.unite!, 
+      unite: widget.stock!.unite!,
       magasin: widget.stock!.magasin!, acteur: acteur);
     }else{
     await StockService().updateStock(
-      idStock: widget.idStock!,
-      nomProduit: widget.nomProduit,
+      idStock: widget.stock!.idStock!, nomProduit: widget.nomProduit,
+      origineProduit: widget.origine, prix: widget.prix,
      formeProduit: widget.forme, quantiteStock: widget.quantite, 
      typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
       zoneProduction: widget.stock!.zoneProduction!, speculation: widget.stock!.speculation!,
       unite: widget.stock!.unite!, 
       magasin: widget.stock!.magasin!, acteur: acteur);
-    
    }
     } catch (error) {
         // Handle any exceptions that might occur during the request
         final String errorMessage = error.toString();
-        debugPrint("no " + errorMessage);
+        debugPrint("no update" + errorMessage);
       } 
 
 
    } 
+
+     @override
+  void initState() {
+
+    verify();
+    magasinListe =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
+    speculationListe =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation'));
+    uniteListe =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Unite/getAllUnite'));
+    zoneListe =
+        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/ZoneProduction/getAllZone'));
+
+          debugPrint("id : $id, acteur : $acteur");
+        
+        
+    super.initState();
+    if(widget.isEditable == true){
+     _typeController.text = widget.stock!.typeProduit!;
+     _descriptionController.text = widget.stock!.descriptionStock!;
+    
+    }
+    debugPrint("nom : ${widget.nomProduit}, forme: ${widget.forme}, origine : ${widget.origine}, qte : ${widget.quantite}, prix : ${widget.prix}");
+  }
 
 
   @override
@@ -360,12 +366,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   }
                     
                                   return DropdownButtonFormField<String>(
-                                    validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Veuillez sélectionner une speculation.';
-                                  }
-                                  return null;
-                                },
+                                  
                                     items: speculationListe
                                         .map(
                                           (e) => DropdownMenuItem(
@@ -389,7 +390,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   
                                     decoration: InputDecoration(
                                       
-                                      labelText: 'Selectionner une spéculation',
+                                      labelText: widget.stock!.speculation!.nomSpeculation == null ? 'Selectionner une spéculation' : widget.stock!.speculation!.nomSpeculation!,
                                       contentPadding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
                                       border: OutlineInputBorder(
@@ -488,12 +489,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   }
                     
                                   return DropdownButtonFormField<String>(
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Veuillez sélectionner un magasin.';
-                                      }
-                                      return null;
-                                    },
+                                    
                                     items: magasinListe
                                         .map(
                                           (e) => DropdownMenuItem(
@@ -515,7 +511,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                       });
                                     },
                                     decoration: InputDecoration(
-                                      labelText: 'Selectionner un magasin',
+                                      labelText: widget.stock!.magasin!.nomMagasin == null ? 'Selectionner un magasin' : widget.stock!.magasin!.nomMagasin,
                                       contentPadding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
                                       border: OutlineInputBorder(
@@ -614,12 +610,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   }
                     
                                   return DropdownButtonFormField<String>(
-                                    validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Veuillez sélectionner une unité.';
-                                    }
-                                    return null;
-                                  },
+                                   
                                     items: uniteListe
                                         .map(
                                           (e) => DropdownMenuItem(
@@ -641,7 +632,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                       });
                                     },
                                     decoration: InputDecoration(
-                                      labelText: 'Selectionner une unité',
+                                      labelText: widget.stock!.unite!.nomUnite == null ? 'Selectionner une unité' : widget.stock!.unite!.nomUnite ,
                                       contentPadding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
                                       border: OutlineInputBorder(
@@ -740,12 +731,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   }
                     
                                   return DropdownButtonFormField<String>(
-                                    validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Veuillez sélectionner une zone de production.';
-                                  }
-                                  return null;
-                                },
+                              
                                     items: zoneListe
                                         .map(
                                           (e) => DropdownMenuItem(
@@ -767,7 +753,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                       });
                                     },
                                     decoration: InputDecoration(
-                                      labelText: 'Selectionner une zone de production',
+                                     labelText: widget.stock!.zoneProduction!.nomZoneProduction == null ?'Selectionner une zone de production' : widget.stock!.zoneProduction!.nomZoneProduction,
                                       contentPadding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
                                       border: OutlineInputBorder(
@@ -780,7 +766,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                     items: [],
                                     onChanged: null,
                                     decoration: InputDecoration(
-                                      labelText: 'Aucune zone de production trouvé',
+                                      labelText:  'Aucune zone de production trouvé',
                                       contentPadding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
                                       border: OutlineInputBorder(

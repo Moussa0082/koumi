@@ -158,7 +158,8 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                 localiteMagasin: localiteMagasin,
                 acteur: acteur,
                 niveau1Pays: widget.niveau1Pays!)
-            .then((value) => showDialog(
+            .then((value) => 
+            showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
@@ -247,6 +248,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                                                                                    context,
                                                                                    listen: false)
                                                                                .applyChange(),
+
                   nomMagasinController.clear(),
                   contactMagasinController.clear(),
                   localiteMagasinController.clear(),
@@ -254,6 +256,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                     // niveau1Pays == null;
                     photos == null;
                   }),
+                  Navigator.of(context).pop(),
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Row(
@@ -279,39 +282,41 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                                                                                    context,
                                                                                    listen: false)
                                                                                .applyChange(),
-                                                                                      Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) =>
-                                MagasinScreen(),
-                            transitionsBuilder:
-                                (context, animation, secondaryAnimation, child) {
-                              var begin =
-                                  Offset(0.0, 1.0); // Commencer en bas de l'écran
-                              var end = Offset.zero; // Finir en haut de l'écran
-                              var curve = Curves.ease;
-                              var tween = Tween(begin: begin, end: end)
-                                  .chain(CurveTween(curve: curve));
-                              return SlideTransition(
-                                position: animation.drive(tween),
-                                child: child,
-                              );
-                            },
-                            transitionDuration: const Duration(
-                                milliseconds: 1900), // Durée de la transition
-                          ),
-                        ),
+
+                        //                                                               Navigator.push(
+                        //   context,
+                        //   PageRouteBuilder(
+                        //     pageBuilder: (context, animation, secondaryAnimation) =>
+                        //         MagasinScreen(),
+                        //     transitionsBuilder:
+                        //         (context, animation, secondaryAnimation, child) {
+                        //       var begin =
+                        //           Offset(0.0, 1.0); // Commencer en bas de l'écran
+                        //       var end = Offset.zero; // Finir en haut de l'écran
+                        //       var curve = Curves.ease;
+                        //       var tween = Tween(begin: begin, end: end)
+                        //           .chain(CurveTween(curve: curve));
+                        //       return SlideTransition(
+                        //         position: animation.drive(tween),
+                        //         child: child,
+                        //       );
+                        //     },
+                        //     transitionDuration: const Duration(
+                        //         milliseconds: 1900), // Durée de la transition
+                        //   ),
+                        // ),
                   nomMagasinController.clear(),
                   contactMagasinController.clear(),
                   localiteMagasinController.clear(),
                   setState(() {
                     niveauPaysValue == "Sélectionner une région";
                   }),
+                  Navigator.of(context).pop(),
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Row(
                         children: [
-                          Text("Activer avec succèss "),
+                          Text("Ajouté avec succèss "),
                         ],
                       ),
                       duration: Duration(seconds: 2),

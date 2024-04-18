@@ -23,6 +23,8 @@ class StockService extends ChangeNotifier {
    Future<void> creerStock({
     required String nomProduit,
     required String formeProduit,
+    required String origineProduit,
+    required String prix,
     required String quantiteStock,
     required String typeProduit,
     required String descriptionStock,
@@ -45,6 +47,8 @@ class StockService extends ChangeNotifier {
       requete.fields['stock'] = jsonEncode({
         'nomProduit': nomProduit,
         'formeProduit': formeProduit,
+        'origineProduit': origineProduit,
+        'prix': prix,
         'quantiteStock': int.tryParse(quantiteStock),
         'typeProduit': typeProduit,
         'descriptionStock': descriptionStock,
@@ -64,7 +68,7 @@ class StockService extends ChangeNotifier {
               Get.snackbar("Succès", "Produit ajouté avec succès",duration: Duration(seconds: 3));
         debugPrint('stock service ${donneesResponse.toString()}');
       } else {
-           Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer plus tard",duration: Duration(seconds: 3));
+          //  Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer plus tard",duration: Duration(seconds: 3));
          
         throw Exception(
             'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
@@ -82,6 +86,8 @@ class StockService extends ChangeNotifier {
     required String idStock,
     required String nomProduit,
     required String formeProduit,
+    required String prix,
+    required String origineProduit,
     required String quantiteStock,
     required String typeProduit,
     required String descriptionStock,
@@ -103,8 +109,11 @@ class StockService extends ChangeNotifier {
       }
 
       requete.fields['stock'] = jsonEncode({
+        'idStock': idStock,
         'nomProduit': nomProduit,
         'formeProduit': formeProduit,
+        'origineProduit': origineProduit,
+        'prix': prix,
         'quantiteStock': int.tryParse(quantiteStock),
         'typeProduit': typeProduit,
         'descriptionStock': descriptionStock,
@@ -119,19 +128,23 @@ class StockService extends ChangeNotifier {
       var response = await requete.send();
       var responsed = await http.Response.fromStream(response);
 
-      if (response.statusCode == 200 || responsed.statusCode == 201) {
+      if (response.statusCode == 200 || responsed.statusCode == 201 || responsed.statusCode == 202) {
         Get.snackbar("Succès", "Produit modifier avec succès",duration: Duration(seconds: 3));
         final donneesResponse = json.decode(responsed.body);
-        debugPrint('stock service ${donneesResponse.toString()}');
+        debugPrint('stock service update ${donneesResponse.toString()}');
       } else {
-           Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
+          //  Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
+        final errorMessage =
+            json.decode(utf8.decode(responsed.bodyBytes))['message'];
+                    debugPrint(' erreur : ${errorMessage}');
         throw Exception(
             'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
       }
     } catch (e) {
                 Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
+      debugPrint("catch erreur : $e");
       throw Exception(
-          'Une erreur s\'est produite lors de l\'ajout de acteur : $e');
+          'Une erreur s\'est produite lors de la modification du produit : $e');
     }
   }
 
@@ -243,34 +256,34 @@ class StockService extends ChangeNotifier {
     final response =
         await http.delete(Uri.parse('$baseUrl/deleteStocks/$idStock'));
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
       applyChange();
     } else {
-      Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
+      // Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }
 
-  Future activerStock(String idActeur) async {
-    final response = await http.post(Uri.parse('$baseUrl/activer/$idActeur'));
+  Future activerStock(String id) async {
+    final response = await http.put(Uri.parse('$baseUrl/activer/$id'));
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
       applyChange();
     } else {
-      Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
+      // Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }
 
-  Future desactiverStock(String idStock) async {
-    final response = await http.post(Uri.parse('$baseUrl/desactiver/$idStock'));
+  Future desactiverStock(String id) async {
+    final response = await http.put(Uri.parse('$baseUrl/desactiver/$id'));
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
       applyChange();
     } else {
-      Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
+      // Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }

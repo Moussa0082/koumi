@@ -1,12 +1,15 @@
 import 'dart:convert';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'dart:io';
 import 'package:path/path.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:provider/provider.dart';
 
 
 
@@ -125,11 +128,12 @@ class MagasinService extends ChangeNotifier{
           // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
           'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
       if (response.statusCode == 200) {
-  final String jsonString = utf8.decode(response.bodyBytes);
-        List<dynamic> data = json.decode(jsonString);
-        
-      magasin = data.map((item) => Magasin.fromMap(item)).toList();
-      
+  // final String jsonString = utf8.decode(response.bodyBytes);
+  //       List<dynamic> data = json.decode(jsonString);
+               List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+        magasin = body.where((magasin) => magasin['statutMagasin'] == true)
+        .map((e) => Magasin.fromMap(e)).toList();
+      // magasin = data.map((item) => Magasin.fromMap(item)).toList();
       } else {
         throw Exception('Failed to load magasins for region $id');
       }
@@ -138,6 +142,35 @@ class MagasinService extends ChangeNotifier{
     }
         return magasin;
         
+  }
+
+   Future<List<Magasin>> fetchMagasinByRegionAndActeur(String idActeur, String idNiveau1Pays) async {
+    // try {
+      final response = await http.get(Uri.parse(
+          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${idActeur}/${idNiveau1Pays}'));
+          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/$idActeur/$idNiveau1Pays'));
+      if (response.statusCode == 200 || response.statusCode == 201 ||  response.statusCode == 202) {
+  // final String jsonString = utf8.decode(response.bodyBytes);
+  //       List<dynamic> data = json.decode(jsonString);
+          print("Fetching data succès");
+        List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+        magasin = body.map((e) => Magasin.fromMap(e)).toList();
+                debugPrint("Succes : idActeur : $idActeur , idNiveau1Pays : $idNiveau1Pays , : liste ${magasin.toString()}");
+                  applyChange();
+      // magasin = data.map((item) => Magasin.fromMap(item)).toList();
+      
+      } else {
+        magasin = [];
+        // throw Exception('Failed to load magasins for region $idNiveau1Pays');
+      }
+    // } catch (e) {
+      //  return magasin;
+    //   print('Error fetching magasins for acteur $idActeur et region $idNiveau1Pays: $e');
+    //       throw Exception(" erreur catch ");
+    //       // throw Exception(" erreur catch :  ${e.toString()}");
+
+    // }
+         return magasin;
   }
 
 
@@ -182,3 +215,130 @@ class MagasinService extends ChangeNotifier{
     notifyListeners();
   }
 }
+
+ class MagasinController extends GetxController {
+   List<Magasin> magasinListe = [];
+   List<Magasin> magasinListe1 = [];
+  // var magasinListe = <Magasin>[].obs;
+  var isLoading = true.obs;
+  var isLoading1 = true.obs;
+  //  var  idActeur, idNiveau1Pays = "";
+  String id = "";
+  
+
+    //  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Magasin';
+
+   
+      // var id = Get.parameters["id"];
+
+    Future<void> fetchMagasinByRegion(String id) async {
+
+
+      try {
+      //  var url = 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/$id';
+      // String url = 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}';
+
+     final response = await http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/$id'));
+    if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+       print("reponse 1: ${response.statusCode}");
+      // final String jsonString = utf8.decode(response.bodyBytes);
+      //   List<dynamic> data = json.decode(jsonString);
+          List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+         debugPrint("data succes : ${body.toString()}");
+          magasinListe = body
+          .where((magasin) => magasin['statutMagasin'] == true)
+                           .map((item) => Magasin(
+                    nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
+                    idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
+                    contactMagasin:
+                        item['contactMagasin'] ?? 'Contact manquant',
+                    photo: item['photo'] ?? '',
+                    // ou utilisez une URL par défaut
+                    acteur: Acteur(
+                      idActeur: item['acteur']['idActeur'] ?? 'manquant',
+                      nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
+                      // Autres champs de l'acteur...
+                    ),
+                    niveau1Pays: Niveau1Pays(
+                      idNiveau1Pays: item['niveau1Pays']['idNiveau1Pays'] ?? 'manquant',
+                      nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
+                      // Autres champs de l'acteur...
+                    ),
+                    dateAjout: item['dateAjout'] ?? 'manquante',
+                    localiteMagasin: item['localiteMagasin'] ?? 'manquante',
+                    statutMagasin: item['statutMagasin'] ??
+                        false, // ou une valeur par défaut
+                  ))
+              .toList();
+      isLoading.value = false;
+      update();
+    } else {
+       print("reponse else: ${response.statusCode}");
+      Get.snackbar(
+        'Erreur lors de la recuperation des magasins par region!',
+        'Server responded: ${response.statusCode}:${response.reasonPhrase.toString()}',
+      );
+      debugPrint(
+          'Error Loading data! , Server responded: ${response.statusCode}:${response.reasonPhrase.toString()}');
+    }
+  } catch (e) {
+    Get.snackbar('Catch', 'Erreur catch lors de la recuperation des magasins par region!: $e');
+    debugPrint('Error: $e');
+  }
+}
+
+ 
+   Future<void> fetchMagasinByRegionAndActeur( String idActeur, String idNiveau1Pays) async {
+    // try {
+      final response = await http.get(Uri.parse(
+          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/${idActeur}/${idNiveau1Pays}'));
+          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/$idActeur/$idNiveau1Pays'));
+      
+   if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+      final String jsonString = utf8.decode(response.bodyBytes);
+        List<dynamic> data = json.decode(jsonString);
+          magasinListe1 = data
+          // .where((magasin) => magasin['statutMagasin'] == true)
+                           .map((item) => Magasin(
+                    nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
+                    idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
+                    contactMagasin:
+                        item['contactMagasin'] ?? 'Contact manquant',
+                    photo: item['photo'] ?? '',
+                    // ou utilisez une URL par défaut
+                    acteur: Acteur(
+                      idActeur: item['acteur']['idActeur'] ?? 'manquant',
+                      nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
+                      // Autres champs de l'acteur...
+                    ),
+                    niveau1Pays: Niveau1Pays(
+                      idNiveau1Pays: item['niveau1Pays']['idNiveau1Pays'] ?? 'manquant',
+                      nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
+                      // Autres champs de l'acteur...
+                    ),
+                    dateAjout: item['dateAjout'] ?? 'manquante',
+                    localiteMagasin: item['localiteMagasin'] ?? 'manquante',
+                    statutMagasin: item['statutMagasin'] ??
+                        false, // ou une valeur par défaut
+                  ))
+              .toList();
+      isLoading1.value = false;
+      // update();
+    } else {
+      // Get.snackbar('Erreur lors de la recuperation des magasins de l\'acteur!',
+          // 'Sever responded: ${response.statusCode}:${response.reasonPhrase.toString()}');
+      debugPrint('Error Loading data! , Sever responded: ${response.statusCode}:${response.reasonPhrase.toString()}');
+    }
+  }
+
+
+  //  @override
+  // void onInit() {
+  //   super.onInit();
+  // // fetchMagasinByRegionAndActeur(idActeur!, idNiveau1Pays!);
+  //   // fetchMagasin();
+  //   // fetchMagasinByRegion(id);
+  //   // fetchMagasinByRegionAndActeur(idActeur, idNiveau1Pays);
+  // }
+
+ }

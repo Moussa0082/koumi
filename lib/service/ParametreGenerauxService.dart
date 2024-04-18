@@ -6,8 +6,8 @@ import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:path/path.dart';
 
 class ParametreGenerauxService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/parametreGeneraux';
-  //  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/parametreGeneraux';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/parametreGeneraux';
+   static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/parametreGeneraux';
 
 
   List<ParametreGeneraux> parametreList = [];
@@ -173,9 +173,11 @@ class ParametreGenerauxService extends ChangeNotifier {
       parametreList = [];
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
        
-      throw Exception("Params vide");
+      // throw Exception("Params vide");
       // throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
+          return parametreList;
+
   }
 
   Future<List<ParametreGeneraux>> fetchParametreById(String id) async {

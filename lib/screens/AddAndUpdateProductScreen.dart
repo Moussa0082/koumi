@@ -17,7 +17,8 @@ import 'package:provider/provider.dart';
 
 class AddAndUpdateProductScreen extends StatefulWidget {
   bool? isEditable ;
-   AddAndUpdateProductScreen({super.key, this.isEditable});
+  final Stock? stock;
+   AddAndUpdateProductScreen({super.key, this.isEditable, this.stock});
 
   @override
   State<AddAndUpdateProductScreen> createState() => _AddAndUpdateProductScreenState();
@@ -36,7 +37,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
   TextEditingController _origineController = TextEditingController();
 
   late Acteur acteur;
-   Stock stock = Stock();
+   late Stock stock = Stock();
   late List<TypeActeur> typeActeurData = [];
   late String type;
   late TextEditingController _searchController;
@@ -122,6 +123,13 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
     _searchController = TextEditingController();
 
     super.initState();
+    if(widget.isEditable! == true){
+     _nomController.text = widget.stock!.nomProduit!;
+     _formController.text = widget.stock!.formeProduit!;
+     _origineController.text = widget.stock!.origineProduit!;
+      _prixController.text = widget.stock!.prix!.toString();
+      _quantiteController.text = widget.stock!.quantiteStock!.toString();
+    }
   }
 
    
@@ -422,12 +430,13 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                    
 
                             if (formkey.currentState!.validate()) {
-                              Get.to(AddAndUpdateProductEndSreen(isEditable: false,
+                              Navigator.push(context, MaterialPageRoute(builder:
+               (context)=> (AddAndUpdateProductEndSreen(isEditable: true,
                               nomProduit: _nomController.text, forme: _formController.text,
-                              origine: _origineController.text, prix: _prixController.text,
+                              origine: _origineController.text, prix: _prixController.text.toString(),
                               image: photo,
-                              quantite: _quantiteController.text, idStock: stock.idStock, stock: stock,
-                              ));
+                              quantite: _quantiteController.text, stock: widget.stock,
+                              ))));
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -438,7 +447,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                             minimumSize: const Size(290, 45),
                           ),
                           child: Text(
-                           widget.isEditable! ? "Modifier": "Ajouter"  ,
+                           "Suivant" ,
                             style: TextStyle(
                               fontSize: 20,
                               color: Colors.white,

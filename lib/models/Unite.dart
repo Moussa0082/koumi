@@ -84,7 +84,19 @@ factory Unite.fromMap(Map<String, dynamic> map) {
 }
 
 
-  String toJson() => json.encode(toMap());
+  // String toJson() => json.encode(toMap());
+   Map<String, dynamic> toJson() => {
+        "idUnite": idUnite,
+        "codeUnite": codeUnite,
+        "nomUnite": nomUnite,
+        "sigleUnite": sigleUnite,
+        "description": description,
+        "dateAjout": dateAjout,
+        "dateModif": dateModif,
+        "statutUnite": statutUnite,
+        "personneModif": personneModif,
+        "acteur": acteur?.toJson(),
+    };
 
   factory Unite.fromJson(String source) => Unite.fromMap(json.decode(source) as Map<String, dynamic>);
 
