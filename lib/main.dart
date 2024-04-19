@@ -99,6 +99,7 @@ class MyApp extends StatelessWidget {
         '/BottomNavigationPage': (context) => const BottomNavigationPage()
       },
       home: const SplashScreen(),
+      // home: const SplashScreen(),
     );
   }
 }

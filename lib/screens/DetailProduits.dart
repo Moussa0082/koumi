@@ -79,11 +79,27 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
         child: Column(
            mainAxisSize: MainAxisSize.min, // Set mainAxisSize to min
           children: [
-            Image.asset(
-              "assets/images/pomme.png",
-              height: MediaQuery.of(context).size.height * 0.200,
-              fit: BoxFit.cover,
-            ),
+           widget.stock!.photo!.isEmpty ||  widget.stock!.photo == null ?
+             Image.asset(
+                                "assets/images/default_image.png",
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: 200,
+                              ):
+            Image.network(
+                    'https://koumi.ml/api-koumi/Stock/${widget.stock!.photo}/image',
+                  
+                    width: double.infinity,
+                    height: 200,
+                    fit: BoxFit.cover,
+                    errorBuilder: (BuildContext context, Object exception,
+                        StackTrace? stackTrace) {
+                      return Image.asset(
+                        'assets/images/default_image.png',
+                        fit: BoxFit.cover,
+                      );
+                    },
+                  ),
             const SizedBox(height: defaultPadding * 0.300),
             Container(
               padding: const EdgeInsets.fromLTRB(defaultPadding, defaultPadding * 2, defaultPadding, defaultPadding),

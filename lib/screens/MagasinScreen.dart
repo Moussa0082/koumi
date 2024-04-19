@@ -1,27 +1,22 @@
-import 'dart:convert';
+
+ import 'dart:convert';
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:koumi_app/Admin/AcceuilAdmin.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/Aaaa.dart';
-import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
-import 'package:koumi_app/screens/AddMagasinScreen.dart';
 import 'package:koumi_app/screens/MagasinActeur.dart';
 import 'package:koumi_app/screens/Produit.dart';
-import 'package:koumi_app/service/MagasinService.dart';
-import 'package:koumi_app/theme/Pallete.dart';
-import 'package:shimmer/shimmer.dart';
-import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
+
+import '../service/MagasinService.dart';
 
 class MagasinScreen extends StatefulWidget {
   const MagasinScreen({super.key});
@@ -30,17 +25,14 @@ class MagasinScreen extends StatefulWidget {
   State<MagasinScreen> createState() => _MagasinScreenState();
 }
 
-class _MagasinScreenState extends State<MagasinScreen>
-    with TickerProviderStateMixin {
-  // Déclarez une variable pour suivre si le chargement est terminé
+class _MagasinScreenState extends State<MagasinScreen>     with TickerProviderStateMixin {
+ 
+ 
   
-
   TabController? _tabController;
   late TextEditingController _searchController;
-  bool isLoading = false;
-  bool _isLoadingShimmer = false;
 
-  List<Magasin> magasin = [];
+  // List<Magasin> magasin = [];
   late Acteur acteur = Acteur();
   late List<TypeActeur> typeActeurData = [];
   late String type;
@@ -55,18 +47,17 @@ class _MagasinScreenState extends State<MagasinScreen>
   String contactMagasin = "";
   File? photo;
   String searchText = "";
-    late Future<List<Magasin>> magasinList;
 
        MagasinController  
-   controller = Get.put(MagasinController() );
+   _controller = Get.put(MagasinController() );
 
 
 
   Future<void> fetchRegions() async {
     try {
       final response = await http
-          // .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-          .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+          .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+          // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
       if (response.statusCode == 200) {
         final String jsonString = utf8.decode(response.bodyBytes);
         List<dynamic> data = json.decode(jsonString);
@@ -75,6 +66,7 @@ class _MagasinScreenState extends State<MagasinScreen>
               .where((niveau1Pays) => niveau1Pays['statutN1'] == true)
               .map((item) => Niveau1Pays(
                   idNiveau1Pays: item['idNiveau1Pays'] as String,
+                  statutN1: item['statutN1'] as bool,
                   nomN1: item['nomN1']))
               .toList();
         });
@@ -82,9 +74,12 @@ class _MagasinScreenState extends State<MagasinScreen>
         _tabController = TabController(length: niveau1Pays.length, vsync: this);
         _tabController!.addListener(_handleTabChange);
 
-        // Fetch les magasins pour la première région
+         // Fetch les magasins pour la première région
+      if (niveau1Pays.isNotEmpty) {
+         _controller.fetchMagasinByRegion(niveau1Pays.first.idNiveau1Pays!);
+      }
 
-              // controller.fetchMagasinByRegion(niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '');
+              // controller.fetchMagasinByRegion(niveau1Pays.isNotEmpty ? niveau1Pays[_tabController!.index].idNiveau1Pays! : '');
     // Appel de _handleTabChange pour capturer automatiquement l'ID de la première région
         // fetchMagasinByRegion(
         //     niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '');
@@ -96,114 +91,16 @@ class _MagasinScreenState extends State<MagasinScreen>
     }
   }
       
-
-
-
-
-
-  // Future<void> fetchMagasinsByRegion(String id) async {
-  //    // set Loading to True before fetching data to display Shimmer
-  //   try {
-  //     final response = await http.get(Uri.parse(
-  //         // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-  //         'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-  //     if (response.statusCode == 200) {
-  //       final String jsonString = utf8.decode(response.bodyBytes);
-  //       List<dynamic> data = json.decode(jsonString);
-  //               setState(() {
-  //         magasin = data
-  //             .where((magasin) => magasin['statutMagasin'] == true)
-  //             .map((item) => Magasin(
-  //                   nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
-  //                   idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
-  //                   contactMagasin:
-  //                       item['contactMagasin'] ?? 'Contact manquant',
-  //                   photo: item['photo'] ?? '',
-  //                   // ou utilisez une URL par défaut
-  //                   acteur: Acteur(
-  //                     idActeur: item['acteur']['idActeur'] ?? 'manquant',
-  //                     nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
-  //                     // Autres champs de l'acteur...
-  //                   ),
-  //                   niveau1Pays: Niveau1Pays(
-  //                     idNiveau1Pays: item['niveau1Pays']['idNiveau1Pays'] ?? 'manquant',
-  //                     nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
-  //                     // Autres champs de l'acteur...
-  //                   ),
-  //                   dateAjout: item['dateAjout'] ?? 'manquante',
-  //                   localiteMagasin: item['localiteMagasin'] ?? 'manquante',
-  //                   statutMagasin: item['statutMagasin'] ??
-  //                       false, // ou une valeur par défaut
-  //                 ))
-  //             .toList();
-  //       });
-  //             await Future.delayed(const Duration(seconds: 2));
-
-  //     } else {
-  //       throw Exception('Failed to load magasins for region $id');
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching magasins for region $id: $e');
-  //   } // Simulate Network Delay to Keep Shimmer for another 2 seconds
-
-     
-  // }
   
 
-  //Pour charger les magasin auto apres suppression ou ajout not finish
-  // Future<List<Magasin>> fetchMagasinByRegion(String id) async {
-  //   try {
-  //     final response = await http.get(Uri.parse(
-  //         // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-  //         'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-  //     if (response.statusCode == 200) {
-  // final String jsonString = utf8.decode(response.bodyBytes);
-  //       List<dynamic> data = json.decode(jsonString);
-        
-  //               setState(() {
-  //         magasin = data
-  //             .where((magasin) => magasin['statutMagasin'] == true)
-  //             .map((item) => Magasin(
-  //                   nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
-  //                   idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
-  //                   contactMagasin:
-  //                       item['contactMagasin'] ?? 'Contact manquant',
-  //                   photo: item['photo'] ?? '',
-  //                   // ou utilisez une URL par défaut
-  //                   acteur: Acteur(
-  //                     idActeur: item['acteur']['idActeur'] ?? 'manquant',
-  //                     nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
-  //                     // Autres champs de l'acteur...
-  //                   ),
-  //                   niveau1Pays: Niveau1Pays(
-  //                     idNiveau1Pays: item['niveau1Pays']['idNiveau1Pays'] ?? 'manquant',
-  //                     nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
-  //                     // Autres champs de l'acteur...
-  //                   ),
-  //                   dateAjout: item['dateAjout'] ?? 'manquante',
-  //                   localiteMagasin: item['localiteMagasin'] ?? 'manquante',
-  //                   statutMagasin: item['statutMagasin'] ??
-  //                       false, // ou une valeur par défaut
-  //                 ))
-  //             .toList();
-  //       });
-
-  //     } else {
-  //       throw Exception('Failed to load magasins for region $id');
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching magasins for region $id: $e');
-  //   }
-  //     return magasin;
-        
-  // }
+ 
 
   void _handleTabChange() {
     if (_tabController != null &&
         _tabController!.index >= 0 &&
         _tabController!.index < niveau1Pays.length) {
       selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
-       controller.fetchMagasinByRegion(niveau1Pays[_tabController!.index].idNiveau1Pays!);
+       _controller.fetchMagasinByRegion(selectedRegionId);
     }
   }
 
@@ -216,27 +113,27 @@ class _MagasinScreenState extends State<MagasinScreen>
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-      typeActeurData = acteur.typeActeur!;
-      type = typeActeurData.map((data) => data.libelle).join(', ');
+      // typeActeurData = acteur.typeActeur!;
+      // type = typeActeurData.map((data) => data.libelle).join(', ');
       setState(() {
         isExist = true;
+      selectedRegionId = niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '';
+        if (niveau1Pays.isNotEmpty) {
+      // fetchMagasinsByRegion(selectedRegionId);
+       _tabController = TabController(length: niveau1Pays.length, vsync: this);
+        _tabController!.addListener(_handleTabChange);
+    }
       });
     } else {
       setState(() {
         isExist = false;
       });
     }
-    fetchRegions().then((value) => {
-       controller.fetchMagasinByRegion(niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '')
+      
+   await fetchRegions().then((value) => {
+       _controller.fetchMagasinByRegion(niveau1Pays.isNotEmpty ? niveau1Pays[_tabController!.index].idNiveau1Pays! : '')
     });
-      if (niveau1Pays.isNotEmpty) {
-      selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
-      // fetchMagasinsByRegion(selectedRegionId);
-       _tabController = TabController(length: niveau1Pays.length, vsync: this);
-        _tabController!.addListener(_handleTabChange);
-    }
-    // magasinList = getListe(selectedRegionId);
-    //  controller.fetchMagasinByRegion(selectedRegionId);
+
   }
 
 
@@ -246,6 +143,14 @@ class _MagasinScreenState extends State<MagasinScreen>
     verify();
     _searchController = TextEditingController();
     // _buildShimmerEffect();
+    _controller.isLoadingn.listen((isLoading) {
+    if (!isLoading) {
+      // Les données sont chargées, mettez à jour l'interface utilisateur
+      setState(() {});
+    }
+  });
+  // Charger les régions
+  fetchRegions();
   }
 
   @override
@@ -297,8 +202,8 @@ class _MagasinScreenState extends State<MagasinScreen>
                                 context,
                                 MaterialPageRoute(
                                     // builder: (context) => AaaaScreen()));
-                                    builder: (context) => AaaaScreen()));
-                                    // builder: (context) => MagasinActeurScreen()));
+                                    // builder: (context) => AaaaScreen()));
+                                    builder: (context) => MagasinActeurScreen()));
                           },
                         ),
                       ),
@@ -372,16 +277,45 @@ class _MagasinScreenState extends State<MagasinScreen>
 
      Widget buildGridView(String id) {
 
-      magasin = controller.magasinListe;  
+          final controller = Get.find<MagasinController>();
+        debugPrint("taille : ${controller.magasinListen.length}");
      
      // Si aucun magasin n'est trouvé après le filtrage
-        List<Magasin> filteredMagasins = magasin.where((magasin) {
+        List<Magasin> filteredMagasins = controller.magasinListen.where((magasin) {
       String nomMagasin = magasin.nomMagasin!.toString().toLowerCase();
       searchText = _searchController.text.toLowerCase();
       return nomMagasin.contains(searchText);
     }).toList();
 
-      if (controller.magasinListe.isEmpty) {
+    //   if (filteredMagasins.isEmpty) {
+    //   // Vous pouvez afficher une image ou un texte ici
+    //   return 
+    //   SingleChildScrollView(
+    //       child: Padding(
+    //         padding: EdgeInsets.all(10),
+    //         child: Center(
+    //           child: Column(
+    //             children: [
+    //               Image.asset('assets/images/notif.jpg'),
+    //               SizedBox(
+    //                 height: 10,
+    //               ),
+    //               Text(
+    //                 'Aucun magasin trouvé ' ,
+    //                 style: TextStyle(
+    //                   color: Colors.black,
+    //                   fontSize: 17,
+    //                   overflow: TextOverflow.ellipsis,
+    //                 ),
+    //               ),
+    //             ],
+    //           ),
+    //         ),
+    //       ),
+    //     );
+
+    // }
+                                        if (filteredMagasins.isEmpty) {
       // Vous pouvez afficher une image ou un texte ici
       return 
       SingleChildScrollView(
@@ -437,19 +371,19 @@ class _MagasinScreenState extends State<MagasinScreen>
         );
 
     }
-          
+          debugPrint("m f : ${filteredMagasins.length}");
                                 return Obx(
-        () => controller.isLoading.value
+        () => _controller.isLoadingn.value
                                   ? _buildShimmerEffect() :
-                                   
+ 
                                    Container(
                                                             child: GridView.builder(
                                                               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                                                 crossAxisCount: 2,
-                                                                mainAxisSpacing: 10,
+                                                                mainAxisSpacing: 2,
                                                                 crossAxisSpacing: 10,
                                                               ),
-                                                              itemCount: controller.magasinListe.length,
+                                                              itemCount: filteredMagasins.length,
                                                               itemBuilder: (context, index) {
                                                                 Magasin magasinn = filteredMagasins[index];
                                                                 Magasin currentMagasin = magasinn;
@@ -505,13 +439,14 @@ class _MagasinScreenState extends State<MagasinScreen>
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(15),
                                         boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.white.withOpacity(0.2),
-                                            offset: const Offset(0, 1),
-                                            blurRadius: 8,
-                                            spreadRadius: 2,
-                                          ),
-                                        ],
+                                                BoxShadow(
+                                                  color: Colors.grey
+                                                      .withOpacity(0.2),
+                                                  offset: const Offset(0, 2),
+                                                  blurRadius: 5,
+                                                  spreadRadius: 2,
+                                                ),
+                                              ],
                                       ),
                                       child: Padding(
                                         padding: const EdgeInsets.all(4.0),
@@ -532,7 +467,7 @@ class _MagasinScreenState extends State<MagasinScreen>
                                                           fit: BoxFit.cover,
                                                         )
                                                       : Image.network(
-                                                          "http://10.0.2.2/${magasinn.photo}",
+                                                          "https://koumi.ml/api-koumi/Magasin/${magasinn.idMagasin}/image",
                                                           fit: BoxFit.cover,
                                                           errorBuilder:
                                                               (BuildContext
@@ -547,6 +482,7 @@ class _MagasinScreenState extends State<MagasinScreen>
                                                             );
                                                           },
                                                         ),
+                                                        
                                                 ),
                                               ),
                                             ),
@@ -611,16 +547,7 @@ class _MagasinScreenState extends State<MagasinScreen>
   }
 
 
-  Widget _buildEtat(bool isState) {
-    return Container(
-      width: 15,
-      height: 15,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: isState ? Colors.green : Colors.red,
-      ),
-    );
-  }
+ 
 
   Widget _buildShimmerEffect() {
     return Shimmer.fromColors(
@@ -682,181 +609,3 @@ class _MagasinScreenState extends State<MagasinScreen>
   
 
 }
-
-
-
-//   class MagasinController extends GetxController {
-//   var isLoading = false.obs;
- 
-//   TabController? _tabController;
-//   late TextEditingController _searchController;
-
-//   List<Magasin> magasin = [];
-//   late Acteur acteur = Acteur();
-//   late List<TypeActeur> typeActeurData = [];
-//   late String type;
-//   List<Niveau1Pays> niveau1Pays = [];
-//   String selectedRegionId =
-//       ''; // Ajoutez une variable pour stocker l'ID de la région sélectionnée
-
-//   double scaleFactor = 1;
-//   bool isVisible = true;
-
-//   String localiteMagasin = "";
-//   String contactMagasin = "";
-//   File? photo;
-//   String searchText = "";
-
-//   Set<String> loadedRegions =
-//       {}; // Ensemble pour garder une trace des régions pour lesquelles les magasins ont déjà été chargés
-
-//   void fetchRegions() async {
-//     try {
-//       final response = await http
-//           // .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-//           .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
-//       if (response.statusCode == 200) {
-//         List<dynamic> data = json.decode(response.body);
-
-//           niveau1Pays = data
-//               .where((niveau1Pays) => niveau1Pays['statutN1'] == true)
-//               .map((item) => Niveau1Pays(
-//                   idNiveau1Pays: item['idNiveau1Pays'] as String,
-//                   nomN1: item['nomN1']))
-//               .toList();
-
-//         _tabController = TabController(length: niveau1Pays.length, vsync: );
-//         _tabController!.addListener(_handleTabChange);
-
-//         // Fetch les magasins pour la première région
-//         fetchMagasinsByRegion(
-//             niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '');
-//       } else {
-//         throw Exception('Failed to load regions');
-//       }
-//     } catch (e) {
-//       print('Error fetching regions: $e');
-//     }
-//   }
-
-
-//   Future<void> fetchMagasinsByRegion(String id) async {
-//     try {
-//       final response = await http.get(Uri.parse(
-//           // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-//           'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-//       if (response.statusCode == 200) {
-//         List<dynamic> data = json.decode(response.body);
-//           magasin = data
-//               .where((magasin) => magasin['statutMagasin'] == true)
-//               .map((item) => Magasin(
-//                     nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
-//                     idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
-//                     contactMagasin:
-//                         item['contactMagasin'] ?? 'Contact manquant',
-//                     photo: item['photo'] ?? '',
-//                     // ou utilisez une URL par défaut
-//                     acteur: Acteur(
-//                       idActeur: item['acteur']['idActeur'] ?? 'manquant',
-//                       nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
-//                       // Autres champs de l'acteur...
-//                     ),
-//                     niveau1Pays: Niveau1Pays(
-//                       nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
-//                       // Autres champs de l'acteur...
-//                     ),
-//                     dateAjout: item['dateAjout'] ?? 'manquante',
-//                     localiteMagasin: item['localiteMagasin'] ?? 'manquante',
-//                     statutMagasin: item['statutMagasin'] ??
-//                         false, // ou une valeur par défaut
-//                   ))
-//               .toList();
-//       } else {
-//         throw Exception('Failed to load magasins for region $id');
-//       }
-//     } catch (e) {
-//       print('Error fetching magasins for region $id: $e');
-//     }
-//   }
-//   Future<void> fetchMagasinByRegion(String id) async {
-//     try {
-//       final response = await http.get(Uri.parse(
-//           // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-//           'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-//       if (response.statusCode == 200) {
-//         List<dynamic> data = json.decode(response.body);
-        
-//           magasin = data
-//               .where((magasin) => magasin['statutMagasin'] == true)
-//               .map((item) => Magasin(
-//                     nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
-//                     idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
-//                     contactMagasin:
-//                         item['contactMagasin'] ?? 'Contact manquant',
-//                     photo: item['photo'] ?? '',
-//                     // ou utilisez une URL par défaut
-//                     acteur: Acteur(
-//                       idActeur: item['acteur']['idActeur'] ?? 'manquant',
-//                       nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
-//                       // Autres champs de l'acteur...
-//                     ),
-//                     niveau1Pays: Niveau1Pays(
-//                       nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
-//                       // Autres champs de l'acteur...
-//                     ),
-//                     dateAjout: item['dateAjout'] ?? 'manquante',
-//                     localiteMagasin: item['localiteMagasin'] ?? 'manquante',
-//                     statutMagasin: item['statutMagasin'] ??
-//                         false, // ou une valeur par défaut
-//                   ))
-//               .toList();
-//       } else {
-//         throw Exception('Failed to load magasins for region $id');
-//       }
-//     } catch (e) {
-//       print('Error fetching magasins for region $id: $e');
-//     }
-//   }
-
-//   void _handleTabChange() {
-//     if (_tabController != null &&
-//         _tabController!.index >= 0 &&
-//         _tabController!.index < niveau1Pays.length) {
-//       selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
-//       fetchMagasinsByRegion(selectedRegionId);
-//     }
-//   }
-
-//   bool isExist = false;
-//   String? email = "";
-
-//   void verify() async {
-//     SharedPreferences prefs = await SharedPreferences.getInstance();
-//     email = prefs.getString('emailActeur');
-//     if (email != null) {
-//     //   // Si l'email de l'acteur est présent, exécute checkLoggedIn
-//     //   acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-//     //   typeActeurData = acteur.typeActeur!;
-//     //   type = typeActeurData.map((data) => data.libelle).join(', ');
-//     //     isExist = true;
-//     // } else {
-//     //     isExist = false;
-//     // }
-//       if (niveau1Pays.isNotEmpty) {
-//       selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
-//       // fetchMagasinsByRegion(selectedRegionId);
-//     }
-//     fetchRegions();
-//   }
-
-
-
-//   @override
-//   Future<void> onInit() async {
-//     super.onInit();
-//   }
-
-  
-  
-// }
-//   }

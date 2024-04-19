@@ -146,8 +146,8 @@ class _ProduitActeurScreenState extends State<ProduitActeurScreen>
    void fetchProduitByCategorieAndActeur(String idCategorie, String idActeur) async {
     try {
       final response = await http.get(
-          // Uri.parse('https://koumi.ml/api-koumi/Stock/categorieAndActeur/$idCategorie/$idMagasin/$idActeur'));
-          Uri.parse('http://10.0.2.2:9000/api-koumi/Stock/categorieAndIdActeur/$idCategorie/$idActeur'));
+          Uri.parse('https://koumi.ml/api-koumi/Stock/categorieAndIdActeur/$idCategorie/$idActeur'));
+          // Uri.parse('http://10.0.2.2:9000/api-koumi/Stock/categorieAndIdActeur/$idCategorie/$idActeur'));
        if (response.statusCode == 200) {
         final String jsonString = utf8.decode(response.bodyBytes);
         List<dynamic> data = json.decode(jsonString);
@@ -206,16 +206,18 @@ class _ProduitActeurScreenState extends State<ProduitActeurScreen>
   void fetchCategorie() async {
     try {
       final response = await http
-          // .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
-          .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
+          .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
+          // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
       if (response.statusCode == 200) {
         final String jsonString = utf8.decode(response.bodyBytes);
         List<dynamic> data = json.decode(jsonString);
         setState(() {
-          categorieProduit = data
+         categorieProduit = data
+          .where((element) => element['statutCategorie'] == true)
               .map((item) => CategorieProduit(
                     idCategorieProduit: item['idCategorieProduit'] as String,
                     libelleCategorie: item['libelleCategorie'] as String,
+                    statutCategorie: item['statutCategorie'] as bool
                   ))
               .toList();
           _tabController =
