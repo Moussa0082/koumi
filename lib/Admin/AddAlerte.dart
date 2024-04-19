@@ -516,14 +516,14 @@ class _AddAlerteState extends State<AddAlerte> {
                                                         Text(
                                                           "Une erreur est survenu lors de l'ajout",
                                                           style: TextStyle(
-                                                              overflow:
+                                                              overflow :
                                                                   TextOverflow
                                                                       .ellipsis),
                                                         ),
                                                       ],
                                                     ),
                                                     duration:
-                                                        Duration(seconds: 5),
+                                                      Duration(seconds: 5),
                                                   ),
                                                 )
                                               });
