@@ -15,6 +15,7 @@ class Stock {
    String? codeStock;
    String? nomProduit;
    String? formeProduit;
+   String? origineProduit;
    String? dateProduction;
    double? quantiteStock;
    int? prix;
@@ -37,6 +38,7 @@ class Stock {
     this.codeStock,
      this.nomProduit,
      this.formeProduit,
+     this.origineProduit,
     this.dateProduction,
      this.quantiteStock,
      this.prix,
@@ -65,6 +67,7 @@ class Stock {
       'codeStock': codeStock,
       'nomProduit': nomProduit,
       'formeProduit': formeProduit,
+      'origineProduit': origineProduit,
       'dateProduction': dateProduction,
       'quantiteStock': quantiteStock,
       'prix': prix,
@@ -90,6 +93,7 @@ class Stock {
     codeStock: map['codeStock'] as String?,
     nomProduit: map['nomProduit'] as String,
     formeProduit: map['formeProduit'] as String?,
+    origineProduit: map['origineProduit'] as String?,
     dateProduction: map['dateProduction'] as String?,
     quantiteStock: (map['quantiteStock'] as num?)?.toDouble() ?? 0.0,
     prix: (map['prix'] as num?)?.toInt() ?? 0,
@@ -130,6 +134,7 @@ class Stock {
       'codeStock': codeStock,
       'nomProduit': nomProduit,
       'formeProduit': formeProduit,
+      'origineProduit': origineProduit,
       'dateProduction': dateProduction,
       'quantiteStock': quantiteStock,
       'prix': prix,
@@ -156,6 +161,7 @@ class Stock {
     codeStock: json['codeStock'],
     nomProduit: json['nomProduit'],
     formeProduit: json['formeProduit'],
+    origineProduit: json['origineProduit'],
     dateProduction: json['dateProduction'],
     quantiteStock: json['quantiteStock']?.toDouble(),
     prix: json['prix'],

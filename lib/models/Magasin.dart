@@ -114,7 +114,23 @@ class Magasin {
     );
   }
 
-  String toJson() => json.encode(toMap());
+  // String toJson() => json.encode(toMap());
+   Map<String, dynamic> toJson() => {
+        "idMagasin": idMagasin,
+        "codeMagasin": codeMagasin,
+        "nomMagasin": nomMagasin,
+        "latitude": latitude,
+        "longitude": longitude,
+        "localiteMagasin": localiteMagasin,
+        "contactMagasin": contactMagasin,
+        "personneModif": personneModif,
+        "statutMagasin": statutMagasin,
+        "dateAjout": dateAjout,
+        "dateModif": dateModif,
+        "photo": photo,
+        "acteur": acteur?.toJson(),
+        "niveau1Pays": niveau1Pays?.toJson(),
+    };
 
   factory Magasin.fromJson(String source) => Magasin.fromMap(json.decode(source) as Map<String, dynamic>);
 

@@ -93,6 +93,7 @@ dependencies:
   video_uploader: ^1.2.1
   firebase_core: ^2.30.0
   firebase_messaging: ^14.8.2
+  awesome_notifications: 0.8.2
 
 
 dev_dependencies:

@@ -1,13 +1,22 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:koumi_app/Admin/CodePays.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
+import 'package:koumi_app/models/Niveau2Pays.dart';
+import 'package:koumi_app/models/Niveau3Pays.dart';
+import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/AddMagasinScreen.dart';
 import 'package:koumi_app/screens/Produit.dart';
 import 'package:koumi_app/service/MagasinService.dart';
+import 'package:koumi_app/service/Niveau3Service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
@@ -19,28 +28,33 @@ class MagasinActeurScreen extends StatefulWidget {
   State<MagasinActeurScreen> createState() => _MagasinActeurScreenState();
 }
 
+const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
+const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
+
 class _MagasinActeurScreenState extends State<MagasinActeurScreen>
     with TickerProviderStateMixin {
+  late ParametreGeneraux para;
+  List<ParametreGeneraux> paraList = [];
+  late TextEditingController _searchController;
   late Acteur acteur = Acteur();
   TabController? _tabController;
-  late TextEditingController _searchController;
 
   List<Niveau1Pays> niveau1Pays = [];
-  List<Magasin> magasin = [];
+  List<Magasin> magasins = [];
+  String searchText = "";
 
   String selectedRegionId =
       ''; // Ajoutez une variable pour stocker l'ID de la région sélectionnée
 
   bool isAdmin = false;
 
-  Set<String> loadedRegions =
-      {}; // Ensemble pour garder une trace des régions pour lesquelles les magasins ont déjà été chargés
+  MagasinController controller = Get.put(MagasinController());
 
-  void fetchRegions() async {
+  Future<void> fetchRegions() async {
     try {
       final response = await http
           .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-          // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+      // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
       if (response.statusCode == 200) {
         final String jsonString = utf8.decode(response.bodyBytes);
         List<dynamic> data = json.decode(jsonString);
@@ -49,6 +63,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
               .where((niveau1Pays) => niveau1Pays['statutN1'] == true)
               .map((item) => Niveau1Pays(
                   idNiveau1Pays: item['idNiveau1Pays'] as String,
+                  statutN1: item['statutN1'] as bool,
                   nomN1: item['nomN1']))
               .toList();
         });
@@ -57,71 +72,23 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
         _tabController!.addListener(_handleTabChange);
 
         // Fetch les magasins pour la première région
-
-        fetchMagasinsByRegionAndActeur(acteur.idActeur!,
-            niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '');
+        // controller.fetchMagasinByRegionAndActeur(acteur.idActeur!,niveau1Pays.first.idNiveau1Pays!);
       } else {
         throw Exception('Failed to load regions');
       }
     } catch (e) {
       print('Error fetching regions: $e');
+      throw Exception('Error fetching regions: $e');
     }
   }
 
-  void fetchMagasinsByRegionAndActeur(
-      String idActeur, String idNiveau1Pays) async {
-    try {
-      final response = await http.get(Uri.parse(
-          'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeurAndNieau1Pay/${idActeur}/${idNiveau1Pays}'));
-          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pay/${idActeur}/${idNiveau1Pays}'));
-      if (response.statusCode == 200) {
-        final String jsonString = utf8.decode(response.bodyBytes);
-        List<dynamic> data = json.decode(jsonString);
-        setState(() {
-          magasin = data
-              .where((magasin) => magasin['statutMagasin'] == true)
-              .map((item) => Magasin(
-                    nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
-                    idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
-                    contactMagasin:
-                        item['contactMagasin'] ?? 'Contact manquant',
-                    photo: item['photo'] ?? '',
-                    // ou utilisez une URL par défaut
-                    acteur: Acteur(
-                      idActeur: item['acteur']['idActeur'] ?? 'manquant',
-                      nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
-                      // Autres champs de l'acteur...
-                    ),
-                    niveau1Pays: Niveau1Pays(
-                      idNiveau1Pays: item['niveau1Pays']['idNiveau1Pays'] ?? 'manquant',
-                      nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
-                      // Autres champs de l'acteur...
-                    ),
-                    dateAjout: item['dateAjout'] ?? 'manquante',
-                    localiteMagasin: item['localiteMagasin'] ?? 'manquante',
-                    statutMagasin: item['statutMagasin'] ??
-                        false, // ou une valeur par défaut
-                  ))
-              .toList();
-        });
-
-        // if (!loadedRegions.contains(idNiveau1Pays)) {
-        //   loadedRegions.add(idNiveau1Pays);
-        // }
-      } else {
-        throw Exception('Failed to load magasins for acteur $idActeur et region $idNiveau1Pays');
-      }
-    } catch (e) {
-      print('Error fetching magasins for acteur $idActeur: $e');
-    }
-  }
-
-  void _handleTabChange() {
+  void _handleTabChange() async {
     if (_tabController != null &&
         _tabController!.index >= 0 &&
         _tabController!.index < niveau1Pays.length) {
       selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
-      fetchMagasinsByRegionAndActeur(acteur.idActeur!, selectedRegionId);
+      controller.fetchMagasinByRegionAndActeur(
+          acteur.idActeur!, selectedRegionId);
     }
   }
 
@@ -138,28 +105,38 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
 
       setState(() {
         isExist = true;
+        selectedRegionId =
+            niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '';
+        if (niveau1Pays.isNotEmpty) {
+          _tabController =
+              TabController(length: niveau1Pays.length, vsync: this);
+          _tabController!.addListener(_handleTabChange);
+        }
       });
     } else {
       setState(() {
         isExist = false;
       });
     }
+    fetchRegions().then((value) => {
+          controller.fetchMagasinByRegionAndActeur(acteur.idActeur!,
+              niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '')
+        });
+    //     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+    //     .parametreList!;
+    // para = paraList[0];
   }
 
   @override
   void initState() {
     super.initState();
-    _searchController = TextEditingController();
     verify();
-    if (niveau1Pays.isNotEmpty) {
-      selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
-    }
-    fetchRegions();
+    _searchController = TextEditingController();
+    // magasinList = getListe(acteur.idActeur!, selectedRegionId); // itialise magasinList
   }
 
   @override
   void dispose() {
-    _tabController?.dispose();
     _searchController
         .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
     super.dispose();
@@ -176,58 +153,60 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
 
           backgroundColor: const Color.fromARGB(255, 250, 250, 250),
           appBar: AppBar(
-            actions: <PopupMenuEntry<String>>[
-              //     PopupMenuItem<String>(
-              //       value: 'modifier',
-              //       child: Text('Modifier'),
-              //     ),
-              //     PopupMenuItem<String>(
-              //       value: 'activer',
-              //       child: Text('Activer'),
-              //     ),
-              //     PopupMenuItem<String>(
-              //       value: 'desactiver',
-              //       child: Text('Désactiver'),
-              //     ),
-              //     PopupMenuItem<String>(
-              //       value: 'supprimer',
-              //       child: Text('Supprimer'),
-              //     ),
-              //   ],
-              //   elevation: 8.0, // Ajustez l'élévation selon vos préférences
-              // ).then((String? value) {
-              //   if (value != null) {
-              //     // Mettez en œuvre ici la logique pour chaque option sélectionnée
-              //     switch (value) {
-              //       case 'modifier':
-              //         // Mettez en œuvre la logique pour modifier le magasin
-              //         break;
-              //       case 'activer':
-              //         // Mettez en œuvre la logique pour activer le magasin
-              //         break;
-              //       case 'desactiver':
-              //         // Mettez en œuvre la logique pour désactiver le magasin
-              //         break;
-              //       case 'supprimer':
-              //         // Mettez en œuvre la logique pour supprimer le magasin
-              //         break;
-              //     }
-              //   }});
-              //                 },
-              //                 child: Align(
-              //                   alignment: Alignment.bottomRight,
-              //                   child: SizedBox(
-              //                     height: 10,
-              //                     child: IconButton(
-              //                       icon: Icon(Icons.more_vert), // Icône de points de suspension
-              //                       onPressed: () {
-
-              //                       },
-              //                     ),
-              //                   ),
-              //                 ),
-              //               ),
-            ],
+            actions: !isExist
+                ? null
+                : [
+                    PopupMenuButton<String>(
+                      padding: EdgeInsets.zero,
+                      itemBuilder: (context) => <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.remove_red_eye,
+                              color: Colors.green,
+                            ),
+                            title: const Text(
+                              "Ajouter magasin",
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onTap: () async {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          AddMagasinScreen(isEditable: false)));
+                            },
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.remove_red_eye,
+                              color: Colors.green,
+                            ),
+                            title: const Text(
+                              "Ajouter Produit",
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onTap: () async {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          AddAndUpdateProductScreen(
+                                              isEditable: false)));
+                            },
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
             centerTitle: true,
             toolbarHeight: 100,
             leading: IconButton(
@@ -310,200 +289,549 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
   }
 
   Widget buildGridView(String idActeur, String idNiveau1Pays) {
-    try {
-      List<Magasin> magasins = magasin;
+    //  List<Magasin> magasinss = magasin;
 
-      if (magasins.isEmpty) {
-        // Si les données ne sont pas encore chargées, affichez l'effet Shimmer
+    // Si aucun magasin n'est trouvé après le filtrage
+    List<Magasin> filteredMagasins = controller.magasinListe1.where((magasin) {
+      String nomMagasin = magasin.nomMagasin!.toString().toLowerCase();
+      searchText = _searchController.text.toLowerCase();
+      return nomMagasin.contains(searchText);
+    }).toList();
 
-             return SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(10),
-              child: Center(
-                child: Column(
-                  children: [
-                    Image.asset('assets/images/notif.jpg'),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'Aucun magasin trouvé ',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 17,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
+    if (filteredMagasins.isEmpty && _searchController.text.isNotEmpty) {
+      // Vous pouvez afficher une image ou un texte ici
+      return SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(10),
+          child: Center(
+            child: Column(
+              children: [
+                Image.asset('assets/images/notif.jpg'),
+                SizedBox(
+                  height: 10,
                 ),
-              ),
-            ),
-          );
-      } else {
-        // Filtrer les magasins en fonction du texte de recherche
-        List<Magasin> filteredMagasins = magasins.where((magasin) {
-          String nomMagasin = magasin.nomMagasin!.toString().toLowerCase();
-          String searchText = _searchController.text.toLowerCase();
-          return nomMagasin.contains(searchText);
-        }).toList();
-
-        // Si aucun magasin n'est trouvé après le filtrage
-        if (filteredMagasins.isEmpty) {
-          // Vous pouvez afficher une image ou un texte ici
-          return SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(10),
-              child: Center(
-                child: Column(
-                  children: [
-                    Image.asset('assets/images/notif.jpg'),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'Aucun magasin trouvé ',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 17,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }
-
-        // Sinon, afficher la GridView avec les magasins filtrés
-        return Container(
-          child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-            ),
-            itemCount: filteredMagasins.length,
-            itemBuilder: (context, index) {
-              // ici on a recuperer les details du  magasin
-              Magasin magasin = filteredMagasins[index];
-              return Expanded(
-                child: Container(
-                  height: 150,
-                  width: 150,
-                  child: GestureDetector(
-                    onTap: () {
-                      String id = magasin.idMagasin!;
-                      String nom = magasin.nomMagasin!;
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ProduitScreen(
-                                  id: id,
-                                  nom: nom,
-                                )),
-                      );
-                    },
-                    child: Card(
-                      shadowColor: Colors.white,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Container(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: magasin.photo!.isNotEmpty ? Image.network(
-                                // "https://koumi.ml/api-koumi/${magasin.photo}" ?? "assets/images/magasin.png",
-                                "https://koumi.ml/api-koumi/Magasin/${magasin.idMagasin}/image"
-                 ,
-                                     
-                                height: 120,
-                                fit: BoxFit.cover,
-                                errorBuilder: (BuildContext context,
-                                    Object exception, StackTrace? stackTrace) {
-                                  return Image.asset(
-                                    'assets/images/magasin.png',
-                                    height: 120,
-                                    fit: BoxFit.cover,
-                                  );
-                                },
-                              ) : Image.asset("assets/images/magasin.png",height: 120,
-                                    fit: BoxFit.cover,),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text(
-                              magasin.nomMagasin!.toUpperCase(),
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Text(
-                                  'Nombre de produits:',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(right: 8.0),
-                                child: Text(
-                                  '10',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          ),
-                          // if (isAdmin) // Ajoute l'action des trois points si l'utilisateur est un administrateur
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        );
-      }
-    } catch (e) {
-      return Padding(
-        padding: EdgeInsets.all(10),
-        child: Center(
-          child: Column(
-            children: [
-              Image.asset('assets/images/notif.jpg'),
-              SizedBox(
-                height: 10,
-              ),
-              Text('Aucun magasin trouvé ',
+                Text(
+                  'Aucun magasin trouvé avec le nom ' +
+                      _searchController.text.toUpperCase(),
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 17,
                     overflow: TextOverflow.ellipsis,
-                  ))
-            ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
     }
-    // Ajoutez un retour de widget vide à la fin pour s'assurer que la fonction renvoie toujours un widget
+    if (filteredMagasins.isEmpty) {
+      // Vous pouvez afficher une image ou un texte ici
+      return SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(10),
+          child: Center(
+            child: Column(
+              children: [
+                Image.asset('assets/images/notif.jpg'),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Aucun magasin trouvé',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 17,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Obx(
+      () => controller.isLoading1.value
+          ? _buildShimmerEffect()
+          : Container(
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                ),
+                itemCount: filteredMagasins.length,
+                itemBuilder: (context, index) {
+                  Magasin magasinn = filteredMagasins[index];
+                  Magasin currentMagasin = magasinn;
+                  String typeActeurList = '';
+
+                  // Vérifiez d'abord si l'acteur est disponible dans le magasin
+                  if (currentMagasin.acteur != null &&
+                      currentMagasin.acteur!.typeActeur != null) {
+                    // Parcourez la liste des types d'acteurs et extrayez les libellés
+                    typeActeurList = currentMagasin.acteur!.typeActeur!
+                        .map((type) => type
+                            .libelle) // Utilisez la propriété libelle pour récupérer le libellé
+                        .join(
+                            ', '); // Joignez tous les libellés avec une virgule
+                  }
+                  // ici on a recuperer les details du  magasin
+                  // String magasin = filteredMagasins[index].photo!;
+                  return GestureDetector(
+                    onTap: () {
+                      String id = magasinn.idMagasin!;
+                      String nom = magasinn.nomMagasin!;
+
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  ProduitScreen(
+                            id: id,
+                            nom: nom,
+                          ),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            var begin =
+                                Offset(0.0, 1.0); // Commencer en bas de l'écran
+                            var end = Offset.zero; // Finir en haut de l'écran
+                            var curve = Curves.ease;
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+                            return SlideTransition(
+                              position: animation.drive(tween),
+                              child: child,
+                            );
+                          },
+                          transitionDuration: const Duration(
+                              milliseconds: 1900), // Durée de la transition
+                        ),
+                      );
+                    },
+                    child: Column(
+                      children: [
+                        Container(
+                          // height: MediaQuery.sizeOf(context).height,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.2),
+                                offset: const Offset(0, 2),
+                                blurRadius: 5,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: SizedBox(
+                                      height: 80,
+                                      child: magasinn.photo == null
+                                          ? Image.asset(
+                                              "assets/images/magasin.png",
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.network(
+                                              "https://koumi.ml/api-koumi/Magasin/${magasinn.idMagasin}/image",
+                                              fit: BoxFit.cover,
+                                              errorBuilder:
+                                                  (BuildContext context,
+                                                      Object exception,
+                                                      StackTrace? stackTrace) {
+                                                return Image.asset(
+                                                  'assets/images/magasin.png',
+                                                  fit: BoxFit.cover,
+                                                );
+                                              },
+                                            ),
+                                    ),
+                                  ),
+                                ),
+                                // _buildItem(
+                                //     "Nom :", magasin.nomMagasin!.toUpperCase()),
+                                Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Flexible(
+                                            child: Text(
+                                              "Nom",
+                                              style: const TextStyle(
+                                                  color: Colors.black87,
+                                                  fontWeight: FontWeight.w800,
+                                                  fontStyle: FontStyle.italic,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  fontSize: 16),
+                                            ),
+                                          ),
+                                          Flexible(
+                                            child: Text(
+                                              magasinn.nomMagasin!
+                                                  .toUpperCase(),
+                                              style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.w800,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  fontSize: 16),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    // _buildItem(
+                                    //     "Acteur ", type),
+                                    !isExist
+                                        ? SizedBox()
+                                        : Container(
+                                            child: Container(
+                                              alignment: Alignment.bottomRight,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 8.0),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    _buildEtat(magasinn
+                                                        .statutMagasin!),
+                                                    SizedBox(
+                                                      width: 120,
+                                                    ),
+                                                    Expanded(
+                                                      child: PopupMenuButton<
+                                                          String>(
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                        itemBuilder:
+                                                            (context) =>
+                                                                <PopupMenuEntry<
+                                                                    String>>[
+                                                          PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                              leading:
+                                                                  const Icon(
+                                                                Icons.check,
+                                                                color: Colors
+                                                                    .green,
+                                                              ),
+                                                              title: const Text(
+                                                                "Activer",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .green,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              onTap: () async {
+                                                                // Changement d'état du magasin ici
+                                                                await MagasinService()
+                                                                    .activerMagasin(
+                                                                        filteredMagasins[index]
+                                                                            .idMagasin!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              // Mettre à jour la liste des magasins après le changement d'état
+                                                                              setState(() {
+                                                                                controller.fetchMagasinByRegionAndActeur(acteur.idActeur!, niveau1Pays[_tabController!.index].idNiveau1Pays!);
+                                                                                controller.fetchMagasinByRegion(niveau1Pays[_tabController!.index].idNiveau1Pays!);
+                                                                              }),
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 5),
+                                                                                ),
+                                                                              ),
+                                                                              Navigator.of(context).pop(),
+                                                                            });
+
+                                                                ScaffoldMessenger.of(
+                                                                        context)
+                                                                    .showSnackBar(
+                                                                  const SnackBar(
+                                                                    content:
+                                                                        Row(
+                                                                      children: [
+                                                                        Text(
+                                                                            "Activer avec succèss "),
+                                                                      ],
+                                                                    ),
+                                                                    duration: Duration(
+                                                                        seconds:
+                                                                            2),
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                          PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                              leading: Icon(
+                                                                Icons
+                                                                    .disabled_visible,
+                                                                color: Colors
+                                                                        .orange[
+                                                                    400],
+                                                              ),
+                                                              title: Text(
+                                                                "Désactiver",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                          .orange[
+                                                                      400],
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              onTap: () async {
+                                                                await MagasinService()
+                                                                    .desactiverMagasin(
+                                                                        filteredMagasins[index]
+                                                                            .idMagasin!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              if (mounted)
+                                                                                {
+                                                                                  setState(() {
+                                                                                    controller.fetchMagasinByRegionAndActeur(acteur.idActeur!, niveau1Pays[_tabController!.index].idNiveau1Pays!);
+                                                                                    controller.fetchMagasinByRegion(niveau1Pays[_tabController!.index].idNiveau1Pays!);
+                                                                                  }),
+                                                                                  Navigator.of(context).pop(),
+                                                                                }
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              if (mounted)
+                                                                                {
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    const SnackBar(
+                                                                                      content: Row(
+                                                                                        children: [
+                                                                                          Text("Une erreur s'est produit"),
+                                                                                        ],
+                                                                                      ),
+                                                                                      duration: Duration(seconds: 5),
+                                                                                    ),
+                                                                                  ),
+                                                                                  Navigator.of(context).pop(),
+                                                                                }
+                                                                            });
+                                                                if (mounted) {
+                                                                  ScaffoldMessenger.of(
+                                                                          context)
+                                                                      .showSnackBar(
+                                                                    const SnackBar(
+                                                                      content:
+                                                                          Row(
+                                                                        children: [
+                                                                          Text(
+                                                                              "Désactiver avec succèss "),
+                                                                        ],
+                                                                      ),
+                                                                      duration: Duration(
+                                                                          seconds:
+                                                                              2),
+                                                                    ),
+                                                                  );
+                                                                }
+                                                              },
+                                                            ),
+                                                          ),
+                                                          PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                              leading: Icon(
+                                                                Icons
+                                                                    .disabled_visible,
+                                                                color: Colors
+                                                                    .green[400],
+                                                              ),
+                                                              title: Text(
+                                                                "Modifier",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                          .green[
+                                                                      400],
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              onTap: () async {
+                                                                Navigator.push(
+                                                                  context,
+                                                                  PageRouteBuilder(
+                                                                    pageBuilder:
+                                                                        (context,
+                                                                            animation,
+                                                                            secondaryAnimation) {
+                                                                      return FadeTransition(
+                                                                        opacity:
+                                                                            animation,
+                                                                        child:
+                                                                            ScaleTransition(
+                                                                          scale:
+                                                                              animation,
+                                                                          child:
+                                                                              AddMagasinScreen(
+                                                                            idMagasin:
+                                                                                magasinn.idMagasin,
+                                                                            isEditable:
+                                                                                true,
+                                                                            nomMagasin:
+                                                                                magasinn.nomMagasin,
+                                                                            contactMagasin:
+                                                                                magasinn.contactMagasin,
+                                                                            localiteMagasin:
+                                                                                magasinn.localiteMagasin,
+                                                                            niveau1Pays:
+                                                                                magasinn.niveau1Pays!,
+                                                                            // photo: filteredMagasins[index]['photo']!,
+                                                                          ),
+                                                                        ),
+                                                                      );
+                                                                    },
+                                                                    transitionsBuilder: (context,
+                                                                        animation,
+                                                                        secondaryAnimation,
+                                                                        child) {
+                                                                      return child;
+                                                                    },
+                                                                    transitionDuration:
+                                                                        const Duration(
+                                                                            milliseconds:
+                                                                                1500), // Durée de la transition
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                          PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                              leading:
+                                                                  const Icon(
+                                                                Icons.delete,
+                                                                color:
+                                                                    Colors.red,
+                                                              ),
+                                                              title: const Text(
+                                                                "Supprimer",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .red,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              onTap: () async {
+                                                                await MagasinService()
+                                                                    .deleteMagasin(
+                                                                        filteredMagasins[index]
+                                                                            .idMagasin!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              setState(() {
+                                                                                controller.fetchMagasinByRegionAndActeur(acteur.idActeur!, niveau1Pays[_tabController!.index].idNiveau1Pays!);
+                                                                                controller.fetchMagasinByRegion(niveau1Pays[_tabController!.index].idNiveau1Pays!);
+                                                                              }),
+                                                                              Navigator.of(context).pop(),
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Magasin supprimer avec succès"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 2),
+                                                                                ),
+                                                                              )
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Impossible de supprimer"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 2),
+                                                                                ),
+                                                                              )
+                                                                            });
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+    );
+    // } else
+    // }
+    // );
   }
 
   Widget _buildShimmerEffect() {
     return Shimmer.fromColors(
+      period: Duration(seconds: 2),
       baseColor: Colors.grey[300]!,
       highlightColor: Colors.grey[100]!,
       child: GridView.builder(
@@ -531,7 +859,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>
       height: 15,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        color: isState ? Colors.green : Colors.red,
+        color: isState && mounted ? Colors.green : Colors.red,
       ),
     );
   }

@@ -48,7 +48,7 @@ class _AddIntrantState extends State<AddIntrant> {
   late Speculation speculation;
   String? catValue;
   late Future _categorieList;
-  late ParametreGeneraux para;
+  late ParametreGeneraux para = ParametreGeneraux();
   List<ParametreGeneraux> paraList = [];
   // late CategorieProduit categorieProduit;
   late CategorieProduit categorieProduit = CategorieProduit();
@@ -130,12 +130,22 @@ class _AddIntrantState extends State<AddIntrant> {
     });
   }
 
+  void verifyParam() {
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+
+    if (paraList.isNotEmpty) {
+      para = paraList[0];
+    } else {
+      // Gérer le cas où la liste est null ou vide, par exemple :
+      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
-    para = paraList[0];
+    verifyParam();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _categorieList = fetchCategorieList(); // _categorieList = http.get(
     _speculationList = http.get(Uri.parse(

@@ -6,91 +6,87 @@ import 'package:koumi_app/models/CartItem.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/Panier.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
-
-
 class DetailProduits extends StatefulWidget {
   late Stock? stock;
-   DetailProduits({super.key,  this.stock});
+  DetailProduits({super.key, this.stock});
 
   @override
   State<DetailProduits> createState() => _DetailProduitsState();
 }
 
-  const double defaultPadding = 16.0;
+const double defaultPadding = 16.0;
 const double defaultPadding_min = 5.0;
 const double defaultBorderRadius = 12.0;
 
-
-class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProviderStateMixin {
+class _DetailProduitsState extends State<DetailProduits>
+    with SingleTickerProviderStateMixin {
   // late AnimationController _controller;
   // late Animation<Offset> _animation;
 
-   late Acteur acteur;
-    late List<TypeActeur> typeActeurData = [];
+  late Acteur acteur;
+  late List<TypeActeur> typeActeurData = [];
   late String type;
 
-
- 
-
-
-
-     @override
+  @override
   void initState() {
     super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
-  // Initialiser le ValueNotifier
+    // Initialiser le ValueNotifier
   }
-
 
   @override
   Widget build(BuildContext context) {
     const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
     return Scaffold(
       appBar: AppBar(
-                  leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         centerTitle: true,
         title: const Text("Détail Produit"),
-        actions:
-         [
-          IconButton(
-            onPressed: () {},
-            icon: CircleAvatar(
-              backgroundColor: Colors.white,
-              child: SvgPicture.asset(
-                "assets/Heart.svg",
-                height: 20,
-              ),
-            ),
-          )
-        ],
+        actions: acteur.idActeur! != widget.stock!.acteur!.idActeur!
+            ? null
+            : [
+                IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AddAndUpdateProductScreen(
+                                  isEditable: true,
+                                  stock: widget.stock,
+                                )));
+                  },
+                  icon: Icon(
+                    Icons.edit,
+                  ),
+                )
+              ],
       ),
       body: SingleChildScrollView(
         child: Column(
-           mainAxisSize: MainAxisSize.min, // Set mainAxisSize to min
+          mainAxisSize: MainAxisSize.min, // Set mainAxisSize to min
           children: [
-             widget.stock!.photo!.isEmpty ||  widget.stock!.photo == null ?
-             Image.asset(
-                                "assets/images/default_image.png",
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: 200,
-                              ):
-            Image.network(
+            widget.stock!.photo!.isEmpty || widget.stock!.photo == null
+                ? Image.asset(
+                    "assets/images/default_image.png",
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: 200,
+                  )
+                : Image.network(
                     'https://koumi.ml/api-koumi/Stock/${widget.stock!.photo}/image',
-                  
                     width: double.infinity,
                     height: 200,
                     fit: BoxFit.cover,
@@ -104,7 +100,8 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
                   ),
             const SizedBox(height: defaultPadding * 0.300),
             Container(
-              padding: const EdgeInsets.fromLTRB(defaultPadding, defaultPadding * 2, defaultPadding, defaultPadding),
+              padding: const EdgeInsets.fromLTRB(defaultPadding,
+                  defaultPadding * 2, defaultPadding, defaultPadding),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
@@ -123,24 +120,43 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
                     ),
                     child: Center(
                       child: Text(
-                      widget.stock!.nomProduit!.toUpperCase(),
-                        style: const TextStyle(overflow: TextOverflow.ellipsis, fontSize: 20, fontWeight: FontWeight.bold),
+                        widget.stock!.nomProduit!.toUpperCase(),
+                        style: const TextStyle(
+                            overflow: TextOverflow.ellipsis,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children:  [
-                      Text("Forme : ", style: TextStyle(fontSize: 20,fontStyle:FontStyle.italic),),
-                 Text(widget.stock!.formeProduit!, // Use optional chaining and ??
-     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold ,fontStyle:FontStyle.italic)),                    ],
+                    children: [
+                      Text(
+                        "Forme : ",
+                        style: TextStyle(
+                            fontSize: 20, fontStyle: FontStyle.italic),
+                      ),
+                      Text(
+                          widget.stock!
+                              .formeProduit!, // Use optional chaining and ??
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic)),
+                    ],
                   ),
-                  const SizedBox(height:10),
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children:  [
-                      Text("Quantité : ", style: TextStyle(fontSize: 20,fontStyle:FontStyle.italic)),
-                                   Text(widget.stock!.quantiteStock!.toInt().toString(),style: TextStyle(fontSize: 20, fontWeight:FontWeight.bold,fontStyle:FontStyle.italic)),
+                    children: [
+                      Text("Quantité : ",
+                          style: TextStyle(
+                              fontSize: 20, fontStyle: FontStyle.italic)),
+                      Text(widget.stock!.quantiteStock!.toInt().toString(),
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic)),
                     ],
                   ),
                   Container(
@@ -151,8 +167,11 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
                     ),
                     child: Center(
                       child: Text(
-                      "Description",
-                        style: const TextStyle(overflow: TextOverflow.ellipsis, fontSize: 20, fontWeight: FontWeight.bold),
+                        "Description",
+                        style: const TextStyle(
+                            overflow: TextOverflow.ellipsis,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -163,8 +182,9 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
                       trimLines: 2,
                       trimMode: TrimMode.Line,
                       trimCollapsedText: "Lire plus",
-                    trimExpandedText: "Lire moins",
-                    style:TextStyle(fontSize: 16,fontStyle:FontStyle.italic),
+                      trimExpandedText: "Lire moins",
+                      style:
+                          TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
                       "A Henley shirt is a collarless pullover shirt, by a round neckline and a placket about 3 to 5 inches (8 to 13 cm) long and usually having 2–5 buttons.",
                     ),
                   ),
@@ -176,8 +196,11 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
                     ),
                     child: Center(
                       child: Text(
-                      "Autres information",
-                        style: const TextStyle(overflow: TextOverflow.ellipsis, fontSize: 20, fontWeight: FontWeight.bold),
+                        "Autres information",
+                        style: const TextStyle(
+                            overflow: TextOverflow.ellipsis,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -189,7 +212,8 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
                       children: [
                         Text(
                           '${widget.stock!.prix!.toInt()} FCFA', // Convertir en entier
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         RatingBar.builder(
                           initialRating: 3,
@@ -211,99 +235,102 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
                   const SizedBox(height: 5),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children:  [
-                      Text("Speculation : ", style: TextStyle(fontSize: 20,fontStyle:FontStyle.italic)),
-              
-                        Text(
-                          widget.stock!.speculation!.nomSpeculation!,
+                    children: [
+                      Text("Speculation : ",
                           style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
-                          ),
+                              fontSize: 20, fontStyle: FontStyle.italic)),
+                      Text(
+                        widget.stock!.speculation!.nomSpeculation!,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
                         ),
-                      
-                      
+                      ),
                     ],
                   ),
-            
                   const SizedBox(height: 5),
-                 Row(
-                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                   children:  [
-                     Text("Type Produit : ", style: TextStyle(fontSize: 20,fontStyle:FontStyle.italic)),
-                     
-                       Text(
-                         widget.stock!.typeProduit!,
-                         style: TextStyle(
-                     fontSize: 20,
-                     fontWeight: FontWeight.bold,
-                     fontStyle: FontStyle.italic,
-                         ),
-                       ),
-                   
-                   ],
-                 ),
-                 Row(
-                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                   children:  [
-                     Text("Unité Produit : ", style: TextStyle(fontSize: 20,fontStyle:FontStyle.italic)),
-                     
-                       Text(
-                         widget.stock!.unite!.nomUnite!,
-                         style: TextStyle(
-                     fontSize: 20,
-                     fontWeight: FontWeight.bold,
-                     fontStyle: FontStyle.italic,
-                         ),
-                       ),
-                   
-                   ],
-                 ),
-                       Container(
-                    height:70, 
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Type Produit : ",
+                          style: TextStyle(
+                              fontSize: 20, fontStyle: FontStyle.italic)),
+                      Text(
+                        widget.stock!.typeProduit!,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Unité Produit : ",
+                          style: TextStyle(
+                              fontSize: 20, fontStyle: FontStyle.italic)),
+                      Text(
+                        widget.stock!.unite!.nomUnite!,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    height: 70,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children:  [
-                        Text("Code Qr: ", style: TextStyle(fontSize: 20,fontStyle:FontStyle.italic)),   
-                          GestureDetector(
-                            onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) {
-                  return DetailScreen(); // écran de détail avec l'image agrandie
-                }));
-              },
-
-                            child: Image.asset(
-                              "assets/images/qr.png"
-                            ),
-                          ),
+                      children: [
+                        Text("Code Qr: ",
+                            style: TextStyle(
+                                fontSize: 20, fontStyle: FontStyle.italic)),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (_) {
+                              return DetailScreen(); // écran de détail avec l'image agrandie
+                            }));
+                          },
+                          child: Image.asset("assets/images/qr.png"),
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 20),
-                  widget.stock!.acteur!.idActeur! == acteur.idActeur! ? SizedBox() : Center(
-                    child: SizedBox(
-                      width: 200,
-                      height: 48,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // _addToCart(widget.stock);
-                        if (widget.stock!.acteur!.idActeur! == acteur.idActeur!){
-                        Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
-                        }
-                        else{
-                        }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.orange,
-                          shape: const StadiumBorder()),
-                        child:   Text(      
-                           "Ajouter",
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ) ,
-                      ),
-                    ),
-                  ),
+                  widget.stock!.acteur!.idActeur! == acteur.idActeur!
+                      ? SizedBox()
+                      : Center(
+                          child: SizedBox(
+                            width: 200,
+                            height: 48,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // _addToCart(widget.stock);
+                                if (widget.stock!.acteur!.idActeur! ==
+                                    acteur.idActeur!) {
+                                  Snack.error(
+                                      titre: "Alerte",
+                                      message:
+                                          "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
+                                } else {}
+                              },
+                              style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.orange,
+                                  shape: const StadiumBorder()),
+                              child: Text(
+                                "Ajouter",
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ),
                 ],
               ),
             )
@@ -327,14 +354,9 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
   //     Snack.success(titre: "Succès", message: "Produit déjà existant au panier qté " + existingItem.quantity.toString());
   //   }
   // }
- 
-
-
 }
 
-
-
- class CartStorage {
+class CartStorage {
   static const String _keyCartItems = 'cartItems';
 
   static Future<List<String>> getCartItems() async {
@@ -357,12 +379,7 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
   }
 }
 
-
-
-
-
-
- class DetailScreen extends StatelessWidget {
+class DetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -376,7 +393,8 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
           child: ListView(
             children: [
               Hero(
-                tag: "qrImage", // Référence au même tag utilisé dans l'écran précédent
+                tag:
+                    "qrImage", // Référence au même tag utilisé dans l'écran précédent
                 child: Image.asset("assets/images/qr.png"), // Image agrandie
               ),
               // Autres éléments de l'écran de détail ici...

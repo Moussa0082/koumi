@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -11,40 +10,41 @@ import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductEndScreen.dart';
-import 'package:path_provider/path_provider.dart' ;
+import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 
 class AddAndUpdateProductScreen extends StatefulWidget {
-  bool? isEditable ;
-   AddAndUpdateProductScreen({super.key, this.isEditable});
+  bool? isEditable;
+  final Stock? stock;
+  AddAndUpdateProductScreen({super.key, this.isEditable, this.stock});
 
   @override
-  State<AddAndUpdateProductScreen> createState() => _AddAndUpdateProductScreenState();
+  State<AddAndUpdateProductScreen> createState() =>
+      _AddAndUpdateProductScreenState();
 }
 
- const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
+const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
-
-     final formkey = GlobalKey<FormState>();
-     TextEditingController _prixController = TextEditingController();
-     TextEditingController _quantiteController = TextEditingController();
+  final formkey = GlobalKey<FormState>();
+  TextEditingController _prixController = TextEditingController();
+  TextEditingController _quantiteController = TextEditingController();
   TextEditingController _nomController = TextEditingController();
   TextEditingController _formController = TextEditingController();
   TextEditingController _origineController = TextEditingController();
 
   late Acteur acteur;
-   Stock stock = Stock();
+  late Stock stock = Stock();
   late List<TypeActeur> typeActeurData = [];
   late String type;
   late TextEditingController _searchController;
   List<Filiere> filiereListe = [];
-   String? imageSrc;
+  String? imageSrc;
   File? photo;
 
-    Future<File> saveImagePermanently(String imagePath) async {
+  Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
     final name = path.basename(imagePath);
     final image = File('${directory.path}/$name');
@@ -112,7 +112,6 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
       },
     );
   }
-   
 
   @override
   void initState() {
@@ -122,27 +121,33 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
     _searchController = TextEditingController();
 
     super.initState();
+    if (widget.isEditable! == true) {
+      _nomController.text = widget.stock!.nomProduit!;
+      _formController.text = widget.stock!.formeProduit!;
+      _origineController.text = widget.stock!.origineProduit!;
+      _prixController.text = widget.stock!.prix!.toString();
+      _quantiteController.text = widget.stock!.quantiteStock!.toString();
+    }
   }
 
-   
-     @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
-          centerTitle: true,
-          toolbarHeight: 100,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-          title: Text(
-            widget.isEditable! ?  'Modifier de produit' :  'Ajout de produit' ,
-            style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
-          ),
-         ),
+        centerTitle: true,
+        toolbarHeight: 100,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+        title: Text(
+          widget.isEditable! ? 'Modifier de produit' : 'Ajout de produit',
+          style:
+              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(children: [
           // const SizedBox(height: 10),
@@ -354,8 +359,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                           ),
                         ),
                       ),
-                      
-                       SizedBox(
+                      SizedBox(
                         height: 10,
                       ),
                       Padding(
@@ -399,35 +403,41 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                       SizedBox(
                         height: 10,
                       ),
-                      
                       SizedBox(
                         child: photo != null
-                        ? Image.file(
-                            photo!,
-                            fit: BoxFit.fitWidth,
-                            height: 100,
-                            width: 150,
-                          )
-                        :  IconButton(
-                          onPressed: _showImageSourceDialog,
-                          icon: const Icon(
-                            Icons.add_a_photo_rounded,
-                            size: 60,
-                          ),
-                        ),
+                            ? Image.file(
+                                photo!,
+                                fit: BoxFit.fitWidth,
+                                height: 100,
+                                width: 150,
+                              )
+                            : IconButton(
+                                onPressed: _showImageSourceDialog,
+                                icon: const Icon(
+                                  Icons.add_a_photo_rounded,
+                                  size: 60,
+                                ),
+                              ),
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
                           onPressed: () async {
-                   
-
                             if (formkey.currentState!.validate()) {
-                              Get.to(AddAndUpdateProductEndSreen(isEditable: false,
-                              nomProduit: _nomController.text, forme: _formController.text,
-                              origine: _origineController.text, prix: _prixController.text,
-                              image: photo,
-                              quantite: _quantiteController.text, idStock: stock.idStock, stock: stock,
-                              ));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          (AddAndUpdateProductEndSreen(
+                                            isEditable: true,
+                                            nomProduit: _nomController.text,
+                                            forme: _formController.text,
+                                            origine: _origineController.text,
+                                            prix:
+                                                _prixController.text.toString(),
+                                            image: photo,
+                                            quantite: _quantiteController.text,
+                                            stock: widget.stock,
+                                          ))));
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -438,18 +448,16 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                             minimumSize: const Size(290, 45),
                           ),
                           child: Text(
-                           widget.isEditable! ? "Modifier": "Ajouter"  ,
+                            "Suivant",
                             style: TextStyle(
                               fontSize: 20,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),
                           )),
-                          
-                            SizedBox(
+                      SizedBox(
                         height: 10,
                       ),
-
                     ],
                   ))
             ],
@@ -486,6 +494,4 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
       ),
     );
   }
-
-
 }

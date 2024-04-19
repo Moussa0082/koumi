@@ -84,7 +84,7 @@ class _ProduitScreenState extends State<ProduitScreen>
     try {
       final response = await http.get(Uri.parse(
           'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie'));
-          // 'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie'));
+          // 'http://10.0.2.2:9000/api-koumi/Stock/categorieProduit/$idCategorie'));
       if (response.statusCode == 200) {
         final String jsonString = utf8.decode(response.bodyBytes);
         List<dynamic> data = json.decode(jsonString);
@@ -187,9 +187,11 @@ class _ProduitScreenState extends State<ProduitScreen>
         List<dynamic> data = json.decode(jsonString);
         setState(() {
           categorieProduit = data
+          .where((element) => element['statutCategorie'] == true)
               .map((item) => CategorieProduit(
                     idCategorieProduit: item['idCategorieProduit'] as String,
                     libelleCategorie: item['libelleCategorie'] as String,
+                    statutCategorie: item['statutCategorie'] as bool
                   ))
               .toList();
           _tabController =

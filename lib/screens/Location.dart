@@ -16,7 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Location extends StatefulWidget {
   const Location({super.key});
-
+  
   @override
   State<Location> createState() => _LocationState();
 }

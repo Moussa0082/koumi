@@ -1,18 +1,13 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:koumi_app/Admin/NotificationPage.dart';
 import 'package:koumi_app/api/firebase_api.dart';
 import 'package:koumi_app/firebase_options.dart';
-import 'package:koumi_app/models/CartItem.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
-import 'package:koumi_app/screens/AddAndUpdateProductEndScreen.dart';
-import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
-import 'package:koumi_app/screens/PinLoginScreen.dart';
 import 'package:koumi_app/screens/SplashScreen.dart';
-import 'package:koumi_app/screens/Weather.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/AlerteService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
@@ -50,7 +45,21 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await FirebaseApi().initNotification();
-
+  await AwesomeNotifications().initialize(null, [
+    NotificationChannel(
+        channelGroupKey: "basic_channel_group",
+        channelKey: "basic_channel",
+        channelName: "Basic Notification",
+        channelDescription: "Basic notifications channel")
+  ], channelGroups: [
+    NotificationChannelGroup(
+        channelGroupKey: "basic_channel_group", channelGroupName: "Basic group")
+  ]);
+  bool isAllowedToSendNotif =
+      await AwesomeNotifications().isNotificationAllowed();
+  if (isAllowedToSendNotif) {
+    AwesomeNotifications().requestPermissionToSendNotifications();
+  }
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => MagasinService()),
     ChangeNotifierProvider(create: (context) => CartProvider()),
@@ -89,12 +98,16 @@ void main() async {
   ], child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
-  MyApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -108,6 +121,7 @@ class MyApp extends StatelessWidget {
         // '/notificationPage':(context) =>  NotificationPage(),
       },
       home: const SplashScreen(),
+      // home: const SplashScreen(),
     );
   }
 }
