@@ -54,7 +54,7 @@ class _AccueilState extends State<Accueil> {
     super.initState();
     verify();
   }
-
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(

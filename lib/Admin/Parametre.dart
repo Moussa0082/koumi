@@ -30,7 +30,7 @@ class _ParametreState extends State<Parametre> {
     paramList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
 
-    if (paramList != null && paramList.isNotEmpty) {
+    if (paramList.isNotEmpty) {
       params = paramList[0];
     } else {
       // Gérer le cas où la liste est null ou vide, par exemple :
@@ -99,13 +99,23 @@ class _ParametreState extends State<Parametre> {
                               width: 110,
                               height: 150,
                               child: Image.network(
-                                "http://10.0.2.2/api-koumi/${params.logoSysteme!}",
+                                "https://koumi.ml/api-koumi/parametreGeneraux/${params.idParametreGeneraux!}/image",
+                                // scale: 1,
                                 scale: 1,
                                 fit: BoxFit.fill,
+                                errorBuilder: (BuildContext context,
+                                    Object exception, StackTrace? stackTrace) {
+                                  return Image.asset(
+                                    'assets/images/default_image.png',
+                                    // scale: 1,
+                                   scale: 1,
+                                    fit: BoxFit.fill,
+                                  );
+                                },
                               ),
                             ),
                   title: Text(
-                    params.nomSysteme!,
+                    params.nomSysteme! ?? "Koumi",
                     style: const TextStyle(
                       fontSize: 22,
                       color: Colors.black,
@@ -114,7 +124,7 @@ class _ParametreState extends State<Parametre> {
                     ),
                   ),
                   subtitle: Text(
-                    params.sloganSysteme!,
+                    params.sloganSysteme! ?? "Koumi",
                     textAlign: TextAlign.justify,
                     style: const TextStyle(
                       fontSize: 17,

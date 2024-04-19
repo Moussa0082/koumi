@@ -345,9 +345,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                       child: Image.network(
                                                         "https://koumi.ml/api-koumi/parametreGeneraux/${param.idParametreGeneraux!}/image",
                                                         scale: 1,
-                                                        width: 150,
-                                                        height: 80,
-                                                        fit: BoxFit.cover,
+                                                        fit: BoxFit.fill,
                                                         errorBuilder:
                                                             (BuildContext
                                                                     context,
@@ -358,9 +356,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                           return Image.asset(
                                                             'assets/images/default_image.png',
                                                             scale: 1,
-                                                            width: 150,
-                                                            height: 80,
-                                                            fit: BoxFit.cover,
+                                                            fit: BoxFit.fill,
                                                           );
                                                         },
                                                       ),
@@ -397,11 +393,9 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                 width: 110,
                                                 height: 150,
                                                 child: Image.network(
-                                                   "https://koumi.ml/api-koumi/parametreGeneraux/${param.idParametreGeneraux!}/image",
+                                                  "https://koumi.ml/api-koumi/parametreGeneraux/${param.idParametreGeneraux!}/image",
                                                   scale: 1,
-                                                  width: 150,
-                                                  height: 80,
-                                                  fit: BoxFit.cover,
+                                                  fit: BoxFit.fill,
                                                   errorBuilder: (BuildContext
                                                           context,
                                                       Object exception,
@@ -409,9 +403,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                     return Image.asset(
                                                       'assets/images/default_image.png',
                                                       scale: 1,
-                                                      width: 150,
-                                                      height: 80,
-                                                      fit: BoxFit.cover,
+                                                      fit: BoxFit.fill,
                                                     );
                                                   },
                                                 ),
@@ -443,7 +435,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                             param.sloganSysteme!,
                                             style: const TextStyle(
                                               fontSize: 17,
-                                              overflow: TextOverflow.ellipsis,
+                                              // overflow: TextOverflow.ellipsis,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),

@@ -538,7 +538,7 @@ return Consumer<MagasinService>(
                                                           fit: BoxFit.cover,
                                                         )
                                                       : Image.network(
-                                                          "http://10.0.2.2/${magasin.photo}",
+                                                          "https://koumi.ml/api-koumi/Magasin/${magasin.idMagasin}/image",
                                                           fit: BoxFit.cover,
                                                           errorBuilder:
                                                               (BuildContext
