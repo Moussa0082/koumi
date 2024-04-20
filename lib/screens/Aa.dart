@@ -1,27 +1,22 @@
 
  import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:koumi_app/Admin/CodePays.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
-import 'package:koumi_app/models/Niveau2Pays.dart';
-import 'package:koumi_app/models/Niveau3Pays.dart';
-import 'package:koumi_app/models/ParametreGeneraux.dart';
+import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
-import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
-import 'package:koumi_app/screens/AddMagasinScreen.dart';
 import 'package:koumi_app/screens/MagasinActeur.dart';
 import 'package:koumi_app/screens/Produit.dart';
-import 'package:koumi_app/service/MagasinService.dart';
-import 'package:koumi_app/service/Niveau3Service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
+
+import '../service/MagasinService.dart';
 
 class MagasinScreen extends StatefulWidget {
   const MagasinScreen({super.key});
@@ -30,31 +25,33 @@ class MagasinScreen extends StatefulWidget {
   State<MagasinScreen> createState() => _MagasinScreenState();
 }
 
-const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
-const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
-
-class _MagasinScreenState extends State<MagasinScreen>     with TickerProviderStateMixin{
-  late ParametreGeneraux para;
-  List<ParametreGeneraux> paraList = [];
-  late TextEditingController _searchController;
-    late Acteur acteur = Acteur();
-  TabController? _tabController;
-
-  List<Niveau1Pays> niveau1Pays = [];
-  List<Magasin> magasins = [];
-    String searchText = "";
-
-
+class _MagasinScreenState extends State<MagasinScreen>     with TickerProviderStateMixin {
  
+ 
+  
+  TabController? _tabController;
+  late TextEditingController _searchController;
 
+  // List<Magasin> magasin = [];
+  late Acteur acteur = Acteur();
+  late List<TypeActeur> typeActeurData = [];
+  late String type;
+  List<Niveau1Pays> niveau1Pays = [];
   String selectedRegionId =
       ''; // Ajoutez une variable pour stocker l'ID de la région sélectionnée
 
-  bool isAdmin = false;
+  double scaleFactor = 1;
+  bool isVisible = true;
+
+  String localiteMagasin = "";
+  String contactMagasin = "";
+  File? photo;
+  String searchText = "";
+
+       MagasinController  
+   _controller = Get.put(MagasinController() );
 
 
-   MagasinController  
-   controller = Get.put(MagasinController());
 
   Future<void> fetchRegions() async {
     try {
@@ -66,84 +63,98 @@ class _MagasinScreenState extends State<MagasinScreen>     with TickerProviderSt
         List<dynamic> data = json.decode(jsonString);
         setState(() {
           niveau1Pays = data
-                        .where((niveau1Pays) => niveau1Pays['statutN1'] == true)
+              .where((niveau1Pays) => niveau1Pays['statutN1'] == true)
               .map((item) => Niveau1Pays(
                   idNiveau1Pays: item['idNiveau1Pays'] as String,
-                  statutN1:item['statutN1'] as bool,
+                  statutN1: item['statutN1'] as bool,
                   nomN1: item['nomN1']))
               .toList();
+
         _tabController = TabController(length: niveau1Pays.length, vsync: this);
         _tabController!.addListener(_handleTabChange);
-            selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
-      controller.fetchMagasinByRegion(selectedRegionId);
+                    // selectedRegionId = niveau1Pays.first.idNiveau1Pays!;
+
+         // Fetch les magasins pour la première région
+        //  _controller.fetchMagasinByRegion(niveau1Pays.first.idNiveau1Pays!);
         });
 
 
-        // Fetch les magasins pour la première région
-
+              // controller.fetchMagasinByRegion(niveau1Pays.isNotEmpty ? niveau1Pays[_tabController!.index].idNiveau1Pays! : '');
+    // Appel de _handleTabChange pour capturer automatiquement l'ID de la première région
+        // fetchMagasinByRegion(
+        //     niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '');
       } else {
         throw Exception('Failed to load regions');
       }
     } catch (e) {
       print('Error fetching regions: $e');
-     throw Exception('Error fetching regions: $e');
-
     }
   }
+      
+  
 
  
 
-  void _handleTabChange() {
-  if (_tabController != null &&
-      _tabController!.index >= 0 &&
-      _tabController!.index < niveau1Pays.length) {
-    selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
-       
-     controller.fetchMagasinByRegion(selectedRegionId);
+  void _handleTabChange() async {
+    if (_tabController != null &&
+        _tabController!.index >= 0 &&
+        _tabController!.index < niveau1Pays.length) {
+      selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
+    //  await  _controller.fetchMagasinByRegion(selectedRegionId);
+       await _controller.fetchMagasinByRegion(selectedRegionId);
+    }
   }
-}
+   // Déclarer une variable pour stocker l'ID de l'onglet précédemment sélectionné
+
+
+
 
   bool isExist = false;
-
   String? email = "";
 
   void verify() async {
+
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     email = prefs.getString('emailActeur');
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-
+      // typeActeurData = acteur.typeActeur!;
+      // type = typeActeurData.map((data) => data.libelle).join(', ');
       setState(() {
         isExist = true;
-          //  selectedRegionId = niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '';
+        if (niveau1Pays.isNotEmpty) {
+        _tabController = TabController(length: niveau1Pays.length, vsync: this);
+        _tabController!.addListener(_handleTabChange);
+      }
+      fetchRegions().then((value) => {
+               _controller.fetchMagasinByRegion(niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '')
+      });
+      // selectedRegionId = niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '';
       });
     } else {
       setState(() {
         isExist = false;
       });
+      // fetchMagasinsByRegion(selectedRegionId);
+      //  _tabController = TabController(length: niveau1Pays.length, vsync: this);
+      //   _tabController!.addListener(_handleTabChange);
+        
     }
-      if (niveau1Pays.isNotEmpty) {
-        _tabController = TabController(length: niveau1Pays.length, vsync: this);
-        _tabController!.addListener(_handleTabChange);
-      }
-      fetchRegions();
-        // fetchRegions().then((value) => {
-        //  controller.fetchMagasinByRegionAndActeur(acteur.idActeur!, niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '')
-        // });
-    //     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-    //     .parametreList!;
-    // para = paraList[0];
+      
+  
+
   }
 
-  
+
   @override
   void initState() {
-    super.initState();
     verify();
+    super.initState();
     _searchController = TextEditingController();
-          // magasinList = getListe(acteur.idActeur!, selectedRegionId); // itialise magasinList
-             controller.isLoadingn.listen((isLoading) {
+    // _buildShimmerEffect();
+    _controller.isLoadingn.listen((isLoading) {
     if (!isLoading) {
       // Les données sont chargées, mettez à jour l'interface utilisateur
       setState(() {
@@ -151,35 +162,37 @@ class _MagasinScreenState extends State<MagasinScreen>     with TickerProviderSt
       });
     }
   });
-  }
-
-
- 
-
-
-
-
-
-
-  @override
-  void dispose() {
-    _searchController
-        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
-    super.dispose();
+  // Charger les régions
+  // fetchRegions();
   }
 
   @override
   Widget build(BuildContext context) {
- const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
-    return Container(
-      child: DefaultTabController(
-        length: niveau1Pays.length,
-        child: Scaffold(
-          // floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-
-          backgroundColor: const Color.fromARGB(255, 250, 250, 250),
-          appBar: AppBar(
-               actions: !isExist ? null :  [
+    const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
+        return
+         Container(
+          child: DefaultTabController(
+            length: niveau1Pays.length,
+            child: Scaffold(
+              backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+              appBar: AppBar(
+                centerTitle: true,
+                toolbarHeight: 100,
+                leading: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+                title: Text('Tous les magasins'),
+                bottom: TabBar(
+                  isScrollable: niveau1Pays.length > 4,
+                  labelColor: Colors.black,
+                  controller: _tabController, // Ajoutez le contrôleur TabBar
+                  tabs: niveau1Pays
+                      .map((region) => Tab(text: region.nomN1!))
+                      .toList(),
+                ),
+                 actions: !isExist ? null :  [
                  PopupMenuButton<String>(
                     padding: EdgeInsets.zero,
                     itemBuilder: (context) => <PopupMenuEntry<String>>[
@@ -191,7 +204,7 @@ class _MagasinScreenState extends State<MagasinScreen>     with TickerProviderSt
                             color: Colors.green,
                           ),
                           title: const Text(
-                            "Mes magasin",
+                            "Mes magasins",
                             style: TextStyle(
                               color: Colors.green,
                               fontWeight: FontWeight.bold,
@@ -201,29 +214,9 @@ class _MagasinScreenState extends State<MagasinScreen>     with TickerProviderSt
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
+                                    // builder: (context) => AaaaScreen()));
+                                    // builder: (context) => AaaaScreen()));
                                     builder: (context) => MagasinActeurScreen()));
-                          },
-                        ),
-                      ),
-                      
-                      PopupMenuItem<String>(
-                        child: ListTile(
-                          leading: const Icon(
-                            Icons.remove_red_eye,
-                            color: Colors.green,
-                          ),
-                          title: const Text(
-                            "Ajouter Produit",
-                            style: TextStyle(
-                              color: Colors.green,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          onTap: () async {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => AddAndUpdateProductScreen(isEditable:false)));
                           },
                         ),
                       ),
@@ -231,105 +224,110 @@ class _MagasinScreenState extends State<MagasinScreen>     with TickerProviderSt
                     ],
                   )
                 ],
-       
-            centerTitle: true,
-            toolbarHeight: 100,
-            leading: IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-            title: Text('Tous les boutiques'),
-            bottom: TabBar(
-              isScrollable: niveau1Pays.length > 4,
-              labelColor: Colors.black,
-              controller: _tabController, // Ajoutez le contrôleur TabBar
-              tabs: niveau1Pays
-                  .map((region) => Tab(text: region.nomN1!))
-                  .toList(),
-            ),
-          ),
-          body: Container(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.search,
-                              color:
-                                  Colors.blueGrey[400]), // Couleur de l'icône
-                          SizedBox(
-                              width:
-                                  10), // Espacement entre l'icône et le champ de recherche
-                          Expanded(
-                            child: TextField(
-                              controller: _searchController,
-                              onChanged: (value) {
-                                setState(() {});
-                              },
-                              decoration: InputDecoration(
-                                hintText: 'Rechercher',
-                                border: InputBorder.none,
-                                hintStyle: TextStyle(
-                                    color: Colors.blueGrey[
-                                        400]), // Couleur du texte d'aide
+              ),
+              body: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.search,
+                                color: Colors.blueGrey[400]), // Couleur de l'icône
+                            SizedBox(
+                                width:
+                                    10), // Espacement entre l'icône et le champ de recherche
+                            Expanded(
+                              child: TextField(
+                                controller: _searchController,
+                                onChanged: (value) {
+                                  setState(() {});
+                                },
+                                decoration: InputDecoration(
+                                  hintText: 'Rechercher',
+                                  border: InputBorder.none,
+                                  hintStyle: TextStyle(
+                                      color: Colors.blueGrey[
+                                          400]), // Couleur du texte d'aide
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  // const SizedBox(height:10),
-                  Flexible(
-                    child: GestureDetector(
-                      child: TabBarView(
-                        controller:
-                            _tabController, // Ajoutez le contrôleur TabBarView
-                        children: niveau1Pays.map((region) {
-                          return buildGridView(
-                  region.idNiveau1Pays!);
-                        }).toList(),
+                    const SizedBox(height: 10),
+                    // const SizedBox(height:10),
+                    Flexible(
+                      child: GestureDetector(
+                        child: 
+ TabBarView(
+   controller:
+       _tabController, // Ajoutez le contrôleur TabBarView
+   children: niveau1Pays.map((region) {
+     return buildGridView(region.idNiveau1Pays!);
+   }).toList(),
+ ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
-    );
+               
+       );
+      
   }
 
+     Widget buildGridView(String id) {
 
-
-
-
-   Widget buildGridView( String id) {
- //  List<Magasin> magasinss = magasin;
+        debugPrint("taille : ${_controller.magasinListen.length}");
      
      // Si aucun magasin n'est trouvé après le filtrage
-         List<Magasin> filteredMagasins = [];
-     setState(() {
-       filteredMagasins = controller.magasinListen.where((magasin) {
+        List<Magasin> filteredMagasins = _controller.magasinListen.where((magasin) {
       String nomMagasin = magasin.nomMagasin!.toString().toLowerCase();
       searchText = _searchController.text.toLowerCase();
       return nomMagasin.contains(searchText);
     }).toList();
-     });
 
+    //   if (filteredMagasins.isEmpty) {
+    //   // Vous pouvez afficher une image ou un texte ici
+    //   return 
+    //   SingleChildScrollView(
+    //       child: Padding(
+    //         padding: EdgeInsets.all(10),
+    //         child: Center(
+    //           child: Column(
+    //             children: [
+    //               Image.asset('assets/images/notif.jpg'),
+    //               SizedBox(
+    //                 height: 10,
+    //               ),
+    //               Text(
+    //                 'Aucun magasin trouvé ' ,
+    //                 style: TextStyle(
+    //                   color: Colors.black,
+    //                   fontSize: 17,
+    //                   overflow: TextOverflow.ellipsis,
+    //                 ),
+    //               ),
+    //             ],
+    //           ),
+    //         ),
+    //       ),
+    //     );
+
+    // }
+                                       
       if (filteredMagasins.isEmpty &&  _searchController.text.isNotEmpty) {
       // Vous pouvez afficher une image ou un texte ici
       return 
@@ -358,7 +356,8 @@ class _MagasinScreenState extends State<MagasinScreen>     with TickerProviderSt
         );
 
     }
-      if (controller.isEmpty == true) {
+          debugPrint("m f : ${filteredMagasins.length}");
+           if (_controller.magasinListen.isEmpty) {
       // Vous pouvez afficher une image ou un texte ici
       return 
       SingleChildScrollView(
@@ -372,7 +371,7 @@ class _MagasinScreenState extends State<MagasinScreen>     with TickerProviderSt
                     height: 10,
                   ),
                   Text(
-                    'Aucun magasin trouvé' ,
+                    'Aucun magasin trouvé ' ,
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 17,
@@ -385,17 +384,16 @@ class _MagasinScreenState extends State<MagasinScreen>     with TickerProviderSt
           ),
         );
 
-    }
-          
+    } else{
                                 return Obx(
-        () => controller.isLoadingn.value
+        () => _controller.isLoadingn.value
                                   ? _buildShimmerEffect() :
-                                   
+ 
                                    Container(
                                                             child: GridView.builder(
                                                               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                                                 crossAxisCount: 2,
-                                                                mainAxisSpacing: 10,
+                                                                mainAxisSpacing: 2,
                                                                 crossAxisSpacing: 10,
                                                               ),
                                                               itemCount: filteredMagasins.length,
@@ -453,7 +451,7 @@ class _MagasinScreenState extends State<MagasinScreen>     with TickerProviderSt
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(15),
-                                         boxShadow: [
+                                        boxShadow: [
                                                 BoxShadow(
                                                   color: Colors.grey
                                                       .withOpacity(0.2),
@@ -497,6 +495,7 @@ class _MagasinScreenState extends State<MagasinScreen>     with TickerProviderSt
                                                             );
                                                           },
                                                         ),
+                                                        
                                                 ),
                                               ),
                                             ),
@@ -536,7 +535,7 @@ class _MagasinScreenState extends State<MagasinScreen>     with TickerProviderSt
                                              ),
                                             // _buildItem(
                                             //     "Acteur ", type),
-                                           
+                                       
                                                            ],
                                          ),
                                             
@@ -552,17 +551,21 @@ class _MagasinScreenState extends State<MagasinScreen>     with TickerProviderSt
                                                                 );
                                                               },
                                                             ),
-                                                        ),
-                                );
+                                ));
+     }
+                                
                   // } else 
     // } 
               // );
     
   }
 
+
+ 
+
   Widget _buildShimmerEffect() {
     return Shimmer.fromColors(
-      period: Duration(seconds:2),
+      period: Duration(seconds: 2),
       baseColor: Colors.grey[300]!,
       highlightColor: Colors.grey[100]!,
       child: GridView.builder(
@@ -584,14 +587,39 @@ class _MagasinScreenState extends State<MagasinScreen>     with TickerProviderSt
     );
   }
 
-   Widget _buildEtat(bool isState) {
-    return Container(
-      width: 15,
-      height: 15,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: isState && mounted ? Colors.green : Colors.red,
+ Widget _buildItem(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(
+            child: Text(
+              title,
+              style: const TextStyle(
+              
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w800,
+                  fontStyle: FontStyle.italic,
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 16),
+            ),
+          ),
+          Flexible(
+            child: Text(
+              value,
+              style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w800,
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 16),
+            ),
+          )
+        ],
       ),
     );
   }
+
+  
+
 }

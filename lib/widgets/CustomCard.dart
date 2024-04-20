@@ -5,6 +5,7 @@ import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/MagasinScreen.dart';
 import 'package:koumi_app/screens/Meteo.dart';
 import 'package:koumi_app/screens/Transport.dart';
+import 'package:koumi_app/screens/Weather.dart';
 
 class CustomCard extends StatefulWidget {
   const CustomCard({super.key});
@@ -48,7 +49,7 @@ class _CustomCardState extends State<CustomCard> {
                   MaterialPageRoute(builder: (context) => const Transport()));
             } else if (index == 5) {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Meteo()));
+                  MaterialPageRoute(builder: (context) => const WeatherScreen()));
             } else if (index == 4) {
               Navigator.push(
                   context,

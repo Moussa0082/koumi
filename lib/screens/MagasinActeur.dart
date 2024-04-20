@@ -58,8 +58,8 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>     with Tick
   Future<void> fetchRegions() async {
     try {
       final response = await http
-          .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-          // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+          // .get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+          .get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
       if (response.statusCode == 200) {
         final String jsonString = utf8.decode(response.bodyBytes);
         List<dynamic> data = json.decode(jsonString);
@@ -71,10 +71,12 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>     with Tick
                   statutN1:item['statutN1'] as bool,
                   nomN1: item['nomN1']))
               .toList();
-        });
-
         _tabController = TabController(length: niveau1Pays.length, vsync: this);
         _tabController!.addListener(_handleTabChange);
+             selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
+        controller.fetchMagasinByRegionAndActeur(acteur.idActeur!, selectedRegionId);
+        });
+
 
         // Fetch les magasins pour la première région
       // controller.fetchMagasinByRegionAndActeur(acteur.idActeur!,niveau1Pays.first.idNiveau1Pays!);
@@ -96,9 +98,8 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>     with Tick
       _tabController!.index >= 0 &&
       _tabController!.index < niveau1Pays.length) {
     selectedRegionId = niveau1Pays[_tabController!.index].idNiveau1Pays!;
-     controller.fetchMagasinByRegionAndActeur(acteur.idActeur!, selectedRegionId);
-
-
+       controller.clearMagasinListe1();
+    await controller.fetchMagasinByRegionAndActeur(acteur.idActeur!, selectedRegionId);
   }
 }
 
@@ -115,20 +116,23 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>     with Tick
 
       setState(() {
         isExist = true;
-           selectedRegionId = niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '';
+          //  selectedRegionId = niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '';
       if (niveau1Pays.isNotEmpty) {
         _tabController = TabController(length: niveau1Pays.length, vsync: this);
         _tabController!.addListener(_handleTabChange);
       }
+      fetchRegions().then((value) => {
+         controller.fetchMagasinByRegionAndActeur(acteur.idActeur!, niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '')
+        });
       });
     } else {
       setState(() {
         isExist = false;
       });
     }
-        fetchRegions().then((value) => {
-         controller.fetchMagasinByRegionAndActeur(acteur.idActeur!, niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '')
-        });
+        // fetchRegions().then((value) => {
+        //  controller.fetchMagasinByRegionAndActeur(acteur.idActeur!, niveau1Pays.isNotEmpty ? niveau1Pays.first.idNiveau1Pays! : '')
+        // });
     //     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
     //     .parametreList!;
     // para = paraList[0];
@@ -145,6 +149,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>     with Tick
 
   @override
   void dispose() {
+    _tabController?.dispose();
     _searchController
         .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
     super.dispose();
@@ -300,13 +305,46 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>     with Tick
 
 
    Widget buildGridView(String idActeur, String idNiveau1Pays) {
- //  List<Magasin> magasinss = magasin;
-  
+  // final List<Magasin> magasins = Get.find<MagasinController>().magasins.value;
      
                  
      
      // Si aucun magasin n'est trouvé après le filtrage
-        List<Magasin> filteredMagasins = controller.magasinListe1.where((magasin) {
+         if (controller.isLoading1.value && controller.magasinListe1.isEmpty) {
+    return _buildShimmerEffect(); // Afficher l'effet Shimmer
+  }
+
+      
+                                  if (controller.magasinListe1.isEmpty) {
+      // Vous pouvez afficher une image ou un texte ici
+      return 
+      SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Center(
+              child: Column(
+                children: [
+                  Image.asset('assets/images/notif.jpg'),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Aucun magasin trouvé' ,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 17,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+         }
+          
+                              
+                                List<Magasin> filteredMagasins = controller.magasinListe1.where((magasin) {
       String nomMagasin = magasin.nomMagasin!.toString().toLowerCase();
       searchText = _searchController.text.toLowerCase();
       return nomMagasin.contains(searchText);
@@ -340,37 +378,9 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>     with Tick
         );
 
     }
-      if (filteredMagasins.isEmpty) {
-      // Vous pouvez afficher une image ou un texte ici
-      return 
-      SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(10),
-            child: Center(
-              child: Column(
-                children: [
-                  Image.asset('assets/images/notif.jpg'),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    'Aucun magasin trouvé' ,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 17,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
 
-    }
-          
                                 return Obx(
-        () => controller.isLoading1.value
+        () => controller.isLoading1.value == true
                                   ? _buildShimmerEffect() :
                                    
                                    Container(
@@ -385,7 +395,7 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>     with Tick
                                                                 Magasin magasinn = filteredMagasins[index];
                                                                 Magasin currentMagasin = magasinn;
                                                                 String typeActeurList = '';
-                                                  
+        
                                                                 // Vérifiez d'abord si l'acteur est disponible dans le magasin
                                                                 if (currentMagasin.acteur != null &&
                                                     currentMagasin.acteur!.typeActeur != null) {
@@ -784,8 +794,9 @@ class _MagasinActeurScreenState extends State<MagasinActeurScreen>     with Tick
                                                                 );
                                                               },
                                                             ),
-                                                        ),
+                                                        )
                                 );
+                                
                   // } else 
     // } 
               // );
