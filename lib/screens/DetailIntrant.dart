@@ -201,7 +201,8 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         statutIntrant: intrants.statutIntrant,
                         dateAjout: intrants.dateAjout,
                         dateExpiration: date,
-                        speculation: intrants.speculation,
+                        categorieProduit: intrants.categorieProduit,
+                        forme: intrants.forme,
                         acteur: acteur);
                     _isLoading = false;
                   }),
@@ -244,7 +245,9 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         statutIntrant: intrants.statutIntrant,
                         dateAjout: intrants.dateAjout,
                         dateExpiration: date,
-                        speculation: intrants.speculation,
+                       
+                        categorieProduit: intrants.categorieProduit,
+                        forme: intrants.forme,
                         photoIntrant: intrants.photoIntrant,
                         acteur: acteur);
                     _isLoading = false;
@@ -536,9 +539,9 @@ class _DetailIntrantState extends State<DetailIntrant> {
             ),
           ),
         ),
-        _buildItem('Spéculation ', intrants.speculation!.nomSpeculation!),
-        _buildItem('Catégorie  ',
-            intrants.speculation!.categorieProduit!.libelleCategorie!),
+        // _buildItem('Spéculation ', intrants.speculation!.nomSpeculation!),
+        // _buildItem('Catégorie  ',
+            // intrants.speculation!.categorieProduit!.libelleCategorie!),
         _buildItem('Date d\'ajout ', '${intrants.dateAjout}' ?? 'N/A'),
         acteur.nomActeur != intrants.acteur.nomActeur
             ? _buildFournissuer()

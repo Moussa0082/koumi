@@ -9,13 +9,11 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Filiere.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
-import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/NextAddIntrat.dart';
 import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
-import 'package:koumi_app/service/SpeculationService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -149,16 +147,19 @@ class _AddIntrantState extends State<AddIntrant> {
     verifyParam();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // _categorieList = fetchCategorieList(); // _categorieList = http.get(
-    _filiereList = fetchFiliereList();
+    // _filiereList = fetchFiliereList();
+    _filiereList = http.get(
+        Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+    // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
     _categorieList = http.get(Uri.parse(
-        // 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculationByCategorie/${categorieProduit.idCategorieProduit}'));
-        'https://koumi.ml/api-koumi/Categorie/allCategorieByFiliere/${filiere.idFiliere}'));
+        'http://10.0.2.2:9000/api-koumi/Categorie/allCategorieByFiliere/${filiere.idFiliere}'));
+    // 'https://koumi.ml/api-koumi/Categorie/allCategorieByFiliere/${filiere.idFiliere}'));
   }
 
-  Future<List<Filiere>> fetchFiliereList() async {
-    final response = await FiliereService().fetchFiliere();
-    return response;
-  }
+  // Future<List<Filiere>> fetchFiliereList() async {
+  //   final response = await FiliereService().fetchFiliere();
+  //   return response;
+  // }
 
   // Future<List<CategorieProduit>> fetchCategorieList() async {
   //   final response = await CategorieService().fetchCategorie();
@@ -218,7 +219,7 @@ class _AddIntrantState extends State<AddIntrant> {
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: Text(
-                          "Chosir une spéculation",
+                          "Chosir une filière",
                           style: TextStyle(color: (Colors.black), fontSize: 18),
                         ),
                       ),
@@ -226,93 +227,46 @@ class _AddIntrantState extends State<AddIntrant> {
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 20),
-                      child: Consumer<SpeculationService>(
-                          builder: (context, speculationService, child) {
-                        return FutureBuilder(
-                          future: _filiereList,
-                          // future: speculationService.fetchSpeculationByCategorie(categorieProduit.idCategorieProduit!),
-                          builder: (_, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return DropdownButtonFormField(
-                                items: [],
-                                onChanged: null,
-                                decoration: InputDecoration(
-                                  labelText: 'Chargement...',
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
+                      child: FutureBuilder(
+                        future: _filiereList,
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Chargement...',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              );
-                            }
+                              ),
+                            );
+                          }
+                          // if (snapshot.hasError) {
+                          //   return Text("${snapshot.error}");
+                          // }
+                          if (snapshot.hasData) {
+                            dynamic jsonString =
+                                utf8.decode(snapshot.data.bodyBytes);
+                            dynamic responseData = json.decode(jsonString);
 
-                            if (snapshot.hasData) {
-                              dynamic jsonString =
-                                  utf8.decode(snapshot.data.bodyBytes);
-                              dynamic responseData = json.decode(jsonString);
-                              // dynamic responseData =
-                              //     json.decode(snapshot.data.body);
+                            // Vérifier si responseData est une liste
+                            if (responseData is List) {
+                              final reponse = responseData;
+                              final filiereList = reponse
+                                  .map((e) => Filiere.fromMap(e))
+                                  .where((con) => con.statutFiliere == true)
+                                  .toList();
 
-                              if (responseData is List) {
-                                List<Filiere> speList = responseData
-                                    .map((e) => Filiere.fromMap(e))
-                                    .toList();
-
-                                if (speList.isEmpty) {
-                                  return DropdownButtonFormField(
-                                    items: [],
-                                    onChanged: null,
-                                    decoration: InputDecoration(
-                                      labelText: 'Aucune filière trouvé',
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 20),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
-                                }
-
-                                return DropdownButtonFormField<String>(
-                                  items: speList
-                                      .map(
-                                        (e) => DropdownMenuItem(
-                                          value: e.idFiliere,
-                                          child: Text(e.libelleFiliere!),
-                                        ),
-                                      )
-                                      .toList(),
-                                  value: filiereValue,
-                                  onChanged: (newValue) {
-                                    setState(() {
-                                      filiereValue = newValue;
-                                      if (newValue != null) {
-                                        filiere = speList.firstWhere(
-                                          (element) =>
-                                              element.idFiliere == newValue,
-                                        );
-                                      }
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                    labelText: 'Sélectionner une filière',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                // Handle case when response data is not a list
+                              if (filiereList.isEmpty) {
                                 return DropdownButtonFormField(
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Aucune filière trouvé',
+                                    labelText: 'Aucun filière trouvé',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -321,12 +275,48 @@ class _AddIntrantState extends State<AddIntrant> {
                                   ),
                                 );
                               }
+
+                              return DropdownButtonFormField<String>(
+                                items: filiereList
+                                    .map(
+                                      (e) => DropdownMenuItem(
+                                        value: e.idFiliere,
+                                        child: Text(e.libelleFiliere!),
+                                      ),
+                                    )
+                                    .toList(),
+                                value: filiereValue,
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    catValue = null;
+                                    filiereValue = newValue;
+                                    if (newValue != null) {
+                                      filiere = filiereList.firstWhere(
+                                        (element) =>
+                                            element.idFiliere == newValue,
+                                      );
+                                      debugPrint("valeur : $newValue");
+                                      _categorieList = http.get(Uri.parse(
+                                          'http://10.0.2.2:9000/api-koumi/Categorie/allCategorieByFiliere/${newValue}'
+                                          ));
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Sélectionner un filiere',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
                             } else {
                               return DropdownButtonFormField(
                                 items: [],
                                 onChanged: null,
                                 decoration: InputDecoration(
-                                  labelText: 'Aucune filière trouvé',
+                                  labelText: 'Aucun filière trouvé',
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(
@@ -335,9 +325,21 @@ class _AddIntrantState extends State<AddIntrant> {
                                 ),
                               );
                             }
-                          },
-                        );
-                      }),
+                          }
+                          return DropdownButtonFormField(
+                            items: [],
+                            onChanged: null,
+                            decoration: InputDecoration(
+                              labelText: 'Aucun filière trouvé',
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 20),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(
@@ -357,34 +359,15 @@ class _AddIntrantState extends State<AddIntrant> {
                       child: Consumer<CategorieService>(
                         builder: (context, catService, child) {
                           return FutureBuilder(
-                            future: _categorieList,
-                            builder: (_, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Chargement...',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                              }
-
-                              if (snapshot.hasData) {
-                                List<CategorieProduit> catList =
-                                    snapshot.data as List<CategorieProduit>;
-
-                                if (catList.isEmpty) {
+                              future: _categorieList,
+                              builder: (_, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
                                   return DropdownButtonFormField(
                                     items: [],
                                     onChanged: null,
                                     decoration: InputDecoration(
-                                      labelText: 'Aucune catégorie trouvé',
+                                      labelText: 'Chargement...',
                                       contentPadding:
                                           const EdgeInsets.symmetric(
                                               vertical: 10, horizontal: 20),
@@ -395,47 +378,88 @@ class _AddIntrantState extends State<AddIntrant> {
                                   );
                                 }
 
-                                return DropdownButtonFormField<String>(
-                                  items: catList
-                                      .map(
-                                        (e) => DropdownMenuItem(
-                                          value: e.idCategorieProduit,
-                                          child: Text(e.libelleCategorie!),
-                                        ),
-                                      )
-                                      .toList(),
-                                  value: catValue,
-                                  onChanged: (newValue) {
-                                    setState(() {
-                                      filiereValue =
-                                          null; // Réinitialisez la valeur de la spéculation sélectionnée
-                                      catValue = newValue;
-                                      if (newValue != null) {
-                                        categorieProduit = catList.firstWhere(
-                                          (element) =>
-                                              element.idCategorieProduit ==
-                                              newValue,
-                                        );
+                                if (snapshot.hasData) {
+                                  dynamic jsonString =
+                                      utf8.decode(snapshot.data.bodyBytes);
+                                  dynamic responseData =
+                                      json.decode(jsonString);
 
-                                        // _filiereList = SpeculationService().fetchSpeculationByCategorie(newValue);
-                                        _categorieList = http.get(Uri.parse(
-                                            'https://koumi.ml/api-koumi/Categorie/allCategorieByFiliere/${newValue}'
-                                            // 'https://koumi.ml/api-koumi/Speculation/getAllSpeculationByCategorie/${newValue}'
-                                            ));
-                                        // 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculationByCategorie/${newValue}'));
-                                      }
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                    labelText: 'Sélectionner une catégorie',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                              } else {
+                                  if (responseData is List) {
+                                    final reponse = responseData;
+                                    final categorieListe = reponse
+                                        .map((e) => CategorieProduit.fromMap(e))
+                                        .where((cat) =>
+                                            cat.statutCategorie == true)
+                                        .toList();
+
+                                    if (categorieListe.isEmpty) {
+                                      return DropdownButtonFormField(
+                                        items: [],
+                                        onChanged: null,
+                                        decoration: InputDecoration(
+                                          labelText: 'Aucune catégorie trouvé',
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  vertical: 10, horizontal: 20),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                      );
+                                    }
+
+                                    return DropdownButtonFormField<String>(
+                                      items: categorieListe
+                                          .map(
+                                            (e) => DropdownMenuItem(
+                                              value: e.idCategorieProduit,
+                                              child: Text(e.libelleCategorie!),
+                                            ),
+                                          )
+                                          .toList(),
+                                      value: catValue,
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          catValue = newValue;
+                                          if (newValue != null) {
+                                            categorieProduit =
+                                                categorieListe.firstWhere(
+                                              (element) =>
+                                                  element.idCategorieProduit ==
+                                                  newValue,
+                                            );
+                                          }
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        labelText: 'Sélectionner une catégorie',
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 10, horizontal: 20),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    return DropdownButtonFormField(
+                                      items: [],
+                                      onChanged: null,
+                                      decoration: InputDecoration(
+                                        labelText: 'Aucune catégorie trouvé',
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 10, horizontal: 20),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                }
                                 return DropdownButtonFormField(
                                   items: [],
                                   onChanged: null,
@@ -448,9 +472,7 @@ class _AddIntrantState extends State<AddIntrant> {
                                     ),
                                   ),
                                 );
-                              }
-                            },
-                          );
+                              });
                         },
                       ),
                     ),
@@ -534,7 +556,7 @@ class _AddIntrantState extends State<AddIntrant> {
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: Text(
-                          "Quantite (paquets)",
+                          "Quantité",
                           style: TextStyle(color: (Colors.black), fontSize: 18),
                         ),
                       ),
@@ -565,7 +587,7 @@ class _AddIntrantState extends State<AddIntrant> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                     Padding(
+                    Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: 22,
                       ),
@@ -588,7 +610,6 @@ class _AddIntrantState extends State<AddIntrant> {
                           return null;
                         },
                         controller: _uniteController,
-                       
                         decoration: InputDecoration(
                           hintText: "Unité",
                           contentPadding: const EdgeInsets.symmetric(
@@ -610,24 +631,23 @@ class _AddIntrantState extends State<AddIntrant> {
                           final String unit = _uniteController.text;
                           if (formkey.currentState!.validate()) {
                             Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => NextAddIntrat(
-                                            nom: nom,
-                                            description: description,
-                                            quantite: quantite,
-                                            categorieProduit: categorieProduit,
-                                            unite: unit,
-                                            )))
-                                .then((value) => {
-                                      _nomController.clear(),
-                                      _descriptionController.clear(),
-                                      _quantiteController.clear(),
-                                      setState(() {
-                                        filiereValue = null;
-                                        catValue = null;
-                                      }),
-                                    });
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => NextAddIntrat(
+                                          nom: nom,
+                                          description: description,
+                                          quantite: quantite,
+                                          categorieProduit: categorieProduit,
+                                          unite: unit,
+                                        ))).then((value) => {
+                                  _nomController.clear(),
+                                  _descriptionController.clear(),
+                                  _quantiteController.clear(),
+                                  setState(() {
+                                    filiereValue = null;
+                                    catValue = null;
+                                  }),
+                                });
                           }
                         },
                         style: ElevatedButton.styleFrom(

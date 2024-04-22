@@ -18,6 +18,7 @@ import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/ConseilService.dart';
 import 'package:koumi_app/service/ContinentService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
+import 'package:koumi_app/service/FormeService.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/service/MagasinService.dart';
 import 'package:koumi_app/service/MaterielService.dart';
@@ -49,7 +50,7 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await FirebaseApi().initNotification();
   // await AwesomeNotifications().initialize(
-  //    'resource://@drawable/launcher_icon', 
+  //    'resource://@drawable/launcher_icon',
   //   [
   //   NotificationChannel(
   //       channelGroupKey: "basic_channel_group",
@@ -64,7 +65,7 @@ void main() async {
   //     ledOnMs: 1000,
   //     ledOffMs: 500,
   //   ),
-        
+
   // ], channelGroups: [
   //   NotificationChannelGroup(
   //       channelGroupKey: "basic_channel_group", channelGroupName: "Basic group")
@@ -121,6 +122,7 @@ void main() async {
     ChangeNotifierProvider(create: (context) => Niveau2Service()),
     ChangeNotifierProvider(create: (context) => FiliereService()),
     ChangeNotifierProvider(create: (context) => Niveau3Service()),
+    ChangeNotifierProvider(create: (context) => FormeService()),
     ChangeNotifierProvider(create: (context) => BottomNavigationService())
   ], child: MyApp()));
 }

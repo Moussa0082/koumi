@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
+import 'package:koumi_app/models/Forme.dart';
 import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:path/path.dart';
 
 class IntrantService extends ChangeNotifier {
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/intrant';
-  static const String baseUrl = 'https://koumi.ml/api-koumi/intrant';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/intrant';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/intrant';
 
   List<Intrant> intrantList = [];
 
@@ -23,6 +24,7 @@ class IntrantService extends ChangeNotifier {
       required String dateExpiration,
       File? photoIntrant,
       required Acteur acteur,
+      required Forme forme,
       required CategorieProduit categorieProduit}) async {
     try {
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
@@ -41,7 +43,8 @@ class IntrantService extends ChangeNotifier {
         'categorieProduit': categorieProduit.toMap(),
         'descriptionIntrant': descriptionIntrant,
         'photoIntrant': "",
-        'acteur': acteur.toMap()
+        'acteur': acteur.toMap(),
+        'forme' : forme.toMap()
       });
 
       var response = await requete.send();

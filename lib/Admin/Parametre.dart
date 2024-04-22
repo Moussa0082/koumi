@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/Admin/ContinentPage.dart';
+import 'package:koumi_app/Admin/FormeProduit.dart';
 import 'package:koumi_app/Admin/Niveau1Page.dart';
 import 'package:koumi_app/Admin/Niveau2Page.dart';
 import 'package:koumi_app/Admin/Niveau3Page.dart';
@@ -108,7 +109,7 @@ class _ParametreState extends State<Parametre> {
                                   return Image.asset(
                                     'assets/images/default_image.png',
                                     // scale: 1,
-                                   scale: 1,
+                                    scale: 1,
                                     fit: BoxFit.fill,
                                   );
                                 },
@@ -261,6 +262,21 @@ class _ParametreState extends State<Parametre> {
                       endIndent: 0,
                     ),
                     getList(
+                        "fruits.png",
+                        'Forme produit',
+                        const FormeProduit(),
+                        const Icon(
+                          Icons.chevron_right_sharp,
+                          size: 30,
+                        )),
+                    const Divider(
+                      color: Colors.grey,
+                      height: 4,
+                      thickness: 1,
+                      indent: 50,
+                      endIndent: 0,
+                    ),
+                    getList(
                         "car.png",
                         'Type de véhicule',
                         const TypeVehicule(),
@@ -370,11 +386,8 @@ class _ParametreState extends State<Parametre> {
               children: [
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.07,
-                  child: Image.asset(
-                    "assets/images/$imgLocation",
-                    fit: BoxFit
-                        .cover, // You can adjust the BoxFit based on your needs
-                  ),
+                  child: Image.asset("assets/images/$imgLocation",
+                      height: 40, width: 42, fit: BoxFit.contain),
                 ),
                 const SizedBox(
                   width: 15,
