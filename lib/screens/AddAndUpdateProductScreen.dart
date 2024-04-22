@@ -431,7 +431,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
 
                             if (formkey.currentState!.validate()) {
                               Navigator.push(context, MaterialPageRoute(builder:
-               (context)=> (AddAndUpdateProductEndSreen(isEditable: true,
+               (context)=> (AddAndUpdateProductEndSreen(isEditable:widget.isEditable!,
                               nomProduit: _nomController.text, forme: _formController.text,
                               origine: _origineController.text, prix: _prixController.text.toString(),
                               image: photo,

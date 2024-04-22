@@ -8,7 +8,9 @@ import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart';
 import 'package:koumi_app/screens/MagasinScreen.dart';
 import 'package:koumi_app/screens/Meteo.dart';
+import 'package:koumi_app/screens/Product.dart';
 import 'package:koumi_app/screens/Produit.dart';
+import 'package:koumi_app/screens/Store.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/Weather.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
@@ -113,7 +115,7 @@ class _AccueilState extends State<Accueil> {
           onTap: () {
             if (index == 9) {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProduitScreen()));
+                  MaterialPageRoute(builder: (context) => ProductScreen()));
             } else if (index == 8) {
               Navigator.push(
                   context,
@@ -132,7 +134,7 @@ class _AccueilState extends State<Accueil> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const MagasinScreen()));
+                      builder: (context) => const StoreScreen()));
             } else if (index == 3) {
               Navigator.push(
                   context,

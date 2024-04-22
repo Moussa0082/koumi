@@ -4,6 +4,7 @@ import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/MagasinScreen.dart';
 import 'package:koumi_app/screens/Meteo.dart';
+import 'package:koumi_app/screens/Store.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/Weather.dart';
 
@@ -54,7 +55,7 @@ class _CustomCardState extends State<CustomCard> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const MagasinScreen()));
+                      builder: (context) => const StoreScreen()));
             } else if (index == 3) {
               Navigator.push(
                   context,

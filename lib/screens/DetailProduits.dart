@@ -69,7 +69,7 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
           IconButton(
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder:
-               (context)=> AddAndUpdateProductScreen(isEditable: true, stock:widget.stock ,)));
+               (context)=> AddAndUpdateProductScreen(isEditable: true, stock:widget.stock! ,)));
             },
             icon: Icon(Icons.edit,),
           )
@@ -79,7 +79,7 @@ class _DetailProduitsState extends State<DetailProduits>  with SingleTickerProvi
         child: Column(
            mainAxisSize: MainAxisSize.min, // Set mainAxisSize to min
           children: [
-           widget.stock!.photo!.isEmpty ||  widget.stock!.photo == null ?
+             widget.stock!.photo == null ?
              Image.asset(
                                 "assets/images/default_image.png",
                                 fit: BoxFit.cover,

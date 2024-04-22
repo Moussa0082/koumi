@@ -125,8 +125,8 @@ class MagasinService extends ChangeNotifier{
    Future<List<Magasin>> fetchMagasinByRegion(String id) async {
     try {
       final response = await http.get(Uri.parse(
-          'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
       if (response.statusCode == 200) {
   // final String jsonString = utf8.decode(response.bodyBytes);
   //       List<dynamic> data = json.decode(jsonString);
@@ -144,11 +144,58 @@ class MagasinService extends ChangeNotifier{
         
   }
 
+   Future<List<Magasin>> fetchMagasinByActeur(String id) async {
+    try {
+      final response = await http.get(Uri.parse(
+          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
+          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
+      if (response.statusCode == 200) {
+
+               List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+        magasin = body
+        .map((e) => Magasin.fromMap(e)).toList();
+        return magasin;
+      } else {
+        magasin = [];
+        throw Exception('Failed to load magasins for region $id');
+      }
+    } catch (e) {
+      print('Error fetching magasins for region $id: $e');
+    }
+        return magasin;
+        
+  }
+
+
+
+   Future<List<Magasin>> fetchAllMagasin() async {
+    try {
+      final response = await http.get(Uri.parse(
+          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagagin'));
+          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+      if (response.statusCode == 200) {
+  // final String jsonString = utf8.decode(response.bodyBytes);
+  //       List<dynamic> data = json.decode(jsonString);
+               List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+        magasin = body.where((magasin) => magasin['statutMagasin'] == true)
+        .map((e) => Magasin.fromMap(e)).toList();
+        return magasin;
+      // magasin = data.map((item) => Magasin.fromMap(item)).toList();
+      } else {
+        magasin = [];
+        throw Exception('Failed to load magasins ');
+      }
+    } catch (e) {
+      print('Error fetching magasins : $e');
+    }
+        return magasin;
+  }
+
    Future<List<Magasin>> fetchMagasinByRegionAndActeur(String idActeur, String idNiveau1Pays) async {
     // try {
       final response = await http.get(Uri.parse(
-          'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${idActeur}/${idNiveau1Pays}'));
-          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/$idActeur/$idNiveau1Pays'));
+          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${idActeur}/${idNiveau1Pays}'));
+          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/$idActeur/$idNiveau1Pays'));
       if (response.statusCode == 200 || response.statusCode == 201 ||  response.statusCode == 202) {
   // final String jsonString = utf8.decode(response.bodyBytes);
   //       List<dynamic> data = json.decode(jsonString);
@@ -158,7 +205,7 @@ class MagasinService extends ChangeNotifier{
                 debugPrint("Succes : idActeur : $idActeur , idNiveau1Pays : $idNiveau1Pays , : liste ${magasin.toString()}");
                   applyChange();
       // magasin = data.map((item) => Magasin.fromMap(item)).toList();
-      
+       return magasin;
       } else {
         magasin = [];
         // throw Exception('Failed to load magasins for region $idNiveau1Pays');
@@ -168,9 +215,8 @@ class MagasinService extends ChangeNotifier{
     //   print('Error fetching magasins for acteur $idActeur et region $idNiveau1Pays: $e');
     //       throw Exception(" erreur catch ");
     //       // throw Exception(" erreur catch :  ${e.toString()}");
-
+return magasin;
     // }
-         return magasin;
   }
 
 
@@ -226,6 +272,12 @@ class MagasinService extends ChangeNotifier{
 
     final Rx<List<Magasin>> magasins = Rx([]);
 
+
+  void clearMagasinListen() {
+    magasinListen.clear();
+  }
+
+
     Future<void> fetchMagasinByRegion(String id) async {
 
 
@@ -265,21 +317,16 @@ class MagasinService extends ChangeNotifier{
                          // ou une valeur par défaut
                   ))
               .toList();
-              if(magasinListen.isEmpty){
-        isEmpty == true;
-      }
+   
                print("reponse fetch magasin liste n acteur : ${magasinListen.toList()}");
       isLoadingn.value = false;
       update();
       
     } else {
        print("reponse else: ${response.statusCode}");
-      Get.snackbar(
-        'Erreur lors de la recuperation des magasins par region!',
-        'Server responded: ${response.statusCode}:${response.reasonPhrase.toString()}',
-      );
+     
       debugPrint(
-          'Error Loading data! , Server responded: ${response.statusCode}:${response.reasonPhrase.toString()}');
+          'Aucun magasin trouvé! , Server responded: ${response.statusCode}:${response.reasonPhrase.toString()}');
     }
  
   } catch (e) {
@@ -289,10 +336,11 @@ class MagasinService extends ChangeNotifier{
   }
 }
 
+  
    void clearMagasinListe1() {
     magasinListe1.clear();
   }
-  
+
    Future<void> fetchMagasinByRegionAndActeur( String idActeur, String idNiveau1Pays) async {
     try {
       
@@ -332,9 +380,7 @@ class MagasinService extends ChangeNotifier{
                         as bool, // ou une valeur par défaut
                   ))
               .toList();
-      if(magasinListe1.isEmpty){
-        isEmpty1 == true;
-      }
+    
         isLoading1.value = false;
       update();
       
@@ -346,8 +392,6 @@ class MagasinService extends ChangeNotifier{
 
     }catch (e) {
             debugPrint('Error catch Loading data! , Sever responded: $e');
-    }finally{
-
     }
   }
 
