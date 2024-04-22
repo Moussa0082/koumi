@@ -276,7 +276,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                                       leading:
                                                           _getIconForFiliere(e
                                                               .filiere!
-                                                              .libelleFiliere),
+                                                              .libelleFiliere!),
                                                       title: Text(
                                                           e.libelleCategorie!
                                                               .toUpperCase(),
@@ -323,7 +323,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                                           )),
                                                       Text(
                                                           e.filiere!
-                                                              .libelleFiliere,
+                                                              .libelleFiliere!,
                                                           style: TextStyle(
                                                             color:
                                                                 Colors.black87,
@@ -837,7 +837,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                       .map(
                                         (e) => DropdownMenuItem(
                                           value: e.idFiliere,
-                                          child: Text(e.libelleFiliere),
+                                          child: Text(e.libelleFiliere!),
                                         ),
                                       )
                                       .toList(),

@@ -7,12 +7,14 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
+import 'package:koumi_app/models/Filiere.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/NextAddIntrat.dart';
 import 'package:koumi_app/service/CategorieService.dart';
+import 'package:koumi_app/service/FiliereService.dart';
 import 'package:koumi_app/service/SpeculationService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
@@ -33,8 +35,7 @@ class _AddIntrantState extends State<AddIntrant> {
   TextEditingController _nomController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _quantiteController = TextEditingController();
-  TextEditingController _prixController = TextEditingController();
-  TextEditingController _dateController = TextEditingController();
+  TextEditingController _uniteController = TextEditingController();
   DateTime selectedDate = DateTime.now();
   bool _isLoading = false;
   final formkey = GlobalKey<FormState>();
@@ -42,10 +43,10 @@ class _AddIntrantState extends State<AddIntrant> {
   String? imageSrc;
   File? photo;
   List<CategorieProduit> categorieList = [];
-  List<Speculation> speculationList = [];
-  String? speValue;
-  late Future _speculationList;
-  late Speculation speculation;
+  // List<Speculation> speculationList = [];
+  String? filiereValue;
+  late Future _filiereList;
+  late Filiere filiere = Filiere();
   String? catValue;
   late Future _categorieList;
   late ParametreGeneraux para = ParametreGeneraux();
@@ -147,16 +148,22 @@ class _AddIntrantState extends State<AddIntrant> {
     super.initState();
     verifyParam();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    _categorieList = fetchCategorieList(); // _categorieList = http.get(
-    _speculationList = http.get(Uri.parse(
+    // _categorieList = fetchCategorieList(); // _categorieList = http.get(
+    _filiereList = fetchFiliereList();
+    _categorieList = http.get(Uri.parse(
         // 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculationByCategorie/${categorieProduit.idCategorieProduit}'));
-        'https://koumi.ml/api-koumi/Speculation/getAllSpeculationByCategorie/${categorieProduit.idCategorieProduit}'));
+        'https://koumi.ml/api-koumi/Categorie/allCategorieByFiliere/${filiere.idFiliere}'));
   }
 
-  Future<List<CategorieProduit>> fetchCategorieList() async {
-    final response = await CategorieService().fetchCategorie();
+  Future<List<Filiere>> fetchFiliereList() async {
+    final response = await FiliereService().fetchFiliere();
     return response;
   }
+
+  // Future<List<CategorieProduit>> fetchCategorieList() async {
+  //   final response = await CategorieService().fetchCategorie();
+  //   return response;
+  // }
 
 //   @override
 //   void initState() {
@@ -166,13 +173,13 @@ class _AddIntrantState extends State<AddIntrant> {
 //   }
 
 // //  late List<dynamic> _categorieList;
-// //   late List<dynamic> _speculationList;
+// //   late List<dynamic> _filiereList;
 
 //   Future<void> _fetchData() async {
 
 //     setState(() {
 
-//       _speculationList =  http.get(Uri.parse(
+//       _filiereList =  http.get(Uri.parse(
 //         'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculationByCategorie/${categorieProduit.idCategorieProduit}'));
 
 //     });
@@ -204,6 +211,134 @@ class _AddIntrantState extends State<AddIntrant> {
                 Form(
                   key: formkey,
                   child: Column(children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 22,
+                      ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Chosir une spéculation",
+                          style: TextStyle(color: (Colors.black), fontSize: 18),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      child: Consumer<SpeculationService>(
+                          builder: (context, speculationService, child) {
+                        return FutureBuilder(
+                          future: _filiereList,
+                          // future: speculationService.fetchSpeculationByCategorie(categorieProduit.idCategorieProduit!),
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Chargement...',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+
+                            if (snapshot.hasData) {
+                              dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+                              // dynamic responseData =
+                              //     json.decode(snapshot.data.body);
+
+                              if (responseData is List) {
+                                List<Filiere> speList = responseData
+                                    .map((e) => Filiere.fromMap(e))
+                                    .toList();
+
+                                if (speList.isEmpty) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Aucune filière trouvé',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return DropdownButtonFormField<String>(
+                                  items: speList
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idFiliere,
+                                          child: Text(e.libelleFiliere!),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: filiereValue,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      filiereValue = newValue;
+                                      if (newValue != null) {
+                                        filiere = speList.firstWhere(
+                                          (element) =>
+                                              element.idFiliere == newValue,
+                                        );
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Sélectionner une filière',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                // Handle case when response data is not a list
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucune filière trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                            } else {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucune filière trouvé',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        );
+                      }),
+                    ),
                     Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: 22,
@@ -272,7 +407,7 @@ class _AddIntrantState extends State<AddIntrant> {
                                   value: catValue,
                                   onChanged: (newValue) {
                                     setState(() {
-                                      speValue =
+                                      filiereValue =
                                           null; // Réinitialisez la valeur de la spéculation sélectionnée
                                       catValue = newValue;
                                       if (newValue != null) {
@@ -282,9 +417,11 @@ class _AddIntrantState extends State<AddIntrant> {
                                               newValue,
                                         );
 
-                                        // _speculationList = SpeculationService().fetchSpeculationByCategorie(newValue);
-                                        _speculationList = http.get(Uri.parse(
-                                            'https://koumi.ml/api-koumi/Speculation/getAllSpeculationByCategorie/${newValue}'));
+                                        // _filiereList = SpeculationService().fetchSpeculationByCategorie(newValue);
+                                        _categorieList = http.get(Uri.parse(
+                                            'https://koumi.ml/api-koumi/Categorie/allCategorieByFiliere/${newValue}'
+                                            // 'https://koumi.ml/api-koumi/Speculation/getAllSpeculationByCategorie/${newValue}'
+                                            ));
                                         // 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculationByCategorie/${newValue}'));
                                       }
                                     });
@@ -316,134 +453,6 @@ class _AddIntrantState extends State<AddIntrant> {
                           );
                         },
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 22,
-                      ),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          "Chosir une spéculation",
-                          style: TextStyle(color: (Colors.black), fontSize: 18),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      child: Consumer<SpeculationService>(
-                          builder: (context, speculationService, child) {
-                        return FutureBuilder(
-                          future: _speculationList,
-                          // future: speculationService.fetchSpeculationByCategorie(categorieProduit.idCategorieProduit!),
-                          builder: (_, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return DropdownButtonFormField(
-                                items: [],
-                                onChanged: null,
-                                decoration: InputDecoration(
-                                  labelText: 'Chargement...',
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              );
-                            }
-
-                            if (snapshot.hasData) {
-                              dynamic jsonString =
-                                  utf8.decode(snapshot.data.bodyBytes);
-                              dynamic responseData = json.decode(jsonString);
-                              // dynamic responseData =
-                              //     json.decode(snapshot.data.body);
-
-                              if (responseData is List) {
-                                List<Speculation> speList = responseData
-                                    .map((e) => Speculation.fromMap(e))
-                                    .toList();
-
-                                if (speList.isEmpty) {
-                                  return DropdownButtonFormField(
-                                    items: [],
-                                    onChanged: null,
-                                    decoration: InputDecoration(
-                                      labelText: 'Aucune speculation trouvé',
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 20),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
-                                }
-
-                                return DropdownButtonFormField<String>(
-                                  items: speList
-                                      .map(
-                                        (e) => DropdownMenuItem(
-                                          value: e.idSpeculation,
-                                          child: Text(e.nomSpeculation!),
-                                        ),
-                                      )
-                                      .toList(),
-                                  value: speValue,
-                                  onChanged: (newValue) {
-                                    setState(() {
-                                      speValue = newValue;
-                                      if (newValue != null) {
-                                        speculation = speList.firstWhere(
-                                          (element) =>
-                                              element.idSpeculation == newValue,
-                                        );
-                                      }
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                    labelText: 'Sélectionner une speculation',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                // Handle case when response data is not a list
-                                return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Aucune speculation trouvé',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                              }
-                            } else {
-                              return DropdownButtonFormField(
-                                items: [],
-                                onChanged: null,
-                                decoration: InputDecoration(
-                                  labelText: 'Aucune speculation trouvé',
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                        );
-                      }),
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(
@@ -555,6 +564,41 @@ class _AddIntrantState extends State<AddIntrant> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 10),
+                     Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 22,
+                      ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Unité",
+                          style: TextStyle(color: (Colors.black), fontSize: 18),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      child: TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir les champs";
+                          }
+                          return null;
+                        },
+                        controller: _uniteController,
+                       
+                        decoration: InputDecoration(
+                          hintText: "Unité",
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 20),
                     ElevatedButton(
                         onPressed: () async {
@@ -563,7 +607,7 @@ class _AddIntrantState extends State<AddIntrant> {
                               _descriptionController.text;
                           final double quantite =
                               double.tryParse(_quantiteController.text) ?? 0.0;
-
+                          final String unit = _uniteController.text;
                           if (formkey.currentState!.validate()) {
                             Navigator.push(
                                     context,
@@ -572,13 +616,15 @@ class _AddIntrantState extends State<AddIntrant> {
                                             nom: nom,
                                             description: description,
                                             quantite: quantite,
-                                            speculation: speculation)))
+                                            categorieProduit: categorieProduit,
+                                            unite: unit,
+                                            )))
                                 .then((value) => {
                                       _nomController.clear(),
                                       _descriptionController.clear(),
                                       _quantiteController.clear(),
                                       setState(() {
-                                        speValue = null;
+                                        filiereValue = null;
                                         catValue = null;
                                       }),
                                     });
@@ -656,7 +702,7 @@ class _AddIntrantState extends State<AddIntrant> {
                     //             value: catValue,
                     //             onChanged: (newValue) {
                     //               setState(() {
-                    //                 speValue =
+                    //                 filiereValue =
                     //                     null; // Réinitialisez la valeur de la spéculation sélectionnée
                     //                 catValue =
                     //                     newValue; // Assurez-vous que catValue contient l'ID de la catégorie sélectionnée
@@ -667,7 +713,7 @@ class _AddIntrantState extends State<AddIntrant> {
                     //                         newValue,
                     //                   );
                     //                   // Maintenant, vous pouvez récupérer les spéculations associées à cette catégorie
-                    //                   _speculationList = SpeculationService()
+                    //                   _filiereList = SpeculationService()
                     //                       .fetchSpeculationByCategorie(
                     //                           newValue);
                     //                 }
@@ -710,7 +756,7 @@ class _AddIntrantState extends State<AddIntrant> {
                      // Consumer<SpeculationService>(
                     //     builder: (context, speculationService, child) {
                     //   return FutureBuilder(
-                    //     future: _speculationList,
+                    //     future: _filiereList,
                     //     // future: speculationService.fetchSpeculationByCategorie(categorieProduit.idCategorieProduit!),
                     //     builder: (_, snapshot) {
                     //       if (snapshot.connectionState ==
@@ -752,10 +798,10 @@ class _AddIntrantState extends State<AddIntrant> {
                     //                   ),
                     //                 )
                     //                 .toList(),
-                    //             value: speValue,
+                    //             value: filiereValue,
                     //             onChanged: (newValue) {
                     //               setState(() {
-                    //                 speValue = newValue;
+                    //                 filiereValue = newValue;
                     //                 if (newValue != null) {
                     //                   speculation = specList.firstWhere(
                     //                     (element) =>

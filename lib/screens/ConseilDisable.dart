@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Conseil.dart';
@@ -214,16 +216,26 @@ class _ConseilDisableState extends State<ConseilDisable> {
                                                               String>>[
                                                         PopupMenuItem<String>(
                                                           child: ListTile(
-                                                            leading: const Icon(
+                                                            leading:  Icon(
                                                               Icons.check,
-                                                              color:
-                                                                  Colors.green,
+                                                              color:e.statutConseil
+                                                                          ? Colors.green
+                                                                          : Color.fromARGB(
+                                                                              255,
+                                                                              179,
+                                                                              178,
+                                                                              178),
                                                             ),
-                                                            title: const Text(
+                                                            title:  Text(
                                                               "Activer",
                                                               style: TextStyle(
-                                                                color: Colors
-                                                                    .green,
+                                                                color: e.statutConseil
+                                                                          ? Colors.green
+                                                                          : Color.fromARGB(
+                                                                              255,
+                                                                              179,
+                                                                              178,
+                                                                              178),
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
@@ -271,73 +283,73 @@ class _ConseilDisableState extends State<ConseilDisable> {
                                                             },
                                                           ),
                                                         ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: Icon(
-                                                              Icons
-                                                                  .disabled_visible,
-                                                              color: Colors
-                                                                  .orange[400],
-                                                            ),
-                                                            title: Text(
-                                                              "Désactiver",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                        .orange[
-                                                                    400],
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            onTap: () async {
-                                                              await ConseilService()
-                                                                  .desactiverConseil(e
-                                                                      .idConseil!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<ConseilService>(context, listen: false).applyChange(),
-                                                                            Navigator.of(context).pop(),
-                                                                              setState(() {
-                                                                              _liste = getListe();
-                                                                            }),
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Une erreur s'est produit"),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 5),
-                                                                              ),
-                                                                            ),
-                                                                            Navigator.of(context).pop(),
-                                                                          });
+                                                        // PopupMenuItem<String>(
+                                                        //   child: ListTile(
+                                                        //     leading: Icon(
+                                                        //       Icons
+                                                        //           .disabled_visible,
+                                                        //       color: Colors
+                                                        //           .orange[400],
+                                                        //     ),
+                                                        //     title: Text(
+                                                        //       "Désactiver",
+                                                        //       style: TextStyle(
+                                                        //         color: Colors
+                                                        //                 .orange[
+                                                        //             400],
+                                                        //         fontWeight:
+                                                        //             FontWeight
+                                                        //                 .bold,
+                                                        //       ),
+                                                        //     ),
+                                                        //     onTap: () async {
+                                                        //       await ConseilService()
+                                                        //           .desactiverConseil(e
+                                                        //               .idConseil!)
+                                                        //           .then(
+                                                        //               (value) =>
+                                                        //                   {
+                                                        //                     Provider.of<ConseilService>(context, listen: false).applyChange(),
+                                                        //                     Navigator.of(context).pop(),
+                                                        //                       setState(() {
+                                                        //                       _liste = getListe();
+                                                        //                     }),
+                                                        //                   })
+                                                        //           .catchError(
+                                                        //               (onError) =>
+                                                        //                   {
+                                                        //                     ScaffoldMessenger.of(context).showSnackBar(
+                                                        //                       const SnackBar(
+                                                        //                         content: Row(
+                                                        //                           children: [
+                                                        //                             Text("Une erreur s'est produit"),
+                                                        //                           ],
+                                                        //                         ),
+                                                        //                         duration: Duration(seconds: 5),
+                                                        //                       ),
+                                                        //                     ),
+                                                        //                     Navigator.of(context).pop(),
+                                                        //                   });
 
-                                                              ScaffoldMessenger
-                                                                      .of(context)
-                                                                  .showSnackBar(
-                                                                const SnackBar(
-                                                                  content: Row(
-                                                                    children: [
-                                                                      Text(
-                                                                          "Désactiver avec succèss "),
-                                                                    ],
-                                                                  ),
-                                                                  duration:
-                                                                      Duration(
-                                                                          seconds:
-                                                                              2),
-                                                                ),
-                                                              );
-                                                            },
-                                                          ),
-                                                        ),
+                                                        //       ScaffoldMessenger
+                                                        //               .of(context)
+                                                        //           .showSnackBar(
+                                                        //         const SnackBar(
+                                                        //           content: Row(
+                                                        //             children: [
+                                                        //               Text(
+                                                        //                   "Désactiver avec succèss "),
+                                                        //             ],
+                                                        //           ),
+                                                        //           duration:
+                                                        //               Duration(
+                                                        //                   seconds:
+                                                        //                       2),
+                                                        //         ),
+                                                        //       );
+                                                        //     },
+                                                        //   ),
+                                                        // ),
                                                         PopupMenuItem<String>(
                                                           child: ListTile(
                                                             leading: const Icon(

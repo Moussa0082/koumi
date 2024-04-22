@@ -32,7 +32,7 @@ class _DetailConseilState extends State<DetailConseil> {
 
   void verifyAudioSource() {
     try {
-      if (conseils.audioConseil != null) {
+      if (conseils.audioConseil != null && conseils.audioConseil!.isNotEmpty ) {
         player = AudioPlayer();
 
         // Set the release mode to keep the source after playback has completed.
@@ -62,7 +62,7 @@ class _DetailConseilState extends State<DetailConseil> {
   }
 
   void verifyVideoSource() {
-    if (conseils.videoConseil != null) {
+    if (conseils.videoConseil != null && conseils.videoConseil!.isNotEmpty ) {
       flickManager = FlickManager(
         autoPlay: false,
         videoPlayerController: VideoPlayerController.networkUrl(
@@ -158,7 +158,7 @@ class _DetailConseilState extends State<DetailConseil> {
                 ? _videoBuild()
                 : Container(),
             _descriptionBuild(),
-            conseils.audioConseil != null ? _audioBuild() : Container()
+            conseils.audioConseil != null  && conseils.audioConseil!.isNotEmpty ? _audioBuild() : Container()
           ],
         ),
       ),

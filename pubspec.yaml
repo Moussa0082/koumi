@@ -127,6 +127,7 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/logo.png
     - assets/icons/
     - assets/weather/
     - assets/

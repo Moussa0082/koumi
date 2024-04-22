@@ -208,7 +208,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                         String searchText = "";
                         List<Filiere> filteredFiliereSearch =
                             filiereList.where((fil) {
-                          String nomfiliere = fil.libelleFiliere.toLowerCase();
+                          String nomfiliere = fil.libelleFiliere!.toLowerCase();
                           searchText = _searchController.text.toLowerCase();
                           return nomfiliere.contains(searchText);
                         }).toList();
@@ -249,9 +249,9 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                             children: [
                                               ListTile(
                                                   leading: _getIconForFiliere(
-                                                      e.libelleFiliere),
+                                                      e.libelleFiliere!),
                                                   title: Text(
-                                                      e.libelleFiliere
+                                                      e.libelleFiliere!
                                                           .toUpperCase(),
                                                       style: const TextStyle(
                                                         color: Colors.black,
@@ -260,7 +260,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      e.descriptionFiliere
+                                                      e.descriptionFiliere!
                                                           .trim(),
                                                       style: const TextStyle(
                                                         color: Colors.black87,
@@ -308,7 +308,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                       MainAxisAlignment
                                                           .spaceBetween,
                                                   children: [
-                                                    _buildEtat(e.statutFiliere),
+                                                    _buildEtat(e.statutFiliere!),
                                                     PopupMenuButton<String>(
                                                       padding: EdgeInsets.zero,
                                                       itemBuilder: (context) =>
@@ -857,7 +857,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                       .map(
                                         (e) => DropdownMenuItem(
                                           value: e.idFiliere,
-                                          child: Text(e.libelleFiliere),
+                                          child: Text(e.libelleFiliere!),
                                         ),
                                       )
                                       .toList(),

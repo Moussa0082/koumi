@@ -192,7 +192,7 @@ class _SpeculationPageState extends State<SpeculationPage> {
                                                   leading: _getIconForFiliere(e
                                                       .categorieProduit!
                                                       .filiere!
-                                                      .libelleFiliere),
+                                                      .libelleFiliere!),
                                                   title: Text(
                                                       e.nomSpeculation!
                                                           .toUpperCase(),

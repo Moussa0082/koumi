@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +39,7 @@ import 'package:koumi_app/service/UniteService.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
+import 'package:koumi_app/widgets/notification_controller.dart';
 import 'package:provider/provider.dart';
 
 // final navigatorKey = GlofbalKey<NavigatorState>();
@@ -45,21 +48,45 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await FirebaseApi().initNotification();
-  await AwesomeNotifications().initialize(null, [
-    NotificationChannel(
-        channelGroupKey: "basic_channel_group",
-        channelKey: "basic_channel",
-        channelName: "Basic Notification",
-        channelDescription: "Basic notifications channel")
-  ], channelGroups: [
-    NotificationChannelGroup(
-        channelGroupKey: "basic_channel_group", channelGroupName: "Basic group")
-  ]);
-  bool isAllowedToSendNotif =
-      await AwesomeNotifications().isNotificationAllowed();
-  if (isAllowedToSendNotif) {
-    AwesomeNotifications().requestPermissionToSendNotifications();
-  }
+  // await AwesomeNotifications().initialize(
+  //    'resource://@drawable/launcher_icon', 
+  //   [
+  //   NotificationChannel(
+  //       channelGroupKey: "basic_channel_group",
+  //       channelKey: "basic_channel",
+  //       channelName: "Basic Notification",
+  //       channelDescription: "Basic notifications channel",
+  //       defaultRingtoneType: DefaultRingtoneType.Notification,
+  //     playSound: true,
+  //     enableVibration: true,
+  //     importance: NotificationImportance.High,
+  //     ledColor: Colors.white,
+  //     ledOnMs: 1000,
+  //     ledOffMs: 500,
+  //   ),
+        
+  // ], channelGroups: [
+  //   NotificationChannelGroup(
+  //       channelGroupKey: "basic_channel_group", channelGroupName: "Basic group")
+  // ]);
+  // bool isAllowedToSendNotif =
+  //     await AwesomeNotifications().isNotificationAllowed();
+  // if (isAllowedToSendNotif) {
+  //   AwesomeNotifications().requestPermissionToSendNotifications();
+  // }
+  // await AwesomeNotifications().createNotification(
+  //   content:NotificationContent(
+  //     id: 1,
+  //     channelKey: 'basic_channel',
+  //     title: 'Notification programmée',
+  //     body: 'Cette notification est déclenchée à une heure précise.',
+  //       // icon: '@drawable/launcher_icon'
+  //     ),
+  //     schedule: NotificationCalendar(
+  //       second: 10,
+  //       allowWhileIdle: true
+  //     )
+  //   );
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => MagasinService()),
     ChangeNotifierProvider(create: (context) => CartProvider()),
@@ -107,7 +134,20 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   @override
-   Widget build(BuildContext context) {
+  void initState() {
+    // AwesomeNotifications().setListeners(
+    //     onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+    //     onNotificationCreatedMethod:
+    //         NotificationController.onNotificationCreateMethod,
+    //     onDismissActionReceivedMethod:
+    //         NotificationController.onDismissActionReceivedMethod,
+    //     onNotificationDisplayedMethod:
+    //         NotificationController.onNotificationDisplayMethod);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
