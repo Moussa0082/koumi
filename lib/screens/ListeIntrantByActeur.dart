@@ -56,8 +56,8 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         centerTitle: true,
         toolbarHeight: 100,
         leading: IconButton(
@@ -141,143 +141,170 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                       searchText = _searchController.text.toLowerCase();
                       return libelle.contains(searchText);
                     }).toList();
-                    return GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 2,
-                      crossAxisSpacing: 5,
-                      childAspectRatio: 0.9,
-                      children: filtereSearch
-                          .map((e) => Padding(
-                                padding: EdgeInsets.all(10),
-                                child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.45,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  DetailIntrant(intrant: e)));
-                                    },
-                                    child: Container(
-                                      height: 800,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(15),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.3),
-                                            offset: const Offset(0, 2),
-                                            blurRadius: 8,
-                                            spreadRadius: 2,
-                                          ),
-                                        ],
+                    return intrantListe.isEmpty
+                        ? Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Center(child: Text("Aucun donné trouvé")),
+                          )
+                        : GridView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 10,
+                              childAspectRatio: 0.8,
+                            ),
+                            itemCount: intrantListe
+                                .where(
+                                    (element) => element.statutIntrant == true)
+                                .length,
+                            itemBuilder: (context, index) {
+                              var e = intrantListe
+                                  .where((element) =>
+                                      element.statutIntrant == true)
+                                  .elementAt(index);
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DetailIntrant(
+                                        intrant: e,
                                       ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              child: SizedBox(
-                                                height: 90,
-                                                child: e.photoIntrant == null
-                                                    ? Image.asset(
-                                                        "assets/images/default_image.png",
-                                                        fit: BoxFit.cover,
-                                                      )
-                                                    : Image.network(
-                                                        "https://koumi.ml/api-koumi/intrant/${e.idIntrant}/image",
-                                                        // "http://10.0.2.2/${e.photoIntrant}",
-                                                        fit: BoxFit.cover,
-                                                        errorBuilder:
-                                                            (BuildContext
-                                                                    context,
-                                                                Object
-                                                                    exception,
-                                                                StackTrace?
-                                                                    stackTrace) {
-                                                          return Image.asset(
-                                                            'assets/images/default_image.png',
-                                                            fit: BoxFit.cover,
-                                                          );
-                                                        },
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Color.fromARGB(250, 250, 250, 250),
+                                    borderRadius: BorderRadius.circular(15),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.3),
+                                        offset: Offset(0, 2),
+                                        blurRadius: 8,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        child: SizedBox(
+                                          height: 90,
+                                          child: e.photoIntrant == null
+                                              ? Image.asset(
+                                                  "assets/images/default_image.png",
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Image.network(
+                                                  "https://koumi.ml/api-koumi/intrant/${e.idIntrant}/image",
+                                                  // "http://10.0.2.2/${e.photoIntrant}",
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (BuildContext
+                                                          context,
+                                                      Object exception,
+                                                      StackTrace? stackTrace) {
+                                                    return Image.asset(
+                                                      'assets/images/default_image.png',
+                                                      fit: BoxFit.cover,
+                                                    );
+                                                  },
+                                                ),
+                                        ),
+                                      ),
+                                      // SizedBox(height: 8),
+                                      ListTile(
+                                        title: Text(
+                                          e.nomIntrant,
+                                          style: TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
+                                          ),
+                                          // maxLines: 1,
+                                          // overflow: TextOverflow.ellipsis,
+                                        ),
+                                        subtitle: Text(
+                                          "${e.prixIntrant.toString()} ${para.monnaie}",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        alignment: Alignment.bottomRight,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            _buildEtat(e.statutIntrant!),
+                                            PopupMenuButton<String>(
+                                              padding: EdgeInsets.zero,
+                                              itemBuilder: (context) =>
+                                                  <PopupMenuEntry<String>>[
+                                                PopupMenuItem<String>(
+                                                  child: ListTile(
+                                                    leading: const Icon(
+                                                      Icons.check,
+                                                      color: Colors.green,
+                                                    ),
+                                                    title: const Text(
+                                                      "Activer",
+                                                      style: TextStyle(
+                                                        color: Colors.green,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                       ),
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 10,
-                                            ),
-                                            child: Text(
-                                              e.nomIntrant,
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  color: d_colorGreen),
-                                            ),
-                                          ),
-                                          // _buildItem("Statut:",
-                                          //     '${e.statutIntrant! ? 'Disponible' : 'Non disponible'}'),
-                                          _buildItem("Prix :",
-                                              "${e.prixIntrant.toString()} ${para.monnaie}"),
-                                          // SizedBox(height: 10),
-                                          Container(
-                                            alignment: Alignment.bottomRight,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                _buildEtat(e.statutIntrant!),
-                                                PopupMenuButton<String>(
-                                                  padding: EdgeInsets.zero,
-                                                  itemBuilder: (context) =>
-                                                      <PopupMenuEntry<String>>[
-                                                    PopupMenuItem<String>(
-                                                      child: ListTile(
-                                                        leading: const Icon(
-                                                          Icons.check,
-                                                          color: Colors.green,
-                                                        ),
-                                                        title: const Text(
-                                                          "Activer",
-                                                          style: TextStyle(
-                                                            color: Colors.green,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                        onTap: () async {
-                                                          await IntrantService()
-                                                              .activerIntrant(
-                                                                  e.idIntrant!)
-                                                              .then((value) => {
-                                                                    Provider.of<IntrantService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                    setState(
-                                                                        () {
-                                                                      futureList =
-                                                                          getListe(
-                                                                              acteur.idActeur!);
-                                                                    }),
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
+                                                    ),
+                                                    onTap: () async {
+                                                      await IntrantService()
+                                                          .activerIntrant(
+                                                              e.idIntrant!)
+                                                          .then((value) => {
+                                                                Provider.of<IntrantService>(
+                                                                        context,
+                                                                        listen:
+                                                                            false)
+                                                                    .applyChange(),
+                                                                setState(() {
+                                                                  futureList =
+                                                                      getListe(
+                                                                          acteur
+                                                                              .idActeur!);
+                                                                }),
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(),
+                                                                ScaffoldMessenger.of(
+                                                                        context)
+                                                                    .showSnackBar(
+                                                                  const SnackBar(
+                                                                    content:
+                                                                        Row(
+                                                                      children: [
+                                                                        Text(
+                                                                            "Activer avec succèss "),
+                                                                      ],
+                                                                    ),
+                                                                    duration: Duration(
+                                                                        seconds:
+                                                                            2),
+                                                                  ),
+                                                                )
+                                                              })
+                                                          .catchError(
+                                                              (onError) => {
                                                                     ScaffoldMessenger.of(
                                                                             context)
                                                                         .showSnackBar(
@@ -285,176 +312,158 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                                         content:
                                                                             Row(
                                                                           children: [
-                                                                            Text("Activer avec succèss "),
+                                                                            Text("Une erreur s'est produit"),
+                                                                          ],
+                                                                        ),
+                                                                        duration:
+                                                                            Duration(seconds: 5),
+                                                                      ),
+                                                                    ),
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop(),
+                                                                  });
+                                                    },
+                                                  ),
+                                                ),
+                                                PopupMenuItem<String>(
+                                                  child: ListTile(
+                                                    leading: Icon(
+                                                      Icons.disabled_visible,
+                                                      color: Colors.orange[400],
+                                                    ),
+                                                    title: Text(
+                                                      "Désactiver",
+                                                      style: TextStyle(
+                                                        color:
+                                                            Colors.orange[400],
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    onTap: () async {
+                                                      await IntrantService()
+                                                          .desactiverIntrant(
+                                                              e.idIntrant!)
+                                                          .then((value) => {
+                                                                Provider.of<IntrantService>(
+                                                                        context,
+                                                                        listen:
+                                                                            false)
+                                                                    .applyChange(),
+                                                                setState(() {
+                                                                  futureList =
+                                                                      getListe(
+                                                                          acteur
+                                                                              .idActeur!);
+                                                                }),
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(),
+                                                              })
+                                                          .catchError(
+                                                              (onError) => {
+                                                                    ScaffoldMessenger.of(
+                                                                            context)
+                                                                        .showSnackBar(
+                                                                      const SnackBar(
+                                                                        content:
+                                                                            Row(
+                                                                          children: [
+                                                                            Text("Une erreur s'est produit"),
+                                                                          ],
+                                                                        ),
+                                                                        duration:
+                                                                            Duration(seconds: 5),
+                                                                      ),
+                                                                    ),
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop(),
+                                                                  });
+
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        const SnackBar(
+                                                          content: Row(
+                                                            children: [
+                                                              Text(
+                                                                  "Désactiver avec succèss "),
+                                                            ],
+                                                          ),
+                                                          duration: Duration(
+                                                              seconds: 2),
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                                PopupMenuItem<String>(
+                                                  child: ListTile(
+                                                    leading: const Icon(
+                                                      Icons.delete,
+                                                      color: Colors.red,
+                                                    ),
+                                                    title: const Text(
+                                                      "Supprimer",
+                                                      style: TextStyle(
+                                                        color: Colors.red,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    onTap: () async {
+                                                      await IntrantService()
+                                                          .deleteIntrant(
+                                                              e.idIntrant!)
+                                                          .then((value) => {
+                                                                Provider.of<IntrantService>(
+                                                                        context,
+                                                                        listen:
+                                                                            false)
+                                                                    .applyChange(),
+                                                                setState(() {
+                                                                  futureList =
+                                                                      getListe(
+                                                                          acteur
+                                                                              .idActeur!);
+                                                                }),
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(),
+                                                              })
+                                                          .catchError(
+                                                              (onError) => {
+                                                                    ScaffoldMessenger.of(
+                                                                            context)
+                                                                        .showSnackBar(
+                                                                      const SnackBar(
+                                                                        content:
+                                                                            Row(
+                                                                          children: [
+                                                                            Text("Impossible de supprimer"),
                                                                           ],
                                                                         ),
                                                                         duration:
                                                                             Duration(seconds: 2),
                                                                       ),
                                                                     )
-                                                                  })
-                                                              .catchError(
-                                                                  (onError) => {
-                                                                        ScaffoldMessenger.of(context)
-                                                                            .showSnackBar(
-                                                                          const SnackBar(
-                                                                            content:
-                                                                                Row(
-                                                                              children: [
-                                                                                Text("Une erreur s'est produit"),
-                                                                              ],
-                                                                            ),
-                                                                            duration:
-                                                                                Duration(seconds: 5),
-                                                                          ),
-                                                                        ),
-                                                                        Navigator.of(context)
-                                                                            .pop(),
-                                                                      });
-                                                        },
-                                                      ),
-                                                    ),
-                                                    PopupMenuItem<String>(
-                                                      child: ListTile(
-                                                        leading: Icon(
-                                                          Icons
-                                                              .disabled_visible,
-                                                          color: Colors
-                                                              .orange[400],
-                                                        ),
-                                                        title: Text(
-                                                          "Désactiver",
-                                                          style: TextStyle(
-                                                            color: Colors
-                                                                .orange[400],
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                        onTap: () async {
-                                                          await IntrantService()
-                                                              .desactiverIntrant(
-                                                                  e.idIntrant!)
-                                                              .then((value) => {
-                                                                    Provider.of<IntrantService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                    setState(
-                                                                        () {
-                                                                      futureList =
-                                                                          getListe(
-                                                                              acteur.idActeur!);
-                                                                    }),
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
-                                                                  })
-                                                              .catchError(
-                                                                  (onError) => {
-                                                                        ScaffoldMessenger.of(context)
-                                                                            .showSnackBar(
-                                                                          const SnackBar(
-                                                                            content:
-                                                                                Row(
-                                                                              children: [
-                                                                                Text("Une erreur s'est produit"),
-                                                                              ],
-                                                                            ),
-                                                                            duration:
-                                                                                Duration(seconds: 5),
-                                                                          ),
-                                                                        ),
-                                                                        Navigator.of(context)
-                                                                            .pop(),
-                                                                      });
-
-                                                          ScaffoldMessenger.of(
-                                                                  context)
-                                                              .showSnackBar(
-                                                            const SnackBar(
-                                                              content: Row(
-                                                                children: [
-                                                                  Text(
-                                                                      "Désactiver avec succèss "),
-                                                                ],
-                                                              ),
-                                                              duration:
-                                                                  Duration(
-                                                                      seconds:
-                                                                          2),
-                                                            ),
-                                                          );
-                                                        },
-                                                      ),
-                                                    ),
-                                                    PopupMenuItem<String>(
-                                                      child: ListTile(
-                                                        leading: const Icon(
-                                                          Icons.delete,
-                                                          color: Colors.red,
-                                                        ),
-                                                        title: const Text(
-                                                          "Supprimer",
-                                                          style: TextStyle(
-                                                            color: Colors.red,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                        onTap: () async {
-                                                          await IntrantService()
-                                                              .deleteIntrant(
-                                                                  e.idIntrant!)
-                                                              .then((value) => {
-                                                                    Provider.of<IntrantService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                    setState(
-                                                                        () {
-                                                                      futureList =
-                                                                          getListe(
-                                                                              acteur.idActeur!);
-                                                                    }),
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
-                                                                  })
-                                                              .catchError(
-                                                                  (onError) => {
-                                                                        ScaffoldMessenger.of(context)
-                                                                            .showSnackBar(
-                                                                          const SnackBar(
-                                                                            content:
-                                                                                Row(
-                                                                              children: [
-                                                                                Text("Impossible de supprimer"),
-                                                                              ],
-                                                                            ),
-                                                                            duration:
-                                                                                Duration(seconds: 2),
-                                                                          ),
-                                                                        )
-                                                                      });
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ],
+                                                                  });
+                                                    },
+                                                  ),
                                                 ),
                                               ],
                                             ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
                                   ),
                                 ),
-                              ))
-                          .toList(),
-                    );
+                              );
+                            },
+                          );
                   }
                 });
           })
