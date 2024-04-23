@@ -260,19 +260,25 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                               PopupMenuItem<
                                                                   String>(
                                                                 child: ListTile(
-                                                                  leading:
-                                                                      const Icon(
-                                                                    Icons.check,
-                                                                    color: Colors
-                                                                        .green,
-                                                                  ),
+                                                                  leading: e.statutAlerte ==
+                                                                          false
+                                                                      ? Icon(
+                                                                          Icons
+                                                                              .check,
+                                                                          color:
+                                                                              Colors.green,
+                                                                        )
+                                                                      : Icon(
+                                                                          Icons
+                                                                              .disabled_visible,
+                                                                          color:
+                                                                              Colors.orange[400]),
                                                                   title:
-                                                                      const Text(
-                                                                    "Activer",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: Colors
-                                                                          .green,
+                                                                       Text(
+                                                                    e.statutAlerte == false ? "Activer" : "Desactiver",
+                                                                 style: TextStyle(
+                                                                   color: e.statutAlerte == false ? Colors.green : Colors.orange[
+                                                                      400],
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .bold,
@@ -280,6 +286,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                                   ),
                                                                   onTap:
                                                                       () async {
+                                                                        e.statutAlerte == false ? 
                                                                     await AlertesService()
                                                                         .activerAlertes(e
                                                                             .idAlerte!)
@@ -311,56 +318,28 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                                                 ),
                                                                               ),
                                                                               Navigator.of(context).pop(),
-                                                                            });
-                                                                  },
-                                                                ),
-                                                              ),
-                                                              PopupMenuItem<
-                                                                  String>(
-                                                                child: ListTile(
-                                                                  leading: Icon(
-                                                                    Icons
-                                                                        .disabled_visible,
-                                                                    color: Colors
-                                                                            .orange[
-                                                                        400],
-                                                                  ),
-                                                                  title: Text(
-                                                                    "Désactiver",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: Colors
-                                                                              .orange[
-                                                                          400],
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                    ),
-                                                                  ),
-                                                                  onTap:
-                                                                      () async {
-                                                                    await AlertesService()
-                                                                        .desactiverAlertes(e
-                                                                            .idAlerte!)
-                                                                        .then((value) =>
-                                                                            {
-                                                                              Provider.of<AlertesService>(context, listen: false).applyChange(),
-                                                                              Navigator.of(context).pop(),
-                                                                            })
-                                                                        .catchError((onError) =>
-                                                                            {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Une erreur s'est produit"),
-                                                                                    ],
+                                                                            }) : await AlertesService()
+                                                                            .desactiverAlertes(e
+                                                                                .idAlerte!)
+                                                                            .then((value) =>
+                                                                                {
+                                                                                  Provider.of<AlertesService>(context, listen: false).applyChange(),
+                                                                                  Navigator.of(context).pop(),
+                                                                                })
+                                                                            .catchError((onError) =>
+                                                                                {
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    const SnackBar(
+                                                                                      content: Row(
+                                                                                        children: [
+                                                                                          Text("Une erreur s'est produit"),
+                                                                                        ],
+                                                                                      ),
+                                                                                      duration: Duration(seconds: 5),
+                                                                                    ),
                                                                                   ),
-                                                                                  duration: Duration(seconds: 5),
-                                                                                ),
-                                                                              ),
-                                                                              Navigator.of(context).pop(),
-                                                                            });
+                                                                                  Navigator.of(context).pop(),
+                                                                                });
 
                                                                     ScaffoldMessenger.of(
                                                                             context)

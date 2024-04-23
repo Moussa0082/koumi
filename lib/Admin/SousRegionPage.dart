@@ -398,22 +398,41 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                               String>>[
                                                         PopupMenuItem<String>(
                                                           child: ListTile(
-                                                            leading: const Icon(
-                                                              Icons.check,
-                                                              color:
-                                                                  Colors.green,
-                                                            ),
-                                                            title: const Text(
-                                                              "Activer",
+                                                            leading: e.statutSousRegion ==
+                                                                        false
+                                                                    ? Icon(
+                                                                        Icons
+                                                                            .check,
+                                                                        color: Colors
+                                                                            .green,
+                                                                      )
+                                                                    : Icon(
+                                                                        Icons
+                                                                            .disabled_visible,
+                                                                        color: Colors
+                                                                            .orange[400],
+                                                                      ),
+                                                            title:  Text(
+                                                              e.statutSousRegion ==
+                                                                      false
+                                                                  ? "Activer"
+                                                                  : "Desactiver",
                                                               style: TextStyle(
-                                                                color: Colors
-                                                                    .green,
+                                                                color: e.statutSousRegion ==
+                                                                        false
+                                                                    ? Colors
+                                                                        .green
+                                                                    : Colors.orange[
+                                                                        400],
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
                                                               ),
                                                             ),
                                                             onTap: () async {
+                                                              e.statutSousRegion ==
+                                                                        false
+                                                                    ?
                                                               await SousRegionService()
                                                                   .activerSousRegion(e
                                                                       .idSousRegion!)
@@ -450,54 +469,30 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                                               ),
                                                                             ),
                                                                             Navigator.of(context).pop(),
-                                                                          });
-                                                            },
-                                                          ),
-                                                        ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: Icon(
-                                                              Icons
-                                                                  .disabled_visible,
-                                                              color: Colors
-                                                                  .orange[400],
-                                                            ),
-                                                            title: Text(
-                                                              "Désactiver",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                        .orange[
-                                                                    400],
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            onTap: () async {
-                                                              await SousRegionService()
-                                                                  .desactiverSousRegion(e
-                                                                      .idSousRegion!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<SousRegionService>(context, listen: false).applyChange(),
-                                                                            Navigator.of(context).pop(),
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Une erreur s'est produit"),
-                                                                                  ],
+                                                                          }) :  await SousRegionService()
+                                                                      .desactiverSousRegion(e
+                                                                          .idSousRegion!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Provider.of<SousRegionService>(context, listen: false).applyChange(),
+                                                                                Navigator.of(context).pop(),
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Une erreur s'est produit"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
                                                                                 ),
-                                                                                duration: Duration(seconds: 5),
-                                                                              ),
-                                                                            ),
-                                                                            Navigator.of(context).pop(),
-                                                                          });
+                                                                                Navigator.of(context).pop(),
+                                                                              });
 
                                                               ScaffoldMessenger
                                                                       .of(context)

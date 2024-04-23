@@ -54,15 +54,15 @@ class _AddSuperficieState extends State<AddSuperficie> {
     super.initState();
 
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    _liste = getCampListe(); 
-  
-    _speculationList = http.get(Uri.parse(
-        'https://koumi.ml/api-koumi/Speculation/getAllSpeculation'));
-        // 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation'));
+    _liste = getCampListe();
+
+    _speculationList = http.get(
+        Uri.parse('https://koumi.ml/api-koumi/Speculation/getAllSpeculation'));
+    // 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation'));
     // _speculationList = fetchSpeculationList();
     _niveau3List =
         http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
   }
 
   List<String?> selectedIntrantList = [];
@@ -190,11 +190,11 @@ class _AddSuperficieState extends State<AddSuperficie> {
                                 ),
                               );
                             }
-                           
+
                             if (snapshot.hasData) {
                               // dynamic responseData =
                               //     json.decode(snapshot.data.body);
-                               dynamic jsonString =
+                              dynamic jsonString =
                                   utf8.decode(snapshot.data.bodyBytes);
                               dynamic responseData = json.decode(jsonString);
 
@@ -672,8 +672,15 @@ class _AddSuperficieState extends State<AddSuperficie> {
                               }),
                               Navigator.of(context).pop()
                             })
-                        .catchError((onError) => {});
+                        .catchError((onError) => {
+                           setState(() {
+                                _isLoading = false;
+                              }),
+                        });
                   } catch (e) {
+                    setState(() {
+                      _isLoading = false;
+                    });
                     final String errorMessage = e.toString();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(

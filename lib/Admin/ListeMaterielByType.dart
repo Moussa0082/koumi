@@ -251,25 +251,28 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                                     child:
                                                                         ListTile(
                                                                       leading:
-                                                                          const Icon(
-                                                                        Icons
-                                                                            .check,
-                                                                        color: Colors
-                                                                            .green,
-                                                                      ),
+                                                                         e.statut ==
+                                                                              false
+                                                                          ? Icon(
+                                                                              Icons.check,
+                                                                              color: Colors.green,
+                                                                            )
+                                                                          : Icon(
+                                                                              Icons.disabled_visible,
+                                                                              color: Colors.orange[400]),
                                                                       title:
-                                                                          const Text(
-                                                                        "Activer",
-                                                                        style:
-                                                                            TextStyle(
-                                                                          color:
-                                                                              Colors.green,
+                                                                           Text(
+                                                                         e.statut == false ? "Activer" : "Desactiver",
+                                                                 style: TextStyle(
+                                                                   color: e.statut == false ? Colors.green : Colors.orange[
+                                                                      400],
                                                                           fontWeight:
                                                                               FontWeight.bold,
                                                                         ),
                                                                       ),
                                                                       onTap:
                                                                           () async {
+                                                                             e.statut == false ?
                                                                         await MaterielService()
                                                                             .activerMateriel(e
                                                                                 .idMateriel!)
@@ -304,59 +307,28 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                                                     ),
                                                                                   ),
                                                                                   Navigator.of(context).pop(),
-                                                                                });
-                                                                      },
-                                                                    ),
-                                                                  ),
-                                                                  PopupMenuItem<
-                                                                      String>(
-                                                                    child:
-                                                                        ListTile(
-                                                                      leading:
-                                                                          Icon(
-                                                                        Icons
-                                                                            .disabled_visible,
-                                                                        color: Colors
-                                                                            .orange[400],
-                                                                      ),
-                                                                      title:
-                                                                          Text(
-                                                                        "Désactiver",
-                                                                        style:
-                                                                            TextStyle(
-                                                                          color:
-                                                                              Colors.orange[400],
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                        ),
-                                                                      ),
-                                                                      onTap:
-                                                                          () async {
-                                                                        await MaterielService()
-                                                                            .desactiverMateriel(e
-                                                                                .idMateriel!)
-                                                                            .then((value) =>
-                                                                                {
-                                                                                  Provider.of<MaterielService>(context, listen: false).applyChange(),
-                                                                                  setState(() {
-                                                                                    futureListe = getListe(type.idTypeMateriel!);
-                                                                                  }),
-                                                                                  Navigator.of(context).pop(),
-                                                                                })
-                                                                            .catchError((onError) =>
-                                                                                {
-                                                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                                                    const SnackBar(
-                                                                                      content: Row(
-                                                                                        children: [
-                                                                                          Text("Une erreur s'est produit"),
-                                                                                        ],
+                                                                                }) : await MaterielService()
+                                                                                .desactiverMateriel(e.idMateriel!)
+                                                                                .then((value) => {
+                                                                                      Provider.of<MaterielService>(context, listen: false).applyChange(),
+                                                                                      setState(() {
+                                                                                        futureListe = getListe(type.idTypeMateriel!);
+                                                                                      }),
+                                                                                      Navigator.of(context).pop(),
+                                                                                    })
+                                                                                .catchError((onError) => {
+                                                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                                                        const SnackBar(
+                                                                                          content: Row(
+                                                                                            children: [
+                                                                                              Text("Une erreur s'est produit"),
+                                                                                            ],
+                                                                                          ),
+                                                                                          duration: Duration(seconds: 5),
+                                                                                        ),
                                                                                       ),
-                                                                                      duration: Duration(seconds: 5),
-                                                                                    ),
-                                                                                  ),
-                                                                                  Navigator.of(context).pop(),
-                                                                                });
+                                                                                      Navigator.of(context).pop(),
+                                                                                    });
 
                                                                         ScaffoldMessenger.of(context)
                                                                             .showSnackBar(

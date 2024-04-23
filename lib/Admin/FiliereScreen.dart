@@ -297,19 +297,33 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                             PopupMenuItem<
                                                                 String>(
                                                               child: ListTile(
-                                                                leading:
-                                                                    const Icon(
+                                                                leading:e.statutFiliere ==
+                                                                  false
+                                                              ? Icon(
                                                                   Icons.check,
                                                                   color: Colors
                                                                       .green,
-                                                                ),
+                                                                )
+                                                              : Icon(
+                                                                  Icons
+                                                                      .disabled_visible,
+                                                                  color: Colors
+                                                                          .orange[
+                                                                      400]),
                                                                 title:
-                                                                    const Text(
-                                                                  "Activer",
+                                                                     Text(
+                                                                  e.statutFiliere ==
+                                                                          false
+                                                                      ? "Activer"
+                                                                      : "Desactiver",
                                                                   style:
                                                                       TextStyle(
-                                                                    color: Colors
-                                                                        .green,
+                                                                    color: e.statutFiliere ==
+                                                                            false
+                                                                        ? Colors
+                                                                            .green
+                                                                        : Colors
+                                                                            .orange[400],
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .bold,
@@ -317,6 +331,9 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                                 ),
                                                                 onTap:
                                                                     () async {
+                                                                      e.statutFiliere ==
+                                                                  false
+                                                              ?
                                                                   await FiliereService()
                                                                       .activerFiliere(e
                                                                           .idFiliere!)
@@ -350,45 +367,15 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                                                   ),
                                                                                 ),
                                                                                 Navigator.of(context).pop(),
-                                                                              });
-                                                                },
-                                                              ),
-                                                            ),
-                                                            PopupMenuItem<
-                                                                String>(
-                                                              child: ListTile(
-                                                                leading: Icon(
-                                                                  Icons
-                                                                      .disabled_visible,
-                                                                  color: Colors
-                                                                          .orange[
-                                                                      400],
-                                                                ),
-                                                                title: Text(
-                                                                  "Désactiver",
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                            .orange[
-                                                                        400],
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                ),
-                                                                onTap:
-                                                                    () async {
-                                                                  await FiliereService()
-                                                                      .desactiverFiliere(e
-                                                                          .idFiliere!)
-                                                                      .then(
-                                                                          (value) =>
+                                                                              }) : await FiliereService()
+                                                                          .desactiverFiliere(e
+                                                                              .idFiliere!)
+                                                                          .then((value) =>
                                                                               {
                                                                                 Provider.of<FiliereService>(context, listen: false).applyChange(),
                                                                                 Navigator.of(context).pop(),
                                                                               })
-                                                                      .catchError(
-                                                                          (onError) =>
+                                                                          .catchError((onError) =>
                                                                               {
                                                                                 ScaffoldMessenger.of(context).showSnackBar(
                                                                                   const SnackBar(

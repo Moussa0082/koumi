@@ -12,7 +12,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
- 
+
 class AddAlerte extends StatefulWidget {
   const AddAlerte({super.key});
 
@@ -484,7 +484,7 @@ class _AddAlerteState extends State<AddAlerte> {
                                               audioAlerte: audiosUploaded,
                                               photoAlerte: photoUploaded)
                                           .then((value) => {
-                                            FirebaseApi()
+                                                FirebaseApi()
                                                     .sendPushNotificationToTopic(
                                                         'Nouvelle alerte',
                                                         titre),
@@ -506,6 +506,9 @@ class _AddAlerteState extends State<AddAlerte> {
                                                 Navigator.of(context).pop()
                                               })
                                           .catchError((onError) => {
+                                                setState(() {
+                                                  _isLoading = false;
+                                                }),
                                                 print("Error: " +
                                                     onError.toString()),
                                                 ScaffoldMessenger.of(context)
@@ -516,14 +519,14 @@ class _AddAlerteState extends State<AddAlerte> {
                                                         Text(
                                                           "Une erreur est survenu lors de l'ajout",
                                                           style: TextStyle(
-                                                              overflow :
+                                                              overflow:
                                                                   TextOverflow
                                                                       .ellipsis),
                                                         ),
                                                       ],
                                                     ),
                                                     duration:
-                                                      Duration(seconds: 5),
+                                                        Duration(seconds: 5),
                                                   ),
                                                 )
                                               });
@@ -533,9 +536,10 @@ class _AddAlerteState extends State<AddAlerte> {
                                               titreAlerte: titre,
                                               descriptionAlerte: description)
                                           .then((value) => {
-                                             FirebaseApi()
+                                                FirebaseApi()
                                                     .sendPushNotificationToTopic(
-                                                        'Nouvelle alerte', titre),
+                                                        'Nouvelle alerte',
+                                                        titre),
                                                 _titreController.clear(),
                                                 _descriptionController.clear(),
                                                 _tokenTextController.clear(),
@@ -550,10 +554,16 @@ class _AddAlerteState extends State<AddAlerte> {
                                               })
                                           .catchError((onError) => {
                                                 print("Error: " +
-                                                    onError.toString())
+                                                    onError.toString()),
+                                                setState(() {
+                                                  _isLoading = false;
+                                                }),
                                               });
                                     }
                                   } catch (e) {
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
                                     print("Error: " + e.toString());
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(

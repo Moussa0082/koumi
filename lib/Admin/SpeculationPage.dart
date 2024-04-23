@@ -360,22 +360,41 @@ class _SpeculationPageState extends State<SpeculationPage> {
                                                               String>>[
                                                         PopupMenuItem<String>(
                                                           child: ListTile(
-                                                            leading: const Icon(
-                                                              Icons.check,
-                                                              color:
-                                                                  Colors.green,
-                                                            ),
-                                                            title: const Text(
-                                                              "Activer",
+                                                            leading:  e.statutSpeculation ==
+                                                                        false
+                                                                    ? Icon(
+                                                                        Icons
+                                                                            .check,
+                                                                        color: Colors
+                                                                            .green,
+                                                                      )
+                                                                    : Icon(
+                                                                        Icons
+                                                                            .disabled_visible,
+                                                                        color: Colors
+                                                                            .orange[400],
+                                                                      ),
+                                                            title:  Text(
+                                                              e.statutSpeculation ==
+                                                                      false
+                                                                  ? "Activer"
+                                                                  : "Desactiver",
                                                               style: TextStyle(
-                                                                color: Colors
-                                                                    .green,
+                                                                color: e.statutSpeculation ==
+                                                                        false
+                                                                    ? Colors
+                                                                        .green
+                                                                    : Colors.orange[
+                                                                        400],
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
                                                               ),
                                                             ),
                                                             onTap: () async {
+                                                               e.statutSpeculation ==
+                                                                      false
+                                                                  ?
                                                               await SpeculationService()
                                                                   .activerSpeculation(e
                                                                       .idSpeculation!)
@@ -412,57 +431,33 @@ class _SpeculationPageState extends State<SpeculationPage> {
                                                                               ),
                                                                             ),
                                                                             Navigator.of(context).pop(),
-                                                                          });
-                                                            },
-                                                          ),
-                                                        ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: Icon(
-                                                              Icons
-                                                                  .disabled_visible,
-                                                              color: Colors
-                                                                  .orange[400],
-                                                            ),
-                                                            title: Text(
-                                                              "Désactiver",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                        .orange[
-                                                                    400],
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            onTap: () async {
-                                                              await SpeculationService()
-                                                                  .desactiverSpeculation(e
-                                                                      .idSpeculation!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<SpeculationService>(context, listen: false).applyChange(),
-                                                                            setState(() {
-                                                                              _liste = getCatListe(cat.idCategorieProduit!);
-                                                                            }),
-                                                                            Navigator.of(context).pop(),
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Une erreur s'est produit"),
-                                                                                  ],
+                                                                          }) :  await SpeculationService()
+                                                                      .desactiverSpeculation(e
+                                                                          .idSpeculation!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Provider.of<SpeculationService>(context, listen: false).applyChange(),
+                                                                                setState(() {
+                                                                                  _liste = getCatListe(cat.idCategorieProduit!);
+                                                                                }),
+                                                                                Navigator.of(context).pop(),
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Une erreur s'est produit"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
                                                                                 ),
-                                                                                duration: Duration(seconds: 5),
-                                                                              ),
-                                                                            ),
-                                                                            Navigator.of(context).pop(),
-                                                                          });
+                                                                                Navigator.of(context).pop(),
+                                                                              });
 
                                                               ScaffoldMessenger
                                                                       .of(context)

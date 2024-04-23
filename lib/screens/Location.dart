@@ -59,8 +59,8 @@ class _LocationState extends State<Location> {
     super.initState();
     verify();
     _typeList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
-    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
+        // http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
+    http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
   }
 
   @override
@@ -266,58 +266,58 @@ class _LocationState extends State<Location> {
                                 child: Center(
                                     child: Text("Aucun matériel trouvé")),
                               )
-                            : GridView.count(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 2,
-                                crossAxisSpacing: 5,
-                                childAspectRatio: 0.9,
-                                children: materielListe
-                                    .map((e) => Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: SizedBox(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.45,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
+                            : GridView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 10,
+                              childAspectRatio: 0.8,
+                            ),
+                            itemCount: materielListe
+                                .where(
+                                    (element) => element.statut == true)
+                                .length,
+                            itemBuilder: (context, index) {
+                              var e = materielListe
+                                  .where((element) =>
+                                      element.statut == true)
+                                  .elementAt(index);
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
                                                       builder: (context) =>
                                                           DetailMateriel(
                                                               materiel: e)));
-                                            },
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(15),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.grey
-                                                        .withOpacity(0.3),
-                                                    offset: const Offset(0, 2),
-                                                    blurRadius: 8,
-                                                    spreadRadius: 2,
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.stretch,
-                                                children: [
-                                                  ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8.0),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      child: e.photoMateriel ==
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Color.fromARGB(250, 250, 250, 250),
+                                    borderRadius: BorderRadius.circular(15),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.3),
+                                        offset: Offset(0, 2),
+                                        blurRadius: 8,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        child: SizedBox(
+                                          height: 100,
+                                          child:  e.photoMateriel ==
                                                               null
                                                           ? Image.asset(
                                                               "assets/images/default_image.png",
@@ -343,44 +343,40 @@ class _LocationState extends State<Location> {
                                                                 );
                                                               },
                                                             ),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                      horizontal: 10,
-                                                    ),
-                                                    child: Text(
-                                                      e.nom,
-                                                      style: TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          color: d_colorGreen),
-                                                    ),
-                                                  ),
-                                                  _buildItem("Statut:",
-                                                      '${e.statut! ? 'Disponible' : 'Non disponible'}'),
-                                                  _buildItem("Localité :",
-                                                      e.localisation),
-                                                  // SizedBox(height: 10),
-                                                ],
-                                              ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      ListTile(
+                                          title: Text(
+                                             e.nom,
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black87,
+                                            ),
+                                            // maxLines: 1,
+                                            // overflow: TextOverflow.ellipsis,
+                                          ),
+                                          subtitle: Text(
+                                             e.localisation,
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.black87,
                                             ),
                                           ),
-                                        )))
-                                    .toList());
-                      } else {
-                        return Padding(
+                                         
+                                          ),
+
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                      } else{
+                         return const Padding(
                           padding: EdgeInsets.all(10),
-                          child: Text('Aucun matériel trouvé ',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 17,
-                                overflow: TextOverflow.ellipsis,
-                              )),
+                          child: Center(child: Text("Aucun matériel trouvé")),
                         );
                       }
                     });

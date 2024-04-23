@@ -462,29 +462,45 @@ class _CategoriPageState extends State<CategoriPage> {
                                                                     String>>[
                                                           PopupMenuItem<String>(
                                                             child: ListTile(
-                                                              leading:
-                                                                  const Icon(
-                                                                Icons.check,
-                                                                color: Colors
-                                                                    .green,
-                                                              ),
-                                                              title: const Text(
-                                                                "Activer",
+                                                              leading: e.statutCategorie ==
+                                                                      false
+                                                                  ? Icon(
+                                                                      Icons
+                                                                          .check,
+                                                                      color: Colors
+                                                                          .green,
+                                                                    )
+                                                                  : Icon(
+                                                                      Icons
+                                                                          .disabled_visible,
+                                                                      color: Colors
+                                                                              .orange[
+                                                                          400]),
+                                                              title: Text(
+                                                                e.statutCategorie ==
+                                                                        false
+                                                                    ? "Activer"
+                                                                    : "Desactiver",
                                                                 style:
                                                                     TextStyle(
-                                                                  color: Colors
-                                                                      .green,
+                                                                  color: e.statutCategorie ==
+                                                                          false
+                                                                      ? Colors
+                                                                          .green
+                                                                      : Colors.orange[
+                                                                          400],
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold,
                                                                 ),
                                                               ),
                                                               onTap: () async {
-                                                                await CategorieService()
-                                                                    .activerCategorie(e
-                                                                        .idCategorieProduit!)
-                                                                    .then(
-                                                                        (value) =>
+                                                                e.statutCategorie ==
+                                                                        false
+                                                                    ? await CategorieService()
+                                                                        .activerCategorie(e
+                                                                            .idCategorieProduit!)
+                                                                        .then((value) =>
                                                                             {
                                                                               Provider.of<CategorieService>(context, listen: false).applyChange(),
                                                                               // setState(
@@ -504,51 +520,25 @@ class _CategoriPageState extends State<CategoriPage> {
                                                                                 ),
                                                                               )
                                                                             })
-                                                                    .catchError(
-                                                                        (onError) =>
-                                                                            {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Une erreur s'est produit"),
-                                                                                    ],
+                                                                        .catchError(
+                                                                            (onError) =>
+                                                                                {
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    const SnackBar(
+                                                                                      content: Row(
+                                                                                        children: [
+                                                                                          Text("Une erreur s'est produit"),
+                                                                                        ],
+                                                                                      ),
+                                                                                      duration: Duration(seconds: 5),
+                                                                                    ),
                                                                                   ),
-                                                                                  duration: Duration(seconds: 5),
-                                                                                ),
-                                                                              ),
-                                                                              Navigator.of(context).pop(),
-                                                                            });
-                                                              },
-                                                            ),
-                                                          ),
-                                                          PopupMenuItem<String>(
-                                                            child: ListTile(
-                                                              leading: Icon(
-                                                                Icons
-                                                                    .disabled_visible,
-                                                                color: Colors
-                                                                        .orange[
-                                                                    400],
-                                                              ),
-                                                              title: Text(
-                                                                "Désactiver",
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                          .orange[
-                                                                      400],
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                              onTap: () async {
-                                                                await CategorieService()
-                                                                    .desactiverCategorie(e
-                                                                        .idCategorieProduit!)
-                                                                    .then(
-                                                                        (value) =>
+                                                                                  Navigator.of(context).pop(),
+                                                                                })
+                                                                    : await CategorieService()
+                                                                        .desactiverCategorie(e
+                                                                            .idCategorieProduit!)
+                                                                        .then((value) =>
                                                                             {
                                                                               Provider.of<CategorieService>(context, listen: false).applyChange(),
                                                                               // setState(
@@ -558,8 +548,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                                                               // }),
                                                                               Navigator.of(context).pop(),
                                                                             })
-                                                                    .catchError(
-                                                                        (onError) =>
+                                                                        .catchError((onError) =>
                                                                             {
                                                                               ScaffoldMessenger.of(context).showSnackBar(
                                                                                 const SnackBar(

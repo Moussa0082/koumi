@@ -127,7 +127,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
     prixParDestinations = {};
     _niveau3List =
         http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
   }
 
   Future<File> saveImagePermanently(String imagePath) async {
@@ -581,8 +581,12 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                               ),
                                             )
                                           })
-                                      .catchError((onError) =>
-                                          {print(onError.toString())});
+                                      .catchError((onError) => {
+                                            print(onError.toString()),
+                                            setState(() {
+                                              _isLoading = false;
+                                            }),
+                                          });
                                 } else {
                                   await VehiculeService()
                                       .addVehicule(
@@ -608,11 +612,11 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                               // typeVoiture == null;
                                             }),
                                             Navigator.pop(context),
-                                              // Navigator.pushReplacement(
-                                              //   context,
-                                              //   MaterialPageRoute(
-                                              //       builder: (context) =>
-                                              //           VehiculeActeur())), 
+                                            // Navigator.pushReplacement(
+                                            //   context,
+                                            //   MaterialPageRoute(
+                                            //       builder: (context) =>
+                                            //           VehiculeActeur())),
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
@@ -630,10 +634,17 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                               ),
                                             )
                                           })
-                                      .catchError((onError) =>
-                                          {print(onError.toString())});
+                                      .catchError((onError) => {
+                                            print(onError.toString()),
+                                            setState(() {
+                                              _isLoading = false;
+                                            }),
+                                          });
                                 }
                               } catch (e) {
+                                setState(() {
+                                  _isLoading = false;
+                                });
                                 final String errorMessage = e.toString();
                                 print(errorMessage);
                                 ScaffoldMessenger.of(context).showSnackBar(

@@ -6,7 +6,6 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/MessageWa.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/PinLoginScreen.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/MessageService.dart';
@@ -28,14 +27,13 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _CustomAppBarState extends State<CustomAppBar> {
   late Acteur acteur = Acteur();
-    late List<TypeActeur> typeActeurData = [];
+  late List<TypeActeur> typeActeurData = [];
   String type = '';
   List<MessageWa> messageList = [];
   String? email = "";
   bool isExist = false;
- 
 
-    void verify() async {
+  void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     email = prefs.getString('emailActeur');
     if (email != null) {
@@ -84,7 +82,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 ),
                 IconButton(
                   onPressed: () {
-                     Future.microtask(() {
+                    Future.microtask(() {
                       Provider.of<BottomNavigationService>(context,
                               listen: false)
                           .changeIndex(0);
@@ -105,7 +103,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
             ),
           )
         : Padding(
-            padding: const EdgeInsets.symmetric(vertical: 25),
+            padding: const EdgeInsets.symmetric(vertical: 15),
             child: Padding(
               padding: const EdgeInsets.all(5.0),
               child: Consumer<ActeurProvider>(
@@ -116,8 +114,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                   }
 
                   List<TypeActeur> typeActeurData = ac.typeActeur!;
-                   type =
-                      typeActeurData.map((data) => data.libelle).join(', ');
+                  type = typeActeurData.map((data) => data.libelle).join(', ');
                   return ListTile(
                     leading: ac.logoActeur == null || ac.logoActeur!.isEmpty
                         ? ProfilePhoto(
@@ -130,8 +127,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
                             totalWidth: 50,
                             cornerRadius: 50,
                             color: Colors.black,
-                            image:
-                                NetworkImage("http:10.0.2.2/${ac.logoActeur}"),
+                            image: NetworkImage(
+                                "https://koumi.ml/api-koumi/acteur/${ac.idActeur}/image"),
                           ),
                     title: Text(
                       ac.nomActeur!.toUpperCase(),
@@ -164,7 +161,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                                       fontWeight: FontWeight.w800,
                                     ));
                               }
-                    
+
                               if (!snapshot.hasData) {
                                 return Text("0",
                                     style: TextStyle(

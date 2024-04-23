@@ -255,19 +255,29 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                   <PopupMenuEntry<String>>[
                                                 PopupMenuItem<String>(
                                                   child: ListTile(
-                                                    leading: const Icon(
-                                                      Icons.check,
-                                                      color: Colors.green,
-                                                    ),
-                                                    title: const Text(
-                                                      "Activer",
+                                                    leading: e.statutIntrant == false  ? 
+                                                    Icon(
+                                                                              Icons.check,
+                                                                              color: Colors.green,
+                                                                            )
+                                                                          : Icon(
+                                                                              Icons.disabled_visible,
+                                                                              color: Colors.orange[400],
+                                                                            ),
+                                                    title:  Text(
+e.statutIntrant == false  ? 
+                                                      "Activer" : "Desactiver",
                                                       style: TextStyle(
-                                                        color: Colors.green,
+                                                        color: e.statutIntrant == false
+                                                            ? Colors.green
+                                                            : Colors
+                                                                .orange[400],
                                                         fontWeight:
                                                             FontWeight.bold,
                                                       ),
                                                     ),
                                                     onTap: () async {
+                                                      e.statutIntrant == false  ? 
                                                       await IntrantService()
                                                           .activerIntrant(
                                                               e.idIntrant!)
@@ -322,65 +332,43 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop(),
-                                                                  });
-                                                    },
-                                                  ),
-                                                ),
-                                                PopupMenuItem<String>(
-                                                  child: ListTile(
-                                                    leading: Icon(
-                                                      Icons.disabled_visible,
-                                                      color: Colors.orange[400],
-                                                    ),
-                                                    title: Text(
-                                                      "Désactiver",
-                                                      style: TextStyle(
-                                                        color:
-                                                            Colors.orange[400],
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    onTap: () async {
-                                                      await IntrantService()
-                                                          .desactiverIntrant(
-                                                              e.idIntrant!)
-                                                          .then((value) => {
-                                                                Provider.of<IntrantService>(
-                                                                        context,
-                                                                        listen:
-                                                                            false)
-                                                                    .applyChange(),
-                                                                setState(() {
-                                                                  futureList =
-                                                                      getListe(
-                                                                          acteur
-                                                                              .idActeur!);
-                                                                }),
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop(),
-                                                              })
-                                                          .catchError(
-                                                              (onError) => {
-                                                                    ScaffoldMessenger.of(
-                                                                            context)
-                                                                        .showSnackBar(
-                                                                      const SnackBar(
-                                                                        content:
-                                                                            Row(
-                                                                          children: [
-                                                                            Text("Une erreur s'est produit"),
-                                                                          ],
-                                                                        ),
-                                                                        duration:
-                                                                            Duration(seconds: 5),
-                                                                      ),
-                                                                    ),
+                                                                  }) :  await IntrantService()
+                                                              .desactiverIntrant(
+                                                                  e.idIntrant!)
+                                                              .then((value) => {
+                                                                    Provider.of<IntrantService>(
+                                                                            context,
+                                                                            listen:
+                                                                                false)
+                                                                        .applyChange(),
+                                                                    setState(
+                                                                        () {
+                                                                      futureList =
+                                                                          getListe(
+                                                                              acteur.idActeur!);
+                                                                    }),
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop(),
-                                                                  });
+                                                                  })
+                                                              .catchError(
+                                                                  (onError) => {
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          const SnackBar(
+                                                                            content:
+                                                                                Row(
+                                                                              children: [
+                                                                                Text("Une erreur s'est produit"),
+                                                                              ],
+                                                                            ),
+                                                                            duration:
+                                                                                Duration(seconds: 5),
+                                                                          ),
+                                                                        ),
+                                                                        Navigator.of(context)
+                                                                            .pop(),
+                                                                      });
 
                                                       ScaffoldMessenger.of(
                                                               context)

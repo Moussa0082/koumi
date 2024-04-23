@@ -146,8 +146,8 @@ class _NextAddIntratState extends State<NextAddIntrat> {
     para = paraList[0];
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // _formeList = fetchList();
-    _formeList = http.get(Uri.parse(
-        'http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
+    _formeList = http.get(
+        Uri.parse('http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
   }
 
   Future<List<Forme>> fetchList() async {
@@ -480,6 +480,9 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                           )
                                         })
                                     .catchError((onError) => {
+                                       setState(() {
+                                            _isLoading = false;
+                                          }),
                                           print('Erreur :${onError.message}'),
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
@@ -537,6 +540,9 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                         })
                                     .catchError((onError) => {
                                           print('Erreur :${onError.message}'),
+                                           setState(() {
+                                            _isLoading = false;
+                                          }),
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
                                             const SnackBar(
@@ -556,6 +562,9 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                         });
                               }
                             } catch (e) {
+                              setState(() {
+                                _isLoading = false;
+                              });
                               print('Erreur :${e.toString()}');
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(

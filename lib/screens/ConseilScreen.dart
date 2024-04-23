@@ -303,7 +303,7 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                               SizedBox(height: 10),
                                               type.toLowerCase() != 'admin'
                                                   ? Container()
-                                                  : Container(
+                                                  :  Container(
                                                       alignment:
                                                           Alignment.bottomRight,
                                                       padding: const EdgeInsets
@@ -323,92 +323,32 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                                             itemBuilder: (context) =>
                                                                 <PopupMenuEntry<
                                                                     String>>[
-                                                              // PopupMenuItem<
-                                                              //     String>(
-                                                              //     enabled: e.statutConseil,
-                                                              //   child:  ListTile(
-                                                              //     leading:
-                                                              //         const Icon(
-                                                              //       Icons.check,
-                                                              //       color: Colors
-                                                              //           .green,
-                                                              //     ),
-                                                              //     title:
-                                                              //         const Text(
-                                                              //       "Activer",
-                                                              //       style:
-                                                              //           TextStyle(
-                                                              //         color: Colors
-                                                              //             .green,
-                                                              //         fontWeight:
-                                                              //             FontWeight
-                                                              //                 .bold,
-                                                              //       ),
-                                                              //     ),
-                                                              //     onTap:
-                                                              //         () async {
-                                                              //       await ConseilService()
-                                                              //           .activerConseil(e
-                                                              //               .idConseil!)
-                                                              //           .then((value) =>
-                                                              //               {
-                                                              //                 Provider.of<ConseilService>(context, listen: false).applyChange(),
-                                                              //                 Navigator.of(context).pop(),
-                                                              //                 ScaffoldMessenger.of(context).showSnackBar(
-                                                              //                   const SnackBar(
-                                                              //                     content: Row(
-                                                              //                       children: [
-                                                              //                         Text("Activer avec succèss "),
-                                                              //                       ],
-                                                              //                     ),
-                                                              //                     duration: Duration(seconds: 2),
-                                                              //                   ),
-                                                              //                 )
-                                                              //               })
-                                                              //           .catchError((onError) =>
-                                                              //               {
-                                                              //                 ScaffoldMessenger.of(context).showSnackBar(
-                                                              //                   const SnackBar(
-                                                              //                     content: Row(
-                                                              //                       children: [
-                                                              //                         Text("Une erreur s'est produit"),
-                                                              //                       ],
-                                                              //                     ),
-                                                              //                     duration: Duration(seconds: 5),
-                                                              //                   ),
-                                                              //                 ),
-                                                              //                 Navigator.of(context).pop(),
-                                                              //               });
-                                                              //     },
-                                                              //   ),
-                                                              // ),
                                                               PopupMenuItem<
                                                                   String>(
                                                                 child: ListTile(
-                                                                  leading: Icon(
-                                                                    Icons
-                                                                        .disabled_visible,
-                                                                    color: e.statutConseil
-                                                                        ? Colors
-                                                                            .orange[400]: Color.fromARGB(
-                                                                            255,
-                                                                            179,
-                                                                            178,
-                                                                            178)
-                                                                        ,
-                                                                  ),
+                                                                  leading:
+                                                                      e.statutConseil == false
+                                                                          ? Icon(
+                                                                              Icons.check,
+                                                                              color: Colors.green,
+                                                                            )
+                                                                          : Icon(
+                                                                              Icons.disabled_visible,
+                                                                              color: Colors.orange[400],
+                                                                            ),
                                                                   title: Text(
-                                                                    "Désactiver",
+                                                                    e.statutConseil ==
+                                                                            false
+                                                                        ? "Activer"
+                                                                        : "Desactiver",
                                                                     style:
                                                                         TextStyle(
-                                                                      color: e.statutConseil
-                                                                          ? Colors.orange[
-                                                                              400]
-                                                                          : Color.fromARGB(
-                                                                              255,
-                                                                              179,
-                                                                              178,
-                                                                              178),
+                                                                      color: e.statutConseil ==
+                                                                              false
+                                                                          ? Colors
+                                                                              .green
+                                                                          : Colors
+                                                                              .orange[400],
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .bold,
@@ -416,28 +356,64 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                                                   ),
                                                                   onTap:
                                                                       () async {
-                                                                    await ConseilService()
-                                                                        .desactiverConseil(e
-                                                                            .idConseil!)
-                                                                        .then((value) =>
-                                                                            {
-                                                                              Provider.of<ConseilService>(context, listen: false).applyChange(),
-                                                                              Navigator.of(context).pop(),
-                                                                            })
-                                                                        .catchError((onError) =>
-                                                                            {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Une erreur s'est produit"),
-                                                                                    ],
+                                                                    e.statutConseil ==
+                                                                            false
+                                                                        ? await ConseilService()
+                                                                            .activerConseil(e
+                                                                                .idConseil!)
+                                                                            .then((value) =>
+                                                                                {
+                                                                                  Provider.of<ConseilService>(context, listen: false).applyChange(),
+                                                                                  Navigator.of(context).pop(),
+                                                                                 
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    const SnackBar(
+                                                                                      content: Row(
+                                                                                        children: [
+                                                                                          Text("Activer avec succèss "),
+                                                                                        ],
+                                                                                      ),
+                                                                                      duration: Duration(seconds: 2),
+                                                                                    ),
+                                                                                  )
+                                                                                })
+                                                                            .catchError((onError) =>
+                                                                                {
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    const SnackBar(
+                                                                                      content: Row(
+                                                                                        children: [
+                                                                                          Text("Une erreur s'est produit"),
+                                                                                        ],
+                                                                                      ),
+                                                                                      duration: Duration(seconds: 5),
+                                                                                    ),
                                                                                   ),
-                                                                                  duration: Duration(seconds: 5),
-                                                                                ),
-                                                                              ),
-                                                                              Navigator.of(context).pop(),
-                                                                            });
+                                                                                  Navigator.of(context).pop(),
+                                                                                })
+                                                                        : await ConseilService()
+                                                                            .desactiverConseil(e
+                                                                                .idConseil!)
+                                                                            .then((value) =>
+                                                                                {
+                                                                                  Provider.of<ConseilService>(context, listen: false).applyChange(),
+                                                                                  Navigator.of(context).pop(),
+                                                                                 
+                                                                                })
+                                                                            .catchError((onError) =>
+                                                                                {
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    const SnackBar(
+                                                                                      content: Row(
+                                                                                        children: [
+                                                                                          Text("Une erreur s'est produit"),
+                                                                                        ],
+                                                                                      ),
+                                                                                      duration: Duration(seconds: 5),
+                                                                                    ),
+                                                                                  ),
+                                                                                  Navigator.of(context).pop(),
+                                                                                });
 
                                                                     ScaffoldMessenger.of(
                                                                             context)
@@ -487,6 +463,7 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                                                             {
                                                                               Provider.of<ConseilService>(context, listen: false).applyChange(),
                                                                               Navigator.of(context).pop(),
+                                                                             
                                                                             })
                                                                         .catchError((onError) =>
                                                                             {

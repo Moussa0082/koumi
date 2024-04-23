@@ -223,24 +223,32 @@ class _FormeProduitState extends State<FormeProduit> {
                                                                     String>>[
                                                           PopupMenuItem<String>(
                                                             child: ListTile(
-                                                              leading:
-                                                                  const Icon(
-                                                                Icons.check,
-                                                                color: Colors
-                                                                    .green,
-                                                              ),
-                                                              title: const Text(
-                                                                "Activer",
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .green,
+                                                              leading: e.statutForme ==
+                                                                      false
+                                                                  ? Icon(
+                                                                      Icons
+                                                                          .check,
+                                                                      color: Colors
+                                                                          .green,
+                                                                    )
+                                                                  : Icon(
+                                                                      Icons
+                                                                          .disabled_visible,
+                                                                      color: Colors
+                                                                              .orange[
+                                                                          400]),
+                                                              title:  Text(
+                                                                e.statutForme == false ? "Activer" : "Desactiver",
+                                                                 style: TextStyle(
+                                                                   color: e.statutForme == false ? Colors.green : Colors.orange[
+                                                                      400],
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold,
                                                                 ),
                                                               ),
                                                               onTap: () async {
+                                                                 e.statutForme == false ? 
                                                                 await FormeService()
                                                                     .activerForme(e
                                                                         .idForme!)
@@ -277,37 +285,10 @@ class _FormeProduitState extends State<FormeProduit> {
                                                                                 ),
                                                                               ),
                                                                               Navigator.of(context).pop(),
-                                                                            });
-                                                              },
-                                                            ),
-                                                          ),
-                                                          PopupMenuItem<String>(
-                                                            child: ListTile(
-                                                              leading: Icon(
-                                                                Icons
-                                                                    .disabled_visible,
-                                                                color: Colors
-                                                                        .orange[
-                                                                    400],
-                                                              ),
-                                                              title: Text(
-                                                                "Désactiver",
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                          .orange[
-                                                                      400],
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                              onTap: () async {
-                                                                await FormeService()
-                                                                    .desactiverForme(e
-                                                                        .idForme!)
-                                                                    .then(
-                                                                        (value) =>
+                                                                            }) :  await FormeService()
+                                                                        .desactiverForme(e
+                                                                            .idForme!)
+                                                                        .then((value) =>
                                                                             {
                                                                               Provider.of<FormeService>(context, listen: false).applyChange(),
                                                                               setState(() {
@@ -315,8 +296,7 @@ class _FormeProduitState extends State<FormeProduit> {
                                                                               }),
                                                                               Navigator.of(context).pop(),
                                                                             })
-                                                                    .catchError(
-                                                                        (onError) =>
+                                                                        .catchError((onError) =>
                                                                             {
                                                                               ScaffoldMessenger.of(context).showSnackBar(
                                                                                 const SnackBar(
