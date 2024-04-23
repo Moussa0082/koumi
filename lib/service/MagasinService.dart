@@ -177,7 +177,8 @@ class MagasinService extends ChangeNotifier{
   // final String jsonString = utf8.decode(response.bodyBytes);
   //       List<dynamic> data = json.decode(jsonString);
                List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-        magasin = body.where((magasin) => magasin['statutMagasin'] == true)
+        magasin = body
+        // where((magasin) => magasin['statutMagasin'] == true)
         .map((e) => Magasin.fromMap(e)).toList();
         return magasin;
       // magasin = data.map((item) => Magasin.fromMap(item)).toList();

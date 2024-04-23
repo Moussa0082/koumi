@@ -350,7 +350,240 @@ class _ProductScreenState extends State<ProductScreen> {
                       // spacing: 10, // Espacement horizontal entre les conteneurs
                       // runSpacing:
                       //     10, // Espacement vertical entre les lignes de conteneurs
-                      children: filtereSearch
+                      children: 
+                      typeActeurData.map((e) => e.libelle!.toLowerCase()).contains("admin") ?
+                      filtereSearch
+                        //  .where((element) => element.statutSotck == true)
+                          .map((e) => Padding(
+                                padding: EdgeInsets.all(10),
+                                child: SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.45,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DetailProduits(
+                                                      stock: e)));
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(15),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.3),
+                                            offset: const Offset(0, 2),
+                                            blurRadius: 8,
+                                            spreadRadius: 2,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              child: SizedBox(
+                                                height: 90,
+                                                child: e.photo == null
+                                                    ? Image.asset(
+                                                        "assets/images/mang.jpg",
+                                                        fit: BoxFit.cover,
+                                                      )
+                                                    : Image.network(
+                                                        "http://10.0.2.2/${e.photo}",
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder:
+                                                            (BuildContext
+                                                                    context,
+                                                                Object
+                                                                    exception,
+                                                                StackTrace?
+                                                                    stackTrace) {
+                                                          return Image.asset(
+                                                            'assets/images/mang.jpg.png',
+                                                            fit: BoxFit.cover,
+                                                          );
+                                                        },
+                                                      ),
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 5),
+                                            child: Text(
+                                              e.nomProduit!,
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: d_colorGreen,
+                                              ),
+                                            ),
+                                          ),
+                                          // _buildEtat(e.statutSotck!),
+                                          // _buildItem(
+                                          //     "Prix :", e.prix!.toString()),
+                                          SizedBox(height: 1),
+                                           Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text(
+        '${e.prix!.toInt()} FCFA', // Convertir en entier
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, overflow:TextOverflow.ellipsis),
+      ),
+      Container(
+        width: 30, // Largeur du conteneur réduite
+        height: 30, // Hauteur du conteneur réduite
+        decoration: BoxDecoration(
+          color: Colors.blue, // Couleur de fond du bouton
+          borderRadius: BorderRadius.circular(15), // Coins arrondis du bouton
+        ),
+        child: IconButton(
+          onPressed: () {
+            // Action à effectuer lorsque le bouton est pressé
+            if (e.acteur!.idActeur! == acteur.idActeur!){
+                        Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
+                        }else{
+                          Provider.of<CartProvider>(context, listen: false)
+                        .addToCart(e, 1, "");
+                        }
+            // Par exemple, ajouter le produit au panier
+          },
+          icon: Icon(Icons.add), // Icône du panier
+          color: Colors.white, // Couleur de l'icône
+          iconSize: 20, // Taille de l'icône réduite
+          padding: EdgeInsets.zero, // Aucune marge intérieure
+          splashRadius: 15, // Rayon de l'effet de pression réduit
+          tooltip: 'Ajouter au panier', // Info-bulle au survol de l'icône
+        ),
+      ),
+    ],
+  ),
+),
+
+  typeActeurData.map((e) => e.libelle!.toLowerCase()).contains("admin") ?
+                                          //  _buildItem(
+                                          //     "Acteur :", e.acteur!.typeActeur!.map((e) => e.libelle!).join(','))
+                                           Container(
+                                                  alignment:
+                                                            Alignment.bottomRight,
+                                               child: Padding(
+                                                                                            padding: const EdgeInsets.symmetric(horizontal:8.0),
+                                                                                            child: Row(
+                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                   children: [
+                                                     _buildEtat(e.statutSotck!),
+                                                     SizedBox(width: 120,),
+                                                     Expanded(
+                                                       child: PopupMenuButton<String>(
+                                                         padding: EdgeInsets.zero,
+                                                         itemBuilder: (context) =>
+                                                             <PopupMenuEntry<String>>[
+                                                           PopupMenuItem<String>(
+                                                             child: ListTile(
+                                                               leading: e.statutSotck == false? Icon(
+                                                                 Icons.check,
+                                                                 color: Colors.green,
+                                                               ): Icon(
+                                                                Icons.disabled_visible,
+                                                                color:Colors.orange[400]
+                                                               ),
+                                                               title:  Text(
+                                                                e.statutSotck == false ? "Activer" : "Desactiver",
+                                                                 style: TextStyle(
+                                                                   color: e.statutSotck == false ? Colors.green : Colors.red,
+                                                                   fontWeight: FontWeight.bold,
+                                                                 ),
+                                                               ),
+                                                               
+                                                               onTap: () async {
+                                  // Changement d'état du magasin ici
+                           
+                               e.statutSotck == false ?  await StockService().activerStock(e.idStock!).then((value) => {
+                                    // Mettre à jour la liste des stock après le changement d'état
+                                    Provider.of<StockService>(
+                                                                            context,
+                                                                            listen:
+                                                                                false)
+                                                                        .applyChange(),
+                                    setState(() {
+                                      stockListeFuture =  StockService().fetchStock();
+                                    }),
+                                    Navigator.of(context).pop(),
+                                                                         })
+                                                                     .catchError((onError) => {
+                                                                           ScaffoldMessenger.of(context)
+                                                                               .showSnackBar(
+                                                                             const SnackBar(
+                                                                               content: Row(
+                                                                                 children: [
+                                                                                   Text(
+                                                                                       "Une erreur s'est produit"),
+                                                                                 ],
+                                                                               ),
+                                                                               duration:
+                                                                                   Duration(seconds: 5),
+                                                                             ),
+                                                                           ),
+                                                                           Navigator.of(context).pop(),
+                                                                         }): await StockService()
+                                                                     .desactiverStock(e.idStock!)
+                                                                     .then((value) => {
+                                                                        Provider.of<StockService>(
+                                                                            context,
+                                                                            listen:
+                                                                                false)
+                                                                        .applyChange(),
+                                                                                setState(() {
+                                                       stockListeFuture =  StockService().fetchStock();
+                                                       }),
+                                                                           Navigator.of(context).pop(),
+                                                                     
+                                                                         });
+                                                       
+                                                                 ScaffoldMessenger.of(context)
+                                                                     .showSnackBar(
+                                                                    SnackBar(
+                                                                     content: Row(
+                                                                       children: [
+                                                                         Text(e.statutSotck == false ? "Activer avec succèss " : "Desactiver avec succèss"),
+                                                                       ],
+                                                                     ),
+                                                                     duration: Duration(seconds: 2),
+                                                                   ),
+                                                                 );
+                                                               },
+                                                             )
+                                                          
+                                               ),
+                                                           
+                                                          
+                                                         ],
+                                                       ),
+                                                     ),
+                                                   ],
+                                                                                            ),
+                                                                                          ),
+                                                 )
+                                          : SizedBox(),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ))
+                          .toList():
+                           filtereSearch
                          .where((element) => element.statutSotck == true)
                           .map((e) => Padding(
                                 padding: EdgeInsets.all(10),
@@ -468,13 +701,18 @@ class _ProductScreenState extends State<ProductScreen> {
     ],
   ),
 ),
+
+                                          //  _buildItem(
+                                          //     "Acteur :", e.acteur!.typeActeur!.map((e) => e.libelle!).join(','))
+                                           
                                         ],
                                       ),
                                     ),
                                   ),
                                 ),
                               ))
-                          .toList(),
+                          .toList()
+                          ,
                     );
                   }
                 });

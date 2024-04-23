@@ -66,7 +66,10 @@ class _StoreScreenState extends State<StoreScreen> {
   // if(selectedNiveau1Pays != null){
   //  magasinListe = await MagasinService().fetchMagasinByRegion(
   //                       selectedNiveau1Pays!.idNiveau1Pays!);
-  // }else{
+  // }else if(typeActeurData.map((e) => e.libelle!.toLowerCase()).contains("admin")){
+  //  magasinListe = await MagasinService().fetchAllMagasin();
+  // }
+  // else{
   //  magasinListe = await MagasinService().fetchAllMagasin();
   // }
   // return magasinListe;
@@ -79,6 +82,7 @@ class _StoreScreenState extends State<StoreScreen> {
     // // selectedType == null;
     // type = typeActeurData.map((data) => data.libelle).join(', ');
     verify();
+    // magasinListeFuture = getAllMagasin();
     _searchController = TextEditingController();
     _niveau1PaysList =
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
@@ -261,6 +265,7 @@ class _StoreScreenState extends State<StoreScreen> {
           Consumer<MagasinService>(builder: (context, magasinService, child) {
             return FutureBuilder<List<Magasin>>(
                 future: 
+                // magasinListeFuture
                 selectedNiveau1Pays != null
                     ? magasinService.fetchMagasinByRegion(
                         selectedNiveau1Pays!.idNiveau1Pays!)
@@ -320,7 +325,203 @@ class _StoreScreenState extends State<StoreScreen> {
                       // spacing: 10, // Espacement horizontal entre les conteneurs
                       // runSpacing:
                       //     10, // Espacement vertical entre les lignes de conteneurs
-                      children: filtereSearch
+                      children: 
+                        typeActeurData.map((e) => e.libelle!.toLowerCase()).contains("admin") ?
+                      filtereSearch
+                        //  .where((element) => element.statutMagasin == true)
+                          .map((e) => Padding(
+                                padding: EdgeInsets.all(10),
+                                child: SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.45,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ProductScreen(
+                                                     id: e.idMagasin, nom: e.nomMagasin, )
+                                                     ));
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(15),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.3),
+                                            offset: const Offset(0, 2),
+                                            blurRadius: 8,
+                                            spreadRadius: 2,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              child: SizedBox(
+                                                height: 90,
+                                                child: e.photo == null
+                                                    ? Image.asset(
+                                                        "assets/images/magasin.png",
+                                                        fit: BoxFit.cover,
+                                                      )
+                                                    : Image.network(
+                                                        "http://10.0.2.2/${e.photo}",
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder:
+                                                            (BuildContext
+                                                                    context,
+                                                                Object
+                                                                    exception,
+                                                                StackTrace?
+                                                                    stackTrace) {
+                                                          return Image.asset(
+                                                            'assets/images/magasin.png',
+                                                            fit: BoxFit.cover,
+                                                          );
+                                                        },
+                                                      ),
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 5),
+                                            child: Text(
+                                              e.nomMagasin!,
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: d_colorGreen,
+                                              ),
+                                            ),
+                                          ),
+                                           _buildItem(
+                                              "Localité :", e.localiteMagasin!),
+                                           typeActeurData.map((e) => e.libelle!.toLowerCase()).contains("admin") ?
+                                          //  _buildItem(
+                                          //     "Acteur :", e.acteur!.typeActeur!.map((e) => e.libelle!).join(','))
+                                           Container(
+                                                  alignment:
+                                                            Alignment.bottomRight,
+                                               child: Padding(
+                                                                                            padding: const EdgeInsets.symmetric(horizontal:8.0),
+                                                                                            child: Row(
+                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                   children: [
+                                                     _buildEtat(e.statutMagasin!),
+                                                     SizedBox(width: 120,),
+                                                     Expanded(
+                                                       child: PopupMenuButton<String>(
+                                                         padding: EdgeInsets.zero,
+                                                         itemBuilder: (context) =>
+                                                             <PopupMenuEntry<String>>[
+                                                           PopupMenuItem<String>(
+                                                             child: ListTile(
+                                                               leading: e.statutMagasin == false? Icon(
+                                                                 Icons.check,
+                                                                 color: Colors.green,
+                                                               ): Icon(
+                                                                Icons.disabled_visible,
+                                                                color:Colors.orange[400]
+                                                               ),
+                                                               title:  Text(
+                                                                e.statutMagasin == false ? "Activer" : "Desactiver",
+                                                                 style: TextStyle(
+                                                                   color: e.statutMagasin == false ? Colors.green : Colors.red,
+                                                                   fontWeight: FontWeight.bold,
+                                                                 ),
+                                                               ),
+                                                               
+                                                               onTap: () async {
+                                  // Changement d'état du magasin ici
+                           
+                               e.statutMagasin == false ?  await MagasinService().activerMagasin(e.idMagasin!).then((value) => {
+                                    // Mettre à jour la liste des magasins après le changement d'état
+                                    Provider.of<MagasinService>(
+                                                                            context,
+                                                                            listen:
+                                                                                false)
+                                                                        .applyChange(),
+                                    setState(() {
+                                     magasinListeFuture =  MagasinService().fetchAllMagasin();
+                                    }),
+                                    Navigator.of(context).pop(),
+                                                                         })
+                                                                     .catchError((onError) => {
+                                                                           ScaffoldMessenger.of(context)
+                                                                               .showSnackBar(
+                                                                             const SnackBar(
+                                                                               content: Row(
+                                                                                 children: [
+                                                                                   Text(
+                                                                                       "Une erreur s'est produit"),
+                                                                                 ],
+                                                                               ),
+                                                                               duration:
+                                                                                   Duration(seconds: 5),
+                                                                             ),
+                                                                           ),
+                                                                           Navigator.of(context).pop(),
+                                                                         }): await MagasinService()
+                                                                     .desactiverMagasin(e.idMagasin!)
+                                                                     .then((value) => {
+                                                                        Provider.of<MagasinService>(
+                                                                            context,
+                                                                            listen:
+                                                                                false)
+                                                                        .applyChange(),
+                                                                                setState(() {
+                                                       magasinListeFuture =  MagasinService().fetchAllMagasin();
+                                                       }),
+                                                                           Navigator.of(context).pop(),
+                                                                     
+                                                                         });
+                                                       
+                                                                 ScaffoldMessenger.of(context)
+                                                                     .showSnackBar(
+                                                                    SnackBar(
+                                                                     content: Row(
+                                                                       children: [
+                                                                         Text(e.statutMagasin == false ? "Activer avec succèss " : "Desactiver avec succèss"),
+                                                                       ],
+                                                                     ),
+                                                                     duration: Duration(seconds: 2),
+                                                                   ),
+                                                                 );
+                                                               },
+                                                             )
+                                                          
+                                               ),
+                                                           
+                                                          
+                                                         ],
+                                                       ),
+                                                     ),
+                                                   ],
+                                                                                            ),
+                                                                                          ),
+                                                 )
+                                          : SizedBox(),
+                                         SizedBox(height: 2),
+                                        
+
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ))
+                          .toList() : 
+                          filtereSearch
                          .where((element) => element.statutMagasin == true)
                           .map((e) => Padding(
                                 padding: EdgeInsets.all(10),
@@ -399,8 +600,10 @@ class _StoreScreenState extends State<StoreScreen> {
                                           ),
                                            _buildItem(
                                               "Localité :", e.localiteMagasin!),
+                                          //  typeActeurData.map((e) => e.libelle!.toLowerCase()).contains("admin") ?
                                           //  _buildItem(
-                                          //     "Acteur :", e.acteur!.typeActeur!.map((e) => e.libelle!).join(',')),
+                                          //     "Acteur :", e.acteur!.typeActeur!.map((e) => e.libelle!).join(','))
+                                          
                                           
                                          SizedBox(height: 2),
                                         

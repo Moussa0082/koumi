@@ -202,13 +202,13 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
 
           debugPrint("id : $id, type : ${widget.stock!.typeProduit!}, desc : ${widget.stock!.descriptionStock!}  acteur : $acteur");
         
-        
+         
     super.initState();
     if(widget.isEditable! == true){
-     _typeController.text == widget.stock!.typeProduit!;
-     _descriptionController.text == widget.stock!.descriptionStock!;
+     _typeController.text = widget.stock!.typeProduit!;
+     _descriptionController.text = widget.stock!.descriptionStock!;
     }
-    debugPrint("nom : ${widget.nomProduit}, forme: ${widget.forme}, origine : ${widget.origine}, qte : ${widget.quantite}, prix : ${widget.prix}");
+    debugPrint("nom : ${widget.nomProduit}, bool : ${widget.isEditable} , forme: ${widget.forme}, origine : ${widget.origine}, qte : ${widget.quantite}, prix : ${widget.prix}");
   }
 
 

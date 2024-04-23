@@ -452,21 +452,25 @@ Future<List<Magasin>> fetchMagasins() async {
                                                              <PopupMenuEntry<String>>[
                                                            PopupMenuItem<String>(
                                                              child: ListTile(
-                                                               leading: const Icon(
+                                                               leading: e.statutMagasin == false? Icon(
                                                                  Icons.check,
                                                                  color: Colors.green,
+                                                               ): Icon(
+                                                                Icons.disabled_visible,
+                                                                color:Colors.orange[400]
                                                                ),
-                                                               title: const Text(
-                                                                 "Activer",
+                                                               title:  Text(
+                                                                e.statutMagasin == false ? "Activer" : "Desactiver",
                                                                  style: TextStyle(
-                                                                   color: Colors.green,
+                                                                   color: e.statutMagasin == false ? Colors.green : Colors.red,
                                                                    fontWeight: FontWeight.bold,
                                                                  ),
                                                                ),
                                                                
                                                                onTap: () async {
                                   // Changement d'état du magasin ici
-                                  await MagasinService().activerMagasin(e.idMagasin!).then((value) => {
+                           
+                               e.statutMagasin == false ?  await MagasinService().activerMagasin(e.idMagasin!).then((value) => {
                                     // Mettre à jour la liste des magasins après le changement d'état
                                     Provider.of<MagasinService>(
                                                                             context,
@@ -493,37 +497,7 @@ Future<List<Magasin>> fetchMagasins() async {
                                                                              ),
                                                                            ),
                                                                            Navigator.of(context).pop(),
-                                                                         });
-                                                       
-                                                                 ScaffoldMessenger.of(context)
-                                                                     .showSnackBar(
-                                                                   const SnackBar(
-                                                                     content: Row(
-                                                                       children: [
-                                                                         Text("Activer avec succèss "),
-                                                                       ],
-                                                                     ),
-                                                                     duration: Duration(seconds: 2),
-                                                                   ),
-                                                                 );
-                                                               },
-                                                             ),
-                                                           ),
-                                                           PopupMenuItem<String>(
-                                                             child: ListTile(
-                                                               leading: Icon(
-                                                                 Icons.disabled_visible,
-                                                                 color: Colors.orange[400],
-                                                               ),
-                                                               title: Text(
-                                                                 "Désactiver",
-                                                                 style: TextStyle(
-                                                                   color: Colors.orange[400],
-                                                                   fontWeight: FontWeight.bold,
-                                                                 ),
-                                                               ),
-                                                               onTap: () async {
-                                                                 await MagasinService()
+                                                                         }): await MagasinService()
                                                                      .desactiverMagasin(e.idMagasin!)
                                                                      .then((value) => {
                                                                         Provider.of<MagasinService>(
@@ -536,40 +510,23 @@ Future<List<Magasin>> fetchMagasins() async {
                                                        }),
                                                                            Navigator.of(context).pop(),
                                                                      
-                                                                         })
-                                                                     .catchError((onError) => {
-                                                                    
-                                                                           ScaffoldMessenger.of(context)
-                                                                               .showSnackBar(
-                                                                             const SnackBar(
-                                                                               content: Row(
-                                                                                 children: [
-                                                                                   Text(
-                                                                                       "Une erreur s'est produit"),
-                                                                                 ],
-                                                                               ),
-                                                                               duration:
-                                                                                   Duration(seconds: 5),
-                                                                             ),
-                                                                           ),
-                                                                           Navigator.of(context).pop(),
-                                                                      
                                                                          });
+                                                       
                                                                  ScaffoldMessenger.of(context)
                                                                      .showSnackBar(
-                                                                   const SnackBar(
+                                                                    SnackBar(
                                                                      content: Row(
                                                                        children: [
-                                                                         Text("Désactiver avec succèss "),
+                                                                         Text(e.statutMagasin == false ? "Activer avec succèss " : "Desactiver avec succèss"),
                                                                        ],
                                                                      ),
                                                                      duration: Duration(seconds: 2),
                                                                    ),
                                                                  );
-                                                                 
                                                                },
-                                                             ),
-                                                           ),
+                                                             )
+                                                          
+                                               ),
                                                            PopupMenuItem<String>(
                                                              child: ListTile(
                                                                leading: Icon(

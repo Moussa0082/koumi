@@ -192,8 +192,8 @@ class StockService extends ChangeNotifier {
 
         List<dynamic> body = jsonDecode(response.body);
         debugPrint("response body ${body.toString()}");
-        stockList = body.
-      where((stock) => stock['statutSotck'] == true)
+        stockList = body
+      // where((stock) => stock['statutSotck'] == true)
         .map((e) => Stock.fromMap(e)).toList();
         debugPrint("stockList all ${stockList.toList()}");
         return stockList;

@@ -445,31 +445,37 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                                          padding: EdgeInsets.zero,
                                                          itemBuilder: (context) =>
                                                              <PopupMenuEntry<String>>[
-                                                           PopupMenuItem<String>(
+                                                          PopupMenuItem<String>(
                                                              child: ListTile(
-                                                               leading: const Icon(
+                                                               leading: e.statutSotck == false? Icon(
                                                                  Icons.check,
                                                                  color: Colors.green,
+                                                               ): Icon(
+                                                                Icons.disabled_visible,
+                                                                color:Colors.orange[400]
                                                                ),
-                                                               title: const Text(
-                                                                 "Activer",
+                                                               title:  Text(
+                                                                e.statutSotck == false ? "Activer" : "Desactiver",
                                                                  style: TextStyle(
-                                                                   color: Colors.green,
+                                                                   color: e.statutSotck == false ? Colors.green : Colors.red,
                                                                    fontWeight: FontWeight.bold,
                                                                  ),
                                                                ),
                                                                
                                                                onTap: () async {
-                                  await StockService().activerStock(e.idStock!).then((value) => {
+                                  // Changement d'état du magasin ici
+                           
+                               e.statutSotck == false ?  await StockService().activerStock(e.idStock!).then((value) => {
+                                    // Mettre à jour la liste des stock après le changement d'état
                                     Provider.of<StockService>(
                                                                             context,
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
-                                                               setState(() {
-                                                                         stockListeFuture = StockService().fetchStockByActeur(acteur.idActeur!);
-                                                                           }),
-                                                       Navigator.of(context).pop(),
+                                    setState(() {
+                                       stockListeFuture =  StockService().fetchStockByActeur(acteur.idActeur!);
+                                    }),
+                                    Navigator.of(context).pop(),
                                                                          })
                                                                      .catchError((onError) => {
                                                                            ScaffoldMessenger.of(context)
@@ -486,84 +492,36 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                                                              ),
                                                                            ),
                                                                            Navigator.of(context).pop(),
-                                                                         });
-                                                       
-                                                                 ScaffoldMessenger.of(context)
-                                                                     .showSnackBar(
-                                                                   const SnackBar(
-                                                                     content: Row(
-                                                                       children: [
-                                                                         Text("Activer avec succèss "),
-                                                                       ],
-                                                                     ),
-                                                                     duration: Duration(seconds: 2),
-                                                                   ),
-                                                                 );
-                                                               },
-                                                             ),
-                                                           ),
-                                                           PopupMenuItem<String>(
-                                                             child: ListTile(
-                                                               leading: Icon(
-                                                                 Icons.disabled_visible,
-                                                                 color: Colors.orange[400],
-                                                               ),
-                                                               title: Text(
-                                                                 "Désactiver",
-                                                                 style: TextStyle(
-                                                                   color: Colors.orange[400],
-                                                                   fontWeight: FontWeight.bold,
-                                                                 ),
-                                                               ),
-                                                               onTap: () async {
-                                                                 await StockService()
+                                                                         }): await StockService()
                                                                      .desactiverStock(e.idStock!)
                                                                      .then((value) => {
-                                                                            Provider.of<StockService>(
+                                                                        Provider.of<StockService>(
                                                                             context,
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
                                                                                 setState(() {
-                                                                         stockListeFuture = StockService().fetchStockByActeur(acteur.idActeur!);
-                                                                           }),
+                                                       stockListeFuture =  StockService().fetchStockByActeur(acteur.idActeur!);
+                                                       }),
                                                                            Navigator.of(context).pop(),
-                                                                    
-                                                                         })
-                                                                     .catchError((onError) => {
-                                                                      
-                                                                           ScaffoldMessenger.of(context)
-                                                                               .showSnackBar(
-                                                                             const SnackBar(
-                                                                               content: Row(
-                                                                                 children: [
-                                                                                   Text(
-                                                                                       "Une erreur s'est produit"),
-                                                                                 ],
-                                                                               ),
-                                                                               duration:
-                                                                                   Duration(seconds: 5),
-                                                                             ),
-                                                                           ),
-                                                                           Navigator.of(context).pop(),
-                                                                      
+                                                                     
                                                                          });
-                                                         
+                                                       
                                                                  ScaffoldMessenger.of(context)
                                                                      .showSnackBar(
-                                                                   const SnackBar(
+                                                                    SnackBar(
                                                                      content: Row(
                                                                        children: [
-                                                                         Text("Désactiver avec succèss "),
+                                                                         Text(e.statutSotck == false ? "Activer avec succèss " : "Desactiver avec succèss"),
                                                                        ],
                                                                      ),
                                                                      duration: Duration(seconds: 2),
                                                                    ),
                                                                  );
-                                                                 
                                                                },
-                                                             ),
-                                                           ),
+                                                             )
+                                                          
+                                               ),
                                                           
                                                            PopupMenuItem<String>(
                                                              child: ListTile(
