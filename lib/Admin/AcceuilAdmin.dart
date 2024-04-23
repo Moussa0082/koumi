@@ -17,7 +17,10 @@ import 'package:koumi_app/screens/MagasinScreen.dart';
 import 'package:koumi_app/screens/Meteo.dart';
 import 'package:koumi_app/screens/MagasinActeur.dart';
 import 'package:koumi_app/screens/Panier.dart';
+import 'package:koumi_app/screens/Product.dart';
 import 'package:koumi_app/screens/Produit.dart';
+import 'package:koumi_app/screens/MyStores.dart';
+import 'package:koumi_app/screens/Store.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/Weather.dart';
 import 'package:koumi_app/service/ParametreGenerauxService.dart';
@@ -147,7 +150,8 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>  ProduitScreen()));
+                      builder: (context) =>      ProductScreen(),));
+                      // builder: (context) =>  ProduitScreen()));
             } else if (index == 8) {
               Navigator.push(
                   context,
@@ -166,7 +170,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const MagasinScreen()));
+                      builder: (context) => const StoreScreen()));
             } else if (index == 3) {
               Navigator.push(
                   context,

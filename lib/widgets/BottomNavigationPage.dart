@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/screens/Acceuil.dart';
 import 'package:koumi_app/screens/Panier.dart';
+import 'package:koumi_app/screens/Product.dart';
 import 'package:koumi_app/screens/Produit.dart';
 import 'package:koumi_app/screens/Profil.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
@@ -39,7 +40,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
   ];
   List pages = <Widget>[
     const Accueil(),
-    ProduitScreen(),
+    ProductScreen(),
     Panier(),
     const Profil()
   ];
@@ -133,6 +134,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
 
     Map<String, WidgetBuilder> _routeBuilders(BuildContext context, int index) {
     return {
+
       '/': (context) => pages[index],
     };
   }

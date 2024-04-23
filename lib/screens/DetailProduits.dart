@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CartItem.dart';
 import 'package:koumi_app/models/Stock.dart';
@@ -12,6 +14,7 @@ import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DetailProduits extends StatefulWidget {
   late Stock? stock;
@@ -33,15 +36,37 @@ class _DetailProduitsState extends State<DetailProduits>
   late Acteur acteur;
   late List<TypeActeur> typeActeurData = [];
   late String type;
+    late ValueNotifier<bool> isDialOpenNotifier;
 
   @override
   void initState() {
     super.initState();
+    isDialOpenNotifier = ValueNotifier<bool>(false);
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     // Initialiser le ValueNotifier
   }
+
+
+     Future<void> _makePhoneWa(String whatsappNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'https',
+      host: 'wa.me',
+      path: whatsappNumber,
+    );
+    print(Uri);
+    await launchUrl(launchUri);
+  }
+
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    await launchUrl(launchUri);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -55,37 +80,31 @@ class _DetailProduitsState extends State<DetailProduits>
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         centerTitle: true,
         title: const Text("Détail Produit"),
-        actions: acteur.idActeur! != widget.stock!.acteur!.idActeur!
-            ? null
-            : [
-                IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AddAndUpdateProductScreen(
-                                  isEditable: true,
-                                  stock: widget.stock,
-                                )));
-                  },
-                  icon: Icon(
-                    Icons.edit,
-                  ),
-                )
-              ],
+        actions: acteur.idActeur! != widget.stock!.acteur!.idActeur! ? null :
+         [
+          IconButton(
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder:
+               (context)=> AddAndUpdateProductScreen(isEditable: true, stock:widget.stock! ,)));
+            },
+            icon: Icon(Icons.edit,),
+          )
+        ],
+
       ),
       body: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min, // Set mainAxisSize to min
           children: [
-            widget.stock!.photo!.isEmpty || widget.stock!.photo == null
-                ? Image.asset(
-                    "assets/images/default_image.png",
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: 200,
-                  )
-                : Image.network(
+             widget.stock!.photo == null ?
+             Image.asset(
+                                "assets/images/default_image.png",
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: 200,
+                              ):
+            Image.network(
+
                     'https://koumi.ml/api-koumi/Stock/${widget.stock!.photo}/image',
                     width: double.infinity,
                     height: 200,
@@ -336,7 +355,57 @@ class _DetailProduitsState extends State<DetailProduits>
             )
           ],
         ),
+        
       ),
+      floatingActionButton: acteur.idActeur != widget.stock!.acteur!.idActeur
+              ? SpeedDial(
+                  // animatedIcon: AnimatedIcons.close_menu,
+                  backgroundColor: d_colorGreen,
+                  foregroundColor: Colors.white,
+                  overlayColor: Colors.black,
+                  overlayOpacity: 0.4,
+                  spacing: 12,
+                  icon: Icons.phone,
+
+                  children: [
+                    SpeedDialChild(
+                      child: FaIcon(FontAwesomeIcons.whatsapp),
+                      label: 'Par wathsApp',
+                      labelStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      onTap: () {
+                        final String whatsappNumber =
+                            widget.stock!.acteur!.whatsAppActeur!;
+                        _makePhoneWa(whatsappNumber);
+                      },
+                    ),
+                    SpeedDialChild(
+                      child: Icon(Icons.phone),
+                      label: 'Par téléphone ',
+                      labelStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      onTap: () {
+                        final String numberPhone =
+                            widget.stock!.acteur!.telephoneActeur!;
+                        _makePhoneCall(numberPhone);
+                      },
+                    )
+                  ],
+                  // État du Speed Dial (ouvert ou fermé)
+                  openCloseDial: isDialOpenNotifier,
+                  // Fonction appelée lorsque le bouton principal est pressé
+                  onPress: () {
+                    isDialOpenNotifier.value = !isDialOpenNotifier
+                        .value; // Inverser la valeur du ValueNotifier
+                  },
+                )
+              : Container()
     );
   }
 

@@ -5,6 +5,7 @@ import 'package:koumi_app/Admin/AcceuilAdmin.dart';
 import 'package:koumi_app/Admin/ProduitA.dart';
 import 'package:koumi_app/Admin/ProfilA.dart';
 import 'package:koumi_app/screens/Panier.dart';
+import 'package:koumi_app/screens/Product.dart';
 import 'package:koumi_app/screens/Produit.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:provider/provider.dart';
@@ -33,8 +34,8 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
   ];
 
   List pages = <Widget>[
-     AcceuilAdmin(),
-    ProduitScreen(),
+    const AcceuilAdmin(),
+    ProductScreen(),
     Panier(),
      ProfilA()
   ];
@@ -135,6 +136,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
 
    Map<String, WidgetBuilder> _routeBuilders(BuildContext context, int index) {
     return {
+
       '/': (context) => pages[index],
     };
   }
