@@ -455,6 +455,7 @@ Future<List<Magasin>> fetchMagasins() async {
                                                                leading: e.statutMagasin == false? Icon(
                                                                  Icons.check,
                                                                  color: Colors.green,
+                                                                 //FlyBox-3BA0B5
                                                                ): Icon(
                                                                 Icons.disabled_visible,
                                                                 color:Colors.orange[400]
