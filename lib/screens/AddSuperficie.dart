@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Campagne.dart';
@@ -53,22 +54,24 @@ class _AddSuperficieState extends State<AddSuperficie> {
     super.initState();
 
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    _liste = getCampListe(); // _categorieList = http.get(
-    //     Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
-    _speculationList = fetchSpeculationList();
-    _niveau3List = fetchniveauList();
+    _liste = getCampListe(); 
+  
+    _speculationList = http.get(Uri.parse(
+        'https://koumi.ml/api-koumi/Speculation/getAllSpeculation'));
+        // 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation'));
+    // _speculationList = fetchSpeculationList();
+    _niveau3List =
+        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
   }
 
   List<String?> selectedIntrantList = [];
 
-  void addInrant() {
-    // Créer un nouveau contrôleur pour chaque champ
+  void addIntrant() {
     TextEditingController newIntrantController = TextEditingController();
 
     setState(() {
-      // Ajouter les nouveaux contrôleurs aux listes
       intrantController.add(newIntrantController);
-      // Ajouter une valeur nulle à la liste des destinations sélectionnées
       selectedIntrantList.add(null);
     });
   }
@@ -160,6 +163,134 @@ class _AddSuperficieState extends State<AddSuperficie> {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Text(
+                            "Localité",
+                            style:
+                                TextStyle(color: (Colors.black), fontSize: 18),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        child: FutureBuilder(
+                          future: _niveau3List,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Chargement...',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+                           
+                            if (snapshot.hasData) {
+                              // dynamic responseData =
+                              //     json.decode(snapshot.data.body);
+                               dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+
+                              if (responseData is List) {
+                                final reponse = responseData;
+                                final niveau3List = reponse
+                                    .map((e) => Niveau3Pays.fromMap(e))
+                                    .where((con) => con.statutN3 == true)
+                                    .toList();
+
+                                if (niveau3List.isEmpty) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Aucun localité trouvé',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return DropdownButtonFormField<String>(
+                                  items: niveau3List
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idNiveau3Pays,
+                                          child: Text(e.nomN3),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: n3Value,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      n3Value = newValue;
+                                      if (newValue != null) {
+                                        niveau3 = niveau3List
+                                            .map((e) => e.nomN3)
+                                            .first;
+                                        print("niveau 3 : ${niveau3}");
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Selectionner une localité',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucun localité trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucun localité trouvé',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 22,
+                        ),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
                             "Chosir une spéculation",
                             style:
                                 TextStyle(color: (Colors.black), fontSize: 18),
@@ -192,8 +323,11 @@ class _AddSuperficieState extends State<AddSuperficie> {
                               }
 
                               if (snapshot.hasData) {
-                                dynamic responseData =
-                                    json.decode(snapshot.data.body);
+                                // dynamic responseData =
+                                //     json.decode(snapshot.data.body);
+                                dynamic jsonString =
+                                    utf8.decode(snapshot.data.bodyBytes);
+                                dynamic responseData = json.decode(jsonString);
 
                                 if (responseData is List) {
                                   List<Speculation> speList = responseData
@@ -433,7 +567,8 @@ class _AddSuperficieState extends State<AddSuperficie> {
                             if (pickedDate != null) {
                               print(pickedDate);
                               String formattedDate =
-                                  DateFormat('yyyy-MM-dd').format(pickedDate);
+                                  DateFormat('yyyy-MM-dd HH:mm')
+                                      .format(pickedDate);
                               print(formattedDate);
                               setState(() {
                                 _dateController.text = formattedDate;
@@ -443,9 +578,7 @@ class _AddSuperficieState extends State<AddSuperficie> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 22,
-                        ),
+                        padding: EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -453,65 +586,65 @@ class _AddSuperficieState extends State<AddSuperficie> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "Intrant utilisé",
+                                  "Ajouter les intrants utilisées",
                                   style: TextStyle(
                                       color: Colors.black, fontSize: 18),
                                 ),
                                 IconButton(
-                                  onPressed: () {
-                                    // Appeler la méthode pour ajouter une destination et un prix
-                                    addInrant();
-                                  },
-                                  icon: Icon(Icons.add),
-                                ),
+                                    onPressed: addIntrant,
+                                    icon: Icon(Icons.add))
                               ],
                             ),
                             SizedBox(height: 10),
                             Column(
                               children: List.generate(
-                                listeIntrantFields.length,
+                                intrantController.length,
                                 (index) => Padding(
                                   padding: const EdgeInsets.all(8.0),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    child: TextFormField(
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return "Veuillez remplir les champs";
-                                        }
-                                        return null;
-                                      },
-                                      controller: intrantController[index],
-                                      decoration: InputDecoration(
-                                        hintText: "intrant utilisé ",
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 10, horizontal: 20),
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
+                                  child: TextFormField(
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return "Veuillez remplir les champs";
+                                      }
+                                      return null;
+                                    },
+                                    controller: intrantController[index],
+                                    decoration: InputDecoration(
+                                      hintText: "Intrant utilisé",
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                        horizontal: 20,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
+                            SizedBox(height: 10),
                           ],
                         ),
                       ),
-                      Column(
-                        children: listeIntrantFields,
-                      ),
+                      // Column(
+                      //   children: listeIntrantFields,
+                      // ),
                     ],
                   )),
               ElevatedButton(
                 onPressed: () async {
                   final String superficie = _superficieHaController.text;
                   final String date = _dateController.text;
-                  final List<String?> selectedIntrantListe =
-                      selectedIntrantList;
+                  setState(() {
+                    for (int i = 0; i < selectedIntrantList.length; i++) {
+                      String item = intrantController[i].text;
+                      if (item.isNotEmpty) {
+                        selectedIntrant.addAll({item});
+                      }
+                    }
+                  });
                   try {
                     setState(() {
                       _isLoading = true;
@@ -532,6 +665,7 @@ class _AddSuperficieState extends State<AddSuperficie> {
                               _superficieHaController.clear(),
                               _dateController.clear(),
                               setState(() {
+                                _isLoading = false;
                                 catValue = null;
                                 speValue = null;
                                 n3Value = null;

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -195,16 +196,18 @@ class _LoginScreenState extends State<LoginScreen> {
         final List<String> type =
             acteur.typeActeur!.map((e) => e.libelle!).toList();
         if (type.contains('admin') || type.contains('Admin')) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
-          );
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
+          // );
+           Get.off(BottomNavBarAdmin());
         } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const BottomNavigationPage()),
-          );
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(
+          //       builder: (context) => const BottomNavigationPage()),
+          // );
+           Get.off(BottomNavigationPage());
         }
       } else {
         // Traitement en cas d'échec
@@ -371,16 +374,18 @@ class _LoginScreenState extends State<LoginScreen> {
         final List<String> type =
             acteur.typeActeur!.map((e) => e.libelle!).toList();
         if (type.contains('admin') || type.contains('Admin')) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
-          );
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
+          // );
+          Get.off(BottomNavBarAdmin());
         } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const BottomNavigationPage()),
-          );
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(
+          //       builder: (context) => const BottomNavigationPage()),
+          // );
+          Get.off(BottomNavigationPage());
         }
       } else {
         // Traitement en cas d'échec

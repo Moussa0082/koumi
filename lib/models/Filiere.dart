@@ -6,24 +6,22 @@ import 'package:koumi_app/models/Acteur.dart';
 class Filiere {
   final String? idFiliere;
   final String? codeFiliere;
-  final String libelleFiliere;
-  final String descriptionFiliere;
-  final bool statutFiliere;
+  final String? libelleFiliere;
+  final String? descriptionFiliere;
+  final bool? statutFiliere;
   final String? dateAjout;
   final String? personneModif;
   final String? dateModif;
-  
   Filiere({
     this.idFiliere,
     this.codeFiliere,
-    required this.libelleFiliere,
-    required this.descriptionFiliere,
-    required this.statutFiliere,
+    this.libelleFiliere,
+    this.descriptionFiliere,
+    this.statutFiliere,
     this.dateAjout,
     this.personneModif,
     this.dateModif,
   });
-
  
 
   Filiere copyWith({
@@ -65,9 +63,9 @@ class Filiere {
     return Filiere(
       idFiliere: map['idFiliere'] != null ? map['idFiliere'] as String : null,
       codeFiliere: map['codeFiliere'] != null ? map['codeFiliere'] as String : null,
-      libelleFiliere: map['libelleFiliere'] as String,
-      descriptionFiliere: map['descriptionFiliere'] as String,
-      statutFiliere: map['statutFiliere'] as bool,
+      libelleFiliere: map['libelleFiliere'] != null ? map['libelleFiliere'] as String : null,
+      descriptionFiliere: map['descriptionFiliere'] != null ? map['descriptionFiliere'] as String : null,
+      statutFiliere: map['statutFiliere'] != null ? map['statutFiliere'] as bool : null,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,

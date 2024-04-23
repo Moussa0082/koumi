@@ -46,7 +46,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
   void initState() {
     verifyTypeMateriel();
     // futureListe = getListe(type.idTypeMateriel!);
-      
+
     super.initState();
   }
 
@@ -57,13 +57,11 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
       appBar: AppBar(
           centerTitle: true,
           toolbarHeight: 100,
-        
-          title:  Text(
-                  type.nom!.toUpperCase(),
-                  style: const TextStyle(
-                      color: d_colorGreen, fontWeight: FontWeight.bold),
-                )
-              ,
+          title: Text(
+            type.nom!.toUpperCase(),
+            style: const TextStyle(
+                color: d_colorGreen, fontWeight: FontWeight.bold),
+          ),
           actions: [
             PopupMenuButton<String>(
               padding: EdgeInsets.zero,
@@ -98,9 +96,8 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
             Consumer<MaterielService>(
               builder: (context, materielService, child) {
                 return FutureBuilder(
-                    future:materielService.
-                            fetchMaterielByType(type.idTypeMateriel!),
-                        
+                    future: materielService
+                        .fetchMaterielByType(type.idTypeMateriel!),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(
@@ -123,7 +120,13 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                 child: Center(
                                     child: Text("Aucun matériel trouvé")),
                               )
-                            : Wrap(
+                            : GridView.count(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 2,
+                                crossAxisSpacing: 5,
+                                childAspectRatio: 0.9,
                                 children: materielListe
                                     .map((e) => Padding(
                                         padding: EdgeInsets.all(10),
@@ -176,7 +179,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                               height: 90,
                                                             )
                                                           : Image.network(
-                                                              "http://10.0.2.2/${e.photoMateriel}",
+                                                              "https://koumi.ml/api-koumi/Materiel/${e.idMateriel}/image",
                                                               fit: BoxFit.cover,
                                                               height: 90,
                                                               errorBuilder: (BuildContext
@@ -200,13 +203,15 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                     padding: const EdgeInsets
                                                         .symmetric(
                                                         horizontal: 10,
-                                                        vertical: 5),
+                                                        ),
                                                     child: Text(
                                                       e.nom,
                                                       style: TextStyle(
-                                                          fontSize: 18,
+                                                          fontSize: 16,
                                                           fontWeight:
                                                               FontWeight.bold,
+                                                               overflow: TextOverflow
+                                                              .ellipsis,
                                                           color: d_colorGreen),
                                                     ),
                                                   ),
@@ -456,7 +461,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
 
   Widget _buildItem(String title, String value) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -467,7 +472,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                 fontWeight: FontWeight.w500,
                 fontStyle: FontStyle.italic,
                 overflow: TextOverflow.ellipsis,
-                fontSize: 18),
+                fontSize: 16),
           ),
           Text(
             value,

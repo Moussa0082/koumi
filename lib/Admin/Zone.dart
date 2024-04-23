@@ -175,11 +175,26 @@ class _ZoneState extends State<Zone> {
                                                   width: double.infinity,
                                                 )
                                               : Image.network(
-                                                  "http://10.0.2.2/${zone.photoZone!}",
+                                                  "https://koumi.ml/api-koumi/ZoneProduction/${zone.idZoneProduction}/image",
                                                   fit: BoxFit.fitWidth,
                                                   height: 150,
                                                   width: double.infinity,
+                                                   errorBuilder: (BuildContext
+                                                          context,
+                                                      Object exception,
+                                                      StackTrace? stackTrace) {
+                                                    return Image.asset(
+                                                      'assets/images/default_image.png',
+                                                      fit: BoxFit.cover,
+                                                    );
+                                                  },
                                                 ),
+                                              // : Image.network(
+                                              //     "http://10.0.2.2/${zone.photoZone!}",
+                                              //     fit: BoxFit.fitWidth,
+                                              //     height: 150,
+                                              //     width: double.infinity,
+                                              //   ),
                                         ),
                                         const SizedBox(
                                           height: 10,

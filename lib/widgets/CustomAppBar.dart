@@ -164,7 +164,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                                       fontWeight: FontWeight.w800,
                                     ));
                               }
-
+                    
                               if (!snapshot.hasData) {
                                 return Text("0",
                                     style: TextStyle(
@@ -202,7 +202,30 @@ class _CustomAppBarState extends State<CustomAppBar> {
           );
   }
 }
-// Text(
-//                   "3",
-//                   style: TextStyle(color: Colors.white),
-//                 )
+//  IconButton(
+//                   onPressed: () async{
+//                      final acteurProvider = Provider.of<ActeurProvider>(
+//                                 context,
+//                                 listen: false);
+
+//                             // Déconnexion avec le provider
+//                             await acteurProvider.logout();
+//                             SharedPreferences prefs =
+//                                 await SharedPreferences.getInstance();
+//                             await prefs.clear();
+//                             //                   Navigator.pushReplacement(
+//                             // context,
+//                             // MaterialPageRoute(builder: (context) => LoginScreen()),
+//                             //                        );
+//                             Get.off(BottomNavigationPage(),
+//                                 duration: Duration(
+//                                     seconds:
+//                                         1), //duration of transitions, default 1 sec
+//                                 transition: Transition.leftToRight);
+//                   },
+//                   icon: Icon(
+//                     Icons.login,
+//                     color: d_colorGreen, // Ajout d'une couleur à l'icône
+//                     size: 30, // Ajout d'une taille à l'icône
+//                   ),
+//                 ),

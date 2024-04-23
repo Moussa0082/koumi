@@ -71,7 +71,7 @@ class _AddCategorieState extends State<AddCategorie> {
             //   height: 10,
             // ),
             Text(
-              filiere.libelleFiliere.toUpperCase(),
+              filiere.libelleFiliere!.toUpperCase(),
               style:
                   TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
             )
@@ -185,7 +185,7 @@ class _AddCategorieState extends State<AddCategorie> {
                                             children: [
                                               ListTile(
                                                   leading: _getIconForFiliere(e
-                                                      .filiere!.libelleFiliere),
+                                                      .filiere!.libelleFiliere!),
                                                   title: Text(
                                                       e.libelleCategorie!
                                                           .toUpperCase(),

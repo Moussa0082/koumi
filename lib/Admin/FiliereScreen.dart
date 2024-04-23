@@ -8,7 +8,6 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Filiere.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
 import 'package:provider/provider.dart';
@@ -51,7 +50,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
     // para = paraList[0];
     _filiereList = http
         // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
-        .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+    .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
     _liste = getFil();
   }
 
@@ -186,362 +185,360 @@ class _FiliereScreenState extends State<FiliereScreen> {
 
                       if (!snapshot.hasData) {
                         return Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Center(
-                            child: Column(
-                              children: [
-                                Image.asset('assets/images/notif.jpg'),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text('Aucune filière trouvé ',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 17,
-                                      overflow: TextOverflow.ellipsis,
-                                    ))
-                              ],
-                            ),
-                          ),
-                        );
+                            padding: EdgeInsets.all(10),
+                            child: Text('Aucune filière trouvé ',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 17,
+                                  overflow: TextOverflow.ellipsis,
+                                )));
                       } else {
                         filiereList = snapshot.data!;
                         String searchText = "";
                         List<Filiere> filteredFiliereSearch =
                             filiereList.where((fil) {
-                          String nomfiliere = fil.libelleFiliere.toLowerCase();
+                          String nomfiliere = fil.libelleFiliere!.toLowerCase();
                           searchText = _searchController.text.toLowerCase();
                           return nomfiliere.contains(searchText);
                         }).toList();
-                        return Column(
-                            children: filteredFiliereSearch
-                                .map((e) => Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 15),
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
+                        return filteredFiliereSearch.isEmpty
+                            ? Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Text('Aucune filière trouvé ',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 17,
+                                      overflow: TextOverflow.ellipsis,
+                                    )))
+                            : Column(
+                                children: filteredFiliereSearch
+                                    .map((e) => Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 15),
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
                                                 0.9,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color:
-                                                  Colors.grey.withOpacity(0.2),
-                                              offset: const Offset(0, 2),
-                                              blurRadius: 5,
-                                              spreadRadius: 2,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey
+                                                      .withOpacity(0.2),
+                                                  offset: const Offset(0, 2),
+                                                  blurRadius: 5,
+                                                  spreadRadius: 2,
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        AddCategorie(
-                                                          filiere: e,
-                                                        )));
-                                          },
-                                          child: Column(
-                                            children: [
-                                              ListTile(
-                                                  leading: _getIconForFiliere(
-                                                      e.libelleFiliere),
-                                                  title: Text(
-                                                      e.libelleFiliere
-                                                          .toUpperCase(),
-                                                      style: const TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 20,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      )),
-                                                  subtitle: Text(
-                                                      e.descriptionFiliere
-                                                          .trim(),
-                                                      style: const TextStyle(
-                                                        color: Colors.black87,
-                                                        fontSize: 17,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontStyle:
-                                                            FontStyle.italic,
-                                                      ))),
-                                              // const Padding(
-                                              //   padding: EdgeInsets.symmetric(
-                                              //       horizontal: 15),
-                                              //   child: Row(
-                                              //     mainAxisAlignment:
-                                              //         MainAxisAlignment
-                                              //             .spaceBetween,
-                                              //     children: [
-                                              //       Text("Nombres pays :",
-                                              //           style: TextStyle(
-                                              //             color: Colors.black87,
-                                              //             fontSize: 17,
-                                              //             fontWeight:
-                                              //                 FontWeight.w500,
-                                              //             fontStyle:
-                                              //                 FontStyle.italic,
-                                              //           )),
-                                              //       Text("10",
-                                              //           style: TextStyle(
-                                              //             color: Colors.black87,
-                                              //             fontSize: 18,
-                                              //             fontWeight:
-                                              //                 FontWeight.w800,
-                                              //           ))
-                                              //     ],
-                                              //   ),
-                                              // ),
-                                              Container(
-                                                alignment:
-                                                    Alignment.bottomRight,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            AddCategorie(
+                                                              filiere: e,
+                                                            )));
+                                              },
+                                              child: Column(
+                                                children: [
+                                                  ListTile(
+                                                      leading:
+                                                          _getIconForFiliere(e
+                                                              .libelleFiliere!),
+                                                      title: Text(
+                                                          e.libelleFiliere!
+                                                              .toUpperCase(),
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 20,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          )),
+                                                      subtitle: Text(
+                                                          e.descriptionFiliere!
+                                                              .trim(),
+                                                          style:
+                                                              const TextStyle(
+                                                            color:
+                                                                Colors.black87,
+                                                            fontSize: 17,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontStyle: FontStyle
+                                                                .italic,
+                                                          ))),
+                                                  Container(
+                                                    alignment:
+                                                        Alignment.bottomRight,
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
                                                         horizontal: 15),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    _buildEtat(e.statutFiliere),
-                                                    PopupMenuButton<String>(
-                                                      padding: EdgeInsets.zero,
-                                                      itemBuilder: (context) =>
-                                                          <PopupMenuEntry<
-                                                              String>>[
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: const Icon(
-                                                              Icons.check,
-                                                              color:
-                                                                  Colors.green,
-                                                            ),
-                                                            title: const Text(
-                                                              "Activer",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .green,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            onTap: () async {
-                                                              await FiliereService()
-                                                                  .activerFiliere(e
-                                                                      .idFiliere!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<FiliereService>(context, listen: false).applyChange(),
-                                                                            Navigator.of(context).pop(),
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Activer avec succèss "),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 2),
-                                                                              ),
-                                                                            )
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Une erreur s'est produit"),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 5),
-                                                                              ),
-                                                                            ),
-                                                                            Navigator.of(context).pop(),
-                                                                          });
-                                                            },
-                                                          ),
-                                                        ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: Icon(
-                                                              Icons
-                                                                  .disabled_visible,
-                                                              color: Colors
-                                                                  .orange[400],
-                                                            ),
-                                                            title: Text(
-                                                              "Désactiver",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                        .orange[
-                                                                    400],
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            onTap: () async {
-                                                              await FiliereService()
-                                                                  .desactiverFiliere(e
-                                                                      .idFiliere!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<FiliereService>(context, listen: false).applyChange(),
-                                                                            Navigator.of(context).pop(),
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Une erreur s'est produit"),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 5),
-                                                                              ),
-                                                                            ),
-                                                                            Navigator.of(context).pop(),
-                                                                          });
-
-                                                              ScaffoldMessenger
-                                                                      .of(context)
-                                                                  .showSnackBar(
-                                                                const SnackBar(
-                                                                  content: Row(
-                                                                    children: [
-                                                                      Text(
-                                                                          "Désactiver avec succèss "),
-                                                                    ],
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        _buildEtat(
+                                                            e.statutFiliere!),
+                                                        PopupMenuButton<String>(
+                                                          padding:
+                                                              EdgeInsets.zero,
+                                                          itemBuilder:
+                                                              (context) =>
+                                                                  <PopupMenuEntry<
+                                                                      String>>[
+                                                            PopupMenuItem<
+                                                                String>(
+                                                              child: ListTile(
+                                                                leading:
+                                                                    const Icon(
+                                                                  Icons.check,
+                                                                  color: Colors
+                                                                      .green,
+                                                                ),
+                                                                title:
+                                                                    const Text(
+                                                                  "Activer",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .green,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
                                                                   ),
-                                                                  duration:
-                                                                      Duration(
+                                                                ),
+                                                                onTap:
+                                                                    () async {
+                                                                  await FiliereService()
+                                                                      .activerFiliere(e
+                                                                          .idFiliere!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Provider.of<FiliereService>(context, listen: false).applyChange(),
+                                                                                Navigator.of(context).pop(),
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Activer avec succèss "),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 2),
+                                                                                  ),
+                                                                                )
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Une erreur s'est produit"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
+                                                                                ),
+                                                                                Navigator.of(context).pop(),
+                                                                              });
+                                                                },
+                                                              ),
+                                                            ),
+                                                            PopupMenuItem<
+                                                                String>(
+                                                              child: ListTile(
+                                                                leading: Icon(
+                                                                  Icons
+                                                                      .disabled_visible,
+                                                                  color: Colors
+                                                                          .orange[
+                                                                      400],
+                                                                ),
+                                                                title: Text(
+                                                                  "Désactiver",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                            .orange[
+                                                                        400],
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
+                                                                onTap:
+                                                                    () async {
+                                                                  await FiliereService()
+                                                                      .desactiverFiliere(e
+                                                                          .idFiliere!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Provider.of<FiliereService>(context, listen: false).applyChange(),
+                                                                                Navigator.of(context).pop(),
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Une erreur s'est produit"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
+                                                                                ),
+                                                                                Navigator.of(context).pop(),
+                                                                              });
+
+                                                                  ScaffoldMessenger.of(
+                                                                          context)
+                                                                      .showSnackBar(
+                                                                    const SnackBar(
+                                                                      content:
+                                                                          Row(
+                                                                        children: [
+                                                                          Text(
+                                                                              "Désactiver avec succèss "),
+                                                                        ],
+                                                                      ),
+                                                                      duration: Duration(
                                                                           seconds:
                                                                               2),
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ),
+                                                            PopupMenuItem<
+                                                                String>(
+                                                              child: ListTile(
+                                                                leading:
+                                                                    const Icon(
+                                                                  Icons.edit,
+                                                                  color: Colors
+                                                                      .green,
                                                                 ),
-                                                              );
-                                                            },
-                                                          ),
-                                                        ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: const Icon(
-                                                              Icons.edit,
-                                                              color:
-                                                                  Colors.green,
-                                                            ),
-                                                            title: const Text(
-                                                              "Modifier",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .green,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            onTap: () async {
-                                                              // Ouvrir la boîte de dialogue de modification
-                                                              var updatedSousRegion =
-                                                                  await showDialog(
-                                                                context:
-                                                                    context,
-                                                                builder: (BuildContext context) => AlertDialog(
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    content: UpdatesFilieres(
-                                                                        filiere:
-                                                                            e)),
-                                                              );
-
-                                                              // Si les détails sont modifiés, appliquer les changements
-                                                              if (updatedSousRegion !=
-                                                                  null) {
-                                                                Provider.of<FiliereService>(
+                                                                title:
+                                                                    const Text(
+                                                                  "Modifier",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .green,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
+                                                                onTap:
+                                                                    () async {
+                                                                  // Ouvrir la boîte de dialogue de modification
+                                                                  var updatedSousRegion =
+                                                                      await showDialog(
+                                                                    context:
                                                                         context,
-                                                                        listen:
-                                                                            false)
-                                                                    .applyChange();
+                                                                    builder: (BuildContext context) => AlertDialog(
+                                                                        backgroundColor:
+                                                                            Colors
+                                                                                .white,
+                                                                        content:
+                                                                            UpdatesFilieres(filiere: e)),
+                                                                  );
 
-                                                                // Mettre à jour la liste des sous-régions
-                                                              }
-                                                            },
-                                                          ),
-                                                        ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: const Icon(
-                                                              Icons.delete,
-                                                              color: Colors.red,
-                                                            ),
-                                                            title: const Text(
-                                                              "Supprimer",
-                                                              style: TextStyle(
-                                                                color:
-                                                                    Colors.red,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                                  // Si les détails sont modifiés, appliquer les changements
+                                                                  if (updatedSousRegion !=
+                                                                      null) {
+                                                                    Provider.of<FiliereService>(
+                                                                            context,
+                                                                            listen:
+                                                                                false)
+                                                                        .applyChange();
+
+                                                                    // Mettre à jour la liste des sous-régions
+                                                                  }
+                                                                },
                                                               ),
                                                             ),
-                                                            onTap: () async {
-                                                              await FiliereService()
-                                                                  .deleteFiliere(e
-                                                                      .idFiliere!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<FiliereService>(context, listen: false).applyChange(),
-                                                                            Navigator.of(context).pop(),
-                                                                            setState(() {
-                                                                              _filiereList = http
-                                                                                  // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
-                                                                                  .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
-                                                                            })
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text(
-                                                                                      "Impossible de supprimer car cette filière est déjà associé a une categorie",
-                                                                                      style: TextStyle(overflow: TextOverflow.ellipsis),
+                                                            PopupMenuItem<
+                                                                String>(
+                                                              child: ListTile(
+                                                                leading:
+                                                                    const Icon(
+                                                                  Icons.delete,
+                                                                  color: Colors
+                                                                      .red,
+                                                                ),
+                                                                title:
+                                                                    const Text(
+                                                                  "Supprimer",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .red,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
+                                                                onTap:
+                                                                    () async {
+                                                                  await FiliereService()
+                                                                      .deleteFiliere(e
+                                                                          .idFiliere!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Provider.of<FiliereService>(context, listen: false).applyChange(),
+                                                                                Navigator.of(context).pop(),
+                                                                                setState(() {
+                                                                                  _filiereList = http.get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+                                                                                  // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+                                                                                })
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text(
+                                                                                          "Impossible de supprimer car cette filière est déjà associé a une categorie",
+                                                                                          style: TextStyle(overflow: TextOverflow.ellipsis),
+                                                                                        ),
+                                                                                      ],
                                                                                     ),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 2),
-                                                                              ),
-                                                                            )
-                                                                          });
-                                                            },
-                                                          ),
+                                                                                    duration: Duration(seconds: 2),
+                                                                                  ),
+                                                                                )
+                                                                              });
+                                                                },
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                       ],
                                                     ),
-                                                  ],
-                                                ),
-                                              )
-                                            ],
+                                                  )
+                                                ],
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                      ),
-                                    ))
-                                .toList());
+                                        ))
+                                    .toList());
                       }
                     });
               },
@@ -574,7 +571,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
       case 'bétail':
       case 'betails':
       case 'betail':
-      case 'animal':
+      case 'animale':
         return Image.asset(
           "assets/images/betail.png",
           width: 80,
@@ -584,6 +581,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
       case 'légume':
       case 'legumes':
       case 'legume':
+      case 'végétale':
         return Image.asset(
           "assets/images/legumes.png",
           width: 80,
@@ -704,8 +702,9 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                             .applyChange(),
                                         setState(() {
                                           _filiereList = http
-                                              // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
-                                              .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+                                          // .get(Uri.parse(
+                                              // 'https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+                                          .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
                                         }),
                                         libelleController.clear(),
                                         descriptionController.clear(),
@@ -820,15 +819,15 @@ class _FiliereScreenState extends State<FiliereScreen> {
                         return FutureBuilder(
                           future: _filiereList,
                           builder: (_, snapshot) {
-                            // if (snapshot.connectionState ==
-                            //     ConnectionState.waiting) {
-                            //   return CircularProgressIndicator();
-                            // }
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            }
                             // if (snapshot.hasError) {
                             //   return Text("${snapshot.error}");
                             // }
                             if (snapshot.hasData) {
-                             dynamic jsonString =
+                              dynamic jsonString =
                                   utf8.decode(snapshot.data.bodyBytes);
                               dynamic responseData = json.decode(jsonString);
 
@@ -858,7 +857,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                       .map(
                                         (e) => DropdownMenuItem(
                                           value: e.idFiliere,
-                                          child: Text(e.libelleFiliere),
+                                          child: Text(e.libelleFiliere!),
                                         ),
                                       )
                                       .toList(),

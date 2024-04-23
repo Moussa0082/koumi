@@ -132,7 +132,7 @@ Future<List<Magasin>> fetchMagasins() async {
                               PopupMenuItem<String>(
                                 child: ListTile(
                                   leading: const Icon(
-                                    Icons.remove_red_eye,
+                                    Icons.add,
                                     color: Colors.green,
                                   ),
                                   title: const Text(

@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:io'; 
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -151,9 +151,10 @@ class ConseilService extends ChangeNotifier {
   }
 
   Future activerConseil(String idConseil) async {
-    final response = await http.delete(Uri.parse('$baseUrl/enable/$idConseil'));
+    final response = await http.put(Uri.parse('$baseUrl/enable/$idConseil'));
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200 || response.statusCode == 201 ||
+        response.statusCode == 202) {
       applyChange();
     } else {
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
@@ -162,9 +163,10 @@ class ConseilService extends ChangeNotifier {
   }
 
   Future desactiverConseil(String idConseil) async {
-    final response = await http.delete(Uri.parse('$baseUrl/disable/$idConseil'));
+    final response = await http.put(Uri.parse('$baseUrl/disable/$idConseil'));
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200 || response.statusCode == 201 ||
+        response.statusCode == 202) {
       applyChange();
     } else {
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');

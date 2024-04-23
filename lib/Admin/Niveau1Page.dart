@@ -627,15 +627,28 @@ class _Niveau1PageState extends State<Niveau1Page> {
                             builder: (_, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
-                                return CircularProgressIndicator();
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Chargement...',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
                               }
-                              if (snapshot.hasError) {
-                                return Text("${snapshot.error}");
-                              }
+                              // if (snapshot.hasError) {
+                              //   return Text("${snapshot.error}");
+                              // }
                               if (snapshot.hasData) {
-                                final reponse = json.decode(snapshot.data.body);
-                                if (reponse is List) {
-                                  final paysList = reponse
+                                dynamic jsonString =
+                                    utf8.decode(snapshot.data.bodyBytes);
+                                dynamic responseData = json.decode(jsonString);
+
+                                // final reponse = json.decode(snapshot.data.body);
+                                if (responseData is List) {
+                                  final paysList = responseData
                                       .map((e) => Pays.fromMap(e))
                                       .where((con) => con.statutPays == true)
                                       .toList();

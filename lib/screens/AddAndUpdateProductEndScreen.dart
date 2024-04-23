@@ -94,12 +94,16 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
     if(widget.isEditable == false){
 
      await ajouterStock().then((_) {
+      _typeController.clear();
+      _descriptionController.clear();
       setState(() {
         isLoading = false;
       });
      });
     }else{
   await updateProduit().then((_) {
+    _typeController.clear();
+      _descriptionController.clear();
       setState(() {
         isLoading = false;
       });

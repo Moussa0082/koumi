@@ -658,68 +658,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
                           ),
                         ),
                       ),
-                      // SizedBox(height: 16),
-                      // FutureBuilder(
-                      //   future: _paysList,
-                      //   builder: (_, snapshot) {
-                      //     if (snapshot.connectionState ==
-                      //         ConnectionState.waiting) {
-                      //       return CircularProgressIndicator();
-                      //     }
-                      //     if (snapshot.hasError) {
-                      //       return Text("${snapshot.error}");
-                      //     }
-                      //     if (snapshot.hasData) {
-                      //       final reponse =
-                      //           json.decode((snapshot.data.body)) as List;
-                      //       final paysList = reponse
-                      //           .map((e) => Pays.fromMap(e))
-                      //           .where((con) => con.statutPays == true)
-                      //           .toList();
-
-                      //       if (paysList.isEmpty) {
-                      //         return Text(
-                      //           'Aucun donné disponible',
-                      //           style:
-                      //               TextStyle(overflow: TextOverflow.ellipsis),
-                      //         );
-                      //       }
-
-                      //       return DropdownButtonFormField<String>(
-                      //         items: paysList
-                      //             .map(
-                      //               (e) => DropdownMenuItem(
-                      //                 value: e.idPays,
-                      //                 child: Text(e.nomPays),
-                      //               ),
-                      //             )
-                      //             .toList(),
-                      //         value: paysValue,
-                      //         onChanged: (newValue) {
-                      //           setState(() {
-                      //             paysValue = newValue;
-                      //             if (newValue != null) {
-                      //               pays = paysList.firstWhere((element) =>
-                      //                   element.idPays == newValue);
-
-                      //               // typeSelected = true;
-                      //             }
-                      //           });
-                      //         },
-                      //         decoration: InputDecoration(
-                      //           labelText: 'Sélectionner un pays',
-                      //           border: OutlineInputBorder(
-                      //             borderRadius: BorderRadius.circular(8),
-                      //           ),
-                      //         ),
-                      //       );
-                      //     }
-                      //     return Text(
-                      //       'Aucune donnée disponible',
-                      //       style: TextStyle(overflow: TextOverflow.ellipsis),
-                      //     );
-                      //   },
-                      // ),
+                     
                       SizedBox(height: 16),
                       Consumer<Niveau1Service>(
                         builder: (context, niveauService, child) {
@@ -728,13 +667,24 @@ class _Niveau2PageState extends State<Niveau2Page> {
                             builder: (_, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
-                                return CircularProgressIndicator();
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Chargement...',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
                               }
-                              if (snapshot.hasError) {
-                                return Text("${snapshot.error}");
-                              }
+                              
                               if (snapshot.hasData) {
-                                final reponse = json.decode(snapshot.data.body);
+                                 dynamic jsonString =
+                                    utf8.decode(snapshot.data.bodyBytes);
+                                dynamic reponse = json.decode(jsonString);
+
+                                // final reponse = json.decode(snapshot.data.body);
                                 if (reponse is List) {
                                   final niveauList = reponse
                                       .map((e) => Niveau1Pays.fromMap(e))

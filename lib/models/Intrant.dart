@@ -2,6 +2,8 @@
 import 'dart:convert';
 
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/CategorieProduit.dart';
+import 'package:koumi_app/models/Forme.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/Superficie.dart';
 
@@ -18,8 +20,11 @@ class Intrant {
   final String? dateAjout;
   final String? dateModif;
   final String? personneModif;
+  final String? unite;
+  final Forme forme;
   final Acteur acteur;
-  final Speculation? speculation;
+  final CategorieProduit? categorieProduit;
+  
   Intrant({
     this.idIntrant,
     required this.nomIntrant,
@@ -33,11 +38,11 @@ class Intrant {
     this.dateAjout,
     this.dateModif,
     this.personneModif,
+    this.unite,
+    required this.forme,
     required this.acteur,
-    this.speculation,
+    this.categorieProduit,
   });
-
- 
 
   Intrant copyWith({
     String? idIntrant,
@@ -52,8 +57,10 @@ class Intrant {
     String? dateAjout,
     String? dateModif,
     String? personneModif,
+    String? unite,
+    Forme? forme,
     Acteur? acteur,
-    Speculation? speculation,
+    CategorieProduit? categorieProduit,
   }) {
     return Intrant(
       idIntrant: idIntrant ?? this.idIntrant,
@@ -68,8 +75,10 @@ class Intrant {
       dateAjout: dateAjout ?? this.dateAjout,
       dateModif: dateModif ?? this.dateModif,
       personneModif: personneModif ?? this.personneModif,
+      unite: unite ?? this.unite,
+      forme: forme ?? this.forme,
       acteur: acteur ?? this.acteur,
-      speculation: speculation ?? this.speculation,
+      categorieProduit: categorieProduit ?? this.categorieProduit,
     );
   }
 
@@ -87,8 +96,10 @@ class Intrant {
       'dateAjout': dateAjout,
       'dateModif': dateModif,
       'personneModif': personneModif,
+      'unite': unite,
+      'forme': forme.toMap(),
       'acteur': acteur.toMap(),
-      'speculation': speculation?.toMap(),
+      'categorieProduit': categorieProduit?.toMap(),
     };
   }
 
@@ -106,8 +117,10 @@ class Intrant {
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
       personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
+      unite: map['unite'] != null ? map['unite'] as String : null,
+      forme: Forme.fromMap(map['forme'] as Map<String,dynamic>),
       acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
-      speculation: map['speculation'] != null ? Speculation.fromMap(map['speculation'] as Map<String,dynamic>) : null,
+      categorieProduit: map['categorieProduit'] != null ? CategorieProduit.fromMap(map['categorieProduit'] as Map<String,dynamic>) : null,
     );
   }
 
@@ -117,7 +130,7 @@ class Intrant {
 
   @override
   String toString() {
-    return 'Intrant(idIntrant: $idIntrant, nomIntrant: $nomIntrant, quantiteIntrant: $quantiteIntrant, prixIntrant: $prixIntrant, codeIntrant: $codeIntrant, descriptionIntrant: $descriptionIntrant, photoIntrant: $photoIntrant, statutIntrant: $statutIntrant, dateExpiration: $dateExpiration, dateAjout: $dateAjout, dateModif: $dateModif, personneModif: $personneModif, acteur: $acteur, speculation: $speculation)';
+    return 'Intrant(idIntrant: $idIntrant, nomIntrant: $nomIntrant, quantiteIntrant: $quantiteIntrant, prixIntrant: $prixIntrant, codeIntrant: $codeIntrant, descriptionIntrant: $descriptionIntrant, photoIntrant: $photoIntrant, statutIntrant: $statutIntrant, dateExpiration: $dateExpiration, dateAjout: $dateAjout, dateModif: $dateModif, personneModif: $personneModif, unite: $unite, forme: $forme, acteur: $acteur, categorieProduit: $categorieProduit)';
   }
 
   @override
@@ -137,8 +150,10 @@ class Intrant {
       other.dateAjout == dateAjout &&
       other.dateModif == dateModif &&
       other.personneModif == personneModif &&
+      other.unite == unite &&
+      other.forme == forme &&
       other.acteur == acteur &&
-      other.speculation == speculation;
+      other.categorieProduit == categorieProduit;
   }
 
   @override
@@ -155,7 +170,9 @@ class Intrant {
       dateAjout.hashCode ^
       dateModif.hashCode ^
       personneModif.hashCode ^
+      unite.hashCode ^
+      forme.hashCode ^
       acteur.hashCode ^
-      speculation.hashCode;
+      categorieProduit.hashCode;
   }
 }

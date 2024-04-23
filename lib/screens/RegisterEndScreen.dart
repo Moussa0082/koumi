@@ -577,7 +577,7 @@ Future<void> _pickImage(ImageSource source) async {
                           ),
                         ),
                     
-                    keyboardType: TextInputType.text,
+                    keyboardType: TextInputType.phone,
                     obscureText: _obscureText,
                     validator: (val) {
                       if (val == null || val.isEmpty) {
@@ -632,7 +632,7 @@ Future<void> _pickImage(ImageSource source) async {
                           ),
                         ),
                     
-                    keyboardType: TextInputType.text,
+                    keyboardType: TextInputType.phone,
                     obscureText: _obscureText,
                     validator: (val) {
                       if (val == null || val.isEmpty) {

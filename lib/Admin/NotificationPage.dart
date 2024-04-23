@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:koumi_app/Admin/NotificationDetail.dart';
+import 'package:koumi_app/api/firebase_api.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/MessageWa.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -34,6 +35,7 @@ class _NotificationPageState extends State<NotificationPage> {
   final MultiSelectController _controller = MultiSelectController();
   late List<TypeActeur> typeActeurData = [];
   late String type;
+  bool _isLoading = false;
 
   Future<List<MessageWa>> getMessage(String id) async {
     final response = await MessageService().fetchMessageByActeur(id);
@@ -62,6 +64,7 @@ class _NotificationPageState extends State<NotificationPage> {
 
   @override
   Widget build(BuildContext context) {
+    //  final message = ModalRoute.of(context)!.settings.arguments as RemoteMessage;
     return Scaffold(
         backgroundColor: Color.fromARGB(255, 250, 250, 250),
         appBar: AppBar(
@@ -126,6 +129,7 @@ class _NotificationPageState extends State<NotificationPage> {
         ),
         body: SingleChildScrollView(
           child: Column(children: [
+            // Text(message.notification!.title.toString()),
             SizedBox(height: 10),
             Padding(
               padding: EdgeInsets.all(10.0),
@@ -244,69 +248,69 @@ class _NotificationPageState extends State<NotificationPage> {
                                               padding: EdgeInsets.zero,
                                               itemBuilder: (context) =>
                                                   <PopupMenuEntry<String>>[
-                                                    //  PopupMenuItem<String>(
-                                                    //   child: ListTile(
-                                                    //     leading: const Icon(
-                                                    //       Icons.check,
-                                                    //       color: Colors.green,
-                                                    //     ),
-                                                    //     title: const Text(
-                                                    //       "Activer",
-                                                    //       style: TextStyle(
-                                                    //         color: Colors.green,
-                                                    //         fontWeight:
-                                                    //             FontWeight.bold,
-                                                    //       ),
-                                                    //     ),
-                                                    //     onTap: () async {
-                                                    //       await ActeurService()
-                                                    //           .activerActeur(
-                                                    //               e.)
-                                                    //           .then((value) => {
-                                                    //                 Provider.of<ActeurService>(
-                                                    //                         context,
-                                                    //                         listen:
-                                                    //                             false)
-                                                    //                     .applyChange(),
-                                                    //                 Navigator.of(
-                                                    //                         context)
-                                                    //                     .pop(),
-                                                    //                 ScaffoldMessenger.of(
-                                                    //                         context)
-                                                    //                     .showSnackBar(
-                                                    //                   const SnackBar(
-                                                    //                     content:
-                                                    //                         Row(
-                                                    //                       children: [
-                                                    //                         Text("Activer avec succèss "),
-                                                    //                       ],
-                                                    //                     ),
-                                                    //                     duration:
-                                                    //                         Duration(seconds: 2),
-                                                    //                   ),
-                                                    //                 )
-                                                    //               })
-                                                    //           .catchError(
-                                                    //               (onError) => {
-                                                    //                     ScaffoldMessenger.of(context)
-                                                    //                         .showSnackBar(
-                                                    //                       const SnackBar(
-                                                    //                         content:
-                                                    //                             Row(
-                                                    //                           children: [
-                                                    //                             Text("Une erreur s'est produit"),
-                                                    //                           ],
-                                                    //                         ),
-                                                    //                         duration:
-                                                    //                             Duration(seconds: 5),
-                                                    //                       ),
-                                                    //                     ),
-                                                    //                     Navigator.of(context)
-                                                    //                         .pop(),
-                                                    //                   });
-                                                    //     },
-                                                    //   ),
-                                                    // ),
+                                                //  PopupMenuItem<String>(
+                                                //   child: ListTile(
+                                                //     leading: const Icon(
+                                                //       Icons.check,
+                                                //       color: Colors.green,
+                                                //     ),
+                                                //     title: const Text(
+                                                //       "Activer",
+                                                //       style: TextStyle(
+                                                //         color: Colors.green,
+                                                //         fontWeight:
+                                                //             FontWeight.bold,
+                                                //       ),
+                                                //     ),
+                                                //     onTap: () async {
+                                                //       await ActeurService()
+                                                //           .activerActeur(
+                                                //               e.)
+                                                //           .then((value) => {
+                                                //                 Provider.of<ActeurService>(
+                                                //                         context,
+                                                //                         listen:
+                                                //                             false)
+                                                //                     .applyChange(),
+                                                //                 Navigator.of(
+                                                //                         context)
+                                                //                     .pop(),
+                                                //                 ScaffoldMessenger.of(
+                                                //                         context)
+                                                //                     .showSnackBar(
+                                                //                   const SnackBar(
+                                                //                     content:
+                                                //                         Row(
+                                                //                       children: [
+                                                //                         Text("Activer avec succèss "),
+                                                //                       ],
+                                                //                     ),
+                                                //                     duration:
+                                                //                         Duration(seconds: 2),
+                                                //                   ),
+                                                //                 )
+                                                //               })
+                                                //           .catchError(
+                                                //               (onError) => {
+                                                //                     ScaffoldMessenger.of(context)
+                                                //                         .showSnackBar(
+                                                //                       const SnackBar(
+                                                //                         content:
+                                                //                             Row(
+                                                //                           children: [
+                                                //                             Text("Une erreur s'est produit"),
+                                                //                           ],
+                                                //                         ),
+                                                //                         duration:
+                                                //                             Duration(seconds: 5),
+                                                //                       ),
+                                                //                     ),
+                                                //                     Navigator.of(context)
+                                                //                         .pop(),
+                                                //                   });
+                                                //     },
+                                                //   ),
+                                                // ),
                                                 PopupMenuItem<String>(
                                                   child: ListTile(
                                                     leading: Icon(
@@ -472,8 +476,8 @@ class _NotificationPageState extends State<NotificationPage> {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: MultiSelectDropDown.network(
                           networkConfig: NetworkConfig(
-                            url:'http://10.0.2.2:9000/api-koumi/typeActeur/read',
-                            // url: 'https://koumi.ml/api-koumi/typeActeur/read',
+                            // url:'http://10.0.2.2:9000/api-koumi/typeActeur/read',
+                            url: 'https://koumi.ml/api-koumi/typeActeur/read',
                             method: RequestMethod.get,
                             headers: {
                               'Content-Type': 'application/json',
@@ -551,10 +555,15 @@ class _NotificationPageState extends State<NotificationPage> {
                             List<String> type = typeLibelle;
                             if (formkey.currentState!.validate()) {
                               try {
+                                setState(() {
+                                  _isLoading = true;
+                                });
                                 await ActeurService()
                                     .sendMessageToActeurByTypeActeur(
                                         message, type)
                                     .then((value) => {
+                                          // Envoi de la notification push
+                                          FirebaseApi().sendPushNotificationToTopic('Koumi', message),
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
                                             SnackBar(
@@ -563,11 +572,14 @@ class _NotificationPageState extends State<NotificationPage> {
                                               duration: Duration(seconds: 3),
                                             ),
                                           ),
+                                          //  FirebaseApi().sendPushNotification(
+                                          //     ),
                                           Navigator.of(context).pop(),
-                                          descriptionController.clear(),
+                                          // descriptionController.clear(),
                                           setState(() {
                                             typeLibelle.clear();
-                                          })
+                                            _isLoading = false;
+                                          }),
                                         })
                                     .catchError((onError) =>
                                         {print(onError.toString())});
@@ -662,8 +674,8 @@ class _NotificationPageState extends State<NotificationPage> {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: MultiSelectDropDown.network(
                           networkConfig: NetworkConfig(
-                            url: 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
-                            // url: 'https://koumi.ml/api-koumi/typeActeur/read',
+                            // url: 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
+                            url: 'https://koumi.ml/api-koumi/typeActeur/read',
                             method: RequestMethod.get,
                             headers: {
                               'Content-Type': 'application/json',
@@ -763,6 +775,9 @@ class _NotificationPageState extends State<NotificationPage> {
                             final String subject = sujetController.text;
                             if (formkey.currentState!.validate()) {
                               try {
+                                setState(() {
+                                  _isLoading = true;
+                                });
                                 await ActeurService()
                                     .sendEmailToActeurByTypeActeur(
                                         message, type, subject)
@@ -780,6 +795,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                           sujetController.clear(),
                                           setState(() {
                                             typeLibelle.clear();
+                                            _isLoading = false;
                                           })
                                         })
                                     .catchError((onError) =>

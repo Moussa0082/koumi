@@ -5,43 +5,40 @@ import 'package:flutter/foundation.dart';
 
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Campagne.dart';
-import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/Speculation.dart';
 
 class Superficie {
-  final String? idSuperficie;
-  final String codeSuperficie;
-  final String localite;
-  final String? personneModif;
-  final String superficieHa;
-  final String? description;
-  final bool statutSuperficie;
-  final String? dateSemi;
-  final String? dateAjout;
-  final String? dateModif;
-  final Acteur acteur;
-  final List<String> intrants;
-  final Speculation speculation;
-  final Campagne campagne;
+  String? idSuperficie;
+  String? codeSuperficie;
+  String? localite;
+  String? personneModif;
+  String? superficieHa;
+  String? description;
+  bool statutSuperficie;
+  String? dateSemi;
+  String? dateAjout;
+  String? dateModif;
+  Acteur acteur;
+  List<String>? intrants;
+  Speculation speculation;
+  Campagne campagne;
 
   Superficie({
     this.idSuperficie,
-    required this.codeSuperficie,
-    required this.localite,
+    this.codeSuperficie,
+    this.localite,
     this.personneModif,
-    required this.superficieHa,
+    this.superficieHa,
     this.description,
     required this.statutSuperficie,
     this.dateSemi,
     this.dateAjout,
     this.dateModif,
     required this.acteur,
-    required this.intrants,
+    this.intrants,
     required this.speculation,
     required this.campagne,
   });
-  
- 
 
   Superficie copyWith({
     String? idSuperficie,
@@ -96,24 +93,28 @@ class Superficie {
     };
   }
 
-  factory Superficie.fromMap(Map<String, dynamic> map) {
+ factory Superficie.fromMap(Map<String, dynamic> map) {
     return Superficie(
-      idSuperficie: map['idSuperficie'] != null ? map['idSuperficie'] as String : null,
-      codeSuperficie: map['codeSuperficie'] as String,
-      localite: map['localite'] as String,
-      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
-      superficieHa: map['superficieHa'] as String,
-      description: map['description'] != null ? map['description'] as String : null,
+      idSuperficie: map['idSuperficie'] as String?,
+      codeSuperficie: map['codeSuperficie'] as String?,
+      localite: map['localite'] as String?,
+      personneModif: map['personneModif'] as String?,
+      superficieHa: map['superficieHa'] as String?,
+      description: map['description'] as String?,
       statutSuperficie: map['statutSuperficie'] as bool,
-      dateSemi: map['dateSemi'] != null ? map['dateSemi'] as String : null,
-      dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
-      dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
-      acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
-      intrants: List<String>.from(map['intrants'] as List<String>),
-      speculation: Speculation.fromMap(map['speculation'] as Map<String,dynamic>),
-      campagne: Campagne.fromMap(map['campagne'] as Map<String,dynamic>),
+      dateSemi: map['dateSemi'] as String?,
+      dateAjout: map['dateAjout'] as String?,
+      dateModif: map['dateModif'] as String?,
+      acteur: Acteur.fromMap(map['acteur'] as Map<String, dynamic>),
+      intrants:
+          (map['intrants'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      speculation:  Speculation.fromMap(map['speculation'] as Map<String, dynamic>),
+        
+      campagne:  Campagne.fromMap(map['campagne'] as Map<String, dynamic>)
+          
     );
   }
+
 
   String toJson() => json.encode(toMap());
 

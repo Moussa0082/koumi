@@ -32,7 +32,7 @@ class _DetailConseilState extends State<DetailConseil> {
 
   void verifyAudioSource() {
     try {
-      if (conseils.audioConseil != null) {
+      if (conseils.audioConseil != null && conseils.audioConseil!.isNotEmpty ) {
         player = AudioPlayer();
 
         // Set the release mode to keep the source after playback has completed.
@@ -40,7 +40,9 @@ class _DetailConseilState extends State<DetailConseil> {
 
         // Start the player as soon as the app is displayed.
         WidgetsBinding.instance.addPostFrameCallback((_) async {
-          String audioPath = 'http://10.0.2.2/${conseils.audioConseil}';
+          // String audioPath = 'http://10.0.2.2/${conseils.audioConseil}';
+                    String audioPath = 'https://koumi.ml/api-koumi/conseil/${conseils.idConseil}/audio';
+
           await player.play(UrlSource(audioPath));
           await player.pause();
         });
@@ -60,11 +62,12 @@ class _DetailConseilState extends State<DetailConseil> {
   }
 
   void verifyVideoSource() {
-    if (conseils.videoConseil != null) {
+    if (conseils.videoConseil != null && conseils.videoConseil!.isNotEmpty ) {
       flickManager = FlickManager(
         autoPlay: false,
         videoPlayerController: VideoPlayerController.networkUrl(
-          Uri.parse('http://10.0.2.2/${conseils.videoConseil}'),
+          Uri.parse('https://koumi.ml/api-koumi/conseil/${conseils.idConseil}/video'),
+          // Uri.parse('http://10.0.2.2/${conseils.videoConseil}'),
         ),
       );
     }
@@ -108,10 +111,17 @@ class _DetailConseilState extends State<DetailConseil> {
               child: conseils.photoConseil != null &&
                       !conseils.photoConseil!.isEmpty
                   ? Image.network(
-                      "http://10.0.2.2/${conseils.photoConseil!}",
-                      width: double.infinity,
+                      "https://koumi.ml/api-koumi/conseil/${conseils.idConseil}/image",
+                     width: double.infinity,
                       height: 200,
                       fit: BoxFit.cover,
+                      errorBuilder: (BuildContext context, Object exception,
+                          StackTrace? stackTrace) {
+                        return Image.asset(
+                          'assets/images/default_image.png',
+                          fit: BoxFit.cover,
+                        );
+                      },
                     )
                   : Image.asset(
                       "assets/images/default_image.png",
@@ -148,7 +158,7 @@ class _DetailConseilState extends State<DetailConseil> {
                 ? _videoBuild()
                 : Container(),
             _descriptionBuild(),
-            conseils.audioConseil != null ? _audioBuild() : Container()
+            conseils.audioConseil != null  && conseils.audioConseil!.isNotEmpty ? _audioBuild() : Container()
           ],
         ),
       ),

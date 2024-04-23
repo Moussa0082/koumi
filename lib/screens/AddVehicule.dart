@@ -243,7 +243,7 @@ class _AddVehiculeState extends State<AddVehicule> {
                                 items: [],
                                 onChanged: null,
                                 decoration: InputDecoration(
-                                  labelText: 'Aucun type de véhicule trouvé',
+                                  labelText: 'Chargement...',
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(
@@ -252,12 +252,14 @@ class _AddVehiculeState extends State<AddVehicule> {
                                 ),
                               );
                             }
-                            if (snapshot.hasError) {
-                              return Text("${snapshot.error}");
-                            }
+                            
                             if (snapshot.hasData) {
-                              dynamic responseData =
-                                  json.decode(snapshot.data.body);
+                              // dynamic responseData =
+                              //     json.decode(snapshot.data.body);
+                               dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+
                               if (responseData is List) {
                                 final reponse = responseData;
                                 final vehiculeList = reponse
@@ -371,7 +373,7 @@ class _AddVehiculeState extends State<AddVehicule> {
                                 items: [],
                                 onChanged: null,
                                 decoration: InputDecoration(
-                                  labelText: 'Aucun commune trouvé',
+                                  labelText: 'Chargement...',
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(
@@ -380,9 +382,7 @@ class _AddVehiculeState extends State<AddVehicule> {
                                 ),
                               );
                             }
-                            if (snapshot.hasError) {
-                              return Text("${snapshot.error}");
-                            }
+                           
                             if (snapshot.hasData) {
                               dynamic responseData =
                                   json.decode(snapshot.data.body);

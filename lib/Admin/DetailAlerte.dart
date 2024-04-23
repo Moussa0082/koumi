@@ -40,7 +40,8 @@ class _DetailAlerteState extends State<DetailAlerte> {
 
         // Start the player as soon as the app is displayed.
         WidgetsBinding.instance.addPostFrameCallback((_) async {
-          String audioPath = 'http://10.0.2.2/${alerte.audioAlerte}';
+          String audioPath =
+              'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/audio';
           await player.play(UrlSource(audioPath));
           await player.pause();
         });
@@ -64,7 +65,8 @@ class _DetailAlerteState extends State<DetailAlerte> {
       flickManager = FlickManager(
         autoPlay: false,
         videoPlayerController: VideoPlayerController.networkUrl(
-          Uri.parse('http://10.0.2.2/${alerte.videoAlerte}'),
+          Uri.parse(
+              'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/video'),
         ),
       );
     }
@@ -107,10 +109,18 @@ class _DetailAlerteState extends State<DetailAlerte> {
             Center(
               child: alerte.photoAlerte != null && !alerte.photoAlerte!.isEmpty
                   ? Image.network(
-                      "http://10.0.2.2/${alerte.photoAlerte}",
+                      'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/image',
+                      // "http://10.0.2.2/${e.photoIntrant}",
                       width: double.infinity,
                       height: 200,
                       fit: BoxFit.cover,
+                      errorBuilder: (BuildContext context, Object exception,
+                          StackTrace? stackTrace) {
+                        return Image.asset(
+                          'assets/images/default_image.png',
+                          fit: BoxFit.cover,
+                        );
+                      },
                     )
                   : Image.asset(
                       "assets/images/default_image.png",

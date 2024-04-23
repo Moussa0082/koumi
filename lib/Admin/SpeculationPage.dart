@@ -86,7 +86,7 @@ class _SpeculationPageState extends State<SpeculationPage> {
                 _showDialog();
               },
               icon: const Icon(
-                Icons.add_circle_outline,
+                Icons.add,
                 color: d_colorGreen,
                 size: 25,
               ),
@@ -192,7 +192,7 @@ class _SpeculationPageState extends State<SpeculationPage> {
                                                   leading: _getIconForFiliere(e
                                                       .categorieProduit!
                                                       .filiere!
-                                                      .libelleFiliere),
+                                                      .libelleFiliere!),
                                                   title: Text(
                                                       e.nomSpeculation!
                                                           .toUpperCase(),
@@ -324,8 +324,7 @@ class _SpeculationPageState extends State<SpeculationPage> {
                                                                           .italic,
                                                                 )),
                                                             Text(
-                                                                stockList
-                                                                    .length
+                                                                stockList.length
                                                                     .toString(),
                                                                 style:
                                                                     TextStyle(
@@ -698,10 +697,10 @@ class _SpeculationPageState extends State<SpeculationPage> {
                             try {
                               await SpeculationService()
                                   .addSpeculation(
-                                      nomSpeculation: libelle,
-                                      descriptionSpeculation: description,
-                                      categorieProduit: cat,
-                                      )
+                                    nomSpeculation: libelle,
+                                    descriptionSpeculation: description,
+                                    categorieProduit: cat,
+                                  )
                                   .then((value) => {
                                         Provider.of<SpeculationService>(context,
                                                 listen: false)

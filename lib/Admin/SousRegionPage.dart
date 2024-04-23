@@ -691,13 +691,23 @@ class _SousRegionPageState extends State<SousRegionPage> {
                           builder: (_, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return CircularProgressIndicator();
+                              return  DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Chargement...',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
                             }
-                            if (snapshot.hasError) {
-                              return Text("${snapshot.error}");
-                            }
+                            
                             if (snapshot.hasData) {
-                              final reponse = json.decode(snapshot.data.body);
+                              // final reponse = json.decode(snapshot.data.body);
+                              dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic reponse = json.decode(jsonString);
                               if (reponse is List) {
                                 final continentList = reponse
                                     .map((e) => Continent.fromMap(e))

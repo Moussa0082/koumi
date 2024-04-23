@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/Admin/ContinentPage.dart';
+import 'package:koumi_app/Admin/FormeProduit.dart';
 import 'package:koumi_app/Admin/Niveau1Page.dart';
 import 'package:koumi_app/Admin/Niveau2Page.dart';
 import 'package:koumi_app/Admin/Niveau3Page.dart';
@@ -30,7 +31,7 @@ class _ParametreState extends State<Parametre> {
     paramList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
 
-    if (paramList != null && paramList.isNotEmpty) {
+    if (paramList.isNotEmpty) {
       params = paramList[0];
     } else {
       // Gérer le cas où la liste est null ou vide, par exemple :
@@ -99,13 +100,23 @@ class _ParametreState extends State<Parametre> {
                               width: 110,
                               height: 150,
                               child: Image.network(
-                                "http://10.0.2.2/api-koumi/${params.logoSysteme!}",
+                                "https://koumi.ml/api-koumi/parametreGeneraux/${params.idParametreGeneraux!}/image",
+                                // scale: 1,
                                 scale: 1,
                                 fit: BoxFit.fill,
+                                errorBuilder: (BuildContext context,
+                                    Object exception, StackTrace? stackTrace) {
+                                  return Image.asset(
+                                    'assets/images/default_image.png',
+                                    // scale: 1,
+                                    scale: 1,
+                                    fit: BoxFit.fill,
+                                  );
+                                },
                               ),
                             ),
                   title: Text(
-                    params.nomSysteme!,
+                    params.nomSysteme! ?? "Koumi",
                     style: const TextStyle(
                       fontSize: 22,
                       color: Colors.black,
@@ -114,7 +125,7 @@ class _ParametreState extends State<Parametre> {
                     ),
                   ),
                   subtitle: Text(
-                    params.sloganSysteme!,
+                    params.sloganSysteme! ?? "Koumi",
                     textAlign: TextAlign.justify,
                     style: const TextStyle(
                       fontSize: 17,
@@ -251,6 +262,21 @@ class _ParametreState extends State<Parametre> {
                       endIndent: 0,
                     ),
                     getList(
+                        "fruits.png",
+                        'Forme produit',
+                        const FormeProduit(),
+                        const Icon(
+                          Icons.chevron_right_sharp,
+                          size: 30,
+                        )),
+                    const Divider(
+                      color: Colors.grey,
+                      height: 4,
+                      thickness: 1,
+                      indent: 50,
+                      endIndent: 0,
+                    ),
+                    getList(
                         "car.png",
                         'Type de véhicule',
                         const TypeVehicule(),
@@ -360,11 +386,8 @@ class _ParametreState extends State<Parametre> {
               children: [
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.07,
-                  child: Image.asset(
-                    "assets/images/$imgLocation",
-                    fit: BoxFit
-                        .cover, // You can adjust the BoxFit based on your needs
-                  ),
+                  child: Image.asset("assets/images/$imgLocation",
+                      height: 40, width: 42, fit: BoxFit.contain),
                 ),
                 const SizedBox(
                   width: 15,

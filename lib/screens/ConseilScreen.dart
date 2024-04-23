@@ -4,6 +4,7 @@ import 'package:koumi_app/models/Conseil.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddConseil.dart';
+import 'package:koumi_app/screens/ConseilDisable.dart';
 import 'package:koumi_app/screens/DetailConseil.dart';
 import 'package:koumi_app/service/ConseilService.dart';
 import 'package:provider/provider.dart';
@@ -91,30 +92,80 @@ class _ConseilScreenState extends State<ConseilScreen> {
                   PopupMenuButton<String>(
                     padding: EdgeInsets.zero,
                     itemBuilder: (context) {
-                      return <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.add,
-                              color: d_colorGreen,
-                            ),
-                            title: const Text(
-                              "Ajouter conseil ",
-                              style: TextStyle(
-                                color: d_colorGreen,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                      return type.toLowerCase() != 'admin'
+                          ? <PopupMenuEntry<String>>[
+                              PopupMenuItem<String>(
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.add,
+                                    color: d_colorGreen,
+                                  ),
+                                  title: const Text(
+                                    "Ajouter conseil ",
+                                    style: TextStyle(
+                                      color: d_colorGreen,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AddConseil()));
+                                  },
+                                ),
                               ),
-                            ),
-                            onTap: () async {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => AddConseil()));
-                            },
-                          ),
-                        ),
-                      ];
+                            ]
+                          : <PopupMenuEntry<String>>[
+                              PopupMenuItem<String>(
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.add,
+                                    color: d_colorGreen,
+                                  ),
+                                  title: const Text(
+                                    "Ajouter conseil ",
+                                    style: TextStyle(
+                                      color: d_colorGreen,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AddConseil()));
+                                  },
+                                ),
+                              ),
+                              PopupMenuItem<String>(
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.add,
+                                    color: d_colorGreen,
+                                  ),
+                                  title: const Text(
+                                    "Voir conseil désactiver ",
+                                    style: TextStyle(
+                                      color: d_colorGreen,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ConseilDisable()));
+                                  },
+                                ),
+                              ),
+                            ];
                     },
                   )
                 ]),
@@ -190,6 +241,8 @@ class _ConseilScreenState extends State<ConseilScreen> {
                             )
                           : Column(
                               children: filtereSearch
+                                  .where((element) =>
+                                      element.statutConseil == true)
                                   .map((e) => Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 10, horizontal: 15),
@@ -270,81 +323,92 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                                             itemBuilder: (context) =>
                                                                 <PopupMenuEntry<
                                                                     String>>[
-                                                              PopupMenuItem<
-                                                                  String>(
-                                                                child: ListTile(
-                                                                  leading:
-                                                                      const Icon(
-                                                                    Icons.check,
-                                                                    color: Colors
-                                                                        .green,
-                                                                  ),
-                                                                  title:
-                                                                      const Text(
-                                                                    "Activer",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: Colors
-                                                                          .green,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                    ),
-                                                                  ),
-                                                                  onTap:
-                                                                      () async {
-                                                                    await ConseilService()
-                                                                        .activerConseil(e
-                                                                            .idConseil!)
-                                                                        .then((value) =>
-                                                                            {
-                                                                              Provider.of<ConseilService>(context, listen: false).applyChange(),
-                                                                              Navigator.of(context).pop(),
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Activer avec succèss "),
-                                                                                    ],
-                                                                                  ),
-                                                                                  duration: Duration(seconds: 2),
-                                                                                ),
-                                                                              )
-                                                                            })
-                                                                        .catchError((onError) =>
-                                                                            {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Une erreur s'est produit"),
-                                                                                    ],
-                                                                                  ),
-                                                                                  duration: Duration(seconds: 5),
-                                                                                ),
-                                                                              ),
-                                                                              Navigator.of(context).pop(),
-                                                                            });
-                                                                  },
-                                                                ),
-                                                              ),
+                                                              // PopupMenuItem<
+                                                              //     String>(
+                                                              //     enabled: e.statutConseil,
+                                                              //   child:  ListTile(
+                                                              //     leading:
+                                                              //         const Icon(
+                                                              //       Icons.check,
+                                                              //       color: Colors
+                                                              //           .green,
+                                                              //     ),
+                                                              //     title:
+                                                              //         const Text(
+                                                              //       "Activer",
+                                                              //       style:
+                                                              //           TextStyle(
+                                                              //         color: Colors
+                                                              //             .green,
+                                                              //         fontWeight:
+                                                              //             FontWeight
+                                                              //                 .bold,
+                                                              //       ),
+                                                              //     ),
+                                                              //     onTap:
+                                                              //         () async {
+                                                              //       await ConseilService()
+                                                              //           .activerConseil(e
+                                                              //               .idConseil!)
+                                                              //           .then((value) =>
+                                                              //               {
+                                                              //                 Provider.of<ConseilService>(context, listen: false).applyChange(),
+                                                              //                 Navigator.of(context).pop(),
+                                                              //                 ScaffoldMessenger.of(context).showSnackBar(
+                                                              //                   const SnackBar(
+                                                              //                     content: Row(
+                                                              //                       children: [
+                                                              //                         Text("Activer avec succèss "),
+                                                              //                       ],
+                                                              //                     ),
+                                                              //                     duration: Duration(seconds: 2),
+                                                              //                   ),
+                                                              //                 )
+                                                              //               })
+                                                              //           .catchError((onError) =>
+                                                              //               {
+                                                              //                 ScaffoldMessenger.of(context).showSnackBar(
+                                                              //                   const SnackBar(
+                                                              //                     content: Row(
+                                                              //                       children: [
+                                                              //                         Text("Une erreur s'est produit"),
+                                                              //                       ],
+                                                              //                     ),
+                                                              //                     duration: Duration(seconds: 5),
+                                                              //                   ),
+                                                              //                 ),
+                                                              //                 Navigator.of(context).pop(),
+                                                              //               });
+                                                              //     },
+                                                              //   ),
+                                                              // ),
                                                               PopupMenuItem<
                                                                   String>(
                                                                 child: ListTile(
                                                                   leading: Icon(
                                                                     Icons
                                                                         .disabled_visible,
-                                                                    color: Colors
-                                                                            .orange[
-                                                                        400],
+                                                                    color: e.statutConseil
+                                                                        ? Colors
+                                                                            .orange[400]: Color.fromARGB(
+                                                                            255,
+                                                                            179,
+                                                                            178,
+                                                                            178)
+                                                                        ,
                                                                   ),
                                                                   title: Text(
                                                                     "Désactiver",
                                                                     style:
                                                                         TextStyle(
-                                                                      color: Colors
-                                                                              .orange[
-                                                                          400],
+                                                                      color: e.statutConseil
+                                                                          ? Colors.orange[
+                                                                              400]
+                                                                          : Color.fromARGB(
+                                                                              255,
+                                                                              179,
+                                                                              178,
+                                                                              178),
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .bold,

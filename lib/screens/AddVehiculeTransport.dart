@@ -242,7 +242,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                                 items: [],
                                 onChanged: null,
                                 decoration: InputDecoration(
-                                  labelText: 'Aucun localité trouvé',
+                                  labelText: 'Chargement...',
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(
@@ -251,12 +251,14 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                                 ),
                               );
                             }
-                            if (snapshot.hasError) {
-                              return Text("${snapshot.error}");
-                            }
+                           
                             if (snapshot.hasData) {
-                              dynamic responseData =
-                                  json.decode(snapshot.data.body);
+                              // dynamic responseData =
+                              //     json.decode(snapshot.data.body);
+                               dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+
                               if (responseData is List) {
                                 final reponse = responseData;
                                 final niveau3List = reponse

@@ -160,10 +160,14 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                       searchText = _searchController.text.toLowerCase();
                       return libelle.contains(searchText);
                     }).toList();
-                    return Wrap(
-                      // spacing: 10, // Espacement horizontal entre les conteneurs
-                      // runSpacing:
-                      //     10, // Espacement vertical entre les lignes de conteneurs
+                    return 
+                                  GridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 2,
+                      crossAxisSpacing: 5,
+                      childAspectRatio: 0.9,
                       children: filtereSearch
                           .map((e) => Padding(
                                 padding: EdgeInsets.all(10),
@@ -204,12 +208,12 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                   const EdgeInsets.all(8.0),
                                               child: e.photoVehicule == null
                                                   ? Image.asset(
-                                                     'assets/images/transport.png',
+                                                    'assets/images/default_image.png',
                                                       fit: BoxFit.cover,
                                                       height: 90,
                                                     )
                                                   : Image.network(
-                                                      "http://10.0.2.2/${e.photoVehicule}",
+                                                      "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
                                                       fit: BoxFit.cover,
                                                       height: 90,
                                                       errorBuilder:
@@ -218,7 +222,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                               StackTrace?
                                                                   stackTrace) {
                                                         return Image.asset(
-                                                          'assets/images/transport.png',
+                                                          'assets/images/default_image.png',
                                                           fit: BoxFit.cover,
                                                           height: 90,
                                                         );
@@ -228,12 +232,14 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.symmetric(
-                                                horizontal: 10, vertical: 5),
+                                                horizontal: 10,),
                                             child: Text(
                                               e.nomVehicule,
                                               style: TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: 16,
                                                   fontWeight: FontWeight.bold,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   color: d_colorGreen),
                                             ),
                                           ),

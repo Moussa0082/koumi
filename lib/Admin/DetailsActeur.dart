@@ -58,7 +58,8 @@ class _DetailsActeurState extends State<DetailsActeur> {
                         cornerRadius: 185,
                         color: Colors.black,
                         image: NetworkImage(
-                            "http://10.0.2.2/${acteurs.logoActeur!}"),
+                          'https://koumi.ml/api-koumi/acteur/${acteurs.idActeur}/image',
+                        ),
                       ),
               ),
             ),
@@ -112,7 +113,6 @@ class _DetailsActeurState extends State<DetailsActeur> {
                   _buildProfile("whatsApp", acteurs.whatsAppActeur!),
                   _buildProfile("Pays", acteurs.niveau3PaysActeur!),
                   _buildProfile("Localité", acteurs.localiteActeur!),
-
                 ],
               ),
             ),

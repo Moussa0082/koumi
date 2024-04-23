@@ -1,17 +1,21 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:intl/intl.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
+import 'package:koumi_app/models/Forme.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
-import 'package:koumi_app/service/CategorieService.dart';
+import 'package:koumi_app/service/FormeService.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
@@ -22,13 +26,15 @@ class NextAddIntrat extends StatefulWidget {
   final String nom;
   final String description;
   final double quantite;
-  final Speculation speculation;
+  final String unite;
+  final CategorieProduit categorieProduit;
   const NextAddIntrat({
     Key? key,
     required this.nom,
     required this.description,
     required this.quantite,
-    required this.speculation,
+    required this.unite,
+    required this.categorieProduit,
   }) : super(key: key);
 
   @override
@@ -52,6 +58,9 @@ class _NextAddIntratState extends State<NextAddIntrat> {
   late Acteur acteur;
   String? imageSrc;
   File? photo;
+  String? formeValue;
+  late Future _formeList;
+  late Forme forme;
 
   Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
@@ -136,14 +145,13 @@ class _NextAddIntratState extends State<NextAddIntrat> {
         .parametreList!;
     para = paraList[0];
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    // _categorieList = fetchCategorieList(); // _categorieList = http.get(
-    // //     Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
-    // _speculationList = http.get(Uri.parse(
-    //     'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculationByCategorie/${categorieProduit.idCategorieProduit}'));
+    // _formeList = fetchList();
+    _formeList = http.get(Uri.parse(
+        'http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
   }
 
-  Future<List<CategorieProduit>> fetchCategorieList() async {
-    final response = await CategorieService().fetchCategorie();
+  Future<List<Forme>> fetchList() async {
+    final response = await FormeService().fetchForme();
     return response;
   }
 
@@ -173,6 +181,128 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                 Form(
                   key: formkey,
                   child: Column(children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 22,
+                      ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Chosir la forme",
+                          style: TextStyle(color: (Colors.black), fontSize: 18),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      child: FutureBuilder(
+                        future: _formeList,
+                        // future: speculationService.fetchSpeculationByCategorie(categorieProduit.idCategorieProduit!),
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Chargement...',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+
+                          if (snapshot.hasData) {
+                            dynamic jsonString =
+                                utf8.decode(snapshot.data.bodyBytes);
+                            dynamic responseData = json.decode(jsonString);
+
+                            if (responseData is List) {
+                              List<Forme> speList = responseData
+                                  .map((e) => Forme.fromMap(e))
+                                  .toList();
+
+                              if (speList.isEmpty) {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucune forme trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              return DropdownButtonFormField<String>(
+                                items: speList
+                                    .map(
+                                      (e) => DropdownMenuItem(
+                                        value: e.idForme,
+                                        child: Text(e.libelleForme!),
+                                      ),
+                                    )
+                                    .toList(),
+                                value: formeValue,
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    formeValue = newValue;
+                                    if (newValue != null) {
+                                      forme = speList.firstWhere(
+                                        (element) =>
+                                            element.idForme == newValue,
+                                      );
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Sélectionner la forme',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              // Handle case when response data is not a list
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucune forme trouvé',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+                          } else {
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucune forme trouvé',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
                     Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: 22,
@@ -300,7 +430,8 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                           final String nom = widget.nom;
                           final String description = widget.description;
                           final double quantite = widget.quantite;
-                          final Speculation speculations = widget.speculation;
+                          final CategorieProduit categorieProduit =
+                              widget.categorieProduit;
                           final int prix =
                               int.tryParse(_prixController.text) ?? 0;
                           final String date = _dateController.text;
@@ -319,7 +450,8 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                         prixIntrant: prix,
                                         photoIntrant: photo,
                                         dateExpiration: date,
-                                        speculation: speculations,
+                                        forme: forme,
+                                        categorieProduit: categorieProduit,
                                         acteur: acteur)
                                     .then((value) => {
                                           Provider.of<IntrantService>(context,
@@ -374,7 +506,8 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                         descriptionIntrant: description,
                                         prixIntrant: prix,
                                         dateExpiration: date,
-                                        speculation: speculations,
+                                        categorieProduit: categorieProduit,
+                                        forme: forme,
                                         acteur: acteur)
                                     .then((value) => {
                                           Provider.of<IntrantService>(context,

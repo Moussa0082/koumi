@@ -8,13 +8,11 @@ import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/CartProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddIntrant.dart';
 import 'package:koumi_app/screens/DetailIntrant.dart';
 import 'package:koumi_app/screens/ListeIntrantByActeur.dart';
 import 'package:koumi_app/service/IntrantService.dart';
-import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -71,10 +69,10 @@ class _IntrantScreenState extends State<IntrantScreen> {
       para = paraList[0];
     }
     _searchController = TextEditingController();
-    _typeList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
-        // http.get(
-        //     Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
+    _typeList = http
+        .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
+    // http.get(
+    //     Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
   }
 
   @override
@@ -87,8 +85,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
           centerTitle: true,
           toolbarHeight: 100,
           leading: IconButton(
@@ -156,7 +154,6 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                       MaterialPageRoute(
                                           builder: (context) =>
                                               ListeIntrantByActeur()));
-                                              
                                 },
                               ),
                             )
@@ -177,7 +174,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                     items: [],
                     onChanged: null,
                     decoration: InputDecoration(
-                      labelText: '-- Aucun categorie trouvé --',
+                      labelText: 'Chargement...',
                       contentPadding: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 20),
                       border: OutlineInputBorder(
@@ -186,11 +183,12 @@ class _IntrantScreenState extends State<IntrantScreen> {
                     ),
                   );
                 }
-                if (snapshot.hasError) {
-                  return Text("${snapshot.error}");
-                }
+
                 if (snapshot.hasData) {
-                  dynamic responseData = json.decode(snapshot.data.body);
+                  dynamic jsonString = utf8.decode(snapshot.data.bodyBytes);
+                  dynamic responseData = json.decode(jsonString);
+
+                  // dynamic responseData = json.decode(snapshot.data.body);
                   if (responseData is List) {
                     final reponse = responseData;
                     final typeList = reponse
@@ -222,7 +220,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             ),
                           )
                           .toList(),
-                      hint: Text("-- Filtre par type de categorie --"),
+                      hint: Text("-- Filtre par categorie --"),
                       value: catValue,
                       onChanged: (newValue) {
                         setState(() {
@@ -307,156 +305,183 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             padding: EdgeInsets.all(10),
                             child: Center(child: Text("Aucun donné trouvé")),
                           )
-                        : Wrap(
-                            children: intrantListe
+                        : GridView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 10,
+                              childAspectRatio: 0.8,
+                            ),
+                            itemCount: intrantListe
                                 .where(
                                     (element) => element.statutIntrant == true)
-                                .map((e) => Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.45,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        DetailIntrant(
-                                                          intrant: e,
-                                                        )));
-                                          },
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.grey
-                                                      .withOpacity(0.3),
-                                                  offset: const Offset(0, 2),
-                                                  blurRadius: 8,
-                                                  spreadRadius: 2,
+                                .length,
+                            itemBuilder: (context, index) {
+                              var e = intrantListe
+                                  .where((element) =>
+                                      element.statutIntrant == true)
+                                  .elementAt(index);
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DetailIntrant(
+                                        intrant: e,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Color.fromARGB(250, 250, 250, 250),
+                                    borderRadius: BorderRadius.circular(15),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.3),
+                                        offset: Offset(0, 2),
+                                        blurRadius: 8,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        child: SizedBox(
+                                          height: 100,
+                                          child: e.photoIntrant == null
+                                              ? Image.asset(
+                                                  "assets/images/default_image.png",
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Image.network(
+                                                  "https://koumi.ml/api-koumi/intrant/${e.idIntrant}/image",
+                                                  // "http://10.0.2.2/${e.photoIntrant}",
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (BuildContext
+                                                          context,
+                                                      Object exception,
+                                                      StackTrace? stackTrace) {
+                                                    return Image.asset(
+                                                      'assets/images/default_image.png',
+                                                      fit: BoxFit.cover,
+                                                    );
+                                                  },
                                                 ),
-                                              ],
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.stretch,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8.0),
-                                                    child: SizedBox(
-                                                      height: 90,
-                                                      child: e.photoIntrant ==
-                                                              null
-                                                          ? Image.asset(
-                                                              "assets/images/default_image.png",
-                                                              fit: BoxFit.cover,
-                                                            )
-                                                          : Image.network(
-                                                              "http://10.0.2.2/${e.photoIntrant}",
-                                                              fit: BoxFit.cover,
-                                                              errorBuilder: (BuildContext
-                                                                      context,
-                                                                  Object
-                                                                      exception,
-                                                                  StackTrace?
-                                                                      stackTrace) {
-                                                                return Image
-                                                                    .asset(
-                                                                  'assets/images/default_image.png',
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                );
-                                                              },
-                                                            ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                _buildItem(
-                                                    "Quantité:",
-                                                    e.quantiteIntrant
-                                                        .toString()),
-                                                _buildItem("Prix :",
-                                                    "${e.prixIntrant.toString()} ${para.monnaie}"),
-                                                SizedBox(height: 10),
-                                                Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 10,
-                                                        vertical: 5),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          e.nomIntrant,
-                                                          style: TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color: d_colorGreen,
-                                                          ),
-                                                        ),
-                                                        Container(
-                                                          width:
-                                                              30, // Largeur du conteneur réduite
-                                                          height:
-                                                              30, // Hauteur du conteneur réduite
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color:
-                                                                d_colorGreen, // Couleur de fond du bouton
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        15), // Coins arrondis du bouton
-                                                          ),
-                                                          child: IconButton(
-                                                            onPressed: () {
-                        //                                        if (e.acteur.idActeur! == acteur.idActeur!){
-                        // Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un intrant qui vous appartient");
-                        // }else{
-                        //   Provider.of<CartProvider>(context, listen: false)
-                        // .addToCartInt(e, 1, "");
-                        // }
-                                                            },
-                                                            icon: Icon(Icons
-                                                                .add), // Icône du panier
-                                                            color: Colors
-                                                                .white, // Couleur de l'icône
-                                                            iconSize:
-                                                                20, // Taille de l'icône réduite
-                                                            padding: EdgeInsets
-                                                                .zero, // Aucune marge intérieure
-                                                            splashRadius:
-                                                                15, // Rayon de l'effet de pression réduit
-                                                            tooltip:
-                                                                'Ajouter au panier', // Info-bulle au survol de l'icône
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    )),
-                                              ],
-                                            ),
-                                          ),
                                         ),
                                       ),
-                                    ))
-                                .toList(),
+                                      SizedBox(height: 8),
+                                      ListTile(
+                                          title: Text(
+                                            e.nomIntrant,
+                                            style: TextStyle(
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black87,
+                                            ),
+                                            // maxLines: 1,
+                                            // overflow: TextOverflow.ellipsis,
+                                          ),
+                                          subtitle: Text(
+                                            "${e.prixIntrant.toString()} ${para.monnaie}",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                          trailing: Container(
+                                            width:
+                                                30, // Largeur du conteneur réduite
+                                            height:
+                                                30, // Hauteur du conteneur réduite
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  d_colorGreen, // Couleur de fond du bouton
+                                              borderRadius: BorderRadius.circular(
+                                                  15), // Coins arrondis du bouton
+                                            ),
+                                            child: IconButton(
+                                              onPressed: () {
+                                                //                                        if (e.acteur.idActeur! == acteur.idActeur!){
+                                                // Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un intrant qui vous appartient");
+                                                // }else{
+                                                //   Provider.of<CartProvider>(context, listen: false)
+                                                // .addToCartInt(e, 1, "");
+                                                // }
+                                              },
+                                              icon: Icon(
+                                                  Icons.add), // Icône du panier
+                                              color: Colors
+                                                  .white, // Couleur de l'icône
+                                              iconSize:
+                                                  20, // Taille de l'icône réduite
+                                              padding: EdgeInsets
+                                                  .zero, // Aucune marge intérieure
+                                              splashRadius:
+                                                  15, // Rayon de l'effet de pression réduit
+                                              tooltip:
+                                                  'Ajouter au panier', // Info-bulle au survol de l'icône
+                                            ),
+                                          )),
+
+                                      // Align(
+                                      //   alignment: Alignment.bottomRight,
+                                      //   child: Padding(
+                                      //     padding: const EdgeInsets.all(8.0),
+                                      //     child: Container(
+                                      //       width:
+                                      //           30, // Largeur du conteneur réduite
+                                      //       height:
+                                      //           30, // Hauteur du conteneur réduite
+                                      //       decoration: BoxDecoration(
+                                      //         color:
+                                      //             d_colorGreen, // Couleur de fond du bouton
+                                      //         borderRadius: BorderRadius.circular(
+                                      //             15), // Coins arrondis du bouton
+                                      //       ),
+                                      //       child: IconButton(
+                                      //         onPressed: () {
+                                      //           //                                        if (e.acteur.idActeur! == acteur.idActeur!){
+                                      //           // Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un intrant qui vous appartient");
+                                      //           // }else{
+                                      //           //   Provider.of<CartProvider>(context, listen: false)
+                                      //           // .addToCartInt(e, 1, "");
+                                      //           // }
+                                      //         },
+                                      //         icon: Icon(
+                                      //             Icons.add), // Icône du panier
+                                      //         color: Colors
+                                      //             .white, // Couleur de l'icône
+                                      //         iconSize:
+                                      //             20, // Taille de l'icône réduite
+                                      //         padding: EdgeInsets
+                                      //             .zero, // Aucune marge intérieure
+                                      //         splashRadius:
+                                      //             15, // Rayon de l'effet de pression réduit
+                                      //         tooltip:
+                                      //             'Ajouter au panier', // Info-bulle au survol de l'icône
+                                      //       ),
+                                      //     ),
+                                      //   ),
+                                      // ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           );
                   }
                 });
-          })
+          }),
         ]),
       ),
     );
@@ -485,7 +510,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                 color: Colors.black87,
                 fontWeight: FontWeight.w500,
                 fontStyle: FontStyle.italic,
-                overflow: TextOverflow.ellipsis,
+                // overflow: TextOverflow.ellipsis,
                 fontSize: 16),
           ),
           Text(

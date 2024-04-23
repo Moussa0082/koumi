@@ -5,18 +5,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Filiere.dart';
-import 'package:koumi_app/models/Niveau1Pays.dart';
+import 'package:koumi_app/models/Forme.dart';
+import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductEndScreen.dart';
 import 'package:path_provider/path_provider.dart' ;
 import 'package:path/path.dart' as path;
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class AddAndUpdateProductScreen extends StatefulWidget {
@@ -48,9 +48,13 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
   List<Filiere> filiereListe = [];
    String? imageSrc;
   File? photo;
-     Niveau1Pays niveau1Pays = Niveau1Pays();
+   String? formeValue;
+  late Future _formeList;
+  late Forme forme;
 
-    late Future niveau1PaysList;
+  late Future _niveau3List;
+  String? n3Value;
+  String niveau3 = '';
 
 
     Future<File> saveImagePermanently(String imagePath) async {
@@ -138,9 +142,10 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
       _prixController.text = widget.stock!.prix!.toString();
       _quantiteController.text = widget.stock!.quantiteStock!.toString();
     }
-        niveau1PaysList =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-    http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+        _formeList = http.get(Uri.parse(
+        'http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
+            _niveau3List =
+        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
   }
 
    
@@ -272,28 +277,116 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        child: TextFormField(
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Veuillez remplir le champ forme du produit";
+                     Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      child: FutureBuilder(
+                        future: _formeList,
+                        // future: speculationService.fetchSpeculationByCategorie(categorieProduit.idCategorieProduit!),
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'En cours de chargement ...',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+
+                          if (snapshot.hasData) {
+                            dynamic jsonString =
+                                utf8.decode(snapshot.data.bodyBytes);
+                            dynamic responseData = json.decode(jsonString);
+
+                            if (responseData is List) {
+                              List<Forme> speList = responseData
+                                  .map((e) => Forme.fromMap(e))
+                                  .toList();
+
+                              if (speList.isEmpty) {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucune forme trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              return DropdownButtonFormField<String>(
+                                items: speList
+                                    .map(
+                                      (e) => DropdownMenuItem(
+                                        value: e.idForme,
+                                        child: Text(e.libelleForme!),
+                                      ),
+                                    )
+                                    .toList(),
+                                value: formeValue,
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    formeValue = newValue;
+                                    if (newValue != null) {
+                                      forme = speList.firstWhere(
+                                        (element) =>
+                                            element.idForme == newValue,
+                                      );
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Sélectionner la forme',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              // Handle case when response data is not a list
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucune forme trouvé',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
                             }
-                            return null;
-                          },
-                          controller: _formController,
-                          maxLines: null,
-                          decoration: InputDecoration(
-                            hintText: "Forme produit",
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
+                          } else {
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucune forme trouvé',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+                        },
                       ),
+                    ),
                       SizedBox(
                         height: 10,
                       ),
@@ -310,95 +403,19 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                           ),
                         ),
                       ),
-                      FutureBuilder(
-                        future: niveau1PaysList,
-                        builder: (_, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return DropdownButtonFormField(
-                              items: [],
-                              onChanged: null,
-                              decoration: InputDecoration(
-                                labelText: 'En cours de chargement',
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            );
-                          }
-                          if (snapshot.hasError) {
-                            return Text("Une erreur s'est produite veuillez réessayer plus tard");
-                          }
-                          if (snapshot.hasData) {
-                            dynamic jsonString =
-                                  utf8.decode(snapshot.data.bodyBytes);
-                              dynamic responseData = json.decode(jsonString);
-                           
-                            if (responseData is List) {
-                              final reponse = responseData;
-                              final niveau1List = reponse
-                                  .map((e) => Niveau1Pays.fromMap(e))
-                                  .where((con) => con.statutN1 == true)
-                                  .toList();
-
-                              if (niveau1List.isEmpty) {
-                                return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Aucun  region trouvé',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                              }
-
-                              return DropdownButtonFormField<String>(
-                            //     validator: (value) {
-                            //   if (value == null || value.isEmpty) {
-                            //     return 'Veuillez sélectionner une region.';
-                            //   }
-                            //   return null;
-                            // },
-                                 items: niveau1List
-                                    .map(
-                                      (e) => DropdownMenuItem(
-                                        value:e.nomN1 ,
-                                        child: Text(e.nomN1!),
-                                      ),
-                                    )
-                                    .toList(),
-                                value: niveau1Pays.idNiveau1Pays  ,        
-                                       onChanged: (newValue) {
-                                  setState(() {
-                                  niveau1Pays.idNiveau1Pays = newValue;
-                                    if (newValue != null) {
-                                      niveau1Pays.nomN1 =
-                                          niveau1List.map((e) => e.nomN1).first;
-                                      print("niveau 1 : ${niveau1Pays}");
-                                    }
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                  labelText: widget.isEditable! == false ? 'Selectionner une region' : widget.stock!.magasin!.niveau1Pays!.nomN1,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              );
-                            } else {
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        child: FutureBuilder(
+                          future: _niveau3List,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
                               return DropdownButtonFormField(
                                 items: [],
                                 onChanged: null,
                                 decoration: InputDecoration(
-                                  labelText: 'Aucune region trouvé',
+                                  labelText: 'En cours de chargement ...',
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(
@@ -407,20 +424,96 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                 ),
                               );
                             }
-                          }
-                          return DropdownButtonFormField(
-                            items: [],
-                            onChanged: null,
-                            decoration: InputDecoration(
-                              labelText: 'Aucune region trouvé',
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
+                          
+                            if (snapshot.hasData) {
+                               dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+
+                              // dynamic responseData =
+                              //     json.decode(snapshot.data.body);
+                              if (responseData is List) {
+                                final reponse = responseData;
+                                final niveau3List = reponse
+                                    .map((e) => Niveau3Pays.fromMap(e))
+                                    .where((con) => con.statutN3 == true)
+                                    .toList();
+
+                                if (niveau3List.isEmpty) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Aucun localité trouvé',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return DropdownButtonFormField<String>(
+                                  items: niveau3List
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idNiveau3Pays,
+                                          child: Text(e.nomN3),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: n3Value,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      n3Value = newValue;
+                                      if (newValue != null) {
+                                        niveau3 = niveau3List
+                                            .map((e) => e.nomN3)
+                                            .first;
+                                        print("niveau 3 : ${niveau3}");
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Selectionner une localité',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucun localité trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucun localité trouvé',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
                       SizedBox(
                         height: 10,
@@ -533,8 +626,8 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                             if (formkey.currentState!.validate()) {
                               Navigator.push(context, MaterialPageRoute(builder:
                (context)=> (AddAndUpdateProductEndSreen(isEditable:widget.isEditable!,
-                              nomProduit: _nomController.text, forme: _formController.text,
-                              origine: niveau1Pays.nomN1!, prix: _prixController.text.toString(),
+                              nomProduit: _nomController.text, forme: forme.libelleForme!,
+                              origine: _origineController.text, prix: _prixController.text.toString(),
                               image: photo,
                               quantite: _quantiteController.text, stock: widget.stock,
                               ))));

@@ -178,7 +178,7 @@ class _PageTransporteurState extends State<PageTransporteur> {
                                                       cornerRadius: 50,
                                                       color: Colors.black,
                                                       image: NetworkImage(
-                                                          "http://10.0.2.2/${e.logoActeur}"),
+                                                          "https://koumi.ml/api-koumi/acteur/${e.idActeur}/image"),
                                                     ),
                                               title: Text(
                                                   e.nomActeur!.toUpperCase(),
