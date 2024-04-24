@@ -207,8 +207,8 @@ class StockService extends ChangeNotifier {
       print(
           'Une erreur s\'est produite lors de la récupération des stocks: $e');
       // throw Exception(e.toString());
-              return stockList;
     }
+              return stockList;
   
   }
 
@@ -242,7 +242,7 @@ class StockService extends ChangeNotifier {
     try {
       final response = await http.get(Uri.parse(
         
-          // 'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin/$idActeur'));
+          // 'https://koumi.ml/api-koumi/Stock/categorieAndActeur/$idCategorie/$idMagasin/$idActeur'));
           'http://10.0.2.2:9000/api-koumi/Stock/categorieAndActeur/$idCategorie/$idMagasin/$idActeur'));
       if (response.statusCode == 200) {
                 print("Fetching data all stock by id ,categorie, magasin and acteur");

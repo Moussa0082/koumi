@@ -38,7 +38,6 @@ class _ProductScreenState extends State<ProductScreen> {
   late TextEditingController _searchController;
   List<Stock>  stockListe = [];
   late Future <List<Stock>> stockListeFuture;
-  late Future <List<Stock>> stockListeFutureByMagasin;
   CategorieProduit? selectedCat;
   String? typeValue;
   late Future _catList;
@@ -91,7 +90,6 @@ class _ProductScreenState extends State<ProductScreen> {
     _searchController = TextEditingController();
     _catList =
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
     super.initState();
     stockListeFuture = getAllStock();
   }
@@ -106,8 +104,8 @@ class _ProductScreenState extends State<ProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
+      backgroundColor: const Color.fromARGB(255, 250, 250, 250),
           centerTitle: true,
           toolbarHeight: 100,
           leading: IconButton(
@@ -242,11 +240,11 @@ class _ProductScreenState extends State<ProductScreen> {
                       onChanged: (newValue) {
                         setState(() {
                           typeValue = newValue;
-                          if (newValue != null) {
-                            selectedCat = categorieList.firstWhere(
-                              (element) => element.idCategorieProduit == newValue,
-                            );
-                          }
+                          // if (newValue != null) {
+                          //   selectedCat = categorieList.firstWhere(
+                          //     (element) => element.idCategorieProduit == newValue,
+                          //   );
+                          // }
                         });
                       },
                       decoration: InputDecoration(
@@ -346,6 +344,7 @@ class _ProductScreenState extends State<ProductScreen> {
                       searchText = _searchController.text.trim().toLowerCase();
                       return libelle.contains(searchText);
                     }).toList();
+                    
                     return Wrap(
                       // spacing: 10, // Espacement horizontal entre les conteneurs
                       // runSpacing:
@@ -370,17 +369,17 @@ class _ProductScreenState extends State<ProductScreen> {
                                     },
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(15),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.3),
-                                            offset: const Offset(0, 2),
-                                            blurRadius: 8,
-                                            spreadRadius: 2,
-                                          ),
-                                        ],
+                                    color: Color.fromARGB(250, 250, 250, 250),
+                                    borderRadius: BorderRadius.circular(15),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.3),
+                                        offset: Offset(0, 2),
+                                        blurRadius: 8,
+                                        spreadRadius: 2,
                                       ),
+                                    ],
+                                  ),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.stretch,
