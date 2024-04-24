@@ -33,18 +33,39 @@ class _DetailProduitsState extends State<DetailProduits>
   // late AnimationController _controller;
   // late Animation<Offset> _animation;
 
-  late Acteur acteur;
+  late Acteur acteur = Acteur();
   late List<TypeActeur> typeActeurData = [];
   late String type;
     late ValueNotifier<bool> isDialOpenNotifier;
+
+    bool isExist = false;
+  String? email = "";
+
+
+  Future <void> verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      typeActeurData = acteur.typeActeur!;
+      type = typeActeurData.map((data) => data.libelle).join(', ');
+      setState(() {
+        isExist = true;
+  
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     isDialOpenNotifier = ValueNotifier<bool>(false);
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    typeActeurData = acteur.typeActeur!;
-    type = typeActeurData.map((data) => data.libelle).join(', ');
+    
     // Initialiser le ValueNotifier
   }
 
@@ -80,8 +101,9 @@ class _DetailProduitsState extends State<DetailProduits>
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         centerTitle: true,
         title: const Text("Détail Produit"),
-        actions: acteur.idActeur! != widget.stock!.acteur!.idActeur! ? null :
+        actions: isExist == false ? null  :
          [
+          acteur.idActeur! != widget.stock!.acteur!.idActeur! ? SizedBox() :
           IconButton(
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder:
@@ -178,6 +200,23 @@ class _DetailProduitsState extends State<DetailProduits>
                               fontStyle: FontStyle.italic)),
                     ],
                   ),
+                  const SizedBox(height: 10),
+                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Unité Produit : ",
+                          style: TextStyle(
+                              fontSize: 20, fontStyle: FontStyle.italic)),
+                      Text(
+                        widget.stock!.unite!.nomUnite!,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ),
                   Container(
                     height: 40,
                     width: MediaQuery.of(context).size.width,
@@ -194,7 +233,7 @@ class _DetailProduitsState extends State<DetailProduits>
                       ),
                     ),
                   ),
-                  const Padding(
+                   Padding(
                     padding: EdgeInsets.symmetric(vertical: defaultPadding),
                     child: ReadMoreText(
                       colorClickableText: Colors.orange,
@@ -204,7 +243,7 @@ class _DetailProduitsState extends State<DetailProduits>
                       trimExpandedText: "Lire moins",
                       style:
                           TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
-                      "A Henley shirt is a collarless pullover shirt, by a round neckline and a placket about 3 to 5 inches (8 to 13 cm) long and usually having 2–5 buttons.",
+                     widget.stock!.descriptionStock == null ? "A Henley shirt is a collarless pullover shirt, by a round neckline and a placket about 3 to 5 inches (8 to 13 cm) long and usually having 2–5 buttons." : widget.stock!.descriptionStock!,
                     ),
                   ),
                   Container(
@@ -285,22 +324,7 @@ class _DetailProduitsState extends State<DetailProduits>
                       ),
                     ],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Unité Produit : ",
-                          style: TextStyle(
-                              fontSize: 20, fontStyle: FontStyle.italic)),
-                      Text(
-                        widget.stock!.unite!.nomUnite!,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ],
-                  ),
+                 
                   Container(
                     height: 70,
                     child: Row(
@@ -322,6 +346,7 @@ class _DetailProduitsState extends State<DetailProduits>
                     ),
                   ),
                   const SizedBox(height: 20),
+                   isExist == true ? 
                   widget.stock!.acteur!.idActeur! == acteur.idActeur!
                       ? SizedBox()
                       : Center(
@@ -349,7 +374,7 @@ class _DetailProduitsState extends State<DetailProduits>
                               ),
                             ),
                           ),
-                        ),
+                        ) : SizedBox(),
                 ],
               ),
             )
