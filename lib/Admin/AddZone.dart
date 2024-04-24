@@ -363,7 +363,7 @@ class _AddZoneState extends State<AddZone> {
                                               // duration: const Duration(seconds: 5),
                                             ),
                                           ),
-                                          // Navigator.of(context).pop(),
+                                          Navigator.of(context).pop(),
                                         })
                                     .catchError((onError) {
                                   print(onError.message);
@@ -401,7 +401,7 @@ class _AddZoneState extends State<AddZone> {
                                               // duration: const Duration(seconds: 5),
                                             ),
                                           ),
-                                          // Navigator.of(context).pop(),
+                                           Navigator.of(context).pop(),
                                         })
                                     .catchError((onError) {
                                   print(
@@ -418,10 +418,10 @@ class _AddZoneState extends State<AddZone> {
                                 const SnackBar(
                                   content: Row(
                                     children: [
-                                      Text("Cette zone est existe déjà"),
+                                      Text("Une erreur est survenu"),
                                     ],
                                   ),
-                                  duration: Duration(seconds: 3),
+                                  duration: Duration(seconds: 5),
                                 ),
                               );
                             }

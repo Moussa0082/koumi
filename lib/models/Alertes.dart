@@ -1,31 +1,35 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 class Alertes {
   final String? idAlerte;
   final String? codeAlerte;
-  final String titreAlerte;
+  final String? titreAlerte;
   final String? videoAlerte;
   final String? photoAlerte;
   final String? dateAjout;
   final String? dateModif;
   final String? personneModif;
-  final String descriptionAlerte;
+  final String? descriptionAlerte;
   final String? audioAlerte;
-  final bool statutAlerte;
+  final bool? statutAlerte;
 
+  
   Alertes({
     this.idAlerte,
     this.codeAlerte,
-    required this.titreAlerte,
+    this.titreAlerte,
     this.videoAlerte,
     this.photoAlerte,
     this.dateAjout,
     this.dateModif,
     this.personneModif,
-    required this.descriptionAlerte,
+    this.descriptionAlerte,
     this.audioAlerte,
-    required this.statutAlerte,
+    this.statutAlerte,
   });
+
+
 
   Alertes copyWith({
     String? idAlerte,
@@ -75,15 +79,15 @@ class Alertes {
     return Alertes(
       idAlerte: map['idAlerte'] != null ? map['idAlerte'] as String : null,
       codeAlerte: map['codeAlerte'] != null ? map['codeAlerte'] as String : null,
-      titreAlerte: map['titreAlerte'] as String,
+      titreAlerte: map['titreAlerte'] != null ? map['titreAlerte'] as String : null,
       videoAlerte: map['videoAlerte'] != null ? map['videoAlerte'] as String : null,
       photoAlerte: map['photoAlerte'] != null ? map['photoAlerte'] as String : null,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
       personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
-      descriptionAlerte: map['descriptionAlerte'] as String,
+      descriptionAlerte: map['descriptionAlerte'] != null ? map['descriptionAlerte'] as String : null,
       audioAlerte: map['audioAlerte'] != null ? map['audioAlerte'] as String : null,
-      statutAlerte: map['statutAlerte'] as bool,
+      statutAlerte: map['statutAlerte'] != null ? map['statutAlerte'] as bool : null,
     );
   }
 

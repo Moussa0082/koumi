@@ -19,7 +19,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();
   @override
-  Size get preferredSize => const Size.fromHeight(150.0);
+  Size get preferredSize => const Size.fromHeight(100.0);
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);

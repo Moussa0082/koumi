@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/Admin/AddAlerte.dart';
+import 'package:koumi_app/Admin/AlerteDisable.dart';
 import 'package:koumi_app/Admin/DetailAlerte.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Alertes.dart';
@@ -102,6 +103,28 @@ class _AlerteScreenState extends State<AlerteScreen> {
                             },
                           ),
                         ),
+                        PopupMenuItem<String>(
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.remove_red_eye,
+                              color: d_colorGreen,
+                            ),
+                            title: const Text(
+                              "Alerte Désactiver ",
+                              style: TextStyle(
+                                color: d_colorGreen,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onTap: () async {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => AlerteDisable()));
+                            },
+                          ),
+                        ),
                       ];
                     },
                   )
@@ -166,17 +189,21 @@ class _AlerteScreenState extends State<AlerteScreen> {
                       alerteList = snapshot.data!;
                       String searchText = "";
                       List<Alertes> filtereSearch = alerteList.where((search) {
-                        String libelle = search.titreAlerte.toLowerCase();
+                        String libelle = search.titreAlerte!.toLowerCase();
                         searchText = _searchController.text.toLowerCase();
                         return libelle.contains(searchText);
                       }).toList();
-                      return filtereSearch.isEmpty
+                      return filtereSearch
+                              .where((element) => element.statutAlerte == true)
+                              .isEmpty
                           ? Padding(
                               padding: EdgeInsets.all(10),
                               child: Center(child: Text("Aucun alerte trouvé")),
                             )
                           : Column(
-                              children: filtereSearch.where((element) => element.statutAlerte == true)
+                              children: filtereSearch
+                                  .where(
+                                      (element) => element.statutAlerte == true)
                                   .map((e) => Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 10, horizontal: 15),
@@ -216,7 +243,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                     height: 80,
                                                   ),
                                                   title: Text(
-                                                      e.titreAlerte
+                                                      e.titreAlerte!
                                                           .toUpperCase(),
                                                       style: const TextStyle(
                                                         color: Colors.black,
@@ -249,7 +276,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                                 .spaceBetween,
                                                         children: [
                                                           _buildEtat(
-                                                              e.statutAlerte),
+                                                              e.statutAlerte!),
                                                           PopupMenuButton<
                                                               String>(
                                                             padding:
@@ -273,12 +300,19 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                                               .disabled_visible,
                                                                           color:
                                                                               Colors.orange[400]),
-                                                                  title:
-                                                                       Text(
-                                                                    e.statutAlerte == false ? "Activer" : "Desactiver",
-                                                                 style: TextStyle(
-                                                                   color: e.statutAlerte == false ? Colors.green : Colors.orange[
-                                                                      400],
+                                                                  title: Text(
+                                                                    e.statutAlerte ==
+                                                                            false
+                                                                        ? "Activer"
+                                                                        : "Desactiver",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: e.statutAlerte ==
+                                                                              false
+                                                                          ? Colors
+                                                                              .green
+                                                                          : Colors
+                                                                              .orange[400],
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .bold,
@@ -286,39 +320,41 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                                   ),
                                                                   onTap:
                                                                       () async {
-                                                                        e.statutAlerte == false ? 
-                                                                    await AlertesService()
-                                                                        .activerAlertes(e
-                                                                            .idAlerte!)
-                                                                        .then((value) =>
-                                                                            {
-                                                                              Provider.of<AlertesService>(context, listen: false).applyChange(),
-                                                                              Navigator.of(context).pop(),
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Activer avec succèss "),
-                                                                                    ],
+                                                                    e.statutAlerte ==
+                                                                            false
+                                                                        ? await AlertesService()
+                                                                            .activerAlertes(e
+                                                                                .idAlerte!)
+                                                                            .then((value) =>
+                                                                                {
+                                                                                  Provider.of<AlertesService>(context, listen: false).applyChange(),
+                                                                                  Navigator.of(context).pop(),
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    const SnackBar(
+                                                                                      content: Row(
+                                                                                        children: [
+                                                                                          Text("Activer avec succèss "),
+                                                                                        ],
+                                                                                      ),
+                                                                                      duration: Duration(seconds: 2),
+                                                                                    ),
+                                                                                  )
+                                                                                })
+                                                                            .catchError((onError) =>
+                                                                                {
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    const SnackBar(
+                                                                                      content: Row(
+                                                                                        children: [
+                                                                                          Text("Une erreur s'est produit"),
+                                                                                        ],
+                                                                                      ),
+                                                                                      duration: Duration(seconds: 5),
+                                                                                    ),
                                                                                   ),
-                                                                                  duration: Duration(seconds: 2),
-                                                                                ),
-                                                                              )
-                                                                            })
-                                                                        .catchError((onError) =>
-                                                                            {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Une erreur s'est produit"),
-                                                                                    ],
-                                                                                  ),
-                                                                                  duration: Duration(seconds: 5),
-                                                                                ),
-                                                                              ),
-                                                                              Navigator.of(context).pop(),
-                                                                            }) : await AlertesService()
+                                                                                  Navigator.of(context).pop(),
+                                                                                })
+                                                                        : await AlertesService()
                                                                             .desactiverAlertes(e
                                                                                 .idAlerte!)
                                                                             .then((value) =>

@@ -300,7 +300,9 @@ class _IntrantScreenState extends State<IntrantScreen> {
                     //   searchText = _searchController.text.toLowerCase();
                     //   return libelle.contains(searchText);
                     // }).toList();
-                    return intrantListe.isEmpty
+                    return intrantListe
+                            .where((element) => element.statutIntrant == false)
+                            .isEmpty
                         ? Padding(
                             padding: EdgeInsets.all(10),
                             child: Center(child: Text("Aucun donné trouvé")),

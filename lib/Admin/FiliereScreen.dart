@@ -49,8 +49,8 @@ class _FiliereScreenState extends State<FiliereScreen> {
     //     .parametreList!;
     // para = paraList[0];
     _filiereList = http
-        // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
-    .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+        .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+    // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
     _liste = getFil();
   }
 
@@ -201,7 +201,8 @@ class _FiliereScreenState extends State<FiliereScreen> {
                           searchText = _searchController.text.toLowerCase();
                           return nomfiliere.contains(searchText);
                         }).toList();
-                        return filteredFiliereSearch.isEmpty
+                        return filteredFiliereSearch .where((element) => element.statutFiliere == false)
+                              .isEmpty
                             ? Padding(
                                 padding: EdgeInsets.all(10),
                                 child: Text('Aucune filière trouvé ',
@@ -689,9 +690,9 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                             .applyChange(),
                                         setState(() {
                                           _filiereList = http
-                                          // .get(Uri.parse(
-                                              // 'https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
-                                          .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+                                          .get(Uri.parse(
+                                              'https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+                                          // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
                                         }),
                                         libelleController.clear(),
                                         descriptionController.clear(),

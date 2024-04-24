@@ -6,14 +6,11 @@ import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart';
-import 'package:koumi_app/screens/MagasinScreen.dart';
-import 'package:koumi_app/screens/Meteo.dart';
 import 'package:koumi_app/screens/Product.dart';
-
-import 'package:koumi_app/screens/Produit.dart';
 import 'package:koumi_app/screens/Store.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/Weather.dart';
+import 'package:koumi_app/widgets/AlertAcceuil.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
 import 'package:provider/provider.dart';
@@ -67,7 +64,11 @@ class _AccueilState extends State<Accueil> {
         children: [
           SizedBox(height: 180, child: Carrousel()),
           const SizedBox(
-            height: 35,
+            height: 10,
+          ),
+          isExist ? SizedBox(height: 100, child: AlertAcceuil()) : Container(),
+          const SizedBox(
+            height: 10,
           ),
           SizedBox(
             child: GridView.count(
@@ -134,10 +135,8 @@ class _AccueilState extends State<Accueil> {
                   MaterialPageRoute(
                       builder: (context) => const WeatherScreen()));
             } else if (index == 4) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const StoreScreen()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const StoreScreen()));
             } else if (index == 3) {
               Navigator.push(
                   context,

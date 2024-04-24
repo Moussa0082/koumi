@@ -44,8 +44,8 @@ class _Niveau1PageState extends State<Niveau1Page> {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
     para = paraList[0];
-    // _paysList = http.get(Uri.parse('https://koumi.ml/api-koumi/pays/read'));
-    _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
+    _paysList = http.get(Uri.parse('https://koumi.ml/api-koumi/pays/read'));
+    // _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
     _searchController = TextEditingController();
   }
 

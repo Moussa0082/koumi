@@ -145,7 +145,7 @@ class _ConseilScreenState extends State<ConseilScreen> {
                               PopupMenuItem<String>(
                                 child: ListTile(
                                   leading: const Icon(
-                                    Icons.add,
+                                    Icons.remove_red_eye,
                                     color: d_colorGreen,
                                   ),
                                   title: const Text(

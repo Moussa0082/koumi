@@ -12,6 +12,7 @@ import 'package:koumi_app/screens/RegisterScreen.dart';
 import 'package:koumi_app/widgets/BottomNavBarAdmin.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
+import 'package:koumi_app/widgets/connection_verify.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,6 +24,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+   late ConnectionVerify connectionVerify;
+  
   String password = "";
   String email = "";
   bool _obscureText = true;
@@ -84,8 +87,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final String emailActeur = emailController.text;
     final String password = passwordController.text;
 
-    // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
-    const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
+    const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
+    // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
     const String defaultProfileImage = 'assets/images/profil.jpg';
 
@@ -200,14 +203,14 @@ class _LoginScreenState extends State<LoginScreen> {
           //   context,
           //   MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
           // );
-           Get.off(BottomNavBarAdmin());
+          Get.off(BottomNavBarAdmin());
         } else {
           // Navigator.pushReplacement(
           //   context,
           //   MaterialPageRoute(
           //       builder: (context) => const BottomNavigationPage()),
           // );
-           Get.off(BottomNavigationPage());
+          Get.off(BottomNavigationPage());
         }
       } else {
         // Traitement en cas d'échec
@@ -291,9 +294,9 @@ class _LoginScreenState extends State<LoginScreen> {
     final String emailActeur = emailController.text;
     final String password = passwordController.text;
 
-    // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
-
-    const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
+    const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
+//
+    // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
     ActeurProvider acteurProvider =
         Provider.of<ActeurProvider>(context, listen: false);
@@ -444,6 +447,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    connectionVerify = Get.put(ConnectionVerify(), permanent: true);
   }
   // login methode end
 

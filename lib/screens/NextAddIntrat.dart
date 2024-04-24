@@ -147,7 +147,8 @@ class _NextAddIntratState extends State<NextAddIntrat> {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // _formeList = fetchList();
     _formeList = http.get(
-        Uri.parse('http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
+        Uri.parse('https://koumi.ml/api-koumi/formeproduit/getAllForme/'));
+        // Uri.parse('http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
   }
 
   Future<List<Forme>> fetchList() async {

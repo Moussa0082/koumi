@@ -213,7 +213,10 @@ class _CategoriPageState extends State<CategoriPage> {
                           return nomCat.contains(searchText);
                         }).toList();
                         return Column(
-                            children: filteredCatSearch.isEmpty
+                            children: filteredCatSearch
+                                    .where((element) =>
+                                        element.statutCategorie == false)
+                                    .isEmpty
                                 ? [
                                     Padding(
                                       padding: EdgeInsets.all(10),

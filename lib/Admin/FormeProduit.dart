@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:koumi_app/Admin/UpdateForme.dart';
 import 'package:koumi_app/models/Forme.dart';
 import 'package:koumi_app/service/FormeService.dart';
 import 'package:provider/provider.dart';
@@ -59,6 +58,18 @@ class _FormeProduitState extends State<FormeProduit> {
           style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
         actions: [
+          IconButton(
+            onPressed: () {
+              setState(() {
+                                                                                _liste = getListe();
+                                                                              });
+            },
+            icon: const Icon(
+              Icons.refresh,
+              color: d_colorGreen,
+              size: 28,
+            ),
+          ),
           IconButton(
             onPressed: () {
               _addForme();
@@ -179,8 +190,8 @@ class _FormeProduitState extends State<FormeProduit> {
                                             child: Column(
                                               children: [
                                                 ListTile(
-                                                    // leading: _getIconForFiliere(
-                                                    //     e.libelleFiliere!),
+                                                    leading: _getIconForForme(
+                                                        e.libelleForme!),
                                                     title: Text(
                                                         e.libelleForme!
                                                             .toUpperCase(),
@@ -237,23 +248,31 @@ class _FormeProduitState extends State<FormeProduit> {
                                                                       color: Colors
                                                                               .orange[
                                                                           400]),
-                                                              title:  Text(
-                                                                e.statutForme == false ? "Activer" : "Desactiver",
-                                                                 style: TextStyle(
-                                                                   color: e.statutForme == false ? Colors.green : Colors.orange[
-                                                                      400],
+                                                              title: Text(
+                                                                e.statutForme ==
+                                                                        false
+                                                                    ? "Activer"
+                                                                    : "Desactiver",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: e.statutForme ==
+                                                                          false
+                                                                      ? Colors
+                                                                          .green
+                                                                      : Colors.orange[
+                                                                          400],
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold,
                                                                 ),
                                                               ),
                                                               onTap: () async {
-                                                                 e.statutForme == false ? 
-                                                                await FormeService()
-                                                                    .activerForme(e
-                                                                        .idForme!)
-                                                                    .then(
-                                                                        (value) =>
+                                                                e.statutForme ==
+                                                                        false
+                                                                    ? await FormeService()
+                                                                        .activerForme(e
+                                                                            .idForme!)
+                                                                        .then((value) =>
                                                                             {
                                                                               Provider.of<FormeService>(context, listen: false).applyChange(),
                                                                               setState(() {
@@ -271,21 +290,22 @@ class _FormeProduitState extends State<FormeProduit> {
                                                                                 ),
                                                                               )
                                                                             })
-                                                                    .catchError(
-                                                                        (onError) =>
-                                                                            {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Une erreur s'est produit"),
-                                                                                    ],
+                                                                        .catchError(
+                                                                            (onError) =>
+                                                                                {
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    const SnackBar(
+                                                                                      content: Row(
+                                                                                        children: [
+                                                                                          Text("Une erreur s'est produit"),
+                                                                                        ],
+                                                                                      ),
+                                                                                      duration: Duration(seconds: 5),
+                                                                                    ),
                                                                                   ),
-                                                                                  duration: Duration(seconds: 5),
-                                                                                ),
-                                                                              ),
-                                                                              Navigator.of(context).pop(),
-                                                                            }) :  await FormeService()
+                                                                                  Navigator.of(context).pop(),
+                                                                                })
+                                                                    : await FormeService()
                                                                         .desactiverForme(e
                                                                             .idForme!)
                                                                         .then((value) =>
@@ -359,25 +379,24 @@ class _FormeProduitState extends State<FormeProduit> {
                                                                       backgroundColor:
                                                                           Colors
                                                                               .white,
-                                                                      content: UpdateForme(
+                                                                      content: UpdateFormeClass(
                                                                           forme:
                                                                               e)),
                                                                 );
 
                                                                 // Si les détails sont modifiés, appliquer les changements
-                                                                if (updatedSousRegion !=
-                                                                    null) {
-                                                                  Provider.of<FormeService>(
-                                                                          context,
-                                                                          listen:
-                                                                              false)
-                                                                      .applyChange();
-                                                                  setState(() {
-                                                                    _liste =
-                                                                        getListe();
-                                                                  });
-                                                                  //   // Mettre à jour la liste des sous-régions
-                                                                }
+                                                                // if (updatedSousRegion) {
+                                                                //   Provider.of<FormeService>(
+                                                                //           context,
+                                                                //           listen:
+                                                                //               false)
+                                                                //       .applyChange();
+                                                                //   setState(() {
+                                                                //     _liste =
+                                                                //         getListe();
+                                                                //   });
+                                                                //   //   // Mettre à jour la liste des sous-régions
+                                                                // }
                                                               },
                                                             ),
                                                           ),
@@ -462,6 +481,31 @@ class _FormeProduitState extends State<FormeProduit> {
         color: isState ? Colors.green : Colors.red,
       ),
     );
+  }
+
+  Widget _getIconForForme(String libelle) {
+    switch (libelle.toLowerCase()) {
+      case 'graine':
+      case 'graines':
+        return Image.asset(
+          "assets/images/graine.jpg",
+          width: 80,
+          height: 80,
+        );
+      case 'liquide':
+      case 'liqudes':
+        return Image.asset(
+          "assets/images/liquide.jpg",
+          width: 80,
+          height: 80,
+        );
+      default:
+        return Image.asset(
+          "assets/images/default.png",
+          width: 80,
+          height: 80,
+        );
+    }
   }
 
   void _addForme() {
@@ -605,6 +649,169 @@ class _FormeProduitState extends State<FormeProduit> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class UpdateFormeClass extends StatefulWidget {
+  final Forme forme;
+  const UpdateFormeClass({super.key, required this.forme});
+
+  @override
+  State<UpdateFormeClass> createState() => _UpdateFormeClassState();
+}
+
+class _UpdateFormeClassState extends State<UpdateFormeClass> {
+  TextEditingController libelleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+  final formkey = GlobalKey<FormState>();
+  late Forme formes;
+
+  @override
+  void initState() {
+    formes = widget.forme;
+    libelleController.text = formes.libelleForme!;
+    descriptionController.text = formes.descriptionForme!;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(
+                "Ajouter une forme de produit",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  fontSize: 18,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              trailing: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(
+                  Icons.close,
+                  color: Colors.red,
+                  size: 24,
+                ),
+              ),
+            ),
+            const SizedBox(height: 5),
+            Form(
+              key: formkey,
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  TextFormField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez remplir les champs";
+                      }
+                      return null;
+                    },
+                    controller: libelleController,
+                    decoration: InputDecoration(
+                      hintText: "Nom de la filiere",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  TextFormField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez remplir les champs";
+                      }
+                      return null;
+                    },
+                    controller: descriptionController,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      labelText: "Description",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      final String libelle = libelleController.text;
+                      final String description = descriptionController.text;
+                      if (formkey.currentState!.validate()) {
+                        try {
+                          await FormeService()
+                              .updatesFormes(
+                                idForme: formes.idForme!,
+                                libelleForme: libelle,
+                                descriptionForme: description,
+                              )
+                              .then((value) => {
+                                    Provider.of<FormeService>(context,
+                                            listen: false)
+                                        .applyChange(),
+                                    // setState(() {
+                                    //                             _liste =
+                                    //                                 getListe();
+                                    //                           }),
+                                    libelleController.clear(),
+                                    descriptionController.clear(),
+                                    Navigator.of(context).pop()
+                                  });
+                        } catch (e) {
+                          final String errorMessage = e.toString();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Row(
+                                children: [
+                                  Text("Une erreur s'est produite"),
+                                ],
+                              ),
+                              duration: Duration(seconds: 5),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green, // Orange color code
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      minimumSize: const Size(290, 45),
+                    ),
+                    icon: const Icon(
+                      Icons.edit,
+                      color: Colors.white,
+                    ),
+                    label: const Text(
+                      "Modifier",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            )
+          ],
         ),
       ),
     );

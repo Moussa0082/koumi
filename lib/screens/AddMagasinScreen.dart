@@ -48,7 +48,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
   File? photos;
   String? imageSrc;
 
-   Niveau1Pays niveau1Pays = Niveau1Pays();
+  Niveau1Pays niveau1Pays = Niveau1Pays();
 
   List<String> regions = [];
   String? niveauPaysValue;
@@ -92,7 +92,6 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
 //   }
 // }
 
-
 //   Future<void> fetchNiveau1PaysList() async {
 //   try {
 //     final response = await http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
@@ -111,7 +110,6 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
 //     print('Erreur: $e');
 //   }
 // }
-
 
   Future<void> updateMagasin() async {
     final nomMagasin = nomMagasinController.text;
@@ -158,8 +156,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                 localiteMagasin: localiteMagasin,
                 acteur: acteur,
                 niveau1Pays: widget.niveau1Pays!)
-            .then((value) => 
-            showDialog(
+            .then((value) => showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
@@ -214,9 +211,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
         setState(() {
           isLoading = false;
         });
-        Provider.of<MagasinService>(context,
-                                                  listen: false)
-                                              .applyChange();
+        Provider.of<MagasinService>(context, listen: false).applyChange();
       });
     } else {
       await updateMagasin().then((_) {
@@ -244,10 +239,8 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                 acteur: acteur,
                 niveau1Pays: niveau1Pays)
             .then((value) => {
-                      Provider.of<MagasinService>(
-                                                                                   context,
-                                                                                   listen: false)
-                                                                               .applyChange(),
+                  Provider.of<MagasinService>(context, listen: false)
+                      .applyChange(),
 
                   nomMagasinController.clear(),
                   contactMagasinController.clear(),
@@ -278,33 +271,31 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                 acteur: acteur,
                 niveau1Pays: niveau1Pays)
             .then((value) => {
-                      Provider.of<MagasinService>(
-                                                                                   context,
-                                                                                   listen: false)
-                                                                               .applyChange(),
+                  Provider.of<MagasinService>(context, listen: false)
+                      .applyChange(),
 
-                        //                                                               Navigator.push(
-                        //   context,
-                        //   PageRouteBuilder(
-                        //     pageBuilder: (context, animation, secondaryAnimation) =>
-                        //         MagasinScreen(),
-                        //     transitionsBuilder:
-                        //         (context, animation, secondaryAnimation, child) {
-                        //       var begin =
-                        //           Offset(0.0, 1.0); // Commencer en bas de l'écran
-                        //       var end = Offset.zero; // Finir en haut de l'écran
-                        //       var curve = Curves.ease;
-                        //       var tween = Tween(begin: begin, end: end)
-                        //           .chain(CurveTween(curve: curve));
-                        //       return SlideTransition(
-                        //         position: animation.drive(tween),
-                        //         child: child,
-                        //       );
-                        //     },
-                        //     transitionDuration: const Duration(
-                        //         milliseconds: 1900), // Durée de la transition
-                        //   ),
-                        // ),
+                  //                                                               Navigator.push(
+                  //   context,
+                  //   PageRouteBuilder(
+                  //     pageBuilder: (context, animation, secondaryAnimation) =>
+                  //         MagasinScreen(),
+                  //     transitionsBuilder:
+                  //         (context, animation, secondaryAnimation, child) {
+                  //       var begin =
+                  //           Offset(0.0, 1.0); // Commencer en bas de l'écran
+                  //       var end = Offset.zero; // Finir en haut de l'écran
+                  //       var curve = Curves.ease;
+                  //       var tween = Tween(begin: begin, end: end)
+                  //           .chain(CurveTween(curve: curve));
+                  //       return SlideTransition(
+                  //         position: animation.drive(tween),
+                  //         child: child,
+                  //       );
+                  //     },
+                  //     transitionDuration: const Duration(
+                  //         milliseconds: 1900), // Durée de la transition
+                  //   ),
+                  // ),
                   nomMagasinController.clear(),
                   contactMagasinController.clear(),
                   localiteMagasinController.clear(),
@@ -434,10 +425,11 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // fetchNiveau1PaysList();
     niveau1PaysList =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-    http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
   }
 
+// hh
   @override
   Widget build(BuildContext context) {
     const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
@@ -603,7 +595,8 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                             );
                           }
                           if (snapshot.hasError) {
-                            return Text("Une erreur s'est produite veuillez réessayer plus tard");
+                            return Text(
+                                "Une erreur s'est produite veuillez réessayer plus tard");
                           }
                           if (snapshot.hasData) {
                             dynamic responseData =
@@ -631,24 +624,26 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                               }
 
                               return DropdownButtonFormField<String>(
-                            //     validator: (value) {
-                            //   if (value == null || value.isEmpty) {
-                            //     return 'Veuillez sélectionner une region.';
-                            //   }
-                            //   return null;
-                            // },
-                                 items: niveau1List
+                                //     validator: (value) {
+                                //   if (value == null || value.isEmpty) {
+                                //     return 'Veuillez sélectionner une region.';
+                                //   }
+                                //   return null;
+                                // },
+                                items: niveau1List
                                     .map(
                                       (e) => DropdownMenuItem(
-                                        value:widget.isEditable! == false ? e.idNiveau1Pays : widget.niveau1Pays!.idNiveau1Pays,
+                                        value: widget.isEditable! == false
+                                            ? e.idNiveau1Pays
+                                            : widget.niveau1Pays!.idNiveau1Pays,
                                         child: Text(e.nomN1!),
                                       ),
                                     )
                                     .toList(),
-                                value: niveau1Pays.idNiveau1Pays  ,        
-                                       onChanged: (newValue) {
+                                value: niveau1Pays.idNiveau1Pays,
+                                onChanged: (newValue) {
                                   setState(() {
-                                  niveau1Pays.idNiveau1Pays = newValue;
+                                    niveau1Pays.idNiveau1Pays = newValue;
                                     if (newValue != null) {
                                       niveau1Pays.nomN1 =
                                           niveau1List.map((e) => e.nomN1).first;
@@ -657,7 +652,9 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                                   });
                                 },
                                 decoration: InputDecoration(
-                                  labelText: widget.isEditable! == false ? 'Selectionner une region' : widget.niveau1Pays!.nomN1,
+                                  labelText: widget.isEditable! == false
+                                      ? 'Selectionner une region'
+                                      : widget.niveau1Pays!.nomN1,
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(

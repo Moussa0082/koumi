@@ -27,25 +27,22 @@ class MyStoresScreen extends StatefulWidget {
   @override
   State<MyStoresScreen> createState() => _MyStoresScreenState();
 }
- 
-  const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
+
+const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _MyStoresScreenState extends State<MyStoresScreen> {
-  
-
-   late Acteur acteur;
+  late Acteur acteur;
   late List<TypeActeur> typeActeurData = [];
   late String type;
   late TextEditingController _searchController;
-  List<Magasin>  magasinListe = [];
+  List<Magasin> magasinListe = [];
   Niveau1Pays? selectedNiveau1Pays;
   String? typeValue;
   late Future _niveau1PaysList;
-  late Future <List<Magasin>>  magasinListeFuture;
+  late Future<List<Magasin>> magasinListeFuture;
   bool isExist = false;
   String? email = "";
-
 
   //  Future <void>verify() async {
   //   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -56,8 +53,8 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
   //     typeActeurData = acteur.typeActeur!;
   //     type = typeActeurData.map((data) => data.libelle).join(', ');
   //     setState(() {
-  //       isExist = true;    
-           
+  //       isExist = true;
+
   //     });
   //     // Fetch magasins after setting the actor
   //   } else {
@@ -67,22 +64,23 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
   //   }
   // }
 
-  
-Future<List<Magasin>> fetchMagasins() async {
-  try {
-    if (selectedNiveau1Pays != null) {
-      magasinListe = await MagasinService().fetchMagasinByRegionAndActeur(acteur.idActeur!, selectedNiveau1Pays!.idNiveau1Pays!);
-    } else {
-      magasinListe = await MagasinService().fetchMagasinByActeur(acteur.idActeur!);
+  Future<List<Magasin>> fetchMagasins() async {
+    try {
+      if (selectedNiveau1Pays != null) {
+        magasinListe = await MagasinService().fetchMagasinByRegionAndActeur(
+            acteur.idActeur!, selectedNiveau1Pays!.idNiveau1Pays!);
+      } else {
+        magasinListe =
+            await MagasinService().fetchMagasinByActeur(acteur.idActeur!);
+      }
+      // Once magasins are fetched, setState to trigger UI update
+      // setState(() {});
+    } catch (error) {
+      // Handle error
+      print('Error fetching magasins: $error');
     }
-    // Once magasins are fetched, setState to trigger UI update
-    // setState(() {});
-  } catch (error) {
-    // Handle error
-    print('Error fetching magasins: $error');
+    return magasinListe;
   }
-  return magasinListe;
-}
 
   @override
   void initState() {
@@ -93,8 +91,8 @@ Future<List<Magasin>> fetchMagasins() async {
 
     _searchController = TextEditingController();
     _niveau1PaysList =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
     super.initState();
 
     magasinListeFuture = fetchMagasins();
@@ -110,8 +108,8 @@ Future<List<Magasin>> fetchMagasins() async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 250, 250, 250),
           centerTitle: true,
           toolbarHeight: 100,
           leading: IconButton(
@@ -124,68 +122,66 @@ Future<List<Magasin>> fetchMagasins() async {
             style: const TextStyle(
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
-          actions:  [
-                   PopupMenuButton<String>(
-                          padding: EdgeInsets.zero,
-                          itemBuilder: (context) {
-                            return <PopupMenuEntry<String>>[
-                              PopupMenuItem<String>(
-                                child: ListTile(
-                                  leading: const Icon(
-                                    Icons.add,
-                                    color: Colors.green,
-                                  ),
-                                  title: const Text(
-                                    "Ajouter Magasin",
-                                    style: TextStyle(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  onTap: () async {
-                                    // Navigator.push(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //         builder: (context) =>
-                                    //             AddMagasinScreen(isEditable: false,)));
-                                     Navigator.push(
-                                                          context,
-                                                          PageRouteBuilder(
-                                                            pageBuilder: (context, animation, secondaryAnimation) =>
-                                                                AddMagasinScreen(
-                                                             isEditable: false,
-                                                            ),
-                                                            transitionsBuilder:
-                                                                (context, animation, secondaryAnimation, child) {
-                                                              var begin =
-                                  Offset(0.0, 1.0); // Commencer en bas de l'écran
-                                                              var end = Offset.zero; // Finir en haut de l'écran
-                                                              var curve = Curves.ease;
-                                                              var tween = Tween(begin: begin, end: end)
+          actions: [
+            PopupMenuButton<String>(
+              padding: EdgeInsets.zero,
+              itemBuilder: (context) {
+                return <PopupMenuEntry<String>>[
+                  PopupMenuItem<String>(
+                    child: ListTile(
+                      leading: const Icon(
+                        Icons.add,
+                        color: Colors.green,
+                      ),
+                      title: const Text(
+                        "Ajouter Magasin",
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onTap: () async {
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) =>
+                        //             AddMagasinScreen(isEditable: false,)));
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    AddMagasinScreen(
+                              isEditable: false,
+                            ),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              var begin = Offset(
+                                  0.0, 1.0); // Commencer en bas de l'écran
+                              var end = Offset.zero; // Finir en haut de l'écran
+                              var curve = Curves.ease;
+                              var tween = Tween(begin: begin, end: end)
                                   .chain(CurveTween(curve: curve));
-                                                              return SlideTransition(
-                                                                position: animation.drive(tween),
-                                                                child: child,
-                                                              );
-                                                            },
-                                                            transitionDuration: const Duration(
-                                                                milliseconds: 1900), // Durée de la transition
-                                                          ),
-                                                        );
-                                  },
-                                ),
-                              ),
-                             
-                              
-                            ];
-                          },
-                        )
-                     
-                ]),
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                            transitionDuration: const Duration(
+                                milliseconds: 1900), // Durée de la transition
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ];
+              },
+            )
+          ]),
       body: SingleChildScrollView(
         child: Column(children: [
           const SizedBox(height: 10),
-     
+
           // const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
@@ -296,8 +292,7 @@ Future<List<Magasin>> fetchMagasins() async {
 
           Consumer<MagasinService>(builder: (context, magasinService, child) {
             return FutureBuilder<List<Magasin>>(
-                future: 
-                magasinListeFuture,
+                future: magasinListeFuture,
                 // selectedNiveau1Pays != null
                 //     ? magasinService.fetchMagasinByRegionAndActeur(acteur.idActeur!,selectedNiveau1Pays!.idNiveau1Pays!)
                 //     : magasinService.fetchMagasinByActeur(
@@ -318,36 +313,34 @@ Future<List<Magasin>> fetchMagasins() async {
                     );
                   } else {
                     magasinListe = snapshot.data!;
-                                                   if (magasinListe.isEmpty) {
-      // Vous pouvez afficher une image ou un texte ici
-      return 
-      SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(10),
-            child: Center(
-              child: Column(
-                children: [
-                  Image.asset('assets/images/notif.jpg'),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    'Aucun magasin trouvé' ,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 17,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-         }
+                    if (magasinListe.isEmpty) {
+                      // Vous pouvez afficher une image ou un texte ici
+                      return SingleChildScrollView(
+                        child: Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                Image.asset('assets/images/notif.jpg'),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  'Aucun magasin trouvé',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 17,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }
                     String searchText = "";
-                    List<Magasin> filtereSearch =
-                        magasinListe.where((search) {
+                    List<Magasin> filtereSearch = magasinListe.where((search) {
                       String libelle = search.nomMagasin!.toLowerCase();
                       searchText = _searchController.text.trim().toLowerCase();
                       return libelle.contains(searchText);
@@ -357,7 +350,7 @@ Future<List<Magasin>> fetchMagasins() async {
                       // runSpacing:
                       //     10, // Espacement vertical entre les lignes de conteneurs
                       children: filtereSearch
-                        //  .where((element) => element.statutMagasin == true)
+                          //  .where((element) => element.statutMagasin == true)
                           .map((e) => Padding(
                                 padding: EdgeInsets.all(10),
                                 child: SizedBox(
@@ -370,17 +363,18 @@ Future<List<Magasin>> fetchMagasins() async {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   MyProductScreen(
-                                                    id:e.idMagasin!, nom:e.nomMagasin
-                                                      )));
+                                                      id: e.idMagasin!,
+                                                      nom: e.nomMagasin)));
                                     },
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
+                                        color:
+                                            Color.fromARGB(250, 250, 250, 250),
                                         borderRadius: BorderRadius.circular(15),
                                         boxShadow: [
                                           BoxShadow(
                                             color: Colors.grey.withOpacity(0.3),
-                                            offset: const Offset(0, 2),
+                                            offset: Offset(0, 2),
                                             blurRadius: 8,
                                             spreadRadius: 2,
                                           ),
@@ -403,7 +397,7 @@ Future<List<Magasin>> fetchMagasins() async {
                                                         fit: BoxFit.cover,
                                                       )
                                                     : Image.network(
-                                                        "http://10.0.2.2/${e.photo}",
+                                                        "https://koumi.ml/api-koumi/Magasin/${e.idMagasin}/image",
                                                         fit: BoxFit.cover,
                                                         errorBuilder:
                                                             (BuildContext
@@ -434,222 +428,258 @@ Future<List<Magasin>> fetchMagasins() async {
                                             ),
                                           ),
                                           // _buildEtat(e.statutMagasin!),
-                                         SizedBox(height: 1),
-                                           Container(
-                                                  alignment:
-                                                            Alignment.bottomRight,
-                                               child: Padding(
-                                                                                            padding: const EdgeInsets.symmetric(horizontal:8.0),
-                                                                                            child: Row(
-                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                   children: [
-                                                     _buildEtat(e.statutMagasin!),
-                                                     SizedBox(width: 120,),
-                                                     Expanded(
-                                                       child: PopupMenuButton<String>(
-                                                         padding: EdgeInsets.zero,
-                                                         itemBuilder: (context) =>
-                                                             <PopupMenuEntry<String>>[
-                                                           PopupMenuItem<String>(
-                                                             child: ListTile(
-                                                               leading: e.statutMagasin == false? Icon(
-                                                                 Icons.check,
-                                                                 color: Colors.green,
-                                                                 //FlyBox-3BA0B5
-                                                               ): Icon(
-                                                                Icons.disabled_visible,
-                                                                color:Colors.orange[400]
-                                                               ),
-                                                               title:  Text(
-                                                                e.statutMagasin == false ? "Activer" : "Desactiver",
-                                                                 style: TextStyle(
-                                                                   color: e.statutMagasin == false ? Colors.green : Colors.red,
-                                                                   fontWeight: FontWeight.bold,
-                                                                 ),
-                                                               ),
-                                                               
-                                                               onTap: () async {
-                                  // Changement d'état du magasin ici
-                           
-                               e.statutMagasin == false ?  await MagasinService().activerMagasin(e.idMagasin!).then((value) => {
-                                    // Mettre à jour la liste des magasins après le changement d'état
-                                    Provider.of<MagasinService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                    setState(() {
-                                     magasinListeFuture =  MagasinService().fetchMagasinByActeur(acteur.idActeur!);
-                                    }),
-                                    Navigator.of(context).pop(),
-                                                                         })
-                                                                     .catchError((onError) => {
-                                                                           ScaffoldMessenger.of(context)
-                                                                               .showSnackBar(
-                                                                             const SnackBar(
-                                                                               content: Row(
-                                                                                 children: [
-                                                                                   Text(
-                                                                                       "Une erreur s'est produit"),
-                                                                                 ],
-                                                                               ),
-                                                                               duration:
-                                                                                   Duration(seconds: 5),
-                                                                             ),
-                                                                           ),
-                                                                           Navigator.of(context).pop(),
-                                                                         }): await MagasinService()
-                                                                     .desactiverMagasin(e.idMagasin!)
-                                                                     .then((value) => {
-                                                                        Provider.of<MagasinService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                                setState(() {
-                                                       magasinListeFuture =  MagasinService().fetchMagasinByActeur(acteur.idActeur!);
-                                                       }),
-                                                                           Navigator.of(context).pop(),
-                                                                     
-                                                                         });
-                                                       
-                                                                 ScaffoldMessenger.of(context)
-                                                                     .showSnackBar(
-                                                                    SnackBar(
-                                                                     content: Row(
-                                                                       children: [
-                                                                         Text(e.statutMagasin == false ? "Activer avec succèss " : "Desactiver avec succèss"),
-                                                                       ],
-                                                                     ),
-                                                                     duration: Duration(seconds: 2),
-                                                                   ),
-                                                                 );
-                                                               },
-                                                             )
-                                                          
-                                               ),
-                                                           PopupMenuItem<String>(
-                                                             child: ListTile(
-                                                               leading: Icon(
-                                                                 Icons.disabled_visible,
-                                                                 color: Colors.green[400],
-                                                               ),
-                                                               title: Text(
-                                                                 "Modifier",
-                                                                 style: TextStyle(
-                                                                   color: Colors.green[400],
-                                                                   fontWeight: FontWeight.bold,
-                                                                 ),
-                                                               ),
-                                                               onTap: () async {
-                                                                 Navigator.push(
-                                                                   context,
-                                                                   PageRouteBuilder(
-                                                                     pageBuilder: (context, animation,
-                                                                         secondaryAnimation) {
-                                                                       return FadeTransition(
-                                                                         opacity: animation,
-                                                                         child: ScaleTransition(
-                                                                           scale: animation,
-                                                                           child: AddMagasinScreen(
-                                                                             idMagasin: e.idMagasin,
-                                                                             isEditable: true,
-                                                                             nomMagasin:
-                                                                                 e.nomMagasin,
-                                                                             contactMagasin:
-                                                                                 e.contactMagasin,
-                                                                             localiteMagasin:
-                                                                                 e.localiteMagasin,
-                                                                             niveau1Pays:
-                                                                                 e.niveau1Pays!,
-                                                                             // photo: filteredMagasins[index]['photo']!,
-                                                                           ),
-                                                                         ),
-                                                                       );
-                                                                     },
-                                                                     transitionsBuilder: (context,
-                                                                         animation,
-                                                                         secondaryAnimation,
-                                                                         child) {
-                                                                       return child;
-                                                                     },
-                                                                     transitionDuration: const Duration(
-                                                                         milliseconds:
-                                                                             1500), // Durée de la transition
-                                                                   ),
-                                                                 );
-                                                               },
-                                                             ),
-                                                           ),
-                                                           PopupMenuItem<String>(
-                                                             child: ListTile(
-                                                               leading: const Icon(
-                                                                 Icons.delete,
-                                                                 color: Colors.red,
-                                                               ),
-                                                               title: const Text(
-                                                                 "Supprimer",
-                                                                 style: TextStyle(
-                                                                   color: Colors.red,
-                                                                   fontWeight: FontWeight.bold,
-                                                                 ),
-                                                               ),
-                                                               onTap: () async {
-                                                                 await MagasinService()
-                                                                     .deleteMagasin(
-                                                                         e.idMagasin!)
-                                                                     .then((value) => {
-                                                                          Provider.of<MagasinService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                           setState(() {
-                                                                          magasinListeFuture =  MagasinService().fetchMagasinByActeur(acteur.idActeur!);
-                                                                          }),
-                                                                           Navigator.of(context).pop(),
+                                          SizedBox(height: 1),
+                                          Container(
+                                            alignment: Alignment.bottomRight,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8.0),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  _buildEtat(e.statutMagasin!),
+                                                  SizedBox(
+                                                    width: 120,
+                                                  ),
+                                                  Expanded(
+                                                    child:
+                                                        PopupMenuButton<String>(
+                                                      padding: EdgeInsets.zero,
+                                                      itemBuilder: (context) =>
+                                                          <PopupMenuEntry<
+                                                              String>>[
+                                                        PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                          leading: e.statutMagasin ==
+                                                                  false
+                                                              ? Icon(
+                                                                  Icons.check,
+                                                                  color: Colors
+                                                                      .green,
+                                                                  //FlyBox-3BA0B5
+                                                                )
+                                                              : Icon(
+                                                                  Icons
+                                                                      .disabled_visible,
+                                                                  color: Colors
+                                                                          .orange[
+                                                                      400]),
+                                                          title: Text(
+                                                            e.statutMagasin ==
+                                                                    false
+                                                                ? "Activer"
+                                                                : "Desactiver",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  e.statutMagasin ==
+                                                                          false
+                                                                      ? Colors
+                                                                          .green
+                                                                      : Colors
+                                                                          .red,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                          onTap: () async {
+                                                            // Changement d'état du magasin ici
 
-                                                                           ScaffoldMessenger.of(context)
-                                                                               .showSnackBar(
-                                                                          
-                                                                             const SnackBar(
-                                                                               content: Row(
-                                                                                 children: [
-                                                                                   Text(
-                                                                                       "Magasin supprimer avec succès"),
-                                                                                 ],
-                                                                               ),
-                                                                               duration:
-                                                                                   Duration(seconds: 2),
-                                                                             ),
-                                                                           
-                                                                           )
-                                                                         })
-                                                                     .catchError((onError) => {
-                                                                           ScaffoldMessenger.of(context)
-                                                                               .showSnackBar(
-                                                                             const SnackBar(
-                                                                               content: Row(
-                                                                                 children: [
-                                                                                   Text(
-                                                                                       "Impossible de supprimer"),
-                                                                                 ],
-                                                                               ),
-                                                                               duration:
-                                                                                   Duration(seconds: 2),
-                                                                             ),
-                                                                           )
-                                                                         });
-                                                               },
-                                                             ),
-                                                           ),
-                                                         ],
-                                                       ),
-                                                     ),
-                                                   ],
-                                                                                            ),
-                                                                                          ),
-                                                 )
+                                                            e.statutMagasin ==
+                                                                    false
+                                                                ? await MagasinService()
+                                                                    .activerMagasin(e
+                                                                        .idMagasin!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              // Mettre à jour la liste des magasins après le changement d'état
+                                                                              Provider.of<MagasinService>(context, listen: false).applyChange(),
+                                                                              setState(() {
+                                                                                magasinListeFuture = MagasinService().fetchMagasinByActeur(acteur.idActeur!);
+                                                                              }),
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 5),
+                                                                                ),
+                                                                              ),
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                : await MagasinService()
+                                                                    .desactiverMagasin(e
+                                                                        .idMagasin!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<MagasinService>(context, listen: false).applyChange(),
+                                                                              setState(() {
+                                                                                magasinListeFuture = MagasinService().fetchMagasinByActeur(acteur.idActeur!);
+                                                                              }),
+                                                                              Navigator.of(context).pop(),
+                                                                            });
+
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                              SnackBar(
+                                                                content: Row(
+                                                                  children: [
+                                                                    Text(e.statutMagasin ==
+                                                                            false
+                                                                        ? "Activer avec succèss "
+                                                                        : "Desactiver avec succèss"),
+                                                                  ],
+                                                                ),
+                                                                duration:
+                                                                    Duration(
+                                                                        seconds:
+                                                                            2),
+                                                              ),
+                                                            );
+                                                          },
+                                                        )),
+                                                        PopupMenuItem<String>(
+                                                          child: ListTile(
+                                                            leading: Icon(
+                                                              Icons
+                                                                  .disabled_visible,
+                                                              color: Colors
+                                                                  .green[400],
+                                                            ),
+                                                            title: Text(
+                                                              "Modifier",
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .green[400],
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                            onTap: () async {
+                                                              Navigator.push(
+                                                                context,
+                                                                PageRouteBuilder(
+                                                                  pageBuilder: (context,
+                                                                      animation,
+                                                                      secondaryAnimation) {
+                                                                    return FadeTransition(
+                                                                      opacity:
+                                                                          animation,
+                                                                      child:
+                                                                          ScaleTransition(
+                                                                        scale:
+                                                                            animation,
+                                                                        child:
+                                                                            AddMagasinScreen(
+                                                                          idMagasin:
+                                                                              e.idMagasin,
+                                                                          isEditable:
+                                                                              true,
+                                                                          nomMagasin:
+                                                                              e.nomMagasin,
+                                                                          contactMagasin:
+                                                                              e.contactMagasin,
+                                                                          localiteMagasin:
+                                                                              e.localiteMagasin,
+                                                                          niveau1Pays:
+                                                                              e.niveau1Pays!,
+                                                                          // photo: filteredMagasins[index]['photo']!,
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                  },
+                                                                  transitionsBuilder: (context,
+                                                                      animation,
+                                                                      secondaryAnimation,
+                                                                      child) {
+                                                                    return child;
+                                                                  },
+                                                                  transitionDuration:
+                                                                      const Duration(
+                                                                          milliseconds:
+                                                                              1500), // Durée de la transition
+                                                                ),
+                                                              );
+                                                            },
+                                                          ),
+                                                        ),
+                                                        PopupMenuItem<String>(
+                                                          child: ListTile(
+                                                            leading: const Icon(
+                                                              Icons.delete,
+                                                              color: Colors.red,
+                                                            ),
+                                                            title: const Text(
+                                                              "Supprimer",
+                                                              style: TextStyle(
+                                                                color:
+                                                                    Colors.red,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                            onTap: () async {
+                                                              await MagasinService()
+                                                                  .deleteMagasin(e
+                                                                      .idMagasin!)
+                                                                  .then(
+                                                                      (value) =>
+                                                                          {
+                                                                            Provider.of<MagasinService>(context, listen: false).applyChange(),
+                                                                            setState(() {
+                                                                              magasinListeFuture = MagasinService().fetchMagasinByActeur(acteur.idActeur!);
+                                                                            }),
+                                                                            Navigator.of(context).pop(),
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              const SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Magasin supprimer avec succès"),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: Duration(seconds: 2),
+                                                                              ),
+                                                                            )
+                                                                          })
+                                                                  .catchError(
+                                                                      (onError) =>
+                                                                          {
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              const SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Impossible de supprimer"),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: Duration(seconds: 2),
+                                                                              ),
+                                                                            )
+                                                                          });
+                                                            },
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )
                                         ],
                                       ),
                                     ),
@@ -698,7 +728,6 @@ Future<List<Magasin>> fetchMagasins() async {
     );
   }
 
-
   Widget _buildEtat(bool isState) {
     return Container(
       width: 15,
@@ -709,6 +738,4 @@ Future<List<Magasin>> fetchMagasins() async {
       ),
     );
   }
-
-
 }

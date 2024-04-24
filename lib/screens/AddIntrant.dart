@@ -149,11 +149,11 @@ class _AddIntrantState extends State<AddIntrant> {
     // _categorieList = fetchCategorieList(); // _categorieList = http.get(
     // _filiereList = fetchFiliereList();
     _filiereList = http.get(
-        Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
-    // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+        // Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+    Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
     _categorieList = http.get(Uri.parse(
-        'http://10.0.2.2:9000/api-koumi/Categorie/allCategorieByFiliere/${filiere.idFiliere}'));
-    // 'https://koumi.ml/api-koumi/Categorie/allCategorieByFiliere/${filiere.idFiliere}'));
+        // 'http://10.0.2.2:9000/api-koumi/Categorie/allCategorieByFiliere/${filiere.idFiliere}'));
+    'https://koumi.ml/api-koumi/Categorie/allCategorieByFiliere/${filiere.idFiliere}'));
   }
 
   // Future<List<Filiere>> fetchFiliereList() async {
@@ -297,7 +297,8 @@ class _AddIntrantState extends State<AddIntrant> {
                                       );
                                       debugPrint("valeur : $newValue");
                                       _categorieList = http.get(Uri.parse(
-                                          'http://10.0.2.2:9000/api-koumi/Categorie/allCategorieByFiliere/${newValue}'
+                                          'https://koumi.ml/api-koumi/Categorie/allCategorieByFiliere/${newValue}'
+                                          // 'http://10.0.2.2:9000/api-koumi/Categorie/allCategorieByFiliere/${newValue}'
                                           ));
                                     }
                                   });
