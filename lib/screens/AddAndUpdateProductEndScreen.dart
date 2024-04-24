@@ -73,7 +73,8 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
             id = acteur.idActeur;
     magasinListe =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
+        http.get(Uri.parse('https:koumi.ml/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
       setState(() {
         isExist = true;
       });
@@ -192,17 +193,17 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
 
     verify();
     magasinListe =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
     speculationListe =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/Speculation/getAllSpeculation'));
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/Speculation/getAllSpeculation'));
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation'));
     uniteListe =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/Unite/getAllUnite'));
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Unite/getAllUnite'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/Unite/getAllUnite'));
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Unite/getAllUnite'));
     zoneListe =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/ZoneProduction/getAllZone'));
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/ZoneProduction/getAllZone'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/ZoneProduction/getAllZone'));
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/ZoneProduction/getAllZone'));
 
           debugPrint("id : $id, type : ${widget.stock!.typeProduit!}, desc : ${widget.stock!.descriptionStock!}  acteur : $acteur");
         

@@ -85,8 +85,8 @@ class _StoreScreenState extends State<StoreScreen> {
     // magasinListeFuture = getAllMagasin();
     _searchController = TextEditingController();
     _niveau1PaysList =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
     super.initState();
   }
 
@@ -568,7 +568,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                                         fit: BoxFit.cover,
                                                       )
                                                     : Image.network(
-                                                        "http://10.0.2.2/${e.photo}",
+                                                        "https://koumi.ml/api-koumi/Magasin/${e.idMagasin}/image",
                                                         fit: BoxFit.cover,
                                                         errorBuilder:
                                                             (BuildContext
