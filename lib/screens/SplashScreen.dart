@@ -37,7 +37,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     // clearCart();
     // Vérifie d'abord si l'email de l'acteur est présent dans SharedPreferences
-      connectionVerify = Get.put(ConnectionVerify(), permanent: true);
+      // connectionVerify = Get.put(ConnectionVerify(), permanent: true);
     checkEmailInSharedPreferences();
     // checkInternetConnection();
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:koumi_app/admin/AlerteScreen.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -13,6 +14,7 @@ import 'package:koumi_app/screens/Weather.dart';
 import 'package:koumi_app/widgets/AlertAcceuil.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
+import 'package:koumi_app/widgets/connection_verify.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -53,6 +55,7 @@ class _AccueilState extends State<Accueil> {
     // TODO: implement initState
     super.initState();
     verify();
+    // Get.put(ConnectionVerify(), permanent: true);
   }
 
   @override
