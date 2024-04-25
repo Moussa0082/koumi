@@ -354,39 +354,35 @@ class _StoreScreenState extends State<StoreScreen> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.stretch,
                                             children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          8.0),
-                                                  child: SizedBox(
-                                                    height: 90,
-                                                    child: e.photo == null
-                                                        ? Image.asset(
-                                                            "assets/images/magasin.png",
-                                                            fit: BoxFit.cover,
-                                                          )
-                                                        : Image.network(
-                                                            "https://koumi.ml/api-koumi/Magasin/${e.idMagasin}/image",
-                                                            fit: BoxFit.cover,
-                                                            errorBuilder:
-                                                                (BuildContext
-                                                                        context,
-                                                                    Object
-                                                                        exception,
-                                                                    StackTrace?
-                                                                        stackTrace) {
-                                                              return Image
-                                                                  .asset(
-                                                                'assets/images/magasin.png',
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                              );
-                                                            },
-                                                          ),
-                                                  ),
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        8.0),
+                                                child: SizedBox(
+                                                  height: 90,
+                                                  child: e.photo == null
+                                                      ? Image.asset(
+                                                          "assets/images/magasin.png",
+                                                          fit: BoxFit.cover,
+                                                        )
+                                                      : Image.network(
+                                                          "https://koumi.ml/api-koumi/Magasin/${e.idMagasin}/image",
+                                                          fit: BoxFit.cover,
+                                                          errorBuilder:
+                                                              (BuildContext
+                                                                      context,
+                                                                  Object
+                                                                      exception,
+                                                                  StackTrace?
+                                                                      stackTrace) {
+                                                            return Image
+                                                                .asset(
+                                                              'assets/images/magasin.png',
+                                                              fit: BoxFit
+                                                                  .cover,
+                                                            );
+                                                          },
+                                                        ),
                                                 ),
                                               ),
                                               Padding(
@@ -562,14 +558,15 @@ class _StoreScreenState extends State<StoreScreen> {
                                         },
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color: Color.fromARGB(
+                                                250, 250, 250, 250),
                                             borderRadius:
                                                 BorderRadius.circular(15),
                                             boxShadow: [
                                               BoxShadow(
                                                 color: Colors.grey
                                                     .withOpacity(0.3),
-                                                offset: const Offset(0, 2),
+                                                offset: Offset(0, 2),
                                                 blurRadius: 8,
                                                 spreadRadius: 2,
                                               ),

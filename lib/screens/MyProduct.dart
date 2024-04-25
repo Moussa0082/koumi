@@ -111,11 +111,11 @@ class _MyProductScreenState extends State<MyProductScreen> {
       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
           centerTitle: true,
           toolbarHeight: 100,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+          // leading: IconButton(
+          //     onPressed: () {
+          //       Navigator.of(context).pop();
+          //     },
+          //     icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
             'Mes Produit',
             style: const TextStyle(
@@ -382,35 +382,32 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.stretch,
                                         children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              child: SizedBox(
-                                                height: 90,
-                                                child: e.photo == null
-                                                    ? Image.asset(
-                                                        "assets/images/mang.jpg",
-                                                        fit: BoxFit.cover,
-                                                      )
-                                                    : Image.network(
-                                                        "https://koumi.ml/api-koumi/Stock/${e.idStock}/image",
-                                                        fit: BoxFit.cover,
-                                                        errorBuilder:
-                                                            (BuildContext
-                                                                    context,
-                                                                Object
-                                                                    exception,
-                                                                StackTrace?
-                                                                    stackTrace) {
-                                                          return Image.asset(
-                                                            'assets/images/mang.jpg',
-                                                            fit: BoxFit.cover,
-                                                          );
-                                                        },
-                                                      ),
-                                              ),
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            child: SizedBox(
+                                              height: 90,
+                                              child: e.photo == null
+                                                  ? Image.asset(
+                                                      "assets/images/default_image.png",
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : Image.network(
+                                                      "https://koumi.ml/api-koumi/Stock/${e.idStock}/image",
+                                                      fit: BoxFit.cover,
+                                                      errorBuilder:
+                                                          (BuildContext
+                                                                  context,
+                                                              Object
+                                                                  exception,
+                                                              StackTrace?
+                                                                  stackTrace) {
+                                                        return Image.asset(
+                                                          'assets/images/default_image.png',
+                                                          fit: BoxFit.cover,
+                                                        );
+                                                      },
+                                                    ),
                                             ),
                                           ),
                                           Padding(

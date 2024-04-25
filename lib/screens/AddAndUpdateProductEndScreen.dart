@@ -73,7 +73,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
             id = acteur.idActeur;
     magasinListe =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
+        http.get(Uri.parse('https:koumi.ml/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
       setState(() {
         isExist = true;

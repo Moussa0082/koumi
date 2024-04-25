@@ -512,17 +512,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       TextFormField(
                         controller: emailController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          // labelText: "Adresse email",
+                         decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
                           hintText: "Entrez votre adresse email",
-                          // icon: const Icon(
-                          //   Icons.mail,
-                          //   color: Color(0xFFF2B6706),
-                          //   size: 20,
-                          // )
-                        ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
                         keyboardType: TextInputType.text,
                         validator: (val) {
                           if (val == null || val.isEmpty) {
@@ -549,10 +546,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       // debut  mot de pass
                       TextFormField(
                         controller: passwordController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          // labelText: "Mot de passe",
+                         decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           hintText: "Entrez votre mot de passe",
                           suffixIcon: IconButton(
                             onPressed: () {
@@ -569,7 +568,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Colors.grey,
                             ),
                           ),
-                        ),
+                          ),
                         keyboardType: TextInputType.text,
                         obscureText: _obscureText,
                         validator: (val) {

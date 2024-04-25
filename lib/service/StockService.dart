@@ -207,8 +207,8 @@ class StockService extends ChangeNotifier {
       print(
           'Une erreur s\'est produite lors de la récupération des stocks: $e');
       // throw Exception(e.toString());
-              return stockList;
     }
+              return stockList;
   
   }
 

@@ -92,7 +92,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
     _searchController = TextEditingController();
     _niveau1PaysList =
         http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
     super.initState();
 
     magasinListeFuture = fetchMagasins();
@@ -109,7 +109,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+      backgroundColor: const Color.fromARGB(255, 250, 250, 250),
           centerTitle: true,
           toolbarHeight: 100,
           leading: IconButton(
@@ -367,52 +367,48 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                                       nom: e.nomMagasin)));
                                     },
                                     child: Container(
-                                      decoration: BoxDecoration(
-                                        color:
-                                            Color.fromARGB(250, 250, 250, 250),
-                                        borderRadius: BorderRadius.circular(15),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.3),
-                                            offset: Offset(0, 2),
-                                            blurRadius: 8,
-                                            spreadRadius: 2,
-                                          ),
-                                        ],
+                                     decoration: BoxDecoration(
+                                    color: Color.fromARGB(250, 250, 250, 250),
+                                    borderRadius: BorderRadius.circular(15),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.3),
+                                        offset: Offset(0, 2),
+                                        blurRadius: 8,
+                                        spreadRadius: 2,
                                       ),
+                                    ],
+                                  ),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.stretch,
                                         children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              child: SizedBox(
-                                                height: 90,
-                                                child: e.photo == null
-                                                    ? Image.asset(
-                                                        "assets/images/magasin.png",
-                                                        fit: BoxFit.cover,
-                                                      )
-                                                    : Image.network(
-                                                        "https://koumi.ml/api-koumi/Magasin/${e.idMagasin}/image",
-                                                        fit: BoxFit.cover,
-                                                        errorBuilder:
-                                                            (BuildContext
-                                                                    context,
-                                                                Object
-                                                                    exception,
-                                                                StackTrace?
-                                                                    stackTrace) {
-                                                          return Image.asset(
-                                                            'assets/images/magasin.png',
-                                                            fit: BoxFit.cover,
-                                                          );
-                                                        },
-                                                      ),
-                                              ),
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            child: SizedBox(
+                                              height: 90,
+                                              child: e.photo == null
+                                                  ? Image.asset(
+                                                      "assets/images/magasin.png",
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : Image.network(
+                                                      "https://koumi.ml/api-koumi/Magasin/${e.idMagasin}/image",
+                                                      fit: BoxFit.cover,
+                                                      errorBuilder:
+                                                          (BuildContext
+                                                                  context,
+                                                              Object
+                                                                  exception,
+                                                              StackTrace?
+                                                                  stackTrace) {
+                                                        return Image.asset(
+                                                          'assets/images/magasin.png',
+                                                          fit: BoxFit.cover,
+                                                        );
+                                                      },
+                                                    ),
                                             ),
                                           ),
                                           Padding(

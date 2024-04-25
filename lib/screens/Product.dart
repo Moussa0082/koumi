@@ -1,21 +1,18 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
-import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/screens/MyProduct.dart';
-import 'package:koumi_app/screens/MyStores.dart';
-import 'package:koumi_app/screens/ProduitActeur.dart';
 import 'package:koumi_app/service/StockService.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProductScreen extends StatefulWidget {
@@ -84,9 +81,9 @@ class _ProductScreenState extends State<ProductScreen> {
     // type = typeActeurData.map((data) => data.libelle).join(', ');
     verify();
     _searchController = TextEditingController();
-    _catList = http.get(
-        Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
-        // Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
+    _catList = http
+        .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
+    // Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
     super.initState();
     stockListeFuture = getAllStock();
   }
@@ -105,11 +102,11 @@ class _ProductScreenState extends State<ProductScreen> {
           backgroundColor: const Color.fromARGB(255, 250, 250, 250),
           centerTitle: true,
           toolbarHeight: 100,
-          // leading: IconButton(
-          //     onPressed: () {
-          //       Navigator.of(context).pop();
-          //     },
-          //     icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
             'Tous les Produit',
             style: const TextStyle(
@@ -380,39 +377,32 @@ class _ProductScreenState extends State<ProductScreen> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.stretch,
                                             children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          8.0),
-                                                  child: SizedBox(
-                                                    height: 90,
-                                                    child: e.photo == null
-                                                        ? Image.asset(
-                                                            "assets/images/default_image.png",
-                                                            fit: BoxFit.cover,
-                                                          )
-                                                        : Image.network(
-                                                            "https://koumi.ml/api-koumi/Stock/${e.idStock}/image",
-                                                            fit: BoxFit.cover,
-                                                            errorBuilder:
-                                                                (BuildContext
-                                                                        context,
-                                                                    Object
-                                                                        exception,
-                                                                    StackTrace?
-                                                                        stackTrace) {
-                                                              return Image
-                                                                  .asset(
-                                                                'assets/images/mang.jpg.png',
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                              );
-                                                            },
-                                                          ),
-                                                  ),
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                                child: SizedBox(
+                                                  height: 90,
+                                                  child: e.photo == null
+                                                      ? Image.asset(
+                                                          "assets/images/default_image.png",
+                                                          fit: BoxFit.cover,
+                                                        )
+                                                      : Image.network(
+                                                          "https://koumi.ml/api-koumi/Stock/${e.idStock}/image",
+                                                          fit: BoxFit.cover,
+                                                          errorBuilder:
+                                                              (BuildContext
+                                                                      context,
+                                                                  Object
+                                                                      exception,
+                                                                  StackTrace?
+                                                                      stackTrace) {
+                                                            return Image.asset(
+                                                              'assets/images/default_image.png',
+                                                              fit: BoxFit.cover,
+                                                            );
+                                                          },
+                                                        ),
                                                 ),
                                               ),
                                               Padding(
@@ -656,14 +646,15 @@ class _ProductScreenState extends State<ProductScreen> {
                                         },
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            color: Colors.white,
+                                            color: Color.fromARGB(
+                                                250, 250, 250, 250),
                                             borderRadius:
                                                 BorderRadius.circular(15),
                                             boxShadow: [
                                               BoxShadow(
                                                 color: Colors.grey
                                                     .withOpacity(0.3),
-                                                offset: const Offset(0, 2),
+                                                offset: Offset(0, 2),
                                                 blurRadius: 8,
                                                 spreadRadius: 2,
                                               ),
