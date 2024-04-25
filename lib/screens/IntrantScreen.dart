@@ -396,7 +396,9 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                             // overflow: TextOverflow.ellipsis,
                                           ),
                                           subtitle: Text(
-                                            "${e.prixIntrant.toString()} ${para.monnaie}",
+                                            para.monnaie != null
+                                                ? "${e.prixIntrant.toString()} ${para.monnaie}"
+                                                : "${e.prixIntrant.toString()} FCFA",
                                             style: TextStyle(
                                               fontSize: 16,
                                               color: Colors.black87,

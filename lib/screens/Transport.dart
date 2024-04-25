@@ -387,7 +387,7 @@ class _TransportState extends State<Transport> {
                       crossAxisSpacing: 5,
                       childAspectRatio: 0.9,
                       children: filtereSearch
-                          .where((element) => element.statutVehicule == true)
+                          .where((element) => element.statutVehicule == true) 
                           .map((e) => Padding(
                                 padding: EdgeInsets.all(10),
                                 child: SizedBox(

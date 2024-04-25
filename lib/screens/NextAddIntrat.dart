@@ -48,7 +48,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
   TextEditingController _prixController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
   late Speculation speculation;
-  late ParametreGeneraux para;
+  late ParametreGeneraux para = ParametreGeneraux();
   List<ParametreGeneraux> paraList = [];
   // late CategorieProduit categorieProduit;
   late CategorieProduit categorieProduit = CategorieProduit();
@@ -138,17 +138,27 @@ class _NextAddIntratState extends State<NextAddIntrat> {
     });
   }
 
+  void verifyParam() {
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+
+    if (paraList.isNotEmpty) {
+      para = paraList[0];
+    } else {
+      // Gérer le cas où la liste est null ou vide, par exemple :
+      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
-    para = paraList[0];
+    verifyParam();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // _formeList = fetchList();
-    _formeList = http.get(
-        Uri.parse('https://koumi.ml/api-koumi/formeproduit/getAllForme/'));
-        // Uri.parse('http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
+    _formeList = http
+        .get(Uri.parse('https://koumi.ml/api-koumi/formeproduit/getAllForme/'));
+    // Uri.parse('http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
   }
 
   Future<List<Forme>> fetchList() async {
@@ -481,7 +491,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                           )
                                         })
                                     .catchError((onError) => {
-                                       setState(() {
+                                          setState(() {
                                             _isLoading = false;
                                           }),
                                           print('Erreur :${onError.message}'),
@@ -541,7 +551,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                         })
                                     .catchError((onError) => {
                                           print('Erreur :${onError.message}'),
-                                           setState(() {
+                                          setState(() {
                                             _isLoading = false;
                                           }),
                                           ScaffoldMessenger.of(context)

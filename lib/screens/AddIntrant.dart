@@ -644,6 +644,7 @@ class _AddIntrantState extends State<AddIntrant> {
                                   _nomController.clear(),
                                   _descriptionController.clear(),
                                   _quantiteController.clear(),
+                                  _uniteController.clear(),
                                   setState(() {
                                     filiereValue = null;
                                     catValue = null;

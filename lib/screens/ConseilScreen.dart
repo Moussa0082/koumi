@@ -86,7 +86,9 @@ class _ConseilScreenState extends State<ConseilScreen> {
                   type.toLowerCase() == 'commerçant' ||
                   type.toLowerCase() == 'transporteur' ||
                   type.toLowerCase() == 'transformeur' ||
-                  type.toLowerCase() == 'producteur'
+                  type.toLowerCase() == 'producteur' ||
+                  type.toLowerCase() == 'commerçant' ||
+                  type.toLowerCase() == 'commercant'
               ? null
               : [
                   PopupMenuButton<String>(
@@ -303,7 +305,7 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                               SizedBox(height: 10),
                                               type.toLowerCase() != 'admin'
                                                   ? Container()
-                                                  :  Container(
+                                                  : Container(
                                                       alignment:
                                                           Alignment.bottomRight,
                                                       padding: const EdgeInsets
@@ -327,7 +329,8 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                                                   String>(
                                                                 child: ListTile(
                                                                   leading:
-                                                                      e.statutConseil == false
+                                                                      e.statutConseil ==
+                                                                              false
                                                                           ? Icon(
                                                                               Icons.check,
                                                                               color: Colors.green,
@@ -365,7 +368,6 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                                                                 {
                                                                                   Provider.of<ConseilService>(context, listen: false).applyChange(),
                                                                                   Navigator.of(context).pop(),
-                                                                                 
                                                                                   ScaffoldMessenger.of(context).showSnackBar(
                                                                                     const SnackBar(
                                                                                       content: Row(
@@ -398,7 +400,6 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                                                                 {
                                                                                   Provider.of<ConseilService>(context, listen: false).applyChange(),
                                                                                   Navigator.of(context).pop(),
-                                                                                 
                                                                                 })
                                                                             .catchError((onError) =>
                                                                                 {
@@ -463,7 +464,6 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                                                             {
                                                                               Provider.of<ConseilService>(context, listen: false).applyChange(),
                                                                               Navigator.of(context).pop(),
-                                                                             
                                                                             })
                                                                         .catchError((onError) =>
                                                                             {
