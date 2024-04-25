@@ -16,7 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Location extends StatefulWidget {
   const Location({super.key});
-  
+
   @override
   State<Location> createState() => _LocationState();
 }
@@ -261,8 +261,7 @@ class _LocationState extends State<Location> {
                         materielListe = snapshot.data!;
 
                         return materielListe
-                                .where(
-                                    (element) => element.statut == false)
+                                .where((element) => element.statut == true)
                                 .isEmpty
                             ? Padding(
                                 padding: EdgeInsets.all(10),
@@ -270,114 +269,107 @@ class _LocationState extends State<Location> {
                                     child: Text("Aucun matériel trouvé")),
                               )
                             : GridView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 10,
-                              crossAxisSpacing: 10,
-                              childAspectRatio: 0.8,
-                            ),
-                            itemCount: materielListe
-                                .where(
-                                    (element) => element.statut == true)
-                                .length,
-                            itemBuilder: (context, index) {
-                              var e = materielListe
-                                  .where((element) =>
-                                      element.statut == true)
-                                  .elementAt(index);
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          DetailMateriel(
-                                                              materiel: e)));
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: Color.fromARGB(250, 250, 250, 250),
-                                    borderRadius: BorderRadius.circular(15),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.3),
-                                        offset: Offset(0, 2),
-                                        blurRadius: 8,
-                                        spreadRadius: 2,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        child: SizedBox(
-                                          height: 100,
-                                          child:  e.photoMateriel ==
-                                                              null
-                                                          ? Image.asset(
-                                                              "assets/images/default_image.png",
-                                                              fit: BoxFit.cover,
-                                                              height: 90,
-                                                            )
-                                                          : Image.network(
-                                                              "https://koumi.ml/api-koumi/Materiel/${e.idMateriel}/image",
-                                                              fit: BoxFit.cover,
-                                                              height: 90,
-                                                              errorBuilder: (BuildContext
-                                                                      context,
-                                                                  Object
-                                                                      exception,
-                                                                  StackTrace?
-                                                                      stackTrace) {
-                                                                return Image
-                                                                    .asset(
-                                                                  'assets/images/default_image.png',
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                  height: 90,
-                                                                );
-                                                              },
-                                                            ),
-                                        ),
-                                      ),
-                                      SizedBox(height: 8),
-                                      ListTile(
-                                          title: Text(
-                                             e.nom,
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black87,
-                                            ),
-                                            // maxLines: 1,
-                                            // overflow: TextOverflow.ellipsis,
-                                          ),
-                                          subtitle: Text(
-                                             e.localisation,
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                         
-                                          ),
-
-                                    ],
-                                  ),
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: 10,
+                                  crossAxisSpacing: 10,
+                                  childAspectRatio: 0.8,
                                 ),
+                                itemCount: materielListe
+                                    .where((element) => element.statut == true)
+                                    .length,
+                                itemBuilder: (context, index) {
+                                  var e = materielListe
+                                      .where(
+                                          (element) => element.statut == true)
+                                      .elementAt(index);
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DetailMateriel(materiel: e)));
+                                    },
+                                    child: Container(
+                                      margin: EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            Color.fromARGB(250, 250, 250, 250),
+                                        borderRadius: BorderRadius.circular(15),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.3),
+                                            offset: Offset(0, 2),
+                                            blurRadius: 8,
+                                            spreadRadius: 2,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            child: SizedBox(
+                                              height: 100,
+                                              child: e.photoMateriel == null
+                                                  ? Image.asset(
+                                                      "assets/images/default_image.png",
+                                                      fit: BoxFit.cover,
+                                                      height: 90,
+                                                    )
+                                                  : Image.network(
+                                                      "https://koumi.ml/api-koumi/Materiel/${e.idMateriel}/image",
+                                                      fit: BoxFit.cover,
+                                                      height: 90,
+                                                      errorBuilder:
+                                                          (BuildContext context,
+                                                              Object exception,
+                                                              StackTrace?
+                                                                  stackTrace) {
+                                                        return Image.asset(
+                                                          'assets/images/default_image.png',
+                                                          fit: BoxFit.cover,
+                                                          height: 90,
+                                                        );
+                                                      },
+                                                    ),
+                                            ),
+                                          ),
+                                          SizedBox(height: 8),
+                                          ListTile(
+                                            title: Text(
+                                              e.nom,
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black87,
+                                              ),
+                                              // maxLines: 1,
+                                              // overflow: TextOverflow.ellipsis,
+                                            ),
+                                            subtitle: Text(
+                                              e.localisation,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black87,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
                               );
-                            },
-                          );
-                      } else{
-                         return const Padding(
+                      } else {
+                        return const Padding(
                           padding: EdgeInsets.all(10),
                           child: Center(child: Text("Aucun matériel trouvé")),
                         );

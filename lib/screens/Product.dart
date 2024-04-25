@@ -85,7 +85,8 @@ class _ProductScreenState extends State<ProductScreen> {
     verify();
     _searchController = TextEditingController();
     _catList = http.get(
-        Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
+        Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
+        // Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
     super.initState();
     stockListeFuture = getAllStock();
   }

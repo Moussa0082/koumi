@@ -369,7 +369,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                                             fit: BoxFit.cover,
                                                           )
                                                         : Image.network(
-                                                            "http://10.0.2.2/${e.photo}",
+                                                            "https://koumi.ml/api-koumi/Magasin/${e.idMagasin}/image",
                                                             fit: BoxFit.cover,
                                                             errorBuilder:
                                                                 (BuildContext

@@ -144,18 +144,19 @@ class _UpdateZoneState extends State<UpdateZone> {
                         width: 150,
                         height: 150,
                       )
-                    : zoneProd.photoZone == null || zoneProd.photoZone!.isEmpty
-                        ? Image.asset(
-                            "assets/images/zoneProd.jpg",
-                            fit: BoxFit.fitWidth,
-                            height: 150,
-                            width: 300,
-                          )
+                    
                         : Image.network(
-                            "http://10.0.2.2/${zoneProd.photoZone!}",
-                            fit: BoxFit.fitWidth,
-                            height: 150,
-                            width: 300,
+                           "https://koumi.ml/api-koumi/ZoneProduction/${zoneProd.idZoneProduction}/image",
+                           fit: BoxFit.fitWidth,
+                        height: 150,
+                        width: double.infinity,
+                        errorBuilder: (BuildContext context, Object exception,
+                            StackTrace? stackTrace) {
+                          return Image.asset(
+                            'assets/images/default_image.png',
+                            fit: BoxFit.cover,
+                          );
+                        },
                           )),
           ),
           const SizedBox(height: 10),

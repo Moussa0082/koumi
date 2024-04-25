@@ -105,8 +105,10 @@ class _IntrantScreenState extends State<IntrantScreen> {
           actions: !isExist
               ? null
               : (type.toLowerCase() == 'admin' ||
-                      type.toLowerCase() == 'fournisseur' ||
-                      type.toLowerCase() == 'fournisseurs')
+                          type.toLowerCase() == 'fournisseur' ||
+                          type.toLowerCase() == 'fournisseurs') ||
+                      type.toLowerCase() == 'commerçant' ||
+                      type.toLowerCase() == 'commercant'
                   ? [
                       PopupMenuButton<String>(
                         padding: EdgeInsets.zero,
@@ -301,7 +303,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                     //   return libelle.contains(searchText);
                     // }).toList();
                     return intrantListe
-                            .where((element) => element.statutIntrant == false)
+                            .where((element) => element.statutIntrant == true)
                             .isEmpty
                         ? Padding(
                             padding: EdgeInsets.all(10),

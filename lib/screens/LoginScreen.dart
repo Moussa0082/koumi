@@ -24,8 +24,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-   late ConnectionVerify connectionVerify;
-  
+  late ConnectionVerify connectionVerify;
+
   String password = "";
   String email = "";
   bool _obscureText = true;
@@ -690,7 +690,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 "Pas de compte ?.",
                                 style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 18,
+                                    fontSize: 19,
                                     fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(
@@ -708,7 +708,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   "S'inscrire",
                                   style: TextStyle(
                                       color: Colors.blue,
-                                      fontSize: 18,
+                                      fontSize: 21,
                                       fontWeight: FontWeight.bold),
                                 ),
                               ),

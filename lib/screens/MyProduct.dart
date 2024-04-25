@@ -93,8 +93,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
 
     _searchController = TextEditingController();
     _catList =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
+        http.get(Uri.parse('http://koumi.ml/api-koumi/Categorie/allCategorie'));
     super.initState();
   }
 

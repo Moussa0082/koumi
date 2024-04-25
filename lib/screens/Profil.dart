@@ -8,8 +8,6 @@ import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
-import 'package:koumi_app/screens/PinLoginScreen.dart';
-import 'package:koumi_app/screens/RegisterScreen.dart';
 import 'package:koumi_app/screens/Surface.dart';
 import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
@@ -116,7 +114,7 @@ class _ProfilState extends State<Profil> {
                                     listen: false)
                                 .changeIndex(0);
                           });
-                          Get.to(RegisterScreen(),
+                          Get.to(LoginScreen(),
                               duration: Duration(
                                   seconds:
                                       1), //duration of transitions, default 1 sec
@@ -144,7 +142,7 @@ class _ProfilState extends State<Profil> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 10),
                           child: Text(
-                            "S'inscire",
+                            "Se connecter",
                             style: TextStyle(fontSize: 16, color: d_colorGreen),
                           ),
                         ),
@@ -170,7 +168,7 @@ class _ProfilState extends State<Profil> {
                               }
 
                               List<TypeActeur> typeActeurData = ac.typeActeur!;
-                               type = typeActeurData
+                              type = typeActeurData
                                   .map((data) => data.libelle)
                                   .join(', ');
                               return Column(
@@ -190,7 +188,7 @@ class _ProfilState extends State<Profil> {
                                               cornerRadius: 50,
                                               color: Colors.black,
                                               image: NetworkImage(
-                                                  "http:10.0.2.2/${ac.logoActeur}"),
+                                                  "https://koumi.ml/api-koumi/acteur/${ac.idActeur}/image"),
                                             ),
                                       title: Text(
                                         ac.nomActeur!.toUpperCase(),
@@ -315,7 +313,9 @@ class _ProfilState extends State<Profil> {
                         ),
                       ),
                     ),
-                    type.toLowerCase() == 'producteur'
+                    type.toLowerCase() == 'producteur' ||
+                            type.toLowerCase() == 'commerçant' ||
+                            type.toLowerCase() == 'commercant'
                         ? Padding(
                             padding: const EdgeInsets.symmetric(
                                 vertical: 15, horizontal: 10),
@@ -430,7 +430,9 @@ class _ProfilState extends State<Profil> {
                             ),
                           )
                         : Container(),
-                    type.toLowerCase() == 'producteur'
+                    type.toLowerCase() == 'producteur' ||
+                            type.toLowerCase() == 'commerçant' ||
+                            type.toLowerCase() == 'commercant'
                         ? Padding(
                             padding: const EdgeInsets.symmetric(
                                 vertical: 15, horizontal: 10),
@@ -559,7 +561,7 @@ class _ProfilState extends State<Profil> {
 
                             // Déconnexion avec le provider
                             await acteurProvider.logout();
-                     
+
                             //                   Navigator.pushReplacement(
                             // context,
                             // MaterialPageRoute(builder: (context) => LoginScreen()),
