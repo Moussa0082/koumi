@@ -374,7 +374,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                                         fit: BoxFit.cover,
                                                       )
                                                     : Image.network(
-                                                        "http://10.0.2.2/${e.photo}",
+                                                        "https://koumi.ml/api-koumi/Magasin/${e.idMagasin}/image",
                                                         fit: BoxFit.cover,
                                                         errorBuilder:
                                                             (BuildContext
@@ -539,18 +539,18 @@ class _StoreScreenState extends State<StoreScreen> {
                                                      ));
                                     },
                                     child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(15),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.3),
-                                            offset: const Offset(0, 2),
-                                            blurRadius: 8,
-                                            spreadRadius: 2,
-                                          ),
-                                        ],
+                                       decoration: BoxDecoration(
+                                    color: Color.fromARGB(250, 250, 250, 250),
+                                    borderRadius: BorderRadius.circular(15),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.3),
+                                        offset: Offset(0, 2),
+                                        blurRadius: 8,
+                                        spreadRadius: 2,
                                       ),
+                                    ],
+                                  ),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.stretch,

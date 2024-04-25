@@ -392,11 +392,11 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                                 height: 90,
                                                 child: e.photo == null
                                                     ? Image.asset(
-                                                        "assets/images/mang.jpg",
+                                                        "assets/images/default_image.png",
                                                         fit: BoxFit.cover,
                                                       )
                                                     : Image.network(
-                                                        "https://koumi.ml/api-koumi/Stock${e.idStock}/image",
+                                                        "https://koumi.ml/api-koumi/Stock/${e.idStock}/image",
                                                         fit: BoxFit.cover,
                                                         errorBuilder:
                                                             (BuildContext
@@ -406,7 +406,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                                                 StackTrace?
                                                                     stackTrace) {
                                                           return Image.asset(
-                                                            'assets/images/mang.jpg',
+                                                            'assets/images/default_image.png',
                                                             fit: BoxFit.cover,
                                                           );
                                                         },
