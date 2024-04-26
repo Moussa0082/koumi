@@ -3,14 +3,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
@@ -127,7 +125,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
     prixParDestinations = {};
     _niveau3List =
         http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
   }
 
   Future<File> saveImagePermanently(String imagePath) async {
@@ -321,7 +319,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                                 items: [],
                                                 onChanged: null,
                                                 decoration: InputDecoration(
-                                                  labelText: 'Destination',
+                                                  labelText: 'Chargement...',
                                                   contentPadding:
                                                       const EdgeInsets
                                                           .symmetric(
@@ -337,11 +335,33 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                               );
                                             }
                                             if (snapshot.hasError) {
-                                              return Text("${snapshot.error}");
+                                              return DropdownButtonFormField(
+                                                items: [],
+                                                onChanged: null,
+                                                decoration: InputDecoration(
+                                                  labelText: 'Chargement...',
+                                                  contentPadding:
+                                                      const EdgeInsets
+                                                          .symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 20,
+                                                  ),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
+                                                ),
+                                              );
                                             }
                                             if (snapshot.hasData) {
-                                              dynamic responseData = json
-                                                  .decode(snapshot.data.body);
+                                              // dynamic responseData = json
+                                              //     .decode(snapshot.data.body);
+                                              dynamic jsonString = utf8.decode(
+                                                  snapshot.data.bodyBytes);
+                                              dynamic responseData =
+                                                  json.decode(jsonString);
+
                                               if (responseData is List) {
                                                 final reponse = responseData;
                                                 final niveau3List = reponse
@@ -581,8 +601,12 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                               ),
                                             )
                                           })
-                                      .catchError((onError) =>
-                                          {print(onError.toString())});
+                                      .catchError((onError) => {
+                                            print(onError.toString()),
+                                            setState(() {
+                                              _isLoading = false;
+                                            }),
+                                          });
                                 } else {
                                   await VehiculeService()
                                       .addVehicule(
@@ -608,11 +632,11 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                               // typeVoiture == null;
                                             }),
                                             Navigator.pop(context),
-                                              // Navigator.pushReplacement(
-                                              //   context,
-                                              //   MaterialPageRoute(
-                                              //       builder: (context) =>
-                                              //           VehiculeActeur())), 
+                                            // Navigator.pushReplacement(
+                                            //   context,
+                                            //   MaterialPageRoute(
+                                            //       builder: (context) =>
+                                            //           VehiculeActeur())),
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
@@ -630,10 +654,17 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                               ),
                                             )
                                           })
-                                      .catchError((onError) =>
-                                          {print(onError.toString())});
+                                      .catchError((onError) => {
+                                            print(onError.toString()),
+                                            setState(() {
+                                              _isLoading = false;
+                                            }),
+                                          });
                                 }
                               } catch (e) {
+                                setState(() {
+                                  _isLoading = false;
+                                });
                                 final String errorMessage = e.toString();
                                 print(errorMessage);
                                 ScaffoldMessenger.of(context).showSnackBar(

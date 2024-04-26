@@ -12,18 +12,13 @@ import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart';
-import 'package:koumi_app/screens/MagasinActeur.dart';
-import 'package:koumi_app/screens/MagasinScreen.dart';
-import 'package:koumi_app/screens/Meteo.dart';
-import 'package:koumi_app/screens/MagasinActeur.dart';
 import 'package:koumi_app/screens/Panier.dart';
 import 'package:koumi_app/screens/Product.dart';
-import 'package:koumi_app/screens/Produit.dart';
-import 'package:koumi_app/screens/MyStores.dart';
 import 'package:koumi_app/screens/Store.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/Weather.dart';
 import 'package:koumi_app/service/ParametreGenerauxService.dart';
+import 'package:koumi_app/widgets/AlertAcceuil.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
 import 'package:provider/provider.dart';
@@ -66,7 +61,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
     // TODO: implement initState
     super.initState();
     //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  verify();
+    verify();
     //  Snack.info(message:'Connecté en tant que : ${acteur.nomActeur!.toUpperCase()}') ;
     //   });
   }
@@ -90,7 +85,11 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
         children: [
           SizedBox(height: 200, child: Carrousel()),
           const SizedBox(
-            height: 35,
+            height: 10,
+          ),
+          SizedBox(height: 100, child: AlertAcceuil()),
+          const SizedBox(
+            height: 10,
           ),
           SizedBox(
             child: GridView.count(
@@ -150,8 +149,9 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>      ProductScreen(),));
-                      // builder: (context) =>  ProduitScreen()));
+                    builder: (context) => ProductScreen(),
+                  ));
+              // builder: (context) =>  ProduitScreen()));
             } else if (index == 8) {
               Navigator.push(
                   context,
@@ -164,13 +164,13 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const Transport()));
             } else if (index == 5) {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const WeatherScreen()));
-            } else if (index == 4) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const StoreScreen()));
+                      builder: (context) => const WeatherScreen()));
+            } else if (index == 4) {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const StoreScreen()));
             } else if (index == 3) {
               Navigator.push(
                   context,
@@ -231,22 +231,18 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
     );
   }
 
-
- Widget buildPageView(){
+  Widget buildPageView() {
     return SizedBox(
       // height:MediaQuery.of(context).size.height,
-      height:MediaQuery.of(context).size.height * 0.90,
+      height: MediaQuery.of(context).size.height * 0.90,
       child: PageView(
         children: [
           const AcceuilAdmin(),
-            const ProduitA(),
-             Panier(),
-            const ProfilA()
+          const ProduitA(),
+          Panier(),
+          const ProfilA()
         ],
       ),
     );
   }
-
-
 }
-

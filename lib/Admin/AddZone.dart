@@ -13,7 +13,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 
-
 class AddZone extends StatefulWidget {
   const AddZone({super.key});
 
@@ -214,7 +213,8 @@ class _AddZoneState extends State<AddZone> {
             ),
           ),
           body: SingleChildScrollView(
-            child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.start, children: [
               Padding(
                   padding: const EdgeInsets.only(left: 10.0),
                   child: photo != null
@@ -329,13 +329,12 @@ class _AddZoneState extends State<AddZone> {
                             final String latitude = latitudeController.text;
                             final String longitude = longitudeController.text;
                             print("acteur : ${acteur.toString()}");
-      
+
                             try {
-                               setState(() {
-                        _isLoading = true;
-                      });
+                              setState(() {
+                                _isLoading = true;
+                              });
                               if (photo == null) {
-      
                                 await ZoneProductionService()
                                     .addZone(
                                         nomZoneProduction: nom,
@@ -347,42 +346,7 @@ class _AddZoneState extends State<AddZone> {
                                                   context,
                                                   listen: false)
                                               .applyChange(),
-                                               setState(() {
-                        _isLoading = false;
-                      }),
-                                          nomController.clear(),
-                                          latitudeController.clear(),
-                                          longitudeController.clear(),
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  Text("Ajouter avec succèss"),
-                                                ],
-                                              ),
-                                              // duration: const Duration(seconds: 5),
-                                            ),
-                                          ),
-                                          // Navigator.of(context).pop(),
-                                        })
-                                    .catchError((onError) {
-                                  print(onError.message);
-                                });
-                              } else {
-                                await ZoneProductionService()
-                                    .addZone(
-                                        nomZoneProduction: nom,
-                                        latitude: latitude,
-                                        longitude: longitude,
-                                        photoZone: photo,
-                                        acteur: acteur)
-                                    .then((value) => {
-                                          Provider.of<ZoneProductionService>(
-                                                  context,
-                                                  listen: false)
-                                              .applyChange(),
-                                                setState(() {
+                                          setState(() {
                                             _isLoading = false;
                                           }),
                                           nomController.clear(),
@@ -399,22 +363,65 @@ class _AddZoneState extends State<AddZone> {
                                               // duration: const Duration(seconds: 5),
                                             ),
                                           ),
-                                          // Navigator.of(context).pop(),
+                                          Navigator.of(context).pop(),
                                         })
                                     .catchError((onError) {
-                                  print(onError.toString());
+                                  print(onError.message);
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+                                });
+                              } else {
+                                await ZoneProductionService()
+                                    .addZone(
+                                        nomZoneProduction: nom,
+                                        latitude: latitude,
+                                        longitude: longitude,
+                                        photoZone: photo,
+                                        acteur: acteur)
+                                    .then((value) => {
+                                          Provider.of<ZoneProductionService>(
+                                                  context,
+                                                  listen: false)
+                                              .applyChange(),
+                                          setState(() {
+                                            _isLoading = false;
+                                          }),
+                                          nomController.clear(),
+                                          latitudeController.clear(),
+                                          longitudeController.clear(),
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Row(
+                                                children: [
+                                                  Text("Ajouter avec succèss"),
+                                                ],
+                                              ),
+                                              // duration: const Duration(seconds: 5),
+                                            ),
+                                          ),
+                                           Navigator.of(context).pop(),
+                                        })
+                                    .catchError((onError) {
+                                  print(
+                                    onError.toString(),
+                                  );
                                 });
                               }
                             } catch (e) {
+                              setState(() {
+                                _isLoading = false;
+                              });
                               print(e.toString());
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Row(
                                     children: [
-                                      Text("Cette zone est existe déjà"),
+                                      Text("Une erreur est survenu"),
                                     ],
                                   ),
-                                  duration: Duration(seconds: 3),
+                                  duration: Duration(seconds: 5),
                                 ),
                               );
                             }

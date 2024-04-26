@@ -650,7 +650,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 10, vertical: 5),
                                             child: Text(
-                                              e.nomProduit!,
+                                              e.nomProduit! ?? "Pas de non definis",
                                               style: TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,

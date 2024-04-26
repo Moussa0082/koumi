@@ -35,7 +35,7 @@ class _ActeurScreenState extends State<ActeurScreen> {
     try {
       await _acteurService.activerActeur(idActeur);
       _acteurService.applyChange();
-       Navigator.of(context).pop();
+      Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Activer avec succès"),
@@ -180,224 +180,246 @@ class _ActeurScreenState extends State<ActeurScreen> {
                           return libelle.contains(searchText);
                         }).toList();
 
-                        return Column(
-                            children: filtereSearch
+                        return filtereSearch
                                 .where((element) => !element.typeActeur!.any(
                                     (e) => e.libelle!
                                         .toLowerCase()
                                         .contains('admin')))
-                                .map((e) => Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 15),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    DetailsActeur(acteur: e)));
-                                      },
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
+                                .isEmpty
+                            ? Padding(
+                                padding: EdgeInsets.all(10),
+                                child:
+                                    Center(child: Text("Aucun acteur trouvé")),
+                              )
+                            : Column(
+                                children: filtereSearch
+                                    .where((element) => !element.typeActeur!
+                                        .any((e) => e.libelle!
+                                            .toLowerCase()
+                                            .contains('admin')))
+                                    .map((e) => Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 10, horizontal: 15),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        DetailsActeur(
+                                                            acteur: e)));
+                                          },
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
                                                 0.9,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color:
-                                                  Colors.grey.withOpacity(0.2),
-                                              offset: const Offset(0, 2),
-                                              blurRadius: 5,
-                                              spreadRadius: 2,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey
+                                                      .withOpacity(0.2),
+                                                  offset: const Offset(0, 2),
+                                                  blurRadius: 5,
+                                                  spreadRadius: 2,
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                        child: Column(
-                                          children: [
-                                            ListTile(
-                                                leading: e.logoActeur == null ||
-                                                        e.logoActeur!.isEmpty
-                                                    ? ProfilePhoto(
-                                                        totalWidth: 50,
-                                                        cornerRadius: 50,
-                                                        color: Colors.black,
-                                                        image: const AssetImage(
-                                                            'assets/images/profil.jpg'),
-                                                      )
-                                                    : ProfilePhoto(
-                                                        totalWidth: 50,
-                                                        cornerRadius: 50,
-                                                        color: Colors.black,
-                                                        image: NetworkImage(
-                                                            "http://10.0.2.2/${e.logoActeur!}"),
-                                                      ),
-                                                title: Text(
-                                                    e.nomActeur!.toUpperCase(),
-                                                    style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 20,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    )),
-                                                subtitle: Text(
-                                                    e.typeActeur!
-                                                        .map((data) =>
-                                                            data.libelle)
-                                                        .join(', '),
-                                                    style: const TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                    ))),
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 15),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text("Date d'adhésion :",
-                                                      style: TextStyle(
-                                                        color: Colors.black87,
-                                                        fontSize: 15,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontStyle:
-                                                            FontStyle.italic,
-                                                      )),
-                                                  Text(e.dateAjout! ?? "",
-                                                      style: TextStyle(
-                                                        color: Colors.black87,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.w800,
-                                                      ))
-                                                ],
-                                              ),
-                                            ),
-                                            Container(
-                                              alignment: Alignment.bottomRight,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
+                                            child: Column(
+                                              children: [
+                                                ListTile(
+                                                    leading: e.logoActeur ==
+                                                                null ||
+                                                            e.logoActeur!
+                                                                .isEmpty
+                                                        ? ProfilePhoto(
+                                                            totalWidth: 50,
+                                                            cornerRadius: 50,
+                                                            color: Colors.black,
+                                                            image: const AssetImage(
+                                                                'assets/images/profil.jpg'),
+                                                          )
+                                                        : ProfilePhoto(
+                                                            totalWidth: 50,
+                                                            cornerRadius: 50,
+                                                            color: Colors.black,
+                                                            image: NetworkImage(
+                                                                "https://koumi.ml/api-koumi/acteur/${e.idActeur}/image"),
+                                                          ),
+                                                    title: Text(
+                                                        e.nomActeur!
+                                                            .toUpperCase(),
+                                                        style: const TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 20,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        )),
+                                                    subtitle: Text(
+                                                        e.typeActeur!
+                                                            .map((data) =>
+                                                                data.libelle)
+                                                            .join(', '),
+                                                        style: const TextStyle(
+                                                          color: Colors.black87,
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          fontStyle:
+                                                              FontStyle.italic,
+                                                        ))),
+                                                Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 15),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text("Date d'adhésion :",
+                                                          style: TextStyle(
+                                                            color:
+                                                                Colors.black87,
+                                                            fontSize: 15,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontStyle: FontStyle
+                                                                .italic,
+                                                          )),
+                                                      Text(e.dateAjout! ?? "",
+                                                          style: TextStyle(
+                                                            color:
+                                                                Colors.black87,
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.w800,
+                                                          ))
+                                                    ],
+                                                  ),
+                                                ),
+                                                Container(
+                                                  alignment:
+                                                      Alignment.bottomRight,
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
                                                       horizontal: 10),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  _buildEtat(e.statutActeur!),
-                                                  PopupMenuButton<String>(
-                                                    padding: EdgeInsets.zero,
-                                                    itemBuilder: (context) =>
-                                                        <PopupMenuEntry<
-                                                            String>>[
-                                                      PopupMenuItem<String>(
-                                                        child: ListTile(
-                                                          leading: const Icon(
-                                                            Icons.check,
-                                                            color: Colors.green,
-                                                          ),
-                                                          title: const Text(
-                                                            "Activer",
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.green,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          onTap: () async {
-                                                            _activerActeur(
-                                                                e.idActeur!);
-                                                          },
-                                                        ),
-                                                      ),
-                                                      PopupMenuItem<String>(
-                                                        child: ListTile(
-                                                            leading: Icon(
-                                                              Icons
-                                                                  .disabled_visible,
-                                                              color: Colors
-                                                                  .orange[400],
-                                                            ),
-                                                            title: Text(
-                                                              "Désactiver",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                        .orange[
-                                                                    400],
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      _buildEtat(
+                                                          e.statutActeur!),
+                                                      PopupMenuButton<String>(
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                        itemBuilder:
+                                                            (context) =>
+                                                                <PopupMenuEntry<
+                                                                    String>>[
+                                                          PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                              leading: e.statutActeur ==
+                                                                      false
+                                                                  ? Icon(
+                                                                      Icons
+                                                                          .check,
+                                                                      color: Colors
+                                                                          .green,
+                                                                    )
+                                                                  : Icon(
+                                                                      Icons
+                                                                          .disabled_visible,
+                                                                      color: Colors
+                                                                              .orange[
+                                                                          400]),
+                                                              title: Text(
+                                                                e.statutActeur ==
+                                                                        false
+                                                                    ? "Activer"
+                                                                    : "Desactiver",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: e.statutActeur ==
+                                                                          false
+                                                                      ? Colors
+                                                                          .green
+                                                                      : Colors.orange[
+                                                                          400],
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
                                                               ),
-                                                            ),
-                                                            onTap: () {
-                                                              _desactiverActeur(
-                                                                  e.idActeur!);
-                                                            }),
-                                                      ),
-                                                      PopupMenuItem<String>(
-                                                        child: ListTile(
-                                                          leading: const Icon(
-                                                            Icons.delete,
-                                                            color: Colors.red,
-                                                          ),
-                                                          title: const Text(
-                                                            "Supprimer",
-                                                            style: TextStyle(
-                                                              color: Colors.red,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
+                                                              onTap: () async {
+                                                                e.statutActeur ==
+                                                                        false
+                                                                    ? _activerActeur(e
+                                                                        .idActeur!)
+                                                                    : _desactiverActeur(
+                                                                        e.idActeur!);
+                                                              },
                                                             ),
                                                           ),
-                                                          onTap: () async {
-                                                            await ActeurService()
-                                                                .deleteActeur(
-                                                                    e.idActeur!)
-                                                                .then(
-                                                                    (value) => {
-                                                                          Provider.of<ActeurService>(context, listen: false)
-                                                                              .applyChange(),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        })
-                                                                .catchError(
-                                                                    (onError) =>
-                                                                        {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Impossible de supprimer"),
-                                                                                ],
-                                                                              ),
-                                                                              duration: Duration(seconds: 2),
-                                                                            ),
-                                                                          )
-                                                                        });
-                                                          },
-                                                        ),
+                                                          PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                              leading:
+                                                                  const Icon(
+                                                                Icons.delete,
+                                                                color:
+                                                                    Colors.red,
+                                                              ),
+                                                              title: const Text(
+                                                                "Supprimer",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .red,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              onTap: () async {
+                                                                await ActeurService()
+                                                                    .deleteActeur(e
+                                                                        .idActeur!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<ActeurService>(context, listen: false).applyChange(),
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Impossible de supprimer"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 2),
+                                                                                ),
+                                                                              )
+                                                                            });
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ],
                                                   ),
-                                                ],
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    )))
-                                .toList());
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        )))
+                                    .toList());
                       }
                     });
               })

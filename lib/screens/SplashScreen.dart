@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -13,12 +14,14 @@ import 'package:koumi_app/widgets/BottomNavBarAdmin.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 
 import 'package:koumi_app/widgets/AnimatedBackground.dart';
+import 'package:koumi_app/widgets/connection_verify.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
-
+ 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
@@ -27,13 +30,16 @@ const d_colorPage = Color.fromRGBO(255, 255, 255, 1);
 
 class _SplashScreenState extends State<SplashScreen> {
   late Acteur acteur;
-
+  late ConnectionVerify connectionVerify;
+  
   @override
   void initState() {
     super.initState();
     // clearCart();
     // Vérifie d'abord si l'email de l'acteur est présent dans SharedPreferences
+      // connectionVerify = Get.put(ConnectionVerify(), permanent: true);
     checkEmailInSharedPreferences();
+    // checkInternetConnection();
   }
 
   void checkEmailInSharedPreferences() async {
@@ -41,10 +47,7 @@ class _SplashScreenState extends State<SplashScreen> {
     String? emailActeur = prefs.getString('emailActeur');
     if (emailActeur != null) {
       checkLoggedIn();
-      
-    } 
-    else {
-
+    } else {
       Timer(
         const Duration(seconds: 5),
         () => Navigator.of(context).pushReplacement(
@@ -54,49 +57,48 @@ class _SplashScreenState extends State<SplashScreen> {
       // Si l'email de l'acteur n'est pas présent, redirige directement vers l'écran de connexion
     }
   }
- Future<void> clearCart() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.remove('cart');
-  // Récupérer le codeActeur depuis SharedPreferences
-String? codeActeur = prefs.getString('codeActeur');
-String? emailActeur = prefs.getString('emailActeur');
 
- if (emailActeur == null || emailActeur.isEmpty) {
- 
+  Future<void> clearCart() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('cart');
+    // Récupérer le codeActeur depuis SharedPreferences
+    String? codeActeur = prefs.getString('codeActeur');
+    String? emailActeur = prefs.getString('emailActeur');
 
-  // Nettoyer toutes les données de SharedPreferences
-  // await prefs.clear();
-  debugPrint("Email shared : $emailActeur");
-}else{
-  debugPrint("Email shared isExist : $emailActeur");
-
-}
+    if (emailActeur == null || emailActeur.isEmpty) {
+      // Nettoyer toutes les données de SharedPreferences
+      // await prefs.clear();
+      debugPrint("Email shared : $emailActeur");
+    } else {
+      debugPrint("Email shared isExist : $emailActeur");
+    }
 
 // Vérifier si le codeActeur est présent dans SharedPreferences
-if (codeActeur == null || codeActeur.isEmpty) {
-  // Gérer le cas où le codeActeur est manquant
-  // Sauvegarder le codeActeur avant de nettoyer les SharedPreferences
-  String savedCodeActeur = "VF212";
-  // String savedCodeActeur = codeActeur;
+    if (codeActeur == null || codeActeur.isEmpty) {
+      // Gérer le cas où le codeActeur est manquant
+      // Sauvegarder le codeActeur avant de nettoyer les SharedPreferences
+      String savedCodeActeur = "VF212";
+      // String savedCodeActeur = codeActeur;
 
-  // Nettoyer toutes les données de SharedPreferences
-  await prefs.clear();
+      // Nettoyer toutes les données de SharedPreferences
+      await prefs.clear();
 
-  // Réenregistrer le codeActeur dans SharedPreferences
-  prefs.setString('codeActeur', savedCodeActeur);
-} else {
-  // Sauvegarder le codeActeur avant de nettoyer les SharedPreferences
-  String savedCodeActeur = "VF212";
-  
+      // Réenregistrer le codeActeur dans SharedPreferences
+      prefs.setString('codeActeur', savedCodeActeur);
+    } else {
+      // Sauvegarder le codeActeur avant de nettoyer les SharedPreferences
+      String savedCodeActeur = "VF212";
 
-  // // Nettoyer toutes les données de SharedPreferences
-  await prefs.clear();
+      // // Nettoyer toutes les données de SharedPreferences
+      await prefs.clear();
 
-  // // Réenregistrer le codeActeur dans SharedPreferences
-  prefs.setString('codeActeur', savedCodeActeur);
-}
+      // // Réenregistrer le codeActeur dans SharedPreferences
+      prefs.setString('codeActeur', savedCodeActeur);
+    }
+  }
 
-}
+
+
 
   void checkLoggedIn() async {
     // Initialise les données de l'utilisateur à partir de SharedPreferences
@@ -117,7 +119,7 @@ if (codeActeur == null || codeActeur.isEmpty) {
         ),
       );
     }
-    
+
     // Vérifie si l'utilisateur est déjà connecté
     if (acteur != null) {
       // Vérifie si l'utilisateur est un administrateur
@@ -173,9 +175,3 @@ if (codeActeur == null || codeActeur.isEmpty) {
     );
   }
 }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   // TODO: implement build
-  //   throw UnimplementedError();
-  // }

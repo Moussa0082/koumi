@@ -536,9 +536,9 @@ class _AddConseilState extends State<AddConseil> {
                                         audioConseil: audiosUploaded,
                                         acteur: acteur)
                                     .then((value) => {
-                                       FirebaseApi()
-                                              .sendPushNotificationToTopic(
-                                                  'Nouveau conseil', titre),
+                                          // FirebaseApi()
+                                          //     .sendPushNotificationToTopic(
+                                          //         'Nouveau conseil', titre),
                                           _titreController.clear(),
                                           _descriptionController.clear(),
                                           _tokenTextController.clear(),
@@ -557,6 +557,9 @@ class _AddConseilState extends State<AddConseil> {
                                         })
                                     .catchError((onError) => {
                                           print("Error: " + onError.toString()),
+                                          setState(() {
+                                            _isLoading = false;
+                                          }),
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
                                             const SnackBar(
@@ -581,7 +584,7 @@ class _AddConseilState extends State<AddConseil> {
                                         descriptionConseil: description,
                                         acteur: acteur)
                                     .then((value) => {
-                                       FirebaseApi()
+                                          FirebaseApi()
                                               .sendPushNotificationToTopic(
                                                   'Nouveau conseil', titre),
                                           _titreController.clear(),
@@ -593,14 +596,45 @@ class _AddConseilState extends State<AddConseil> {
                                           Provider.of<ConseilService>(context,
                                                   listen: false)
                                               .applyChange(),
+                                          //                 !acteur.typeActeur!.contains('admin') ?
+                                          //                  ScaffoldMessenger.of(context).showSnackBar(
+                                          //    SnackBar(
+                                          //     content: Row(
+                                          //       children: [
+                                          //         Text(
+                                          //           "Conseil sera activé par administrateur",
+                                          //           style: TextStyle(
+                                          //               overflow: TextOverflow.ellipsis),
+                                          //         ),
+                                          //       ],
+                                          //     ),
+                                          //     duration: Duration(seconds: 5),
+                                          //   ),
+                                          // ):  ScaffoldMessenger.of(context).showSnackBar(
+                                          //    SnackBar(
+                                          //     content: Row(
+                                          //       children: [
+                                          //         Text(
+                                          //           "Ajouter avec succéss",
+                                          //           style: TextStyle(
+                                          //               overflow: TextOverflow.ellipsis),
+                                          //         ),
+                                          //       ],
+                                          //     ),)),
                                           Navigator.of(context).pop()
                                         })
                                     .catchError((onError) => {
-                                          print("Error: " + onError.toString())
+                                          print("Error: " + onError.toString()),
+                                          setState(() {
+                                            _isLoading = false;
+                                          }),
                                         });
                               }
                             } catch (e) {
                               print("Error: " + e.toString());
+                              setState(() {
+                                _isLoading = false;
+                              });
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Row(

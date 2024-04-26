@@ -1,32 +1,31 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:koumi_app/Admin/AddAlerte.dart';
+import 'package:koumi_app/Admin/DetailAlerte.dart';
 import 'package:koumi_app/models/Acteur.dart';
-import 'package:koumi_app/models/Conseil.dart';
+import 'package:koumi_app/models/Alertes.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/AddConseil.dart';
-import 'package:koumi_app/screens/DetailConseil.dart';
-import 'package:koumi_app/service/ConseilService.dart';
+import 'package:koumi_app/service/AlerteService.dart';
 import 'package:provider/provider.dart';
 
-class ConseilDisable extends StatefulWidget {
-  const ConseilDisable({super.key});
+class AlerteDisable extends StatefulWidget {
+  const AlerteDisable({super.key});
 
   @override
-  State<ConseilDisable> createState() => _ConseilDisableState();
+  State<AlerteDisable> createState() => _AlerteDisableState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _ConseilDisableState extends State<ConseilDisable> {
+class _AlerteDisableState extends State<AlerteDisable> {
   late TextEditingController _searchController;
-  List<Conseil> conseilList = [];
+  List<Alertes> alerteList = [];
+
   late Future _liste;
 
-  Future<List<Conseil>> getListe() async {
-    final response = ConseilService().fetchConseil();
+  Future<List<Alertes>> getListe() async {
+    final response = AlertesService().fetchAlertes();
     return response;
   }
 
@@ -57,7 +56,7 @@ class _ConseilDisableState extends State<ConseilDisable> {
             },
             icon: const Icon(Icons.arrow_back_ios)),
         title: const Text(
-          "Conseil désactiver",
+          "Alerte Désactiver",
           style: TextStyle(
             color: d_colorGreen,
             fontSize: 22,
@@ -104,7 +103,7 @@ class _ConseilDisableState extends State<ConseilDisable> {
               ),
             ),
             const SizedBox(height: 10),
-            Consumer<ConseilService>(builder: (context, conseilService, child) {
+            Consumer<AlertesService>(builder: (context, alerteService, child) {
               return FutureBuilder(
                   future: _liste,
                   builder: (context, snapshot) {
@@ -122,23 +121,24 @@ class _ConseilDisableState extends State<ConseilDisable> {
                         child: Center(child: Text("Aucun conseil trouvé")),
                       );
                     } else {
-                      conseilList = snapshot.data!;
+                      alerteList = snapshot.data!;
                       String searchText = "";
-                      List<Conseil> filtereSearch = conseilList.where((search) {
-                        String libelle = search.titreConseil.toLowerCase();
+                      List<Alertes> filtereSearch = alerteList.where((search) {
+                        String libelle = search.titreAlerte!.toLowerCase();
                         searchText = _searchController.text.toLowerCase();
                         return libelle.contains(searchText);
                       }).toList();
-                      return filtereSearch.isEmpty
+                      return filtereSearch
+                              .where((element) => element.statutAlerte == false)
+                              .isEmpty
                           ? Padding(
                               padding: EdgeInsets.all(10),
-                              child:
-                                  Center(child: Text("Aucun conseil trouvé")),
+                              child: Center(child: Text("Aucun alerte trouvé")),
                             )
                           : Column(
                               children: filtereSearch
                                   .where((element) =>
-                                      element.statutConseil == false)
+                                      element.statutAlerte == false)
                                   .map((e) => Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 10, horizontal: 15),
@@ -148,8 +148,8 @@ class _ConseilDisableState extends State<ConseilDisable> {
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        DetailConseil(
-                                                            conseil: e)));
+                                                        DetailAlerte(
+                                                            alertes: e)));
                                           },
                                           child: Container(
                                             width: MediaQuery.of(context)
@@ -173,12 +173,12 @@ class _ConseilDisableState extends State<ConseilDisable> {
                                             child: Column(children: [
                                               ListTile(
                                                   leading: Image.asset(
-                                                    "assets/images/conseille.png",
+                                                    "assets/images/alt.png",
                                                     width: 80,
                                                     height: 80,
                                                   ),
                                                   title: Text(
-                                                      e.titreConseil
+                                                      e.titreAlerte!
                                                           .toUpperCase(),
                                                       style: const TextStyle(
                                                         color: Colors.black,
@@ -208,7 +208,7 @@ class _ConseilDisableState extends State<ConseilDisable> {
                                                       MainAxisAlignment
                                                           .spaceBetween,
                                                   children: [
-                                                    _buildEtat(e.statutConseil),
+                                                    _buildEtat(e.statutAlerte!),
                                                     PopupMenuButton<String>(
                                                       padding: EdgeInsets.zero,
                                                       itemBuilder: (context) =>
@@ -216,28 +216,26 @@ class _ConseilDisableState extends State<ConseilDisable> {
                                                               String>>[
                                                         PopupMenuItem<String>(
                                                           child: ListTile(
-                                                            leading:
-                                                                e.statutConseil ==
-                                                                        false
-                                                                    ? Icon(
-                                                                        Icons
-                                                                            .check,
-                                                                        color: Colors
-                                                                            .green,
-                                                                      )
-                                                                    : Icon(
-                                                                        Icons
-                                                                            .disabled_visible,
-                                                                        color: Colors
-                                                                            .orange[400],
-                                                                      ),
+                                                            leading: e.statutAlerte ==
+                                                                    false
+                                                                ? Icon(
+                                                                    Icons.check,
+                                                                    color: Colors
+                                                                        .green,
+                                                                  )
+                                                                : Icon(
+                                                                    Icons
+                                                                        .disabled_visible,
+                                                                    color: Colors
+                                                                            .orange[
+                                                                        400]),
                                                             title: Text(
-                                                              e.statutConseil ==
+                                                              e.statutAlerte ==
                                                                       false
                                                                   ? "Activer"
                                                                   : "Desactiver",
                                                               style: TextStyle(
-                                                                color: e.statutConseil ==
+                                                                color: e.statutAlerte ==
                                                                         false
                                                                     ? Colors
                                                                         .green
@@ -249,19 +247,19 @@ class _ConseilDisableState extends State<ConseilDisable> {
                                                               ),
                                                             ),
                                                             onTap: () async {
-                                                              e.statutConseil ==
+                                                              e.statutAlerte ==
                                                                       false
-                                                                  ? await ConseilService()
-                                                                      .activerConseil(e
-                                                                          .idConseil!)
+                                                                  ? await AlertesService()
+                                                                      .activerAlertes(e
+                                                                          .idAlerte!)
                                                                       .then(
                                                                           (value) =>
                                                                               {
-                                                                                Provider.of<ConseilService>(context, listen: false).applyChange(),
-                                                                                Navigator.of(context).pop(),
+                                                                                Provider.of<AlertesService>(context, listen: false).applyChange(),
                                                                                 setState(() {
-                                                                                  _liste = getListe();
+                                                                                   _liste = getListe();
                                                                                 }),
+                                                                                Navigator.of(context).pop(),
                                                                                 ScaffoldMessenger.of(context).showSnackBar(
                                                                                   const SnackBar(
                                                                                     content: Row(
@@ -288,17 +286,33 @@ class _ConseilDisableState extends State<ConseilDisable> {
                                                                                 ),
                                                                                 Navigator.of(context).pop(),
                                                                               })
-                                                                  : await ConseilService()
-                                                                      .desactiverConseil(e
-                                                                          .idConseil!)
+                                                                  : await AlertesService()
+                                                                      .desactiverAlertes(e
+                                                                          .idAlerte!)
                                                                       .then(
                                                                           (value) =>
                                                                               {
-                                                                                Provider.of<ConseilService>(context, listen: false).applyChange(),
-                                                                                Navigator.of(context).pop(),
-                                                                                setState(() {
-                                                                                  _liste = getListe();
+                                                                                Provider.of<AlertesService>(context, listen: false).applyChange(),
+                                                                                 setState(() {
+                                                                                   _liste = getListe();
                                                                                 }),
+                                                                                Navigator.of(context).pop(),
+                                                                                ScaffoldMessenger
+                                                                      .of(context)
+                                                                  .showSnackBar(
+                                                                const SnackBar(
+                                                                  content: Row(
+                                                                    children: [
+                                                                      Text(
+                                                                          "Désactiver avec succèss "),
+                                                                    ],
+                                                                  ),
+                                                                  duration:
+                                                                      Duration(
+                                                                          seconds:
+                                                                              2),
+                                                                ),
+                                                              )
                                                                               })
                                                                       .catchError(
                                                                           (onError) =>
@@ -316,22 +330,7 @@ class _ConseilDisableState extends State<ConseilDisable> {
                                                                                 Navigator.of(context).pop(),
                                                                               });
 
-                                                              ScaffoldMessenger
-                                                                      .of(context)
-                                                                  .showSnackBar(
-                                                                const SnackBar(
-                                                                  content: Row(
-                                                                    children: [
-                                                                      Text(
-                                                                          "Désactiver avec succèss "),
-                                                                    ],
-                                                                  ),
-                                                                  duration:
-                                                                      Duration(
-                                                                          seconds:
-                                                                              2),
-                                                                ),
-                                                              );
+                                                              
                                                             },
                                                           ),
                                                         ),
@@ -352,17 +351,17 @@ class _ConseilDisableState extends State<ConseilDisable> {
                                                               ),
                                                             ),
                                                             onTap: () async {
-                                                              await ConseilService()
-                                                                  .deleteConseil(e
-                                                                      .idConseil!)
+                                                              await AlertesService()
+                                                                  .deleteAlertes(e
+                                                                      .idAlerte!)
                                                                   .then(
                                                                       (value) =>
                                                                           {
-                                                                            Provider.of<ConseilService>(context, listen: false).applyChange(),
-                                                                            Navigator.of(context).pop(),
-                                                                            setState(() {
+                                                                            Provider.of<AlertesService>(context, listen: false).applyChange(),
+                                                                             setState(() {
                                                                               _liste = getListe();
                                                                             }),
+                                                                            Navigator.of(context).pop(),
                                                                           })
                                                                   .catchError(
                                                                       (onError) =>

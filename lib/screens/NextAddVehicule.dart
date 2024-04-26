@@ -74,7 +74,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
   //     prixControllers.add(newPrixController);
   //   });
   // }
-  
+
 // Méthode pour ajouter une nouvelle destination et prix
   // void addDestinationAndPrix() {
   //   // Créer un nouveau contrôleur pour chaque champ
@@ -126,7 +126,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
     prixParDestinations = {};
     _niveau3List =
         http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
   }
 
   Future<File> saveImagePermanently(String imagePath) async {
@@ -152,7 +152,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
 
     return File(image.path);
   }
-  
+
   Future<void> _showImageSourceDialog() async {
     final BuildContext context = this.context;
     return showDialog<void>(
@@ -519,8 +519,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                               for (int i = 0;
                                   i < selectedDestinationsList.length;
                                   i++) {
-                                String destination =
-                                    selectedDestinations[i];
+                                String destination = selectedDestinations[i];
                                 int prix =
                                     int.tryParse(prixControllers[i].text) ?? 0;
 
@@ -567,7 +566,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                                 content: Row(
                                                   children: [
                                                     Text(
-                                                        "vehicule ajouté avec succèss",
+                                                      "vehicule ajouté avec succèss",
                                                       style: TextStyle(
                                                           overflow: TextOverflow
                                                               .ellipsis),
@@ -578,8 +577,12 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                               ),
                                             )
                                           })
-                                      .catchError((onError) =>
-                                          {print(onError.toString())});
+                                      .catchError((onError) => {
+                                            setState(() {
+                                              _isLoading = false;
+                                            }),
+                                            print(onError.toString())
+                                          });
                                 } else {
                                   await VehiculeService()
                                       .addVehicule(
@@ -607,14 +610,14 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                               _isLoading = false;
                                               // typeVoiture == null;
                                             }),
-                                           Navigator.pop(context),
+                                            Navigator.pop(context),
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
                                                 content: Row(
                                                   children: [
                                                     Text(
-                                                        "vehicule ajouté avec succèss",
+                                                      "vehicule ajouté avec succèss",
                                                       style: TextStyle(
                                                           overflow: TextOverflow
                                                               .ellipsis),
@@ -625,17 +628,25 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                               ),
                                             )
                                           })
-                                      .catchError((onError) =>
-                                          {print(onError.toString())});
+                                      .catchError((onError) => {
+                                            print(onError.toString()),
+                                            setState(() {
+                                              _isLoading = false;
+                                            }),
+                                          });
                                 }
                               } catch (e) {
+                                setState(() {
+                                  _isLoading = false;
+                                });
                                 final String errorMessage = e.toString();
                                 print(errorMessage);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Row(
                                       children: [
-                                        Text("Une erreur s'est produit",
+                                        Text(
+                                          "Une erreur s'est produit",
                                           style: TextStyle(
                                               overflow: TextOverflow.ellipsis),
                                         ),

@@ -105,8 +105,10 @@ class _IntrantScreenState extends State<IntrantScreen> {
           actions: !isExist
               ? null
               : (type.toLowerCase() == 'admin' ||
-                      type.toLowerCase() == 'fournisseur' ||
-                      type.toLowerCase() == 'fournisseurs')
+                          type.toLowerCase() == 'fournisseur' ||
+                          type.toLowerCase() == 'fournisseurs') ||
+                      type.toLowerCase() == 'commerçant' ||
+                      type.toLowerCase() == 'commercant'
                   ? [
                       PopupMenuButton<String>(
                         padding: EdgeInsets.zero,
@@ -300,7 +302,9 @@ class _IntrantScreenState extends State<IntrantScreen> {
                     //   searchText = _searchController.text.toLowerCase();
                     //   return libelle.contains(searchText);
                     // }).toList();
-                    return intrantListe.isEmpty
+                    return intrantListe
+                            .where((element) => element.statutIntrant == true)
+                            .isEmpty
                         ? Padding(
                             padding: EdgeInsets.all(10),
                             child: Center(child: Text("Aucun donné trouvé")),
@@ -392,7 +396,9 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                             // overflow: TextOverflow.ellipsis,
                                           ),
                                           subtitle: Text(
-                                            "${e.prixIntrant.toString()} ${para.monnaie}",
+                                            para.monnaie != null
+                                                ? "${e.prixIntrant.toString()} ${para.monnaie}"
+                                                : "${e.prixIntrant.toString()} FCFA",
                                             style: TextStyle(
                                               fontSize: 16,
                                               color: Colors.black87,

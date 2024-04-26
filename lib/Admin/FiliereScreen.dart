@@ -49,8 +49,8 @@ class _FiliereScreenState extends State<FiliereScreen> {
     //     .parametreList!;
     // para = paraList[0];
     _filiereList = http
-        // .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
-    .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+        .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+    // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
     _liste = getFil();
   }
 
@@ -201,7 +201,8 @@ class _FiliereScreenState extends State<FiliereScreen> {
                           searchText = _searchController.text.toLowerCase();
                           return nomfiliere.contains(searchText);
                         }).toList();
-                        return filteredFiliereSearch.isEmpty
+                        return filteredFiliereSearch .where((element) => element.statutFiliere == false)
+                              .isEmpty
                             ? Padding(
                                 padding: EdgeInsets.all(10),
                                 child: Text('Aucune filière trouvé ',
@@ -297,19 +298,33 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                             PopupMenuItem<
                                                                 String>(
                                                               child: ListTile(
-                                                                leading:
-                                                                    const Icon(
+                                                                leading:e.statutFiliere ==
+                                                                  false
+                                                              ? Icon(
                                                                   Icons.check,
                                                                   color: Colors
                                                                       .green,
-                                                                ),
+                                                                )
+                                                              : Icon(
+                                                                  Icons
+                                                                      .disabled_visible,
+                                                                  color: Colors
+                                                                          .orange[
+                                                                      400]),
                                                                 title:
-                                                                    const Text(
-                                                                  "Activer",
+                                                                     Text(
+                                                                  e.statutFiliere ==
+                                                                          false
+                                                                      ? "Activer"
+                                                                      : "Desactiver",
                                                                   style:
                                                                       TextStyle(
-                                                                    color: Colors
-                                                                        .green,
+                                                                    color: e.statutFiliere ==
+                                                                            false
+                                                                        ? Colors
+                                                                            .green
+                                                                        : Colors
+                                                                            .orange[400],
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .bold,
@@ -317,6 +332,9 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                                 ),
                                                                 onTap:
                                                                     () async {
+                                                                      e.statutFiliere ==
+                                                                  false
+                                                              ?
                                                                   await FiliereService()
                                                                       .activerFiliere(e
                                                                           .idFiliere!)
@@ -350,45 +368,15 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                                                   ),
                                                                                 ),
                                                                                 Navigator.of(context).pop(),
-                                                                              });
-                                                                },
-                                                              ),
-                                                            ),
-                                                            PopupMenuItem<
-                                                                String>(
-                                                              child: ListTile(
-                                                                leading: Icon(
-                                                                  Icons
-                                                                      .disabled_visible,
-                                                                  color: Colors
-                                                                          .orange[
-                                                                      400],
-                                                                ),
-                                                                title: Text(
-                                                                  "Désactiver",
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                            .orange[
-                                                                        400],
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                ),
-                                                                onTap:
-                                                                    () async {
-                                                                  await FiliereService()
-                                                                      .desactiverFiliere(e
-                                                                          .idFiliere!)
-                                                                      .then(
-                                                                          (value) =>
+                                                                              }) : await FiliereService()
+                                                                          .desactiverFiliere(e
+                                                                              .idFiliere!)
+                                                                          .then((value) =>
                                                                               {
                                                                                 Provider.of<FiliereService>(context, listen: false).applyChange(),
                                                                                 Navigator.of(context).pop(),
                                                                               })
-                                                                      .catchError(
-                                                                          (onError) =>
+                                                                          .catchError((onError) =>
                                                                               {
                                                                                 ScaffoldMessenger.of(context).showSnackBar(
                                                                                   const SnackBar(
@@ -702,9 +690,9 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                             .applyChange(),
                                         setState(() {
                                           _filiereList = http
-                                          // .get(Uri.parse(
-                                              // 'https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
-                                          .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
+                                          .get(Uri.parse(
+                                              'https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+                                          // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
                                         }),
                                         libelleController.clear(),
                                         descriptionController.clear(),

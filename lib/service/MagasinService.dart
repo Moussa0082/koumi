@@ -15,8 +15,8 @@ import 'package:provider/provider.dart';
 
 class MagasinService extends ChangeNotifier{
 
-    // static const String baseUrl = 'https://koumi.ml/api-koumi/Magasin';
-    static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Magasin';
+    static const String baseUrl = 'https://koumi.ml/api-koumi/Magasin';
+    // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Magasin';
     List<Magasin> magasin = [];
  
   Future<void> creerMagasin({
@@ -125,8 +125,8 @@ class MagasinService extends ChangeNotifier{
    Future<List<Magasin>> fetchMagasinByRegion(String id) async {
     try {
       final response = await http.get(Uri.parse(
-          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+          'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
       if (response.statusCode == 200) {
   // final String jsonString = utf8.decode(response.bodyBytes);
   //       List<dynamic> data = json.decode(jsonString);
@@ -147,8 +147,8 @@ class MagasinService extends ChangeNotifier{
    Future<List<Magasin>> fetchMagasinByActeur(String id) async {
     try {
       final response = await http.get(Uri.parse(
-          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
-          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
+          'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
+          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
       if (response.statusCode == 200) {
 
                List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
@@ -171,8 +171,8 @@ class MagasinService extends ChangeNotifier{
    Future<List<Magasin>> fetchAllMagasin() async {
     try {
       final response = await http.get(Uri.parse(
-          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagagin'));
-          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagagin'));
+          'https://koumi.ml/api-koumi/Magasin/getAllMagagin'));
       if (response.statusCode == 200) {
   // final String jsonString = utf8.decode(response.bodyBytes);
   //       List<dynamic> data = json.decode(jsonString);
@@ -195,8 +195,8 @@ class MagasinService extends ChangeNotifier{
    Future<List<Magasin>> fetchMagasinByRegionAndActeur(String idActeur, String idNiveau1Pays) async {
     // try {
       final response = await http.get(Uri.parse(
-          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${idActeur}/${idNiveau1Pays}'));
-          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/$idActeur/$idNiveau1Pays'));
+          'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/${idActeur}/${idNiveau1Pays}'));
+          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/$idActeur/$idNiveau1Pays'));
       if (response.statusCode == 200 || response.statusCode == 201 ||  response.statusCode == 202) {
   // final String jsonString = utf8.decode(response.bodyBytes);
   //       List<dynamic> data = json.decode(jsonString);
@@ -263,140 +263,140 @@ return magasin;
   }
 }
 
- class MagasinController extends GetxController {
-   List<Magasin> magasinListen = [];
-   List<Magasin> magasinListe1 = [];
-  var isLoadingn = true.obs;
-  var isLoading1 = true.obs;
-  var isEmpty = false.obs;
-  var isEmpty1 = false.obs;
+//  class MagasinController extends GetxController {
+//    List<Magasin> magasinListen = [];
+//    List<Magasin> magasinListe1 = [];
+//   var isLoadingn = true.obs;
+//   var isLoading1 = true.obs;
+//   var isEmpty = false.obs;
+//   var isEmpty1 = false.obs;
 
-    final Rx<List<Magasin>> magasins = Rx([]);
-
-
-  void clearMagasinListen() {
-    magasinListen.clear();
-  }
+//     final Rx<List<Magasin>> magasins = Rx([]);
 
 
-    Future<void> fetchMagasinByRegion(String id) async {
+//   void clearMagasinListen() {
+//     magasinListen.clear();
+//   }
 
 
-      //  var url = 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/$id';
-  try {
+//     Future<void> fetchMagasinByRegion(String id) async {
+
+
+//       //  var url = 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/$id';
+//   try {
     
-     final response = await http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/$id'));
-    if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
-       print("reponse all magasin active all: ${response.statusCode}");
-      final String jsonString = utf8.decode(response.bodyBytes);
-        List<dynamic> data = json.decode(jsonString);
-             print("reponse fetch magasi acteur : ${data.toList()}");
+//      final response = await http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/$id'));
+//     if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+//        print("reponse all magasin active all: ${response.statusCode}");
+//       final String jsonString = utf8.decode(response.bodyBytes);
+//         List<dynamic> data = json.decode(jsonString);
+//              print("reponse fetch magasi acteur : ${data.toList()}");
    
-                 await Future.delayed(Duration(seconds: 2));
-          magasinListen = data
-          .where((magasin) => magasin['statutMagasin'] == true)
-                           .map((item) => Magasin(
-                    nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
-                    idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
-                    contactMagasin:
-                        item['contactMagasin'] ?? 'Contact manquant',
-                    photo: item['photo'] ?? '',
-                    // ou utilisez une URL par défaut
-                    acteur: Acteur(
-                      idActeur: item['acteur']['idActeur'] ?? 'manquant',
-                      nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
-                      // Autres champs de l'acteur...
-                    ),
-                    niveau1Pays: Niveau1Pays(
-                      idNiveau1Pays: item['niveau1Pays']['idNiveau1Pays'] ?? 'manquant',
-                      nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
-                      // Autres champs de l'acteur...
-                    ),
-                    dateAjout: item['dateAjout'] ?? 'manquante',
-                    localiteMagasin: item['localiteMagasin'] ?? 'manquante',
-                    statutMagasin: item['statutMagasin'] as bool
-                         // ou une valeur par défaut
-                  ))
-              .toList();
+//                  await Future.delayed(Duration(seconds: 2));
+//           magasinListen = data
+//           .where((magasin) => magasin['statutMagasin'] == true)
+//                            .map((item) => Magasin(
+//                     nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
+//                     idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
+//                     contactMagasin:
+//                         item['contactMagasin'] ?? 'Contact manquant',
+//                     photo: item['photo'] ?? '',
+//                     // ou utilisez une URL par défaut
+//                     acteur: Acteur(
+//                       idActeur: item['acteur']['idActeur'] ?? 'manquant',
+//                       nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
+//                       // Autres champs de l'acteur...
+//                     ),
+//                     niveau1Pays: Niveau1Pays(
+//                       idNiveau1Pays: item['niveau1Pays']['idNiveau1Pays'] ?? 'manquant',
+//                       nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
+//                       // Autres champs de l'acteur...
+//                     ),
+//                     dateAjout: item['dateAjout'] ?? 'manquante',
+//                     localiteMagasin: item['localiteMagasin'] ?? 'manquante',
+//                     statutMagasin: item['statutMagasin'] as bool
+//                          // ou une valeur par défaut
+//                   ))
+//               .toList();
    
-               print("reponse fetch magasin liste n acteur : ${magasinListen.toList()}");
-      isLoadingn.value = false;
-      update();
+//                print("reponse fetch magasin liste n acteur : ${magasinListen.toList()}");
+//       isLoadingn.value = false;
+//       update();
       
-    } else {
-       print("reponse else: ${response.statusCode}");
+//     } else {
+//        print("reponse else: ${response.statusCode}");
      
-      debugPrint(
-          'Aucun magasin trouvé! , Server responded: ${response.statusCode}:${response.reasonPhrase.toString()}');
-    }
+//       debugPrint(
+//           'Aucun magasin trouvé! , Server responded: ${response.statusCode}:${response.reasonPhrase.toString()}');
+//     }
  
-  } catch (e) {
-      debugPrint(
-          'Error Loading data! , Server responded: $e');
+//   } catch (e) {
+//       debugPrint(
+//           'Error Loading data! , Server responded: $e');
     
-  }
-}
+//   }
+// }
 
   
-   void clearMagasinListe1() {
-    magasinListe1.clear();
-  }
+//    void clearMagasinListe1() {
+//     magasinListe1.clear();
+//   }
 
-   Future<void> fetchMagasinByRegionAndActeur( String idActeur, String idNiveau1Pays) async {
-    try {
+//    Future<void> fetchMagasinByRegionAndActeur( String idActeur, String idNiveau1Pays) async {
+//     try {
       
     
-      final response = await http.get(Uri.parse(
-          // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/${idActeur}/${idNiveau1Pays}'));
-          'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/$idActeur/$idNiveau1Pays'));
+//       final response = await http.get(Uri.parse(
+//           // 'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/${idActeur}/${idNiveau1Pays}'));
+//           'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/$idActeur/$idNiveau1Pays'));
       
-   if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
-             print("reponse fetch magasi acteur : ${response.statusCode}");
+//    if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+//              print("reponse fetch magasi acteur : ${response.statusCode}");
 
-      final String jsonString = utf8.decode(response.bodyBytes);
-        List<dynamic> data = json.decode(jsonString);
-              await Future.delayed(Duration(seconds: 2));
-          magasinListe1 = data
-          // .where((magasin) => magasin['statutMagasin'] == true)
-                           .map((item) => Magasin(
-                    nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
-                    idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
-                    contactMagasin:
-                        item['contactMagasin'] ?? 'Contact manquant',
-                    photo: item['photo'] ?? '',
-                    // ou utilisez une URL par défaut
-                    acteur: Acteur(
-                      idActeur: item['acteur']['idActeur'] ?? 'manquant',
-                      nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
-                      // Autres champs de l'acteur...
-                    ),
-                    niveau1Pays: Niveau1Pays(
-                      idNiveau1Pays: item['niveau1Pays']['idNiveau1Pays'] ?? 'manquant',
-                      nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
-                      // Autres champs de l'acteur...
-                    ),
-                    dateAjout: item['dateAjout'] ?? 'manquante',
-                    localiteMagasin: item['localiteMagasin'] ?? 'manquante',
-                    statutMagasin: item['statutMagasin'] 
-                        as bool, // ou une valeur par défaut
-                  ))
-              .toList();
+//       final String jsonString = utf8.decode(response.bodyBytes);
+//         List<dynamic> data = json.decode(jsonString);
+//               await Future.delayed(Duration(seconds: 2));
+//           magasinListe1 = data
+//           // .where((magasin) => magasin['statutMagasin'] == true)
+//                            .map((item) => Magasin(
+//                     nomMagasin: item['nomMagasin'] ?? 'Nom du magasin manquant',
+//                     idMagasin: item['idMagasin'] ?? 'ID du magasin manquant',
+//                     contactMagasin:
+//                         item['contactMagasin'] ?? 'Contact manquant',
+//                     photo: item['photo'] ?? '',
+//                     // ou utilisez une URL par défaut
+//                     acteur: Acteur(
+//                       idActeur: item['acteur']['idActeur'] ?? 'manquant',
+//                       nomActeur: item['acteur']['nomActeur'] ?? ' manquant',
+//                       // Autres champs de l'acteur...
+//                     ),
+//                     niveau1Pays: Niveau1Pays(
+//                       idNiveau1Pays: item['niveau1Pays']['idNiveau1Pays'] ?? 'manquant',
+//                       nomN1: item['niveau1Pays']['nomN1'] ?? 'manquant',
+//                       // Autres champs de l'acteur...
+//                     ),
+//                     dateAjout: item['dateAjout'] ?? 'manquante',
+//                     localiteMagasin: item['localiteMagasin'] ?? 'manquante',
+//                     statutMagasin: item['statutMagasin'] 
+//                         as bool, // ou une valeur par défaut
+//                   ))
+//               .toList();
     
-        isLoading1.value = false;
-      update();
+//         isLoading1.value = false;
+//       update();
       
-    } else {
-      // Get.snackbar('Erreur lors de la recuperation des magasins de l\'acteur!',
-          // 'Sever responded: ${response.statusCode}:${response.reasonPhrase.toString()}');
-      debugPrint('Aucun magasin trouvé! , Sever responded: ${response.statusCode}:${response.reasonPhrase.toString()}');
-    }
+//     } else {
+//       // Get.snackbar('Erreur lors de la recuperation des magasins de l\'acteur!',
+//           // 'Sever responded: ${response.statusCode}:${response.reasonPhrase.toString()}');
+//       debugPrint('Aucun magasin trouvé! , Sever responded: ${response.statusCode}:${response.reasonPhrase.toString()}');
+//     }
 
-    }catch (e) {
-            debugPrint('Error catch Loading data! , Sever responded: $e');
-    }
-  }
+//     }catch (e) {
+//             debugPrint('Error catch Loading data! , Sever responded: $e');
+//     }
+//   }
 
 
  
 
- }
+//  }

@@ -144,7 +144,7 @@ class _DetailAlerteState extends State<DetailAlerte> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                alerte.titreAlerte,
+                alerte.titreAlerte!,
                 style: const TextStyle(
                     color: Colors.black87,
                     fontWeight: FontWeight.w500,
@@ -208,7 +208,7 @@ class _DetailAlerteState extends State<DetailAlerte> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
-            alerte.descriptionAlerte,
+            alerte.descriptionAlerte!,
             style: TextStyle(
               color: Colors.black87,
               fontWeight: FontWeight.w500,

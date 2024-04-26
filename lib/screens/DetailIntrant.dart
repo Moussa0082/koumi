@@ -245,7 +245,6 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         statutIntrant: intrants.statutIntrant,
                         dateAjout: intrants.dateAjout,
                         dateExpiration: date,
-                       
                         categorieProduit: intrants.categorieProduit,
                         forme: intrants.forme,
                         photoIntrant: intrants.photoIntrant,
@@ -499,27 +498,27 @@ class _DetailIntrantState extends State<DetailIntrant> {
           ),
         ),
         _buildDescription(intrants.descriptionIntrant),
-        acteur.nomActeur != intrants.acteur.nomActeur
-            ? Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Container(
-                  height: 40,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: const BoxDecoration(
-                    color: Colors.orangeAccent,
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Fournisseur',
-                      style: const TextStyle(
-                          overflow: TextOverflow.ellipsis,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              )
-            : Container(),
+        // acteur.nomActeur != intrants.acteur.nomActeur
+        //     ? Padding(
+        //         padding: const EdgeInsets.symmetric(horizontal: 10),
+        //         child: Container(
+        //           height: 40,
+        //           width: MediaQuery.of(context).size.width,
+        //           decoration: const BoxDecoration(
+        //             color: Colors.orangeAccent,
+        //           ),
+        //           child: Center(
+        //             child: Text(
+        //               'Fournisseur',
+        //               style: const TextStyle(
+        //                   overflow: TextOverflow.ellipsis,
+        //                   fontSize: 20,
+        //                   fontWeight: FontWeight.bold),
+        //             ),
+        //           ),
+        //         ),
+        //       )
+        //     : Container(),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Container(
@@ -540,8 +539,9 @@ class _DetailIntrantState extends State<DetailIntrant> {
           ),
         ),
         // _buildItem('Spéculation ', intrants.speculation!.nomSpeculation!),
-        // _buildItem('Catégorie  ',
-            // intrants.speculation!.categorieProduit!.libelleCategorie!),
+        _buildItem('Catégorie  ', intrants.categorieProduit!.libelleCategorie!),
+        _buildItem(
+            'Filière  ', intrants.categorieProduit!.filiere!.libelleFiliere!),
         _buildItem('Date d\'ajout ', '${intrants.dateAjout}' ?? 'N/A'),
         acteur.nomActeur != intrants.acteur.nomActeur
             ? _buildFournissuer()
@@ -566,8 +566,12 @@ class _DetailIntrantState extends State<DetailIntrant> {
         _buildItem('Nom intrant ', intrants.nomIntrant),
         _buildItem('Quantité ', intrants.quantiteIntrant.toString()),
         _buildItem('Date péremption ', intrants.dateExpiration!),
-        _buildItem(
-            'Prix ', '${intrants.prixIntrant.toString()} ${para.monnaie}'),
+        para.monnaie != null
+            ? _buildItem(
+                'Prix ', '${intrants.prixIntrant.toString()} ${para.monnaie}')
+            : _buildItem('Prix ', '${intrants.prixIntrant.toString()} FCFA'),
+        _buildItem('Unité ', '${intrants.unite}'),
+        _buildItem('Forme ', '${intrants.forme.libelleForme}'),
         _buildItem('Statut ',
             '${intrants.statutIntrant! ? 'Disponible' : 'Non disponible'}'),
       ],

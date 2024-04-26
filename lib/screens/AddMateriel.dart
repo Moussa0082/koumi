@@ -676,6 +676,9 @@ class _AddMaterielState extends State<AddMateriel> {
                                               )
                                             })
                                         .catchError((onError) => {
+                                           setState(() {
+                                                _isLoading = false;
+                                              }),
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 const SnackBar(
@@ -738,6 +741,9 @@ class _AddMaterielState extends State<AddMateriel> {
                                               )
                                             })
                                         .catchError((onError) => {
+                                           setState(() {
+                                                _isLoading = false;
+                                              }),
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 const SnackBar(
@@ -760,6 +766,9 @@ class _AddMaterielState extends State<AddMateriel> {
                                   }
                                 } catch (e) {
                                   print("Error: " + e.toString());
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Row(

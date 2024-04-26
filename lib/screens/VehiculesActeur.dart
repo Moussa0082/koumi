@@ -264,19 +264,39 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                       <PopupMenuEntry<String>>[
                                                     PopupMenuItem<String>(
                                                       child: ListTile(
-                                                        leading: const Icon(
-                                                          Icons.check,
-                                                          color: Colors.green,
-                                                        ),
-                                                        title: const Text(
-                                                          "Activer",
+                                                        leading:  e.statutVehicule ==
+                                                                    false
+                                                                ? Icon(
+                                                                    Icons.check,
+                                                                    color: Colors
+                                                                        .green,
+                                                                  )
+                                                                : Icon(
+                                                                    Icons
+                                                                        .disabled_visible,
+                                                                    color: Colors
+                                                                            .orange[
+                                                                        400],
+                                                                  ),
+                                                        title:  Text(
+                                                         e.statutVehicule ==
+                                                                  false
+                                                              ? "Activer"
+                                                              : "Desactiver",
                                                           style: TextStyle(
-                                                            color: Colors.green,
+                                                            color: e.statutVehicule ==
+                                                                    false
+                                                                ? Colors.green
+                                                                : Colors.orange[
+                                                                    400],
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                           ),
                                                         ),
                                                         onTap: () async {
+                                                           e.statutVehicule ==
+                                                                    false
+                                                                ?
                                                           await VehiculeService()
                                                               .activerVehicules(
                                                                   e.idVehicule)
@@ -327,65 +347,33 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                                         ),
                                                                         Navigator.of(context)
                                                                             .pop(),
-                                                                      });
-                                                        },
-                                                      ),
-                                                    ),
-                                                    PopupMenuItem<String>(
-                                                      child: ListTile(
-                                                        leading: Icon(
-                                                          Icons
-                                                              .disabled_visible,
-                                                          color: Colors
-                                                              .orange[400],
-                                                        ),
-                                                        title: Text(
-                                                          "Désactiver",
-                                                          style: TextStyle(
-                                                            color: Colors
-                                                                .orange[400],
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                        onTap: () async {
-                                                          await VehiculeService()
-                                                              .desactiverVehicules(
-                                                                  e.idVehicule)
-                                                              .then((value) => {
-                                                                    Provider.of<VehiculeService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                    setState(
-                                                                        () {
-                                                                      _liste = getVehicule(
-                                                                          acteur
-                                                                              .idActeur!);
-                                                                    }),
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
-                                                                  })
-                                                              .catchError(
-                                                                  (onError) => {
-                                                                        ScaffoldMessenger.of(context)
-                                                                            .showSnackBar(
-                                                                          const SnackBar(
-                                                                            content:
-                                                                                Row(
-                                                                              children: [
-                                                                                Text("Une erreur s'est produit"),
-                                                                              ],
+                                                                      }) :  await VehiculeService()
+                                                                  .desactiverVehicules(e
+                                                                      .idVehicule)
+                                                                  .then(
+                                                                      (value) =>
+                                                                          {
+                                                                            Provider.of<VehiculeService>(context, listen: false).applyChange(),
+                                                                            setState(() {
+                                                                              _liste = getVehicule(acteur.idActeur!);
+                                                                            }),
+                                                                            Navigator.of(context).pop(),
+                                                                          })
+                                                                  .catchError(
+                                                                      (onError) =>
+                                                                          {
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              const SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Une erreur s'est produit"),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: Duration(seconds: 5),
+                                                                              ),
                                                                             ),
-                                                                            duration:
-                                                                                Duration(seconds: 5),
-                                                                          ),
-                                                                        ),
-                                                                        Navigator.of(context)
-                                                                            .pop(),
-                                                                      });
+                                                                            Navigator.of(context).pop(),
+                                                                          });
 
                                                           ScaffoldMessenger.of(
                                                                   context)

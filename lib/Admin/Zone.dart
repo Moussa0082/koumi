@@ -267,19 +267,40 @@ class _ZoneState extends State<Zone> {
                                                       <PopupMenuEntry<String>>[
                                                     PopupMenuItem<String>(
                                                       child: ListTile(
-                                                        leading: const Icon(
-                                                          Icons.check,
-                                                          color: Colors.green,
-                                                        ),
-                                                        title: const Text(
-                                                          "Activer",
+                                                        leading:   zone.statutZone ==
+                                                                    false
+                                                                ? Icon(
+                                                                    Icons.check,
+                                                                    color: Colors
+                                                                        .green,
+                                                                  )
+                                                                : Icon(
+                                                                    Icons
+                                                                        .disabled_visible,
+                                                                    color: Colors
+                                                                            .orange[
+                                                                        400],
+                                                                  ),
+                                                        title:  Text(
+                                                           zone.statutZone ==
+                                                                    false
+                                                                ?
+                                                          "Activer"
+                                                              : "Desactiver",
                                                           style: TextStyle(
-                                                            color: Colors.green,
+                                                            color: zone.statutZone ==
+                                                                    false
+                                                                ? Colors.green
+                                                                : Colors.orange[
+                                                                    400],
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                           ),
                                                         ),
                                                         onTap: () async {
+                                                          zone.statutZone ==
+                                                                    false
+                                                                ?
                                                           await ZoneProductionService()
                                                               .activerZone(zone
                                                                   .idZoneProduction!)
@@ -324,59 +345,30 @@ class _ZoneState extends State<Zone> {
                                                                         ),
                                                                         Navigator.of(context)
                                                                             .pop(),
-                                                                      });
-                                                        },
-                                                      ),
-                                                    ),
-                                                    PopupMenuItem<String>(
-                                                      child: ListTile(
-                                                        leading: Icon(
-                                                          Icons
-                                                              .disabled_visible,
-                                                          color: Colors
-                                                              .orange[400],
-                                                        ),
-                                                        title: Text(
-                                                          "Désactiver",
-                                                          style: TextStyle(
-                                                            color: Colors
-                                                                .orange[400],
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                        onTap: () async {
-                                                          await ZoneProductionService()
-                                                              .desactiverZone(zone
-                                                                  .idZoneProduction!)
-                                                              .then((value) => {
-                                                                    Provider.of<ZoneProductionService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
-                                                                  })
-                                                              .catchError(
-                                                                  (onError) => {
-                                                                        ScaffoldMessenger.of(context)
-                                                                            .showSnackBar(
-                                                                          SnackBar(
-                                                                            content:
-                                                                                Row(
-                                                                              children: [
-                                                                                Text("Une erreur s'est produit : $onError"),
-                                                                              ],
+                                                                      }) :   await ZoneProductionService()
+                                                                  .desactiverZone(zone
+                                                                      .idZoneProduction!)
+                                                                  .then(
+                                                                      (value) =>
+                                                                          {
+                                                                            Provider.of<ZoneProductionService>(context, listen: false).applyChange(),
+                                                                            Navigator.of(context).pop(),
+                                                                          })
+                                                                  .catchError(
+                                                                      (onError) =>
+                                                                          {
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Une erreur s'est produit : $onError"),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: const Duration(seconds: 5),
+                                                                              ),
                                                                             ),
-                                                                            duration:
-                                                                                const Duration(seconds: 5),
-                                                                          ),
-                                                                        ),
-                                                                        Navigator.of(context)
-                                                                            .pop(),
-                                                                      });
+                                                                            Navigator.of(context).pop(),
+                                                                          });
 
                                                           ScaffoldMessenger.of(
                                                                   context)
