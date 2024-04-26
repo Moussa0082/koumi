@@ -7,6 +7,7 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddConseil.dart';
 import 'package:koumi_app/screens/DetailConseil.dart';
+import 'package:koumi_app/screens/UpdateConseil.dart';
 import 'package:koumi_app/service/ConseilService.dart';
 import 'package:provider/provider.dart';
 
@@ -332,6 +333,34 @@ class _ConseilDisableState extends State<ConseilDisable> {
                                                                               2),
                                                                 ),
                                                               );
+                                                            },
+                                                          ),
+                                                        ),
+                                                         PopupMenuItem<String>(
+                                                          child: ListTile(
+                                                            leading: const Icon(
+                                                             Icons
+                                                                        .edit,
+                                                                     color:
+                                                                  Colors.green,
+                                                            ),
+                                                            title: const Text(
+                                                              "Modifier",
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .green,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                            onTap: () async {
+                                                              Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                      builder: (context) =>
+                                                                          UpdateConseil(
+                                                                              conseils: e)));
                                                             },
                                                           ),
                                                         ),

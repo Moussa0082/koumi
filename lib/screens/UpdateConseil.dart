@@ -1,10 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:koumi_app/api/firebase_api.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/ConseilService.dart';
@@ -14,17 +12,20 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
-class AddConseil extends StatefulWidget {
-  const AddConseil({super.key});
+import '../models/Conseil.dart';
+
+class UpdateConseil extends StatefulWidget {
+  final Conseil conseils;
+  const UpdateConseil({super.key, required this.conseils});
 
   @override
-  State<AddConseil> createState() => _AddConseilState();
+  State<UpdateConseil> createState() => _UpdateConseilState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _AddConseilState extends State<AddConseil> {
+class _UpdateConseilState extends State<UpdateConseil> {
   TextEditingController _titreController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   final recorder = FlutterSoundRecorder();
@@ -43,6 +44,7 @@ class _AddConseilState extends State<AddConseil> {
   final ImagePicker _picker = ImagePicker();
   double _progressValue = 0;
   bool _hasUploadStarted = false;
+  late Conseil conseil;
 
   void setProgress(double value) async {
     setState(() {
@@ -56,7 +58,6 @@ class _AddConseilState extends State<AddConseil> {
     final images = File('${directory.path}/$name');
     return images;
   }
-
 
   Future<void> _pickVideo(ImageSource source) async {
     final video = await ImagePicker().pickVideo(source: source);
@@ -194,6 +195,12 @@ class _AddConseilState extends State<AddConseil> {
     super.initState();
     initRecoder();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    conseil = widget.conseils;
+    _titreController.text = conseil.titreConseil;
+    _descriptionController.text = conseil.descriptionConseil;
+    _tokenAudioController.text = conseil.audioConseil!;
+    _tokenImageController.text = conseil.photoConseil!;
+    _tokenTextController.text = conseil.videoConseil!;
   }
 
   @override
@@ -249,7 +256,7 @@ class _AddConseilState extends State<AddConseil> {
                 },
                 icon: const Icon(Icons.arrow_back_ios)),
             title: const Text(
-              "Ajout conseil ",
+              "Modification ",
               style: TextStyle(
                 color: d_colorGreen,
                 fontSize: 22,
@@ -473,7 +480,8 @@ class _AddConseilState extends State<AddConseil> {
                                   photoUploaded != null ||
                                   audiosUploaded != null) {
                                 await ConseilService()
-                                    .creerConseil(
+                                    .updateConseil(
+                                        idConseil: conseil.idConseil!,
                                         titreConseil: titre,
                                         descriptionConseil: description,
                                         videoConseil: _videoUploaded,
@@ -481,9 +489,6 @@ class _AddConseilState extends State<AddConseil> {
                                         audioConseil: audiosUploaded,
                                         acteur: acteur)
                                     .then((value) => {
-                                          FirebaseApi()
-                                              .sendPushNotificationToTopic(
-                                                  'Nouveau conseil', titre),
                                           _titreController.clear(),
                                           _descriptionController.clear(),
                                           _tokenTextController.clear(),
@@ -511,7 +516,7 @@ class _AddConseilState extends State<AddConseil> {
                                               content: Row(
                                                 children: [
                                                   Text(
-                                                    "Une erreur est survenu lors de l'ajout",
+                                                    "Une erreur est survenu lors de la modification",
                                                     style: TextStyle(
                                                         overflow: TextOverflow
                                                             .ellipsis),
@@ -524,14 +529,12 @@ class _AddConseilState extends State<AddConseil> {
                                         });
                               } else {
                                 await ConseilService()
-                                    .creerConseil(
+                                    .updateConseil(
+                                        idConseil: conseil.idConseil!,
                                         titreConseil: titre,
                                         descriptionConseil: description,
                                         acteur: acteur)
                                     .then((value) => {
-                                          FirebaseApi()
-                                              .sendPushNotificationToTopic(
-                                                  'Nouveau conseil', titre),
                                           _titreController.clear(),
                                           _descriptionController.clear(),
                                           _tokenTextController.clear(),
@@ -541,31 +544,6 @@ class _AddConseilState extends State<AddConseil> {
                                           Provider.of<ConseilService>(context,
                                                   listen: false)
                                               .applyChange(),
-                                          //                 !acteur.typeActeur!.contains('admin') ?
-                                          //                  ScaffoldMessenger.of(context).showSnackBar(
-                                          //    SnackBar(
-                                          //     content: Row(
-                                          //       children: [
-                                          //         Text(
-                                          //           "Conseil sera activé par administrateur",
-                                          //           style: TextStyle(
-                                          //               overflow: TextOverflow.ellipsis),
-                                          //         ),
-                                          //       ],
-                                          //     ),
-                                          //     duration: Duration(seconds: 5),
-                                          //   ),
-                                          // ):  ScaffoldMessenger.of(context).showSnackBar(
-                                          //    SnackBar(
-                                          //     content: Row(
-                                          //       children: [
-                                          //         Text(
-                                          //           "Ajouter avec succéss",
-                                          //           style: TextStyle(
-                                          //               overflow: TextOverflow.ellipsis),
-                                          //         ),
-                                          //       ],
-                                          //     ),)),
                                           Navigator.of(context).pop()
                                         })
                                     .catchError((onError) => {
@@ -585,7 +563,7 @@ class _AddConseilState extends State<AddConseil> {
                                   content: Row(
                                     children: [
                                       Text(
-                                        "Une erreur est survenu lors de l'ajout",
+                                        "Une erreur est survenu lors de la modification",
                                         style: TextStyle(
                                             overflow: TextOverflow.ellipsis),
                                       ),
@@ -605,7 +583,7 @@ class _AddConseilState extends State<AddConseil> {
                           minimumSize: const Size(290, 45),
                         ),
                         child: Text(
-                          "Ajouter",
+                          "Modifier",
                           style: TextStyle(
                             fontSize: 20,
                             color: Colors.white,
@@ -699,47 +677,5 @@ class _AddConseilState extends State<AddConseil> {
         showCloseIcon: showCloseIcon,
       ),
     );
-  }
-}
-
-// _hasUploadStarted
-//     ? LinearProgressIndicator(
-//         color: d_colorGreen,
-//         backgroundColor: d_colorGreen,
-//         value: _progressValue,
-//       )
-//     : Container(),
-// _hasUploadStarted
-//     ? MaterialButton(
-//         color: d_colorGreen,
-//         child: const Text(
-//           "Cancel",
-//           style: TextStyle(
-//               color: Colors.white70, fontWeight: FontWeight.bold),
-//         ),
-//         onPressed: () async {
-//           try {
-//             await ApiVideoUploader.cancelAll();
-//           } catch (e) {
-//             log("Failed to cancel video: $e");
-//           }
-//         },
-//       )
-//     : Container(),
-// photoUploaded != null
-//     ? Center(
-//         child: Image.file(
-//         photoUploaded!,
-//         width: double.infinity,
-//         height: 200,
-//         fit: BoxFit.cover,
-//       ))
-//     : Text("aucun image"),
-extension ErrorExtension on Exception {
-  String get message {
-    if (this is PlatformException) {
-      return (this as PlatformException).message ?? "Unknown error";
-    }
-    return toString();
   }
 }

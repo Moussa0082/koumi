@@ -167,15 +167,32 @@ class _AlertAcceuilState extends State<AlertAcceuil> {
                           ),
                           child: Center(
                             child: ListTile(
-                              leading: Image.asset(
-                                "assets/images/alt.png",
-                                width: 80,
-                                height: 80,
-                              ),
+                              leading: alerte.photoAlerte != null &&
+                                      !alerte.photoAlerte!.isEmpty
+                                  ? Image.network(
+                                      'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/image',
+                                      width: 80,
+                                      height: 80,
+                                      errorBuilder: (BuildContext context,
+                                          Object exception,
+                                          StackTrace? stackTrace) {
+                                        return Image.asset(
+                                          "assets/images/alt.png",
+                                          width: 80,
+                                          height: 80,
+                                        );
+                                      },
+                                    )
+                                  : Image.asset(
+                                      "assets/images/alt.png",
+                                      width: 80,
+                                      height: 80,
+                                    ),
                               title: Text(
                                   alerte != null
-                                      ? alerte.titreAlerte!.toUpperCase()
+                                      ? alerte.titreAlerte!
                                       : "Aucun alerte",
+                                  maxLines: null,
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 20,

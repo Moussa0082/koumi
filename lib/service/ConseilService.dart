@@ -64,7 +64,7 @@ class ConseilService extends ChangeNotifier {
     }
   }
 
-  static Future<void> updateConseil({
+   Future<void> updateConseil({
       required String idConseil,
       required String titreConseil,
       required String descriptionConseil,
@@ -95,9 +95,9 @@ class ConseilService extends ChangeNotifier {
         'idConseil' : idConseil,
         'titreConseil': titreConseil,
         'descriptionConseil': descriptionConseil,
-        'audioConseil': audioConseil,
-        'photoConseil': photoConseil,
-        'videoConseil': videoConseil,
+        'audioConseil': '',
+        'photoConseil': '',
+        'videoConseil': '',
         'acteur': acteur.toMap(),
       });
 

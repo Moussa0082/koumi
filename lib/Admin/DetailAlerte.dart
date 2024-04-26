@@ -32,7 +32,7 @@ class _DetailAlerteState extends State<DetailAlerte> {
 
   void verifyAudioSource() {
     try {
-      if (alerte.audioAlerte != null) {
+      if (alerte.audioAlerte != null && alerte.audioAlerte!.isNotEmpty) {
         player = AudioPlayer();
 
         // Set the release mode to keep the source after playback has completed.
@@ -61,7 +61,7 @@ class _DetailAlerteState extends State<DetailAlerte> {
   }
 
   void verifyVideoSource() {
-    if (alerte.videoAlerte != null) {
+    if (alerte.videoAlerte != null && alerte.videoAlerte!.isNotEmpty) {
       flickManager = FlickManager(
         autoPlay: false,
         videoPlayerController: VideoPlayerController.networkUrl(
@@ -157,7 +157,9 @@ class _DetailAlerteState extends State<DetailAlerte> {
                 ? _videoBuild()
                 : Container(),
             _descriptionBuild(),
-            alerte.audioAlerte != null ? _audioBuild() : Container()
+            alerte.audioAlerte != null && alerte.audioAlerte!.isNotEmpty
+                ? _audioBuild()
+                : Container()
           ],
         ),
       ),
