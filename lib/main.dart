@@ -46,15 +46,15 @@ import 'package:koumi_app/widgets/notification_controller.dart';
 import 'package:provider/provider.dart';
 
 // final navigatorKey = GlofbalKey<NavigatorState>();
- 
+
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await FirebaseApi().initNotification();
+  // WidgetsFlutterBinding.ensureInitialized();
+  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // await FirebaseApi().initNotification();
   // await AwesomeNotifications().initialize(
   //    'resource://@drawable/launcher_icon',
   //   [
-  //   NotificationChannel(
+  //   Not
   //       channelGroupKey: "basic_channel_group",
   //       channelKey: "basic_channel",
   //       channelName: "Basic Notification",

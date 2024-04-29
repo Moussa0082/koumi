@@ -12,6 +12,7 @@ import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
+import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -35,7 +36,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
   TextEditingController _quantiteController = TextEditingController();
   TextEditingController _prixController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
-
+  TextEditingController _uniteController = TextEditingController();
   bool _isEditing = false;
   bool _isLoading = false;
   late Acteur acteur = Acteur();
@@ -94,6 +95,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
     _quantiteController.text = intrants.quantiteIntrant.toString();
     _prixController.text = intrants.prixIntrant.toString();
     _dateController.text = intrants.dateExpiration!;
+    _uniteController.text = intrants.unite!;
     isDialOpenNotifier = ValueNotifier<bool>(false);
   }
 
@@ -177,6 +179,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
       final double quantite = double.tryParse(_quantiteController.text) ?? 0.0;
       final int prix = int.tryParse(_prixController.text) ?? 0;
       final String date = _dateController.text;
+      final String unite = _uniteController.text;
 
       if (photo != null) {
         await IntrantService()
@@ -188,6 +191,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                 prixIntrant: prix,
                 dateExpiration: date,
                 photoIntrant: photo,
+                unite: unite,
                 acteur: acteur)
             .then((value) => {
                   Provider.of<IntrantService>(context, listen: false)
@@ -203,6 +207,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         dateExpiration: date,
                         categorieProduit: intrants.categorieProduit,
                         forme: intrants.forme,
+                        unite: unite,
                         acteur: acteur);
                     _isLoading = false;
                   }),
@@ -232,6 +237,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                 descriptionIntrant: description,
                 prixIntrant: prix,
                 dateExpiration: date,
+                unite: unite,
                 acteur: acteur)
             .then((value) => {
                   Provider.of<IntrantService>(context, listen: false)
@@ -247,6 +253,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         dateExpiration: date,
                         categorieProduit: intrants.categorieProduit,
                         forme: intrants.forme,
+                        unite: unite,
                         photoIntrant: intrants.photoIntrant,
                         acteur: acteur);
                     _isLoading = false;
@@ -546,6 +553,32 @@ class _DetailIntrantState extends State<DetailIntrant> {
         acteur.nomActeur != intrants.acteur.nomActeur
             ? _buildFournissuer()
             : Container(),
+        // acteur.nomActeur != intrants.acteur.nomActeur
+        //     ?
+        Center(
+          child: SizedBox(
+            width: 200,
+            height: 60,
+            child: ElevatedButton(
+              onPressed: () {
+                // _addToCart(widget.stock);
+                if (acteur.nomActeur != intrants.acteur.nomActeur) {
+                  Snack.error(
+                      titre: "Alerte",
+                      message:
+                          "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
+                } else {}
+              },
+              style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.orange, shape: const StadiumBorder()),
+              child: Text(
+                "Ajouter au panier",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        )
+        // : Container()
       ],
     );
   }

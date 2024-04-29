@@ -19,6 +19,7 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 class _DetailAlerteState extends State<DetailAlerte> {
   late AudioPlayer player = AudioPlayer();
   FlickManager? flickManager;
+  late VideoPlayerController _controller;
   late Alertes alerte;
 
   @override
@@ -166,7 +167,7 @@ class _DetailAlerteState extends State<DetailAlerte> {
     );
   }
 
-  Widget _videoBuild() {
+ Widget _videoBuild() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -182,15 +183,46 @@ class _DetailAlerteState extends State<DetailAlerte> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: AspectRatio(
-            aspectRatio: 18 / 10,
-            child: FlickVideoPlayer(flickManager: flickManager!),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: SizedBox(
+            height: 200, // Fixer la hauteur de la vidéo à 200 pixels
+            child: AspectRatio(
+              aspectRatio: 18 / 10,
+              child: FlickVideoPlayer(
+                flickManager: flickManager!,
+              ),
+            ),
           ),
         ),
       ],
     );
   }
+
+  // Widget _videoBuild() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Padding(
+  //         padding: const EdgeInsets.all(8.0),
+  //         child: Text(
+  //           'Vidéo',
+  //           style: TextStyle(
+  //             color: d_colorGreen,
+  //             fontWeight: FontWeight.w500,
+  //             fontSize: 20,
+  //           ),
+  //         ),
+  //       ),
+  //       Padding(
+  //         padding: const EdgeInsets.all(8.0),
+  //         child: AspectRatio(
+  //           aspectRatio: 18 / 10,
+  //           child: FlickVideoPlayer(flickManager: flickManager!),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _descriptionBuild() {
     return Column(

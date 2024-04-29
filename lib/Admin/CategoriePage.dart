@@ -214,8 +214,7 @@ class _CategoriPageState extends State<CategoriPage> {
                         }).toList();
                         return Column(
                             children: filteredCatSearch
-                                    .where((element) =>
-                                        element.statutCategorie == false)
+                          
                                     .isEmpty
                                 ? [
                                     Padding(
