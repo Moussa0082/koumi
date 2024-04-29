@@ -354,7 +354,7 @@ class _PanierState extends State<Panier> {
                                 Snack.error(
                                     titre: "Alerte",
                                     message:
-                                        "Veuiller ajouté au moins 1 produits à votre panier");
+                                        "Veuiller ajouté au moins 1 produit à votre panier");
                               }
                             },
                             style: ElevatedButton.styleFrom(

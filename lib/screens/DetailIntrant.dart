@@ -417,6 +417,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                             ),
                           ),
                         ) : SizedBox(),
+                        const SizedBox(height:10),
 
                 ],
               ),
