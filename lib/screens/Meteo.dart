@@ -1,5 +1,49 @@
 // import 'package:flutter/material.dart';
 
+
+
+
+
+
+// String _fcmToken = '';
+
+//   @override
+//   void initState() {
+//     super.initState();
+
+//     FirebaseMessaging.instance.getToken().then((token) {
+//       setState(() {
+//         _fcmToken = token;
+//       });
+//       // Enregistrer le token FCM côté serveur pour l'utilisateur courant
+//     });
+
+//     FirebaseMessaging.instance.getInitialMessage().then((message) {
+//       if (message != null) {
+//         _handleMessage(message);
+//       }
+//     });
+
+//     FirebaseMessaging.onMessage.listen((message) {
+//       _handleMessage(message);
+//     });
+//   }
+
+//   void _handleMessage(RemoteMessage message) {
+//     // Extraire et afficher les informations de la notification
+//     String notificationTitle = message.notification?.title;
+//     String notificationBody = message.notification?.body;
+
+//     // ... (afficher la notification à l'utilisateur)
+//   }
+
+
+
+
+
+
+
+
 // class Meteo extends StatefulWidget {
 //   const Meteo({super.key});
 

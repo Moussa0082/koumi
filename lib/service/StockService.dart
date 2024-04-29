@@ -186,7 +186,7 @@ class StockService extends ChangeNotifier {
     try {
       final response =
           // await http.get(Uri.parse('https://koumi.ml/api-koumi/Stock/getAllStocks'));
-          await http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Stock/getAllStocks'));
+          await http.get(Uri.parse('$baseUrl/getAllStocks'));
 
       if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
 
@@ -242,8 +242,8 @@ class StockService extends ChangeNotifier {
     try {
       final response = await http.get(Uri.parse(
         
-          // 'https://koumi.ml/api-koumi/Stock/categorieAndActeur/$idCategorie/$idMagasin/$idActeur'));
-          'http://10.0.2.2:9000/api-koumi/Stock/categorieAndActeur/$idCategorie/$idMagasin/$idActeur'));
+          '$baseUrl/categorieAndActeur/$idCategorie/$idMagasin/$idActeur'));
+
       if (response.statusCode == 200) {
                 print("Fetching data all stock by id ,categorie, magasin and acteur");
         List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
@@ -265,8 +265,8 @@ class StockService extends ChangeNotifier {
   Future<List<Stock>> fetchProduitByCategorieAndMagasin(String idCategorie, String idMagasin) async {
     try {
       final response = await http.get(Uri.parse(
-          // 'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
-          'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
+          // '$baseUrl/categorieAndMagasin/$idCategorie/$idMagasin'));
+          '$baseUrl/categorieAndMagasin/$idCategorie/$idMagasin'));
       if (response.statusCode == 200) {
                 print("Fetching data all stock by id categorie and id magasin");
           List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
@@ -288,8 +288,7 @@ class StockService extends ChangeNotifier {
    Future<List<Stock>> fetchProduitByCategorieAndActeur(String idCategorie, String idActeur) async {
     try {
       final response = await http.get(
-          Uri.parse('https://koumi.ml/api-koumi/Stock/categorieAndIdActeur/$idCategorie/$idActeur'));
-          // Uri.parse('http://10.0.2.2:9000/api-koumi/Stock/categorieAndIdActeur/$idCategorie/$idActeur'));
+          Uri.parse('$baseUrl/categorieAndIdActeur/$idCategorie/$idActeur'));
        if (response.statusCode == 200) {
                     // await Future.delayed(Duration(seconds: 2));
                             print("Fetching data all stock by id categorie and id acteur");
@@ -311,7 +310,7 @@ class StockService extends ChangeNotifier {
     try {
       final response = await http.get(
           // Uri.parse('https://koumi.ml/api-koumi/Stock/categorieProduit/$idCategorie'));
-          Uri.parse('http://10.0.2.2:9000/api-koumi/Stock/categorieProduit/$id'));
+          Uri.parse('$baseUrl/categorieProduit/$id'));
        if (response.statusCode == 200) {
                 print("Fetching data all stock by id categorie produit");
           List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));

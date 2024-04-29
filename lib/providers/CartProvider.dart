@@ -11,17 +11,38 @@ class CartProvider extends ChangeNotifier {
 
   List<CartItem> get cartItem => cartItems;
 
-  void addToCart(Stock product, int quantity, String selectedVariant) {
+  void addToCart( Stock? product, int quantity, String? selectedVariant) {
     var existingCartItem = cartItem.firstWhereOrNull(
-      (item) => item.stock!.idStock == product.idStock,
+      (item) => item.stock != null && item.stock!.idStock == product!.idStock,
     );
+  
 
     if (existingCartItem != null) {
       // existingCartItem.quantiteStock += quantity;
     Snack.error(titre:"Alerte", message:existingCartItem.stock!.nomProduit! + " existe déjà au panier");
     } else {
-      cartItem.add(CartItem(stock: product, quantiteStock: quantity));
-    Snack.success(titre:"Alerte", message:product.nomProduit! + " a été ajouté au panier");
+      cartItem.add(CartItem(stock: product, quantiteStock: quantity, isStock:true ));
+    Snack.success(titre:"Alerte", message:product!.nomProduit! + " a été ajouté au panier");
+
+    }
+
+
+    notifyListeners();
+  }
+
+  void addToCartInt(Intrant? intrant, int? quantityInt,String? selectedVariantInt) {
+    
+    var existingCartItemInt = cartItem.firstWhereOrNull(
+  (item) => item.intrant != null && item.intrant!.idIntrant == intrant!.idIntrant,
+);
+
+
+    if (existingCartItemInt != null) {
+      // existingCartItem.quantiteStock += quantity;
+    Snack.error(titre:"Alerte", message:existingCartItemInt.intrant!.nomIntrant + " existe déjà au panier");
+    } else {
+      cartItem.add(CartItem(intrant: intrant, quantiteIntrant: quantityInt!, isStock: false));
+    Snack.success(titre:"Alerte", message:intrant!.nomIntrant + " a été ajouté au panier");
 
     }
 
@@ -37,19 +58,45 @@ class CartProvider extends ChangeNotifier {
     }
     return quantity;
   }
+  int getIntrantQuantity(int intrantId) {
+    int quantity = 0;
+    for (CartItem item in cartItem) {
+      if (item.intrant!.idIntrant == intrantId) {
+        quantity += item.quantiteIntrant;
+      }
+    }
+    return quantity;
+  }
 
   int get cartCount {
-    return cartItem.fold(0, (sum, item) => sum + item.quantiteStock);
+    return cartItem.fold(0, (sum, item) => sum + item.quantiteStock + item.quantiteIntrant);
   }
 
-  double get totalPrice {
-    return cartItem.fold(
-        0.0, (sum, item) => sum + (item.stock!.prix! * item.quantiteStock));
-  }
+  // double get totalPrice {
+  //   return cartItem.fold(
+  //       0.0, (sum, item) => sum + (item.stock!.prix! * item.quantiteStock) + (item.intrant!.prixIntrant * item.quantiteIntrant));
+  // }
+        double get totalPrice {
+        return cartItem.fold(
+          0.0,
+          (sum, item) => sum +
+              ((item.stock != null ? item.stock!.prix! * item.quantiteStock : 0) +
+                  (item.intrant != null ? item.intrant!.prixIntrant * item.quantiteIntrant : 0))
+        );
+      }
+
 
   void updateCartItemQuantity(int index, int newQuantity) {
     if (index >= 0 && index < cartItem.length) {
       cartItem[index].quantiteStock = newQuantity;
+    
+      notifyListeners();
+    }
+  }
+
+  void updateCartItemIntQuantity(int index, int newQuantity) {
+    if (index >= 0 && index < cartItem.length) {
+      cartItem[index].quantiteIntrant = newQuantity;
     
       notifyListeners();
     }
@@ -62,10 +109,29 @@ class CartProvider extends ChangeNotifier {
     }
   }
 
+  void increaseCartItemIntQuantity(int index) {
+    if (index >= 0 && index < cartItem.length) {
+      cartItem[index].quantiteIntrant++;
+      notifyListeners();
+    }
+  }
+
   void decreaseCartItemQuantity(int index) {
     if (index >= 0 && index < cartItem.length) {
       if (cartItem[index].quantiteStock > 1) {
         cartItem[index].quantiteStock--;
+        notifyListeners();
+      } else {
+        // If the quantity is 1, remove the item from the cart
+        cartItem.removeAt(index);
+        notifyListeners();
+      }
+    }
+  }
+  void decreaseCartItemIntQuantity(int index) {
+    if (index >= 0 && index < cartItem.length) {
+      if (cartItem[index].quantiteIntrant > 1) {
+        cartItem[index].quantiteIntrant--;
         notifyListeners();
       } else {
         // If the quantity is 1, remove the item from the cart

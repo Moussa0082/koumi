@@ -9,8 +9,8 @@ import 'package:koumi_app/models/Stock.dart';
 
  class CommandeService{
 
-    final String apiUrl = 'https://koumi.ml/api-koumi/commande/'; // Replace with your API URL
-    // final String apiUrl = 'http://10.0.2.2:9000/api-koumi/commande/'; // Replace with your API URL
+    // final String apiUrl = 'https://koumi.ml/api-koumi/commande/'; // Replace with your API URL
+    final String apiUrl = 'http://10.0.2.2:9000/api-koumi/commande/'; // Replace with your API URL
 
 
 Future<Commande> createCommande(CommandeAvecStocks commandeAvecStocks) async {
@@ -27,6 +27,35 @@ Future<Commande> createCommande(CommandeAvecStocks commandeAvecStocks) async {
       return Commande.fromJson(data);
     } else {
       throw Exception('Erreur lors de la création de commande. Status code: ${response.statusCode}');
+    }
+  }
+
+
+  Future<Map<String, dynamic>> ajouterStocksACommande(CommandeAvecStocks commandeAvecStocks) async {
+    final String apiUrl = 'http://10.0.2.2/api-koumi/commande/add';
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({
+          'commande': commandeAvecStocks.commande.toJson(),
+          'stocks': commandeAvecStocks.stocks.map((stock) => stock.toJson()).toList(),
+          'intrants': commandeAvecStocks.intrants!.map((intrant) => intrant.toJson()).toList(),
+          'quantitesDemandees': commandeAvecStocks.quantitesDemandees,
+          'quantitesIntrants': commandeAvecStocks.quantitesIntrants,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception('Failed to add stocks to order');
+      }
+    } catch (e) {
+      throw Exception('Failed to add stocks to order: $e');
     }
   }
 

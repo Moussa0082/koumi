@@ -87,8 +87,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final String emailActeur = emailController.text;
     final String password = passwordController.text;
 
-    const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
-    // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
+    // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
+    const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
     const String defaultProfileImage = 'assets/images/profil.jpg';
 
@@ -267,36 +267,68 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _handleButtonPress() async {
-    // Afficher l'indicateur de chargement
-    setState(() {
-      _isLoading = true;
-    });
+  // void _handleButtonPress() async {
+  //   // Afficher l'indicateur de chargement
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
 
-    if (isActive) {
-      await loginUser().then((_) {
-        // Cacher l'indicateur de chargement lorsque votre fonction est terminée
-        setState(() {
-          _isLoading = false;
-        });
+  //   if (isActive) {
+  //     await loginUser().then((_) {
+  //       // Cacher l'indicateur de chargement lorsque votre fonction est terminée
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //     });
+  //   } else {
+  //     await loginUserWithoutSavedData().then((_) {
+  //       // Cacher l'indicateur de chargement lorsque votre fonction est terminée
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //     });
+  //   }
+  // }
+   void _handleButtonPress() async {
+  // Vérifier si le widget est toujours monté avant de continuer
+  if (!mounted) return;
+
+  // Afficher l'indicateur de chargement
+  setState(() {
+    _isLoading = true;
+  });
+
+  if (isActive) {
+    await loginUser().then((_) {
+      // Vérifier à nouveau si le widget est toujours monté
+      if (!mounted) return;
+      
+      // Cacher l'indicateur de chargement lorsque votre fonction est terminée
+      setState(() {
+        _isLoading = false;
       });
-    } else {
-      await loginUserWithoutSavedData().then((_) {
-        // Cacher l'indicateur de chargement lorsque votre fonction est terminée
-        setState(() {
-          _isLoading = false;
-        });
+    });
+  } else {
+    await loginUserWithoutSavedData().then((_) {
+      // Vérifier à nouveau si le widget est toujours monté
+      if (!mounted) return;
+      
+      // Cacher l'indicateur de chargement lorsque votre fonction est terminée
+      setState(() {
+        _isLoading = false;
       });
-    }
+    });
   }
+}
+
 
   Future<void> loginUserWithoutSavedData() async {
     final String emailActeur = emailController.text;
     final String password = passwordController.text;
 
-    const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
-//
-    // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
+    // const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
+
+    const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
     ActeurProvider acteurProvider =
         Provider.of<ActeurProvider>(context, listen: false);

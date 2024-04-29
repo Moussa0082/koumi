@@ -39,21 +39,39 @@ class _CartListItemState extends State<CartListItem> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-         ClipRRect(
+     widget.cartItem.isStock == true? ClipRRect(
   borderRadius: BorderRadius.circular(8),
-  child: widget.cartItem.stock!.photo != null && widget.cartItem.stock!.photo!.isNotEmpty
-      ? CachedNetworkImage(
-          imageUrl: widget.cartItem.stock!.photo!,
+  child: widget.cartItem.stock!.photo != null
+      ?  CachedNetworkImage(
+          imageUrl: 
+           widget.cartItem.stock!.photo!,
           fit: BoxFit.cover,
           width: 67,
           height: 100,
           placeholder: (context, url) =>
               const Center(child: CircularProgressIndicator()),
-          errorWidget: (context, url, error) => Image.asset("assets/images/mang.jpg", width: 67,
+          errorWidget: (context, url, error) => Image.asset("assets/images/default_image.png", width: 67,
           height: 100,),
         )
-      : Image.asset("assets/images/mang.jpg", width: 67,
-          height: 100,), // Use a placeholder image if URL is invalid or empty
+      : Image.asset("assets/images/default_image.png", width: 67,
+          height: 100,),
+) :
+ ClipRRect(
+  borderRadius: BorderRadius.circular(8),
+  child: widget.cartItem.intrant!.photoIntrant != null
+      ?  CachedNetworkImage(
+          imageUrl: 
+           widget.cartItem.intrant!.photoIntrant!,
+          fit: BoxFit.cover,
+          width: 67,
+          height: 100,
+          placeholder: (context, url) =>
+              const Center(child: CircularProgressIndicator()),
+          errorWidget: (context, url, error) => Image.asset("assets/images/default_image.png", width: 67,
+          height: 100,),
+        )
+      : Image.asset("assets/images/default_image.png", width: 67,
+          height: 100,),
 ),
           const SizedBox(
             width: 10,
@@ -65,7 +83,7 @@ class _CartListItemState extends State<CartListItem> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.cartItem.stock!.nomProduit!,
+                   widget.cartItem.isStock == true ? widget.cartItem.stock!.nomProduit! : widget.cartItem.intrant!.nomIntrant,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.left,
@@ -77,7 +95,7 @@ class _CartListItemState extends State<CartListItem> {
                   Row(
                     children: [
                       Text(
-                        "${widget.cartItem.stock!.prix!.toInt()} F",
+                        "${widget.cartItem.isStock == true ? widget.cartItem.stock!.prix!.toInt() : widget.cartItem.intrant!.prixIntrant} F",
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       Expanded(child: Container()),
@@ -105,9 +123,11 @@ class _CartListItemState extends State<CartListItem> {
                               color: Colors.white,
                               iconSize: 16,
                               onPressed: () {
-                                Provider.of<CartProvider>(context,
+                              widget.cartItem.isStock == true ? Provider.of<CartProvider>(context,
                                         listen: false)
-                                    .increaseCartItemQuantity(widget.index);
+                                    .increaseCartItemQuantity(widget.index) :Provider.of<CartProvider>(context,
+                                        listen: false)
+                                    .increaseCartItemIntQuantity(widget.index) ;
                               },
                             ),
                           ),
@@ -115,7 +135,7 @@ class _CartListItemState extends State<CartListItem> {
                             width: 5,
                           ),
                           Text(
-                            widget.cartItem.quantiteStock.toString(),
+                           widget.cartItem.isStock == true ? widget.cartItem.quantiteStock.toString() : widget.cartItem.quantiteIntrant.toString(),
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const SizedBox(
@@ -144,9 +164,11 @@ class _CartListItemState extends State<CartListItem> {
                               iconSize: 16,
                               onPressed: () {
                                 if (quantity >= 1) {
-                                  Provider.of<CartProvider>(context,
+                                widget.cartItem.isStock == true ?  Provider.of<CartProvider>(context,
                                           listen: false)
-                                      .decreaseCartItemQuantity(widget.index);
+                                      .decreaseCartItemQuantity(widget.index): Provider.of<CartProvider>(context,
+                                          listen: false)
+                                      .decreaseCartItemIntQuantity(widget.index);
                                 }
                               },
                             ),

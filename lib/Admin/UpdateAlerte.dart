@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:koumi_app/api/firebase_api.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Alertes.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/AlerteService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
@@ -13,17 +13,18 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
-class AddAlerte extends StatefulWidget {
-  const AddAlerte({super.key});
+class UpdateAlerted extends StatefulWidget {
+  final Alertes alertes;
+  const UpdateAlerted({super.key, required this.alertes});
 
   @override
-  State<AddAlerte> createState() => _AddAlerteState();
+  State<UpdateAlerted> createState() => _UpdateAlertedState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _AddAlerteState extends State<AddAlerte> {
+class _UpdateAlertedState extends State<UpdateAlerted> {
   TextEditingController _titreController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   final recorder = FlutterSoundRecorder();
@@ -42,6 +43,7 @@ class _AddAlerteState extends State<AddAlerte> {
   final ImagePicker _picker = ImagePicker();
   double _progressValue = 0;
   bool _hasUploadStarted = false;
+  late Alertes alerte;
 
   void setProgress(double value) async {
     setState(() {
@@ -192,6 +194,12 @@ class _AddAlerteState extends State<AddAlerte> {
     super.initState();
     initRecoder();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    alerte = widget.alertes;
+    _titreController.text = alerte.titreAlerte!;
+    _descriptionController.text = alerte.descriptionAlerte!;
+    _tokenAudioController.text = alerte.audioAlerte!;
+    _tokenImageController.text = alerte.photoAlerte!;
+    _tokenTextController.text = alerte.videoAlerte!;
   }
 
   @override
@@ -477,17 +485,15 @@ class _AddAlerteState extends State<AddAlerte> {
                                         photoUploaded != null ||
                                         audiosUploaded != null) {
                                       await AlertesService()
-                                          .creerAlertes(
+                                          .updateAlertes(
+                                              idAlerte: alerte.idAlerte!,
                                               titreAlerte: titre,
                                               descriptionAlerte: description,
                                               videoAlerte: _videoUploaded,
-                                              audioAlerte: audiosUploaded,
-                                              photoAlerte: photoUploaded)
+                                              photoAlerte: photoUploaded,
+                                              audioAlerte: audiosUploaded
+                                              )
                                           .then((value) => {
-                                                FirebaseApi()
-                                                    .sendPushNotificationToTopic(
-                                                        'Nouvelle alerte',
-                                                        titre),
                                                 _titreController.clear(),
                                                 _descriptionController.clear(),
                                                 _tokenTextController.clear(),
@@ -517,7 +523,7 @@ class _AddAlerteState extends State<AddAlerte> {
                                                     content: Row(
                                                       children: [
                                                         Text(
-                                                          "Une erreur est survenu lors de l'ajout",
+                                                          "Une erreur est survenu lors de la modification",
                                                           style: TextStyle(
                                                               overflow:
                                                                   TextOverflow
@@ -532,14 +538,11 @@ class _AddAlerteState extends State<AddAlerte> {
                                               });
                                     } else {
                                       await AlertesService()
-                                          .creerAlertes(
+                                          .updateAlertes(
+                                              idAlerte: alerte.idAlerte!,
                                               titreAlerte: titre,
                                               descriptionAlerte: description)
                                           .then((value) => {
-                                                FirebaseApi()
-                                                    .sendPushNotificationToTopic(
-                                                        'Nouvelle alerte',
-                                                        titre),
                                                 _titreController.clear(),
                                                 _descriptionController.clear(),
                                                 _tokenTextController.clear(),
@@ -570,7 +573,7 @@ class _AddAlerteState extends State<AddAlerte> {
                                         content: Row(
                                           children: [
                                             Text(
-                                              "Une erreur est survenu lors de l'ajout",
+                                              "Une erreur est survenu lors de la modification",
                                               style: TextStyle(
                                                   overflow:
                                                       TextOverflow.ellipsis),
@@ -592,7 +595,7 @@ class _AddAlerteState extends State<AddAlerte> {
                                 minimumSize: const Size(290, 45),
                               ),
                               child: Text(
-                                "Ajouter",
+                                "Modifier",
                                 style: TextStyle(
                                   fontSize: 20,
                                   color: Colors.white,

@@ -15,8 +15,8 @@ import 'package:provider/provider.dart';
 
 class MagasinService extends ChangeNotifier{
 
-    static const String baseUrl = 'https://koumi.ml/api-koumi/Magasin';
-    // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Magasin';
+    // static const String baseUrl = 'https://koumi.ml/api-koumi/Magasin';
+    static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Magasin';
     List<Magasin> magasin = [];
  
   Future<void> creerMagasin({
@@ -125,8 +125,7 @@ class MagasinService extends ChangeNotifier{
    Future<List<Magasin>> fetchMagasinByRegion(String id) async {
     try {
       final response = await http.get(Uri.parse(
-          'https://koumi.ml/api-koumi/Magasin/getAllMagasinByPays/${id}'));
-          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByPays/${id}'));
+          '$baseUrl/getAllMagasinByPays/${id}'));
       if (response.statusCode == 200) {
   // final String jsonString = utf8.decode(response.bodyBytes);
   //       List<dynamic> data = json.decode(jsonString);
@@ -147,7 +146,7 @@ class MagasinService extends ChangeNotifier{
    Future<List<Magasin>> fetchMagasinByActeur(String id) async {
     try {
       final response = await http.get(Uri.parse(
-          'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
+          '$baseUrl/getAllMagasinByActeur/${id}'));
           // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
       if (response.statusCode == 200) {
 
@@ -171,8 +170,7 @@ class MagasinService extends ChangeNotifier{
    Future<List<Magasin>> fetchAllMagasin() async {
     try {
       final response = await http.get(Uri.parse(
-          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagagin'));
-          'https://koumi.ml/api-koumi/Magasin/getAllMagagin'));
+          '$baseUrl/Magasin/getAllMagagin'));
       if (response.statusCode == 200) {
   // final String jsonString = utf8.decode(response.bodyBytes);
   //       List<dynamic> data = json.decode(jsonString);
@@ -195,7 +193,7 @@ class MagasinService extends ChangeNotifier{
    Future<List<Magasin>> fetchMagasinByRegionAndActeur(String idActeur, String idNiveau1Pays) async {
     // try {
       final response = await http.get(Uri.parse(
-          'https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/${idActeur}/${idNiveau1Pays}'));
+          '$baseUrl/getAllMagasinByActeurAndNiveau1Pays/${idActeur}/${idNiveau1Pays}'));
           // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/$idActeur/$idNiveau1Pays'));
       if (response.statusCode == 200 || response.statusCode == 201 ||  response.statusCode == 202) {
   // final String jsonString = utf8.decode(response.bodyBytes);

@@ -87,6 +87,7 @@ class _StoreScreenState extends State<StoreScreen> {
     _niveau1PaysList =
         http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+
     super.initState();
   }
 
@@ -102,6 +103,7 @@ class _StoreScreenState extends State<StoreScreen> {
     return Scaffold(
       appBar: AppBar(
       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+
           centerTitle: true,
           toolbarHeight: 100,
           leading: IconButton(
@@ -178,7 +180,9 @@ class _StoreScreenState extends State<StoreScreen> {
                   return Text("Une erreur s'est produite veuillez reessayer");
                 }
                 if (snapshot.hasData) {
-                  dynamic responseData = json.decode(snapshot.data.body);
+                  dynamic jsonString =
+                                utf8.decode(snapshot.data.bodyBytes);
+                            dynamic responseData = json.decode(jsonString);
                   if (responseData is List) {
                     final reponse = responseData;
                     final niveau1PaysList = reponse
@@ -389,6 +393,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                                           );
                                                         },
                                                       ),
+
                                               ),
                                             ),
                                           ),
@@ -582,6 +587,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                                             fit: BoxFit.cover,
                                                           );
                                                         },
+
                                                       ),
                                               ),
                                             ),
@@ -595,6 +601,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,
                                                 color: d_colorGreen,
+
                                               ),
                                             ),
                                           ),

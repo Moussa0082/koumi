@@ -10,9 +10,11 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Filiere.dart';
 import 'package:koumi_app/models/Forme.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
+import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductEndScreen.dart';
 import 'package:path_provider/path_provider.dart' ;
 import 'package:path/path.dart' as path;
@@ -55,7 +57,8 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
   late Future _niveau3List;
   String? n3Value;
   String niveau3 = '';
-
+  List<ParametreGeneraux> paraList = [];
+  late ParametreGeneraux para = ParametreGeneraux();
 
     Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
@@ -126,6 +129,18 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
     );
   }
    
+   void verifyParam() {
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+
+    if (paraList.isNotEmpty) {
+      para = paraList[0];
+    } else {
+      // Gérer le cas où la liste est null ou vide, par exemple :
+      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+    }
+  }
+
 
   @override
   void initState() {
@@ -143,10 +158,11 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
       _quantiteController.text = widget.stock!.quantiteStock!.toString();
     }
         _formeList = http.get(Uri.parse(
-        'https:koumi.ml/api-koumi/formeproduit/getAllForme/'));
+        'https://koumi.ml/api-koumi/formeproduit/getAllForme/'));
         // 'http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
             _niveau3List =
         http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
+   verifyParam();
   }
 
    
@@ -348,7 +364,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                   });
                                 },
                                 decoration: InputDecoration(
-                                  labelText: 'Sélectionner la forme',
+                                  labelText: widget.isEditable == false ? 'Sélectionner la forme' : widget.stock!.formeProduit!,
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(
@@ -478,7 +494,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                     });
                                   },
                                   decoration: InputDecoration(
-                                    labelText: 'Selectionner une localité',
+                                    labelText: widget.isEditable == false ? 'Selectionner une localité' : widget.stock!.origineProduit!,
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -526,7 +542,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Text(
-                            "Prix du produit",
+                            "Prix du produit en (${para.monnaie})",
                             style:
                                 TextStyle(color: (Colors.black), fontSize: 18),
                           ),
@@ -548,7 +564,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                             FilteringTextInputFormatter.digitsOnly,
                           ],
                           decoration: InputDecoration(
-                            hintText: "Prix du produit",
+                            hintText: "Prix du produit en (${para.monnaie})",
                             contentPadding: const EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 20),
                             border: OutlineInputBorder(
@@ -585,7 +601,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                             return null;
                           },
                           controller: _quantiteController,
-                          keyboardType: TextInputType.text,
+                          keyboardType: TextInputType.phone,
                           inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.digitsOnly,
                           ],
@@ -628,7 +644,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                               Navigator.push(context, MaterialPageRoute(builder:
                (context)=> (AddAndUpdateProductEndSreen(isEditable:widget.isEditable!,
                               nomProduit: _nomController.text, forme: forme.libelleForme!,
-                              origine: _origineController.text, prix: _prixController.text.toString(),
+                              origine: niveau3, prix: _prixController.text.toString(),
                               image: photo,
                               quantite: _quantiteController.text, stock: widget.stock,
                               ))));

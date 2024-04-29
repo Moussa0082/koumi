@@ -78,6 +78,19 @@ class _ProductScreenState extends State<ProductScreen> {
       return stockListe;
    }
 
+   // Méthode pour mettre à jour la liste de stocks
+void updateStockList() async {
+  try {
+  
+    setState(() {
+      stockListeFuture = getAllStock();
+    });
+  } catch (error) {
+    print('Erreur lors de la mise à jour de la liste de stocks: $error');
+  }
+}
+
+
    
 
   @override
@@ -108,11 +121,11 @@ class _ProductScreenState extends State<ProductScreen> {
       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
           centerTitle: true,
           toolbarHeight: 100,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+          // leading: IconButton(
+          //     onPressed: () {
+          //       Navigator.of(context).pop();
+          //     },
+          //     icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
             'Tous les Produit',
             style: const TextStyle(
@@ -203,7 +216,9 @@ class _ProductScreenState extends State<ProductScreen> {
                   return Text("Une erreur s'est produite veuillez reessayer");
                 }
                 if (snapshot.hasData) {
-                  dynamic responseData = json.decode(snapshot.data.body);
+                  dynamic jsonString =
+                                utf8.decode(snapshot.data.bodyBytes);
+                            dynamic responseData = json.decode(jsonString);
                   if (responseData is List) {
                     final reponse = responseData;
                     final categorieList = reponse
@@ -393,7 +408,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                                 height: 90,
                                                 child: e.photo == null
                                                     ? Image.asset(
-                                                        "assets/images/mang.jpg",
+                                                        "assets/images/default_image.png",
                                                         fit: BoxFit.cover,
                                                       )
                                                     : Image.network(
@@ -407,7 +422,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                                                 StackTrace?
                                                                     stackTrace) {
                                                           return Image.asset(
-                                                            'assets/images/mang.jpg.png',
+                                                            'assets/images/default_image.png',
                                                             fit: BoxFit.cover,
                                                           );
                                                         },

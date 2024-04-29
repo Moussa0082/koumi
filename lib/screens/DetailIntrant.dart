@@ -9,9 +9,11 @@ import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/CartProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
+import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -381,7 +383,41 @@ class _DetailIntrantState extends State<DetailIntrant> {
                                 ),
                         ),
                   SizedBox(height: 30),
-                  !_isEditing ? viewData() : _buildEditing()
+                  !_isEditing ? viewData() : _buildEditing(),
+                  SizedBox(height: 10),
+                   isExist == true ? 
+                  widget.intrant.acteur.idActeur == acteur.idActeur
+                      ? SizedBox()
+                      : Center(
+                          child: SizedBox(
+                            width: 200,
+                            height: 48,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // _addToCart(widget.stock);
+                                if (widget.intrant.acteur.idActeur ==
+                                    acteur.idActeur) {
+                                  Snack.error(
+                                      titre: "Alerte",
+                                      message:
+                                          "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
+                                } else {
+                                  Provider.of<CartProvider>(context, listen: false)
+                        .addToCartInt(widget.intrant, 1, "");
+                               }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.orange,
+                                  shape: const StadiumBorder()),
+                              child: Text(
+                                "Ajouter",
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ) : SizedBox(),
+
                 ],
               ),
             ),

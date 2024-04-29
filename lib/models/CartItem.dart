@@ -12,7 +12,8 @@ class CartItem {
   final Intrant? intrant;
   int quantiteIntrant;
   int quantiteStock;
-  CartItem({ this.stock, this.intrant, this.quantiteIntrant = 1, this.quantiteStock = 1});
+  bool? isStock;
+  CartItem({ this.stock, this.intrant, this.quantiteIntrant = 1, this.quantiteStock = 1,  this.isStock});
 
 }
 

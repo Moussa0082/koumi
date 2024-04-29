@@ -7,6 +7,7 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CartItem.dart';
 import 'package:koumi_app/models/Commande.dart';
 import 'package:koumi_app/models/CommandeAvecStocks.dart';
+import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
@@ -67,6 +68,15 @@ class _PanierState extends State<Panier> {
             .toDouble(), // Assuming quantiteStock is of type double
       );
     }).toList();
+    // Map each CartItem to a Intrant object
+    // List<Intrant> intrants = cartItems.map((cartItem) {
+    //   return Intrant(
+    //     idIntrant:
+    //         cartItem.stock!.idStock, // Assuming stock is a property in CartItem
+    //     quantiteStock: cartItem.quantiteStock
+    //         .toDouble(), // Assuming quantiteStock is of type double
+    //   );
+    // }).toList();
 
     // Prepare the Commande object
     Acteur acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
@@ -76,6 +86,7 @@ class _PanierState extends State<Panier> {
     CommandeAvecStocks commandeAvecStocks = CommandeAvecStocks(
       commande: commande,
       stocks: stocks,
+      // stocks: stocks,
       quantitesDemandees: stocks.map((stock) => stock.quantiteStock!).toList(),
     );
 
@@ -83,8 +94,8 @@ class _PanierState extends State<Panier> {
     String jsonData = jsonEncode(commandeAvecStocks);
 
     // Make the HTTP request
-    final url = 'https://koumi.ml/api-koumi/commande/add';
-    // final url = 'http://10.0.2.2:9000/api-koumi/commande/add';
+    // final url = 'https://koumi.ml/api-koumi/commande/add';
+    final url = 'http://10.0.2.2:9000/api-koumi/commande/add';
 
     try {
       final response = await http.post(
@@ -241,7 +252,7 @@ class _PanierState extends State<Panier> {
                             itemBuilder: (context, index) {
                               final cartItem = cartItems[index];
                               return Dismissible(
-                                key: Key(cartItem.stock!.idStock!),
+                                key: Key(cartItem.isStock == true ? cartItem.stock!.idStock! : cartItem.intrant!.idIntrant!),
                                 // Use a unique key for each item
                                 background: Container(
                                   color: Colors.red,

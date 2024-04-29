@@ -210,7 +210,9 @@ Future<List<Magasin>> fetchMagasins() async {
                   return Text("Une erreur s'est produite veuillez reessayer");
                 }
                 if (snapshot.hasData) {
-                  dynamic responseData = json.decode(snapshot.data.body);
+                 dynamic jsonString =
+                                utf8.decode(snapshot.data.bodyBytes);
+                            dynamic responseData = json.decode(jsonString);
                   if (responseData is List) {
                     final reponse = responseData;
                     final niveau1PaysList = reponse
@@ -390,35 +392,32 @@ Future<List<Magasin>> fetchMagasins() async {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.stretch,
                                         children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              child: SizedBox(
-                                                height: 90,
-                                                child: e.photo == null
-                                                    ? Image.asset(
-                                                        "assets/images/magasin.png",
-                                                        fit: BoxFit.cover,
-                                                      )
-                                                    : Image.network(
-                                                        "https://koumi.ml/api-koumi/Magasin/${e.idMagasin}/image",
-                                                        fit: BoxFit.cover,
-                                                        errorBuilder:
-                                                            (BuildContext
-                                                                    context,
-                                                                Object
-                                                                    exception,
-                                                                StackTrace?
-                                                                    stackTrace) {
-                                                          return Image.asset(
-                                                            'assets/images/magasin.png',
-                                                            fit: BoxFit.cover,
-                                                          );
-                                                        },
-                                                      ),
-                                              ),
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            child: SizedBox(
+                                              height: 90,
+                                              child: e.photo == null
+                                                  ? Image.asset(
+                                                      "assets/images/magasin.png",
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : Image.network(
+                                                      "https://koumi.ml/api-koumi/Magasin/${e.idMagasin}/image",
+                                                      fit: BoxFit.cover,
+                                                      errorBuilder:
+                                                          (BuildContext
+                                                                  context,
+                                                              Object
+                                                                  exception,
+                                                              StackTrace?
+                                                                  stackTrace) {
+                                                        return Image.asset(
+                                                          'assets/images/magasin.png',
+                                                          fit: BoxFit.cover,
+                                                        );
+                                                      },
+                                                    ),
                                             ),
                                           ),
                                           Padding(

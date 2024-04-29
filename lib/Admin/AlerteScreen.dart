@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:koumi_app/Admin/AddAlerte.dart';
 import 'package:koumi_app/Admin/AlerteDisable.dart';
 import 'package:koumi_app/Admin/DetailAlerte.dart';
+import 'package:koumi_app/Admin/UpdateAlerte.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Alertes.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -391,6 +392,38 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                                             Duration(seconds: 2),
                                                                       ),
                                                                     );
+                                                                  },
+                                                                ),
+                                                              ),
+                                                              PopupMenuItem<
+                                                                  String>(
+                                                                child: ListTile(
+                                                                  leading:
+                                                                      const Icon(
+                                                                  Icons
+                                                                        .edit,
+                                                                     color:
+                                                                  Colors.green,
+                                                                  ),
+                                                                  title:
+                                                                      const Text(
+                                                                    "Modifier",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .green,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  onTap:
+                                                                      () async {
+                                                                    Navigator.push(
+                                                                        context,
+                                                                        MaterialPageRoute(
+                                                                            builder: (context) =>
+                                                                                UpdateAlerted(alertes: e)));
                                                                   },
                                                                 ),
                                                               ),

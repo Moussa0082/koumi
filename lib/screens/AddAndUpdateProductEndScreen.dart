@@ -73,7 +73,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
             id = acteur.idActeur;
     magasinListe =
-        http.get(Uri.parse('https:koumi.ml/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
+        http.get(Uri.parse('https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
       setState(() {
         isExist = true;
@@ -100,6 +100,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
       setState(() {
         isLoading = false;
       });
+      Navigator.of(context).pop();
      });
     }else{
   await updateProduit().then((_) {
@@ -108,6 +109,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
       setState(() {
         isLoading = false;
       });
+      Navigator.of(context).pop();
      });
      _typeController.clear();
      _descriptionController.clear();
@@ -205,15 +207,15 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
         http.get(Uri.parse('https://koumi.ml/api-koumi/ZoneProduction/getAllZone'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/ZoneProduction/getAllZone'));
 
-          debugPrint("id : $id, type : ${widget.stock!.typeProduit!}, desc : ${widget.stock!.descriptionStock!}  acteur : $acteur");
         
+    debugPrint("nom : ${widget.nomProduit}, bool : ${widget.isEditable} , forme: ${widget.forme}, origine : ${widget.origine}, qte : ${widget.quantite}, prix : ${widget.prix}");
          
     super.initState();
     if(widget.isEditable! == true){
      _typeController.text = widget.stock!.typeProduit!;
      _descriptionController.text = widget.stock!.descriptionStock!;
+          debugPrint("id : $id, type : ${widget.stock!.typeProduit!}, desc : ${widget.stock!.descriptionStock!}  acteur : $acteur");
     }
-    debugPrint("nom : ${widget.nomProduit}, bool : ${widget.isEditable} , forme: ${widget.forme}, origine : ${widget.origine}, qte : ${widget.quantite}, prix : ${widget.prix}");
   }
 
 
@@ -348,8 +350,9 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                             return Text("Une erreur s'est produite veuillez réessayer");
                               }
                               if (snapshot.hasData) {
-                                dynamic responseData =
-                                    json.decode(snapshot.data.body);
+                                dynamic jsonString =
+                                utf8.decode(snapshot.data.bodyBytes);
+                            dynamic responseData = json.decode(jsonString);
                                 if (responseData is List) {
                                   final reponse = responseData;
                                   final speculationListe = reponse
@@ -398,7 +401,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   
                                     decoration: InputDecoration(
                                       
-                                      labelText: widget.stock!.speculation!.nomSpeculation == null ? 'Selectionner une spéculation' : widget.stock!.speculation!.nomSpeculation!,
+                                      labelText: widget.isEditable == false ? 'Selectionner une spéculation' : widget.stock!.speculation!.nomSpeculation!,
                                       contentPadding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
                                       border: OutlineInputBorder(
@@ -458,7 +461,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'En cours de chargement',
+                                    labelText: 'En cours de chargement ...',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -471,8 +474,9 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                             return Text("Une erreur s'est produite veuillez réessayer plus tard");
                               }
                               if (snapshot.hasData) {
-                                dynamic responseData =
-                                    json.decode(snapshot.data.body);
+                                dynamic jsonString =
+                                utf8.decode(snapshot.data.bodyBytes);
+                            dynamic responseData = json.decode(jsonString);
                                 if (responseData is List) {
                                   final reponse = responseData;
                                   final magasinListe = reponse
@@ -519,7 +523,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                       });
                                     },
                                     decoration: InputDecoration(
-                                      labelText: widget.stock!.magasin!.nomMagasin == null ? 'Selectionner un magasin' : widget.stock!.magasin!.nomMagasin,
+                                      labelText: widget.isEditable == false ? 'Selectionner un magasin' : widget.stock!.magasin!.nomMagasin,
                                       contentPadding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
                                       border: OutlineInputBorder(
@@ -592,8 +596,9 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                             return Text("Une erreur s'est produite veuillez réessayer plus tard");
                               }
                               if (snapshot.hasData) {
-                                dynamic responseData =
-                                    json.decode(snapshot.data.body);
+                                dynamic jsonString =
+                                utf8.decode(snapshot.data.bodyBytes);
+                            dynamic responseData = json.decode(jsonString);
                                 if (responseData is List) {
                                   final reponse = responseData;
                                   final uniteListe = reponse
@@ -640,7 +645,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                       });
                                     },
                                     decoration: InputDecoration(
-                                      labelText: widget.stock!.unite!.nomUnite == null ? 'Selectionner une unité' : widget.stock!.unite!.nomUnite ,
+                                      labelText: widget.isEditable == false ? 'Selectionner une unité' : widget.stock!.unite!.nomUnite ,
                                       contentPadding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
                                       border: OutlineInputBorder(
@@ -700,7 +705,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'En cours de chargement',
+                                    labelText: 'En cours de chargement ...',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -713,8 +718,9 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                             return Text("Une erreur s'est produite veuillez réessayer plus tard");
                               }
                               if (snapshot.hasData) {
-                                dynamic responseData =
-                                    json.decode(snapshot.data.body);
+                                dynamic jsonString =
+                                utf8.decode(snapshot.data.bodyBytes);
+                            dynamic responseData = json.decode(jsonString);
                                 if (responseData is List) {
                                   final reponse = responseData;
                                   final zoneListe = reponse
@@ -761,7 +767,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                       });
                                     },
                                     decoration: InputDecoration(
-                                     labelText: widget.stock!.zoneProduction!.nomZoneProduction == null ?'Selectionner une zone de production' : widget.stock!.zoneProduction!.nomZoneProduction,
+                                     labelText: widget.isEditable == false ? 'Selectionner une zone de production' : widget.stock!.zoneProduction!.nomZoneProduction,
                                       contentPadding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
                                       border: OutlineInputBorder(
