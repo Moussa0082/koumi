@@ -134,7 +134,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
           //     },
           //     icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
-            'Mes Produit',
+            'Mes Produits',
             style: const TextStyle(
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
@@ -383,8 +383,8 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => MyProductScreen(
-                                        id: filtereSearch[index].idStock, nom:filtereSearch[index].nomProduit
+                                      builder: (context) => DetailProduits(
+                                        stock:filtereSearch[index]
                                       ),
                                     ),
                                   );
@@ -447,7 +447,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                         ),
                                         subtitle: Text(
                                           overflow: TextOverflow.ellipsis,
-                                         " ${filtereSearch[index].quantiteStock!.toString()} ${filtereSearch[index].unite!.nomUnite} ",
+                                         "${filtereSearch[index].quantiteStock!.toString()} ${filtereSearch[index].unite!.nomUnite} ",
                                           style:TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
@@ -460,10 +460,10 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 15),
                                         child: Text(
-                                          // para.monnaie != null
-                                              // ? 
+                                          para.monnaie != null
+                                              ? 
                                               "${filtereSearch[index].prix.toString()} ${para.monnaie}"
-                                              // :
+                                              :
                                                "${filtereSearch[index].prix.toString()} FCFA",
                                           style: TextStyle(
                                             fontSize: 16,

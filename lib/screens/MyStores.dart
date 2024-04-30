@@ -376,7 +376,7 @@ Future<List<Magasin>> fetchMagasins() async {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => ProductScreen(
+                                      builder: (context) => MyProductScreen(
                                         id: filtereSearch[index].idMagasin, nom:filtereSearch[index].nomMagasin
                                       ),
                                     ),

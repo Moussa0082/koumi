@@ -407,8 +407,12 @@ void updateStockList() async {
                               childAspectRatio: 0.8,
                             ),
                             itemCount: 
+                             typeActeurData.map((e) => e.libelle!.toLowerCase()).contains("admin") ?
                             stockListe
-                                .length ,
+                                .length :
+                                stockListe.where((element) => element.statutSotck == true)
+                                .length
+                                ,
                             itemBuilder: (context, index) {
                              
                               return GestureDetector(

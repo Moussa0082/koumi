@@ -230,7 +230,7 @@ class StockService extends ChangeNotifier {
         throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
       }
     } catch (e) {
-            print('Error fetching magasins : $e');
+            print('Error fetching stock: $e');
       // throw Exception(e.toString());
     }
         return stockList;
