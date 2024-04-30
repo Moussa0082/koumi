@@ -585,7 +585,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                   content: Row(
                                     children: [
                                       Text(
-                                        "Une erreur s'est produite",
+                                        "Erreur de connexion !",
                                         style: TextStyle(
                                             overflow: TextOverflow.ellipsis),
                                       ),
