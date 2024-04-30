@@ -83,7 +83,7 @@ class _CartListItemState extends State<CartListItem> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                   widget.cartItem.isStock == true ? widget.cartItem.stock!.nomProduit! : widget.cartItem.intrant!.nomIntrant,
+                   widget.cartItem.isStock == true ? widget.cartItem.stock!.nomProduit! : widget.cartItem.intrant!.nomIntrant!,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.left,

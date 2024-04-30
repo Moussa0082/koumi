@@ -91,8 +91,8 @@ class _DetailIntrantState extends State<DetailIntrant> {
     // para = paraList[0];
     verifyParam();
     intrants = widget.intrant;
-    _nomController.text = intrants.nomIntrant;
-    _descriptionController.text = intrants.descriptionIntrant;
+    _nomController.text = intrants.nomIntrant!;
+    _descriptionController.text = intrants.descriptionIntrant!;
     _quantiteController.text = intrants.quantiteIntrant.toString();
     _prixController.text = intrants.prixIntrant.toString();
     _dateController.text = intrants.dateExpiration!;
@@ -318,7 +318,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                   style: const TextStyle(
                       color: d_colorGreen, fontWeight: FontWeight.bold),
                 ),
-                actions: acteur.nomActeur == intrants.acteur.nomActeur
+                actions: acteur.nomActeur == intrants.acteur!.nomActeur
                     ? [
                         _isEditing
                             ? IconButton(
@@ -386,7 +386,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                   !_isEditing ? viewData() : _buildEditing(),
                   SizedBox(height: 10),
                    isExist == true ? 
-                  widget.intrant.acteur.idActeur == acteur.idActeur
+                  widget.intrant.acteur!.idActeur == acteur.idActeur
                       ? SizedBox()
                       : Center(
                           child: SizedBox(
@@ -395,7 +395,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                             child: ElevatedButton(
                               onPressed: () {
                                 // _addToCart(widget.stock);
-                                if (widget.intrant.acteur.idActeur ==
+                                if (widget.intrant.acteur!.idActeur ==
                                     acteur.idActeur) {
                                   Snack.error(
                                       titre: "Alerte",
@@ -422,7 +422,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                 ],
               ),
             ),
-            floatingActionButton: acteur.nomActeur != intrants.acteur.nomActeur
+            floatingActionButton: acteur.nomActeur != intrants.acteur!.nomActeur
                 ? SpeedDial(
                     // animatedIcon: AnimatedIcons.close_menu,
 
@@ -444,7 +444,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         ),
                         onTap: () {
                           final String whatsappNumber =
-                              intrants.acteur.whatsAppActeur!;
+                              intrants.acteur!.whatsAppActeur!;
                           _makePhoneWa(whatsappNumber);
                         },
                       ),
@@ -458,7 +458,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         ),
                         onTap: () {
                           final String numberPhone =
-                              intrants.acteur.telephoneActeur!;
+                              intrants.acteur!.telephoneActeur!;
                           _makePhoneCall(numberPhone);
                         },
                       )
@@ -505,7 +505,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
             ),
             child: Center(
               child: Text(
-                intrants.nomIntrant.toUpperCase(),
+                intrants.nomIntrant!.toUpperCase(),
                 style: const TextStyle(
                     overflow: TextOverflow.ellipsis,
                     fontSize: 20,
@@ -534,7 +534,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
             ),
           ),
         ),
-        _buildDescription(intrants.descriptionIntrant),
+        _buildDescription(intrants.descriptionIntrant!),
         // acteur.nomActeur != intrants.acteur.nomActeur
         //     ? Padding(
         //         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -580,7 +580,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
         _buildItem(
             'Filière  ', intrants.categorieProduit!.filiere!.libelleFiliere!),
         _buildItem('Date d\'ajout ', '${intrants.dateAjout}' ?? 'N/A'),
-        acteur.nomActeur != intrants.acteur.nomActeur
+        acteur.nomActeur != intrants.acteur!.nomActeur
             ? _buildFournissuer()
             : Container(),
       ],
@@ -600,7 +600,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
   _buildData() {
     return Column(
       children: [
-        _buildItem('Nom intrant ', intrants.nomIntrant),
+        _buildItem('Nom intrant ', intrants.nomIntrant!),
         _buildItem('Quantité ', intrants.quantiteIntrant.toString()),
         _buildItem('Date péremption ', intrants.dateExpiration!),
         para.monnaie != null
@@ -608,7 +608,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                 'Prix ', '${intrants.prixIntrant.toString()} ${para.monnaie}')
             : _buildItem('Prix ', '${intrants.prixIntrant.toString()} FCFA'),
         _buildItem('Unité ', '${intrants.unite}'),
-        _buildItem('Forme ', '${intrants.forme.libelleForme}'),
+        _buildItem('Forme ', '${intrants.forme!.libelleForme}'),
         _buildItem('Statut ',
             '${intrants.statutIntrant! ? 'Disponible' : 'Non disponible'}'),
       ],
@@ -618,8 +618,8 @@ class _DetailIntrantState extends State<DetailIntrant> {
   _buildFournissuer() {
     return Column(
       children: [
-        _buildItem('Nom du fournisseur ', intrants.acteur.nomActeur!),
-        _buildItem('Contact ', intrants.acteur.telephoneActeur!),
+        _buildItem('Nom du fournisseur ', intrants.acteur!.nomActeur!),
+        _buildItem('Contact ', intrants.acteur!.telephoneActeur!),
       ],
     );
   }

@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
+import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/screens/MyProduct.dart';
@@ -34,6 +36,8 @@ class _ProductScreenState extends State<ProductScreen> {
 
    late Acteur acteur = Acteur();
   late List<TypeActeur> typeActeurData = [];
+    List<ParametreGeneraux> paraList = [];
+  late ParametreGeneraux para = ParametreGeneraux();
   late String type;
   late TextEditingController _searchController;
   List<Stock>  stockListe = [];
@@ -89,6 +93,18 @@ void updateStockList() async {
     print('Erreur lors de la mise à jour de la liste de stocks: $error');
   }
 }
+
+  void verifyParam() {
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+
+    if (paraList.isNotEmpty) {
+      para = paraList[0];
+    } else {
+      // Gérer le cas où la liste est null ou vide, par exemple :
+      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+    }
+  }
 
 
    
@@ -301,14 +317,10 @@ void updateStockList() async {
             ),
           ),
           const SizedBox(height: 10),
-         
+
           Consumer<StockService>(builder: (context, stockService, child) {
             return FutureBuilder<List<Stock>>(
                 future: stockListeFuture,
-                // selectedCat != null
-                //     ? stockService.fetchProduitByCategorie(
-                //         selectedCat!.idCategorieProduit!)
-                    // : stockService.fetchStock(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -318,16 +330,8 @@ void updateStockList() async {
                     );
                   }
 
-                  if (!snapshot.hasData) {
-                    return const Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Center(child: Text("Aucun donné trouvé")),
-                    );
-                  } else {
-                    stockListe = snapshot.data!;
-                                                   if (stockListe.isEmpty) {
-      // Vous pouvez afficher une image ou un texte ici
-      return 
+                      if (!snapshot.hasData) {
+                    return 
       SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.all(10),
@@ -351,39 +355,76 @@ void updateStockList() async {
             ),
           ),
         );
-         }
-                    String searchText = "";
+                  } else {
+                    stockListe = snapshot.data!;
+      // Vous pouvez afficher une image ou un texte ici
+                       String searchText = "";
                     List<Stock> filtereSearch =
                         stockListe.where((search) {
                       String libelle = search.nomProduit!.toLowerCase();
                       searchText = _searchController.text.trim().toLowerCase();
                       return libelle.contains(searchText);
                     }).toList();
-                    
-                    return Wrap(
-                      // spacing: 10, // Espacement horizontal entre les conteneurs
-                      // runSpacing:
-                      //     10, // Espacement vertical entre les lignes de conteneurs
-                      children: 
-                      typeActeurData.map((e) => e.libelle!.toLowerCase()).contains("admin") ?
-                      filtereSearch
-                        //  .where((element) => element.statutSotck == true)
-                          .map((e) => Padding(
-                                padding: EdgeInsets.all(10),
-                                child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.45,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  DetailProduits(
-                                                      stock: e)));
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
+
+                      if(stockListe.isEmpty || stockListe.isEmpty && _searchController.text.isNotEmpty){   
+      SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Center(
+              child: Column(
+                children: [
+                  Image.asset('assets/images/notif.jpg'),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Aucun produit trouvé' ,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 17,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+                  }
+         
+
+                        
+                
+                    return 
+    GridView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 10,
+                              childAspectRatio: 0.8,
+                            ),
+                            itemCount: 
+                            stockListe
+                                .length ,
+                            itemBuilder: (context, index) {
+                             
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DetailProduits(
+                                        stock: filtereSearch[index],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
                                     color: Color.fromARGB(250, 250, 250, 250),
                                     borderRadius: BorderRadius.circular(15),
                                     boxShadow: [
@@ -395,344 +436,618 @@ void updateStockList() async {
                                       ),
                                     ],
                                   ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              child: SizedBox(
-                                                height: 90,
-                                                child: e.photo == null
-                                                    ? Image.asset(
-                                                        "assets/images/default_image.png",
-                                                        fit: BoxFit.cover,
-                                                      )
-                                                    : Image.network(
-                                                        "https://koumi.ml/api-koumi/Stock/${e.idStock}/image",
-                                                        fit: BoxFit.cover,
-                                                        errorBuilder:
-                                                            (BuildContext
-                                                                    context,
-                                                                Object
-                                                                    exception,
-                                                                StackTrace?
-                                                                    stackTrace) {
-                                                          return Image.asset(
-                                                            'assets/images/default_image.png',
-                                                            fit: BoxFit.cover,
-                                                          );
-                                                        },
-                                                      ),
-                                              ),
-                                            ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        child: Container(
+                                          height: 90,
+                                          child: filtereSearch[index].photo == null  
+                                              ? Image.asset(
+                                                  "assets/images/default_image.png",
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Image.network(
+                                                  "https://koumi.ml/api-koumi/Stock/${filtereSearch[index].idStock}/image",
+                                                  // "http://10.0.2.2/${e.photoIntrant}",
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (BuildContext
+                                                          context,
+                                                      Object exception,
+                                                      StackTrace? stackTrace) {
+                                                    return Image.asset(
+                                                      'assets/images/default_image.png',
+                                                      fit: BoxFit.cover,
+                                                    );
+                                                  },
+                                                ),
+                                        ),
+                                      ),
+                                      // SizedBox(height: 8),
+                                      ListTile(
+                                        title: Text(
+                                          filtereSearch[index].nomProduit!,
+                                          style: TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
                                           ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10, vertical: 5),
-                                            child: Text(
-                                              e.nomProduit!,
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: d_colorGreen,
-                                              ),
-                                            ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        subtitle: Text(
+                                          overflow: TextOverflow.ellipsis,
+                                         "${filtereSearch[index].quantiteStock!.toString()} ${filtereSearch[index].unite!.nomUnite} ",
+                                          style:TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
                                           ),
-                                          // _buildEtat(e.statutSotck!),
-                                          // _buildItem(
-                                          //     "Prix :", e.prix!.toString()),
-                                          SizedBox(height: 1),
+                                        ),
+                                      
+                                      ),
                                            Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Text(
-        '${e.prix!.toInt()} FCFA', // Convertir en entier
-        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, overflow:TextOverflow.ellipsis),
-      ),
-      Container(
-        width: 30, // Largeur du conteneur réduite
-        height: 30, // Hauteur du conteneur réduite
-        decoration: BoxDecoration(
-          color: Colors.blue, // Couleur de fond du bouton
-          borderRadius: BorderRadius.circular(15), // Coins arrondis du bouton
-        ),
-        child: IconButton(
-          onPressed: () {
-            // Action à effectuer lorsque le bouton est pressé
-            if (e.acteur!.idActeur! == acteur.idActeur!){
-                        Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
-                        }else{
-                          Provider.of<CartProvider>(context, listen: false)
-                        .addToCart(e, 1, "");
-                        }
-            // Par exemple, ajouter le produit au panier
-          },
-          icon: Icon(Icons.add), // Icône du panier
-          color: Colors.white, // Couleur de l'icône
-          iconSize: 20, // Taille de l'icône réduite
-          padding: EdgeInsets.zero, // Aucune marge intérieure
-          splashRadius: 15, // Rayon de l'effet de pression réduit
-          tooltip: 'Ajouter au panier', // Info-bulle au survol de l'icône
-        ),
-      ),
-    ],
-  ),
-),
-
-  typeActeurData.map((e) => e.libelle!.toLowerCase()).contains("admin") ?
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 15),
+                                        child: Text(
+                                          para.monnaie != null
+                                              ? 
+                                              "${filtereSearch[index].prix.toString()} ${para.monnaie}"
+                                              :
+                                               "${filtereSearch[index].prix.toString()} FCFA",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                      ),
+                                      //  _buildItem(
+                                      //         "Localité :", filtereSearch[index].localiteMagasin!),
                                           //  _buildItem(
                                           //     "Acteur :", e.acteur!.typeActeur!.map((e) => e.libelle!).join(','))
-                                           Container(
-                                                  alignment:
-                                                            Alignment.bottomRight,
-                                               child: Padding(
-                                                                                            padding: const EdgeInsets.symmetric(horizontal:8.0),
-                                                                                            child: Row(
-                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                   children: [
-                                                     _buildEtat(e.statutSotck!),
-                                                     SizedBox(width: 120,),
-                                                     Expanded(
-                                                       child: PopupMenuButton<String>(
-                                                         padding: EdgeInsets.zero,
-                                                         itemBuilder: (context) =>
-                                                             <PopupMenuEntry<String>>[
-                                                           PopupMenuItem<String>(
-                                                             child: ListTile(
-                                                               leading: e.statutSotck == false? Icon(
-                                                                 Icons.check,
-                                                                 color: Colors.green,
-                                                               ): Icon(
-                                                                Icons.disabled_visible,
-                                                                color:Colors.orange[400]
-                                                               ),
-                                                               title:  Text(
-                                                                e.statutSotck == false ? "Activer" : "Desactiver",
-                                                                 style: TextStyle(
-                                                                   color: e.statutSotck == false ? Colors.green : Colors.red,
-                                                                   fontWeight: FontWeight.bold,
-                                                                 ),
-                                                               ),
-                                                               
-                                                               onTap: () async {
-                                  // Changement d'état du magasin ici
-                           
-                               e.statutSotck == false ?  await StockService().activerStock(e.idStock!).then((value) => {
-                                    // Mettre à jour la liste des stock après le changement d'état
-                                    Provider.of<StockService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                    setState(() {
-                                      stockListeFuture =  StockService().fetchStock();
-                                    }),
-                                    Navigator.of(context).pop(),
-                                                                         })
-                                                                     .catchError((onError) => {
-                                                                           ScaffoldMessenger.of(context)
-                                                                               .showSnackBar(
-                                                                             const SnackBar(
-                                                                               content: Row(
-                                                                                 children: [
-                                                                                   Text(
-                                                                                       "Une erreur s'est produit"),
-                                                                                 ],
-                                                                               ),
-                                                                               duration:
-                                                                                   Duration(seconds: 5),
-                                                                             ),
-                                                                           ),
-                                                                           Navigator.of(context).pop(),
-                                                                         }): await StockService()
-                                                                     .desactiverStock(e.idStock!)
-                                                                     .then((value) => {
-                                                                        Provider.of<StockService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                                setState(() {
-                                                       stockListeFuture =  StockService().fetchStock();
-                                                       }),
-                                                                           Navigator.of(context).pop(),
-                                                                     
-                                                                         });
-                                                       
-                                                                 ScaffoldMessenger.of(context)
-                                                                     .showSnackBar(
-                                                                    SnackBar(
-                                                                     content: Row(
-                                                                       children: [
-                                                                         Text(e.statutSotck == false ? "Activer avec succèss " : "Desactiver avec succèss"),
-                                                                       ],
-                                                                     ),
-                                                                     duration: Duration(seconds: 2),
-                                                                   ),
-                                                                 );
-                                                               },
-                                                             )
-                                                          
-                                               ),
+                                            typeActeurData.map((e) => e.libelle!.toLowerCase()).contains("admin") ?
+                                           Padding(
+                                                                                        padding: const EdgeInsets.symmetric(horizontal:8.0),
+                                                                                        child: Row(
+                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                               children: [
+                                                 _buildEtat(filtereSearch[index].statutSotck!),
+                                                 SizedBox(width: 120,),
+                                                 Expanded(
+                                                   child: PopupMenuButton<String>(
+                                                     padding: EdgeInsets.zero,
+                                                     itemBuilder: (context) =>
+                                                         <PopupMenuEntry<String>>[
+                                                       PopupMenuItem<String>(
+                                                         child: ListTile(
+                                                           leading: filtereSearch[index].statutSotck == false ? Icon(
+                                                             Icons.check,
+                                                             color: Colors.green,
+                                                           ): Icon(
+                                                            Icons.disabled_visible,
+                                                            color:Colors.orange[400]
+                                                           ),
+                                                           title:  Text(
+                                                            filtereSearch[index].statutSotck == false ? "Activer" : "Desactiver",
+                                                             style: TextStyle(
+                                                               color: filtereSearch[index].statutSotck == false ? Colors.green : Colors.red,
+                                                               fontWeight: FontWeight.bold,
+                                                             ),
+                                                           ),
                                                            
-                                                          
-                                                         ],
-                                                       ),
-                                                     ),
-                                                   ],
-                                                                                            ),
-                                                                                          ),
-                                                 )
-                                          : SizedBox(),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ))
-                          .toList():
-                           filtereSearch
-                         .where((element) => element.statutSotck == true)
-                          .map((e) => Padding(
-                                padding: EdgeInsets.all(10),
-                                child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.45,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  DetailProduits(
-                                                      stock: e)));
-                                    },
-                                    child: Container(
-                                       decoration: BoxDecoration(
-                                    color: Color.fromARGB(250, 250, 250, 250),
-                                    borderRadius: BorderRadius.circular(15),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.3),
-                                        offset: Offset(0, 2),
-                                        blurRadius: 8,
-                                        spreadRadius: 2,
-                                      ),
+                                                           onTap: () async {
+                                                                             // Changement d'état du magasin ici
+                                                                          filtereSearch[index].statutSotck == false ?  await StockService().activerStock(filtereSearch[index].idStock!).then((value) => {
+                                                                               // Mettre à jour la liste des magasins après le changement d'état
+                                                                               Provider.of<StockService>(
+                                                                        context,
+                                                                        listen:
+                                                                            false)
+                                                                    .applyChange(),
+                                                                               setState(() {
+                                                       stockListeFuture =  StockService().fetchStock();
+                                                                               }),
+                                                                               Navigator.of(context).pop(),
+                                                                     })
+                                                                 .catchError((onError) => {
+                                                                       ScaffoldMessenger.of(context)
+                                                                           .showSnackBar(
+                                                                         const SnackBar(
+                                                                           content: Row(
+                                                                             children: [
+                                                                               Text(
+                                                                                   "Une erreur s'est produit"),
+                                                                             ],
+                                                                           ),
+                                                                           duration:
+                                                                               Duration(seconds: 5),
+                                                                         ),
+                                                                       ),
+                                                                       Navigator.of(context).pop(),
+                                                                     }): await StockService()
+                                                                 .desactiverStock(filtereSearch[index].idStock!)
+                                                                 .then((value) => {
+                                                                    Provider.of<StockService>(
+                                                                        context,
+                                                                        listen:
+                                                                            false)
+                                                                    .applyChange(),
+                                                                   setState(() {
+                                                       stockListeFuture =  StockService().fetchStock();
+                                                                               }),
+                                                                       Navigator.of(context).pop(),
+                                                                 
+                                                                     });
+                                                   
+                                                             ScaffoldMessenger.of(context)
+                                                                 .showSnackBar(
+                                                                SnackBar(
+                                                                 content: Row(
+                                                                   children: [
+                                                                     Text(filtereSearch[index].statutSotck == false ? "Activer avec succèss " : "Desactiver avec succèss"),
+                                                                   ],
+                                                                 ),
+                                                                 duration: Duration(seconds: 2),
+                                                               ),
+                                                             );
+                                                           },
+                                                         )
+                                                      
+                                           ),
+                                                      
+                                                      
+                                                     ],
+                                                   ),
+                                                 ),
+                                               ],
+                                                                                        ),
+                                                                                      ) : SizedBox(),
+                                          
+                                     
                                     ],
                                   ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              child: SizedBox(
-                                                height: 90,
-                                                child: e.photo == null
-                                                    ? Image.asset(
-                                                        "assets/images/default_image.png",
-                                                        fit: BoxFit.cover,
-                                                      )
-                                                    : Image.network(
-                                                        "https://koumi.ml/api-koumi/Stock/${e.idStock}/image",
-                                                        fit: BoxFit.cover,
-                                                        errorBuilder:
-                                                            (BuildContext
-                                                                    context,
-                                                                Object
-                                                                    exception,
-                                                                StackTrace?
-                                                                    stackTrace) {
-                                                          return Image.asset(
-                                                            'assets/images/default_image.png',
-                                                            fit: BoxFit.cover,
-                                                          );
-                                                        },
-                                                      ),
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10, vertical: 5),
-                                            child: Text(
-                                              e.nomProduit! ?? "Pas de non definis",
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: d_colorGreen,
-                                              ),
-                                            ),
-                                          ),
-                                          // _buildEtat(e.statutSotck!),
-                                          // _buildItem(
-                                          //     "Prix :", e.prix!.toString()),
-                                          SizedBox(height: 1),
-                                           Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Text(
-        '${e.prix!.toInt()} FCFA', // Convertir en entier
-        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, overflow:TextOverflow.ellipsis),
-      ),
-      Container(
-        width: 30, // Largeur du conteneur réduite
-        height: 30, // Hauteur du conteneur réduite
-        decoration: BoxDecoration(
-          color: Colors.blue, // Couleur de fond du bouton
-          borderRadius: BorderRadius.circular(15), // Coins arrondis du bouton
-        ),
-        child: IconButton(
-          onPressed: () {
-            // Action à effectuer lorsque le bouton est pressé
-            if (e.acteur!.idActeur! == acteur.idActeur!){
-                        Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
-                        }else{
-                          Provider.of<CartProvider>(context, listen: false)
-                        .addToCart(e, 1, "");
-                        }
-            // Par exemple, ajouter le produit au panier
-          },
-          icon: Icon(Icons.add), // Icône du panier
-          color: Colors.white, // Couleur de l'icône
-          iconSize: 20, // Taille de l'icône réduite
-          padding: EdgeInsets.zero, // Aucune marge intérieure
-          splashRadius: 15, // Rayon de l'effet de pression réduit
-          tooltip: 'Ajouter au panier', // Info-bulle au survol de l'icône
-        ),
-      ),
-    ],
-  ),
-),
-
-                                          //  _buildItem(
-                                          //     "Acteur :", e.acteur!.typeActeur!.map((e) => e.libelle!).join(','))
-                                           
-                                        ],
-                                      ),
-                                    ),
-                                  ),
                                 ),
-                              ))
-                          .toList()
-                          ,
-                    );
+                              );
+                            },
+                          );
                   }
                 });
-          }) 
+          }),
+         
+//           Consumer<StockService>(builder: (context, stockService, child) {
+//             return FutureBuilder<List<Stock>>(
+//                 future: stockListeFuture,
+//                 // selectedCat != null
+//                 //     ? stockService.fetchProduitByCategorie(
+//                 //         selectedCat!.idCategorieProduit!)
+//                     // : stockService.fetchStock(),
+//                 builder: (context, snapshot) {
+//                   if (snapshot.connectionState == ConnectionState.waiting) {
+//                     return const Center(
+//                       child: CircularProgressIndicator(
+//                         color: Colors.orange,
+//                       ),
+//                     );
+//                   }
+
+//                   if (!snapshot.hasData) {
+//                     return const Padding(
+//                       padding: EdgeInsets.all(10),
+//                       child: Center(child: Text("Aucun donné trouvé")),
+//                     );
+//                   } else {
+//                     stockListe = snapshot.data!;
+//                                                    if (stockListe.isEmpty) {
+//       // Vous pouvez afficher une image ou un texte ici
+//       return 
+//       SingleChildScrollView(
+//           child: Padding(
+//             padding: EdgeInsets.all(10),
+//             child: Center(
+//               child: Column(
+//                 children: [
+//                   Image.asset('assets/images/notif.jpg'),
+//                   SizedBox(
+//                     height: 10,
+//                   ),
+//                   Text(
+//                     'Aucun produit trouvé' ,
+//                     style: TextStyle(
+//                       color: Colors.black,
+//                       fontSize: 17,
+//                       overflow: TextOverflow.ellipsis,
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ),
+//         );
+//          }
+//                     String searchText = "";
+//                     List<Stock> filtereSearch =
+//                         stockListe.where((search) {
+//                       String libelle = search.nomProduit!.toLowerCase();
+//                       searchText = _searchController.text.trim().toLowerCase();
+//                       return libelle.contains(searchText);
+//                     }).toList();
+                    
+//                     return Wrap(
+//                       // spacing: 10, // Espacement horizontal entre les conteneurs
+//                       // runSpacing:
+//                       //     10, // Espacement vertical entre les lignes de conteneurs
+//                       children: 
+//                       typeActeurData.map((e) => e.libelle!.toLowerCase()).contains("admin") ?
+//                       filtereSearch
+//                         //  .where((element) => element.statutSotck == true)
+//                           .map((e) => Padding(
+//                                 padding: EdgeInsets.all(10),
+//                                 child: SizedBox(
+//                                   width:
+//                                       MediaQuery.of(context).size.width * 0.45,
+//                                   child: GestureDetector(
+//                                     onTap: () {
+//                                       Navigator.push(
+//                                           context,
+//                                           MaterialPageRoute(
+//                                               builder: (context) =>
+//                                                   DetailProduits(
+//                                                       stock: e)));
+//                                     },
+//                                     child: Container(
+//                                       decoration: BoxDecoration(
+//                                     color: Color.fromARGB(250, 250, 250, 250),
+//                                     borderRadius: BorderRadius.circular(15),
+//                                     boxShadow: [
+//                                       BoxShadow(
+//                                         color: Colors.grey.withOpacity(0.3),
+//                                         offset: Offset(0, 2),
+//                                         blurRadius: 8,
+//                                         spreadRadius: 2,
+//                                       ),
+//                                     ],
+//                                   ),
+//                                       child: Column(
+//                                         crossAxisAlignment:
+//                                             CrossAxisAlignment.stretch,
+//                                         children: [
+//                                           Padding(
+//                                             padding: const EdgeInsets.all(8.0),
+//                                             child: ClipRRect(
+//                                               borderRadius:
+//                                                   BorderRadius.circular(8.0),
+//                                               child: SizedBox(
+//                                                 height: 90,
+//                                                 child: e.photo == null
+//                                                     ? Image.asset(
+//                                                         "assets/images/default_image.png",
+//                                                         fit: BoxFit.cover,
+//                                                       )
+//                                                     : Image.network(
+//                                                         "https://koumi.ml/api-koumi/Stock/${e.idStock}/image",
+//                                                         fit: BoxFit.cover,
+//                                                         errorBuilder:
+//                                                             (BuildContext
+//                                                                     context,
+//                                                                 Object
+//                                                                     exception,
+//                                                                 StackTrace?
+//                                                                     stackTrace) {
+//                                                           return Image.asset(
+//                                                             'assets/images/default_image.png',
+//                                                             fit: BoxFit.cover,
+//                                                           );
+//                                                         },
+//                                                       ),
+//                                               ),
+//                                             ),
+//                                           ),
+//                                           Padding(
+//                                             padding: const EdgeInsets.symmetric(
+//                                                 horizontal: 10, vertical: 5),
+//                                             child: Text(
+//                                               e.nomProduit!,
+//                                               style: TextStyle(
+//                                                 fontSize: 18,
+//                                                 fontWeight: FontWeight.bold,
+//                                                 color: d_colorGreen,
+//                                               ),
+//                                             ),
+//                                           ),
+//                                           // _buildEtat(e.statutSotck!),
+//                                           // _buildItem(
+//                                           //     "Prix :", e.prix!.toString()),
+//                                           SizedBox(height: 1),
+//                                            Padding(
+//   padding: const EdgeInsets.symmetric(horizontal: 4.0),
+//   child: Row(
+//     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//     children: [
+//       Text(
+//         '${e.prix!.toInt()} FCFA', // Convertir en entier
+//         style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, overflow:TextOverflow.ellipsis),
+//       ),
+//       Container(
+//         width: 30, // Largeur du conteneur réduite
+//         height: 30, // Hauteur du conteneur réduite
+//         decoration: BoxDecoration(
+//           color: Colors.blue, // Couleur de fond du bouton
+//           borderRadius: BorderRadius.circular(15), // Coins arrondis du bouton
+//         ),
+//         child: IconButton(
+//           onPressed: () {
+//             // Action à effectuer lorsque le bouton est pressé
+//             if (e.acteur!.idActeur! == acteur.idActeur!){
+//                         Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
+//                         }else{
+//                           Provider.of<CartProvider>(context, listen: false)
+//                         .addToCart(e, 1, "");
+//                         }
+//             // Par exemple, ajouter le produit au panier
+//           },
+//           icon: Icon(Icons.add), // Icône du panier
+//           color: Colors.white, // Couleur de l'icône
+//           iconSize: 20, // Taille de l'icône réduite
+//           padding: EdgeInsets.zero, // Aucune marge intérieure
+//           splashRadius: 15, // Rayon de l'effet de pression réduit
+//           tooltip: 'Ajouter au panier', // Info-bulle au survol de l'icône
+//         ),
+//       ),
+//     ],
+//   ),
+// ),
+
+//   typeActeurData.map((e) => e.libelle!.toLowerCase()).contains("admin") ?
+//                                           //  _buildItem(
+//                                           //     "Acteur :", e.acteur!.typeActeur!.map((e) => e.libelle!).join(','))
+//                                            Container(
+//                                                   alignment:
+//                                                             Alignment.bottomRight,
+//                                                child: Padding(
+//                                                                                             padding: const EdgeInsets.symmetric(horizontal:8.0),
+//                                                                                             child: Row(
+//                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                                                    children: [
+//                                                      _buildEtat(e.statutSotck!),
+//                                                      SizedBox(width: 120,),
+//                                                      Expanded(
+//                                                        child: PopupMenuButton<String>(
+//                                                          padding: EdgeInsets.zero,
+//                                                          itemBuilder: (context) =>
+//                                                              <PopupMenuEntry<String>>[
+//                                                            PopupMenuItem<String>(
+//                                                              child: ListTile(
+//                                                                leading: e.statutSotck == false? Icon(
+//                                                                  Icons.check,
+//                                                                  color: Colors.green,
+//                                                                ): Icon(
+//                                                                 Icons.disabled_visible,
+//                                                                 color:Colors.orange[400]
+//                                                                ),
+//                                                                title:  Text(
+//                                                                 e.statutSotck == false ? "Activer" : "Desactiver",
+//                                                                  style: TextStyle(
+//                                                                    color: e.statutSotck == false ? Colors.green : Colors.red,
+//                                                                    fontWeight: FontWeight.bold,
+//                                                                  ),
+//                                                                ),
+                                                               
+//                                                                onTap: () async {
+//                                   // Changement d'état du magasin ici
+                           
+//                                e.statutSotck == false ?  await StockService().activerStock(e.idStock!).then((value) => {
+//                                     // Mettre à jour la liste des stock après le changement d'état
+//                                     Provider.of<StockService>(
+//                                                                             context,
+//                                                                             listen:
+//                                                                                 false)
+//                                                                         .applyChange(),
+//                                     setState(() {
+//                                       stockListeFuture =  StockService().fetchStock();
+//                                     }),
+//                                     Navigator.of(context).pop(),
+//                                                                          })
+//                                                                      .catchError((onError) => {
+//                                                                            ScaffoldMessenger.of(context)
+//                                                                                .showSnackBar(
+//                                                                              const SnackBar(
+//                                                                                content: Row(
+//                                                                                  children: [
+//                                                                                    Text(
+//                                                                                        "Une erreur s'est produit"),
+//                                                                                  ],
+//                                                                                ),
+//                                                                                duration:
+//                                                                                    Duration(seconds: 5),
+//                                                                              ),
+//                                                                            ),
+//                                                                            Navigator.of(context).pop(),
+//                                                                          }): await StockService()
+//                                                                      .desactiverStock(e.idStock!)
+//                                                                      .then((value) => {
+//                                                                         Provider.of<StockService>(
+//                                                                             context,
+//                                                                             listen:
+//                                                                                 false)
+//                                                                         .applyChange(),
+//                                                                                 setState(() {
+//                                                        stockListeFuture =  StockService().fetchStock();
+//                                                        }),
+//                                                                            Navigator.of(context).pop(),
+                                                                     
+//                                                                          });
+                                                       
+//                                                                  ScaffoldMessenger.of(context)
+//                                                                      .showSnackBar(
+//                                                                     SnackBar(
+//                                                                      content: Row(
+//                                                                        children: [
+//                                                                          Text(e.statutSotck == false ? "Activer avec succèss " : "Desactiver avec succèss"),
+//                                                                        ],
+//                                                                      ),
+//                                                                      duration: Duration(seconds: 2),
+//                                                                    ),
+//                                                                  );
+//                                                                },
+//                                                              )
+                                                          
+//                                                ),
+                                                           
+                                                          
+//                                                          ],
+//                                                        ),
+//                                                      ),
+//                                                    ],
+//                                                                                             ),
+//                                                                                           ),
+//                                                  )
+//                                           : SizedBox(),
+//                                         ],
+//                                       ),
+//                                     ),
+//                                   ),
+//                                 ),
+//                               ))
+//                           .toList():
+//                            filtereSearch
+//                          .where((element) => element.statutSotck == true)
+//                           .map((e) => Padding(
+//                                 padding: EdgeInsets.all(10),
+//                                 child: SizedBox(
+//                                   width:
+//                                       MediaQuery.of(context).size.width * 0.45,
+//                                   child: GestureDetector(
+//                                     onTap: () {
+//                                       Navigator.push(
+//                                           context,
+//                                           MaterialPageRoute(
+//                                               builder: (context) =>
+//                                                   DetailProduits(
+//                                                       stock: e)));
+//                                     },
+//                                     child: Container(
+//                                        decoration: BoxDecoration(
+//                                     color: Color.fromARGB(250, 250, 250, 250),
+//                                     borderRadius: BorderRadius.circular(15),
+//                                     boxShadow: [
+//                                       BoxShadow(
+//                                         color: Colors.grey.withOpacity(0.3),
+//                                         offset: Offset(0, 2),
+//                                         blurRadius: 8,
+//                                         spreadRadius: 2,
+//                                       ),
+//                                     ],
+//                                   ),
+//                                       child: Column(
+//                                         crossAxisAlignment:
+//                                             CrossAxisAlignment.stretch,
+//                                         children: [
+//                                           Padding(
+//                                             padding: const EdgeInsets.all(8.0),
+//                                             child: ClipRRect(
+//                                               borderRadius:
+//                                                   BorderRadius.circular(8.0),
+//                                               child: SizedBox(
+//                                                 height: 90,
+//                                                 child: e.photo == null
+//                                                     ? Image.asset(
+//                                                         "assets/images/default_image.png",
+//                                                         fit: BoxFit.cover,
+//                                                       )
+//                                                     : Image.network(
+//                                                         "https://koumi.ml/api-koumi/Stock/${e.idStock}/image",
+//                                                         fit: BoxFit.cover,
+//                                                         errorBuilder:
+//                                                             (BuildContext
+//                                                                     context,
+//                                                                 Object
+//                                                                     exception,
+//                                                                 StackTrace?
+//                                                                     stackTrace) {
+//                                                           return Image.asset(
+//                                                             'assets/images/default_image.png',
+//                                                             fit: BoxFit.cover,
+//                                                           );
+//                                                         },
+//                                                       ),
+//                                               ),
+//                                             ),
+//                                           ),
+//                                           Padding(
+//                                             padding: const EdgeInsets.symmetric(
+//                                                 horizontal: 10, vertical: 5),
+//                                             child: Text(
+//                                               e.nomProduit! ?? "Pas de non definis",
+//                                               style: TextStyle(
+//                                                 fontSize: 18,
+//                                                 fontWeight: FontWeight.bold,
+//                                                 color: d_colorGreen,
+//                                               ),
+//                                             ),
+//                                           ),
+//                                           // _buildEtat(e.statutSotck!),
+//                                           // _buildItem(
+//                                           //     "Prix :", e.prix!.toString()),
+//                                           SizedBox(height: 1),
+//                                            Padding(
+//   padding: const EdgeInsets.symmetric(horizontal: 4.0),
+//   child: Row(
+//     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//     children: [
+//       Text(
+//         '${e.prix!.toInt()} FCFA', // Convertir en entier
+//         style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, overflow:TextOverflow.ellipsis),
+//       ),
+//       Container(
+//         width: 30, // Largeur du conteneur réduite
+//         height: 30, // Hauteur du conteneur réduite
+//         decoration: BoxDecoration(
+//           color: Colors.blue, // Couleur de fond du bouton
+//           borderRadius: BorderRadius.circular(15), // Coins arrondis du bouton
+//         ),
+//         child: IconButton(
+//           onPressed: () {
+//             // Action à effectuer lorsque le bouton est pressé
+//             if (e.acteur!.idActeur! == acteur.idActeur!){
+//                         Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
+//                         }else{
+//                           Provider.of<CartProvider>(context, listen: false)
+//                         .addToCart(e, 1, "");
+//                         }
+//             // Par exemple, ajouter le produit au panier
+//           },
+//           icon: Icon(Icons.add), // Icône du panier
+//           color: Colors.white, // Couleur de l'icône
+//           iconSize: 20, // Taille de l'icône réduite
+//           padding: EdgeInsets.zero, // Aucune marge intérieure
+//           splashRadius: 15, // Rayon de l'effet de pression réduit
+//           tooltip: 'Ajouter au panier', // Info-bulle au survol de l'icône
+//         ),
+//       ),
+//     ],
+//   ),
+// ),
+
+//                                           //  _buildItem(
+//                                           //     "Acteur :", e.acteur!.typeActeur!.map((e) => e.libelle!).join(','))
+                                           
+//                                         ],
+//                                       ),
+//                                     ),
+//                                   ),
+//                                 ),
+//                               ))
+//                           .toList()
+//                           ,
+//                     );
+//                   }
+//                 });
+//           }) 
           
-          ,
+//           ,
         ]),
       ),
     );

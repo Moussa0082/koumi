@@ -10,18 +10,18 @@ import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/Stock.dart';
 
 class CommandeAvecStocks {
-  Commande commande;
-  List<Stock> stocks;
+  Commande? commande;
+  List<Stock>? stocks;
   List<Intrant>? intrants;
-  List<double> quantitesDemandees;
+  List<double>? quantitesDemandees;
   List<double>? quantitesIntrants;
 
 
   CommandeAvecStocks({
-    required this.commande,
-    required this.stocks,
+     this.commande,
+     this.stocks,
      this.intrants,
-    required this.quantitesDemandees,
+     this.quantitesDemandees,
      this.quantitesIntrants,
   });
 
@@ -40,9 +40,9 @@ class CommandeAvecStocks {
 
   Map<String, dynamic> toJson() {
     return {
-      'commande': commande.toMap(),
-      'stocks': stocks.map((stock) => stock.toMap()).toList(),
-      'intrants': intrants!.map((intrant) => intrant.toMap()).toList(),
+      'commande': commande?.toJson(),
+      'stocks': stocks?.map((stock) => stock.toMap()).toList(),
+      'intrants': intrants?.map((intrant) => intrant.toMap()).toList(),
       'quantitesDemandees': quantitesDemandees,
       'quantitesIntrants': quantitesIntrants,
     };
@@ -59,7 +59,7 @@ class CommandeAvecStocks {
   }
 
 
-  factory CommandeAvecStocks.fromJson(String source) => CommandeAvecStocks.fromMap(json.decode(source) as Map<String, dynamic>);
+  // factory CommandeAvecStocks.fromJson(String source) => CommandeAvecStocks.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() => 'CommandeAvecStocks(commande: $commande, stocks: $stocks,intrants: $intrants ,quantitesDemandees: $quantitesDemandees, quantitesIntrants: $quantitesIntrants)';

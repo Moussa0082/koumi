@@ -13,7 +13,7 @@ import 'package:koumi_app/models/Stock.dart';
     final String apiUrl = 'http://10.0.2.2:9000/api-koumi/commande/'; // Replace with your API URL
 
 
-Future<Commande> createCommande(CommandeAvecStocks commandeAvecStocks) async {
+  Future<Commande> createCommande(CommandeAvecStocks commandeAvecStocks) async {
     final url = '$apiUrl/add';
     final response = await http.post(
       Uri.parse(url),
@@ -31,67 +31,69 @@ Future<Commande> createCommande(CommandeAvecStocks commandeAvecStocks) async {
   }
 
 
-  Future<Map<String, dynamic>> ajouterStocksACommande(CommandeAvecStocks commandeAvecStocks) async {
-    final String apiUrl = 'http://10.0.2.2/api-koumi/commande/add';
+  Future<void> ajouterStocksACommande(CommandeAvecStocks commandeAvecStocks) async {
+    final String apiUrl = 'http://10.0.2.2:9000/api-koumi/commande/add';
 
     try {
       final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
+        Uri.tryParse(apiUrl)!,
+        headers: {
+          'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          'commande': commandeAvecStocks.commande.toJson(),
-          'stocks': commandeAvecStocks.stocks.map((stock) => stock.toJson()).toList(),
+          'commande': commandeAvecStocks.commande!.toJson(),
+          'stocks': commandeAvecStocks.stocks!.map((stock) => stock.toJson()).toList(),
           'intrants': commandeAvecStocks.intrants!.map((intrant) => intrant.toJson()).toList(),
           'quantitesDemandees': commandeAvecStocks.quantitesDemandees,
           'quantitesIntrants': commandeAvecStocks.quantitesIntrants,
         }),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to add stocks to order');
+        print("Erreur lors de l'ajout de la commande ${response.body.toString()} ");
       }
     } catch (e) {
-      throw Exception('Failed to add stocks to order: $e');
+      print("Une erreur s'est produite lors de l'ajout de la commande: $e");
     }
   }
 
- Future<void> makeCommand(List<String> idStocks, Commande commande) async {
+  
 
-  // Create a Commande object
+//  Future<void> makeCommand(List<String> idStocks, Commande commande) async {
 
-  // Create a list of Stock objects based on the idStocks list
-  final List<Stock> stocks = idStocks.map((idStock) => Stock(idStock: idStock)).toList();
+//   // Create a Commande object
 
-  // Create a CommandeAvecStocks object
-  final commandeAvecStocks = CommandeAvecStocks(
-    commande: commande,
-    stocks: stocks,
-    quantitesDemandees: List.filled(stocks.length, 1), // Assuming all quantities are 1 for now
-  );
+//   // Create a list of Stock objects based on the idStocks list
+//   final List<Stock> stocks = idStocks.map((idStock) => Stock(idStock: idStock)).toList();
 
-  try {
-    final response = await http.post(
-      Uri.parse(apiUrl + '/add'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(commandeAvecStocks.toJson()), // Convert CommandeAvecStocks to JSON
-    );
+//   // Create a CommandeAvecStocks object
+//   final commandeAvecStocks = CommandeAvecStocks(
+//     commande: commande,
+//     stocks: stocks,
+//     quantitesDemandees: List.filled(stocks.length, 1), // Assuming all quantities are 1 for now
+//   );
 
-    if (response.statusCode == 200) {
-      print('Commande ajoutée avec succès.: ${response.body}');
+//   try {
+//     final response = await http.post(
+//       Uri.parse(apiUrl + '/add'),
+//       headers: <String, String>{
+//         'Content-Type': 'application/json; charset=UTF-8',
+//       },
+//       body: jsonEncode(commandeAvecStocks.toJson()), // Convert CommandeAvecStocks to JSON
+//     );
 
-    } else {
-      print('Erreur lors de l\'ajout de la commande: ${response.body}');
-    }
-  } catch (e) {
-    print('Exception lors de l\'envoi de la commande: $e');
-  }
-}
+//     if (response.statusCode == 200) {
+//       print('Commande ajoutée avec succès.: ${response.body}');
+
+//     } else {
+//       print('Erreur lors de l\'ajout de la commande: ${response.body}');
+//     }
+//   } catch (e) {
+//     print('Exception lors de l\'envoi de la commande: $e');
+//   }
+// }
 
 
  }

@@ -9,11 +9,11 @@ import 'package:koumi_app/models/Superficie.dart';
 
 class Intrant {
   final String? idIntrant;
-  final String nomIntrant;
-  final double quantiteIntrant;
-  final int prixIntrant;
+   String? nomIntrant;
+   double? quantiteIntrant;
+   int? prixIntrant;
   final String? codeIntrant;
-  final String descriptionIntrant;
+  final String? descriptionIntrant;
   final String? photoIntrant;
   final bool? statutIntrant;
   final String? dateExpiration;
@@ -21,17 +21,17 @@ class Intrant {
   final String? dateModif;
   final String? personneModif;
   final String? unite;
-  final Forme forme;
-  final Acteur acteur;
+  final Forme? forme;
+  final Acteur? acteur;
   final CategorieProduit? categorieProduit;
   
   Intrant({
     this.idIntrant,
-    required this.nomIntrant,
-    required this.quantiteIntrant,
-    required this.prixIntrant,
+     this.nomIntrant,
+     this.quantiteIntrant,
+     this.prixIntrant,
     this.codeIntrant,
-    required this.descriptionIntrant,
+     this.descriptionIntrant,
     this.photoIntrant,
     this.statutIntrant,
     this.dateExpiration,
@@ -39,8 +39,8 @@ class Intrant {
     this.dateModif,
     this.personneModif,
     this.unite,
-    required this.forme,
-    required this.acteur,
+     this.forme,
+     this.acteur,
     this.categorieProduit,
   });
 
@@ -97,8 +97,8 @@ class Intrant {
       'dateModif': dateModif,
       'personneModif': personneModif,
       'unite': unite,
-      'forme': forme.toMap(),
-      'acteur': acteur.toMap(),
+      'forme': forme?.toMap(),
+      'acteur': acteur?.toMap(),
       'categorieProduit': categorieProduit?.toMap(),
     };
   }

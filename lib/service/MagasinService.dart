@@ -170,7 +170,7 @@ class MagasinService extends ChangeNotifier{
    Future<List<Magasin>> fetchAllMagasin() async {
     try {
       final response = await http.get(Uri.parse(
-          '$baseUrl/Magasin/getAllMagagin'));
+          '$baseUrl/getAllMagagin'));
       if (response.statusCode == 200) {
   // final String jsonString = utf8.decode(response.bodyBytes);
   //       List<dynamic> data = json.decode(jsonString);

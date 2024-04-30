@@ -386,7 +386,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                       SizedBox(height: 8),
                                       ListTile(
                                           title: Text(
-                                            e.nomIntrant,
+                                            e.nomIntrant!,
                                             style: TextStyle(
                                               fontSize: 17,
                                               fontWeight: FontWeight.bold,

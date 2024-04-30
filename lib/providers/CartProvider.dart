@@ -12,9 +12,9 @@ class CartProvider extends ChangeNotifier {
   List<CartItem> get cartItem => cartItems;
 
   // void addToCart( Stock? product, int quantity, String? selectedVariant) {
-  //   var existingCartItem = cartItem.firstWhereOrNull(
-  //     (item) => item.stock != null && item.stock!.idStock == product!.idStock,
-  //   );
+    // var existingCartItem = cartItem.firstWhereOrNull(
+    //   (item) => item.stock != null && item.stock!.idStock == product!.idStock,
+    // );
   
 
   //   if (existingCartItem != null) {
@@ -31,47 +31,83 @@ class CartProvider extends ChangeNotifier {
   // }
 
   void addToCart(Stock? product, int quantity, String? selectedVariant) {
+  if (product == null || quantity <= 0) {
+    // Gérer le cas où le produit ou la quantité est nulle ou invalide
+    Snack.error(titre: "Alerte", message: "Produit ou quantité invalide");
+    return;
+  }
+
+  var existingCartItem = cartItem.firstWhereOrNull(
+    (item) => item.stock != null && item.stock!.idStock == product.idStock,
+  );
+
+  if (existingCartItem != null) {
+    // Le produit existe déjà dans le panier
+    Snack.error(titre: "Alerte", message: "${existingCartItem.stock!.nomProduit!} existe déjà dans le panier");
+    return;
+  }
+
   if (cartItem.isEmpty) {
     // Si le panier est vide, ajoutez simplement le produit
     cartItem.add(CartItem(stock: product, quantiteStock: quantity, isStock: true));
-    Snack.success(titre: "Alerte", message: product!.nomProduit! + " a été ajouté au panier");
+    Snack.success(titre: "Alerte", message: "${product.nomProduit!} a été ajouté au panier");
   } else {
     // Vérifiez si le nouveau produit appartient au même acteur que les produits déjà présents dans le panier
-    bool sameActor = cartItem.every((item) => item.stock != null && item.stock!.acteur!.idActeur == product!.acteur!.idActeur);
+    bool sameActor = cartItem.every((item) => item.stock != null && item.stock!.acteur!.idActeur == product.acteur!.idActeur);
 
     if (sameActor) {
       // Si le nouveau produit appartient au même acteur, ajoutez-le au panier
       cartItem.add(CartItem(stock: product, quantiteStock: quantity, isStock: true));
-      Snack.success(titre: "Alerte", message: product!.nomProduit! + " a été ajouté au panier");
+      Snack.success(titre: "Alerte", message: "${product.nomProduit!} a été ajouté au panier");
     } else {
       // Sinon, affichez un message d'erreur
-      Snack.error(titre: "Alerte", message: "Impossible d'ajouter le produit. On peut pas commander chez puliseurs personnes à la fois en une seule commande.");
+      Snack.error(titre: "Alerte", message: "Impossible d'ajouter le produit. On ne peut pas commander chez plusieurs personnes à la fois en une seule commande.");
+      return;
     }
   }
 
   notifyListeners();
+}
+
+
+ void addToCartInt(Intrant? intrant, int? quantityInt, String? selectedVariantInt) {
+  if (intrant == null || quantityInt == null || quantityInt <= 0) {
+    // Gérer le cas où l'intrant ou la quantité est nulle ou invalide
+    Snack.error(titre: "Alerte", message: "Intrant ou quantité invalide");
+    return;
   }
-  void addToCartInt(Intrant? intrant, int? quantityInt,String? selectedVariantInt) {
+
+  var existingCartItem = cartItem.firstWhereOrNull(
+    (item) => item.intrant != null && item.intrant!.idIntrant! == intrant.idIntrant!,
+  );
+
+  if (existingCartItem != null) {
+    // L'intrant existe déjà dans le panier
+    Snack.error(titre: "Alerte", message: "${intrant.nomIntrant!} existe déjà dans le panier");
+    return;
+  }
+
   if (cartItem.isEmpty) {
     // Si le panier est vide, ajoutez simplement l'intrant
-    cartItem.add(CartItem(intrant: intrant, quantiteIntrant: quantityInt!, isStock: false));
-    Snack.success(titre: "Alerte", message: intrant!.nomIntrant + " a été ajouté au panier");
+    cartItem.add(CartItem(intrant: intrant, quantiteIntrant: quantityInt, isStock: false));
+    Snack.success(titre: "Alerte", message: "${intrant.nomIntrant!} a été ajouté au panier");
   } else {
     // Vérifiez si le nouveau intrant appartient au même acteur que les intrants déjà présents dans le panier
-    bool sameActor = cartItem.every((item) => item.intrant != null && item.intrant!.acteur.idActeur == intrant!.acteur.idActeur);
-
+    bool sameActor = cartItem.every((item) => item.intrant != null && item.intrant!.acteur!.idActeur == intrant.acteur!.idActeur);
     if (sameActor) {
       // Si le nouveau produit appartient au même acteur, ajoutez-le au panier
-      cartItem.add(CartItem(intrant: intrant, quantiteIntrant: quantityInt!, isStock: false));
-      Snack.success(titre: "Alerte", message: intrant!.nomIntrant + " a été ajouté au panier");
+      cartItem.add(CartItem(intrant: intrant, quantiteIntrant: quantityInt, isStock: false));
+      Snack.success(titre: "Alerte", message: "${intrant.nomIntrant!} a été ajouté au panier");
     } else {
       // Sinon, affichez un message d'erreur
-      Snack.error(titre: "Alerte", message: "Impossible d'ajouter l'intrant. On peut pas commander chez puliseurs personnes à la fois en une seule commande.");
+      Snack.error(titre: "Alerte", message: "Impossible d'ajouter l'intrant. On ne peut pas commander chez plusieurs personnes à la fois en une seule commande.");
+      return;
     }
   }
 
   notifyListeners();
-  }
+}
+
 
 
 //   void addToCartInt(Intrant? intrant, int? quantityInt,String? selectedVariantInt) {
@@ -81,10 +117,11 @@ class CartProvider extends ChangeNotifier {
 // );
 
 
-//     if (existingCartItemInt != null) {
-//       // existingCartItem.quantiteStock += quantity;
-//     Snack.error(titre:"Alerte", message:existingCartItemInt.intrant!.nomIntrant + " existe déjà au panier");
-//     } else {
+    // if (existingCartItemInt != null) {
+    //   // existingCartItem.quantiteStock += quantity;
+    // Snack.error(titre:"Alerte", message:existingCartItemInt.intrant!.nomIntrant + " existe déjà au panier");
+    // } 
+//else {
 //       cartItem.add(CartItem(intrant: intrant, quantiteIntrant: quantityInt!, isStock: false));
 //     Snack.success(titre:"Alerte", message:intrant!.nomIntrant + " a été ajouté au panier");
 
@@ -125,7 +162,7 @@ class CartProvider extends ChangeNotifier {
           0.0,
           (sum, item) => sum +
               ((item.stock != null ? item.stock!.prix! * item.quantiteStock : 0) +
-                  (item.intrant != null ? item.intrant!.prixIntrant * item.quantiteIntrant : 0))
+                  (item.intrant != null ? item.intrant!.prixIntrant! * item.quantiteIntrant : 0))
         );
       }
 
