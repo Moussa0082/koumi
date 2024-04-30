@@ -185,30 +185,19 @@ class _FiliereScreenState extends State<FiliereScreen> {
 
                       if (!snapshot.hasData) {
                         return Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Center(
-                            child: Column(
-                              children: [
-                                Image.asset('assets/images/notif.jpg'),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text('Aucune filière trouvé ',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 17,
-                                      overflow: TextOverflow.ellipsis,
-                                    ))
-                              ],
-                            ),
-                          ),
-                        );
+                            padding: EdgeInsets.all(10),
+                            child: Text('Aucune filière trouvé ',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 17,
+                                  overflow: TextOverflow.ellipsis,
+                                )));
                       } else {
                         filiereList = snapshot.data!;
                         String searchText = "";
                         List<Filiere> filteredFiliereSearch =
                             filiereList.where((fil) {
-                          String nomfiliere = fil.libelleFiliere.toLowerCase();
+                          String nomfiliere = fil.libelleFiliere!.toLowerCase();
                           searchText = _searchController.text.toLowerCase();
                           return nomfiliere.contains(searchText);
                         }).toList();
@@ -249,9 +238,9 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                             children: [
                                               ListTile(
                                                   leading: _getIconForFiliere(
-                                                      e.libelleFiliere),
+                                                      e.libelleFiliere!),
                                                   title: Text(
-                                                      e.libelleFiliere
+                                                      e.libelleFiliere!
                                                           .toUpperCase(),
                                                       style: const TextStyle(
                                                         color: Colors.black,
@@ -260,7 +249,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      e.descriptionFiliere
+                                                      e.descriptionFiliere!
                                                           .trim(),
                                                       style: const TextStyle(
                                                         color: Colors.black87,
@@ -270,33 +259,6 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                         fontStyle:
                                                             FontStyle.italic,
                                                       ))),
-                                              // const Padding(
-                                              //   padding: EdgeInsets.symmetric(
-                                              //       horizontal: 15),
-                                              //   child: Row(
-                                              //     mainAxisAlignment:
-                                              //         MainAxisAlignment
-                                              //             .spaceBetween,
-                                              //     children: [
-                                              //       Text("Nombres pays :",
-                                              //           style: TextStyle(
-                                              //             color: Colors.black87,
-                                              //             fontSize: 17,
-                                              //             fontWeight:
-                                              //                 FontWeight.w500,
-                                              //             fontStyle:
-                                              //                 FontStyle.italic,
-                                              //           )),
-                                              //       Text("10",
-                                              //           style: TextStyle(
-                                              //             color: Colors.black87,
-                                              //             fontSize: 18,
-                                              //             fontWeight:
-                                              //                 FontWeight.w800,
-                                              //           ))
-                                              //     ],
-                                              //   ),
-                                              // ),
                                               Container(
                                                 alignment:
                                                     Alignment.bottomRight,
@@ -308,7 +270,8 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                       MainAxisAlignment
                                                           .spaceBetween,
                                                   children: [
-                                                    _buildEtat(e.statutFiliere),
+                                                    _buildEtat(
+                                                        e.statutFiliere!),
                                                     PopupMenuButton<String>(
                                                       padding: EdgeInsets.zero,
                                                       itemBuilder: (context) =>
@@ -316,103 +279,97 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                               String>>[
                                                         PopupMenuItem<String>(
                                                           child: ListTile(
-                                                            leading: const Icon(
-                                                              Icons.check,
-                                                              color:
-                                                                  Colors.green,
-                                                            ),
-                                                            title: const Text(
-                                                              "Activer",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .green,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            onTap: () async {
-                                                              await FiliereService()
-                                                                  .activerFiliere(e
-                                                                      .idFiliere!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<FiliereService>(context, listen: false).applyChange(),
-                                                                            Navigator.of(context).pop(),
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Activer avec succèss "),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 2),
-                                                                              ),
-                                                                            )
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Une erreur s'est produit"),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 5),
-                                                                              ),
-                                                                            ),
-                                                                            Navigator.of(context).pop(),
-                                                                          });
-                                                            },
-                                                          ),
-                                                        ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: Icon(
-                                                              Icons
-                                                                  .disabled_visible,
-                                                              color: Colors
-                                                                  .orange[400],
-                                                            ),
+                                                            leading: e.statutFiliere ==
+                                                                    false
+                                                                ? Icon(
+                                                                    Icons.check,
+                                                                    color: Colors
+                                                                        .green,
+                                                                  )
+                                                                : Icon(
+                                                                    Icons
+                                                                        .disabled_visible,
+                                                                    color: Colors
+                                                                            .orange[
+                                                                        400]),
                                                             title: Text(
-                                                              "Désactiver",
+                                                              e.statutFiliere ==
+                                                                      false
+                                                                  ? "Activer"
+                                                                  : "Desactiver",
                                                               style: TextStyle(
-                                                                color: Colors
-                                                                        .orange[
-                                                                    400],
+                                                                color: e.statutFiliere ==
+                                                                        false
+                                                                    ? Colors
+                                                                        .green
+                                                                    : Colors.orange[
+                                                                        400],
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
                                                               ),
                                                             ),
                                                             onTap: () async {
-                                                              await FiliereService()
-                                                                  .desactiverFiliere(e
-                                                                      .idFiliere!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<FiliereService>(context, listen: false).applyChange(),
-                                                                            Navigator.of(context).pop(),
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Une erreur s'est produit"),
-                                                                                  ],
+                                                              e.statutFiliere ==
+                                                                      false
+                                                                  ? await FiliereService()
+                                                                      .activerFiliere(e
+                                                                          .idFiliere!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Provider.of<FiliereService>(context, listen: false).applyChange(),
+                                                                                Navigator.of(context).pop(),
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Activer avec succèss "),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 2),
+                                                                                  ),
+                                                                                )
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Une erreur s'est produit"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
                                                                                 ),
-                                                                                duration: Duration(seconds: 5),
-                                                                              ),
-                                                                            ),
-                                                                            Navigator.of(context).pop(),
-                                                                          });
+                                                                                Navigator.of(context).pop(),
+                                                                              })
+                                                                  : await FiliereService()
+                                                                      .desactiverFiliere(e
+                                                                          .idFiliere!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Provider.of<FiliereService>(context, listen: false).applyChange(),
+                                                                                Navigator.of(context).pop(),
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Une erreur s'est produit"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
+                                                                                ),
+                                                                                Navigator.of(context).pop(),
+                                                                              });
 
                                                               ScaffoldMessenger
                                                                       .of(context)
@@ -819,10 +776,10 @@ class _FiliereScreenState extends State<FiliereScreen> {
                         return FutureBuilder(
                           future: _filiereList,
                           builder: (_, snapshot) {
-                            // if (snapshot.connectionState ==
-                            //     ConnectionState.waiting) {
-                            //   return CircularProgressIndicator();
-                            // }
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            }
                             // if (snapshot.hasError) {
                             //   return Text("${snapshot.error}");
                             // }
@@ -857,7 +814,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                       .map(
                                         (e) => DropdownMenuItem(
                                           value: e.idFiliere,
-                                          child: Text(e.libelleFiliere),
+                                          child: Text(e.libelleFiliere!),
                                         ),
                                       )
                                       .toList(),

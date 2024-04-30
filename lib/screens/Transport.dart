@@ -204,46 +204,7 @@ class _TransportState extends State<Transport> {
       body: SingleChildScrollView(
         child: Column(children: [
           const SizedBox(height: 10),
-          // Padding(
-          //   padding: const EdgeInsets.all(10.0),
-          //   child: Container(
-          //     padding: EdgeInsets.symmetric(horizontal: 10),
-          //     decoration: BoxDecoration(
-          //       color: Colors.blueGrey[50], // Couleur d'arrière-plan
-          //       borderRadius: BorderRadius.circular(25),
-          //     ),
-          //     child: Row(
-          //       children: [
-          //         Icon(Icons.search,
-          //             color: Colors.blueGrey[400],
-          //             size: 28), // Utiliser une icône de recherche plus grande
-          //         SizedBox(width: 10),
-          //         Expanded(
-          //           child: TextField(
-          //             controller: _searchController,
-          //             onChanged: (value) {
-          //               setState(() {});
-          //             },
-          //             decoration: InputDecoration(
-          //               hintText: 'Rechercher',
-          //               border: InputBorder.none,
-          //               hintStyle: TextStyle(color: Colors.blueGrey[400]),
-          //             ),
-          //           ),
-          //         ),
-          //         // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
-          //         IconButton(
-          //           icon: Icon(Icons.clear),
-          //           onPressed: () {
-          //             _searchController.clear();
-          //             setState(() {});
-          //           },
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
-          // const SizedBox(height: 10),
+         
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: FutureBuilder(
@@ -379,101 +340,105 @@ class _TransportState extends State<Transport> {
                       searchText = _searchController.text.toLowerCase();
                       return libelle.contains(searchText);
                     }).toList();
-                    return GridView.count(
-                    shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 2,
-                      crossAxisSpacing: 5,
-                      childAspectRatio: 0.9,
-                      children: filtereSearch
-                          .where((element) => element.statutVehicule == true)
-                          .map((e) => Padding(
-                                padding: EdgeInsets.all(10),
-                                child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.45,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  DetailTransport(
-                                                      vehicule: e)));
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(15),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.3),
-                                            offset: const Offset(0, 2),
-                                            blurRadius: 8,
-                                            spreadRadius: 2,
+                    return GridView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                        childAspectRatio: 0.8,
+                      ),
+                      itemCount: filtereSearch.length,
+                      itemBuilder: (context, index) {
+                        var e = filtereSearch
+                            .where((element) => element.statutVehicule == true)
+                            .elementAt(index);
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        DetailTransport(vehicule: e)));
+                          },
+                          child: Container(
+                            margin: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Color.fromARGB(250, 250, 250, 250),
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.3),
+                                  offset: Offset(0, 2),
+                                  blurRadius: 8,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: SizedBox(
+                                    height: 90,
+                                    child: e.photoVehicule == null ||  e.photoVehicule!.isEmpty
+                                        ? Image.asset(
+                                            "assets/images/default_image.png",
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Image.network(
+                                            "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
+                                            // "http://10.0.2.2/${e.photoIntrant}",
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (BuildContext context,
+                                                Object exception,
+                                                StackTrace? stackTrace) {
+                                              return Image.asset(
+                                                'assets/images/default_image.png',
+                                                fit: BoxFit.cover,
+                                              );
+                                            },
                                           ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              child: SizedBox(
-                                                height: 90,
-                                                child: e.photoVehicule == null
-                                                    ? Image.asset(
-                                                        'assets/images/default_image.png',
-                                                        fit: BoxFit.cover,
-                                                      )
-                                                    : Image.network(
-                                                        "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
-                                                        fit: BoxFit.cover,
-                                                        errorBuilder:
-                                                            (BuildContext
-                                                                    context,
-                                                                Object
-                                                                    exception,
-                                                                StackTrace?
-                                                                    stackTrace) {
-                                                          return Image.asset(
-                                                            'assets/images/default_image.png',
-                                                            fit: BoxFit.cover,
-                                                          );
-                                                        },
-                                                      ),
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10, vertical: 5),
-                                            child: Text(
-                                              e.nomVehicule,
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: d_colorGreen,
-                                              ),
-                                            ),
-                                          ),
-                                          _buildItem("Statut:",
-                                              '${e.statutVehicule ? 'Disponible' : 'Non disponible'}'),
-                                          _buildItem(
-                                              "Localité :", e.localisation),
-                                          SizedBox(height: 10),
-                                        ],
-                                      ),
+                                  ),
+                                ),
+                                // SizedBox(height: 8),
+                                ListTile(
+                                  title: Text(
+                                    e.nomVehicule,
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  subtitle: Text(
+                                   "${ e.nbKilometrage.toString()} Km",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black87,
                                     ),
                                   ),
                                 ),
-                              ))
-                          .toList(),
+Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                  child: Text(
+                                    e.localisation,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     );
                   }
                 });

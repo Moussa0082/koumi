@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/api/firebase_api.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/AlerteService.dart';
@@ -11,7 +12,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
- 
+
 class AddAlerte extends StatefulWidget {
   const AddAlerte({super.key});
 
@@ -60,6 +61,7 @@ class _AddAlerteState extends State<AddAlerte> {
     if (video == null) return;
 
     final videoFile = File(video.path);
+    print(videoFile.absolute);
     setState(() {
       _videoUploaded = videoFile;
       _tokenTextController.text = _videoUploaded!.path.toString();
@@ -394,33 +396,34 @@ class _AddAlerteState extends State<AddAlerte> {
                           ),
                           !recorder.isRecording
                               ? Container()
-                              : SizedBox(
-                                  child: Center(
-                                    child: StreamBuilder<RecordingDisposition>(
-                                      stream: recorder.onProgress,
-                                      builder: (context, snapshot) {
-                                        final duration = snapshot.hasData
-                                            ? snapshot.data!.duration
-                                            : Duration.zero;
+                              : StreamBuilder<RecordingDisposition>(
+                                  stream: recorder.onProgress,
+                                  builder: (context, snapshot) {
+                                    final duration = snapshot.hasData
+                                        ? snapshot.data!.duration
+                                        : Duration.zero;
 
-                                        String twoDigits(int n) =>
-                                            n.toString().padLeft(60);
-                                        final twoDigiMinutes = twoDigits(
-                                            duration.inMinutes.remainder(60));
-                                        final twoDigiSeconds = twoDigits(
-                                            duration.inSeconds.remainder(60));
+                                    String twoDigits(int n) =>
+                                        n.toString().padLeft(2,
+                                            '0'); // Correction de la taille du pad
 
-                                        return Center(
-                                          child: Text(
-                                            '$twoDigiMinutes:$twoDigiSeconds',
-                                            style: TextStyle(
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
+                                    final twoDigitMinutes = twoDigits(
+                                        duration.inMinutes.remainder(60));
+                                    final twoDigitSeconds = twoDigits(
+                                        duration.inSeconds.remainder(60));
+
+                                    return Center(
+                                      child: Text(
+                                        '$twoDigitMinutes:$twoDigitSeconds',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        overflow: TextOverflow
+                                            .ellipsis, // Gestion du dépassement de texte
+                                      ),
+                                    );
+                                  },
                                 ),
                           _hasUploadStarted
                               ? LinearProgressIndicator(
@@ -483,6 +486,10 @@ class _AddAlerteState extends State<AddAlerte> {
                                               audioAlerte: audiosUploaded,
                                               photoAlerte: photoUploaded)
                                           .then((value) => {
+                                                FirebaseApi()
+                                                    .sendPushNotificationToTopic(
+                                                        'Nouvelle alerte',
+                                                        titre),
                                                 _titreController.clear(),
                                                 _descriptionController.clear(),
                                                 _tokenTextController.clear(),
@@ -501,6 +508,9 @@ class _AddAlerteState extends State<AddAlerte> {
                                                 Navigator.of(context).pop()
                                               })
                                           .catchError((onError) => {
+                                                setState(() {
+                                                  _isLoading = false;
+                                                }),
                                                 print("Error: " +
                                                     onError.toString()),
                                                 ScaffoldMessenger.of(context)
@@ -528,6 +538,10 @@ class _AddAlerteState extends State<AddAlerte> {
                                               titreAlerte: titre,
                                               descriptionAlerte: description)
                                           .then((value) => {
+                                                FirebaseApi()
+                                                    .sendPushNotificationToTopic(
+                                                        'Nouvelle alerte',
+                                                        titre),
                                                 _titreController.clear(),
                                                 _descriptionController.clear(),
                                                 _tokenTextController.clear(),
@@ -542,10 +556,16 @@ class _AddAlerteState extends State<AddAlerte> {
                                               })
                                           .catchError((onError) => {
                                                 print("Error: " +
-                                                    onError.toString())
+                                                    onError.toString()),
+                                                setState(() {
+                                                  _isLoading = false;
+                                                }),
                                               });
                                     }
                                   } catch (e) {
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
                                     print("Error: " + e.toString());
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
@@ -593,6 +613,7 @@ class _AddAlerteState extends State<AddAlerte> {
         cursorColor: d_colorGreen,
         decoration: InputDecoration(
           hintText: "video upload",
+          enabled: false,
           contentPadding:
               const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           border: OutlineInputBorder(
@@ -611,6 +632,7 @@ class _AddAlerteState extends State<AddAlerte> {
         cursorColor: d_colorGreen,
         decoration: InputDecoration(
           hintText: "Image upload",
+          enabled: false,
           contentPadding:
               const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           border: OutlineInputBorder(
@@ -629,6 +651,7 @@ class _AddAlerteState extends State<AddAlerte> {
         cursorColor: d_colorGreen,
         decoration: InputDecoration(
           hintText: "Audio upload",
+          enabled: false,
           contentPadding:
               const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           border: OutlineInputBorder(

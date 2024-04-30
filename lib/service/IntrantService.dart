@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/CategorieProduit.dart';
+import 'package:koumi_app/models/Forme.dart';
 import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:path/path.dart';
@@ -22,7 +24,9 @@ class IntrantService extends ChangeNotifier {
       required String dateExpiration,
       File? photoIntrant,
       required Acteur acteur,
-      required Speculation speculation}) async {
+      required Forme forme,
+      required String unite,
+      required CategorieProduit categorieProduit}) async {
     try {
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
 
@@ -37,10 +41,12 @@ class IntrantService extends ChangeNotifier {
         'quantiteIntrant': quantiteIntrant,
         'prixIntrant': prixIntrant,
         'dateExpiration': dateExpiration,
-        'speculation': speculation.toMap(),
+        'categorieProduit': categorieProduit.toMap(),
         'descriptionIntrant': descriptionIntrant,
+        'unite' : unite,
         'photoIntrant': "",
-        'acteur': acteur.toMap()
+        'acteur': acteur.toMap(),
+        'forme' : forme.toMap()
       });
 
       var response = await requete.send();
@@ -67,6 +73,7 @@ class IntrantService extends ChangeNotifier {
     required int prixIntrant,
     required String dateExpiration,
     File? photoIntrant,
+    required String unite,
     required Acteur acteur,
   }) async {
     try {
@@ -87,6 +94,7 @@ class IntrantService extends ChangeNotifier {
         'dateExpiration': dateExpiration,
         'descriptionIntrant': descriptionIntrant,
         'photoIntrant': "",
+        'unite': unite,
         'acteur': acteur.toMap()
       });
 

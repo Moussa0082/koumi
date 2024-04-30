@@ -338,22 +338,42 @@ class _PaysPageState extends State<PaysPage> {
                                                               String>>[
                                                         PopupMenuItem<String>(
                                                           child: ListTile(
-                                                            leading: const Icon(
-                                                              Icons.check,
-                                                              color:
-                                                                  Colors.green,
-                                                            ),
-                                                            title: const Text(
-                                                              "Activer",
+                                                            leading:
+                                                                e.statutPays ==
+                                                                        false
+                                                                    ? Icon(
+                                                                        Icons
+                                                                            .check,
+                                                                        color: Colors
+                                                                            .green,
+                                                                      )
+                                                                    : Icon(
+                                                                        Icons
+                                                                            .disabled_visible,
+                                                                        color: Colors
+                                                                            .orange[400],
+                                                                      ),
+                                                            title:  Text(
+                                                              e.statutPays ==
+                                                                      false
+                                                                  ? "Activer"
+                                                                  : "Desactiver",
                                                               style: TextStyle(
-                                                                color: Colors
-                                                                    .green,
+                                                                color: e.statutPays ==
+                                                                        false
+                                                                    ? Colors
+                                                                        .green
+                                                                    : Colors.orange[
+                                                                        400],
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
                                                               ),
                                                             ),
                                                             onTap: () async {
+                                                              e.statutPays ==
+                                                                        false
+                                                                    ?
                                                               await PaysService()
                                                                   .activerPays(
                                                                       e.idPays!)
@@ -390,31 +410,7 @@ class _PaysPageState extends State<PaysPage> {
                                                                               ),
                                                                             ),
                                                                             Navigator.of(context).pop(),
-                                                                          });
-                                                            },
-                                                          ),
-                                                        ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: Icon(
-                                                              Icons
-                                                                  .disabled_visible,
-                                                              color: Colors
-                                                                  .orange[400],
-                                                            ),
-                                                            title: Text(
-                                                              "Désactiver",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                        .orange[
-                                                                    400],
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            onTap: () async {
-                                                              await PaysService()
+                                                                          }) : await PaysService()
                                                                   .desactiverPays(
                                                                       e.idPays!)
                                                                   .then(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:koumi_app/admin/AlerteScreen.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -6,13 +7,14 @@ import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart';
-import 'package:koumi_app/screens/MagasinScreen.dart';
-import 'package:koumi_app/screens/Meteo.dart';
-import 'package:koumi_app/screens/Produit.dart';
+import 'package:koumi_app/screens/Product.dart';
+import 'package:koumi_app/screens/Store.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/Weather.dart';
+import 'package:koumi_app/widgets/AlertAcceuil.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
+import 'package:koumi_app/widgets/connection_verify.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -53,6 +55,7 @@ class _AccueilState extends State<Accueil> {
     // TODO: implement initState
     super.initState();
     verify();
+    // Get.put(ConnectionVerify(), permanent: true);
   }
 
   @override
@@ -62,9 +65,13 @@ class _AccueilState extends State<Accueil> {
       appBar: const CustomAppBar(),
       body: ListView(
         children: [
-          SizedBox(height: 200, child: Carrousel()),
+          SizedBox(height: 180, child: Carrousel()),
           const SizedBox(
-            height: 35,
+            height: 10,
+          ),
+          isExist ? SizedBox(height: 100, child: AlertAcceuil()) : Container(),
+          const SizedBox(
+            height: 10,
           ),
           SizedBox(
             child: GridView.count(
@@ -90,16 +97,16 @@ class _AccueilState extends State<Accueil> {
       _buildAccueilCard("Intrants", "intrant.png", 1),
       _buildAccueilCard("Commandes", "commande.png", 3),
       _buildAccueilCard("Magasin", "magasin.png", 4),
-      _buildAccueilCard("Météo", "meteo.png", 5),
-      // _buildAccueilCard("Transports", "transport.png", 6),
+      // _buildAccueilCard("Météo", "meteo.png", 5),
+      _buildAccueilCard("Transports", "transport.png", 6),
       _buildAccueilCard("Locations", "location.png", 7),
       _buildAccueilCard("Produits", "produit.png", 9),
     ];
 
     if (isExist) {
       cards.insert(1, _buildAccueilCard("Conseils", "conseil.png", 2));
-      cards.insert(4, _buildAccueilCard("Transport", "transport.png", 6));
-      // cards.insert(4, _buildAccueilCard("Meteo", "meteo.png", 5));
+      // cards.insert(4, _buildAccueilCard("Transport", "transport.png", 6));
+      cards.insert(4, _buildAccueilCard("Meteo", "meteo.png", 5));
       cards.insert(7, _buildAccueilCard("Alertes", "alerte.png", 8));
     }
 
@@ -113,7 +120,7 @@ class _AccueilState extends State<Accueil> {
           onTap: () {
             if (index == 9) {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProduitScreen()));
+                  MaterialPageRoute(builder: (context) => ProductScreen()));
             } else if (index == 8) {
               Navigator.push(
                   context,
@@ -126,13 +133,13 @@ class _AccueilState extends State<Accueil> {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const Transport()));
             } else if (index == 5) {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const WeatherScreen()));
-            } else if (index == 4) {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const MagasinScreen()));
+                      builder: (context) => const WeatherScreen()));
+            } else if (index == 4) {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const StoreScreen()));
             } else if (index == 3) {
               Navigator.push(
                   context,

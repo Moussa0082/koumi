@@ -64,7 +64,9 @@ class _SuperficiePageState extends State<SuperficiePage> {
         actions: [
           IconButton(
               onPressed: () {
-                _liste = getCampListe(acteur.idActeur!);
+                setState(() {
+                  _liste = getCampListe(acteur.idActeur!);
+                });
               },
               icon: Icon(Icons.refresh)),
           PopupMenuButton<String>(
@@ -242,21 +244,43 @@ class _SuperficiePageState extends State<SuperficiePage> {
                                                             String>>[
                                                       PopupMenuItem<String>(
                                                         child: ListTile(
-                                                          leading: const Icon(
-                                                            Icons.check,
-                                                            color: Colors.green,
-                                                          ),
-                                                          title: const Text(
-                                                            "Activer",
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.green,
+                                                          leading:  e
+                                                                  .statutSuperficie == false
+                                                              ? Icon(
+                                                                  Icons.check,
+                                                                  color: Colors
+                                                                      .green,
+                                                                )
+                                                              : Icon(
+                                                                  Icons
+                                                                      .disabled_visible,
+                                                                  color: Colors
+                                                                          .orange[
+                                                                      400],
+                                                                ),
+                                                          title:  Text(
+                                                             e
+                                                                  .statutSuperficie == false
+                                                              
+                                                             ? "Activer"
+                                                                        : "Desactiver",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: e.statutSuperficie ==
+                                                                              false
+                                                                          ? Colors
+                                                                              .green
+                                                                          : Colors
+                                                                              .orange[400],
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
                                                             ),
                                                           ),
                                                           onTap: () async {
+                                                             e.statutSuperficie ==
+                                                                              false
+                                                                          ?
                                                             await SuperficieService()
                                                                 .activerSuperficie(e
                                                                     .idSuperficie!)
@@ -299,71 +323,43 @@ class _SuperficiePageState extends State<SuperficiePage> {
                                                                           ),
                                                                           Navigator.of(context)
                                                                               .pop(),
-                                                                        });
-                                                          },
-                                                        ),
-                                                      ),
-                                                      PopupMenuItem<String>(
-                                                        child: ListTile(
-                                                          leading: Icon(
-                                                            Icons
-                                                                .disabled_visible,
-                                                            color: Colors
-                                                                .orange[400],
-                                                          ),
-                                                          title: Text(
-                                                            "Désactiver",
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .orange[400],
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          onTap: () async {
-                                                            await SuperficieService()
-                                                                .desactiverSuperficie(e
-                                                                    .idSuperficie!)
-                                                                .then(
-                                                                    (value) => {
-                                                                          Provider.of<SuperficieService>(context, listen: false)
-                                                                              .applyChange(),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                          setState(
-                                                                              () {
-                                                                            _liste =
-                                                                                getCampListe(acteur.idActeur!);
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Desactiver avec succèss "),
-                                                                                  ],
+                                                                        }):  await SuperficieService()
+                                                                    .desactiverSuperficie(e
+                                                                        .idSuperficie!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<SuperficieService>(context, listen: false).applyChange(),
+                                                                              Navigator.of(context).pop(),
+                                                                              setState(() {
+                                                                                _liste = getCampListe(acteur.idActeur!);
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Desactiver avec succèss "),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 2),
+                                                                                  ),
+                                                                                );
+                                                                              })
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 5),
                                                                                 ),
-                                                                                duration: Duration(seconds: 2),
                                                                               ),
-                                                                            );
-                                                                          })
-                                                                        })
-                                                                .catchError(
-                                                                    (onError) =>
-                                                                        {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Une erreur s'est produit"),
-                                                                                ],
-                                                                              ),
-                                                                              duration: Duration(seconds: 5),
-                                                                            ),
-                                                                          ),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        });
+                                                                              Navigator.of(context).pop(),
+                                                                            });
 
                                                             ScaffoldMessenger
                                                                     .of(context)

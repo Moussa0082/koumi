@@ -19,6 +19,7 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 class _DetailAlerteState extends State<DetailAlerte> {
   late AudioPlayer player = AudioPlayer();
   FlickManager? flickManager;
+  late VideoPlayerController _controller;
   late Alertes alerte;
 
   @override
@@ -32,7 +33,7 @@ class _DetailAlerteState extends State<DetailAlerte> {
 
   void verifyAudioSource() {
     try {
-      if (alerte.audioAlerte != null) {
+      if (alerte.audioAlerte != null && alerte.audioAlerte!.isNotEmpty) {
         player = AudioPlayer();
 
         // Set the release mode to keep the source after playback has completed.
@@ -41,12 +42,13 @@ class _DetailAlerteState extends State<DetailAlerte> {
         // Start the player as soon as the app is displayed.
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           String audioPath =
-              'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/image';
+              'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/audio';
           await player.play(UrlSource(audioPath));
           await player.pause();
         });
       }
     } catch (e) {
+      print(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Row(
@@ -54,19 +56,33 @@ class _DetailAlerteState extends State<DetailAlerte> {
               Text("Audio non disponible"),
             ],
           ),
-          duration: Duration(seconds: 2),
+          duration: Duration(seconds: 5),
         ),
       );
     }
   }
 
   void verifyVideoSource() {
-    if (alerte.videoAlerte != null) {
-      flickManager = FlickManager(
-        autoPlay: false,
-        videoPlayerController: VideoPlayerController.networkUrl(
-          Uri.parse(
-              'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/video'),
+    try {
+      if (alerte.videoAlerte != null && alerte.videoAlerte!.isNotEmpty) {
+        flickManager = FlickManager(
+          autoPlay: false,
+          videoPlayerController: VideoPlayerController.networkUrl(
+            Uri.parse(
+                'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/video'),
+          ),
+        );
+      }
+    } catch (e) {
+      print(e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Text("Video non disponible"),
+            ],
+          ),
+          duration: Duration(seconds: 5),
         ),
       );
     }
@@ -106,29 +122,27 @@ class _DetailAlerteState extends State<DetailAlerte> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: alerte.photoAlerte != null && !alerte.photoAlerte!.isEmpty
-                  ? Image.network(
-                      'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/image',
-                      // "http://10.0.2.2/${e.photoIntrant}",
-                      width: double.infinity,
-                      height: 200,
-                      fit: BoxFit.cover,
-                      errorBuilder: (BuildContext context, Object exception,
-                          StackTrace? stackTrace) {
-                        return Image.asset(
-                          'assets/images/default_image.png',
-                          fit: BoxFit.cover,
-                        );
-                      },
-                    )
-                  : Image.asset(
-                      "assets/images/default_image.png",
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: 200,
-                    ),
-            ),
+            alerte.photoAlerte != null && !alerte.photoAlerte!.isEmpty
+                ? Image.network(
+                    'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/image',
+                    // "http://10.0.2.2/${e.photoIntrant}",
+                    width: double.infinity,
+                    height: 200,
+                    fit: BoxFit.cover,
+                    errorBuilder: (BuildContext context, Object exception,
+                        StackTrace? stackTrace) {
+                      return Image.asset(
+                        'assets/images/default_image.png',
+                        fit: BoxFit.cover,
+                      );
+                    },
+                  )
+                : Image.asset(
+                    "assets/images/default_image.png",
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: 200,
+                  ),
             SizedBox(height: 30),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -144,7 +158,7 @@ class _DetailAlerteState extends State<DetailAlerte> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                alerte.titreAlerte,
+                alerte.titreAlerte!,
                 style: const TextStyle(
                     color: Colors.black87,
                     fontWeight: FontWeight.w500,
@@ -157,7 +171,9 @@ class _DetailAlerteState extends State<DetailAlerte> {
                 ? _videoBuild()
                 : Container(),
             _descriptionBuild(),
-            alerte.audioAlerte != null ? _audioBuild() : Container()
+            alerte.audioAlerte != null && alerte.audioAlerte!.isNotEmpty
+                ? _audioBuild()
+                : Container()
           ],
         ),
       ),
@@ -179,16 +195,50 @@ class _DetailAlerteState extends State<DetailAlerte> {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: AspectRatio(
-            aspectRatio: 18 / 10,
-            child: FlickVideoPlayer(flickManager: flickManager!),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Padding(
+            padding: const EdgeInsets.all(1),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: FlickVideoPlayer(
+                  flickManager: flickManager!,
+                ),
+              ),
+            ),
           ),
         ),
       ],
     );
   }
+
+  // Widget _videoBuild() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Padding(
+  //         padding: const EdgeInsets.all(8.0),
+  //         child: Text(
+  //           'Vidéo',
+  //           style: TextStyle(
+  //             color: d_colorGreen,
+  //             fontWeight: FontWeight.w500,
+  //             fontSize: 20,
+  //           ),
+  //         ),
+  //       ),
+  //       Padding(
+  //         padding: const EdgeInsets.all(8.0),
+  //         child: AspectRatio(
+  //           aspectRatio: 18 / 10,
+  //           child: FlickVideoPlayer(flickManager: flickManager!),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _descriptionBuild() {
     return Column(
@@ -208,7 +258,7 @@ class _DetailAlerteState extends State<DetailAlerte> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
-            alerte.descriptionAlerte,
+            alerte.descriptionAlerte!,
             style: TextStyle(
               color: Colors.black87,
               fontWeight: FontWeight.w500,

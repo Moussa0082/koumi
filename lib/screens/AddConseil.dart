@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/api/firebase_api.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/ConseilService.dart';
@@ -55,62 +56,6 @@ class _AddConseilState extends State<AddConseil> {
     final images = File('${directory.path}/$name');
     return images;
   }
-
-  // Future<void> _pickVideo(ImageSource source) async {
-  //   final video = await ImagePicker().pickVideo(source: source);
-  //   if (video == null) return;
-
-  //   final videoFile = File(video.path);
-  //   setState(() {
-  //     _videoUploaded = videoFile;
-  //     _tokenTextController.text = _videoUploaded!.path.toString();
-  //     videoSrc = videoFile.path;
-  //   });
-  // }
-
-  // Future<void> _showVideoSourceDialog() async {
-  //   return showDialog<void>(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return SizedBox(
-  //         height: 150,
-  //         child: AlertDialog(
-  //           title: const Text('Choose a source'),
-  //           content: Wrap(
-  //             alignment: WrapAlignment.center,
-  //             children: [
-  //               GestureDetector(
-  //                 onTap: () {
-  //                   Navigator.pop(context); // Close dialog
-  //                   _pickVideo(ImageSource.camera);
-  //                 },
-  //                 child: const Column(
-  //                   children: [
-  //                     Icon(Icons.videocam, size: 40),
-  //                     Text('Camera'),
-  //                   ],
-  //                 ),
-  //               ),
-  //               const SizedBox(width: 40),
-  //               GestureDetector(
-  //                 onTap: () {
-  //                   Navigator.pop(context); // Close dialog
-  //                   _pickVideo(ImageSource.gallery);
-  //                 },
-  //                 child: const Column(
-  //                   children: [
-  //                     Icon(Icons.video_library, size: 40),
-  //                     Text('Gallery'),
-  //                   ],
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   Future<void> _pickVideo(ImageSource source) async {
     final video = await ImagePicker().pickVideo(source: source);
@@ -450,29 +395,33 @@ class _AddConseilState extends State<AddConseil> {
                     ),
                     !recorder.isRecording
                         ? Container()
-                        : SizedBox(
-                            child: StreamBuilder<RecordingDisposition>(
-                              stream: recorder.onProgress,
-                              builder: (context, snapshot) {
-                                final duration = snapshot.hasData
-                                    ? snapshot.data!.duration
-                                    : Duration.zero;
+                        : StreamBuilder<RecordingDisposition>(
+                            stream: recorder.onProgress,
+                            builder: (context, snapshot) {
+                              final duration = snapshot.hasData
+                                  ? snapshot.data!.duration
+                                  : Duration.zero;
 
-                                String twoDigits(int n) =>
-                                    n.toString().padLeft(60);
-                                final twoDigiMinutes =
-                                    twoDigits(duration.inMinutes.remainder(60));
-                                final twoDigiSeconds =
-                                    twoDigits(duration.inSeconds.remainder(60));
+                              String twoDigits(int n) => n.toString().padLeft(
+                                  2, '0'); // Correction de la taille du pad
 
-                                return Text(
-                                  '$twoDigiMinutes:$twoDigiSeconds',
+                              final twoDigitMinutes =
+                                  twoDigits(duration.inMinutes.remainder(60));
+                              final twoDigitSeconds =
+                                  twoDigits(duration.inSeconds.remainder(60));
+
+                              return Center(
+                                child: Text(
+                                  '$twoDigitMinutes:$twoDigitSeconds',
                                   style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                );
-                              },
-                            ),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow
+                                      .ellipsis, // Gestion du dépassement de texte
+                                ),
+                              );
+                            },
                           ),
                     _hasUploadStarted
                         ? LinearProgressIndicator(
@@ -535,6 +484,9 @@ class _AddConseilState extends State<AddConseil> {
                                         audioConseil: audiosUploaded,
                                         acteur: acteur)
                                     .then((value) => {
+                                          FirebaseApi()
+                                              .sendPushNotificationToTopic(
+                                                  'Nouveau conseil', titre),
                                           _titreController.clear(),
                                           _descriptionController.clear(),
                                           _tokenTextController.clear(),
@@ -553,6 +505,9 @@ class _AddConseilState extends State<AddConseil> {
                                         })
                                     .catchError((onError) => {
                                           print("Error: " + onError.toString()),
+                                          setState(() {
+                                            _isLoading = false;
+                                          }),
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
                                             const SnackBar(
@@ -577,6 +532,9 @@ class _AddConseilState extends State<AddConseil> {
                                         descriptionConseil: description,
                                         acteur: acteur)
                                     .then((value) => {
+                                          FirebaseApi()
+                                              .sendPushNotificationToTopic(
+                                                  'Nouveau conseil', titre),
                                           _titreController.clear(),
                                           _descriptionController.clear(),
                                           _tokenTextController.clear(),
@@ -586,14 +544,35 @@ class _AddConseilState extends State<AddConseil> {
                                           Provider.of<ConseilService>(context,
                                                   listen: false)
                                               .applyChange(),
+                                         
                                           Navigator.of(context).pop()
                                         })
                                     .catchError((onError) => {
-                                          print("Error: " + onError.toString())
+                                          print("Error: " + onError.toString()),
+                                          setState(() {
+                                            _isLoading = false;
+                                          }),
+                              //              ScaffoldMessenger.of(context).showSnackBar(
+                              //   const SnackBar(
+                              //     content: Row(
+                              //       children: [
+                              //         Text(
+                              //           "La taille des fichiers ne doit pas depassé 25 MB",
+                              //           style: TextStyle(
+                              //               overflow: TextOverflow.ellipsis),
+                              //         ),
+                              //       ],
+                              //     ),
+                              //     duration: Duration(seconds: 5),
+                              //   ),
+                              // )
                                         });
                               }
                             } catch (e) {
                               print("Error: " + e.toString());
+                              setState(() {
+                                _isLoading = false;
+                              });
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Row(
@@ -643,6 +622,7 @@ class _AddConseilState extends State<AddConseil> {
         cursorColor: d_colorGreen,
         decoration: InputDecoration(
           hintText: "video upload",
+          enabled: false,
           contentPadding:
               const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           border: OutlineInputBorder(
@@ -659,6 +639,7 @@ class _AddConseilState extends State<AddConseil> {
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       child: TextField(
         cursorColor: d_colorGreen,
+        enabled: false,
         decoration: InputDecoration(
           hintText: "Image upload",
           contentPadding:
@@ -677,6 +658,7 @@ class _AddConseilState extends State<AddConseil> {
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       child: TextField(
         cursorColor: d_colorGreen,
+        enabled: false,
         decoration: InputDecoration(
           hintText: "Audio upload",
           contentPadding:

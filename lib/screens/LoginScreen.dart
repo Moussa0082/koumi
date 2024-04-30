@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -11,6 +12,7 @@ import 'package:koumi_app/screens/RegisterScreen.dart';
 import 'package:koumi_app/widgets/BottomNavBarAdmin.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
+import 'package:koumi_app/widgets/connection_verify.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,6 +24,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  late ConnectionVerify connectionVerify;
+
   String password = "";
   String email = "";
   bool _obscureText = true;
@@ -195,16 +199,18 @@ class _LoginScreenState extends State<LoginScreen> {
         final List<String> type =
             acteur.typeActeur!.map((e) => e.libelle!).toList();
         if (type.contains('admin') || type.contains('Admin')) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
-          );
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
+          // );
+          Get.off(BottomNavBarAdmin());
         } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const BottomNavigationPage()),
-          );
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(
+          //       builder: (context) => const BottomNavigationPage()),
+          // );
+          Get.off(BottomNavigationPage());
         }
       } else {
         // Traitement en cas d'échec
@@ -289,7 +295,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final String password = passwordController.text;
 
     const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
-
+//
     // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
     ActeurProvider acteurProvider =
@@ -371,16 +377,18 @@ class _LoginScreenState extends State<LoginScreen> {
         final List<String> type =
             acteur.typeActeur!.map((e) => e.libelle!).toList();
         if (type.contains('admin') || type.contains('Admin')) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
-          );
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
+          // );
+          Get.off(BottomNavBarAdmin());
         } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const BottomNavigationPage()),
-          );
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(
+          //       builder: (context) => const BottomNavigationPage()),
+          // );
+          Get.off(BottomNavigationPage());
         }
       } else {
         // Traitement en cas d'échec
@@ -439,6 +447,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    connectionVerify = Get.put(ConnectionVerify(), permanent: true);
   }
   // login methode end
 
@@ -503,17 +512,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       TextFormField(
                         controller: emailController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          // labelText: "Adresse email",
+                         decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
                           hintText: "Entrez votre adresse email",
-                          // icon: const Icon(
-                          //   Icons.mail,
-                          //   color: Color(0xFFF2B6706),
-                          //   size: 20,
-                          // )
-                        ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
                         keyboardType: TextInputType.text,
                         validator: (val) {
                           if (val == null || val.isEmpty) {
@@ -540,10 +546,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       // debut  mot de pass
                       TextFormField(
                         controller: passwordController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          // labelText: "Mot de passe",
+                         decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           hintText: "Entrez votre mot de passe",
                           suffixIcon: IconButton(
                             onPressed: () {
@@ -560,7 +568,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Colors.grey,
                             ),
                           ),
-                        ),
+                          ),
                         keyboardType: TextInputType.text,
                         obscureText: _obscureText,
                         validator: (val) {
@@ -681,7 +689,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 "Pas de compte ?.",
                                 style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 18,
+                                    fontSize: 19,
                                     fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(
@@ -699,7 +707,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   "S'inscrire",
                                   style: TextStyle(
                                       color: Colors.blue,
-                                      fontSize: 18,
+                                      fontSize: 21,
                                       fontWeight: FontWeight.bold),
                                 ),
                               ),

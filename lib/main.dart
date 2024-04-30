@@ -1,14 +1,16 @@
+import 'dart:async';
+
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:koumi_app/models/CartItem.dart';
+import 'package:koumi_app/api/firebase_api.dart';
+import 'package:koumi_app/firebase_options.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
-import 'package:koumi_app/screens/AddAndUpdateProductEndScreen.dart';
-import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
-import 'package:koumi_app/screens/PinLoginScreen.dart';
+import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/SplashScreen.dart';
-import 'package:koumi_app/screens/Weather.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/AlerteService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
@@ -17,6 +19,7 @@ import 'package:koumi_app/service/CategorieService.dart';
 import 'package:koumi_app/service/ConseilService.dart';
 import 'package:koumi_app/service/ContinentService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
+import 'package:koumi_app/service/FormeService.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/service/MagasinService.dart';
 import 'package:koumi_app/service/MaterielService.dart';
@@ -38,13 +41,56 @@ import 'package:koumi_app/service/UniteService.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
+import 'package:koumi_app/widgets/connection_verify.dart';
+import 'package:koumi_app/widgets/notification_controller.dart';
 import 'package:provider/provider.dart';
 
+// final navigatorKey = GlofbalKey<NavigatorState>();
 
+void main() async {
+  // WidgetsFlutterBinding.ensureInitialized();
+  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // await FirebaseApi().initNotification();
+  // await AwesomeNotifications().initialize(
+  //    'resource://@drawable/launcher_icon',
+  //   [
+  //   Not
+  //       channelGroupKey: "basic_channel_group",
+  //       channelKey: "basic_channel",
+  //       channelName: "Basic Notification",
+  //       channelDescription: "Basic notifications channel",
+  //       defaultRingtoneType: DefaultRingtoneType.Notification,
+  //     playSound: true,
+  //     enableVibration: true,
+  //     importance: NotificationImportance.High,
+  //     ledColor: Colors.white,
+  //     ledOnMs: 1000,
+  //     ledOffMs: 500,
+  //   ),
 
-void main() {
-  runApp(MultiProvider(
-    providers: [
+  // ], channelGroups: [
+  //   NotificationChannelGroup(
+  //       channelGroupKey: "basic_channel_group", channelGroupName: "Basic group")
+  // ]);
+  // bool isAllowedToSendNotif =
+  //     await AwesomeNotifications().isNotificationAllowed();
+  // if (isAllowedToSendNotif) {
+  //   AwesomeNotifications().requestPermissionToSendNotifications();
+  // }
+  // await AwesomeNotifications().createNotification(
+  //   content:NotificationContent(
+  //     id: 1,
+  //     channelKey: 'basic_channel',
+  //     title: 'Notification programmée',
+  //     body: 'Cette notification est déclenchée à une heure précise.',
+  //       // icon: '@drawable/launcher_icon'
+  //     ),
+  //     schedule: NotificationCalendar(
+  //       second: 10,
+  //       allowWhileIdle: true
+  //     )
+  //   );
+  runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => MagasinService()),
     ChangeNotifierProvider(create: (context) => CartProvider()),
     ChangeNotifierProvider(create: (context) => ActeurService()),
@@ -61,9 +107,12 @@ void main() {
     ChangeNotifierProvider(create: (context) => TypeMaterielService()),
     ChangeNotifierProvider(create: (context) => SuperficieService()),
     ChangeNotifierProvider(create: (context) => AlertesService()),
-    ChangeNotifierProvider(create: (context) => IntrantService()),                                                                                                                                                                                                                                                                                                                         ChangeNotifierProvider(create: (context) => TypeVoitureService()),
-    ChangeNotifierProvider(create: (context) => CampagneService()),                                                                                                                                                                                                                                                                                                                         ChangeNotifierProvider(create: (context) => TypeVoitureService()),
-    ChangeNotifierProvider(create: (context) => TypeMaterielService()),                                                                                                                                                                                                                                                                                                                                         ChangeNotifierProvider(create: (context) => TypeVoitureService()),
+    ChangeNotifierProvider(create: (context) => IntrantService()),
+    ChangeNotifierProvider(create: (context) => TypeVoitureService()),
+    ChangeNotifierProvider(create: (context) => CampagneService()),
+    ChangeNotifierProvider(create: (context) => TypeVoitureService()),
+    ChangeNotifierProvider(create: (context) => TypeMaterielService()),
+    ChangeNotifierProvider(create: (context) => TypeVoitureService()),
     ChangeNotifierProvider(create: (context) => MessageService()),
     ChangeNotifierProvider(create: (context) => MaterielService()),
     ChangeNotifierProvider(create: (context) => VehiculeService()),
@@ -75,17 +124,35 @@ void main() {
     ChangeNotifierProvider(create: (context) => Niveau2Service()),
     ChangeNotifierProvider(create: (context) => FiliereService()),
     ChangeNotifierProvider(create: (context) => Niveau3Service()),
+    ChangeNotifierProvider(create: (context) => FormeService()),
     ChangeNotifierProvider(create: (context) => BottomNavigationService())
-  ], child:  MyApp()));
+  ], child: MyApp()));
+  // Get.put(ConnectionVerify(), permanent: true);
 }
 
- 
-class MyApp extends StatelessWidget {
-   MyApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
 
+class _MyAppState extends State<MyApp> {
+  //  late ConnectionVerify connectionVerify;
+  @override
+  void initState() {
+    // AwesomeNotifications().setListeners(
+    //     onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+    //     onNotificationCreatedMethod:
+    //         NotificationController.onNotificationCreateMethod,
+    //     onDismissActionReceivedMethod:
+    //         NotificationController.onDismissActionReceivedMethod,
+    //     onNotificationDisplayedMethod:
+    //         NotificationController.onNotificationDisplayMethod);
+    //  connectionVerify = Get.put(ConnectionVerify(), permanent: true);
+    super.initState();
+  }
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
@@ -95,13 +162,13 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange.shade400),
         useMaterial3: true,
       ),
+      // navigatorKey: navigatorKey,
       routes: {
-        '/BottomNavigationPage': (context) => const BottomNavigationPage()
+        '/BottomNavigationPage': (context) => const BottomNavigationPage(),
+        // '/notificationPage':(context) =>  NotificationPage(),
       },
-      home: const SplashScreen(),
+       home: const SplashScreen(),
+      // home: LoginScreen(), 
     );
   }
 }
-
-
-

@@ -86,7 +86,7 @@ class _ProfilAState extends State<ProfilA> {
                                         cornerRadius: 50,
                                         color: Colors.black,
                                         image: NetworkImage(
-                                            "http:10.0.2.2/${ac.logoActeur!}"),
+                                            "https://koumi.ml/api-koumi/acteur/${ac.idActeur}/image"),
                                       ),
                                 title: Text(
                                   ac.nomActeur!.toUpperCase(),

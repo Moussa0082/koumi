@@ -343,11 +343,9 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   children: [
                                                     Flexible(
                                                       child: Image.network(
-                                                       "https://koumi.ml/api-koumi/parametreGeneraux/${param.idParametreGeneraux}/image",
+                                                        "https://koumi.ml/api-koumi/parametreGeneraux/${param.idParametreGeneraux!}/image",
                                                         scale: 1,
-                                                        width: 150,
-                                                        height: 80,
-                                                        fit: BoxFit.cover,
+                                                        fit: BoxFit.fill,
                                                         errorBuilder:
                                                             (BuildContext
                                                                     context,
@@ -358,9 +356,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                           return Image.asset(
                                                             'assets/images/default_image.png',
                                                             scale: 1,
-                                                            width: 150,
-                                                            height: 80,
-                                                            fit: BoxFit.cover,
+                                                            fit: BoxFit.fill,
                                                           );
                                                         },
                                                       ),
@@ -397,9 +393,19 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                 width: 110,
                                                 height: 150,
                                                 child: Image.network(
-                                                  "http://10.0.2.2/api-koumi/${param.logoSysteme!}",
+                                                  "https://koumi.ml/api-koumi/parametreGeneraux/${param.idParametreGeneraux!}/image",
                                                   scale: 1,
                                                   fit: BoxFit.fill,
+                                                  errorBuilder: (BuildContext
+                                                          context,
+                                                      Object exception,
+                                                      StackTrace? stackTrace) {
+                                                    return Image.asset(
+                                                      'assets/images/default_image.png',
+                                                      scale: 1,
+                                                      fit: BoxFit.fill,
+                                                    );
+                                                  },
                                                 ),
                                               ),
                                     title: isEditing
@@ -429,7 +435,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                             param.sloganSysteme!,
                                             style: const TextStyle(
                                               fontSize: 17,
-                                              overflow: TextOverflow.ellipsis,
+                                              // overflow: TextOverflow.ellipsis,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
@@ -1045,7 +1051,10 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     sigleStructureController,
                                                 ),
                                               )
-                                            : Text(param.tauxYuan! != null ? param.tauxYuan! : '' ,
+                                            : Text(
+                                                param.tauxYuan! != null
+                                                    ? param.tauxYuan!
+                                                    : '',
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,

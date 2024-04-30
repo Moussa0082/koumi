@@ -363,23 +363,42 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                                                           PopupMenuItem<String>(
                                                             child: ListTile(
                                                               leading:
-                                                                  const Icon(
-                                                                Icons.check,
-                                                                color: Colors
-                                                                    .green,
-                                                              ),
-                                                              title: const Text(
-                                                                "Activer",
+                                                                  e.statutTypeActeur ==
+                                                                          false
+                                                                      ? Icon(
+                                                                          Icons
+                                                                              .check,
+                                                                          color:
+                                                                              Colors.green,
+                                                                        )
+                                                                      : Icon(
+                                                                          Icons
+                                                                              .disabled_visible,
+                                                                          color:
+                                                                              Colors.orange[400],
+                                                                        ),
+                                                              title:  Text(
+                                                               e.statutTypeActeur ==
+                                                                        false
+                                                                    ? "Activer"
+                                                                    : "Desactiver",
                                                                 style:
                                                                     TextStyle(
-                                                                  color: Colors
-                                                                      .green,
+                                                                  color: e.statutTypeActeur ==
+                                                                          false
+                                                                      ? Colors
+                                                                          .green
+                                                                      : Colors.orange[
+                                                                          400],
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold,
                                                                 ),
                                                               ),
                                                               onTap: () async {
+                                                                 e.statutTypeActeur ==
+                                                                          false
+                                                                      ?
                                                                 await TypeActeurService()
                                                                     .activerTypeActeur(e
                                                                         .idTypeActeur!)
@@ -413,43 +432,15 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                                                                                 ),
                                                                               ),
                                                                               Navigator.of(context).pop(),
-                                                                            });
-                                                              },
-                                                            ),
-                                                          ),
-                                                          PopupMenuItem<String>(
-                                                            child: ListTile(
-                                                              leading: Icon(
-                                                                Icons
-                                                                    .disabled_visible,
-                                                                color: Colors
-                                                                        .orange[
-                                                                    400],
-                                                              ),
-                                                              title: Text(
-                                                                "Désactiver",
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                          .orange[
-                                                                      400],
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                              onTap: () async {
-                                                                await TypeActeurService()
-                                                                    .desactiverTypeActeur(e
-                                                                        .idTypeActeur!)
-                                                                    .then(
-                                                                        (value) =>
+                                                                            }) : await TypeActeurService()
+                                                                        .desactiverTypeActeur(e
+                                                                            .idTypeActeur!)
+                                                                        .then((value) =>
                                                                             {
                                                                               Provider.of<TypeActeurService>(context, listen: false).applyChange(),
                                                                               Navigator.of(context).pop(),
                                                                             })
-                                                                    .catchError(
-                                                                        (onError) =>
+                                                                        .catchError((onError) =>
                                                                             {
                                                                               ScaffoldMessenger.of(context).showSnackBar(
                                                                                 SnackBar(

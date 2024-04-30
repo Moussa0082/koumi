@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "592355641252",
+    "project_id": "koumipushnotification",
+    "storage_bucket": "koumipushnotification.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:592355641252:android:be7dd4f25de5f727cb6331",
+        "android_client_info": {
+          "package_name": "com.example.koumi_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxlWK2u_Wzp02c8ERX5R9d-GWZoLk10Qc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

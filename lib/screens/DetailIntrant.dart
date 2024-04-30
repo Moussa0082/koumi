@@ -12,6 +12,7 @@ import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
+import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -35,7 +36,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
   TextEditingController _quantiteController = TextEditingController();
   TextEditingController _prixController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
-
+  TextEditingController _uniteController = TextEditingController();
   bool _isEditing = false;
   bool _isLoading = false;
   late Acteur acteur = Acteur();
@@ -94,6 +95,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
     _quantiteController.text = intrants.quantiteIntrant.toString();
     _prixController.text = intrants.prixIntrant.toString();
     _dateController.text = intrants.dateExpiration!;
+    _uniteController.text = intrants.unite!;
     isDialOpenNotifier = ValueNotifier<bool>(false);
   }
 
@@ -177,6 +179,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
       final double quantite = double.tryParse(_quantiteController.text) ?? 0.0;
       final int prix = int.tryParse(_prixController.text) ?? 0;
       final String date = _dateController.text;
+      final String unite = _uniteController.text;
 
       if (photo != null) {
         await IntrantService()
@@ -188,6 +191,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                 prixIntrant: prix,
                 dateExpiration: date,
                 photoIntrant: photo,
+                unite: unite,
                 acteur: acteur)
             .then((value) => {
                   Provider.of<IntrantService>(context, listen: false)
@@ -201,7 +205,9 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         statutIntrant: intrants.statutIntrant,
                         dateAjout: intrants.dateAjout,
                         dateExpiration: date,
-                        speculation: intrants.speculation,
+                        categorieProduit: intrants.categorieProduit,
+                        forme: intrants.forme,
+                        unite: unite,
                         acteur: acteur);
                     _isLoading = false;
                   }),
@@ -231,6 +237,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                 descriptionIntrant: description,
                 prixIntrant: prix,
                 dateExpiration: date,
+                unite: unite,
                 acteur: acteur)
             .then((value) => {
                   Provider.of<IntrantService>(context, listen: false)
@@ -244,7 +251,9 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         statutIntrant: intrants.statutIntrant,
                         dateAjout: intrants.dateAjout,
                         dateExpiration: date,
-                        speculation: intrants.speculation,
+                        categorieProduit: intrants.categorieProduit,
+                        forme: intrants.forme,
+                        unite: unite,
                         photoIntrant: intrants.photoIntrant,
                         acteur: acteur);
                     _isLoading = false;
@@ -496,27 +505,27 @@ class _DetailIntrantState extends State<DetailIntrant> {
           ),
         ),
         _buildDescription(intrants.descriptionIntrant),
-        acteur.nomActeur != intrants.acteur.nomActeur
-            ? Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Container(
-                  height: 40,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: const BoxDecoration(
-                    color: Colors.orangeAccent,
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Fournisseur',
-                      style: const TextStyle(
-                          overflow: TextOverflow.ellipsis,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              )
-            : Container(),
+        // acteur.nomActeur != intrants.acteur.nomActeur
+        //     ? Padding(
+        //         padding: const EdgeInsets.symmetric(horizontal: 10),
+        //         child: Container(
+        //           height: 40,
+        //           width: MediaQuery.of(context).size.width,
+        //           decoration: const BoxDecoration(
+        //             color: Colors.orangeAccent,
+        //           ),
+        //           child: Center(
+        //             child: Text(
+        //               'Fournisseur',
+        //               style: const TextStyle(
+        //                   overflow: TextOverflow.ellipsis,
+        //                   fontSize: 20,
+        //                   fontWeight: FontWeight.bold),
+        //             ),
+        //           ),
+        //         ),
+        //       )
+        //     : Container(),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Container(
@@ -536,13 +545,40 @@ class _DetailIntrantState extends State<DetailIntrant> {
             ),
           ),
         ),
-        _buildItem('Spéculation ', intrants.speculation!.nomSpeculation!),
-        _buildItem('Catégorie  ',
-            intrants.speculation!.categorieProduit!.libelleCategorie!),
+        // _buildItem('Spéculation ', intrants.speculation!.nomSpeculation!),
+        _buildItem('Catégorie  ', intrants.categorieProduit!.libelleCategorie!),
+        _buildItem(
+            'Filière  ', intrants.categorieProduit!.filiere!.libelleFiliere!),
         _buildItem('Date d\'ajout ', '${intrants.dateAjout}' ?? 'N/A'),
         acteur.nomActeur != intrants.acteur.nomActeur
             ? _buildFournissuer()
             : Container(),
+        // acteur.nomActeur != intrants.acteur.nomActeur
+        //     ?
+        Center(
+          child: SizedBox(
+            width: 200,
+            height: 60,
+            child: ElevatedButton(
+              onPressed: () {
+                // _addToCart(widget.stock);
+                if (acteur.nomActeur != intrants.acteur.nomActeur) {
+                  Snack.error(
+                      titre: "Alerte",
+                      message:
+                          "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
+                } else {}
+              },
+              style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.orange, shape: const StadiumBorder()),
+              child: Text(
+                "Ajouter au panier",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        )
+        // : Container()
       ],
     );
   }
@@ -563,8 +599,12 @@ class _DetailIntrantState extends State<DetailIntrant> {
         _buildItem('Nom intrant ', intrants.nomIntrant),
         _buildItem('Quantité ', intrants.quantiteIntrant.toString()),
         _buildItem('Date péremption ', intrants.dateExpiration!),
-        _buildItem(
-            'Prix ', '${intrants.prixIntrant.toString()} ${para.monnaie}'),
+        para.monnaie != null
+            ? _buildItem(
+                'Prix ', '${intrants.prixIntrant.toString()} ${para.monnaie}')
+            : _buildItem('Prix ', '${intrants.prixIntrant.toString()} FCFA'),
+        _buildItem('Unité ', '${intrants.unite}'),
+        _buildItem('Forme ', '${intrants.forme.libelleForme}'),
         _buildItem('Statut ',
             '${intrants.statutIntrant! ? 'Disponible' : 'Non disponible'}'),
       ],
@@ -605,30 +645,65 @@ class _DetailIntrantState extends State<DetailIntrant> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-                color: Colors.black87,
-                fontWeight: FontWeight.w500,
-                fontStyle: FontStyle.italic,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 18),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w500,
+                  fontStyle: FontStyle.italic,
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 16),
+            ),
           ),
-          Text(
-            value,
-            textAlign: TextAlign.justify,
-            softWrap: true,
-            style: const TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w800,
-              overflow: TextOverflow.ellipsis,
-              fontSize: 16,
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              maxLines: 2,
+              // softWrap: true,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w800,
+                overflow: TextOverflow.ellipsis,
+                fontSize: 16,
+              ),
             ),
           )
         ],
       ),
     );
   }
+  // Widget _buildItem(String title, String value) {
+  //   return Padding(
+  //     padding: const EdgeInsets.all(10.0),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         Text(
+  //           title,
+  //           style: const TextStyle(
+  //               color: Colors.black87,
+  //               fontWeight: FontWeight.w500,
+  //               fontStyle: FontStyle.italic,
+  //               overflow: TextOverflow.ellipsis,
+  //               fontSize: 18),
+  //         ),
+  //         Text(
+  //           value,
+  //           textAlign: TextAlign.justify,
+  //           softWrap: true,
+  //           style: const TextStyle(
+  //             color: Colors.black,
+  //             fontWeight: FontWeight.w800,
+  //             overflow: TextOverflow.ellipsis,
+  //             fontSize: 16,
+  //           ),
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildEditableDetailItem(
       String label, TextEditingController controller) {

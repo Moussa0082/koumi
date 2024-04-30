@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Conseil.dart';
@@ -5,6 +7,7 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddConseil.dart';
 import 'package:koumi_app/screens/DetailConseil.dart';
+import 'package:koumi_app/screens/UpdateConseil.dart';
 import 'package:koumi_app/service/ConseilService.dart';
 import 'package:provider/provider.dart';
 
@@ -214,110 +217,105 @@ class _ConseilDisableState extends State<ConseilDisable> {
                                                               String>>[
                                                         PopupMenuItem<String>(
                                                           child: ListTile(
-                                                            leading: const Icon(
-                                                              Icons.check,
-                                                              color:
-                                                                  Colors.green,
-                                                            ),
-                                                            title: const Text(
-                                                              "Activer",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .green,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            onTap: () async {
-                                                              await ConseilService()
-                                                                  .activerConseil(e
-                                                                      .idConseil!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<ConseilService>(context, listen: false).applyChange(),
-
-                                                                            Navigator.of(context).pop(),
-                                                                            setState(() {
-                                                                               _liste = getListe();
-                                                                            }),
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Activer avec succèss "),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 2),
-                                                                              ),
-                                                                            )
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Une erreur s'est produit"),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 5),
-                                                                              ),
-                                                                            ),
-                                                                            Navigator.of(context).pop(),
-                                                                          });
-                                                            },
-                                                          ),
-                                                        ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: Icon(
-                                                              Icons
-                                                                  .disabled_visible,
-                                                              color: Colors
-                                                                  .orange[400],
-                                                            ),
+                                                            leading:
+                                                                e.statutConseil ==
+                                                                        false
+                                                                    ? Icon(
+                                                                        Icons
+                                                                            .check,
+                                                                        color: Colors
+                                                                            .green,
+                                                                      )
+                                                                    : Icon(
+                                                                        Icons
+                                                                            .disabled_visible,
+                                                                        color: Colors
+                                                                            .orange[400],
+                                                                      ),
                                                             title: Text(
-                                                              "Désactiver",
+                                                              e.statutConseil ==
+                                                                      false
+                                                                  ? "Activer"
+                                                                  : "Desactiver",
                                                               style: TextStyle(
-                                                                color: Colors
-                                                                        .orange[
-                                                                    400],
+                                                                color: e.statutConseil ==
+                                                                        false
+                                                                    ? Colors
+                                                                        .green
+                                                                    : Colors.orange[
+                                                                        400],
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
                                                               ),
                                                             ),
                                                             onTap: () async {
-                                                              await ConseilService()
-                                                                  .desactiverConseil(e
-                                                                      .idConseil!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<ConseilService>(context, listen: false).applyChange(),
-                                                                            Navigator.of(context).pop(),
-                                                                              setState(() {
-                                                                              _liste = getListe();
-                                                                            }),
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Une erreur s'est produit"),
-                                                                                  ],
+                                                              e.statutConseil ==
+                                                                      false
+                                                                  ? await ConseilService()
+                                                                      .activerConseil(e
+                                                                          .idConseil!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Provider.of<ConseilService>(context, listen: false).applyChange(),
+                                                                                Navigator.of(context).pop(),
+                                                                                setState(() {
+                                                                                  _liste = getListe();
+                                                                                }),
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Activer avec succèss "),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 2),
+                                                                                  ),
+                                                                                )
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Une erreur s'est produit"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
                                                                                 ),
-                                                                                duration: Duration(seconds: 5),
-                                                                              ),
-                                                                            ),
-                                                                            Navigator.of(context).pop(),
-                                                                          });
+                                                                                Navigator.of(context).pop(),
+                                                                              })
+                                                                  : await ConseilService()
+                                                                      .desactiverConseil(e
+                                                                          .idConseil!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Provider.of<ConseilService>(context, listen: false).applyChange(),
+                                                                                Navigator.of(context).pop(),
+                                                                                setState(() {
+                                                                                  _liste = getListe();
+                                                                                }),
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Une erreur s'est produit"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
+                                                                                ),
+                                                                                Navigator.of(context).pop(),
+                                                                              });
 
                                                               ScaffoldMessenger
                                                                       .of(context)
@@ -335,6 +333,34 @@ class _ConseilDisableState extends State<ConseilDisable> {
                                                                               2),
                                                                 ),
                                                               );
+                                                            },
+                                                          ),
+                                                        ),
+                                                         PopupMenuItem<String>(
+                                                          child: ListTile(
+                                                            leading: const Icon(
+                                                             Icons
+                                                                        .edit,
+                                                                     color:
+                                                                  Colors.green,
+                                                            ),
+                                                            title: const Text(
+                                                              "Modifier",
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .green,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                            onTap: () async {
+                                                              Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                      builder: (context) =>
+                                                                          UpdateConseil(
+                                                                              conseils: e)));
                                                             },
                                                           ),
                                                         ),
@@ -363,7 +389,7 @@ class _ConseilDisableState extends State<ConseilDisable> {
                                                                           {
                                                                             Provider.of<ConseilService>(context, listen: false).applyChange(),
                                                                             Navigator.of(context).pop(),
-                                                                              setState(() {
+                                                                            setState(() {
                                                                               _liste = getListe();
                                                                             }),
                                                                           })

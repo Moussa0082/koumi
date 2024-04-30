@@ -26,8 +26,8 @@ class _UpdatesFilieresState extends State<UpdatesFilieres> {
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    libelleController.text = widget.filiere.libelleFiliere;
-    descriptionController.text = widget.filiere.descriptionFiliere;
+    libelleController.text = widget.filiere.libelleFiliere!;
+    descriptionController.text = widget.filiere.descriptionFiliere!;
 
     super.initState();
   }

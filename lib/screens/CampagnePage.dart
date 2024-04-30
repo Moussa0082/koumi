@@ -233,128 +233,115 @@ class _CampagnePageState extends State<CampagnePage> {
                                                             String>>[
                                                       PopupMenuItem<String>(
                                                         child: ListTile(
-                                                          leading: const Icon(
-                                                            Icons.check,
-                                                            color: Colors.green,
-                                                          ),
-                                                          title: const Text(
-                                                            "Activer",
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.green,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          onTap: () async {
-                                                            await CampagneService()
-                                                                .activerCampagne(e
-                                                                    .idCampagne!)
-                                                                .then(
-                                                                    (value) => {
-                                                                          Provider.of<CampagneService>(context, listen: false)
-                                                                              .applyChange(),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                          setState(
-                                                                              () {
-                                                                            _liste =
-                                                                                getCampListe();
-                                                                          }),
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Activer avec succèss "),
-                                                                                ],
-                                                                              ),
-                                                                              duration: Duration(seconds: 2),
-                                                                            ),
-                                                                          )
-                                                                        })
-                                                                .catchError(
-                                                                    (onError) =>
-                                                                        {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Une erreur s'est produit"),
-                                                                                ],
-                                                                              ),
-                                                                              duration: Duration(seconds: 5),
-                                                                            ),
-                                                                          ),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        });
-                                                          },
-                                                        ),
-                                                      ),
-                                                      PopupMenuItem<String>(
-                                                        child: ListTile(
-                                                          leading: Icon(
-                                                            Icons
-                                                                .disabled_visible,
-                                                            color: Colors
-                                                                .orange[400],
-                                                          ),
+                                                          leading:
+                                                              e.statutCampagne ==
+                                                                      false
+                                                                  ? Icon(
+                                                                      Icons
+                                                                          .check,
+                                                                      color: Colors
+                                                                          .green,
+                                                                    )
+                                                                  : Icon(
+                                                                      Icons
+                                                                          .disabled_visible,
+                                                                      color: Colors
+                                                                              .orange[
+                                                                          400],
+                                                                    ),
                                                           title: Text(
-                                                            "Désactiver",
+                                                            e.statutCampagne ==
+                                                                    false
+                                                                ? "Activer"
+                                                                : "Desactiver",
                                                             style: TextStyle(
-                                                              color: Colors
-                                                                  .orange[400],
+                                                              color: e.statutCampagne ==
+                                                                      false
+                                                                  ? Colors.green
+                                                                  : Colors.orange[
+                                                                      400],
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
                                                             ),
                                                           ),
                                                           onTap: () async {
-                                                            await CampagneService()
-                                                                .desactiverCampagne(e
-                                                                    .idCampagne!)
-                                                                .then(
-                                                                    (value) => {
-                                                                          Provider.of<CampagneService>(context, listen: false)
-                                                                              .applyChange(),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                          setState(
-                                                                              () {
-                                                                            _liste =
-                                                                                getCampListe();
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Desactiver avec succèss "),
-                                                                                  ],
+                                                            e.statutCampagne ==
+                                                                    false
+                                                                ? await CampagneService()
+                                                                    .activerCampagne(e
+                                                                        .idCampagne!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<CampagneService>(context, listen: false).applyChange(),
+                                                                              Navigator.of(context).pop(),
+                                                                              setState(() {
+                                                                                _liste = getCampListe();
+                                                                              }),
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Activer avec succèss "),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 2),
                                                                                 ),
-                                                                                duration: Duration(seconds: 2),
+                                                                              )
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 5),
+                                                                                ),
                                                                               ),
-                                                                            );
-                                                                          })
-                                                                        })
-                                                                .catchError(
-                                                                    (onError) =>
-                                                                        {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Une erreur s'est produit"),
-                                                                                ],
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                : await CampagneService()
+                                                                    .desactiverCampagne(e
+                                                                        .idCampagne!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<CampagneService>(context, listen: false).applyChange(),
+                                                                              Navigator.of(context).pop(),
+                                                                              setState(() {
+                                                                                _liste = getCampListe();
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Desactiver avec succèss "),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 2),
+                                                                                  ),
+                                                                                );
+                                                                              })
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 5),
+                                                                                ),
                                                                               ),
-                                                                              duration: Duration(seconds: 5),
-                                                                            ),
-                                                                          ),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        });
+                                                                              Navigator.of(context).pop(),
+                                                                            });
 
                                                             ScaffoldMessenger
                                                                     .of(context)

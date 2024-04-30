@@ -44,15 +44,25 @@ class _AddMaterielState extends State<AddMateriel> {
   String? typeValue;
   late TypeMateriel typeMateriel;
   bool isExist = false;
-  late ParametreGeneraux para;
+  late ParametreGeneraux para = ParametreGeneraux();
   List<ParametreGeneraux> paraList = [];
+
+  void verifyParam() {
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+
+    if (paraList.isNotEmpty) {
+      para = paraList[0];
+    } else {
+      // Gérer le cas où la liste est null ou vide, par exemple :
+      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
-    para = paraList[0];
+    verifyParam();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _typeList =
         http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
@@ -666,6 +676,9 @@ class _AddMaterielState extends State<AddMateriel> {
                                               )
                                             })
                                         .catchError((onError) => {
+                                           setState(() {
+                                                _isLoading = false;
+                                              }),
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 const SnackBar(
@@ -728,6 +741,9 @@ class _AddMaterielState extends State<AddMateriel> {
                                               )
                                             })
                                         .catchError((onError) => {
+                                           setState(() {
+                                                _isLoading = false;
+                                              }),
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 const SnackBar(
@@ -750,6 +766,9 @@ class _AddMaterielState extends State<AddMateriel> {
                                   }
                                 } catch (e) {
                                   print("Error: " + e.toString());
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Row(

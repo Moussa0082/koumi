@@ -322,21 +322,35 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
                                                             String>>[
                                                       PopupMenuItem<String>(
                                                         child: ListTile(
-                                                          leading: const Icon(
-                                                            Icons.check,
-                                                            color: Colors.green,
-                                                          ),
-                                                          title: const Text(
-                                                            "Activer",
+                                                          leading:   e.statutType == false
+                                                                          ? Icon(
+                                                                              Icons.check,
+                                                                              color: Colors.green,
+                                                                            )
+                                                                          : Icon(
+                                                                              Icons.disabled_visible,
+                                                                              color: Colors.orange[400],
+                                                                            ),
+                                                          title:  Text(
+                                                            e.statutType ==
+                                                                    false
+                                                                ? "Activer"
+                                                                : "Desactiver",
                                                             style: TextStyle(
-                                                              color:
-                                                                  Colors.green,
+                                                              color: e.statutType ==
+                                                                      false
+                                                                  ? Colors.green
+                                                                  : Colors.orange[
+                                                                      400],
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
                                                             ),
                                                           ),
                                                           onTap: () async {
+                                                              e.statutType ==
+                                                                    false
+                                                                ?
                                                             await TypeMaterielService()
                                                                 .activerType(e
                                                                     .idTypeMateriel!)
@@ -374,56 +388,30 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
                                                                           ),
                                                                           Navigator.of(context)
                                                                               .pop(),
-                                                                        });
-                                                          },
-                                                        ),
-                                                      ),
-                                                      PopupMenuItem<String>(
-                                                        child: ListTile(
-                                                          leading: Icon(
-                                                            Icons
-                                                                .disabled_visible,
-                                                            color: Colors
-                                                                .orange[400],
-                                                          ),
-                                                          title: Text(
-                                                            "Désactiver",
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .orange[400],
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          onTap: () async {
-                                                            await TypeMaterielService()
-                                                                .desactiverType(e
-                                                                    .idTypeMateriel!)
-                                                                .then(
-                                                                    (value) => {
-                                                                          Provider.of<TypeMaterielService>(context, listen: false)
-                                                                              .applyChange(),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        })
-                                                                .catchError(
-                                                                    (onError) =>
-                                                                        {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Une erreur s'est produit"),
-                                                                                ],
+                                                                        }) : await TypeMaterielService()
+                                                                    .desactiverType(e
+                                                                        .idTypeMateriel!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<TypeMaterielService>(context, listen: false).applyChange(),
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: const Duration(seconds: 5),
+                                                                                ),
                                                                               ),
-                                                                              duration: const Duration(seconds: 5),
-                                                                            ),
-                                                                          ),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        });
+                                                                              Navigator.of(context).pop(),
+                                                                            });
 
                                                             ScaffoldMessenger
                                                                     .of(context)

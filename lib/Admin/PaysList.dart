@@ -181,33 +181,7 @@ class _PaysListState extends State<PaysList> {
                                                       fontStyle:
                                                           FontStyle.italic,
                                                     ))),
-                                            // const Padding(
-                                            //   padding: EdgeInsets.symmetric(
-                                            //       horizontal: 15),
-                                            //   child: Row(
-                                            //     mainAxisAlignment:
-                                            //         MainAxisAlignment
-                                            //             .spaceBetween,
-                                            //     children: [
-                                            //       Text("Nombres pays :",
-                                            //           style: TextStyle(
-                                            //             color: Colors.black87,
-                                            //             fontSize: 17,
-                                            //             fontWeight:
-                                            //                 FontWeight.w500,
-                                            //             fontStyle:
-                                            //                 FontStyle.italic,
-                                            //           )),
-                                            //       Text("10",
-                                            //           style: TextStyle(
-                                            //             color: Colors.black87,
-                                            //             fontSize: 18,
-                                            //             fontWeight:
-                                            //                 FontWeight.w800,
-                                            //           ))
-                                            //     ],
-                                            //   ),
-                                            // ),
+                                           
                                             Container(
                                               alignment: Alignment.bottomRight,
                                               padding:
@@ -226,118 +200,105 @@ class _PaysListState extends State<PaysList> {
                                                             String>>[
                                                       PopupMenuItem<String>(
                                                         child: ListTile(
-                                                          leading: const Icon(
-                                                            Icons.check,
-                                                            color: Colors.green,
-                                                          ),
-                                                          title: const Text(
-                                                            "Activer",
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.green,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          onTap: () async {
-                                                            await PaysService()
-                                                                .activerPays(
-                                                                    e.idPays!)
-                                                                .then(
-                                                                    (value) => {
-                                                                          Provider.of<PaysService>(context, listen: false)
-                                                                              .applyChange(),
-                                                                          setState(
-                                                                              () {
-                                                                            _liste =
-                                                                                PaysService().fetchPaysBySousRegion(region.idSousRegion!);
-                                                                          }),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Activer avec succèss "),
-                                                                                ],
-                                                                              ),
-                                                                              duration: Duration(seconds: 2),
-                                                                            ),
-                                                                          )
-                                                                        })
-                                                                .catchError(
-                                                                    (onError) =>
-                                                                        {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Une erreur s'est produit"),
-                                                                                ],
-                                                                              ),
-                                                                              duration: Duration(seconds: 5),
-                                                                            ),
-                                                                          ),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        });
-                                                          },
-                                                        ),
-                                                      ),
-                                                      PopupMenuItem<String>(
-                                                        child: ListTile(
-                                                          leading: Icon(
-                                                            Icons
-                                                                .disabled_visible,
-                                                            color: Colors
-                                                                .orange[400],
-                                                          ),
+                                                          leading:
+                                                              e.statutPays ==
+                                                                      false
+                                                                  ? Icon(
+                                                                      Icons
+                                                                          .check,
+                                                                      color: Colors
+                                                                          .green,
+                                                                    )
+                                                                  : Icon(
+                                                                      Icons
+                                                                          .disabled_visible,
+                                                                      color: Colors
+                                                                              .orange[
+                                                                          400],
+                                                                    ),
                                                           title: Text(
-                                                            "Désactiver",
+                                                            e.statutPays ==
+                                                                    false
+                                                                ? "Activer"
+                                                                : "Desactiver",
                                                             style: TextStyle(
-                                                              color: Colors
-                                                                  .orange[400],
+                                                              color: e.statutPays ==
+                                                                      false
+                                                                  ? Colors.green
+                                                                  : Colors.orange[
+                                                                      400],
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
                                                             ),
                                                           ),
                                                           onTap: () async {
-                                                            await PaysService()
-                                                                .desactiverPays(
-                                                                    e.idPays!)
-                                                                .then(
-                                                                    (value) => {
-                                                                          Provider.of<PaysService>(context, listen: false)
-                                                                              .applyChange(),
-                                                                          setState(
-                                                                              () {
-                                                                            _liste =
-                                                                                PaysService().fetchPaysBySousRegion(region.idSousRegion!);
-                                                                          }),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        })
-                                                                .catchError(
-                                                                    (onError) =>
-                                                                        {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Une erreur s'est produit"),
-                                                                                ],
+                                                            e.statutPays ==
+                                                                    false
+                                                                ? await PaysService()
+                                                                    .activerPays(e
+                                                                        .idPays!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<PaysService>(context, listen: false).applyChange(),
+                                                                              setState(() {
+                                                                                _liste = getPaysListe(region.idSousRegion!);
+                                                                              }),
+                                                                              Navigator.of(context).pop(),
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Activer avec succèss "),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 2),
+                                                                                ),
+                                                                              )
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 5),
+                                                                                ),
                                                                               ),
-                                                                              duration: Duration(seconds: 5),
-                                                                            ),
-                                                                          ),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        });
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                : await PaysService()
+                                                                    .desactiverPays(e
+                                                                        .idPays!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<PaysService>(context, listen: false).applyChange(),
+                                                                              setState(() {
+                                                                                _liste = getPaysListe(region.idSousRegion!);
+                                                                              }),
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 5),
+                                                                                ),
+                                                                              ),
+                                                                              Navigator.of(context).pop(),
+                                                                            });
 
                                                             ScaffoldMessenger
                                                                     .of(context)
@@ -355,58 +316,6 @@ class _PaysListState extends State<PaysList> {
                                                                             2),
                                                               ),
                                                             );
-                                                          },
-                                                        ),
-                                                      ),
-                                                      PopupMenuItem<String>(
-                                                        child: ListTile(
-                                                          leading: const Icon(
-                                                            Icons.edit,
-                                                            color: Colors.green,
-                                                          ),
-                                                          title: const Text(
-                                                            "Modifier",
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.green,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          onTap: () async {
-                                                            // Ouvrir la boîte de dialogue de modification
-                                                            var updatedSousRegion =
-                                                                await showDialog(
-                                                              context: context,
-                                                              builder: (BuildContext
-                                                                      context) =>
-                                                                  AlertDialog(
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .white,
-                                                                shape:
-                                                                    RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              16),
-                                                                ),
-                                                                // content: UpdatesPays(
-                                                                //     pays:
-                                                                //         e)
-                                                              ),
-                                                            );
-
-                                                            // Si les détails sont modifiés, appliquer les changements
-                                                            if (updatedSousRegion !=
-                                                                null) {
-                                                              Provider.of<PaysService>(
-                                                                      context,
-                                                                      listen:
-                                                                          false)
-                                                                  .applyChange();
-                                                            }
                                                           },
                                                         ),
                                                       ),
@@ -433,6 +342,11 @@ class _PaysListState extends State<PaysList> {
                                                                     (value) => {
                                                                           Provider.of<PaysService>(context, listen: false)
                                                                               .applyChange(),
+                                                                              setState(
+                                                                              () {
+                                                                            _liste =
+                                                                                getPaysListe(region.idSousRegion!);
+                                                                          }),
                                                                           Navigator.of(context)
                                                                               .pop(),
                                                                         })

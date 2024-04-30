@@ -63,7 +63,7 @@ class AlertesService extends ChangeNotifier {
     }
   }
 
-  static Future<void> updateAlertes(
+   Future<void> updateAlertes(
       {required String idAlerte,
       required String titreAlerte,
       required String descriptionAlerte,

@@ -232,21 +232,41 @@ class _Niveau3PageState extends State<Niveau3Page> {
                                                             String>>[
                                                       PopupMenuItem<String>(
                                                         child: ListTile(
-                                                          leading: const Icon(
-                                                            Icons.check,
-                                                            color: Colors.green,
-                                                          ),
-                                                          title: const Text(
-                                                            "Activer",
+                                                          leading:  e.statutN3 ==
+                                                                      false
+                                                                  ? Icon(
+                                                                      Icons
+                                                                          .check,
+                                                                      color: Colors
+                                                                          .green,
+                                                                    )
+                                                                  : Icon(
+                                                                      Icons
+                                                                          .disabled_visible,
+                                                                      color: Colors
+                                                                              .orange[
+                                                                          400],
+                                                                    ),
+                                                          title:  Text(
+                                                            e.statutN3 ==
+                                                                    false
+                                                                ? "Activer"
+                                                                : "Desactiver",
                                                             style: TextStyle(
-                                                              color:
-                                                                  Colors.green,
+                                                              color: e.statutN3 ==
+                                                                      false
+                                                                  ? Colors.green
+                                                                  : Colors.orange[
+                                                                      400],
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
                                                             ),
                                                           ),
                                                           onTap: () async {
+                                                            e.statutN3 ==
+                                                                      false
+                                                                  ?
                                                             await Niveau3Service()
                                                                 .activerNiveau3(e
                                                                     .idNiveau3Pays!)
@@ -289,56 +309,30 @@ class _Niveau3PageState extends State<Niveau3Page> {
                                                                           ),
                                                                           Navigator.of(context)
                                                                               .pop(),
-                                                                        });
-                                                          },
-                                                        ),
-                                                      ),
-                                                      PopupMenuItem<String>(
-                                                        child: ListTile(
-                                                          leading: Icon(
-                                                            Icons
-                                                                .disabled_visible,
-                                                            color: Colors
-                                                                .orange[400],
-                                                          ),
-                                                          title: Text(
-                                                            "Désactiver",
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .orange[400],
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          onTap: () async {
-                                                            await Niveau3Service()
-                                                                .desactiverNiveau3Pays(e
-                                                                    .idNiveau3Pays!)
-                                                                .then(
-                                                                    (value) => {
-                                                                          Provider.of<Niveau3Service>(context, listen: false)
-                                                                              .applyChange(),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        })
-                                                                .catchError(
-                                                                    (onError) =>
-                                                                        {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Une erreur s'est produit"),
-                                                                                ],
+                                                                        }) :  await Niveau3Service()
+                                                                    .desactiverNiveau3Pays(e
+                                                                        .idNiveau3Pays!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<Niveau3Service>(context, listen: false).applyChange(),
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 5),
+                                                                                ),
                                                                               ),
-                                                                              duration: Duration(seconds: 5),
-                                                                            ),
-                                                                          ),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        });
+                                                                              Navigator.of(context).pop(),
+                                                                            });
 
                                                             ScaffoldMessenger
                                                                     .of(context)

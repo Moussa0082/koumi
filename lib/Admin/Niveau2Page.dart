@@ -340,19 +340,39 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                                       <PopupMenuEntry<String>>[
                                                     PopupMenuItem<String>(
                                                       child: ListTile(
-                                                        leading: const Icon(
-                                                          Icons.check,
-                                                          color: Colors.green,
-                                                        ),
-                                                        title: const Text(
-                                                          "Activer",
+                                                        leading: e.statutN2 ==
+                                                                false
+                                                            ? Icon(
+                                                                Icons.check,
+                                                                color: Colors
+                                                                    .green,
+                                                              )
+                                                            : Icon(
+                                                                Icons
+                                                                    .disabled_visible,
+                                                                color: Colors
+                                                                        .orange[
+                                                                    400]),
+                                                        title:  Text(
+                                                           e.statutN2 == false
+                                                              ? "Activer"
+                                                              : "Desactiver",
                                                           style: TextStyle(
-                                                            color: Colors.green,
+                                                            color:
+                                                                e.statutN2 ==
+                                                                        false
+                                                                    ? Colors
+                                                                        .green
+                                                                    : Colors.orange[
+                                                                    400],
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                           ),
                                                         ),
                                                         onTap: () async {
+                                                           e.statutN2 ==
+                                                                false
+                                                            ?
                                                           await Niveau2Service()
                                                               .activerNiveau2(e
                                                                   .idNiveau2Pays!)
@@ -403,65 +423,36 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                                                         ),
                                                                         Navigator.of(context)
                                                                             .pop(),
-                                                                      });
-                                                        },
-                                                      ),
-                                                    ),
-                                                    PopupMenuItem<String>(
-                                                      child: ListTile(
-                                                        leading: Icon(
-                                                          Icons
-                                                              .disabled_visible,
-                                                          color: Colors
-                                                              .orange[400],
-                                                        ),
-                                                        title: Text(
-                                                          "Désactiver",
-                                                          style: TextStyle(
-                                                            color: Colors
-                                                                .orange[400],
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                        onTap: () async {
-                                                          await Niveau2Service()
-                                                              .desactiverNiveau2Pays(e
-                                                                  .idNiveau2Pays!)
-                                                              .then((value) => {
-                                                                    Provider.of<Niveau2Service>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                    // setState(
-                                                                    //     () {
-                                                                    //   _liste = Niveau2Service().fetchNiveau2ByNiveau1(widget
-                                                                    //       .niveau1pays
-                                                                    //       .idNiveau1Pays!);
-                                                                    // }),
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
-                                                                  })
-                                                              .catchError(
-                                                                  (onError) => {
-                                                                        ScaffoldMessenger.of(context)
-                                                                            .showSnackBar(
-                                                                          const SnackBar(
-                                                                            content:
-                                                                                Row(
-                                                                              children: [
-                                                                                Text("Une erreur s'est produit"),
-                                                                              ],
+                                                                      }) : await Niveau2Service()
+                                                                  .desactiverNiveau2Pays(e
+                                                                      .idNiveau2Pays!)
+                                                                  .then(
+                                                                      (value) =>
+                                                                          {
+                                                                            Provider.of<Niveau2Service>(context, listen: false).applyChange(),
+                                                                            // setState(
+                                                                            //     () {
+                                                                            //   _liste = Niveau2Service().fetchNiveau2ByNiveau1(widget
+                                                                            //       .niveau1pays
+                                                                            //       .idNiveau1Pays!);
+                                                                            // }),
+                                                                            Navigator.of(context).pop(),
+                                                                          })
+                                                                  .catchError(
+                                                                      (onError) =>
+                                                                          {
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              const SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Une erreur s'est produit"),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: Duration(seconds: 5),
+                                                                              ),
                                                                             ),
-                                                                            duration:
-                                                                                Duration(seconds: 5),
-                                                                          ),
-                                                                        ),
-                                                                        Navigator.of(context)
-                                                                            .pop(),
-                                                                      });
+                                                                            Navigator.of(context).pop(),
+                                                                          });
 
                                                           ScaffoldMessenger.of(
                                                                   context)

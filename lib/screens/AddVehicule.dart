@@ -3,16 +3,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/NextAddVehicule.dart';
 import 'package:koumi_app/screens/NextAddVehiculeActeur.dart';
-import 'package:koumi_app/screens/Transport.dart';
-import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:provider/provider.dart';
@@ -45,7 +41,6 @@ class _AddVehiculeState extends State<AddVehicule> {
   late Acteur acteur;
   bool _isLoading = false;
   final formkey = GlobalKey<FormState>();
-
 
   void _handleButtonPress() async {
     // Afficher l'indicateur de chargement
@@ -83,7 +78,6 @@ class _AddVehiculeState extends State<AddVehicule> {
                 Provider.of<VehiculeService>(context, listen: false)
                     .applyChange();
                 Navigator.of(context).pop();
-                
 
                 // Navigator.pushReplacement(context,
                 //     MaterialPageRoute(builder: (context) => Transport()));
@@ -252,11 +246,11 @@ class _AddVehiculeState extends State<AddVehicule> {
                                 ),
                               );
                             }
-                            
+
                             if (snapshot.hasData) {
                               // dynamic responseData =
                               //     json.decode(snapshot.data.body);
-                               dynamic jsonString =
+                              dynamic jsonString =
                                   utf8.decode(snapshot.data.bodyBytes);
                               dynamic responseData = json.decode(jsonString);
 
@@ -382,10 +376,14 @@ class _AddVehiculeState extends State<AddVehicule> {
                                 ),
                               );
                             }
-                           
+
                             if (snapshot.hasData) {
-                              dynamic responseData =
-                                  json.decode(snapshot.data.body);
+                              // dynamic responseData =
+                              //     json.decode(snapshot.data.body);
+                              dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+
                               if (responseData is List) {
                                 final reponse = responseData;
                                 final niveau3List = reponse
@@ -512,21 +510,22 @@ class _AddVehiculeState extends State<AddVehicule> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => NextAddVehiculeActeur(
-                                          typeVoiture: typeVoiture,
-                                          nomV: _nomController.text,
-                                          localite: niveau3,
-                                          description:
-                                              _descriptionController.text,
-                                          nbKilo: _nbKilometrageController.text,
-                                          capacite: _capaciteController
-                                              .text))).then((value) => {
+                                      builder: (context) =>
+                                          NextAddVehiculeActeur(
+                                              typeVoiture: typeVoiture,
+                                              nomV: _nomController.text,
+                                              localite: niveau3,
+                                              description:
+                                                  _descriptionController.text,
+                                              nbKilo:
+                                                  _nbKilometrageController.text,
+                                              capacite: _capaciteController
+                                                  .text))).then((value) => {
                                     _nomController.clear(),
                                     _descriptionController.clear(),
                                     _localiteController.clear(),
                                     _nbKilometrageController.clear(),
                                     _capaciteController.clear(),
-                                   
                                     setState(() {
                                       typeValue = null;
                                       n3Value = null;

@@ -175,234 +175,272 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                       searchText = _searchController.text.toLowerCase();
                       return libelle.contains(searchText);
                     }).toList();
-                    return 
-                                  GridView.count(
+                    return   GridView.builder(
                       shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 2,
-                      crossAxisSpacing: 5,
-                      childAspectRatio: 0.9,
-                      children: filtereSearch
-                          // .where((element) => element.statutVehicule == true)
-                          .map((e) => Padding(
-                                padding: EdgeInsets.all(10),
-                                child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.45,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  DetailTransport(
-                                                      vehicule: e)));
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(15),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.3),
-                                            offset: const Offset(0, 2),
-                                            blurRadius: 8,
-                                            spreadRadius: 2,
+                      physics: NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                        childAspectRatio: 0.8,
+                      ),
+                      itemCount: filtereSearch.length,
+                      itemBuilder: (context, index) {
+                        var e = filtereSearch
+                            .where((element) => element.statutVehicule == true)
+                            .elementAt(index);
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        DetailTransport(vehicule: e)));
+                          },
+                          child: Container(
+                            margin: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Color.fromARGB(250, 250, 250, 250),
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.3),
+                                  offset: Offset(0, 2),
+                                  blurRadius: 8,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: SizedBox(
+                                    height: 90,
+                                    child: e.photoVehicule == null ||
+                                            e.photoVehicule!.isEmpty
+                                        ? Image.asset(
+                                            "assets/images/default_image.png",
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Image.network(
+                                            "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
+                                            // "http://10.0.2.2/${e.photoIntrant}",
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (BuildContext context,
+                                                Object exception,
+                                                StackTrace? stackTrace) {
+                                              return Image.asset(
+                                                'assets/images/default_image.png',
+                                                fit: BoxFit.cover,
+                                              );
+                                            },
                                           ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: e.photoVehicule == null
-                                                  ? Image.asset(
-                                                      'assets/images/default_image.png',
-                                                      fit: BoxFit.cover,
-                                                      height: 90,
+                                  ),
+                                ),
+                                // SizedBox(height: 8),
+                                ListTile(
+                                  title: Text(
+                                    e.nomVehicule,
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                    // maxLines: 1,
+                                    // overflow: TextOverflow.ellipsis,
+                                  ),
+                                  subtitle: Text(
+                                    e.localisation,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                                 Container(
+                                  alignment: Alignment.bottomRight,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      _buildEtat(e.statutVehicule),
+                                      PopupMenuButton<String>(
+                                        padding: EdgeInsets.zero,
+                                        itemBuilder: (context) =>
+                                            <PopupMenuEntry<String>>[
+                                          PopupMenuItem<String>(
+                                            child: ListTile(
+                                              leading: e.statutVehicule == false
+                                                  ? Icon(
+                                                      Icons.check,
+                                                      color: Colors.green,
                                                     )
-                                                  : Image.network(
-                                                      "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
-                                                      fit: BoxFit.cover,
-                                                      height: 90,
-                                                      errorBuilder:
-                                                          (BuildContext context,
-                                                              Object exception,
-                                                              StackTrace?
-                                                                  stackTrace) {
-                                                        return Image.asset(
-                                                           'assets/images/default_image.png',
-                                                          fit: BoxFit.cover,
-                                                          height: 90,
-                                                        );
-                                                      },
+                                                  : Icon(
+                                                      Icons.disabled_visible,
+                                                      color: Colors.orange[400],
                                                     ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10, ),
-                                            child: Text(
-                                              e.nomVehicule,
-                                              style: TextStyle(
-                                                  fontSize: 16,
+                                              title: Text(
+                                                e.statutVehicule == false
+                                                    ? "Activer"
+                                                    : "Desactiver",
+                                                style: TextStyle(
+                                                  color:
+                                                      e.statutVehicule == false
+                                                          ? Colors.green
+                                                          : Colors.orange[400],
                                                   fontWeight: FontWeight.bold,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  color: d_colorGreen),
+                                                ),
+                                              ),
+                                              onTap: () async {
+                                                e.statutVehicule == false
+                                                    ? await VehiculeService()
+                                                        .activerVehicules(
+                                                            e.idVehicule)
+                                                        .then((value) => {
+                                                              Provider.of<VehiculeService>(
+                                                                      context,
+                                                                      listen:
+                                                                          false)
+                                                                  .applyChange(),
+                                                              setState(() {
+                                                                futureListe = getListe(
+                                                                    typeVoiture
+                                                                        .idTypeVoiture!);
+                                                              }),
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop(),
+                                                              ScaffoldMessenger
+                                                                      .of(context)
+                                                                  .showSnackBar(
+                                                                const SnackBar(
+                                                                  content: Row(
+                                                                    children: [
+                                                                      Text(
+                                                                          "Activer avec succèss "),
+                                                                    ],
+                                                                  ),
+                                                                  duration:
+                                                                      Duration(
+                                                                          seconds:
+                                                                              2),
+                                                                ),
+                                                              )
+                                                            })
+                                                        .catchError(
+                                                            (onError) => {
+                                                                  ScaffoldMessenger.of(
+                                                                          context)
+                                                                      .showSnackBar(
+                                                                    const SnackBar(
+                                                                      content:
+                                                                          Row(
+                                                                        children: [
+                                                                          Text(
+                                                                              "Une erreur s'est produit"),
+                                                                        ],
+                                                                      ),
+                                                                      duration: Duration(
+                                                                          seconds:
+                                                                              5),
+                                                                    ),
+                                                                  ),
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop(),
+                                                                })
+                                                    : await VehiculeService()
+                                                        .desactiverVehicules(
+                                                            e.idVehicule)
+                                                        .then((value) => {
+                                                              Provider.of<VehiculeService>(
+                                                                      context,
+                                                                      listen:
+                                                                          false)
+                                                                  .applyChange(),
+                                                              setState(() {
+                                                                futureListe = getListe(
+                                                                    typeVoiture
+                                                                        .idTypeVoiture!);
+                                                              }),
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop(),
+                                                            })
+                                                        .catchError(
+                                                            (onError) => {
+                                                                  ScaffoldMessenger.of(
+                                                                          context)
+                                                                      .showSnackBar(
+                                                                    const SnackBar(
+                                                                      content:
+                                                                          Row(
+                                                                        children: [
+                                                                          Text(
+                                                                              "Une erreur s'est produit"),
+                                                                        ],
+                                                                      ),
+                                                                      duration: Duration(
+                                                                          seconds:
+                                                                              5),
+                                                                    ),
+                                                                  ),
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop(),
+                                                                });
+
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Row(
+                                                      children: [
+                                                        Text(
+                                                            "Désactiver avec succèss "),
+                                                      ],
+                                                    ),
+                                                    duration:
+                                                        Duration(seconds: 2),
+                                                  ),
+                                                );
+                                              },
                                             ),
                                           ),
-                                          _buildItem("Statut:",
-                                              '${e.statutVehicule ? 'Disponible' : 'Non disponible'}'),
-                                          _buildItem(
-                                              "Localité :", e.localisation),
-                                          SizedBox(height: 10),
-                                          Container(
-                                            alignment: Alignment.bottomRight,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                _buildEtat(e.statutVehicule),
-                                                PopupMenuButton<String>(
-                                                  padding: EdgeInsets.zero,
-                                                  itemBuilder: (context) =>
-                                                      <PopupMenuEntry<String>>[
-                                                    PopupMenuItem<String>(
-                                                      child: ListTile(
-                                                        leading: const Icon(
-                                                          Icons.check,
-                                                          color: Colors.green,
-                                                        ),
-                                                        title: const Text(
-                                                          "Activer",
-                                                          style: TextStyle(
-                                                            color: Colors.green,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                        onTap: () async {
-                                                          await VehiculeService()
-                                                              .activerVehicules(
-                                                                  e.idVehicule)
-                                                              .then((value) => {
-                                                                    Provider.of<VehiculeService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                    setState(
-                                                                        () {
-                                                                      futureListe =
-                                                                          getListe(
-                                                                              typeVoiture.idTypeVoiture!);
-                                                                    }),
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
-                                                                    ScaffoldMessenger.of(
-                                                                            context)
-                                                                        .showSnackBar(
-                                                                      const SnackBar(
-                                                                        content:
-                                                                            Row(
-                                                                          children: [
-                                                                            Text("Activer avec succèss "),
-                                                                          ],
-                                                                        ),
-                                                                        duration:
-                                                                            Duration(seconds: 2),
-                                                                      ),
-                                                                    )
-                                                                  })
-                                                              .catchError(
-                                                                  (onError) => {
-                                                                        ScaffoldMessenger.of(context)
-                                                                            .showSnackBar(
-                                                                          const SnackBar(
-                                                                            content:
-                                                                                Row(
-                                                                              children: [
-                                                                                Text("Une erreur s'est produit"),
-                                                                              ],
-                                                                            ),
-                                                                            duration:
-                                                                                Duration(seconds: 5),
-                                                                          ),
-                                                                        ),
-                                                                        Navigator.of(context)
-                                                                            .pop(),
-                                                                      });
-                                                        },
-                                                      ),
-                                                    ),
-                                                    PopupMenuItem<String>(
-                                                      child: ListTile(
-                                                        leading: Icon(
-                                                          Icons
-                                                              .disabled_visible,
-                                                          color: Colors
-                                                              .orange[400],
-                                                        ),
-                                                        title: Text(
-                                                          "Désactiver",
-                                                          style: TextStyle(
-                                                            color: Colors
-                                                                .orange[400],
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                        onTap: () async {
-                                                          await VehiculeService()
-                                                              .desactiverVehicules(
-                                                                  e.idVehicule)
-                                                              .then((value) => {
-                                                                    Provider.of<VehiculeService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                    setState(
-                                                                        () {
-                                                                      futureListe =
-                                                                          getListe(
-                                                                              typeVoiture.idTypeVoiture!);
-                                                                    }),
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
-                                                                  })
-                                                              .catchError(
-                                                                  (onError) => {
-                                                                        ScaffoldMessenger.of(context)
-                                                                            .showSnackBar(
-                                                                          const SnackBar(
-                                                                            content:
-                                                                                Row(
-                                                                              children: [
-                                                                                Text("Une erreur s'est produit"),
-                                                                              ],
-                                                                            ),
-                                                                            duration:
-                                                                                Duration(seconds: 5),
-                                                                          ),
-                                                                        ),
-                                                                        Navigator.of(context)
-                                                                            .pop(),
-                                                                      });
-
+                                          PopupMenuItem<String>(
+                                            child: ListTile(
+                                              leading: const Icon(
+                                                Icons.delete,
+                                                color: Colors.red,
+                                              ),
+                                              title: const Text(
+                                                "Supprimer",
+                                                style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              onTap: () async {
+                                                await VehiculeService()
+                                                    .deleteVehicule(
+                                                        e.idVehicule)
+                                                    .then((value) => {
+                                                          Provider.of<VehiculeService>(
+                                                                  context,
+                                                                  listen: false)
+                                                              .applyChange(),
+                                                          setState(() {
+                                                            futureListe = getListe(
+                                                                typeVoiture
+                                                                    .idTypeVoiture!);
+                                                          }),
+                                                          Navigator.of(context)
+                                                              .pop(),
+                                                        })
+                                                    .catchError((onError) => {
                                                           ScaffoldMessenger.of(
                                                                   context)
                                                               .showSnackBar(
@@ -410,7 +448,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                                                               content: Row(
                                                                 children: [
                                                                   Text(
-                                                                      "Désactiver avec succèss "),
+                                                                      "Impossible de supprimer"),
                                                                 ],
                                                               ),
                                                               duration:
@@ -418,75 +456,21 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                                                                       seconds:
                                                                           2),
                                                             ),
-                                                          );
-                                                        },
-                                                      ),
-                                                    ),
-                                                    PopupMenuItem<String>(
-                                                      child: ListTile(
-                                                        leading: const Icon(
-                                                          Icons.delete,
-                                                          color: Colors.red,
-                                                        ),
-                                                        title: const Text(
-                                                          "Supprimer",
-                                                          style: TextStyle(
-                                                            color: Colors.red,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                        onTap: () async {
-                                                          await VehiculeService()
-                                                              .deleteVehicule(
-                                                                  e.idVehicule)
-                                                              .then((value) => {
-                                                                    Provider.of<VehiculeService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                    setState(
-                                                                        () {
-                                                                      futureListe =
-                                                                          getListe(
-                                                                              typeVoiture.idTypeVoiture!);
-                                                                    }),
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
-                                                                  })
-                                                              .catchError(
-                                                                  (onError) => {
-                                                                        ScaffoldMessenger.of(context)
-                                                                            .showSnackBar(
-                                                                          const SnackBar(
-                                                                            content:
-                                                                                Row(
-                                                                              children: [
-                                                                                Text("Impossible de supprimer"),
-                                                                              ],
-                                                                            ),
-                                                                            duration:
-                                                                                Duration(seconds: 2),
-                                                                          ),
-                                                                        )
-                                                                      });
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
+                                                          )
+                                                        });
+                                              },
                                             ),
-                                          )
+                                          ),
                                         ],
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ),
-                              ))
-                          .toList(),
+                                )
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     );
                   }
                 });
