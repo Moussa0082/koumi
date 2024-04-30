@@ -293,7 +293,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
                 style: const TextStyle(
                     color: d_colorGreen, fontWeight: FontWeight.bold),
               ),
-              actions: acteur.nomActeur == materiels.acteur.nomActeur
+              actions: acteur.idActeur == materiels.acteur.idActeur
                   ? [
                       _isEditing
                           ? IconButton(
@@ -354,7 +354,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
               ],
             ),
           ),
-          floatingActionButton: acteur.nomActeur != materiels.acteur.nomActeur
+          floatingActionButton: acteur.idActeur != materiels.acteur.idActeur
               ? SpeedDial(
                   // animatedIcon: AnimatedIcons.close_menu,
                   backgroundColor: d_colorGreen,

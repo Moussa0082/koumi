@@ -13,8 +13,8 @@ import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:path/path.dart';
 
 class StockService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/Stock';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Stock';
+  // static const String baseUrl = 'https://koumi.ml/api-koumi/Stock';
+  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Stock';
 
   List<Stock> stockList = [];
   // List<dynamic> stockListe = [];
@@ -185,8 +185,8 @@ class StockService extends ChangeNotifier {
   Future<List<Stock>> fetchStock() async {
     try {
       final response =
-          await http.get(Uri.parse('https://koumi.ml/api-koumi/Stock/getAllStocks'));
-          // await http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Stock/getAllStocks'));
+          // await http.get(Uri.parse('https://koumi.ml/api-koumi/Stock/getAllStocks'));
+          await http.get(Uri.parse('$baseUrl/getAllStocks'));
 
       if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
 
@@ -242,8 +242,8 @@ class StockService extends ChangeNotifier {
     try {
       final response = await http.get(Uri.parse(
         
-          'https://koumi.ml/api-koumi/Stock/categorieAndActeur/$idCategorie/$idMagasin/$idActeur'));
-          // 'http://10.0.2.2:9000/api-koumi/Stock/categorieAndActeur/$idCategorie/$idMagasin/$idActeur'));
+          '$baseUrl/categorieAndActeur/$idCategorie/$idMagasin/$idActeur'));
+
       if (response.statusCode == 200) {
                 print("Fetching data all stock by id ,categorie, magasin and acteur");
         List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
@@ -265,8 +265,8 @@ class StockService extends ChangeNotifier {
   Future<List<Stock>> fetchProduitByCategorieAndMagasin(String idCategorie, String idMagasin) async {
     try {
       final response = await http.get(Uri.parse(
-          'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
-          // 'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
+          // '$baseUrl/categorieAndMagasin/$idCategorie/$idMagasin'));
+          '$baseUrl/categorieAndMagasin/$idCategorie/$idMagasin'));
       if (response.statusCode == 200) {
                 print("Fetching data all stock by id categorie and id magasin");
           List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
@@ -288,8 +288,7 @@ class StockService extends ChangeNotifier {
    Future<List<Stock>> fetchProduitByCategorieAndActeur(String idCategorie, String idActeur) async {
     try {
       final response = await http.get(
-          Uri.parse('https://koumi.ml/api-koumi/Stock/categorieAndIdActeur/$idCategorie/$idActeur'));
-          // Uri.parse('http://10.0.2.2:9000/api-koumi/Stock/categorieAndIdActeur/$idCategorie/$idActeur'));
+          Uri.parse('$baseUrl/categorieAndIdActeur/$idCategorie/$idActeur'));
        if (response.statusCode == 200) {
                     // await Future.delayed(Duration(seconds: 2));
                             print("Fetching data all stock by id categorie and id acteur");
@@ -310,8 +309,8 @@ class StockService extends ChangeNotifier {
    Future<List<Stock>> fetchProduitByCategorie(String id) async {
     try {
       final response = await http.get(
-          Uri.parse('https://koumi.ml/api-koumi/Stock/categorieProduit/$id'));
-          // Uri.parse('http://10.0.2.2:9000/api-koumi/Stock/categorieProduit/$id'));
+          // Uri.parse('https://koumi.ml/api-koumi/Stock/categorieProduit/$idCategorie'));
+          Uri.parse('$baseUrl/categorieProduit/$id'));
        if (response.statusCode == 200) {
                 print("Fetching data all stock by id categorie produit");
           List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
@@ -397,187 +396,187 @@ class StockService extends ChangeNotifier {
 
 
 
-// class StockController extends GetxController {
-//    List<Stock> stockListen = [];
-//    List<Stock> stockListe1 = [];
-//    List<Stock> stockListe2 = [];
-//   var isLoadingn = true.obs;
-//   var isLoading1 = true.obs;
-//   var isLoading2 = true.obs;
+class StockController extends GetxController {
+   List<Stock> stockListen = [];
+   List<Stock> stockListe1 = [];
+   List<Stock> stockListe2 = [];
+  var isLoadingn = true.obs;
+  var isLoading1 = true.obs;
+  var isLoading2 = true.obs;
  
 
 
-//   void clearStockListen() {
-//     stockListen.clear();
-//   }
+  void clearStockListen() {
+    stockListen.clear();
+  }
 
   
-//    void clearStockListe1() {
-//     stockListe1.clear();
-//   }
+   void clearStockListe1() {
+    stockListe1.clear();
+  }
 
 
-//    Future<void> fetchProduitByCategorieProduit(String idCategorie, String idMagasin, String idActeur) async {
-//     try {
-//       final response = await http.get(Uri.parse(
+   Future<void> fetchProduitByCategorieProduit(String idCategorie, String idMagasin, String idActeur) async {
+    try {
+      final response = await http.get(Uri.parse(
         
-//           'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin/$idActeur'));
-//           'http://10.0.2.2:9000/api-koumi/Stock/categorieProduit/$idCategorie/$idMagasin/$idActeur'));
-//       if (response.statusCode == 200) {
-//         final String jsonString = utf8.decode(response.bodyBytes);
-//         List<dynamic> data = json.decode(jsonString);
-//           stockListen = data
-//               .where((stock) => stock['statutSotck'] == true)
-//               .map((item) => Stock(
-//                     idStock: item['idStock'] as String,
-//                     nomProduit: item['nomProduit'] as String,
-//                     photo: item['photo'] ?? '',
-//                     quantiteStock: item['quantiteStock'] ?? 0,
-//                     prix: item['prix'] ?? 0,
-//                     formeProduit: item['formeProduit'] as String,
-//                     typeProduit: item['typeProduit'] as String,
-//                     descriptionStock: item['descriptionStock'] as String,
-//                     speculation: Speculation(
-//                       idSpeculation: item['speculation']['idSpeculation'], 
-//                       codeSpeculation: item['speculation']['codeSpeculation'], 
-//                       nomSpeculation: item['speculation']['nomSpeculation'],
-//                        descriptionSpeculation: item['speculation']['descriptionSpeculation'], 
-//                        statutSpeculation: item['speculation']['statutSpeculation'],
-//                         ),
-//                         acteur:Acteur(
-//                         idActeur:item['acteur']['idActeur'],
-//                         nomActeur:item['acteur']['nomActeur'],
-//                         ),
-//                        unite: Unite(
-//                         nomUnite: item['unite']['nomUnite'],
-//                         sigleUnite: item['unite']['sigleUnite'],
-//                         description: item['unite']['description'],
-//                         statutUnite: item['unite']['statutUnite'],
-//                        ), 
-//                   ))
-//               .toList();
-//         isLoadingn.value = false;
-//         update();
-//         debugPrint("Produit : ${stockListen.map((e) => e.nomProduit)}");
-//       } else {
-//         debugPrint('Failed to load stock');
-//       }
-//     } catch (e) {
-//       print('Error fetching stock: $e');
-//     }
-//   }
+          // 'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin/$idActeur'));
+          'http://10.0.2.2:9000/api-koumi/Stock/categorieProduit/$idCategorie/$idMagasin/$idActeur'));
+      if (response.statusCode == 200) {
+        final String jsonString = utf8.decode(response.bodyBytes);
+        List<dynamic> data = json.decode(jsonString);
+          stockListen = data
+              .where((stock) => stock['statutSotck'] == true)
+              .map((item) => Stock(
+                    idStock: item['idStock'] as String,
+                    nomProduit: item['nomProduit'] as String,
+                    photo: item['photo'] ?? '',
+                    quantiteStock: item['quantiteStock'] ?? 0,
+                    prix: item['prix'] ?? 0,
+                    formeProduit: item['formeProduit'] as String,
+                    typeProduit: item['typeProduit'] as String,
+                    descriptionStock: item['descriptionStock'] as String,
+                    speculation: Speculation(
+                      idSpeculation: item['speculation']['idSpeculation'], 
+                      codeSpeculation: item['speculation']['codeSpeculation'], 
+                      nomSpeculation: item['speculation']['nomSpeculation'],
+                       descriptionSpeculation: item['speculation']['descriptionSpeculation'], 
+                       statutSpeculation: item['speculation']['statutSpeculation'],
+                        ),
+                        acteur:Acteur(
+                        idActeur:item['acteur']['idActeur'],
+                        nomActeur:item['acteur']['nomActeur'],
+                        ),
+                       unite: Unite(
+                        nomUnite: item['unite']['nomUnite'],
+                        sigleUnite: item['unite']['sigleUnite'],
+                        description: item['unite']['description'],
+                        statutUnite: item['unite']['statutUnite'],
+                       ), 
+                  ))
+              .toList();
+        isLoadingn.value = false;
+        update();
+        debugPrint("Produit : ${stockListen.map((e) => e.nomProduit)}");
+      } else {
+        debugPrint('Failed to load stock');
+      }
+    } catch (e) {
+      print('Error fetching stock: $e');
+    }
+  }
 
-//   Future<void> fetchProduitByCategorieAndMagasin(String idCategorie, String idMagasin) async {
-//     try {
-//       final response = await http.get(Uri.parse(
-//           // 'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
-//           'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
-//       if (response.statusCode == 200) {
-//         final String jsonString = utf8.decode(response.bodyBytes);
-//         List<dynamic> data = json.decode(jsonString);
-//           await Future.delayed(Duration(seconds: 2));
-//           stockListe1 = data
-//               .where((stock) => stock['statutSotck'] == true)
-//               .map((item) => Stock(
-//                     idStock: item['idStock'] as String,
-//                     nomProduit: item['nomProduit'] as String,
-//                     photo: item['photo'] ?? '',
-//                     quantiteStock: item['quantiteStock'] ?? 0,
-//                     prix: item['prix'] ?? 0,
-//                     formeProduit: item['formeProduit'] as String,
-//                     typeProduit: item['typeProduit'] as String,
-//                     descriptionStock: item['descriptionStock'] as String,
-//                     speculation: Speculation(
-//                       idSpeculation: item['speculation']['idSpeculation'], 
-//                       codeSpeculation: item['speculation']['codeSpeculation'], 
-//                       nomSpeculation: item['speculation']['nomSpeculation'],
-//                        descriptionSpeculation: item['speculation']['descriptionSpeculation'], 
-//                        statutSpeculation: item['speculation']['statutSpeculation'],
-//                         ),
-//                         acteur:Acteur(
-//                         idActeur:item['acteur']['idActeur'],
-//                         nomActeur:item['acteur']['nomActeur'],
-//                         ),
-//                        unite: Unite(
-//                         nomUnite: item['unite']['nomUnite'],
-//                         sigleUnite: item['unite']['sigleUnite'],
-//                         description: item['unite']['description'],
-//                         statutUnite: item['unite']['statutUnite'],
-//                        ), 
-//                   ))
-//               .toList();
-//        isLoadingn.value = false;
-//          update();
-//         debugPrint("Produit : ${stockListe1.map((e) => e.nomProduit)}");
-//       } else {
-//         debugPrint('Failed to load stock');
-//       }
-//     } catch (e) {
-//       print('Error fetching stock: $e');
-//     }
-//   }
+  Future<void> fetchProduitByCategorieAndMagasin(String idCategorie, String idMagasin) async {
+    try {
+      final response = await http.get(Uri.parse(
+          // 'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
+          'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
+      if (response.statusCode == 200) {
+        final String jsonString = utf8.decode(response.bodyBytes);
+        List<dynamic> data = json.decode(jsonString);
+          await Future.delayed(Duration(seconds: 2));
+          stockListe1 = data
+              .where((stock) => stock['statutSotck'] == true)
+              .map((item) => Stock(
+                    idStock: item['idStock'] as String,
+                    nomProduit: item['nomProduit'] as String,
+                    photo: item['photo'] ?? '',
+                    quantiteStock: item['quantiteStock'] ?? 0,
+                    prix: item['prix'] ?? 0,
+                    formeProduit: item['formeProduit'] as String,
+                    typeProduit: item['typeProduit'] as String,
+                    descriptionStock: item['descriptionStock'] as String,
+                    speculation: Speculation(
+                      idSpeculation: item['speculation']['idSpeculation'], 
+                      codeSpeculation: item['speculation']['codeSpeculation'], 
+                      nomSpeculation: item['speculation']['nomSpeculation'],
+                       descriptionSpeculation: item['speculation']['descriptionSpeculation'], 
+                       statutSpeculation: item['speculation']['statutSpeculation'],
+                        ),
+                        acteur:Acteur(
+                        idActeur:item['acteur']['idActeur'],
+                        nomActeur:item['acteur']['nomActeur'],
+                        ),
+                       unite: Unite(
+                        nomUnite: item['unite']['nomUnite'],
+                        sigleUnite: item['unite']['sigleUnite'],
+                        description: item['unite']['description'],
+                        statutUnite: item['unite']['statutUnite'],
+                       ), 
+                  ))
+              .toList();
+       isLoadingn.value = false;
+         update();
+        debugPrint("Produit : ${stockListe1.map((e) => e.nomProduit)}");
+      } else {
+        debugPrint('Failed to load stock');
+      }
+    } catch (e) {
+      print('Error fetching stock: $e');
+    }
+  }
 
 
    
-//  //Non implementé en spring api
-//    void fetchProduitByCategorieAndActeur(String idCategorie, String idActeur) async {
-//     try {
-//       final response = await http.get(
-//           Uri.parse('https://koumi.ml/api-koumi/Stock/categorieAndIdActeur/$idCategorie/$idActeur'));
-//           // Uri.parse('http://10.0.2.2:9000/api-koumi/Stock/categorieAndIdActeur/$idCategorie/$idActeur'));
-//        if (response.statusCode == 200) {
-//         final String jsonString = utf8.decode(response.bodyBytes);
-//         List<dynamic> data = json.decode(jsonString);
-//                     await Future.delayed(Duration(seconds: 2));
-//           stockListe2 = data
-//               // .where((stock) => stock['statutSotck'] == true)
-//               .map((item) => Stock(
-//                     idStock: item['idStock'] as String,
-//                     nomProduit: item['nomProduit'] as String,
-//                     photo: item['photo'] ?? '',
-//                     quantiteStock: item['quantiteStock'] ?? 0,
-//                     prix: item['prix'] ?? 0,
-//                     statutSotck: item['statutSotck'] as bool,
-//                     origineProduit: item['origineProduit'] as String,
-//                     formeProduit: item['formeProduit'] as String,
-//                     typeProduit: item['typeProduit'] as String,
-//                     descriptionStock: item['descriptionStock'] as String,
-//                     speculation: Speculation(
-//                       idSpeculation: item['speculation']['idSpeculation'], 
-//                       codeSpeculation: item['speculation']['codeSpeculation'], 
-//                       nomSpeculation: item['speculation']['nomSpeculation'],
-//                        descriptionSpeculation: item['speculation']['descriptionSpeculation'], 
-//                        statutSpeculation: item['speculation']['statutSpeculation'],
-//                         ),
-//                         acteur:Acteur(
-//                         idActeur:item['acteur']['idActeur'],
-//                         nomActeur:item['acteur']['nomActeur'],
-//                         ),
-//                        unite: Unite(
-//                         nomUnite: item['unite']['nomUnite'],
-//                         sigleUnite: item['unite']['sigleUnite'],
-//                         description: item['unite']['description'],
-//                         statutUnite: item['unite']['statutUnite'],
-//                        ), 
-//                        magasin:Magasin(
-//                         idMagasin:item['magasin']['idMagasin'],
-//                         nomMagasin:item['magasin']['nomMagasin'],
-//                         statutMagasin:item['magasin']['statutMagasin'],
-//                        ),
-//                        zoneProduction: ZoneProduction(
-//                         idZoneProduction: item['zoneProduction']['idZoneProduction'],
-//                         nomZoneProduction: item['zoneProduction']['nomZoneProduction'],
-//                        ),
-//                   ))
-//               .toList();
-//               isLoading2.value = false;
-//         debugPrint("Produit : ${stockListe2.map((e) => e.nomProduit)}");
-//       } else {
-//         throw Exception('Failed to load stock');
-//       }
-//     } catch (e) {
-//       print('Error fetching stock: $e');
-//     }
-//   }
+ //Non implementé en spring api
+   void fetchProduitByCategorieAndActeur(String idCategorie, String idActeur) async {
+    try {
+      final response = await http.get(
+          Uri.parse('https://koumi.ml/api-koumi/Stock/categorieAndIdActeur/$idCategorie/$idActeur'));
+          // Uri.parse('http://10.0.2.2:9000/api-koumi/Stock/categorieAndIdActeur/$idCategorie/$idActeur'));
+       if (response.statusCode == 200) {
+        final String jsonString = utf8.decode(response.bodyBytes);
+        List<dynamic> data = json.decode(jsonString);
+                    await Future.delayed(Duration(seconds: 2));
+          stockListe2 = data
+              // .where((stock) => stock['statutSotck'] == true)
+              .map((item) => Stock(
+                    idStock: item['idStock'] as String,
+                    nomProduit: item['nomProduit'] as String,
+                    photo: item['photo'] ?? '',
+                    quantiteStock: item['quantiteStock'] ?? 0,
+                    prix: item['prix'] ?? 0,
+                    statutSotck: item['statutSotck'] as bool,
+                    origineProduit: item['origineProduit'] as String,
+                    formeProduit: item['formeProduit'] as String,
+                    typeProduit: item['typeProduit'] as String,
+                    descriptionStock: item['descriptionStock'] as String,
+                    speculation: Speculation(
+                      idSpeculation: item['speculation']['idSpeculation'], 
+                      codeSpeculation: item['speculation']['codeSpeculation'], 
+                      nomSpeculation: item['speculation']['nomSpeculation'],
+                       descriptionSpeculation: item['speculation']['descriptionSpeculation'], 
+                       statutSpeculation: item['speculation']['statutSpeculation'],
+                        ),
+                        acteur:Acteur(
+                        idActeur:item['acteur']['idActeur'],
+                        nomActeur:item['acteur']['nomActeur'],
+                        ),
+                       unite: Unite(
+                        nomUnite: item['unite']['nomUnite'],
+                        sigleUnite: item['unite']['sigleUnite'],
+                        description: item['unite']['description'],
+                        statutUnite: item['unite']['statutUnite'],
+                       ), 
+                       magasin:Magasin(
+                        idMagasin:item['magasin']['idMagasin'],
+                        nomMagasin:item['magasin']['nomMagasin'],
+                        statutMagasin:item['magasin']['statutMagasin'],
+                       ),
+                       zoneProduction: ZoneProduction(
+                        idZoneProduction: item['zoneProduction']['idZoneProduction'],
+                        nomZoneProduction: item['zoneProduction']['nomZoneProduction'],
+                       ),
+                  ))
+              .toList();
+              isLoading2.value = false;
+        debugPrint("Produit : ${stockListe2.map((e) => e.nomProduit)}");
+      } else {
+        throw Exception('Failed to load stock');
+      }
+    } catch (e) {
+      print('Error fetching stock: $e');
+    }
+  }
 
-//  }
+ }

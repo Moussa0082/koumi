@@ -405,7 +405,7 @@ class _DetailTransportState extends State<DetailTransport> {
                 style: const TextStyle(
                     color: d_colorGreen, fontWeight: FontWeight.bold),
               ),
-              actions: acteur.nomActeur == vehicules.acteur.nomActeur
+              actions: acteur.idActeur == vehicules.acteur.idActeur
                   ? [
                       _isEditing
                           ? IconButton(
@@ -473,7 +473,7 @@ class _DetailTransportState extends State<DetailTransport> {
               ],
             ),
           ),
-          floatingActionButton: acteur.nomActeur != vehicules.acteur.nomActeur
+          floatingActionButton: acteur.idActeur != vehicules.acteur.idActeur
               ? SpeedDial(
                   // animatedIcon: AnimatedIcons.close_menu,
                   backgroundColor: d_colorGreen,
@@ -776,7 +776,7 @@ class _DetailTransportState extends State<DetailTransport> {
             '${vehicules.statutVehicule ? 'Disponible' : 'Non disponible'}'),
         !isExist
             ? Container()
-            : acteur.nomActeur != vehicules.acteur.nomActeur
+            : acteur.idActeur != vehicules.acteur.idActeur
                 ? _buildItem('Propriètaire : ', vehicules.acteur.nomActeur!)
                 : Container(),
         // _buildItem('Description : ', vehicules.description!),

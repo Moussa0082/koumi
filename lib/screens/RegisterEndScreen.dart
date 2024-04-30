@@ -228,6 +228,7 @@ Future<void> _pickImage(ImageSource source) async {
       typeActeur: widget.typeActeur, // Convertir les IDs en chaînes de caractères
       password: password,
       speculations: selectedSpec
+      
 
         ).then((value) => 
                  showDialog(
@@ -324,7 +325,7 @@ Future<void> _pickImage(ImageSource source) async {
     // TODO: implement initState
     super.initState();
    
-    debugPrint("Adresse : " + widget.adresse +  " Type : ${widget.typeActeur}"+   " Tel : ${widget.telephoneActeur}"+
+    debugPrint("Adresse : " + widget.adresse +  " Type : ${widget.typeActeur}"+   " Tel : ${widget.telephoneActeur}"+ "pays : ${widget.pays}" +
     " Localisation :  " + widget.localistaion + " Whats app : " + widget.numeroWhatsApp + "Email :" + widget.email
   
     );
@@ -482,8 +483,8 @@ Future<void> _pickImage(ImageSource source) async {
     networkConfig: NetworkConfig(
       // Endpoint pour récupérer les spéculations en fonction des catégories sélectionnées
       // url:url , //e40ijxd5k0n0yrzj5f80,
-      url: 'https://koumi.ml/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
-      // url: 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
+      // url: 'https://koumi.ml/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
+      url: 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
       method: RequestMethod.get,
       headers: {'Content-Type': 'application/json'},
     ),

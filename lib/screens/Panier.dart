@@ -7,9 +7,11 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CartItem.dart';
 import 'package:koumi_app/models/Commande.dart';
 import 'package:koumi_app/models/CommandeAvecStocks.dart';
+import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
+import 'package:koumi_app/service/CommandeService.dart';
 import 'package:koumi_app/widgets/CartListItem.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
@@ -31,69 +33,148 @@ class _PanierState extends State<Panier> {
   List<CartItem> cartItems = [];
   String currency = "FCFA";
 
-  late Acteur acteur;
+  late Acteur acteur = Acteur();
   late List<CartItem> cartItem;
   bool isLoading = false;
 
   String? email = "";
   bool isExist = false;
 
-  void verify() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    email = prefs.getString('emailActeur');
-    if (email != null) {
-      // Si l'email de l'acteur est présent, exécute checkLoggedIn
-      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-      cartItems = Provider.of<CartProvider>(context, listen: false).cartItems;
-      setState(() {
-        isExist = true;
-      });
+  // void verify() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   email = prefs.getString('emailActeur');
+  //   if (email != null) {
+  //     // Si l'email de l'acteur est présent, exécute checkLoggedIn
+  //     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+  //     cartItems = Provider.of<CartProvider>(context, listen: false).cartItems;
+  //     setState(() {
+  //       isExist = true;
+  //     });
+  //   } else {
+  //     setState(() {
+  //       isExist = false;
+  //     });
+  //   }
+  // }
+
+
+  Future<void> ajouterStocksACommandes(CommandeAvecStocks commandeAvecStocks) async {
+  final String apiUrl = 'http://10.0.2.2:9000/api-koumi/commande/add';
+
+  try {
+    // Récupérez les informations de l'acteur connecté depuis votre application Flutter
+    // Assurez-vous que vous avez ces informations disponibles, peut-être stockées dans un Provider ou un autre mécanisme de gestion d'état
+
+
+    // Ajoutez l'acteur connecté à la commande
+    commandeAvecStocks.commande!.acteur = acteur;
+
+    final response = await http.post(
+      Uri.tryParse(apiUrl)!,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'commande': commandeAvecStocks.commande?.toJson(),
+        'stocks': commandeAvecStocks.stocks?.map((stock) => stock.toJson()).toList(),
+        'intrants': commandeAvecStocks.intrants?.map((intrant) => intrant.toJson()).toList(),
+        'quantitesDemandees': commandeAvecStocks.quantitesDemandees,
+        'quantitesIntrants': commandeAvecStocks.quantitesIntrants,
+      }),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+      return json.decode(response.body);
     } else {
-      setState(() {
-        isExist = false;
-      });
+      print('Failed to add stocks to order ${response.body.toString()} ');
     }
+  } catch (e) {
+    print('Failed to add stocks to order: $e');
   }
+}
+
 
   _createCommande() async {
     // Get the current cart items
+   // Map each CartItem to a Stock object
+  List<Stock> stocks = cartItems.map((cartItem) {
+  if (cartItem.stock != null) {
+    return Stock(
+      idStock: cartItem.stock!.idStock,
+      quantiteStock: cartItem.quantiteStock.toDouble(),
+    );
+  } else {
+    // Handle the case when stock is null
+    // For example, return a default Stock object or throw an exception
+    // Here, I'm returning a default Stock object with idStock as 0
+    return Stock(idStock: null, quantiteStock: 0);
+  }
+}).toList();
 
-    // Map each CartItem to a Stock object
-    List<Stock> stocks = cartItems.map((cartItem) {
-      return Stock(
-        idStock:
-            cartItem.stock!.idStock, // Assuming stock is a property in CartItem
-        quantiteStock: cartItem.quantiteStock
-            .toDouble(), // Assuming quantiteStock is of type double
-      );
-    }).toList();
+// Map each CartItem to an Intrant object
+List<Intrant> intrants = cartItems.map((cartItem) {
+  if (cartItem.intrant != null) {
+    return Intrant(
+      idIntrant: cartItem.intrant!.idIntrant,
+      quantiteIntrant: cartItem.quantiteStock.toDouble(),
+    );
+  } else {
+    // Handle the case when intrant is null
+    // For example, return a default Intrant object or throw an exception
+    // Here, I'm returning a default Intrant object with idIntrant as 0
+    return Intrant(idIntrant: null, quantiteIntrant: 0);
+  }
+}).toList();
+
+    // // Map each CartItem to a Stock object
+    // List<Stock> stocks = cartItems.map((cartItem) {
+    //   return Stock(
+    //     idStock:
+    //         cartItem.stock!.idStock, // Assuming stock is a property in CartItem
+    //     quantiteStock: cartItem.quantiteStock
+    //         .toDouble(), // Assuming quantiteStock is of type double
+    //   );
+    // }).toList();
+    // // Map each CartItem to a Intrant object
+    // List<Intrant> intrants = cartItems.map((cartItem) {
+    //   return Intrant(
+    //     idIntrant:
+    //         cartItem.intrant!.idIntrant, // Assuming stock is a property in CartItem
+    //     quantiteIntrant: cartItem.quantiteStock
+    //         .toDouble(), // Assuming quantiteStock is of type double
+    //   );
+    // }).toList();
 
     // Prepare the Commande object
-    Acteur acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    Commande commande = Commande(acteur: acteur); // Replace with actual data
+    // Acteur acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    
+    // commande.acteur = acteur;
 
     // Create CommandeAvecStocks object
+    Commande commande =  Commande(acteur: acteur);
     CommandeAvecStocks commandeAvecStocks = CommandeAvecStocks(
       commande: commande,
       stocks: stocks,
+      intrants: intrants,
       quantitesDemandees: stocks.map((stock) => stock.quantiteStock!).toList(),
+      quantitesIntrants: intrants.map((intrant) => intrant.quantiteIntrant!).toList(),
     );
 
     // Convert to JSON
-    String jsonData = jsonEncode(commandeAvecStocks);
+    // String jsonData = jsonEncode(commandeAvecStocks);
 
     // Make the HTTP request
-    final url = 'https://koumi.ml/api-koumi/commande/add';
-    // final url = 'http://10.0.2.2:9000/api-koumi/commande/add';
+    // final url = 'https://koumi.ml/api-koumi/commande/add';
+    final url = 'http://10.0.2.2:9000/api-koumi/commande/add';
 
     try {
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
-        body: jsonData,
+        body:  jsonEncode(commandeAvecStocks),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
         // Commande ajoutée avec succès
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -101,15 +182,8 @@ class _PanierState extends State<Panier> {
           ),
         );
         print('Commande ajoutée avec succès. ${response.body}');
-      } else if (response.statusCode == 400 || response.statusCode == 401) {
-        // Erreur d'authentification
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Échec de l\'authentification. Veuillez réessayer.'),
-          ),
-        );
-        print('Erreur lors de l\'ajout de la commande: ${response.body}');
-      } else {
+        return response;
+      }  else {
         // Autre erreur
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -127,6 +201,9 @@ class _PanierState extends State<Panier> {
               'Une erreur est survenue. Veuillez réessayer ultérieurement.'),
         ),
       );
+      setState(() {
+        isLoading = false;
+      });
       print('Erreur lors de l\'envoi de la requête: $e');
     }
   }
@@ -145,9 +222,15 @@ class _PanierState extends State<Panier> {
     });
   }
 
+   
+
+ 
+
+
   @override
   void initState() {
     super.initState();
+    // verify();
   }
 
   @override
@@ -241,7 +324,7 @@ class _PanierState extends State<Panier> {
                             itemBuilder: (context, index) {
                               final cartItem = cartItems[index];
                               return Dismissible(
-                                key: Key(cartItem.stock!.idStock!),
+                                key: Key(cartItem.isStock == true ? cartItem.stock!.idStock! : cartItem.intrant!.idIntrant!),
                                 // Use a unique key for each item
                                 background: Container(
                                   color: Colors.red,
@@ -259,7 +342,9 @@ class _PanierState extends State<Panier> {
                                       .removeCartItem(index);
                                 },
                                 child: GestureDetector(
-                                  onTap: () {},
+                                  onTap: () {
+
+                                  },
                                   child: CartListItem(
                                     cartItem: cartItem,
                                     index: index,
@@ -339,11 +424,59 @@ class _PanierState extends State<Panier> {
                               // Prepare the JSON payload
                               if (cartProvider.cartItems.isNotEmpty) {
                                 _handleButtonPress();
+//                                  List<Stock> stocks = cartItems.map((cartItem) {
+//   if (cartItem.stock != null) {
+//     return Stock(
+//       idStock: cartItem.stock!.idStock,
+//       quantiteStock: cartItem.quantiteStock.toDouble(),
+//     );
+//   } else {
+//     // Handle the case when stock is null
+//     // For example, return a default Stock object or throw an exception
+//     // Here, I'm returning a default Stock object with idStock as 0
+//     return Stock(idStock: null, quantiteStock: 0);
+//   }
+// }).toList();
+
+// // Map each CartItem to an Intrant object
+// List<Intrant> intrants = cartItems.map((cartItem) {
+//   if (cartItem.intrant != null) {
+//     return Intrant(
+//       idIntrant: cartItem.intrant!.idIntrant,
+//       quantiteIntrant: cartItem.quantiteStock.toDouble(),
+//     );
+//   } else {
+//     // Handle the case when intrant is null
+//     // For example, return a default Intrant object or throw an exception
+//     // Here, I'm returning a default Intrant object with idIntrant as 0
+//     return Intrant(idIntrant: null, quantiteIntrant: 0);
+//   }
+// }).toList();
+
+//     // Prepare the Commande object
+//     // Create CommandeAvecStocks object
+   
+//    Commande commande = Commande();
+//     CommandeAvecStocks commandeAvecStocks = CommandeAvecStocks(
+//       commande: commande,
+//       stocks: stocks,
+//       intrants: intrants,
+//       quantitesDemandees: stocks.map((stock) => stock.quantiteStock!).toList(),
+//       quantitesIntrants: intrants.map((intrant) => intrant.quantiteIntrant!).toList(),
+//     );
+//        commandeAvecStocks.commande?.acteur = acteur;
+
+//                                 ajouterStocksACommandes(
+//                                   commandeAvecStocks
+//                                   ).then((value) => {
+
+//                                   });
+
                               } else {
                                 Snack.error(
                                     titre: "Alerte",
                                     message:
-                                        "Veuiller ajouté au moins 1 produits à votre panier");
+                                        "Veuiller ajouté au moins 1 produit à votre panier");
                               }
                             },
                             style: ElevatedButton.styleFrom(

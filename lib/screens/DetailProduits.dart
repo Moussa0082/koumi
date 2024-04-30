@@ -5,9 +5,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CartItem.dart';
+import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/CartProvider.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/Panier.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
@@ -40,7 +43,8 @@ class _DetailProduitsState extends State<DetailProduits>
 
     bool isExist = false;
   String? email = "";
-
+  List<ParametreGeneraux> paraList = [];
+  late ParametreGeneraux para = ParametreGeneraux();
 
   Future <void> verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -52,7 +56,7 @@ class _DetailProduitsState extends State<DetailProduits>
       type = typeActeurData.map((data) => data.libelle).join(', ');
       setState(() {
         isExist = true;
-  
+    debugPrint("id: ${acteur.idActeur}");
       });
     } else {
       setState(() {
@@ -61,12 +65,25 @@ class _DetailProduitsState extends State<DetailProduits>
     }
   }
 
+  void verifyParam() {
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+
+    if (paraList.isNotEmpty) {
+      para = paraList[0];
+    } else {
+      // Gérer le cas où la liste est null ou vide, par exemple :
+      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     isDialOpenNotifier = ValueNotifier<bool>(false);
-    
+    verifyParam();
     // Initialiser le ValueNotifier
+    verify();
   }
 
 
@@ -101,9 +118,9 @@ class _DetailProduitsState extends State<DetailProduits>
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         centerTitle: true,
         title: const Text("Détail Produit"),
-        actions: isExist == false ? null  :
+        actions: acteur.idActeur != widget.stock!.acteur!.idActeur ? null  :
          [
-          acteur.idActeur! != widget.stock!.acteur!.idActeur! ? SizedBox() :
+          isExist == false ? SizedBox() :
           IconButton(
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder:
@@ -127,7 +144,7 @@ class _DetailProduitsState extends State<DetailProduits>
                               ):
             Image.network(
 
-                    'https://koumi.ml/api-koumi/Stock/${widget.stock!.idStock}/image',
+                    'https://koumi.ml/api-koumi/Stock/${widget.stock!.photo}/image',
                     width: double.infinity,
                     height: 200,
                     fit: BoxFit.cover,
@@ -269,7 +286,7 @@ class _DetailProduitsState extends State<DetailProduits>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '${widget.stock!.prix!.toInt()} FCFA', // Convertir en entier
+                          '${widget.stock!.prix!.toInt()} (${para.monnaie})', // Convertir en entier
                           style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
@@ -347,7 +364,7 @@ class _DetailProduitsState extends State<DetailProduits>
                   ),
                   const SizedBox(height: 20),
                    isExist == true ? 
-                  widget.stock!.acteur!.idActeur! == acteur.idActeur!
+                  widget.stock!.acteur!.idActeur == acteur.idActeur
                       ? SizedBox()
                       : Center(
                           child: SizedBox(
@@ -356,13 +373,16 @@ class _DetailProduitsState extends State<DetailProduits>
                             child: ElevatedButton(
                               onPressed: () {
                                 // _addToCart(widget.stock);
-                                if (widget.stock!.acteur!.idActeur! ==
-                                    acteur.idActeur!) {
+                                if (widget.stock!.acteur!.idActeur ==
+                                    acteur.idActeur) {
                                   Snack.error(
                                       titre: "Alerte",
                                       message:
                                           "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
-                                } else {}
+                                } else {
+                                  Provider.of<CartProvider>(context, listen: false)
+                        .addToCart(widget.stock!, 1, "");
+                               }
                               },
                               style: ElevatedButton.styleFrom(
                                   foregroundColor: Colors.orange,
@@ -430,7 +450,7 @@ class _DetailProduitsState extends State<DetailProduits>
                         .value; // Inverser la valeur du ValueNotifier
                   },
                 )
-              : Container()
+              : SizedBox()
     );
   }
 

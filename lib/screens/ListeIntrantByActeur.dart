@@ -137,7 +137,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                     intrantListe = snapshot.data!;
                     String searchText = "";
                     List<Intrant> filtereSearch = intrantListe.where((search) {
-                      String libelle = search.nomIntrant.toLowerCase();
+                      String libelle = search.nomIntrant!.toLowerCase();
                       searchText = _searchController.text.toLowerCase();
                       return libelle.contains(searchText);
                     }).toList();
@@ -218,7 +218,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                       // SizedBox(height: 8),
                                       ListTile(
                                         title: Text(
-                                          e.nomIntrant,
+                                          e.nomIntrant!,
                                           style: TextStyle(
                                             fontSize: 17,
                                             fontWeight: FontWeight.bold,
