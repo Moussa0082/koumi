@@ -5,9 +5,11 @@ import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/DetailMateriel.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Materiel.dart';
+import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddMateriel.dart';
 import 'package:koumi_app/screens/ListeMaterielByActeur.dart';
 import 'package:koumi_app/service/MaterielService.dart';
@@ -35,6 +37,8 @@ class _LocationState extends State<Location> {
   String? typeValue;
   TypeMateriel? selectedType;
   late Future _typeList;
+    List<ParametreGeneraux> paraList = [];
+  late ParametreGeneraux para = ParametreGeneraux();
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -58,6 +62,12 @@ class _LocationState extends State<Location> {
   void initState() {
     super.initState();
     verify();
+      paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+
+    if (paraList.isNotEmpty) {
+      para = paraList[0];
+    }
     _typeList =
         http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
@@ -318,7 +328,8 @@ class _LocationState extends State<Location> {
                                                 BorderRadius.circular(8.0),
                                             child: SizedBox(
                                               height: 100,
-                                              child: e.photoMateriel == null
+                                              child: e.photoMateriel == null ||
+                                                      e.photoMateriel!.isEmpty
                                                   ? Image.asset(
                                                       "assets/images/default_image.png",
                                                       fit: BoxFit.cover,
@@ -351,8 +362,8 @@ class _LocationState extends State<Location> {
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.black87,
                                               ),
-                                              // maxLines: 1,
-                                              // overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                             subtitle: Text(
                                               e.localisation,
@@ -362,6 +373,18 @@ class _LocationState extends State<Location> {
                                               ),
                                             ),
                                           ),
+                                           Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 15),
+                                            child: Text(
+                                               "${e.prixParHeure.toString()} ${para.monnaie}"
+                                                  ,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black87,
+                                              ),
+                                            ),
+                                          )
                                         ],
                                       ),
                                     ),

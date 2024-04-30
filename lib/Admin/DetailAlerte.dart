@@ -48,6 +48,7 @@ class _DetailAlerteState extends State<DetailAlerte> {
         });
       }
     } catch (e) {
+      print(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Row(
@@ -55,19 +56,33 @@ class _DetailAlerteState extends State<DetailAlerte> {
               Text("Audio non disponible"),
             ],
           ),
-          duration: Duration(seconds: 2),
+          duration: Duration(seconds: 5),
         ),
       );
     }
   }
 
   void verifyVideoSource() {
-    if (alerte.videoAlerte != null && alerte.videoAlerte!.isNotEmpty) {
-      flickManager = FlickManager(
-        autoPlay: false,
-        videoPlayerController: VideoPlayerController.networkUrl(
-          Uri.parse(
-              'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/video'),
+    try {
+      if (alerte.videoAlerte != null && alerte.videoAlerte!.isNotEmpty) {
+        flickManager = FlickManager(
+          autoPlay: false,
+          videoPlayerController: VideoPlayerController.networkUrl(
+            Uri.parse(
+                'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/video'),
+          ),
+        );
+      }
+    } catch (e) {
+      print(e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Text("Video non disponible"),
+            ],
+          ),
+          duration: Duration(seconds: 5),
         ),
       );
     }
@@ -107,29 +122,27 @@ class _DetailAlerteState extends State<DetailAlerte> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: alerte.photoAlerte != null && !alerte.photoAlerte!.isEmpty
-                  ? Image.network(
-                      'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/image',
-                      // "http://10.0.2.2/${e.photoIntrant}",
-                      width: double.infinity,
-                      height: 200,
-                      fit: BoxFit.cover,
-                      errorBuilder: (BuildContext context, Object exception,
-                          StackTrace? stackTrace) {
-                        return Image.asset(
-                          'assets/images/default_image.png',
-                          fit: BoxFit.cover,
-                        );
-                      },
-                    )
-                  : Image.asset(
-                      "assets/images/default_image.png",
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: 200,
-                    ),
-            ),
+            alerte.photoAlerte != null && !alerte.photoAlerte!.isEmpty
+                ? Image.network(
+                    'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/image',
+                    // "http://10.0.2.2/${e.photoIntrant}",
+                    width: double.infinity,
+                    height: 200,
+                    fit: BoxFit.cover,
+                    errorBuilder: (BuildContext context, Object exception,
+                        StackTrace? stackTrace) {
+                      return Image.asset(
+                        'assets/images/default_image.png',
+                        fit: BoxFit.cover,
+                      );
+                    },
+                  )
+                : Image.asset(
+                    "assets/images/default_image.png",
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: 200,
+                  ),
             SizedBox(height: 30),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -167,7 +180,7 @@ class _DetailAlerteState extends State<DetailAlerte> {
     );
   }
 
- Widget _videoBuild() {
+  Widget _videoBuild() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -182,14 +195,17 @@ class _DetailAlerteState extends State<DetailAlerte> {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: SizedBox(
-            height: 200, // Fixer la hauteur de la vidéo à 200 pixels
-            child: AspectRatio(
-              aspectRatio: 18 / 10,
-              child: FlickVideoPlayer(
-                flickManager: flickManager!,
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Padding(
+            padding: const EdgeInsets.all(1),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: FlickVideoPlayer(
+                  flickManager: flickManager!,
+                ),
               ),
             ),
           ),

@@ -113,28 +113,63 @@ class _DetailSuperficieState extends State<DetailSuperficie> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-                color: Colors.black87,
-                fontWeight: FontWeight.w500,
-                fontStyle: FontStyle.italic,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 18),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w500,
+                  fontStyle: FontStyle.italic,
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 16),
+            ),
           ),
-          Text(
-            value,
-            textAlign: TextAlign.justify,
-            softWrap: true,
-            style: const TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w800,
-              overflow: TextOverflow.ellipsis,
-              fontSize: 16,
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              maxLines: 2,
+              // softWrap: true,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w800,
+                overflow: TextOverflow.ellipsis,
+                fontSize: 16,
+              ),
             ),
           )
         ],
       ),
     );
   }
+  // Widget _buildItem(String title, String value) {
+  //   return Padding(
+  //     padding: const EdgeInsets.all(10.0),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         Text(
+  //           title,
+  //           style: const TextStyle(
+  //               color: Colors.black87,
+  //               fontWeight: FontWeight.w500,
+  //               fontStyle: FontStyle.italic,
+  //               overflow: TextOverflow.ellipsis,
+  //               fontSize: 18),
+  //         ),
+  //         Text(
+  //           value,
+  //           textAlign: TextAlign.justify,
+  //           softWrap: true,
+  //           style: const TextStyle(
+  //             color: Colors.black,
+  //             fontWeight: FontWeight.w800,
+  //             overflow: TextOverflow.ellipsis,
+  //             fontSize: 16,
+  //           ),
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
 }

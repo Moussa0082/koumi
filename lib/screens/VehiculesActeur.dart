@@ -204,7 +204,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: SizedBox(
                                     height: 90,
-                                    child: e.photoVehicule == null
+                                    child: e.photoVehicule == null ||  e.photoVehicule!.isEmpty
                                         ? Image.asset(
                                             "assets/images/default_image.png",
                                             fit: BoxFit.cover,

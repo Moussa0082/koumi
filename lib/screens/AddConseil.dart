@@ -544,31 +544,7 @@ class _AddConseilState extends State<AddConseil> {
                                           Provider.of<ConseilService>(context,
                                                   listen: false)
                                               .applyChange(),
-                                          //                 !acteur.typeActeur!.contains('admin') ?
-                                          //                  ScaffoldMessenger.of(context).showSnackBar(
-                                          //    SnackBar(
-                                          //     content: Row(
-                                          //       children: [
-                                          //         Text(
-                                          //           "Conseil sera activé par administrateur",
-                                          //           style: TextStyle(
-                                          //               overflow: TextOverflow.ellipsis),
-                                          //         ),
-                                          //       ],
-                                          //     ),
-                                          //     duration: Duration(seconds: 5),
-                                          //   ),
-                                          // ):  ScaffoldMessenger.of(context).showSnackBar(
-                                          //    SnackBar(
-                                          //     content: Row(
-                                          //       children: [
-                                          //         Text(
-                                          //           "Ajouter avec succéss",
-                                          //           style: TextStyle(
-                                          //               overflow: TextOverflow.ellipsis),
-                                          //         ),
-                                          //       ],
-                                          //     ),)),
+                                         
                                           Navigator.of(context).pop()
                                         })
                                     .catchError((onError) => {
@@ -576,6 +552,20 @@ class _AddConseilState extends State<AddConseil> {
                                           setState(() {
                                             _isLoading = false;
                                           }),
+                              //              ScaffoldMessenger.of(context).showSnackBar(
+                              //   const SnackBar(
+                              //     content: Row(
+                              //       children: [
+                              //         Text(
+                              //           "La taille des fichiers ne doit pas depassé 25 MB",
+                              //           style: TextStyle(
+                              //               overflow: TextOverflow.ellipsis),
+                              //         ),
+                              //       ],
+                              //     ),
+                              //     duration: Duration(seconds: 5),
+                              //   ),
+                              // )
                                         });
                               }
                             } catch (e) {

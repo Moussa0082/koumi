@@ -294,15 +294,26 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      "Date d'ajout : ${e.dateAjout!}",
+                                                      e.descriptionConseil,
+                                                      maxLines: 2,
                                                       style: const TextStyle(
                                                         color: Colors.black87,
                                                         fontSize: 17,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
                                                         fontWeight:
                                                             FontWeight.w500,
                                                         fontStyle:
                                                             FontStyle.italic,
                                                       ))),
+                                              Text(
+                                                  "Date d'ajout : ${e.dateAjout!}",
+                                                  style: const TextStyle(
+                                                    color: Colors.black87,
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontStyle: FontStyle.italic,
+                                                  )),
                                               SizedBox(height: 10),
                                               type.toLowerCase() != 'admin'
                                                   ? Container()

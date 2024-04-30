@@ -193,7 +193,8 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                             BorderRadius.circular(8.0),
                                         child: SizedBox(
                                           height: 90,
-                                          child: e.photoIntrant == null
+                                          child: e.photoIntrant == null ||
+                                                  e.photoIntrant!.isEmpty 
                                               ? Image.asset(
                                                   "assets/images/default_image.png",
                                                   fit: BoxFit.cover,

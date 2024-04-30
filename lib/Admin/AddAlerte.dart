@@ -61,6 +61,7 @@ class _AddAlerteState extends State<AddAlerte> {
     if (video == null) return;
 
     final videoFile = File(video.path);
+    print(videoFile.absolute);
     setState(() {
       _videoUploaded = videoFile;
       _tokenTextController.text = _videoUploaded!.path.toString();

@@ -357,7 +357,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                             BorderRadius.circular(8.0),
                                         child: SizedBox(
                                           height: 100,
-                                          child: e.photoIntrant == null
+                                          child: e.photoIntrant == null ||  e.photoIntrant!.isEmpty 
                                               ? Image.asset(
                                                   "assets/images/default_image.png",
                                                   fit: BoxFit.cover,
@@ -387,8 +387,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                             fontWeight: FontWeight.bold,
                                             color: Colors.black87,
                                           ),
-                                          // maxLines: 1,
-                                          // overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                         subtitle: Text(
                                           "${e.quantiteIntrant.toString()} ${e.unite}",

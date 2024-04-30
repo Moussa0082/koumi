@@ -32,7 +32,7 @@ class _DetailConseilState extends State<DetailConseil> {
 
   void verifyAudioSource() {
     try {
-      if (conseils.audioConseil != null && conseils.audioConseil!.isNotEmpty ) {
+      if (conseils.audioConseil != null && conseils.audioConseil!.isNotEmpty) {
         player = AudioPlayer();
 
         // Set the release mode to keep the source after playback has completed.
@@ -41,13 +41,15 @@ class _DetailConseilState extends State<DetailConseil> {
         // Start the player as soon as the app is displayed.
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           // String audioPath = 'http://10.0.2.2/${conseils.audioConseil}';
-                    String audioPath = 'https://koumi.ml/api-koumi/conseil/${conseils.idConseil}/audio';
+          String audioPath =
+              'https://koumi.ml/api-koumi/conseil/${conseils.idConseil}/audio';
 
           await player.play(UrlSource(audioPath));
           await player.pause();
         });
       }
     } catch (e) {
+      print(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Row(
@@ -55,19 +57,34 @@ class _DetailConseilState extends State<DetailConseil> {
               Text("Audio non disponible"),
             ],
           ),
-          duration: Duration(seconds: 2),
+          duration: Duration(seconds: 5),
         ),
       );
     }
   }
 
   void verifyVideoSource() {
-    if (conseils.videoConseil != null && conseils.videoConseil!.isNotEmpty ) {
-      flickManager = FlickManager(
-        autoPlay: false,
-        videoPlayerController: VideoPlayerController.networkUrl(
-          Uri.parse('https://koumi.ml/api-koumi/conseil/${conseils.idConseil}/video'),
-          // Uri.parse('http://10.0.2.2/${conseils.videoConseil}'),
+    try {
+      if (conseils.videoConseil != null && conseils.videoConseil!.isNotEmpty) {
+        flickManager = FlickManager(
+          autoPlay: false,
+          videoPlayerController: VideoPlayerController.networkUrl(
+            Uri.parse(
+                'https://koumi.ml/api-koumi/conseil/${conseils.idConseil}/video'),
+            // Uri.parse('http://10.0.2.2/${conseils.videoConseil}'),
+          ),
+        );
+      }
+    } catch (e) {
+       print(e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Text("Video non disponible"),
+            ],
+          ),
+          duration: Duration(seconds: 5),
         ),
       );
     }
@@ -107,29 +124,27 @@ class _DetailConseilState extends State<DetailConseil> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: conseils.photoConseil != null &&
-                      !conseils.photoConseil!.isEmpty
-                  ? Image.network(
-                      "https://koumi.ml/api-koumi/conseil/${conseils.idConseil}/image",
-                     width: double.infinity,
-                      height: 200,
-                      fit: BoxFit.cover,
-                      errorBuilder: (BuildContext context, Object exception,
-                          StackTrace? stackTrace) {
-                        return Image.asset(
-                          'assets/images/default_image.png',
-                          fit: BoxFit.cover,
-                        );
-                      },
-                    )
-                  : Image.asset(
-                      "assets/images/default_image.png",
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: 200,
-                    ),
-            ),
+            conseils.photoConseil != null &&
+                    !conseils.photoConseil!.isEmpty
+                ? Image.network(
+                    "https://koumi.ml/api-koumi/conseil/${conseils.idConseil}/image",
+                    width: double.infinity,
+                    height: 200,
+                    fit: BoxFit.cover,
+                    errorBuilder: (BuildContext context, Object exception,
+                        StackTrace? stackTrace) {
+                      return Image.asset(
+                        'assets/images/default_image.png',
+                        fit: BoxFit.cover,
+                      );
+                    },
+                  )
+                : Image.asset(
+                    "assets/images/default_image.png",
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: 200,
+                  ),
             SizedBox(height: 30),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -158,7 +173,9 @@ class _DetailConseilState extends State<DetailConseil> {
                 ? _videoBuild()
                 : Container(),
             _descriptionBuild(),
-            conseils.audioConseil != null  && conseils.audioConseil!.isNotEmpty ? _audioBuild() : Container()
+            conseils.audioConseil != null && conseils.audioConseil!.isNotEmpty
+                ? _audioBuild()
+                : Container()
           ],
         ),
       ),
@@ -180,16 +197,50 @@ class _DetailConseilState extends State<DetailConseil> {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: AspectRatio(
-            aspectRatio: 18 / 10,
-            child: FlickVideoPlayer(flickManager: flickManager!),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Padding(
+            padding: const EdgeInsets.all(1),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: FlickVideoPlayer(
+                  flickManager: flickManager!,
+                ),
+              ),
+            ),
           ),
         ),
       ],
     );
   }
+
+  // Widget _videoBuild() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Padding(
+  //         padding: const EdgeInsets.all(8.0),
+  //         child: Text(
+  //           'Vidéo',
+  //           style: TextStyle(
+  //             color: d_colorGreen,
+  //             fontWeight: FontWeight.w500,
+  //             fontSize: 20,
+  //           ),
+  //         ),
+  //       ),
+  //       Padding(
+  //         padding: const EdgeInsets.all(8.0),
+  //         child: AspectRatio(
+  //           aspectRatio: 18 / 10,
+  //           child: FlickVideoPlayer(flickManager: flickManager!),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _descriptionBuild() {
     return Column(
