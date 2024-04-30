@@ -116,7 +116,8 @@ class _ParametreState extends State<Parametre> {
                               ),
                             ),
                   title: Text(
-                    params.nomSysteme! ?? "Koumi",
+                    params.nomSysteme != null ?
+                    params.nomSysteme!: "Koumi",
                     style: const TextStyle(
                       fontSize: 22,
                       color: Colors.black,
@@ -125,7 +126,8 @@ class _ParametreState extends State<Parametre> {
                     ),
                   ),
                   subtitle: Text(
-                    params.sloganSysteme! ?? "Koumi",
+                    params.sloganSysteme != null ?
+                    params.sloganSysteme! : "Koumi",
                     textAlign: TextAlign.justify,
                     style: const TextStyle(
                       fontSize: 17,

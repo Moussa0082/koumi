@@ -594,6 +594,17 @@ class _AddCategorieState extends State<AddCategorie> {
                                                     context,
                                                     listen: false)
                                                 .applyChange(),
+                                                Navigator.of(context).pop(),
+                                                   ScaffoldMessenger.of(context).showSnackBar(
+                                 SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Text("Categorie ajouté avec success"),
+                                    ],
+                                  ),
+                                  duration: Duration(seconds: 5),
+                                ),
+                              ),
                                             setState(() {
                                               _liste = CategorieService()
                                                   .fetchCategorieByFiliere(
@@ -601,7 +612,7 @@ class _AddCategorieState extends State<AddCategorie> {
                                             }),
                                             libelleController.clear(),
                                             descriptionController.clear(),
-                                            Navigator.of(context).pop()
+                                            
                                           });
                                 } catch (e) {
                                   final String errorMessage = e.toString();
@@ -609,7 +620,7 @@ class _AddCategorieState extends State<AddCategorie> {
                                     const SnackBar(
                                       content: Row(
                                         children: [
-                                          Text("Une erreur s'est produite"),
+                                          Text("Cette categorie existe déjà"),
                                         ],
                                       ),
                                       duration: Duration(seconds: 5),

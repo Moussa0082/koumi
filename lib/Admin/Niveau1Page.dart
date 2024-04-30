@@ -724,6 +724,7 @@ class _Niveau1PageState extends State<Niveau1Page> {
                                       descriptionN1: description,
                                       pays: pays)
                                   .then((value) => {
+                                    Navigator.of(context).pop(),
                                         Provider.of<Niveau1Service>(context,
                                                 listen: false)
                                             .applyChange(),
@@ -734,15 +735,25 @@ class _Niveau1PageState extends State<Niveau1Page> {
                                         setState(() {
                                           pays == null;
                                         }),
-                                        Navigator.of(context).pop()
+                                         ScaffoldMessenger.of(context).showSnackBar(
+                                 SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Text("${para.libelleNiveau1Pays} ajouté avec success"),
+                                    ],
+                                  ),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              )
+                                        // Navigator.of(context).pop()
                                       });
                             } catch (e) {
                               final String errorMessage = e.toString();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
+                                 SnackBar(
                                   content: Row(
                                     children: [
-                                      Text("Une erreur s'est produit"),
+                                      Text("${para.libelleNiveau1Pays} existe déjà"),
                                     ],
                                   ),
                                   duration: Duration(seconds: 5),

@@ -658,6 +658,16 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                         Provider.of<FiliereService>(context,
                                                 listen: false)
                                             .applyChange(),
+                                               ScaffoldMessenger.of(context).showSnackBar(
+                                 SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Text("Filière ajouté avec success"),
+                                    ],
+                                  ),
+                                  duration: Duration(seconds: 5),
+                                ),
+                              ),
                                         setState(() {
                                           _filiereList = http.get(Uri.parse(
                                               'https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
@@ -673,7 +683,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                 const SnackBar(
                                   content: Row(
                                     children: [
-                                      Text("Une erreur s'est produite"),
+                                      Text("Cette filière existe déjà"),
                                     ],
                                   ),
                                   duration: Duration(seconds: 5),
@@ -909,7 +919,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                             content: Row(
                                               children: [
                                                 Text(
-                                                    "Catégorie ajouter avec success"),
+                                                    "Catégorie ajouté avec success"),
                                               ],
                                             ),
                                             duration: Duration(seconds: 3),
@@ -922,7 +932,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                 const SnackBar(
                                   content: Row(
                                     children: [
-                                      Text("Une erreur s'est produit"),
+                                      Text("Cette catgorie existe déjà"),
                                     ],
                                   ),
                                   duration: Duration(seconds: 5),
