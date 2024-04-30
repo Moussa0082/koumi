@@ -278,7 +278,7 @@ class _DetailProduitsState extends State<DetailProduits>
                           minRating: 0,
                           maxRating: 5,
                           direction: Axis.horizontal,
-                          allowHalfRating: false,
+                          // allowHalfRating: false,
                           itemCount: 5,
                           itemSize: 30,
                           itemBuilder: (context, _) => const Icon(
