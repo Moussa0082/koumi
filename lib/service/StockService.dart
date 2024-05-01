@@ -230,10 +230,9 @@ class StockService extends ChangeNotifier {
         throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
       }
     } catch (e) {
-            print('Error fetching stock: $e');
-      // throw Exception(e.toString());
+            print('Error fetching stock by acteur: $e');
+      throw Exception(e.toString());
     }
-        return stockList;
   }
 
 
@@ -257,7 +256,7 @@ class StockService extends ChangeNotifier {
         debugPrint('Failed to load stock');
       }
     } catch (e) {
-      print('Error fetching stock: $e');
+      print('Error fetching stock by id ,categorie, magasin and acteur: $e');
     }
     return stockList;
   }
@@ -278,7 +277,7 @@ class StockService extends ChangeNotifier {
         debugPrint('Failed to load stock');
       }
     } catch (e) {
-      print('Error fetching stock: $e');
+      print('Error fetching stock by id categorie and id magasin: $e');
     }
     return stockList;
   }
@@ -301,7 +300,7 @@ class StockService extends ChangeNotifier {
         throw Exception('Failed to load stock');
       }
     } catch (e) {
-      print('Error fetching stock: $e');
+      print('Error fetching stock by id categorie and id acteu: $e');
     }
     return stockList;
   }
@@ -324,7 +323,7 @@ class StockService extends ChangeNotifier {
         throw Exception('Failed to load stock');
       }
     } catch (e) {
-      print('Error fetching stock: $e');
+      print('Error fetching stock by id categorie produit: $e');
     }
     return stockList;
   }
@@ -348,6 +347,8 @@ class StockService extends ChangeNotifier {
         throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
       }
     } catch (e) {
+        print(
+            'Érror fetching stock by id magasin');
       throw Exception(e.toString());
     }
   }
