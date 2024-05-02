@@ -508,9 +508,13 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                         .map(
                                           (e) => DropdownMenuItem(
                                             value: e.idMagasin,
-                                            child: Text(e.nomMagasin!,
-                                            style:TextStyle(overflow: TextOverflow.ellipsis),
-                                            ),
+                                            child: SizedBox( // Utilisation de SizedBox pour définir une largeur maximale
+          width: double.infinity, // Largeur maximale
+          child: Text(
+            e.nomMagasin!,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
                                           ),
                                         )
                                         .toList(),
@@ -527,6 +531,9 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                       });
                                     },
                                     decoration: InputDecoration(
+                                      labelStyle: TextStyle(
+                                        overflow: TextOverflow.ellipsis
+                                      ),
                                       labelText: widget.isEditable == false ? 'Selectionner un magasin' : widget.stock!.magasin!.nomMagasin,
                                       contentPadding: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 20),
