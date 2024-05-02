@@ -45,7 +45,6 @@ class _MyProductScreenState extends State<MyProductScreen> {
   bool isExist = false;
   String? email = "";
     late Future <List<Stock>> stockListeFuture;
-    late Future <List<Stock>> stockListeFutureByStore;
    
       void verifyParam() {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
@@ -78,7 +77,6 @@ class _MyProductScreenState extends State<MyProductScreen> {
   //   }
   // }
 
-  
 
   Future <List<Stock>> getAllStocksByMagasinAndActeur() async{
       if(selectedCat != null && widget.id != null){
@@ -93,25 +91,37 @@ class _MyProductScreenState extends State<MyProductScreen> {
                         acteur.idActeur!);
       }
       return stockListe;
-      
-                    
+              
    }
+
+   void updateStockList() async {
+  try {
+  
+    setState(() {
+      stockListeFuture = getAllStocksByMagasinAndActeur();
+    });
+  } catch (error) {
+    print('Erreur lors de la mise à jour de la liste de stocks: $error');
+  }
+}
+
 
   @override
   void initState() {
+    super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // typeActeurData = acteur.typeActeur!;
     // // selectedType == null;
     // type = typeActeurData.map((data) => data.libelle).join(', ');
-      stockListeFuture =  getAllStocksByMagasinAndActeur();
     
 
     _searchController = TextEditingController();
     _catList =
         http.get(Uri.parse('http://koumi.ml/api-koumi/Categorie/allCategorie'));
-    super.initState();
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
         verifyParam();
-
+     updateStockList();
+      stockListeFuture =  getAllStocksByMagasinAndActeur();
   }
 
   @override
@@ -325,15 +335,8 @@ class _MyProductScreenState extends State<MyProductScreen> {
                   } else {
                     stockListe = snapshot.data!;
       // Vous pouvez afficher une image ou un texte ici
-                       String searchText = "";
-                    List<Stock> filtereSearch =
-                        stockListe.where((search) {
-                      String libelle = search.nomProduit!.toLowerCase();
-                      searchText = _searchController.text.trim().toLowerCase();
-                      return libelle.contains(searchText);
-                    }).toList();
 
-                      if(stockListe.isEmpty || stockListe.isEmpty && _searchController.text.isNotEmpty ){   
+                      if(stockListe.isEmpty){   
       SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.all(10),
@@ -345,7 +348,39 @@ class _MyProductScreenState extends State<MyProductScreen> {
                     height: 10,
                   ),
                   Text(
-                    'Aucun produit trouvé' ,
+                    'Aucun magasin trouvé' ,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 17,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+                  }
+                       String searchText = "";
+                    List<Stock> filtereSearch =
+                        stockListe.where((search) {
+                      String libelle = search.nomProduit!.toLowerCase();
+                      searchText = _searchController.text.trim().toLowerCase();
+                      return libelle.contains(searchText);
+                    }).toList();
+                      if(filtereSearch.isEmpty && _searchController.text.isNotEmpty){   
+      SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Center(
+              child: Column(
+                children: [
+                  Image.asset('assets/images/notif.jpg'),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Aucun magasin trouvé' ,
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 17,
@@ -374,7 +409,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
                               childAspectRatio: 0.8,
                             ),
                             itemCount: 
-                            stockListe
+                            filtereSearch
                                 .length ,
                             itemBuilder: (context, index) {
                              
@@ -383,8 +418,8 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => MyProductScreen(
-                                        id: filtereSearch[index].idStock, nom:filtereSearch[index].nomProduit
+                                      builder: (context) => DetailProduits(
+                                        stock:filtereSearch[index]
                                       ),
                                     ),
                                   );
@@ -447,7 +482,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                         ),
                                         subtitle: Text(
                                           overflow: TextOverflow.ellipsis,
-                                         " ${filtereSearch[index].quantiteStock!.toString()} ${filtereSearch[index].unite!.nomUnite} ",
+                                         "${filtereSearch[index].quantiteStock!.toString()} ${filtereSearch[index].unite!.nomUnite} ",
                                           style:TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
@@ -460,12 +495,13 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 15),
                                         child: Text(
-                                          // para.monnaie != null
-                                              // ? 
+                                          para.monnaie != null
+                                              ? 
                                               "${filtereSearch[index].prix.toString()} ${para.monnaie}"
-                                              // :
+                                              :
                                                "${filtereSearch[index].prix.toString()} FCFA",
                                           style: TextStyle(
+                                            overflow: TextOverflow.ellipsis,
                                             fontSize: 16,
                                             color: Colors.black87,
                                           ),
@@ -644,6 +680,278 @@ class _MyProductScreenState extends State<MyProductScreen> {
                   }
                 });
           }),
+      
+      //   Consumer<StockService>(builder: (context, stockService, child) {
+      //       return FutureBuilder<List<Stock>>(
+      //           future: stockListeFuture,
+      //           // selectedCat != null
+      //           //     ? stockService.fetchProduitByCategorieAndActeur(
+      //           //         selectedCat!.idCategorieProduit!, acteur.idActeur!)
+      //           //     : stockService.fetchStockByActeur(acteur.idActeur!),
+      //           builder: (context, snapshot) {
+      //             if (snapshot.connectionState == ConnectionState.waiting) {
+      //               return const Center(
+      //                 child: CircularProgressIndicator(
+      //                   color: Colors.orange,
+      //                 ),
+      //               );
+      //             }
+
+      //             if (!snapshot.hasData) {
+      //               return 
+      // SingleChildScrollView(
+      //     child: Padding(
+      //       padding: EdgeInsets.all(10),
+      //       child: Center(
+      //         child: Column(
+      //           children: [
+      //             Image.asset('assets/images/notif.jpg'),
+      //             SizedBox(
+      //               height: 10,
+      //             ),
+      //             Text(
+      //               'Aucun produit trouvé' ,
+      //               style: TextStyle(
+      //                 color: Colors.black,
+      //                 fontSize: 17,
+      //                 overflow: TextOverflow.ellipsis,
+      //               ),
+      //             ),
+      //           ],
+      //         ),
+      //       ),
+      //     ),
+      //   );
+      //             } else {
+      //               stockListe = snapshot.data!;
+      //                if (stockListe.isEmpty) {
+      // // Vous pouvez afficher une image ou un texte ici
+      // return 
+      // SingleChildScrollView(
+      //     child: Padding(
+      //       padding: EdgeInsets.all(10),
+      //       child: Center(
+      //         child: Column(
+      //           children: [
+      //             Image.asset('assets/images/notif.jpg'),
+      //             SizedBox(
+      //               height: 10,
+      //             ),
+      //             Text(
+      //               'Aucun produit trouvé' ,
+      //               style: TextStyle(
+      //                 color: Colors.black,
+      //                 fontSize: 17,
+      //                 overflow: TextOverflow.ellipsis,
+      //               ),
+      //             ),
+      //           ],
+      //         ),
+      //       ),
+      //     ),
+      //   );
+      //    }
+      //               String searchText = "";
+      //               List<Stock> filtereSearch =
+      //                   stockListe.where((search) {
+      //                 String libelle = search.nomProduit!.toLowerCase();
+      //                 searchText = _searchController.text.trim().toLowerCase();
+      //                 return libelle.contains(searchText);
+      //               }).toList();
+      //               return Wrap(
+      //                 // spacing: 10, // Espacement horizontal entre les conteneurs
+      //                 // runSpacing:
+      //                 //     10, // Espacement vertical entre les lignes de conteneurs
+      //                 children: filtereSearch
+      //                   //  .where((element) => element.statutSotck == true)
+      //                     .map((e) => Padding(
+      //                           padding: EdgeInsets.all(10),
+      //                           child: SizedBox(
+      //                             width:
+      //                                 MediaQuery.of(context).size.width * 0.45,
+      //                             child: GestureDetector(
+      //                               onTap: () {
+      //                                 Navigator.push(
+      //                                     context,
+      //                                     MaterialPageRoute(
+      //                                         builder: (context) =>
+      //                                             DetailProduits(
+      //                                                 stock: e)));
+      //                               },
+      //                               child: Container(
+      //                                 decoration: BoxDecoration(
+      //                               color: Color.fromARGB(250, 250, 250, 250),
+      //                               borderRadius: BorderRadius.circular(15),
+      //                               boxShadow: [
+      //                                 BoxShadow(
+      //                                   color: Colors.grey.withOpacity(0.3),
+      //                                   offset: Offset(0, 2),
+      //                                   blurRadius: 8,
+      //                                   spreadRadius: 2,
+      //                                 ),
+      //                               ],
+      //                             ),
+      //                                 child: Column(
+      //                                   crossAxisAlignment:
+      //                                       CrossAxisAlignment.stretch,
+      //                                   children: [
+      //                                     ClipRRect(
+      //                                       borderRadius:
+      //                                           BorderRadius.circular(8.0),
+      //                                       child: SizedBox(
+      //                                         height: 90,
+      //                                         child: e.photo == null
+      //                                             ? Image.asset(
+      //                                                 "assets/images/default_image.png",
+      //                                                 fit: BoxFit.cover,
+      //                                               )
+      //                                             : Image.network(
+      //                                                 "https://koumi.ml/api-koumi/Stock/${e.idStock}/image",
+      //                                                 fit: BoxFit.cover,
+      //                                                 errorBuilder:
+      //                                                     (BuildContext
+      //                                                             context,
+      //                                                         Object
+      //                                                             exception,
+      //                                                         StackTrace?
+      //                                                             stackTrace) {
+      //                                                   return Image.asset(
+      //                                                     'assets/images/default_image.png',
+      //                                                     fit: BoxFit.cover,
+      //                                                   );
+      //                                                 },
+      //                                               ),
+      //                                       ),
+      //                                     ),
+      //                                     Padding(
+      //                                       padding: const EdgeInsets.symmetric(
+      //                                           horizontal: 10, vertical: 5),
+      //                                       child: Text(
+      //                                         e.nomProduit!,
+      //                                         style: TextStyle(
+      //                                           fontSize: 18,
+      //                                           fontWeight: FontWeight.bold,
+      //                                           color: d_colorGreen,
+      //                                         ),
+      //                                       ),
+      //                                     ),
+      //                                     // _buildEtat(e.statutSotck!),
+      //                                     _buildItem(
+      //                                         "Prix :", e.prix!.toString()),
+      //                                     SizedBox(height: 2),
+      //                                       Container(
+      //                                             alignment:
+      //                                                       Alignment.bottomRight,
+      //                                          child: Padding(
+      //                                                                                       padding: const EdgeInsets.symmetric(horizontal:8.0),
+      //                                                                                       child: Row(
+      //                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //                                              children: [
+      //                                                _buildEtat(e.statutSotck!),
+      //                                                SizedBox(width: 120,),
+      //                                                Expanded(
+      //                                                  child: PopupMenuButton<String>(
+      //                                                    padding: EdgeInsets.zero,
+      //                                                    itemBuilder: (context) =>
+      //                                                        <PopupMenuEntry<String>>[
+      //                                                     PopupMenuItem<String>(
+      //                                                        child: ListTile(
+      //                                                          leading: e.statutSotck == false? Icon(
+      //                                                            Icons.check,
+      //                                                            color: Colors.green,
+      //                                                          ): Icon(
+      //                                                           Icons.disabled_visible,
+      //                                                           color:Colors.orange[400]
+      //                                                          ),
+      //                                                          title:  Text(
+      //                                                           e.statutSotck == false ? "Activer" : "Desactiver",
+      //                                                            style: TextStyle(
+      //                                                              color: e.statutSotck == false ? Colors.green : Colors.red,
+      //                                                              fontWeight: FontWeight.bold,
+      //                                                            ),
+      //                                                          ),
+                                                               
+      //                                                          onTap: () async {
+      //                             // Changement d'état du magasin ici
+                           
+      //                          e.statutSotck == false ?  await StockService().activerStock(e.idStock!).then((value) => {
+      //                               // Mettre à jour la liste des stock après le changement d'état
+      //                               Provider.of<StockService>(
+      //                                                                       context,
+      //                                                                       listen:
+      //                                                                           false)
+      //                                                                   .applyChange(),
+      //                               setState(() {
+      //                                  stockListeFuture =  StockService().fetchStockByActeur(acteur.idActeur!);
+      //                               }),
+      //                               Navigator.of(context).pop(),
+      //                                                                    })
+      //                                                                .catchError((onError) => {
+      //                                                                      ScaffoldMessenger.of(context)
+      //                                                                          .showSnackBar(
+      //                                                                        const SnackBar(
+      //                                                                          content: Row(
+      //                                                                            children: [
+      //                                                                              Text(
+      //                                                                                  "Une erreur s'est produit"),
+      //                                                                            ],
+      //                                                                          ),
+      //                                                                          duration:
+      //                                                                              Duration(seconds: 5),
+      //                                                                        ),
+      //                                                                      ),
+      //                                                                      Navigator.of(context).pop(),
+      //                                                                    }): await StockService()
+      //                                                                .desactiverStock(e.idStock!)
+      //                                                                .then((value) => {
+      //                                                                   Provider.of<StockService>(
+      //                                                                       context,
+      //                                                                       listen:
+      //                                                                           false)
+      //                                                                   .applyChange(),
+      //                                                                           setState(() {
+      //                                                  stockListeFuture =  StockService().fetchStockByActeur(acteur.idActeur!);
+      //                                                  }),
+      //                                                                      Navigator.of(context).pop(),
+                                                                     
+      //                                                                    });
+                                                       
+      //                                                            ScaffoldMessenger.of(context)
+      //                                                                .showSnackBar(
+      //                                                               SnackBar(
+      //                                                                content: Row(
+      //                                                                  children: [
+      //                                                                    Text(e.statutSotck == false ? "Activer avec succèss " : "Desactiver avec succèss"),
+      //                                                                  ],
+      //                                                                ),
+      //                                                                duration: Duration(seconds: 2),
+      //                                                              ),
+      //                                                            );
+      //                                                          },
+      //                                                        )
+                                                          
+      //                                          ),
+                                                          
+                                                          
+      //                                                    ],
+      //                                                  ),
+      //                                                ),
+      //                                              ],
+      //                                                                                       ),
+      //                                                                                     ),
+      //                                            ),
+      //                                   ],
+      //                                 ),
+      //                               ),
+      //                             ),
+      //                           ),
+      //                         ))
+      //                     .toList(),
+      //               );
+      //             }
+      //           });
+      //     }) 
+      //    ,
         ]),
       ),
     );

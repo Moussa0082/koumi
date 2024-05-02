@@ -8,9 +8,12 @@ class Commande {
   String? idCommande;
   String? codeCommande;
   String? dateCommande;
-  final List<Stock>? stock;
-  final List<Intrant>? intrant;
-  final List<dynamic>? materielList;
+  final bool? statutCommande;
+  final bool? statutCommandeLivrer;
+  final bool? statutConfirmation;
+  List<Stock>? stock;
+  List<Intrant>? intrant;
+  List<dynamic>? materielList;
   String? photoSignature;
   String? idClient;
   String? idCommercant;
@@ -24,6 +27,9 @@ class Commande {
     this.idCommande,
      this.codeCommande,
      this.dateCommande,
+     this.statutCommande,
+     this.statutCommandeLivrer,
+     this.statutConfirmation,
      this.stock,
      this.intrant,
      this.materielList,
@@ -42,6 +48,9 @@ class Commande {
       idCommande: map['idCommande'] as String?,
       codeCommande: map['codeCommande'] as String,
       dateCommande: map['dateCommande'] as String,
+      statutCommande: map['statutCommande'] as bool,
+      statutCommandeLivrer: map['statutCommandeLivrer'] as bool,
+      statutConfirmation: map['statutConfirmation'] as bool,
       stock: List<Stock>.from(map['stock'].map((x) => x)),
       intrant: List<Intrant>.from(map['intrant'].map((x) => x)),
       materielList: List<dynamic>.from(
@@ -63,6 +72,9 @@ class Commande {
       'idCommande': idCommande,
       'codeCommande': codeCommande,
       'dateCommande': dateCommande,
+      'statutCommande': statutCommande,
+      'statutCommandeLivrer': statutCommandeLivrer,
+      'statutConfirmation': statutConfirmation,
       'stock': stock,
       'intrant': intrant,
       'materielList': materielList,
@@ -78,15 +90,7 @@ class Commande {
   }
 
   String toJson() => json.encode(toMap());
-  //  Map<String, dynamic> toJson() => {
-  //       "idCommande": idCommande,
-  //       "codeCommande": codeCommande,
-  //       "dateCommande": dateCommande,
-  //       "stocks": List<dynamic>.from(stock!.map((x) => x)),
-  //       "intrants": List<dynamic>.from(intrant!.map((x) => x)),
-  //       "dateModif": dateModif,
-  //       "acteur": acteur?.toJson(),
-  //   };
+
 
   factory Commande.fromJson(String source) =>
       Commande.fromMap(json.decode(source));

@@ -15,8 +15,8 @@ import 'package:provider/provider.dart';
 
 class MagasinService extends ChangeNotifier{
 
-    // static const String baseUrl = 'https://koumi.ml/api-koumi/Magasin';
-    static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Magasin';
+    static const String baseUrl = 'https://koumi.ml/api-koumi/Magasin';
+    // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Magasin';
     List<Magasin> magasin = [];
  
   Future<void> creerMagasin({

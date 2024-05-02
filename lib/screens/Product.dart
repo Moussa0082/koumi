@@ -115,11 +115,12 @@ void updateStockList() async {
     // typeActeurData = acteur.typeActeur!;
     // // selectedType == null;
     // type = typeActeurData.map((data) => data.libelle).join(', ');
+    super.initState();
     verify();
     _searchController = TextEditingController();
     _catList =
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
-    super.initState();
+        http.get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
+        updateStockList();
     stockListeFuture = getAllStock();
   }
 
@@ -154,28 +155,7 @@ void updateStockList() async {
                           padding: EdgeInsets.zero,
                           itemBuilder: (context) {
                             return <PopupMenuEntry<String>>[
-                              // PopupMenuItem<String>(
-                              //   child: ListTile(
-                              //     leading: const Icon(
-                              //       Icons.remove_red_eye,
-                              //       color: Colors.green,
-                              //     ),
-                              //     title: const Text(
-                              //       "Ajouter produit",
-                              //       style: TextStyle(
-                              //         color: Colors.green,
-                              //         fontWeight: FontWeight.bold,
-                              //       ),
-                              //     ),
-                              //     onTap: () async {
-                              //       Navigator.push(
-                              //           context,
-                              //           MaterialPageRoute(
-                              //               builder: (context) =>
-                              //                   AddAndUpdateProductScreen(isEditable: false,)));
-                              //     },
-                              //   ),
-                              // ),
+                              
                               PopupMenuItem<String>(
                                 child: ListTile(
                                   leading: const Icon(
@@ -366,8 +346,8 @@ void updateStockList() async {
                       return libelle.contains(searchText);
                     }).toList();
 
-                      if(stockListe.isEmpty || stockListe.isEmpty && _searchController.text.isNotEmpty){   
-      SingleChildScrollView(
+                      if(stockListe.isEmpty || filtereSearch.isEmpty && _searchController.text.isNotEmpty){   
+          SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.all(10),
             child: Center(
@@ -391,12 +371,9 @@ void updateStockList() async {
           ),
         );
                   }
-         
 
-                        
-                
                     return 
-    GridView.builder(
+                     GridView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
                             gridDelegate:
@@ -407,10 +384,12 @@ void updateStockList() async {
                               childAspectRatio: 0.8,
                             ),
                             itemCount: 
-                            stockListe
-                                .length ,
-                            itemBuilder: (context, index) {
-                             
+                             typeActeurData.map((e) => e.libelle!.toLowerCase()).contains("admin") ?
+                            filtereSearch
+                                .length :
+                                filtereSearch.where((element) => element.statutSotck == true)
+                                .length,
+                                itemBuilder: (context, index) {
                               return GestureDetector(
                                 onTap: () {
                                   Navigator.push(

@@ -399,8 +399,8 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: MultiSelectDropDown.network(
                           networkConfig: NetworkConfig(
-                            // url: 'https://koumi.ml/api-koumi/typeActeur/read',
-                            url: 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
+                            url: 'https://koumi.ml/api-koumi/typeActeur/read',
+                            // url: 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
                             method: RequestMethod.get,
                             headers: {
                               'Content-Type': 'application/json',

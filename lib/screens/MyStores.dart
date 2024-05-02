@@ -1,25 +1,16 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
-import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
-import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/AddMagasinScreen.dart';
-import 'package:koumi_app/screens/DetailProduits.dart';
-import 'package:koumi_app/screens/MagasinActeur.dart';
 import 'package:koumi_app/screens/MyProduct.dart';
-import 'package:koumi_app/screens/Product.dart';
-import 'package:koumi_app/screens/ProduitActeur.dart';
 import 'package:koumi_app/service/MagasinService.dart';
-import 'package:koumi_app/service/StockService.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MyStoresScreen extends StatefulWidget {
   const MyStoresScreen({super.key});
@@ -82,8 +73,19 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
     return magasinListe;
   }
 
+  void updateMagasinList() async {
+    try {
+      setState(() {
+        magasinListeFuture = fetchMagasins();
+      });
+    } catch (error) {
+      print('Erreur lors de la mise à jour de la liste de stocks: $error');
+    }
+  }
+
   @override
   void initState() {
+    super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // typeActeurData = acteur.typeActeur!;
     // // selectedType == null;
@@ -93,8 +95,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
     _niveau1PaysList =
         http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
-    super.initState();
-
+    updateMagasinList();
     magasinListeFuture = fetchMagasins();
   }
 
@@ -123,6 +124,13 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
           actions: [
+            IconButton(
+                onPressed: () {
+                  setState(() {
+                    magasinListeFuture = fetchMagasins();
+                  });
+                },
+                icon: Icon(Icons.refresh)),
             PopupMenuButton<String>(
               padding: EdgeInsets.zero,
               itemBuilder: (context) {
@@ -364,7 +372,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ProductScreen(
+                                builder: (context) => MyProductScreen(
                                     id: filtereSearch[index].idMagasin,
                                     nom: filtereSearch[index].nomMagasin),
                               ),

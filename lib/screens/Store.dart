@@ -57,6 +57,16 @@ class _StoreScreenState extends State<StoreScreen> {
     }
   }
 
+  void updateMagasinList() async {
+    try {
+      setState(() {
+        magasinListeFuture = getAllMagasin();
+      });
+    } catch (error) {
+      print('Erreur lors de la mise à jour de la liste de stocks: $error');
+    }
+  }
+
   Future<List<Magasin>> getAllMagasin() async {
     if (selectedNiveau1Pays != null) {
       magasinListe = await MagasinService()
@@ -77,14 +87,14 @@ class _StoreScreenState extends State<StoreScreen> {
     // typeActeurData = acteur.typeActeur!;
     // // selectedType == null;
     // type = typeActeurData.map((data) => data.libelle).join(', ');
+    super.initState();
     verify();
     // magasinListeFuture = getAllMagasin();
     _searchController = TextEditingController();
     _niveau1PaysList =
-        // http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-        http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
-
-    super.initState();
+        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+    updateMagasinList();
   }
 
   @override

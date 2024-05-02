@@ -208,7 +208,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/ZoneProduction/getAllZone'));
 
         
-    debugPrint("nom : ${widget.nomProduit}, bool : ${widget.isEditable} , forme: ${widget.forme}, origine : ${widget.origine}, qte : ${widget.quantite}, prix : ${widget.prix}");
+    debugPrint("nom : ${widget.nomProduit}, bool : ${widget.isEditable} ,image : ${widget.image.toString()} , forme: ${widget.forme}, origine : ${widget.origine}, qte : ${widget.quantite}, prix : ${widget.prix}");
          
     super.initState();
     if(widget.isEditable! == true){
@@ -382,7 +382,9 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                         .map(
                                           (e) => DropdownMenuItem(
                                             value: e.idSpeculation,
-                                            child: Text(e.nomSpeculation!),
+                                            child: Text(e.nomSpeculation!,
+                                            style:TextStyle(overflow: TextOverflow.ellipsis),
+                                            ),
                                           ),
                                         )
                                         .toList(),
@@ -506,7 +508,9 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                         .map(
                                           (e) => DropdownMenuItem(
                                             value: e.idMagasin,
-                                            child: Text(e.nomMagasin!),
+                                            child: Text(e.nomMagasin!,
+                                            style:TextStyle(overflow: TextOverflow.ellipsis),
+                                            ),
                                           ),
                                         )
                                         .toList(),
@@ -628,7 +632,9 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                         .map(
                                           (e) => DropdownMenuItem(
                                             value: e.idUnite,
-                                            child: Text(e.nomUnite!),
+                                            child: Text(e.nomUnite!,
+                                            style:TextStyle(overflow: TextOverflow.ellipsis),
+                                            ),
                                           ),
                                         )
                                         .toList(),
@@ -750,7 +756,9 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                         .map(
                                           (e) => DropdownMenuItem(
                                             value: e.idZoneProduction,
-                                            child: Text(e.nomZoneProduction!),
+                                            child: Text(e.nomZoneProduction!,
+                                            style:TextStyle(overflow: TextOverflow.ellipsis),
+                                            ),
                                           ),
                                         )
                                         .toList(),
