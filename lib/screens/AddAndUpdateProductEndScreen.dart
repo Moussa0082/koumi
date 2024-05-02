@@ -508,13 +508,10 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                         .map(
                                           (e) => DropdownMenuItem(
                                             value: e.idMagasin,
-                                            child: SizedBox( // Utilisation de SizedBox pour définir une largeur maximale
-          width: double.infinity, // Largeur maximale
-          child: Text(
-            e.nomMagasin!,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
+                                            child: Text(
+                                              e.nomMagasin!,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
                                         )
                                         .toList(),
