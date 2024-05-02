@@ -149,6 +149,13 @@ class _MyProductScreenState extends State<MyProductScreen> {
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
           actions:  [
+             IconButton(
+                onPressed: () {
+                  setState(() {
+                    stockListeFuture = getAllStocksByMagasinAndActeur();
+                  });
+                },
+                icon: Icon(Icons.refresh)),
                    PopupMenuButton<String>(
                           padding: EdgeInsets.zero,
                           itemBuilder: (context) {
