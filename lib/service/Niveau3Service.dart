@@ -6,7 +6,7 @@ import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 
 class Niveau3Service extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/niveau3Pays';
+  static const String baseUrl = 'https://koumi.ml/api-koumi/nivveau3Pays';
   // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/nivveau3Pays';
 
   List<Niveau3Pays> niveauList = [];
@@ -56,7 +56,7 @@ class Niveau3Service extends ChangeNotifier {
     }
   }
 
-   Future<List<Niveau3Pays>> fetchNiveau3Pays() async {
+  Future<List<Niveau3Pays>> fetchNiveau3Pays() async {
     final response = await http.get(Uri.parse('$baseUrl/read'));
 
     if (response.statusCode == 200) {

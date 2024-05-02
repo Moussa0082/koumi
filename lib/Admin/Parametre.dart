@@ -205,7 +205,7 @@ class _ParametreState extends State<Parametre> {
                     ),
                     getList(
                         "region.png",
-                        params.libelleNiveau1Pays!,
+                        params.libelleNiveau1Pays != null ? params.libelleNiveau1Pays! : "Niveau 1",
                         const Niveau1Page(),
                         const Icon(
                           Icons.chevron_right_sharp,
@@ -220,7 +220,9 @@ class _ParametreState extends State<Parametre> {
                     ),
                     getList(
                         "region.png",
-                        params.libelleNiveau2Pays!,
+                        params.libelleNiveau2Pays != null
+                            ? params.libelleNiveau2Pays!
+                            : "Niveau 2",
                         const Niveau2Page(),
                         const Icon(
                           Icons.chevron_right_sharp,
@@ -235,7 +237,9 @@ class _ParametreState extends State<Parametre> {
                     ),
                     getList(
                         "region.png",
-                        params.libelleNiveau3Pays!,
+                        params.libelleNiveau3Pays != null
+                            ? params.libelleNiveau3Pays!
+                            : "Niveau 3",
                         const Niveau3Page(),
                         const Icon(
                           Icons.chevron_right_sharp,
