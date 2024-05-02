@@ -115,11 +115,12 @@ void updateStockList() async {
     // typeActeurData = acteur.typeActeur!;
     // // selectedType == null;
     // type = typeActeurData.map((data) => data.libelle).join(', ');
+    super.initState();
     verify();
     _searchController = TextEditingController();
     _catList =
         http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
-    super.initState();
+        updateStockList();
     stockListeFuture = getAllStock();
   }
 

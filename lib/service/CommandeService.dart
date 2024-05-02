@@ -9,91 +9,144 @@ import 'package:koumi_app/models/Stock.dart';
 
  class CommandeService{
 
-    // final String apiUrl = 'https://koumi.ml/api-koumi/commande/'; // Replace with your API URL
-    final String apiUrl = 'http://10.0.2.2:9000/api-koumi/commande/'; // Replace with your API URL
+    // final String baseUrl = 'https://koumi.ml/api-koumi/commande/'; // Replace with your API URL
+    final String baseUrl = 'http://10.0.2.2:9000/api-koumi/commande/'; // Replace with your API URL
+        List<Commande> commande = [];
 
 
-  Future<Commande> createCommande(CommandeAvecStocks commandeAvecStocks) async {
-    final url = '$apiUrl/add';
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(commandeAvecStocks.toJson()),
-    );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      print("succes " + data);
-      return Commande.fromJson(data);
-    } else {
-      throw Exception('Erreur lors de la création de commande. Status code: ${response.statusCode}');
-    }
-  }
-
-
-  Future<void> ajouterStocksACommande(CommandeAvecStocks commandeAvecStocks) async {
-    final String apiUrl = 'http://10.0.2.2:9000/api-koumi/commande/add';
-
+  Future<List<Commande>> fetchCommandeByActeur(String idActeur) async {
     try {
-      final response = await http.post(
-        Uri.tryParse(apiUrl)!,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'commande': commandeAvecStocks.commande!.toJson(),
-          'stocks': commandeAvecStocks.stocks!.map((stock) => stock.toJson()).toList(),
-          'intrants': commandeAvecStocks.intrants!.map((intrant) => intrant.toJson()).toList(),
-          'quantitesDemandees': commandeAvecStocks.quantitesDemandees,
-          'quantitesIntrants': commandeAvecStocks.quantitesIntrants,
-        }),
-      );
-
+      final response = await http.get(Uri.parse(
+          '$baseUrl/getAllCommandeByActeur/${idActeur}'));
       if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
-        return json.decode(response.body);
+
+               List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+        commande = body
+        .where((commande) => commande['statutCommande'] == true)
+        .map((e) => Commande.fromMap(e)).toList();
       } else {
-        print("Erreur lors de l'ajout de la commande ${response.body.toString()} ");
+        debugPrint("erreur lors de la recuperation des  commande pour l'\ acteur $idActeur");
       }
     } catch (e) {
-      print("Une erreur s'est produite lors de l'ajout de la commande: $e");
+      print('Error catch fetching commande for acteur $idActeur: $e');
     }
+        return commande;
+        
+  }
+  
+  Future<List<Commande>> fetchCommandeByActeurProprietaire(String acteurProprietaire) async {
+    try {
+      final response = await http.get(Uri.parse(
+          '$baseUrl/getAllCommandeByActeurProprietaire/${acteurProprietaire}'));
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+
+               List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+        commande = body
+        .where((commande) => commande['statutCommande'] == true)
+        .map((e) => Commande.fromMap(e)).toList();
+      } else {
+        debugPrint("erreur lors de la recuperation des  commande pour l'\ acteur proprietaire $acteurProprietaire");
+      }
+    } catch (e) {
+      print('Error catch fetching commande for acteur proprietaire $acteurProprietaire: $e');
+    }
+        return commande;
+        
   }
 
-  
 
-//  Future<void> makeCommand(List<String> idStocks, Commande commande) async {
 
-//   // Create a Commande object
+  Future<List<Commande>> fetchAllCommande() async {
+    try {
+      final response = await http.get(Uri.parse(
+          '$baseUrl/getAllCommande'));
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
 
-//   // Create a list of Stock objects based on the idStocks list
-//   final List<Stock> stocks = idStocks.map((idStock) => Stock(idStock: idStock)).toList();
+               List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+        commande = body
+        .map((e) => Commande.fromMap(e)).toList();
+      } else {
+        debugPrint("erreur lors de la recuperation des  commandes");
+      }
+    } catch (e) {
+      print('Error fetching all commandes : $e');
+    }
+        return commande;
+        
+  }
 
-//   // Create a CommandeAvecStocks object
-//   final commandeAvecStocks = CommandeAvecStocks(
-//     commande: commande,
-//     stocks: stocks,
-//     quantitesDemandees: List.filled(stocks.length, 1), // Assuming all quantities are 1 for now
+
+//    Future<void> ajouterStocksACommandes() async {
+//     try {
+//       // Map cart items to stocks and intrants
+//       List<Stock> stocks = [];
+//       List<Intrant> intrants = [];
+
+//       for (CartItem cartItem in cartItems) {
+//         if (cartItem.stock != null) {
+//           stocks.add(Stock(
+//             idStock: cartItem.stock!.idStock,
+//             quantiteStock: cartItem.quantiteStock.toDouble(),
+//           ));
+//         }
+
+//         if (cartItem.intrant != null) {
+//           intrants.add(Intrant(
+//             idIntrant: cartItem.intrant!.idIntrant,
+//             quantiteIntrant: cartItem.intrant!.quantiteIntrant!.toDouble(),
+//           ));
+//         }
+//       }
+
+//       // Prepare the Commande object
+//       Acteur acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+
+//       // Create CommandeAvecStocks object
+//       CommandeAvecStocks commandeAvecStocks = CommandeAvecStocks(
+//         acteur: acteur,
+//         stocks: stocks,
+//         intrants: intrants,
+//         quantitesDemandees: stocks.map((stock) => stock.quantiteStock!).toList(),
+//         quantitesIntrants: intrants.map((intrant) => intrant.quantiteIntrant!).toList(),
+//       );
+//  final response = await http.post(
+//     Uri.parse(baseUrl),
+//     headers: {"Content-Type": "application/json"},
+//     body:  jsonEncode(commandeAvecStocks.toJson()),
 //   );
 
-//   try {
-//     final response = await http.post(
-//       Uri.parse(apiUrl + '/add'),
-//       headers: <String, String>{
-//         'Content-Type': 'application/json; charset=UTF-8',
-//       },
-//       body: jsonEncode(commandeAvecStocks.toJson()), // Convert CommandeAvecStocks to JSON
-//     );
-
-//     if (response.statusCode == 200) {
-//       print('Commande ajoutée avec succès.: ${response.body}');
-
-//     } else {
-//       print('Erreur lors de l\'ajout de la commande: ${response.body}');
+//       if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(
+//             content: Text('Commande passé avec succès.'),
+//           ),
+//         );
+//         print('Commande ajoutée avec succès. ${response.body}');
+//         return await json.decode(json.encode(response.body));   
+//         // jsonDecode(response.body);
+//       } else {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(
+//             content: Text(
+//                 'Une erreur est survenue. Veuillez réessayer ultérieurement.'),
+//           ),
+//         );
+//         print('Erreur lors de l\'ajout de la commande: ${response.body}');
+//       }
+//     } catch (e) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(
+//           content: Text(
+//               'Une erreur est survenue. Veuillez réessayer ultérieurement.'),
+//         ),
+//       );
+//       print('Erreur lors de l\'envoi de la requête: $e');
 //     }
-//   } catch (e) {
-//     print('Exception lors de l\'envoi de la commande: $e');
 //   }
-// }
+  
+
+
 
 
  }

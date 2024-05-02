@@ -13,8 +13,8 @@ import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:path/path.dart';
 
 class StockService extends ChangeNotifier {
-  // static const String baseUrl = 'https://koumi.ml/api-koumi/Stock';
-  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Stock';
+  static const String baseUrl = 'https://koumi.ml/api-koumi/Stock';
+  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Stock';
 
   List<Stock> stockList = [];
   // List<dynamic> stockListe = [];
@@ -68,7 +68,7 @@ class StockService extends ChangeNotifier {
               Get.snackbar("Succès", "Produit ajouté avec succès",duration: Duration(seconds: 3));
         debugPrint('stock service ${donneesResponse.toString()}');
       } else {
-          //  Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer plus tard",duration: Duration(seconds: 3));
+           Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer plus tard",duration: Duration(seconds: 3));
          
         throw Exception(
             'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
@@ -76,9 +76,9 @@ class StockService extends ChangeNotifier {
     } catch (e) {
               debugPrint('stock service erreur $e');
 
-      Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
-      throw Exception(
-          'Une erreur s\'est produite lors de l\'ajout de acteur : $e');
+      Get.snackbar("Erreur de connexion", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 5));
+      // throw Exception(
+      //     'Une erreur s\'est produite lors de l\'ajout de acteur : $e');
     }
   }
 
@@ -206,9 +206,9 @@ class StockService extends ChangeNotifier {
     } catch (e) {
       print(
           'Une erreur s\'est produite lors de la récupération des stocks: $e');
-      // throw Exception(e.toString());
+      throw Exception(e.toString());
     }
-              return stockList;
+              // return stockList;
   
   }
 
@@ -231,8 +231,9 @@ class StockService extends ChangeNotifier {
       }
     } catch (e) {
             print('Error fetching stock by acteur: $e');
-      throw Exception(e.toString());
+      // throw Exception(e.toString());
     }
+    return stockList;
   }
 
 

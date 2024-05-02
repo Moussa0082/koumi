@@ -84,8 +84,20 @@ Future<List<Magasin>> fetchMagasins() async {
   return magasinListe;
 }
 
+  void updateMagasinList() async {
+  try {
+  
+    setState(() {
+      magasinListeFuture = fetchMagasins();
+    });
+  } catch (error) {
+    print('Erreur lors de la mise à jour de la liste de stocks: $error');
+  }
+}
+
   @override
   void initState() {
+    super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // typeActeurData = acteur.typeActeur!;
     // // selectedType == null;
@@ -95,8 +107,7 @@ Future<List<Magasin>> fetchMagasins() async {
     _niveau1PaysList =
         http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
-    super.initState();
-
+      updateMagasinList();
     magasinListeFuture = fetchMagasins();
   }
 

@@ -45,7 +45,6 @@ class _MyProductScreenState extends State<MyProductScreen> {
   bool isExist = false;
   String? email = "";
     late Future <List<Stock>> stockListeFuture;
-    late Future <List<Stock>> stockListeFutureByStore;
    
       void verifyParam() {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
@@ -93,12 +92,24 @@ class _MyProductScreenState extends State<MyProductScreen> {
                         acteur.idActeur!);
       }
       return stockListe;
-      
-                    
+              
    }
+
+   void updateStockList() async {
+  try {
+  
+    setState(() {
+      stockListeFuture = getAllStocksByMagasinAndActeur();
+    });
+  } catch (error) {
+    print('Erreur lors de la mise à jour de la liste de stocks: $error');
+  }
+}
+
 
   @override
   void initState() {
+    super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // typeActeurData = acteur.typeActeur!;
     // // selectedType == null;
@@ -108,9 +119,9 @@ class _MyProductScreenState extends State<MyProductScreen> {
     _searchController = TextEditingController();
     _catList =
         http.get(Uri.parse('http://koumi.ml/api-koumi/Categorie/allCategorie'));
-    super.initState();
+        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
         verifyParam();
-
+     updateStockList();
       stockListeFuture =  getAllStocksByMagasinAndActeur();
   }
 

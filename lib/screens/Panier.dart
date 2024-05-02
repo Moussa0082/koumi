@@ -58,74 +58,9 @@ class _PanierState extends State<Panier> {
 
  static const String baseUrl = "http://10.0.2.2:9000/api-koumi/commande/add";
 
-  Future<void> ajouterStocksACommandes() async {
-    try {
-      // Map cart items to stocks and intrants
-      List<Stock> stocks = [];
-      List<Intrant> intrants = [];
 
-      for (CartItem cartItem in cartItems) {
-        if (cartItem.stock != null) {
-          stocks.add(Stock(
-            idStock: cartItem.stock!.idStock,
-            quantiteStock: cartItem.quantiteStock.toDouble(),
-          ));
-        }
-
-        if (cartItem.intrant != null) {
-          intrants.add(Intrant(
-            idIntrant: cartItem.intrant!.idIntrant,
-            quantiteIntrant: cartItem.intrant!.quantiteIntrant!.toDouble(),
-          ));
-        }
-      }
-
-      // Prepare the Commande object
-      Acteur acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-
-      // Create CommandeAvecStocks object
-      CommandeAvecStocks commandeAvecStocks = CommandeAvecStocks(
-        acteur: acteur,
-        stocks: stocks,
-        intrants: intrants,
-        quantitesDemandees: stocks.map((stock) => stock.quantiteStock!).toList(),
-        quantitesIntrants: intrants.map((intrant) => intrant.quantiteIntrant!).toList(),
-      );
- final response = await http.post(
-    Uri.parse(baseUrl),
-    headers: {"Content-Type": "application/json"},
-    body:  jsonEncode(commandeAvecStocks.toJson()),
-  );
-
-      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Commande passé avec succès.'),
-          ),
-        );
-        print('Commande ajoutée avec succès. ${response.body}');
-        return await json.decode(json.encode(response.body));   
-        // jsonDecode(response.body);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Une erreur est survenue. Veuillez réessayer ultérieurement.'),
-          ),
-        );
-        print('Erreur lors de l\'ajout de la commande: ${response.body}');
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              'Une erreur est survenue. Veuillez réessayer ultérieurement.'),
-        ),
-      );
-      print('Erreur lors de l\'envoi de la requête: $e');
-    }
-  }
   
+
   _createCommande() async {
     // Get the current cart items
    List<Stock> stocks = [];
@@ -209,97 +144,7 @@ class _PanierState extends State<Panier> {
   print('Erreur lors de l\'envoi de la requête: $e');
 }
   }
-//   _createCommande() async {
-//     // Get the current cart items
-//    // Map each CartItem to a Stock object
-//   List<Stock> stocks = cartItems.map((cartItem) {
-//   if (cartItem.stock != null) {
-//     return Stock(
-//       idStock: cartItem.stock!.idStock,
-//       quantiteStock: cartItem.quantiteStock.toDouble(),
-//     );
-//   } else {
-//     // Handle the case when stock is null
-//     // For example, return a default Stock object or throw an exception
-//     // Here, I'm returning a default Stock object with idStock as 0
-//     return Stock(idStock: null, quantiteStock: 0);
-//   }
-// }).toList();
 
-// // Map each CartItem to an Intrant object
-// List<Intrant> intrants = cartItems.map((cartItem) {
-//   if (cartItem.intrant != null) {
-//     return Intrant(
-//       idIntrant: cartItem.intrant!.idIntrant,
-//       quantiteIntrant: cartItem.quantiteStock.toDouble(),
-//     );
-//   } else {
-//     // Handle the case when intrant is null
-//     // For example, return a default Intrant object or throw an exception
-//     // Here, I'm returning a default Intrant object with idIntrant as 0
-//     return Intrant(idIntrant: null, quantiteIntrant: 0);
-//   }
-// }).toList();
-
-//     // Prepare the Commande object
-//     Acteur acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-
-//     // Create CommandeAvecStocks object
-//     CommandeAvecStocks commandeAvecStocks = CommandeAvecStocks(
-//       acteur: acteur,
-//       stocks: stocks,
-//       intrants: intrants,
-//       quantitesDemandees: stocks.map((stock) => stock.quantiteStock!).toList(),
-//       quantitesIntrants: intrants.map((intrant) => intrant.quantiteIntrant!).toList(),
-//     );
-
-//     // Convert to JSON
-//     // String jsonData = jsonEncode(commandeAvecStocks);
-
-//     // Make the HTTP request
-//     // final url = 'https://koumi.ml/api-koumi/commande/add';
-//     final url = 'http://10.0.2.2:9000/api-koumi/commande/add';
-
-//     try {
-//       final response = await http.post(
-//         Uri.parse(url),
-//         headers: {"Content-Type": "application/json"},
-//         body:  jsonEncode(commandeAvecStocks.toJson()),
-//       );
-
-//       if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
-//         // Commande ajoutée avec succès
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(
-//             content: Text('Commande passé avec succès.'),
-//           ),
-//         );
-//         print('Commande ajoutée avec succès. ${response.body}');
-//         return jsonDecode(response.body);
-//       }  else {
-//         // Autre erreur
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(
-//             content: Text(
-//                 'Une erreur est survenue. Veuillez réessayer ultérieurement.'),
-//           ),
-//         );
-//       }
-//       print('Erreur lors de l\'ajout de la commande: ${response.body}');
-//     } catch (e) {
-//       // Error handling
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(
-//           content: Text(
-//               'Une erreur est survenue. Veuillez réessayer ultérieurement.'),
-//         ),
-//       );
-//       setState(() {
-//         isLoading = false;
-//       });
-//       print('Erreur lors de l\'envoi de la requête: $e');
-//     }
-//   }
 
   void _handleButtonPress() async {
     // Afficher l'indicateur de chargement
