@@ -432,7 +432,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                         borderRadius:
                                             BorderRadius.circular(8.0),
                                         child: Container(
-                                          height: 90,
+                                          height: 85,
                                           child: filtereSearch[index].photo ==
                                                   null
                                               ? Image.asset(
@@ -460,7 +460,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                         title: Text(
                                           filtereSearch[index].nomProduit!,
                                           style: TextStyle(
-                                            fontSize: 17,
+                                            fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.black87,
                                           ),
@@ -471,7 +471,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                           overflow: TextOverflow.ellipsis,
                                           "${filtereSearch[index].quantiteStock!.toString()} ${filtereSearch[index].unite!.nomUnite} ",
                                           style: TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 15,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.black87,
                                           ),
@@ -485,7 +485,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                               ? "${filtereSearch[index].prix.toString()} ${para.monnaie}"
                                               : "${filtereSearch[index].prix.toString()} FCFA",
                                           style: TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 15,
                                             color: Colors.black87,
                                           ),
                                         ),

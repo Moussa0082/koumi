@@ -356,7 +356,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                         borderRadius:
                                             BorderRadius.circular(8.0),
                                         child: SizedBox(
-                                          height: 100,
+                                          height: 85,
                                           child: e.photoIntrant == null ||  e.photoIntrant!.isEmpty 
                                               ? Image.asset(
                                                   "assets/images/default_image.png",
@@ -378,7 +378,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                                 ),
                                         ),
                                       ),
-                                      SizedBox(height: 8),
+                                      // SizedBox(height: 8),
                                       ListTile(
                                         title: Text(
                                           e.nomIntrant!,
@@ -398,40 +398,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                           ),
                                         ),
 
-                                        // trailing: Container(
-                                        //   width:
-                                        //       30, // Largeur du conteneur réduite
-                                        //   height:
-                                        //       30, // Hauteur du conteneur réduite
-                                        //   decoration: BoxDecoration(
-                                        //     color:
-                                        //         d_colorGreen, // Couleur de fond du bouton
-                                        //     borderRadius: BorderRadius.circular(
-                                        //         15), // Coins arrondis du bouton
-                                        //   ),
-                                        //   child: IconButton(
-                                        //     onPressed: () {
-                                        //       //                                        if (e.acteur.idActeur! == acteur.idActeur!){
-                                        //       // Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un intrant qui vous appartient");
-                                        //       // }else{
-                                        //       //   Provider.of<CartProvider>(context, listen: false)
-                                        //       // .addToCartInt(e, 1, "");
-                                        //       // }
-                                        //     },
-                                        //     icon: Icon(
-                                        //         Icons.add), // Icône du panier
-                                        //     color: Colors
-                                        //         .white, // Couleur de l'icône
-                                        //     iconSize:
-                                        //         20, // Taille de l'icône réduite
-                                        //     padding: EdgeInsets
-                                        //         .zero, // Aucune marge intérieure
-                                        //     splashRadius:
-                                        //         15, // Rayon de l'effet de pression réduit
-                                        //     tooltip:
-                                        //         'Ajouter au panier', // Info-bulle au survol de l'icône
-                                        //   ),
-                                        // )
+                                        
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
@@ -441,7 +408,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                               ? "${e.prixIntrant.toString()} ${para.monnaie}"
                                               : "${e.prixIntrant.toString()} FCFA",
                                           style: TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 15,
                                             color: Colors.black87,
                                           ),
                                         ),
