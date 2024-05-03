@@ -139,7 +139,7 @@ class MagasinService extends ChangeNotifier{
     } catch (e) {
       print('Error fetching magasins for region $id: $e');
     }
-        return magasin;
+        return magasin = [];
         
   }
 
@@ -161,7 +161,7 @@ class MagasinService extends ChangeNotifier{
     } catch (e) {
       print('Error fetching magasins for region $id: $e');
     }
-        return magasin;
+        return magasin = [];
         
   }
 
@@ -187,7 +187,7 @@ class MagasinService extends ChangeNotifier{
     } catch (e) {
       print('Error fetching magasins : $e');
     }
-        return magasin;
+       return magasin = [];
   }
 
    Future<List<Magasin>> fetchMagasinByRegionAndActeur(String idActeur, String idNiveau1Pays) async {
@@ -214,7 +214,7 @@ class MagasinService extends ChangeNotifier{
     //   print('Error fetching magasins for acteur $idActeur et region $idNiveau1Pays: $e');
     //       throw Exception(" erreur catch ");
     //       // throw Exception(" erreur catch :  ${e.toString()}");
-return magasin;
+return magasin = [];
     // }
   }
 

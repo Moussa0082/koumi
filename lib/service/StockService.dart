@@ -206,9 +206,9 @@ class StockService extends ChangeNotifier {
     } catch (e) {
       print(
           'Une erreur s\'est produite lors de la récupération des stocks: $e');
-      throw Exception(e.toString());
+      
     }
-              // return stockList;
+             return stockList = [];
   
   }
 
@@ -233,7 +233,7 @@ class StockService extends ChangeNotifier {
             print('Error fetching stock by acteur: $e');
       // throw Exception(e.toString());
     }
-    return stockList;
+    return stockList = [];
   }
 
 
@@ -259,7 +259,7 @@ class StockService extends ChangeNotifier {
     } catch (e) {
       print('Error fetching stock by id ,categorie, magasin and acteur: $e');
     }
-    return stockList;
+    return stockList = [];
   }
 
   Future<List<Stock>> fetchProduitByCategorieAndMagasin(String idCategorie, String idMagasin) async {
@@ -280,7 +280,7 @@ class StockService extends ChangeNotifier {
     } catch (e) {
       print('Error fetching stock by id categorie and id magasin: $e');
     }
-    return stockList;
+    return stockList = [];
   }
 
 
@@ -303,7 +303,7 @@ class StockService extends ChangeNotifier {
     } catch (e) {
       print('Error fetching stock by id categorie and id acteu: $e');
     }
-    return stockList;
+    return stockList = [];
   }
 
    Future<List<Stock>> fetchProduitByCategorie(String id) async {
@@ -326,7 +326,7 @@ class StockService extends ChangeNotifier {
     } catch (e) {
       print('Error fetching stock by id categorie produit: $e');
     }
-    return stockList;
+    return stockList = [];
   }
 
 
@@ -350,7 +350,8 @@ class StockService extends ChangeNotifier {
     } catch (e) {
         print(
             'Érror fetching stock by id magasin');
-      throw Exception(e.toString());
+        return    stockList = [];
+      // throw Exception(e.toString());
     }
   }
 

@@ -404,7 +404,31 @@ class _MyProductScreenState extends State<MyProductScreen> {
 
                         
                 
-                    return 
+                    return filtereSearch.isEmpty
+                        ? SingleChildScrollView(
+                            child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Center(
+                                child: Column(
+                                  children: [
+                                    Image.asset('assets/images/notif.jpg'),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      'Aucun produit trouvé',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 17,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        :
     GridView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
