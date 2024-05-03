@@ -16,6 +16,7 @@ import 'package:koumi_app/service/AlerteService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/CampagneService.dart';
 import 'package:koumi_app/service/CategorieService.dart';
+import 'package:koumi_app/service/CommandeService.dart';
 import 'package:koumi_app/service/ConseilService.dart';
 import 'package:koumi_app/service/ContinentService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
@@ -93,6 +94,7 @@ void main() async {
   //   );
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => MagasinService()),
+    ChangeNotifierProvider(create: (context) => CommandeService()),
     ChangeNotifierProvider(create: (context) => CartProvider()),
     ChangeNotifierProvider(create: (context) => ActeurService()),
     ChangeNotifierProvider(create: (context) => TypeActeurService()),

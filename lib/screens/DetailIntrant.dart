@@ -583,9 +583,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                       titre: "Alerte",
                       message:
                           "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
-                } else {
-                  
-                }
+                } else {}
               },
               style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.orange, shape: const StadiumBorder()),
