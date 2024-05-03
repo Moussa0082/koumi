@@ -175,7 +175,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                       searchText = _searchController.text.toLowerCase();
                       return libelle.contains(searchText);
                     }).toList();
-                    return   GridView.builder(
+                    return GridView.builder(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -217,7 +217,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: SizedBox(
-                                    height: 90,
+                                    height: 80,
                                     child: e.photoVehicule == null ||
                                             e.photoVehicule!.isEmpty
                                         ? Image.asset(
@@ -248,18 +248,18 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black87,
                                     ),
-                                    // maxLines: 1,
-                                    // overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   subtitle: Text(
                                     e.localisation,
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 15,
                                       color: Colors.black87,
                                     ),
                                   ),
                                 ),
-                                 Container(
+                                Container(
                                   alignment: Alignment.bottomRight,
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 10),

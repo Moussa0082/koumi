@@ -137,12 +137,12 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
                                                         ? Image.asset(
                                                             "assets/images/default_image.png",
                                                             fit: BoxFit.cover,
-                                                            height: 90,
+                                                            height: 85,
                                                           )
                                                         : Image.network(
                                                             "https://koumi.ml/api-koumi/Materiel/${e.idMateriel}/image",
                                                             fit: BoxFit.cover,
-                                                            height: 90,
+                                                            height: 85,
                                                             errorBuilder:
                                                                 (BuildContext
                                                                         context,
@@ -166,18 +166,19 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
                                                   title: Text(
                                                     e.nom,
                                                     style: TextStyle(
-                                                      fontSize: 17,
+                                                      fontSize: 16,
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       color: Colors.black87,
                                                     ),
-                                                    // maxLines: 1,
-                                                    // overflow: TextOverflow.ellipsis,
+                                                   maxLines: 2,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   ),
                                                   subtitle: Text(
                                                     e.localisation,
                                                     style: TextStyle(
-                                                      fontSize: 16,
+                                                      fontSize: 15,
                                                       color: Colors.black87,
                                                     ),
                                                   ),

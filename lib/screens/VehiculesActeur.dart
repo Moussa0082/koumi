@@ -203,7 +203,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: SizedBox(
-                                    height: 90,
+                                    height: 85,
                                     child: e.photoVehicule == null ||  e.photoVehicule!.isEmpty
                                         ? Image.asset(
                                             "assets/images/default_image.png",
@@ -229,17 +229,17 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                   title: Text(
                                     e.nomVehicule,
                                     style: TextStyle(
-                                      fontSize: 17,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black87,
                                     ),
-                                    // maxLines: 1,
-                                    // overflow: TextOverflow.ellipsis,
+                                   maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   subtitle: Text(
                                     e.localisation,
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 15,
                                       color: Colors.black87,
                                     ),
                                   ),
