@@ -255,7 +255,7 @@ class _UpdateAlertedState extends State<UpdateAlerted> {
                     },
                     icon: const Icon(Icons.arrow_back_ios)),
                 title: const Text(
-                  "Ajout Alerte ",
+                  "Modification",
                   style: TextStyle(
                     color: d_colorGreen,
                     fontSize: 22,
@@ -403,33 +403,34 @@ class _UpdateAlertedState extends State<UpdateAlerted> {
                           ),
                           !recorder.isRecording
                               ? Container()
-                              : SizedBox(
-                                  child: Center(
-                                    child: StreamBuilder<RecordingDisposition>(
-                                      stream: recorder.onProgress,
-                                      builder: (context, snapshot) {
-                                        final duration = snapshot.hasData
-                                            ? snapshot.data!.duration
-                                            : Duration.zero;
+                              : StreamBuilder<RecordingDisposition>(
+                                  stream: recorder.onProgress,
+                                  builder: (context, snapshot) {
+                                    final duration = snapshot.hasData
+                                        ? snapshot.data!.duration
+                                        : Duration.zero;
 
-                                        String twoDigits(int n) =>
-                                            n.toString().padLeft(60);
-                                        final twoDigiMinutes = twoDigits(
-                                            duration.inMinutes.remainder(60));
-                                        final twoDigiSeconds = twoDigits(
-                                            duration.inSeconds.remainder(60));
+                                    String twoDigits(int n) =>
+                                        n.toString().padLeft(2,
+                                            '0'); // Correction de la taille du pad
 
-                                        return Center(
-                                          child: Text(
-                                            '$twoDigiMinutes:$twoDigiSeconds',
-                                            style: TextStyle(
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
+                                    final twoDigitMinutes = twoDigits(
+                                        duration.inMinutes.remainder(60));
+                                    final twoDigitSeconds = twoDigits(
+                                        duration.inSeconds.remainder(60));
+
+                                    return Center(
+                                      child: Text(
+                                        '$twoDigitMinutes:$twoDigitSeconds',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        overflow: TextOverflow
+                                            .ellipsis, // Gestion du dépassement de texte
+                                      ),
+                                    );
+                                  },
                                 ),
                           _hasUploadStarted
                               ? LinearProgressIndicator(
@@ -491,8 +492,7 @@ class _UpdateAlertedState extends State<UpdateAlerted> {
                                               descriptionAlerte: description,
                                               videoAlerte: _videoUploaded,
                                               photoAlerte: photoUploaded,
-                                              audioAlerte: audiosUploaded
-                                              )
+                                              audioAlerte: audiosUploaded)
                                           .then((value) => {
                                                 _titreController.clear(),
                                                 _descriptionController.clear(),
@@ -556,11 +556,11 @@ class _UpdateAlertedState extends State<UpdateAlerted> {
                                                 Navigator.of(context).pop()
                                               })
                                           .catchError((onError) => {
-                                                print("Error: " +
-                                                    onError.toString()),
                                                 setState(() {
                                                   _isLoading = false;
                                                 }),
+                                                print("Error: " +
+                                                    onError.toString()),
                                               });
                                     }
                                   } catch (e) {
@@ -614,6 +614,7 @@ class _UpdateAlertedState extends State<UpdateAlerted> {
         cursorColor: d_colorGreen,
         decoration: InputDecoration(
           hintText: "video upload",
+          enabled: false,
           contentPadding:
               const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           border: OutlineInputBorder(
@@ -632,6 +633,7 @@ class _UpdateAlertedState extends State<UpdateAlerted> {
         cursorColor: d_colorGreen,
         decoration: InputDecoration(
           hintText: "Image upload",
+          enabled: false,
           contentPadding:
               const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           border: OutlineInputBorder(
@@ -650,6 +652,7 @@ class _UpdateAlertedState extends State<UpdateAlerted> {
         cursorColor: d_colorGreen,
         decoration: InputDecoration(
           hintText: "Audio upload",
+          enabled: false,
           contentPadding:
               const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           border: OutlineInputBorder(

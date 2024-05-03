@@ -296,12 +296,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                     );
                   } else {
                     intrantListe = snapshot.data!;
-                    // String searchText = "";
-                    // List<Intrant> filtereSearch = intrantListe.where((search) {
-                    //   String libelle = search.nomIntrant.toLowerCase();
-                    //   searchText = _searchController.text.toLowerCase();
-                    //   return libelle.contains(searchText);
-                    // }).toList();
+
                     return intrantListe
                             .where((element) => element.statutIntrant == true)
                             .isEmpty
@@ -361,8 +356,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                         borderRadius:
                                             BorderRadius.circular(8.0),
                                         child: SizedBox(
-                                          height: 100,
-                                          child: e.photoIntrant == null
+                                          height: 85,
+                                          child: e.photoIntrant == null ||  e.photoIntrant!.isEmpty 
                                               ? Image.asset(
                                                   "assets/images/default_image.png",
                                                   fit: BoxFit.cover,
@@ -383,62 +378,41 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                                 ),
                                         ),
                                       ),
-                                      SizedBox(height: 8),
+                                      // SizedBox(height: 8),
                                       ListTile(
-                                          title: Text(
-                                            e.nomIntrant!,
-                                            style: TextStyle(
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black87,
-                                            ),
-                                            // maxLines: 1,
-                                            // overflow: TextOverflow.ellipsis,
+                                        title: Text(
+                                          e.nomIntrant!,
+                                          style: TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
                                           ),
-                                          subtitle: Text(
-                                            para.monnaie != null
-                                                ? "${e.prixIntrant.toString()} ${para.monnaie}"
-                                                : "${e.prixIntrant.toString()} FCFA",
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black87,
-                                            ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        subtitle: Text(
+                                          "${e.quantiteIntrant.toString()} ${e.unite}",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black87,
                                           ),
-                                          trailing: Container(
-                                            width:
-                                                30, // Largeur du conteneur réduite
-                                            height:
-                                                30, // Hauteur du conteneur réduite
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  d_colorGreen, // Couleur de fond du bouton
-                                              borderRadius: BorderRadius.circular(
-                                                  15), // Coins arrondis du bouton
-                                            ),
-                                            child: IconButton(
-                                              onPressed: () {
-                                                //                                        if (e.acteur.idActeur! == acteur.idActeur!){
-                                                // Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un intrant qui vous appartient");
-                                                // }else{
-                                                //   Provider.of<CartProvider>(context, listen: false)
-                                                // .addToCartInt(e, 1, "");
-                                                // }
-                                              },
-                                              icon: Icon(
-                                                  Icons.add), // Icône du panier
-                                              color: Colors
-                                                  .white, // Couleur de l'icône
-                                              iconSize:
-                                                  20, // Taille de l'icône réduite
-                                              padding: EdgeInsets
-                                                  .zero, // Aucune marge intérieure
-                                              splashRadius:
-                                                  15, // Rayon de l'effet de pression réduit
-                                              tooltip:
-                                                  'Ajouter au panier', // Info-bulle au survol de l'icône
-                                            ),
-                                          )),
+                                        ),
 
+                                        
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 15),
+                                        child: Text(
+                                          para.monnaie != null
+                                              ? "${e.prixIntrant.toString()} ${para.monnaie}"
+                                              : "${e.prixIntrant.toString()} FCFA",
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                      )
                                       // Align(
                                       //   alignment: Alignment.bottomRight,
                                       //   child: Padding(

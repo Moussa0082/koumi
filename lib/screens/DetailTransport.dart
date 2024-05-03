@@ -405,7 +405,7 @@ class _DetailTransportState extends State<DetailTransport> {
                 style: const TextStyle(
                     color: d_colorGreen, fontWeight: FontWeight.bold),
               ),
-              actions: acteur.nomActeur == vehicules.acteur.nomActeur
+              actions: acteur.idActeur == vehicules.acteur.idActeur
                   ? [
                       _isEditing
                           ? IconButton(
@@ -435,37 +435,34 @@ class _DetailTransportState extends State<DetailTransport> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 photo != null
-                    ? Center(
-                        child: Image.file(
+                    ? Image.file(
                         photo!,
                         width: double.infinity,
                         height: 200,
                         fit: BoxFit.cover,
-                      ))
-                    : Center(
-                        child: vehicules.photoVehicule != null &&
-                                !vehicules.photoVehicule!.isEmpty
-                            ? Image.network(
-                                "https://koumi.ml/api-koumi/vehicule/${vehicules.idVehicule}/image",
-                                // "http://10.0.2.2/${e.photoIntrant}",
-                                width: double.infinity,
-                                height: 200,
+                      )
+                    : vehicules.photoVehicule != null &&
+                            !vehicules.photoVehicule!.isEmpty
+                        ? Image.network(
+                            "https://koumi.ml/api-koumi/vehicule/${vehicules.idVehicule}/image",
+                            // "http://10.0.2.2/${e.photoIntrant}",
+                            width: double.infinity,
+                            height: 200,
+                            fit: BoxFit.cover,
+                            errorBuilder: (BuildContext context,
+                                Object exception, StackTrace? stackTrace) {
+                              return Image.asset(
+                                'assets/images/default_image.png',
                                 fit: BoxFit.cover,
-                                errorBuilder: (BuildContext context,
-                                    Object exception, StackTrace? stackTrace) {
-                                  return Image.asset(
-                                    'assets/images/default_image.png',
-                                    fit: BoxFit.cover,
-                                  );
-                                },
-                              )
-                            : Image.asset(
-                                "assets/images/default_image.png",
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: 200,
-                              ),
-                      ),
+                              );
+                            },
+                          )
+                        : Image.asset(
+                            "assets/images/default_image.png",
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: 200,
+                          ),
                 SizedBox(height: 30),
                 _isEditing ? _buildEditing() : _buildData(),
                 !_isEditing ? _buildPanel() : Container(),
@@ -476,7 +473,7 @@ class _DetailTransportState extends State<DetailTransport> {
               ],
             ),
           ),
-          floatingActionButton: acteur.nomActeur != vehicules.acteur.nomActeur
+          floatingActionButton: acteur.idActeur != vehicules.acteur.idActeur
               ? SpeedDial(
                   // animatedIcon: AnimatedIcons.close_menu,
                   backgroundColor: d_colorGreen,
@@ -764,7 +761,7 @@ class _DetailTransportState extends State<DetailTransport> {
   Widget _buildData() {
     return Column(
       children: [
-        _buildItem('Nom du véhicule : ', vehicules.nomVehicule),
+        _buildItem('Nom du véhicule: ', vehicules.nomVehicule),
         _buildItem('Type de véhicule : ', vehicules.typeVoiture.nom!),
         vehicules.typeVoiture.nombreSieges != 0
             ? _buildItem('Nombre de siège : ',
@@ -779,7 +776,7 @@ class _DetailTransportState extends State<DetailTransport> {
             '${vehicules.statutVehicule ? 'Disponible' : 'Non disponible'}'),
         !isExist
             ? Container()
-            : acteur.nomActeur != vehicules.acteur.nomActeur
+            : acteur.idActeur != vehicules.acteur.idActeur
                 ? _buildItem('Propriètaire : ', vehicules.acteur.nomActeur!)
                 : Container(),
         // _buildItem('Description : ', vehicules.description!),
@@ -903,24 +900,29 @@ class _DetailTransportState extends State<DetailTransport> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-                color: Colors.black87,
-                fontWeight: FontWeight.w500,
-                fontStyle: FontStyle.italic,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 18),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w500,
+                  fontStyle: FontStyle.italic,
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 16),
+            ),
           ),
-          Text(
-            value,
-            textAlign: TextAlign.justify,
-            softWrap: true,
-            style: const TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w800,
-              overflow: TextOverflow.ellipsis,
-              fontSize: 16,
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              maxLines: 2,
+              // softWrap: true,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w800,
+                overflow: TextOverflow.ellipsis,
+                fontSize: 16,
+              ),
             ),
           )
         ],

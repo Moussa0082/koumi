@@ -9,8 +9,8 @@ import 'package:koumi_app/models/Stock.dart';
 
  class CommandeService{
 
-    // final String baseUrl = 'https://koumi.ml/api-koumi/commande/'; // Replace with your API URL
-    final String baseUrl = 'http://10.0.2.2:9000/api-koumi/commande/'; // Replace with your API URL
+    final String baseUrl = 'https://koumi.ml/api-koumi/commande/'; // Replace with your API URL
+    // final String baseUrl = 'http://10.0.2.2:9000/api-koumi/commande/'; // Replace with your API URL
         List<Commande> commande = [];
 
 

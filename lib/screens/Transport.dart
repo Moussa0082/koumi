@@ -204,46 +204,7 @@ class _TransportState extends State<Transport> {
       body: SingleChildScrollView(
         child: Column(children: [
           const SizedBox(height: 10),
-          // Padding(
-          //   padding: const EdgeInsets.all(10.0),
-          //   child: Container(
-          //     padding: EdgeInsets.symmetric(horizontal: 10),
-          //     decoration: BoxDecoration(
-          //       color: Colors.blueGrey[50], // Couleur d'arrière-plan
-          //       borderRadius: BorderRadius.circular(25),
-          //     ),
-          //     child: Row(
-          //       children: [
-          //         Icon(Icons.search,
-          //             color: Colors.blueGrey[400],
-          //             size: 28), // Utiliser une icône de recherche plus grande
-          //         SizedBox(width: 10),
-          //         Expanded(
-          //           child: TextField(
-          //             controller: _searchController,
-          //             onChanged: (value) {
-          //               setState(() {});
-          //             },
-          //             decoration: InputDecoration(
-          //               hintText: 'Rechercher',
-          //               border: InputBorder.none,
-          //               hintStyle: TextStyle(color: Colors.blueGrey[400]),
-          //             ),
-          //           ),
-          //         ),
-          //         // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
-          //         IconButton(
-          //           icon: Icon(Icons.clear),
-          //           onPressed: () {
-          //             _searchController.clear();
-          //             setState(() {});
-          //           },
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
-          // const SizedBox(height: 10),
+         
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: FutureBuilder(
@@ -422,7 +383,7 @@ class _TransportState extends State<Transport> {
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: SizedBox(
                                     height: 90,
-                                    child: e.photoVehicule == null
+                                    child: e.photoVehicule == null ||  e.photoVehicule!.isEmpty
                                         ? Image.asset(
                                             "assets/images/default_image.png",
                                             fit: BoxFit.cover,
@@ -451,17 +412,28 @@ class _TransportState extends State<Transport> {
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black87,
                                     ),
-                                    // maxLines: 1,
-                                    // overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   subtitle: Text(
-                                    e.localisation,
+                                   "${ e.nbKilometrage.toString()} Km",
                                     style: TextStyle(
                                       fontSize: 16,
                                       color: Colors.black87,
                                     ),
                                   ),
                                 ),
+Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                  child: Text(
+                                    e.localisation,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                )
                               ],
                             ),
                           ),

@@ -293,7 +293,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
                 style: const TextStyle(
                     color: d_colorGreen, fontWeight: FontWeight.bold),
               ),
-              actions: acteur.nomActeur == materiels.acteur.nomActeur
+              actions: acteur.idActeur == materiels.acteur.idActeur
                   ? [
                       _isEditing
                           ? IconButton(
@@ -321,43 +321,40 @@ class _DetailMaterielState extends State<DetailMateriel> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 photo != null
-                    ? Center(
-                        child: Image.file(
-                        photo!,
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ))
-                    : Center(
-                        child: materiels.photoMateriel != null &&
-                                materiels.photoMateriel!.isNotEmpty
-                            ? Image.network(
-                                'https://koumi.ml/api-koumi/Materiel/${materiels.idMateriel}/image',
-                                // "http://10.0.2.2/${e.photoIntrant}",
-                                width: double.infinity,
-                                height: 200,
+                    ? Image.file(
+                    photo!,
+                    width: double.infinity,
+                    height: 200,
+                    fit: BoxFit.cover,
+                                          )
+                    : materiels.photoMateriel != null &&
+                            materiels.photoMateriel!.isNotEmpty
+                        ? Image.network(
+                            'https://koumi.ml/api-koumi/Materiel/${materiels.idMateriel}/image',
+                            // "http://10.0.2.2/${e.photoIntrant}",
+                            width: double.infinity,
+                            height: 200,
+                            fit: BoxFit.cover,
+                            errorBuilder: (BuildContext context,
+                                Object exception, StackTrace? stackTrace) {
+                              return Image.asset(
+                                'assets/images/default_image.png',
                                 fit: BoxFit.cover,
-                                errorBuilder: (BuildContext context,
-                                    Object exception, StackTrace? stackTrace) {
-                                  return Image.asset(
-                                    'assets/images/default_image.png',
-                                    fit: BoxFit.cover,
-                                  );
-                                },
-                              )
-                            : Image.asset(
-                                "assets/images/default_image.png",
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: 200,
-                              ),
-                      ),
+                              );
+                            },
+                          )
+                        : Image.asset(
+                            "assets/images/default_image.png",
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: 200,
+                          ),
                 SizedBox(height: 30),
                 _isEditing ? _buildEditingData() : _buildData(),
               ],
             ),
           ),
-          floatingActionButton: acteur.nomActeur != materiels.acteur.nomActeur
+          floatingActionButton: acteur.idActeur != materiels.acteur.idActeur
               ? SpeedDial(
                   // animatedIcon: AnimatedIcons.close_menu,
                   backgroundColor: d_colorGreen,
@@ -530,34 +527,70 @@ class _DetailMaterielState extends State<DetailMateriel> {
     );
   }
 
-  Widget _buildItem(String title, String value) {
+ Widget _buildItem(String title, String value) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-                color: Colors.black87,
-                fontWeight: FontWeight.w500,
-                fontStyle: FontStyle.italic,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 18),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w500,
+                  fontStyle: FontStyle.italic,
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 16),
+            ),
           ),
-          Text(
-            value,
-            textAlign: TextAlign.justify,
-            softWrap: true,
-            style: const TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w800,
-              overflow: TextOverflow.ellipsis,
-              fontSize: 16,
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              maxLines: 2,
+              // softWrap: true,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w800,
+                overflow: TextOverflow.ellipsis,
+                fontSize: 16,
+              ),
             ),
           )
         ],
       ),
     );
   }
+
+  // Widget _buildItem(String title, String value) {
+  //   return Padding(
+  //     padding: const EdgeInsets.all(10.0),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         Text(
+  //           title,
+  //           style: const TextStyle(
+  //               color: Colors.black87,
+  //               fontWeight: FontWeight.w500,
+  //               fontStyle: FontStyle.italic,
+  //               overflow: TextOverflow.ellipsis,
+  //               fontSize: 18),
+  //         ),
+  //         Text(
+  //           value,
+  //           textAlign: TextAlign.justify,
+  //           softWrap: true,
+  //           style: const TextStyle(
+  //             color: Colors.black,
+  //             fontWeight: FontWeight.w800,
+  //             overflow: TextOverflow.ellipsis,
+  //             fontSize: 16,
+  //           ),
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
 }

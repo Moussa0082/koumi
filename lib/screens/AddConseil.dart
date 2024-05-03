@@ -57,7 +57,6 @@ class _AddConseilState extends State<AddConseil> {
     return images;
   }
 
-
   Future<void> _pickVideo(ImageSource source) async {
     final video = await ImagePicker().pickVideo(source: source);
     if (video == null) return;
@@ -396,29 +395,33 @@ class _AddConseilState extends State<AddConseil> {
                     ),
                     !recorder.isRecording
                         ? Container()
-                        : SizedBox(
-                            child: StreamBuilder<RecordingDisposition>(
-                              stream: recorder.onProgress,
-                              builder: (context, snapshot) {
-                                final duration = snapshot.hasData
-                                    ? snapshot.data!.duration
-                                    : Duration.zero;
+                        : StreamBuilder<RecordingDisposition>(
+                            stream: recorder.onProgress,
+                            builder: (context, snapshot) {
+                              final duration = snapshot.hasData
+                                  ? snapshot.data!.duration
+                                  : Duration.zero;
 
-                                String twoDigits(int n) =>
-                                    n.toString().padLeft(60);
-                                final twoDigiMinutes =
-                                    twoDigits(duration.inMinutes.remainder(60));
-                                final twoDigiSeconds =
-                                    twoDigits(duration.inSeconds.remainder(60));
+                              String twoDigits(int n) => n.toString().padLeft(
+                                  2, '0'); // Correction de la taille du pad
 
-                                return Text(
-                                  '$twoDigiMinutes:$twoDigiSeconds',
+                              final twoDigitMinutes =
+                                  twoDigits(duration.inMinutes.remainder(60));
+                              final twoDigitSeconds =
+                                  twoDigits(duration.inSeconds.remainder(60));
+
+                              return Center(
+                                child: Text(
+                                  '$twoDigitMinutes:$twoDigitSeconds',
                                   style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                );
-                              },
-                            ),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow
+                                      .ellipsis, // Gestion du dépassement de texte
+                                ),
+                              );
+                            },
                           ),
                     _hasUploadStarted
                         ? LinearProgressIndicator(
@@ -541,31 +544,7 @@ class _AddConseilState extends State<AddConseil> {
                                           Provider.of<ConseilService>(context,
                                                   listen: false)
                                               .applyChange(),
-                                          //                 !acteur.typeActeur!.contains('admin') ?
-                                          //                  ScaffoldMessenger.of(context).showSnackBar(
-                                          //    SnackBar(
-                                          //     content: Row(
-                                          //       children: [
-                                          //         Text(
-                                          //           "Conseil sera activé par administrateur",
-                                          //           style: TextStyle(
-                                          //               overflow: TextOverflow.ellipsis),
-                                          //         ),
-                                          //       ],
-                                          //     ),
-                                          //     duration: Duration(seconds: 5),
-                                          //   ),
-                                          // ):  ScaffoldMessenger.of(context).showSnackBar(
-                                          //    SnackBar(
-                                          //     content: Row(
-                                          //       children: [
-                                          //         Text(
-                                          //           "Ajouter avec succéss",
-                                          //           style: TextStyle(
-                                          //               overflow: TextOverflow.ellipsis),
-                                          //         ),
-                                          //       ],
-                                          //     ),)),
+                                         
                                           Navigator.of(context).pop()
                                         })
                                     .catchError((onError) => {
@@ -573,6 +552,20 @@ class _AddConseilState extends State<AddConseil> {
                                           setState(() {
                                             _isLoading = false;
                                           }),
+                              //              ScaffoldMessenger.of(context).showSnackBar(
+                              //   const SnackBar(
+                              //     content: Row(
+                              //       children: [
+                              //         Text(
+                              //           "La taille des fichiers ne doit pas depassé 25 MB",
+                              //           style: TextStyle(
+                              //               overflow: TextOverflow.ellipsis),
+                              //         ),
+                              //       ],
+                              //     ),
+                              //     duration: Duration(seconds: 5),
+                              //   ),
+                              // )
                                         });
                               }
                             } catch (e) {
@@ -629,6 +622,7 @@ class _AddConseilState extends State<AddConseil> {
         cursorColor: d_colorGreen,
         decoration: InputDecoration(
           hintText: "video upload",
+          enabled: false,
           contentPadding:
               const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           border: OutlineInputBorder(
@@ -645,6 +639,7 @@ class _AddConseilState extends State<AddConseil> {
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       child: TextField(
         cursorColor: d_colorGreen,
+        enabled: false,
         decoration: InputDecoration(
           hintText: "Image upload",
           contentPadding:
@@ -663,6 +658,7 @@ class _AddConseilState extends State<AddConseil> {
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       child: TextField(
         cursorColor: d_colorGreen,
+        enabled: false,
         decoration: InputDecoration(
           hintText: "Audio upload",
           contentPadding:

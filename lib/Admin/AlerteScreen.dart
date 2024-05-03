@@ -253,15 +253,26 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      "Date d'ajout : ${e.dateAjout!}",
+                                                      e.descriptionAlerte!,
+                                                      maxLines: 2,
                                                       style: const TextStyle(
                                                         color: Colors.black87,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
                                                         fontSize: 17,
                                                         fontWeight:
                                                             FontWeight.w500,
                                                         fontStyle:
                                                             FontStyle.italic,
                                                       ))),
+                                              Text(
+                                                  "Date d'ajout : ${e.dateAjout!}",
+                                                  style: const TextStyle(
+                                                    color: Colors.black87,
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontStyle: FontStyle.italic,
+                                                  )),
                                               SizedBox(height: 10),
                                               type.toLowerCase() != 'admin'
                                                   ? Container()
@@ -400,10 +411,9 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                                 child: ListTile(
                                                                   leading:
                                                                       const Icon(
-                                                                  Icons
-                                                                        .edit,
-                                                                     color:
-                                                                  Colors.green,
+                                                                    Icons.edit,
+                                                                    color: Colors
+                                                                        .green,
                                                                   ),
                                                                   title:
                                                                       const Text(

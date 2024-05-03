@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/CodePays.dart';
 import 'package:koumi_app/Admin/UpdateNiveau3.dart';
+import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
@@ -24,6 +25,7 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _Niveau3PageState extends State<Niveau3Page> {
+  late TextEditingController _searchController;
   late ParametreGeneraux para;
   List<Niveau3Pays> niveau3Liste = [];
   final formkey = GlobalKey<FormState>();
@@ -32,19 +34,42 @@ class _Niveau3PageState extends State<Niveau3Page> {
   List<ParametreGeneraux> paraList = [];
   late Niveau2Pays niveau2;
   String? niveau2Value;
-  late Future _niveauList;
-  late TextEditingController _searchController;
+  late Future _niveau2List;
+
+  String? niveau1Value;
+  late Future _niveau1List;
+  late Niveau1Pays niveau1Pays = Niveau1Pays();
+
+  void verifyParam() {
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+
+    if (paraList.isNotEmpty) {
+      para = paraList[0];
+    } else {
+      // Gérer le cas où la liste est null ou vide, par exemple :
+      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+    }
+  }
 
   @override
   void initState() {
     _searchController = TextEditingController();
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
-    para = paraList[0];
-    _niveauList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau2Pays/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau2Pays/read'));
+    verifyParam();
+    // _niveau1List =
+    //     http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+
+    // // _niveau2List == null;
+    // _niveau2List = http.get(Uri.parse(
+    //     'https://koumi.ml/api-koumi/niveau2Pays/listeNiveau2PaysByIdNiveau1Pays/${niveau1Pays.idNiveau1Pays}'));
+
+    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau2Pays/read'));
     super.initState();
+  }
+
+  Future<List<Niveau2Pays>> fetchList(String id) async {
+    final response = await Niveau2Service().fetchNiveau2ByNiveau1(id);
+    return response;
   }
 
   @override
@@ -89,7 +114,13 @@ class _Niveau3PageState extends State<Niveau3Page> {
                         overflow: TextOverflow.ellipsis),
                   ),
                   onTap: () async {
-                    _showDialog();
+                    // _showDialog();
+
+                    await showDialog(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                          backgroundColor: Colors.white, content: AddDialog()),
+                    );
                   },
                 ),
               ),
@@ -232,24 +263,22 @@ class _Niveau3PageState extends State<Niveau3Page> {
                                                             String>>[
                                                       PopupMenuItem<String>(
                                                         child: ListTile(
-                                                          leading:  e.statutN3 ==
-                                                                      false
-                                                                  ? Icon(
-                                                                      Icons
-                                                                          .check,
-                                                                      color: Colors
-                                                                          .green,
-                                                                    )
-                                                                  : Icon(
-                                                                      Icons
-                                                                          .disabled_visible,
-                                                                      color: Colors
-                                                                              .orange[
-                                                                          400],
-                                                                    ),
-                                                          title:  Text(
-                                                            e.statutN3 ==
-                                                                    false
+                                                          leading: e.statutN3 ==
+                                                                  false
+                                                              ? Icon(
+                                                                  Icons.check,
+                                                                  color: Colors
+                                                                      .green,
+                                                                )
+                                                              : Icon(
+                                                                  Icons
+                                                                      .disabled_visible,
+                                                                  color: Colors
+                                                                          .orange[
+                                                                      400],
+                                                                ),
+                                                          title: Text(
+                                                            e.statutN3 == false
                                                                 ? "Activer"
                                                                 : "Desactiver",
                                                             style: TextStyle(
@@ -264,52 +293,47 @@ class _Niveau3PageState extends State<Niveau3Page> {
                                                             ),
                                                           ),
                                                           onTap: () async {
-                                                            e.statutN3 ==
-                                                                      false
-                                                                  ?
-                                                            await Niveau3Service()
-                                                                .activerNiveau3(e
-                                                                    .idNiveau3Pays!)
-                                                                .then(
-                                                                    (value) => {
-                                                                          Provider.of<Niveau3Service>(context, listen: false)
-                                                                              .applyChange(),
-                                                                          // setState(
-                                                                          //     () {
-                                                                          //   _liste =
-                                                                          //       Niveau3Service().fetchNiveau3ByNiveau2(widget.niveau2pays.idNiveau2Pays!);
-                                                                          // }),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Activer avec succèss "),
-                                                                                ],
+                                                            e.statutN3 == false
+                                                                ? await Niveau3Service()
+                                                                    .activerNiveau3(e
+                                                                        .idNiveau3Pays!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<Niveau3Service>(context, listen: false).applyChange(),
+                                                                              // setState(
+                                                                              //     () {
+                                                                              //   _liste =
+                                                                              //       Niveau3Service().fetchNiveau3ByNiveau2(widget.niveau2pays.idNiveau2Pays!);
+                                                                              // }),
+                                                                              Navigator.of(context).pop(),
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Activer avec succèss "),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 2),
+                                                                                ),
+                                                                              )
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 5),
+                                                                                ),
                                                                               ),
-                                                                              duration: Duration(seconds: 2),
-                                                                            ),
-                                                                          )
-                                                                        })
-                                                                .catchError(
-                                                                    (onError) =>
-                                                                        {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Une erreur s'est produit"),
-                                                                                ],
-                                                                              ),
-                                                                              duration: Duration(seconds: 5),
-                                                                            ),
-                                                                          ),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        }) :  await Niveau3Service()
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                : await Niveau3Service()
                                                                     .desactiverNiveau3Pays(e
                                                                         .idNiveau3Pays!)
                                                                     .then(
@@ -465,305 +489,341 @@ class _Niveau3PageState extends State<Niveau3Page> {
     );
   }
 
-  void _showDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ListTile(
-                  title: Text(
-                    "Ajouter un(e) ${para.libelleNiveau3Pays}",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 18,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  trailing: IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: Icon(
-                      Icons.close,
-                      color: Colors.red,
-                      size: 24,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                Form(
-                  key: formkey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: libelleController,
-                        decoration: InputDecoration(
-                          labelText: "Nom du ${para.libelleNiveau3Pays}",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      // SizedBox(height: 16),
-                      // FutureBuilder(
-                      //   future: _paysList,
-                      //   builder: (_, snapshot) {
-                      //     if (snapshot.connectionState ==
-                      //         ConnectionState.waiting) {
-                      //       return CircularProgressIndicator();
-                      //     }
-                      //     if (snapshot.hasError) {
-                      //       return Text("${snapshot.error}");
-                      //     }
-                      //     if (snapshot.hasData) {
-                      //       final reponse =
-                      //           json.decode((snapshot.data.body)) as List;
-                      //       final paysList = reponse
-                      //           .map((e) => Pays.fromMap(e))
-                      //           .where((con) => con.statutPays == true)
-                      //           .toList();
+  // void _showDialog() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) => Dialog(
+  //       backgroundColor: Colors.white,
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(16),
+  //       ),
+  //       child: Container(
+  //         padding: const EdgeInsets.all(16),
+  //         child: SingleChildScrollView(
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             crossAxisAlignment: CrossAxisAlignment.stretch,
+  //             children: [
+  //               ListTile(
+  //                 title: Text(
+  //                   "Ajouter un(e) ${para.libelleNiveau3Pays}",
+  //                   style: TextStyle(
+  //                     fontWeight: FontWeight.bold,
+  //                     color: Colors.black,
+  //                     fontSize: 18,
+  //                   ),
+  //                   textAlign: TextAlign.center,
+  //                 ),
+  //                 trailing: IconButton(
+  //                   onPressed: () {
+  //                     Navigator.of(context).pop();
+  //                   },
+  //                   icon: Icon(
+  //                     Icons.close,
+  //                     color: Colors.red,
+  //                     size: 24,
+  //                   ),
+  //                 ),
+  //               ),
+  //               SizedBox(height: 16),
+  //               Form(
+  //                 key: formkey,
+  //                 child: Column(
+  //                   crossAxisAlignment: CrossAxisAlignment.stretch,
+  //                   children: [
+  //                     TextFormField(
+  //                       validator: (value) {
+  //                         if (value == null || value.isEmpty) {
+  //                           return "Veuillez remplir ce champ";
+  //                         }
+  //                         return null;
+  //                       },
+  //                       controller: libelleController,
+  //                       decoration: InputDecoration(
+  //                         labelText: "Nom du ${para.libelleNiveau3Pays}",
+  //                         border: OutlineInputBorder(
+  //                           borderRadius: BorderRadius.circular(8),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                     SizedBox(height: 16),
+  //                     FutureBuilder(
+  //                       future: _niveau1List,
+  //                       builder: (_, snapshot) {
+  //                         if (snapshot.connectionState ==
+  //                             ConnectionState.waiting) {
+  //                           return DropdownButtonFormField(
+  //                             items: [],
+  //                             onChanged: null,
+  //                             decoration: InputDecoration(
+  //                               labelText: 'Chargement...',
+  //                               border: OutlineInputBorder(
+  //                                 borderRadius: BorderRadius.circular(8),
+  //                               ),
+  //                             ),
+  //                           );
+  //                         }
 
-                      //       if (paysList.isEmpty) {
-                      //         return Text(
-                      //           'Aucun donné disponible',
-                      //           style:
-                      //               TextStyle(overflow: TextOverflow.ellipsis),
-                      //         );
-                      //       }
+  //                         if (snapshot.hasData) {
+  //                           // final reponse = json.decode(snapshot.data.body);
+  //                           dynamic jsonString =
+  //                               utf8.decode(snapshot.data.bodyBytes);
+  //                           dynamic reponse = json.decode(jsonString);
+  //                           if (reponse is List) {
+  //                             final niveau1List = reponse
+  //                                 .map((e) => Niveau1Pays.fromMap(e))
+  //                                 .where((con) => con.statutN1 == true)
+  //                                 .toList();
 
-                      //       return DropdownButtonFormField<String>(
-                      //         items: paysList
-                      //             .map(
-                      //               (e) => DropdownMenuItem(
-                      //                 value: e.idPays,
-                      //                 child: Text(e.nomPays),
-                      //               ),
-                      //             )
-                      //             .toList(),
-                      //         value: paysValue,
-                      //         onChanged: (newValue) {
-                      //           setState(() {
-                      //             paysValue = newValue;
-                      //             if (newValue != null) {
-                      //               pays = paysList.firstWhere((element) =>
-                      //                   element.idPays == newValue);
+  //                             if (niveau1List.isEmpty) {
+  //                               return DropdownButtonFormField(
+  //                                 items: [],
+  //                                 onChanged: null,
+  //                                 decoration: InputDecoration(
+  //                                   labelText:
+  //                                       'Aucun ${para.libelleNiveau1Pays} trouvé',
+  //                                   border: OutlineInputBorder(
+  //                                     borderRadius: BorderRadius.circular(8),
+  //                                   ),
+  //                                 ),
+  //                               );
+  //                             }
 
-                      //               // typeSelected = true;
-                      //             }
-                      //           });
-                      //         },
-                      //         decoration: InputDecoration(
-                      //           labelText: 'Sélectionner un pays',
-                      //           border: OutlineInputBorder(
-                      //             borderRadius: BorderRadius.circular(8),
-                      //           ),
-                      //         ),
-                      //       );
-                      //     }
-                      //     return Text(
-                      //       'Aucune donnée disponible',
-                      //       style: TextStyle(overflow: TextOverflow.ellipsis),
-                      //     );
-                      //   },
-                      // ),
-                      SizedBox(height: 16),
-                      Consumer<Niveau2Service>(
-                        builder: (context, niveauService, child) {
-                          return FutureBuilder(
-                            future: _niveauList,
-                            builder: (_, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Chargement...',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                              }
-                              
-                              if (snapshot.hasData) {
-                                // final reponse = json.decode(snapshot.data.body);
-                                dynamic jsonString =
-                                    utf8.decode(snapshot.data.bodyBytes);
-                                dynamic reponse = json.decode(jsonString);
-                                if (reponse is List) {
-                                  final niveauList = reponse
-                                      .map((e) => Niveau2Pays.fromMap(e))
-                                      .where((con) => con.statutN2 == true)
-                                      .toList();
+  //                             return DropdownButtonFormField<String>(
+  //                               items: niveau1List
+  //                                   .map(
+  //                                     (e) => DropdownMenuItem(
+  //                                       value: e.idNiveau1Pays,
+  //                                       child: Text(e.nomN1!),
+  //                                     ),
+  //                                   )
+  //                                   .toList(),
+  //                               value: niveau1Value,
+  //                               onChanged: (newValue) {
+  //                                 niveau2Value = null;
+  //                                 setState(() {
+  //                                   if (newValue != null) {
+  //                                     niveau1Pays = niveau1List.firstWhere(
+  //                                       (element) =>
+  //                                           element.idNiveau1Pays == newValue,
+  //                                     );
 
-                                  if (niveauList.isEmpty) {
-                                    return DropdownButtonFormField(
-                                      items: [],
-                                      onChanged: null,
-                                      decoration: InputDecoration(
-                                        labelText:
-                                            'Aucun ${para.libelleNiveau2Pays} trouvé',
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                    );
-                                  }
+  //                                     // Appel de la méthode pour mettre à jour _niveau2List
+  //                                     updateNiveau2List(newValue);
+  //                                   }
+  //                                 });
+  //                               },
+  //                               decoration: InputDecoration(
+  //                                 labelText:
+  //                                     'Sélectionner un ${para.libelleNiveau1Pays}',
+  //                                 border: OutlineInputBorder(
+  //                                   borderRadius: BorderRadius.circular(8),
+  //                                 ),
+  //                               ),
+  //                             );
+  //                           }
+  //                         }
+  //                         return DropdownButtonFormField(
+  //                           items: [],
+  //                           onChanged: null,
+  //                           decoration: InputDecoration(
+  //                             labelText:
+  //                                 'Aucun ${para.libelleNiveau1Pays} trouvé',
+  //                             border: OutlineInputBorder(
+  //                               borderRadius: BorderRadius.circular(8),
+  //                             ),
+  //                           ),
+  //                         );
+  //                       },
+  //                     ),
+  //                     SizedBox(height: 16),
+  //                     FutureBuilder(
+  //                       future: _niveau2List,
+  //                       builder: (_, snapshot) {
+  //                         if (snapshot.connectionState ==
+  //                             ConnectionState.waiting) {
+  //                           return DropdownButtonFormField(
+  //                             items: [],
+  //                             onChanged: null,
+  //                             decoration: InputDecoration(
+  //                               labelText: 'Chargement...',
+  //                               border: OutlineInputBorder(
+  //                                 borderRadius: BorderRadius.circular(8),
+  //                               ),
+  //                             ),
+  //                           );
+  //                         }
 
-                                  return DropdownButtonFormField<String>(
-                                    items: niveauList
-                                        .map(
-                                          (e) => DropdownMenuItem(
-                                            value: e.idNiveau2Pays,
-                                            child: Text(e.nomN2 ?? ''),
-                                          ),
-                                        )
-                                        .toList(),
-                                    value: niveau2Value,
-                                    onChanged: (newValue) {
-                                      setState(() {
-                                        niveau2Value = newValue;
-                                        if (newValue != null) {
-                                          niveau2 = niveauList.firstWhere(
-                                              (element) =>
-                                                  element.idNiveau2Pays ==
-                                                  newValue);
-                                          debugPrint(
-                                              "niveau select :${niveau2.toString()}");
-                                          // typeSelected = true;
-                                        }
-                                      });
-                                    },
-                                    decoration: InputDecoration(
-                                      labelText:
-                                          'Sélectionner un ${para.libelleNiveau2Pays}',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
-                                }
-                              }
-                              return DropdownButtonFormField(
-                                items: [],
-                                onChanged: null,
-                                decoration: InputDecoration(
-                                  labelText:
-                                      'Aucun ${para.libelleNiveau2Pays} trouvé',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: descriptionController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Description",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final String libelle = libelleController.text;
-                          final String description = descriptionController.text;
-                          if (formkey.currentState!.validate()) {
-                            try {
-                              await Niveau3Service()
-                                  .addNiveau3Pays(
-                                      nomN3: libelle,
-                                      descriptionN3: description,
-                                      niveau2Pays: niveau2)
-                                  .then((value) => {
-                                        Provider.of<Niveau3Service>(context,
-                                                listen: false)
-                                            .applyChange(),
-                                        libelleController.clear(),
-                                        descriptionController.clear(),
-                                        Navigator.of(context).pop(),
-                                        setState(() {
-                                          niveau2 == null;
-                                        }),
-                                      });
-                            } catch (e) {
-                              final String errorMessage = e.toString();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text("Une erreur s'est produit"),
-                                    ],
-                                  ),
-                                  duration: Duration(seconds: 5),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green, // Orange color code
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          minimumSize: const Size(290, 45),
-                        ),
-                        icon: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Ajouter",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  //                         if (snapshot.hasData) {
+  //                           dynamic jsonString =
+  //                               utf8.decode(snapshot.data.bodyBytes);
+  //                           dynamic reponse = json.decode(jsonString);
+  //                           if (reponse is List) {
+  //                             final niveauList = reponse
+  //                                 .map((e) => Niveau2Pays.fromMap(e))
+  //                                 // .where((con) => con.statutN2 == true)
+  //                                 .toList();
+
+  //                             if (niveauList.isEmpty) {
+  //                               return DropdownButtonFormField(
+  //                                 items: [],
+  //                                 onChanged: null,
+  //                                 decoration: InputDecoration(
+  //                                   labelText:
+  //                                       'Aucun ${para.libelleNiveau2Pays} trouvé',
+  //                                   border: OutlineInputBorder(
+  //                                     borderRadius: BorderRadius.circular(8),
+  //                                   ),
+  //                                 ),
+  //                               );
+  //                             }
+
+  //                             return DropdownButtonFormField<String>(
+  //                               items: niveauList
+  //                                   .map(
+  //                                     (e) => DropdownMenuItem(
+  //                                       value: e.idNiveau2Pays,
+  //                                       child: Text(e.nomN2),
+  //                                     ),
+  //                                   )
+  //                                   .toList(),
+  //                               value: niveau2Value,
+  //                               onChanged: (newValue) {
+  //                                 setState(() {
+  //                                   niveau2Value = newValue;
+  //                                   if (newValue != null) {
+  //                                     niveau2 = niveauList.firstWhere(
+  //                                         (element) =>
+  //                                             element.idNiveau2Pays ==
+  //                                             newValue);
+  //                                     debugPrint(
+  //                                         "niveau select :${niveau2.toString()}");
+  //                                   }
+  //                                 });
+  //                               },
+  //                               decoration: InputDecoration(
+  //                                 labelText:
+  //                                     'Sélectionner un ${para.libelleNiveau2Pays}',
+  //                                 border: OutlineInputBorder(
+  //                                   borderRadius: BorderRadius.circular(8),
+  //                                 ),
+  //                               ),
+  //                             );
+  //                           }
+  //                         }
+  //                         return DropdownButtonFormField(
+  //                           items: [],
+  //                           onChanged: null,
+  //                           decoration: InputDecoration(
+  //                             labelText:
+  //                                 'Aucun ${para.libelleNiveau2Pays} trouvé',
+  //                             border: OutlineInputBorder(
+  //                               borderRadius: BorderRadius.circular(8),
+  //                             ),
+  //                           ),
+  //                         );
+  //                       },
+  //                     ),
+  //                     SizedBox(height: 16),
+  //                     TextFormField(
+  //                       validator: (value) {
+  //                         if (value == null || value.isEmpty) {
+  //                           return "Veuillez remplir ce champ";
+  //                         }
+  //                         return null;
+  //                       },
+  //                       controller: descriptionController,
+  //                       maxLines: null,
+  //                       decoration: InputDecoration(
+  //                         labelText: "Description",
+  //                         border: OutlineInputBorder(
+  //                           borderRadius: BorderRadius.circular(8),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                     SizedBox(height: 20),
+  //                     ElevatedButton.icon(
+  //                       onPressed: () async {
+  //                         final String libelle = libelleController.text;
+  //                         final String description = descriptionController.text;
+  //                         if (formkey.currentState!.validate()) {
+  //                           try {
+  //                             await Niveau3Service()
+  //                                 .addNiveau3Pays(
+  //                                     nomN3: libelle,
+  //                                     descriptionN3: description,
+  //                                     niveau2Pays: niveau2)
+  //                                 .then((value) => {
+  //                                       Provider.of<Niveau3Service>(context,
+  //                                               listen: false)
+  //                                           .applyChange(),
+  //                                       Navigator.of(context).pop(),
+  //                                       ScaffoldMessenger.of(context)
+  //                                           .showSnackBar(
+  //                                         SnackBar(
+  //                                           content: Row(
+  //                                             children: [
+  //                                               Text(
+  //                                                   "${para.libelleNiveau3Pays} ajouté avec success"),
+  //                                             ],
+  //                                           ),
+  //                                           duration: Duration(seconds: 5),
+  //                                         ),
+  //                                       ),
+  //                                       libelleController.clear(),
+  //                                       descriptionController.clear(),
+  //                                       setState(() {
+  //                                         niveau2 == null;
+  //                                         niveau1Pays == null;
+  //                                       }),
+  //                                     });
+  //                           } catch (e) {
+  //                             final String errorMessage = e.toString();
+  //                             print(errorMessage);
+  //                             ScaffoldMessenger.of(context).showSnackBar(
+  //                               SnackBar(
+  //                                 content: Row(
+  //                                   children: [
+  //                                     Text(
+  //                                         "Cette ${para.libelleNiveau3Pays} existe déjà"),
+  //                                   ],
+  //                                 ),
+  //                                 duration: Duration(seconds: 5),
+  //                               ),
+  //                             );
+  //                           }
+  //                         }
+  //                       },
+  //                       style: ElevatedButton.styleFrom(
+  //                         backgroundColor: Colors.green, // Orange color code
+  //                         shape: RoundedRectangleBorder(
+  //                           borderRadius: BorderRadius.circular(15),
+  //                         ),
+  //                         minimumSize: const Size(290, 45),
+  //                       ),
+  //                       icon: const Icon(
+  //                         Icons.add,
+  //                         color: Colors.white,
+  //                       ),
+  //                       label: const Text(
+  //                         "Ajouter",
+  //                         style: TextStyle(
+  //                           fontSize: 20,
+  //                           color: Colors.white,
+  //                           fontWeight: FontWeight.w700,
+  //                         ),
+  //                       ),
+  //                     )
+  //                   ],
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildEtat(bool isState) {
     return Container(
@@ -772,6 +832,382 @@ class _Niveau3PageState extends State<Niveau3Page> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         color: isState ? Colors.green : Colors.red,
+      ),
+    );
+  }
+}
+
+class AddDialog extends StatefulWidget {
+  @override
+  _AddDialogState createState() => _AddDialogState();
+}
+
+class _AddDialogState extends State<AddDialog> {
+  late ParametreGeneraux para;
+  List<Niveau3Pays> niveau3Liste = [];
+  final formkey = GlobalKey<FormState>();
+  TextEditingController libelleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+  List<ParametreGeneraux> paraList = [];
+  late Niveau2Pays niveau2;
+  String? niveau2Value;
+  late Future _niveau2List;
+
+  String? niveau1Value;
+  late Future _niveau1List;
+  late Niveau1Pays niveau1Pays = Niveau1Pays();
+
+  void verifyParam() {
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+
+    if (paraList.isNotEmpty) {
+      para = paraList[0];
+    } else {
+      // Gérer le cas où la liste est null ou vide, par exemple :
+      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+    }
+  }
+
+  @override
+  void initState() {
+    verifyParam();
+    _niveau1List =
+        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+
+    // _niveau2List == null;
+    _niveau2List = http.get(Uri.parse(
+        'https://koumi.ml/api-koumi/niveau2Pays/listeNiveau2PaysByIdNiveau1Pays/${niveau1Pays.idNiveau1Pays}'));
+
+    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau2Pays/read'));
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    libelleController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ListTile(
+              title: Text(
+                "Ajouter un(e) ${para.libelleNiveau3Pays}",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  fontSize: 18,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              trailing: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(
+                  Icons.close,
+                  color: Colors.red,
+                  size: 24,
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+            Form(
+              key: formkey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextFormField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez remplir ce champ";
+                      }
+                      return null;
+                    },
+                    controller: libelleController,
+                    decoration: InputDecoration(
+                      labelText: "Nom du ${para.libelleNiveau3Pays}",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  FutureBuilder(
+                    future: _niveau1List,
+                    builder: (_, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return DropdownButtonFormField(
+                          items: [],
+                          onChanged: null,
+                          decoration: InputDecoration(
+                            labelText: 'Chargement...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        );
+                      }
+
+                      if (snapshot.hasData) {
+                        // final reponse = json.decode(snapshot.data.body);
+                        dynamic jsonString =
+                            utf8.decode(snapshot.data.bodyBytes);
+                        dynamic reponse = json.decode(jsonString);
+                        if (reponse is List) {
+                          final niveau1List = reponse
+                              .map((e) => Niveau1Pays.fromMap(e))
+                              .where((con) => con.statutN1 == true)
+                              .toList();
+
+                          if (niveau1List.isEmpty) {
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText:
+                                    'Aucun ${para.libelleNiveau1Pays} trouvé',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+
+                          return DropdownButtonFormField<String>(
+                            items: niveau1List
+                                .map(
+                                  (e) => DropdownMenuItem(
+                                    value: e.idNiveau1Pays,
+                                    child: Text(e.nomN1!),
+                                  ),
+                                )
+                                .toList(),
+                            value: niveau1Value,
+                            onChanged: (newValue) {
+                              niveau2Value = null;
+                              setState(() {
+                                if (newValue != null) {
+                                  niveau1Pays = niveau1List.firstWhere(
+                                    (element) =>
+                                        element.idNiveau1Pays == newValue,
+                                  );
+                                  _niveau2List = http.get(Uri.parse(
+                                      'https://koumi.ml/api-koumi/niveau2Pays/listeNiveau2PaysByIdNiveau1Pays/${newValue}'));
+                                  // Appel de la méthode pour mettre à jour _niveau2List
+                                  // updateNiveau2List(newValue);
+                                }
+                              });
+                            },
+                            decoration: InputDecoration(
+                              labelText:
+                                  'Sélectionner un ${para.libelleNiveau1Pays}',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                      return DropdownButtonFormField(
+                        items: [],
+                        onChanged: null,
+                        decoration: InputDecoration(
+                          labelText: 'Aucun ${para.libelleNiveau1Pays} trouvé',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  FutureBuilder(
+                    future: _niveau2List,
+                    builder: (_, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return DropdownButtonFormField(
+                          items: [],
+                          onChanged: null,
+                          decoration: InputDecoration(
+                            labelText: 'Chargement...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        );
+                      }
+
+                      if (snapshot.hasData) {
+                        dynamic jsonString =
+                            utf8.decode(snapshot.data.bodyBytes);
+                        dynamic reponse = json.decode(jsonString);
+                        if (reponse is List) {
+                          final niveauList = reponse
+                              .map((e) => Niveau2Pays.fromMap(e))
+                              // .where((con) => con.statutN2 == true)
+                              .toList();
+
+                          if (niveauList.isEmpty) {
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText:
+                                    'Aucun ${para.libelleNiveau2Pays} trouvé',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+
+                          return DropdownButtonFormField<String>(
+                            items: niveauList
+                                .map(
+                                  (e) => DropdownMenuItem(
+                                    value: e.idNiveau2Pays,
+                                    child: Text(e.nomN2),
+                                  ),
+                                )
+                                .toList(),
+                            value: niveau2Value,
+                            onChanged: (newValue) {
+                              setState(() {
+                                niveau2Value = newValue;
+                                if (newValue != null) {
+                                  niveau2 = niveauList.firstWhere((element) =>
+                                      element.idNiveau2Pays == newValue);
+                                  debugPrint(
+                                      "niveau select :${niveau2.toString()}");
+                                }
+                              });
+                            },
+                            decoration: InputDecoration(
+                              labelText:
+                                  'Sélectionner un ${para.libelleNiveau2Pays}',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                      return DropdownButtonFormField(
+                        items: [],
+                        onChanged: null,
+                        decoration: InputDecoration(
+                          labelText: 'Aucun ${para.libelleNiveau2Pays} trouvé',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Veuillez remplir ce champ";
+                      }
+                      return null;
+                    },
+                    controller: descriptionController,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      labelText: "Description",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      final String libelle = libelleController.text;
+                      final String description = descriptionController.text;
+                      if (formkey.currentState!.validate()) {
+                        try {
+                          await Niveau3Service()
+                              .addNiveau3Pays(
+                                  nomN3: libelle,
+                                  descriptionN3: description,
+                                  niveau2Pays: niveau2)
+                              .then((value) => {
+                                    Provider.of<Niveau3Service>(context,
+                                            listen: false)
+                                        .applyChange(),
+                                    Navigator.of(context).pop(),
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Row(
+                                          children: [
+                                            Text(
+                                                "${para.libelleNiveau3Pays} ajouté avec success"),
+                                          ],
+                                        ),
+                                        duration: Duration(seconds: 5),
+                                      ),
+                                    ),
+                                    libelleController.clear(),
+                                    descriptionController.clear(),
+                                    setState(() {
+                                      niveau2 == null;
+                                      niveau1Pays == null;
+                                    }),
+                                  });
+                        } catch (e) {
+                          final String errorMessage = e.toString();
+                          print(errorMessage);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  Text(
+                                      "Cette ${para.libelleNiveau3Pays} existe déjà"),
+                                ],
+                              ),
+                              duration: Duration(seconds: 5),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green, // Orange color code
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      minimumSize: const Size(290, 45),
+                    ),
+                    icon: const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
+                    label: const Text(
+                      "Ajouter",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

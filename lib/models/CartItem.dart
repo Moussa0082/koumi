@@ -22,4 +22,4 @@ class CartItem {
 //   int quantiteIntrant;
 //   CartItemIntrant({required this.intrant,  this.quantiteIntrant = 1});
 
-// }
+// } 

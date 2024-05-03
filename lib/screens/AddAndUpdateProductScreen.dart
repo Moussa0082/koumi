@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:io';
 
@@ -16,41 +15,41 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductEndScreen.dart';
-import 'package:path_provider/path_provider.dart' ;
+import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class AddAndUpdateProductScreen extends StatefulWidget {
-  bool? isEditable ;
+  bool? isEditable;
   final Stock? stock;
-   AddAndUpdateProductScreen({super.key, this.isEditable, this.stock});
+  AddAndUpdateProductScreen({super.key, this.isEditable, this.stock});
 
   @override
-  State<AddAndUpdateProductScreen> createState() => _AddAndUpdateProductScreenState();
+  State<AddAndUpdateProductScreen> createState() =>
+      _AddAndUpdateProductScreenState();
 }
 
- const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
+const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
-
-     final formkey = GlobalKey<FormState>();
-     TextEditingController _prixController = TextEditingController();
-     TextEditingController _quantiteController = TextEditingController();
+  final formkey = GlobalKey<FormState>();
+  TextEditingController _prixController = TextEditingController();
+  TextEditingController _quantiteController = TextEditingController();
   TextEditingController _nomController = TextEditingController();
   TextEditingController _formController = TextEditingController();
   TextEditingController _origineController = TextEditingController();
 
   late Acteur acteur;
-   late Stock stock = Stock();
+  late Stock stock = Stock();
   late List<TypeActeur> typeActeurData = [];
   late String type;
   late TextEditingController _searchController;
   List<Filiere> filiereListe = [];
-   String? imageSrc;
+  String? imageSrc;
   File? photo;
-   String? formeValue;
+  String? formeValue;
   late Future _formeList;
   late Forme forme;
 
@@ -60,7 +59,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
   List<ParametreGeneraux> paraList = [];
   late ParametreGeneraux para = ParametreGeneraux();
 
-    Future<File> saveImagePermanently(String imagePath) async {
+  Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
     final name = path.basename(imagePath);
     final image = File('${directory.path}/$name');
@@ -128,8 +127,8 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
       },
     );
   }
-   
-   void verifyParam() {
+
+  void verifyParam() {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
 
@@ -141,7 +140,6 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
     }
   }
 
-
   @override
   void initState() {
     // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
@@ -150,41 +148,40 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
     _searchController = TextEditingController();
 
     super.initState();
-    if(widget.isEditable! == true){
-     _nomController.text = widget.stock!.nomProduit!;
-     _formController.text = widget.stock!.formeProduit!;
-     _origineController.text = widget.stock!.origineProduit!;
+    if (widget.isEditable! == true) {
+      _nomController.text = widget.stock!.nomProduit!;
+      _formController.text = widget.stock!.formeProduit!;
+      _origineController.text = widget.stock!.origineProduit!;
       _prixController.text = widget.stock!.prix!.toString();
       _quantiteController.text = widget.stock!.quantiteStock!.toString();
     }
-        _formeList = http.get(Uri.parse(
-        'https://koumi.ml/api-koumi/formeproduit/getAllForme/'));
-        // 'http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
-            _niveau3List =
+    _formeList = http
+        .get(Uri.parse('https://koumi.ml/api-koumi/formeproduit/getAllForme/'));
+    // 'http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
+    _niveau3List =
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
         http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
-   verifyParam();
+    verifyParam();
   }
 
-   
-     @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
-          centerTitle: true,
-          toolbarHeight: 100,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-          title: Text(
-            widget.isEditable! ?  'Modifier de produit' :  'Ajout de produit' ,
-            style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
-          ),
-         ),
+        centerTitle: true,
+        toolbarHeight: 100,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+        title: Text(
+          widget.isEditable! ? 'Modifier de produit' : 'Ajout de produit',
+          style:
+              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(children: [
           // const SizedBox(height: 10),
@@ -295,40 +292,89 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                           ),
                         ),
                       ),
-                     Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      child: FutureBuilder(
-                        future: _formeList,
-                        // future: speculationService.fetchSpeculationByCategorie(categorieProduit.idCategorieProduit!),
-                        builder: (_, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return DropdownButtonFormField(
-                              items: [],
-                              onChanged: null,
-                              decoration: InputDecoration(
-                                labelText: 'En cours de chargement ...',
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        child: FutureBuilder(
+                          future: _formeList,
+                          // future: speculationService.fetchSpeculationByCategorie(categorieProduit.idCategorieProduit!),
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'En cours de chargement ...',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
-                              ),
-                            );
-                          }
+                              );
+                            }
 
-                          if (snapshot.hasData) {
-                            dynamic jsonString =
-                                utf8.decode(snapshot.data.bodyBytes);
-                            dynamic responseData = json.decode(jsonString);
+                            if (snapshot.hasData) {
+                              dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
 
-                            if (responseData is List) {
-                              List<Forme> speList = responseData
-                                  .map((e) => Forme.fromMap(e))
-                                  .toList();
+                              if (responseData is List) {
+                                List<Forme> speList = responseData
+                                    .map((e) => Forme.fromMap(e))
+                                    .toList();
 
-                              if (speList.isEmpty) {
+                                if (speList.isEmpty) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Aucune forme trouvé',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return DropdownButtonFormField<String>(
+                                  items: speList
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idForme,
+                                          child: Text(e.libelleForme!),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: formeValue,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      formeValue = newValue;
+                                      if (newValue != null) {
+                                        forme = speList.firstWhere(
+                                          (element) =>
+                                              element.idForme == newValue,
+                                        );
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: widget.isEditable == false
+                                        ? 'Sélectionner la forme'
+                                        : widget.stock!.formeProduit!,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                // Handle case when response data is not a list
                                 return DropdownButtonFormField(
                                   items: [],
                                   onChanged: null,
@@ -342,39 +388,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                   ),
                                 );
                               }
-
-                              return DropdownButtonFormField<String>(
-                                items: speList
-                                    .map(
-                                      (e) => DropdownMenuItem(
-                                        value: e.idForme,
-                                        child: Text(e.libelleForme!),
-                                      ),
-                                    )
-                                    .toList(),
-                                value: formeValue,
-                                onChanged: (newValue) {
-                                  setState(() {
-                                    formeValue = newValue;
-                                    if (newValue != null) {
-                                      forme = speList.firstWhere(
-                                        (element) =>
-                                            element.idForme == newValue,
-                                      );
-                                    }
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                  labelText: widget.isEditable == false ? 'Sélectionner la forme' : widget.stock!.formeProduit!,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              );
                             } else {
-                              // Handle case when response data is not a list
                               return DropdownButtonFormField(
                                 items: [],
                                 onChanged: null,
@@ -388,23 +402,9 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                 ),
                               );
                             }
-                          } else {
-                            return DropdownButtonFormField(
-                              items: [],
-                              onChanged: null,
-                              decoration: InputDecoration(
-                                labelText: 'Aucune forme trouvé',
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            );
-                          }
-                        },
+                          },
+                        ),
                       ),
-                    ),
                       SizedBox(
                         height: 10,
                       ),
@@ -442,9 +442,9 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                 ),
                               );
                             }
-                          
+
                             if (snapshot.hasData) {
-                               dynamic jsonString =
+                              dynamic jsonString =
                                   utf8.decode(snapshot.data.bodyBytes);
                               dynamic responseData = json.decode(jsonString);
 
@@ -495,7 +495,9 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                     });
                                   },
                                   decoration: InputDecoration(
-                                    labelText: widget.isEditable == false ? 'Selectionner une localité' : widget.stock!.origineProduit!,
+                                    labelText: widget.isEditable == false
+                                        ? 'Selectionner une localité'
+                                        : widget.stock!.origineProduit!,
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -574,8 +576,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                           ),
                         ),
                       ),
-                      
-                       SizedBox(
+                      SizedBox(
                         height: 10,
                       ),
                       Padding(
@@ -619,36 +620,49 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                       SizedBox(
                         height: 10,
                       ),
-                      
                       SizedBox(
                         child: photo != null
-                        ? Image.file(
-                            photo!,
-                            fit: BoxFit.fitWidth,
-                            height: 100,
-                            width: 150,
-                          )
-                        :  IconButton(
-                          onPressed: _showImageSourceDialog,
-                          icon: const Icon(
-                            Icons.add_a_photo_rounded,
-                            size: 60,
-                          ),
-                        ),
+                            ? Image.file(
+                                photo!,
+                                fit: BoxFit.fitWidth,
+                                height: 100,
+                                width: 150,
+                              )
+                            : IconButton(
+                                onPressed: _showImageSourceDialog,
+                                icon: const Icon(
+                                  Icons.add_a_photo_rounded,
+                                  size: 60,
+                                ),
+                              ),
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
                           onPressed: () async {
-                   
-
                             if (formkey.currentState!.validate()) {
-                              Navigator.push(context, MaterialPageRoute(builder:
-               (context)=> (AddAndUpdateProductEndSreen(isEditable:widget.isEditable!,
-                              nomProduit: _nomController.text, forme: forme.libelleForme!,
-                              origine: niveau3, prix: _prixController.text.toString(),
-                              image: photo,
-                              quantite: _quantiteController.text, stock: widget.stock,
-                              ))));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          (AddAndUpdateProductEndSreen(
+                                            isEditable: widget.isEditable!,
+                                            nomProduit: _nomController.text,
+                                            forme: forme.libelleForme!,
+                                            origine: niveau3,
+                                            prix:
+                                                _prixController.text.toString(),
+                                            image: photo,
+                                            quantite: _quantiteController.text,
+                                            stock: widget.stock,
+                                          )))).then((value) => {  
+                                            _nomController.clear(),
+                                            _prixController.clear(),
+                                            _quantiteController.clear(),
+                                            setState(() {
+                                              niveau3 == null;
+
+                                            })
+                                          });
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -659,18 +673,16 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                             minimumSize: const Size(290, 45),
                           ),
                           child: Text(
-                           "Suivant" ,
+                            "Suivant",
                             style: TextStyle(
                               fontSize: 20,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),
                           )),
-                          
-                            SizedBox(
+                      SizedBox(
                         height: 10,
                       ),
-
                     ],
                   ))
             ],
@@ -707,6 +719,4 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
       ),
     );
   }
-
-
 }

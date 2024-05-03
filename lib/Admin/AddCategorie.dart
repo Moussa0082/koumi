@@ -253,22 +253,41 @@ class _AddCategorieState extends State<AddCategorie> {
                                                               String>>[
                                                         PopupMenuItem<String>(
                                                           child: ListTile(
-                                                            leading: const Icon(
-                                                              Icons.check,
-                                                              color:
-                                                                  Colors.green,
-                                                            ),
-                                                            title: const Text(
-                                                              "Activer",
+                                                            leading:  e.statutCategorie ==
+                                                                      false
+                                                                  ? Icon(
+                                                                      Icons
+                                                                          .check,
+                                                                      color: Colors
+                                                                          .green,
+                                                                    )
+                                                                  : Icon(
+                                                                      Icons
+                                                                          .disabled_visible,
+                                                                      color: Colors
+                                                                              .orange[
+                                                                          400]),
+                                                            title: Text(
+                                                              e.statutCategorie ==
+                                                                      false
+                                                                  ? "Activer"
+                                                                  : "Desactiver",
                                                               style: TextStyle(
-                                                                color: Colors
-                                                                    .green,
+                                                                color: e.statutCategorie ==
+                                                                        false
+                                                                    ? Colors
+                                                                        .green
+                                                                    : Colors.orange[
+                                                                        400],
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
                                                               ),
                                                             ),
                                                             onTap: () async {
+                                                               e.statutCategorie ==
+                                                                        false
+                                                                    ?
                                                               await CategorieService()
                                                                   .activerCategorie(e
                                                                       .idCategorieProduit!)
@@ -305,31 +324,7 @@ class _AddCategorieState extends State<AddCategorie> {
                                                                               ),
                                                                             ),
                                                                             Navigator.of(context).pop(),
-                                                                          });
-                                                            },
-                                                          ),
-                                                        ),
-                                                        PopupMenuItem<String>(
-                                                          child: ListTile(
-                                                            leading: Icon(
-                                                              Icons
-                                                                  .disabled_visible,
-                                                              color: Colors
-                                                                  .orange[400],
-                                                            ),
-                                                            title: Text(
-                                                              "Désactiver",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                        .orange[
-                                                                    400],
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            ),
-                                                            onTap: () async {
-                                                              await CategorieService()
+                                                                          }) :  await CategorieService()
                                                                   .desactiverCategorie(e
                                                                       .idCategorieProduit!)
                                                                   .then(
@@ -599,6 +594,17 @@ class _AddCategorieState extends State<AddCategorie> {
                                                     context,
                                                     listen: false)
                                                 .applyChange(),
+                                                Navigator.of(context).pop(),
+                                                   ScaffoldMessenger.of(context).showSnackBar(
+                                 SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Text("Categorie ajouté avec success"),
+                                    ],
+                                  ),
+                                  duration: Duration(seconds: 5),
+                                ),
+                              ),
                                             setState(() {
                                               _liste = CategorieService()
                                                   .fetchCategorieByFiliere(
@@ -606,7 +612,7 @@ class _AddCategorieState extends State<AddCategorie> {
                                             }),
                                             libelleController.clear(),
                                             descriptionController.clear(),
-                                            Navigator.of(context).pop()
+                                            
                                           });
                                 } catch (e) {
                                   final String errorMessage = e.toString();
@@ -614,7 +620,7 @@ class _AddCategorieState extends State<AddCategorie> {
                                     const SnackBar(
                                       content: Row(
                                         children: [
-                                          Text("Une erreur s'est produite"),
+                                          Text("Cette categorie existe déjà"),
                                         ],
                                       ),
                                       duration: Duration(seconds: 5),

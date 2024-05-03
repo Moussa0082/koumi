@@ -214,8 +214,7 @@ class _CategoriPageState extends State<CategoriPage> {
                         }).toList();
                         return Column(
                             children: filteredCatSearch
-                                    .where((element) =>
-                                        element.statutCategorie == false)
+                          
                                     .isEmpty
                                 ? [
                                     Padding(
@@ -912,6 +911,19 @@ class _CategoriPageState extends State<CategoriPage> {
                                         Provider.of<CategorieService>(context,
                                                 listen: false)
                                             .applyChange(),
+                                        Navigator.of(context).pop(),
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Row(
+                                              children: [
+                                                Text(
+                                                    "Catégorie ajouté avec success"),
+                                              ],
+                                            ),
+                                            duration: Duration(seconds: 3),
+                                          ),
+                                        ),
                                         setState(() {
                                           _categorieList = http
                                               .
@@ -922,19 +934,6 @@ class _CategoriPageState extends State<CategoriPage> {
                                         }),
                                         libelleController.clear(),
                                         descriptionController.clear(),
-                                        Navigator.of(context).pop(),
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Row(
-                                              children: [
-                                                Text(
-                                                    "Catégorie ajouter avec success"),
-                                              ],
-                                            ),
-                                            duration: Duration(seconds: 3),
-                                          ),
-                                        )
                                       });
                             } catch (e) {
                               final String errorMessage = e.toString();
@@ -942,7 +941,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                 const SnackBar(
                                   content: Row(
                                     children: [
-                                      Text("Une erreur s'est produit"),
+                                      Text("Cette categorie existe déjà"),
                                     ],
                                   ),
                                   duration: Duration(seconds: 5),

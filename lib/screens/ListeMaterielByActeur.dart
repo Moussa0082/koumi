@@ -131,7 +131,9 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
                                                   child: SizedBox(
                                                     height: 85,
                                                     child: e.photoMateriel ==
-                                                            null
+                                                            null ||
+                                                            e.photoMateriel!
+                                                                .isEmpty
                                                         ? Image.asset(
                                                             "assets/images/default_image.png",
                                                             fit: BoxFit.cover,

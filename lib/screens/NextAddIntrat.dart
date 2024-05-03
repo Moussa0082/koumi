@@ -443,6 +443,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                           final double quantite = widget.quantite;
                           final CategorieProduit categorieProduit =
                               widget.categorieProduit;
+                          final String unite = widget.unite;
                           final int prix =
                               int.tryParse(_prixController.text) ?? 0;
                           final String date = _dateController.text;
@@ -462,6 +463,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                         photoIntrant: photo,
                                         dateExpiration: date,
                                         forme: forme,
+                                         unite: unite,
                                         categorieProduit: categorieProduit,
                                         acteur: acteur)
                                     .then((value) => {
@@ -522,6 +524,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                         dateExpiration: date,
                                         categorieProduit: categorieProduit,
                                         forme: forme,
+                                         unite: unite,
                                         acteur: acteur)
                                     .then((value) => {
                                           Provider.of<IntrantService>(context,
@@ -582,7 +585,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                   content: Row(
                                     children: [
                                       Text(
-                                        "Une erreur s'est produite",
+                                        "Erreur de connexion !",
                                         style: TextStyle(
                                             overflow: TextOverflow.ellipsis),
                                       ),

@@ -37,7 +37,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
   TextEditingController _quantiteController = TextEditingController();
   TextEditingController _prixController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
-
+  TextEditingController _uniteController = TextEditingController();
   bool _isEditing = false;
   bool _isLoading = false;
   late Acteur acteur = Acteur();
@@ -96,6 +96,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
     _quantiteController.text = intrants.quantiteIntrant.toString();
     _prixController.text = intrants.prixIntrant.toString();
     _dateController.text = intrants.dateExpiration!;
+    _uniteController.text = intrants.unite!;
     isDialOpenNotifier = ValueNotifier<bool>(false);
   }
 
@@ -179,6 +180,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
       final double quantite = double.tryParse(_quantiteController.text) ?? 0.0;
       final int prix = int.tryParse(_prixController.text) ?? 0;
       final String date = _dateController.text;
+      final String unite = _uniteController.text;
 
       if (photo != null) {
         await IntrantService()
@@ -190,6 +192,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                 prixIntrant: prix,
                 dateExpiration: date,
                 photoIntrant: photo,
+                unite: unite,
                 acteur: acteur)
             .then((value) => {
                   Provider.of<IntrantService>(context, listen: false)
@@ -205,6 +208,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         dateExpiration: date,
                         categorieProduit: intrants.categorieProduit,
                         forme: intrants.forme,
+                        unite: unite,
                         acteur: acteur);
                     _isLoading = false;
                   }),
@@ -234,6 +238,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                 descriptionIntrant: description,
                 prixIntrant: prix,
                 dateExpiration: date,
+                unite: unite,
                 acteur: acteur)
             .then((value) => {
                   Provider.of<IntrantService>(context, listen: false)
@@ -249,6 +254,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         dateExpiration: date,
                         categorieProduit: intrants.categorieProduit,
                         forme: intrants.forme,
+                        unite: unite,
                         photoIntrant: intrants.photoIntrant,
                         acteur: acteur);
                     _isLoading = false;
@@ -318,7 +324,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                   style: const TextStyle(
                       color: d_colorGreen, fontWeight: FontWeight.bold),
                 ),
-                actions: acteur.nomActeur == intrants.acteur!.nomActeur
+                actions: acteur.idActeur == intrants.acteur!.idActeur
                     ? [
                         _isEditing
                             ? IconButton(
@@ -410,7 +416,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                                   foregroundColor: Colors.orange,
                                   shape: const StadiumBorder()),
                               child: Text(
-                                "Ajouter",
+                                "Ajouter au panier",
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold),
                               ),
@@ -422,7 +428,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                 ],
               ),
             ),
-            floatingActionButton: acteur.nomActeur != intrants.acteur!.nomActeur
+            floatingActionButton: acteur.idActeur != intrants.acteur!.idActeur
                 ? SpeedDial(
                     // animatedIcon: AnimatedIcons.close_menu,
 
@@ -535,27 +541,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
           ),
         ),
         _buildDescription(intrants.descriptionIntrant!),
-        // acteur.nomActeur != intrants.acteur.nomActeur
-        //     ? Padding(
-        //         padding: const EdgeInsets.symmetric(horizontal: 10),
-        //         child: Container(
-        //           height: 40,
-        //           width: MediaQuery.of(context).size.width,
-        //           decoration: const BoxDecoration(
-        //             color: Colors.orangeAccent,
-        //           ),
-        //           child: Center(
-        //             child: Text(
-        //               'Fournisseur',
-        //               style: const TextStyle(
-        //                   overflow: TextOverflow.ellipsis,
-        //                   fontSize: 20,
-        //                   fontWeight: FontWeight.bold),
-        //             ),
-        //           ),
-        //         ),
-        //       )
-        //     : Container(),
+      
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Container(
@@ -580,9 +566,37 @@ class _DetailIntrantState extends State<DetailIntrant> {
         _buildItem(
             'Filière  ', intrants.categorieProduit!.filiere!.libelleFiliere!),
         _buildItem('Date d\'ajout ', '${intrants.dateAjout}' ?? 'N/A'),
-        acteur.nomActeur != intrants.acteur!.nomActeur
+        acteur.idActeur != intrants.acteur!.idActeur
             ? _buildFournissuer()
             : Container(),
+        // acteur.nomActeur != intrants.acteur.nomActeur
+        //     ?
+        Center(
+          child: SizedBox(
+            width: 200,
+            height: 60,
+            child: ElevatedButton(
+              onPressed: () {
+                // _addToCart(widget.stock);
+                if (acteur.idActeur != intrants.acteur!.idActeur) {
+                  Snack.error(
+                      titre: "Alerte",
+                      message:
+                          "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
+                } else {
+                  
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.orange, shape: const StadiumBorder()),
+              child: Text(
+                "Ajouter au panier",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        )
+        // : Container()
       ],
     );
   }
@@ -649,30 +663,65 @@ class _DetailIntrantState extends State<DetailIntrant> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-                color: Colors.black87,
-                fontWeight: FontWeight.w500,
-                fontStyle: FontStyle.italic,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 18),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w500,
+                  fontStyle: FontStyle.italic,
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 16),
+            ),
           ),
-          Text(
-            value,
-            textAlign: TextAlign.justify,
-            softWrap: true,
-            style: const TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w800,
-              overflow: TextOverflow.ellipsis,
-              fontSize: 16,
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              maxLines: 2,
+              // softWrap: true,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w800,
+                overflow: TextOverflow.ellipsis,
+                fontSize: 16,
+              ),
             ),
           )
         ],
       ),
     );
   }
+  // Widget _buildItem(String title, String value) {
+  //   return Padding(
+  //     padding: const EdgeInsets.all(10.0),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         Text(
+  //           title,
+  //           style: const TextStyle(
+  //               color: Colors.black87,
+  //               fontWeight: FontWeight.w500,
+  //               fontStyle: FontStyle.italic,
+  //               overflow: TextOverflow.ellipsis,
+  //               fontSize: 18),
+  //         ),
+  //         Text(
+  //           value,
+  //           textAlign: TextAlign.justify,
+  //           softWrap: true,
+  //           style: const TextStyle(
+  //             color: Colors.black,
+  //             fontWeight: FontWeight.w800,
+  //             overflow: TextOverflow.ellipsis,
+  //             fontSize: 16,
+  //           ),
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildEditableDetailItem(
       String label, TextEditingController controller) {

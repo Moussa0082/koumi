@@ -11,8 +11,8 @@ import 'package:koumi_app/models/Speculation.dart';
 import 'package:path/path.dart';
 
 class IntrantService extends ChangeNotifier {
-  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/intrant';
-  // static const String baseUrl = 'https://koumi.ml/api-koumi/intrant';
+  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/intrant';
+  static const String baseUrl = 'https://koumi.ml/api-koumi/intrant';
 
   List<Intrant> intrantList = [];
 
@@ -25,6 +25,7 @@ class IntrantService extends ChangeNotifier {
       File? photoIntrant,
       required Acteur acteur,
       required Forme forme,
+      required String unite,
       required CategorieProduit categorieProduit}) async {
     try {
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
@@ -42,6 +43,7 @@ class IntrantService extends ChangeNotifier {
         'dateExpiration': dateExpiration,
         'categorieProduit': categorieProduit.toMap(),
         'descriptionIntrant': descriptionIntrant,
+        'unite' : unite,
         'photoIntrant': "",
         'acteur': acteur.toMap(),
         'forme' : forme.toMap()
@@ -71,6 +73,7 @@ class IntrantService extends ChangeNotifier {
     required int prixIntrant,
     required String dateExpiration,
     File? photoIntrant,
+    required String unite,
     required Acteur acteur,
   }) async {
     try {
@@ -91,6 +94,7 @@ class IntrantService extends ChangeNotifier {
         'dateExpiration': dateExpiration,
         'descriptionIntrant': descriptionIntrant,
         'photoIntrant': "",
+        'unite': unite,
         'acteur': acteur.toMap()
       });
 
