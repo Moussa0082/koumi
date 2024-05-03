@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Magasin.dart';
@@ -399,24 +400,26 @@ class _StoreScreenState extends State<StoreScreen> {
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: Container(
                                     height: 85,
-                                    child: filtereSearch[index].photo == null
+                                    child: filtereSearch[index].photo == null || filtereSearch[index].photo!.isEmpty
                                         ? Image.asset(
                                             "assets/images/default_image.png",
                                             fit: BoxFit.cover,
                                           )
-                                        : Image.network(
-                                            "https://koumi.ml/api-koumi/Magasin/${filtereSearch[index].idMagasin}/image",
-                                            // "http://10.0.2.2/${e.photoIntrant}",
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (BuildContext context,
-                                                Object exception,
-                                                StackTrace? stackTrace) {
-                                              return Image.asset(
-                                                'assets/images/default_image.png',
-                                                fit: BoxFit.cover,
-                                              );
-                                            },
-                                          ),
+                                        : CachedNetworkImage(
+                                                  imageUrl:
+                                                      "https://koumi.ml/api-koumi/Magasin/${filtereSearch[index].idMagasin}/image",
+                                                  fit: BoxFit.cover,
+                                                  placeholder: (context, url) =>
+                                                      const Center(
+                                                          child:
+                                                              CircularProgressIndicator()),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Image.asset(
+                                                    'assets/images/default_image.png',
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
                                   ),
                                 ),
                                 // SizedBox(height: 8),

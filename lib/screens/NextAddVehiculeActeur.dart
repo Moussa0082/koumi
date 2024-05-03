@@ -220,22 +220,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(
-                // height: 150,
-                child: Padding(
-                    padding: const EdgeInsets.only(left: 10.0),
-                    child: photo != null
-                        ? Image.file(
-                            photo!,
-                            fit: BoxFit.fitWidth,
-                            height: 150,
-                            width: 300,
-                          )
-                        : Container()),
-              ),
-              SizedBox(
-                height: 30,
-              ),
+             
               Form(
                   key: formkey,
                   child: Column(
@@ -516,14 +501,29 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                         children: destinationPrixFields,
                       ),
                       SizedBox(
-                        child: IconButton(
-                          onPressed: _showImageSourceDialog,
-                          icon: const Icon(
-                            Icons.add_a_photo_rounded,
-                            size: 60,
-                          ),
-                        ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10.0),
+                        child: photo != null
+                            ? GestureDetector(
+                                onTap: _showImageSourceDialog,
+                                child: Image.file(
+                                  photo!,
+                                  fit: BoxFit.fitWidth,
+                                  height: 150,
+                                  width: 300,
+                                ),
+                              )
+                            : SizedBox(
+                                child: IconButton(
+                                  onPressed: _showImageSourceDialog,
+                                  icon: const Icon(
+                                    Icons.add_a_photo_rounded,
+                                    size: 60,
+                                  ),
+                                ),
+                              ),
                       ),
+                    ),
                       const SizedBox(height: 20),
                       ElevatedButton(
                           onPressed: () async {

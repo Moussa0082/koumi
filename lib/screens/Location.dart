@@ -15,6 +15,8 @@ import 'package:koumi_app/screens/ListeMaterielByActeur.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 
 class Location extends StatefulWidget {
   const Location({super.key});
@@ -335,21 +337,21 @@ class _LocationState extends State<Location> {
                                                       fit: BoxFit.cover,
                                                       height:85 ,
                                                     )
-                                                  : Image.network(
-                                                      "https://koumi.ml/api-koumi/Materiel/${e.idMateriel}/image",
+                                                  : CachedNetworkImage(
+                                                      imageUrl:
+                                                          "https://koumi.ml/api-koumi/Materiel/${e.idMateriel}/image",
                                                       fit: BoxFit.cover,
-                                                      height: 85,
-                                                      errorBuilder:
-                                                          (BuildContext context,
-                                                              Object exception,
-                                                              StackTrace?
-                                                                  stackTrace) {
-                                                        return Image.asset(
-                                                          'assets/images/default_image.png',
-                                                          fit: BoxFit.cover,
-                                                          height: 85,
-                                                        );
-                                                      },
+                                                      placeholder: (context,
+                                                              url) =>
+                                                          const Center(
+                                                              child:
+                                                                  CircularProgressIndicator()),
+                                                      errorWidget: (context,
+                                                              url, error) =>
+                                                          Image.asset(
+                                                        'assets/images/default_image.png',
+                                                        fit: BoxFit.cover,
+                                                      ),
                                                     ),
                                             ),
                                           ),

@@ -12,6 +12,8 @@ import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/service/StockService.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -478,24 +480,25 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                             BorderRadius.circular(8.0),
                                         child: Container(
                                           height: 90,
-                                          child: filtereSearch[index].photo == null  
+                                          child: filtereSearch[index].photo == null || filtereSearch[index].photo!.isEmpty  
                                               ? Image.asset(
                                                   "assets/images/default_image.png",
                                                   fit: BoxFit.cover,
                                                 )
-                                              : Image.network(
-                                                  "https://koumi.ml/api-koumi/Stock/${filtereSearch[index].idStock}/image",
-                                                  // "http://10.0.2.2/${e.photoIntrant}",
+                                              : CachedNetworkImage(
+                                                  imageUrl:
+                                                      "https://koumi.ml/api-koumi/Stock/${filtereSearch[index].idStock}/image",
                                                   fit: BoxFit.cover,
-                                                  errorBuilder: (BuildContext
-                                                          context,
-                                                      Object exception,
-                                                      StackTrace? stackTrace) {
-                                                    return Image.asset(
-                                                      'assets/images/default_image.png',
-                                                      fit: BoxFit.cover,
-                                                    );
-                                                  },
+                                                  placeholder: (context, url) =>
+                                                      const Center(
+                                                          child:
+                                                              CircularProgressIndicator()),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Image.asset(
+                                                    'assets/images/default_image.png',
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
                                         ),
                                       ),

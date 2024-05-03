@@ -193,8 +193,8 @@ class _CommandeScreenState extends State<CommandeScreen> {
                     String searchText = "";
                     List<Commande> filtereSearch =
                         commandeList.where((search) {
-                      String date = search.dateAjout!.toLowerCase();
-                      searchText = _searchController.text.toLowerCase();
+                      String date = search.dateAjout!;
+                      searchText = _searchController.text;
                       return date.contains(searchText);
                     }).toList();
                     return 
@@ -255,7 +255,7 @@ class _CommandeScreenState extends State<CommandeScreen> {
                                       child: Column(
                                         children: [
                                           ListTile(
-                                            leading: Image.asset(""),
+                                            leading: Image.asset("assets/image/default_image.png"),
                                             title: Text(e.codeCommande!.toUpperCase(),
                                                 style: const TextStyle(
                                                   color: Colors.black,

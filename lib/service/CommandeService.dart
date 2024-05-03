@@ -9,8 +9,8 @@ import 'package:koumi_app/models/Stock.dart';
 
  class CommandeService extends ChangeNotifier{
 
-    // final String baseUrl = 'https://koumi.ml/api-koumi/commande/'; // Replace with your API URL
-    final String baseUrl = 'http://10.0.2.2:9000/api-koumi/commande/'; // Replace with your API URL
+    final String baseUrl = 'https://koumi.ml/api-koumi/commande/'; // Replace with your API URL
+    // final String baseUrl = 'http://10.0.2.2:9000/api-koumi/commande'; // Replace with your API URL
         List<Commande> commande = [];
 
 
@@ -32,7 +32,7 @@ import 'package:koumi_app/models/Stock.dart';
     } catch (e) {
       print('Error catch fetching commande for acteur $idActeur: $e');
     }
-        return commande;
+        return commande = [];
         
   }
   
@@ -44,7 +44,7 @@ import 'package:koumi_app/models/Stock.dart';
 
                List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
         commande = body
-        .where((commande) => commande['statutCommande'] == true)
+        // .where((commande) => commande['statutCommande'] == true)
         .map((e) => Commande.fromMap(e)).toList();
       } else {
         debugPrint("erreur lors de la recuperation des  commande pour l'\ acteur proprietaire $acteurProprietaire");
@@ -52,7 +52,7 @@ import 'package:koumi_app/models/Stock.dart';
     } catch (e) {
       print('Error catch fetching commande for acteur proprietaire $acteurProprietaire: $e');
     }
-        return commande;
+        return commande = [];
         
   }
 
@@ -73,10 +73,13 @@ import 'package:koumi_app/models/Stock.dart';
     } catch (e) {
       print('Error fetching all commandes : $e');
     }
-        return commande;
+        return commande = [];
         
   }
 
+ void applyChange() {
+    notifyListeners();
+  }
 
 //    Future<void> ajouterStocksACommandes() async {
 //     try {
