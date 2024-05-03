@@ -192,7 +192,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                         borderRadius:
                                             BorderRadius.circular(8.0),
                                         child: SizedBox(
-                                          height: 90,
+                                          height: 85,
                                           child: e.photoIntrant == null ||
                                                   e.photoIntrant!.isEmpty 
                                               ? Image.asset(
@@ -220,7 +220,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                         title: Text(
                                           e.nomIntrant!,
                                           style: TextStyle(
-                                            fontSize: 17,
+                                            fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.black87,
                                           ),
@@ -230,7 +230,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                         subtitle: Text(
                                           "${e.prixIntrant.toString()} ${para.monnaie}",
                                           style: TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 15,
                                             color: Colors.black87,
                                           ),
                                         ),

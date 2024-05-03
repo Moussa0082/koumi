@@ -327,18 +327,18 @@ class _LocationState extends State<Location> {
                                             borderRadius:
                                                 BorderRadius.circular(8.0),
                                             child: SizedBox(
-                                              height: 100,
+                                              height: 85,
                                               child: e.photoMateriel == null ||
                                                       e.photoMateriel!.isEmpty
                                                   ? Image.asset(
                                                       "assets/images/default_image.png",
                                                       fit: BoxFit.cover,
-                                                      height: 90,
+                                                      height:85 ,
                                                     )
                                                   : Image.network(
                                                       "https://koumi.ml/api-koumi/Materiel/${e.idMateriel}/image",
                                                       fit: BoxFit.cover,
-                                                      height: 90,
+                                                      height: 85,
                                                       errorBuilder:
                                                           (BuildContext context,
                                                               Object exception,
@@ -347,7 +347,7 @@ class _LocationState extends State<Location> {
                                                         return Image.asset(
                                                           'assets/images/default_image.png',
                                                           fit: BoxFit.cover,
-                                                          height: 90,
+                                                          height: 85,
                                                         );
                                                       },
                                                     ),
@@ -358,7 +358,7 @@ class _LocationState extends State<Location> {
                                             title: Text(
                                               e.nom,
                                               style: TextStyle(
-                                                fontSize: 18,
+                                                fontSize: 17,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.black87,
                                               ),
@@ -368,7 +368,7 @@ class _LocationState extends State<Location> {
                                             subtitle: Text(
                                               e.localisation,
                                               style: TextStyle(
-                                                fontSize: 16,
+                                                fontSize: 15,
                                                 color: Colors.black87,
                                               ),
                                             ),
@@ -380,7 +380,7 @@ class _LocationState extends State<Location> {
                                                "${e.prixParHeure.toString()} ${para.monnaie}"
                                                   ,
                                               style: TextStyle(
-                                                fontSize: 16,
+                                                fontSize: 15,
                                                 color: Colors.black87,
                                               ),
                                             ),

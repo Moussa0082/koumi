@@ -398,7 +398,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: Container(
-                                    height: 90,
+                                    height: 85,
                                     child: filtereSearch[index].photo == null
                                         ? Image.asset(
                                             "assets/images/default_image.png",

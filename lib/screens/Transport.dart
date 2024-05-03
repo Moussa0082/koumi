@@ -382,7 +382,7 @@ class _TransportState extends State<Transport> {
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: SizedBox(
-                                    height: 90,
+                                    height: 85,
                                     child: e.photoVehicule == null ||  e.photoVehicule!.isEmpty
                                         ? Image.asset(
                                             "assets/images/default_image.png",
@@ -408,7 +408,7 @@ class _TransportState extends State<Transport> {
                                   title: Text(
                                     e.nomVehicule,
                                     style: TextStyle(
-                                      fontSize: 17,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black87,
                                     ),
@@ -418,7 +418,7 @@ class _TransportState extends State<Transport> {
                                   subtitle: Text(
                                    "${ e.nbKilometrage.toString()} Km",
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 15,
                                       color: Colors.black87,
                                     ),
                                   ),
@@ -429,7 +429,7 @@ Padding(
                                   child: Text(
                                     e.localisation,
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 15,
                                       color: Colors.black87,
                                     ),
                                   ),
