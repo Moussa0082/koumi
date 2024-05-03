@@ -621,21 +621,29 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                         height: 10,
                       ),
                       SizedBox(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10.0),
                         child: photo != null
-                            ? Image.file(
-                                photo!,
-                                fit: BoxFit.fitWidth,
-                                height: 100,
-                                width: 150,
+                            ? GestureDetector(
+                                onTap: _showImageSourceDialog,
+                                child: Image.file(
+                                  photo!,
+                                  fit: BoxFit.fitWidth,
+                                  height: 150,
+                                  width: 300,
+                                ),
                               )
-                            : IconButton(
-                                onPressed: _showImageSourceDialog,
-                                icon: const Icon(
-                                  Icons.add_a_photo_rounded,
-                                  size: 60,
+                            : SizedBox(
+                                child: IconButton(
+                                  onPressed: _showImageSourceDialog,
+                                  icon: const Icon(
+                                    Icons.add_a_photo_rounded,
+                                    size: 60,
+                                  ),
                                 ),
                               ),
                       ),
+                    ),
                       const SizedBox(height: 20),
                       ElevatedButton(
                           onPressed: () async {

@@ -11,6 +11,8 @@ import 'package:koumi_app/screens/AddMagasinScreen.dart';
 import 'package:koumi_app/screens/MyProduct.dart';
 import 'package:koumi_app/service/MagasinService.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 
 class MyStoresScreen extends StatefulWidget {
   const MyStoresScreen({super.key});
@@ -429,19 +431,21 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                             "assets/images/default_image.png",
                                             fit: BoxFit.cover,
                                           )
-                                        : Image.network(
-                                            "https://koumi.ml/api-koumi/Magasin/${filtereSearch[index].idMagasin}/image",
-                                            // "http://10.0.2.2/${e.photoIntrant}",
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (BuildContext context,
-                                                Object exception,
-                                                StackTrace? stackTrace) {
-                                              return Image.asset(
-                                                'assets/images/default_image.png',
-                                                fit: BoxFit.cover,
-                                              );
-                                            },
-                                          ),
+                                        : CachedNetworkImage(
+                                                  imageUrl:
+                                                      "https://koumi.ml/api-koumi/Magasin/${filtereSearch[index].idMagasin}/image",
+                                                  fit: BoxFit.cover,
+                                                  placeholder: (context, url) =>
+                                                      const Center(
+                                                          child:
+                                                              CircularProgressIndicator()),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Image.asset(
+                                                    'assets/images/default_image.png',
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
                                   ),
                                 ),
                                 // SizedBox(height: 8),

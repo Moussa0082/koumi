@@ -15,6 +15,8 @@ import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 
 class DetailProduits extends StatefulWidget {
   late Stock? stock;
@@ -146,18 +148,17 @@ class _DetailProduitsState extends State<DetailProduits>
                       width: double.infinity,
                       height: 200,
                     )
-                  : Image.network(
-                      'https://koumi.ml/api-koumi/Stock/${widget.stock!.idStock}/image',
+                  : CachedNetworkImage(
+                      imageUrl:
+                          'https://koumi.ml/api-koumi/Stock/${widget.stock!.idStock}/image',
                       width: double.infinity,
                       height: 200,
-                      fit: BoxFit.cover,
-                      errorBuilder: (BuildContext context, Object exception,
-                          StackTrace? stackTrace) {
-                        return Image.asset(
-                          'assets/images/default_image.png',
-                          fit: BoxFit.cover,
-                        );
-                      },
+                      placeholder: (context, url) =>
+                          const Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) => Image.asset(
+                        'assets/images/default_image.png',
+                        fit: BoxFit.cover,
+                      ),
                     ),
               const SizedBox(height: defaultPadding * 0.300),
               Container(
@@ -393,7 +394,7 @@ class _DetailProduitsState extends State<DetailProduits>
                                         foregroundColor: Colors.orange,
                                         shape: const StadiumBorder()),
                                     child: Text(
-                                      "Ajouter",
+                                      "Ajouter au panier",
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold),

@@ -44,7 +44,7 @@ class _CartListItemState extends State<CartListItem> {
   child: widget.cartItem.stock!.photo != null
       ?  CachedNetworkImage(
           imageUrl: 
-           widget.cartItem.stock!.photo!,
+          "https://koumi.ml/api-koumi/Stock/${widget.cartItem.stock!.idStock!}/image" ,
           fit: BoxFit.cover,
           width: 67,
           height: 100,
@@ -61,7 +61,7 @@ class _CartListItemState extends State<CartListItem> {
   child: widget.cartItem.intrant!.photoIntrant != null
       ?  CachedNetworkImage(
           imageUrl: 
-           widget.cartItem.intrant!.photoIntrant!,
+          "https://koumi.ml/api-koumi/intrant/${widget.cartItem.intrant!.idIntrant}/image"  ,
           fit: BoxFit.cover,
           width: 67,
           height: 100,

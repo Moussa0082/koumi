@@ -14,6 +14,8 @@ import 'package:koumi_app/screens/DetailIntrant.dart';
 import 'package:koumi_app/screens/ListeIntrantByActeur.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class IntrantScreen extends StatefulWidget {
@@ -362,19 +364,20 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                                   "assets/images/default_image.png",
                                                   fit: BoxFit.cover,
                                                 )
-                                              : Image.network(
-                                                  "https://koumi.ml/api-koumi/intrant/${e.idIntrant}/image",
-                                                  // "http://10.0.2.2/${e.photoIntrant}",
+                                              : CachedNetworkImage(
+                                                  imageUrl:
+                                                      "https://koumi.ml/api-koumi/intrant/${e.idIntrant}/image",
                                                   fit: BoxFit.cover,
-                                                  errorBuilder: (BuildContext
-                                                          context,
-                                                      Object exception,
-                                                      StackTrace? stackTrace) {
-                                                    return Image.asset(
-                                                      'assets/images/default_image.png',
-                                                      fit: BoxFit.cover,
-                                                    );
-                                                  },
+                                                  placeholder: (context, url) =>
+                                                      const Center(
+                                                          child:
+                                                              CircularProgressIndicator()),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Image.asset(
+                                                    'assets/images/default_image.png',
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
                                         ),
                                       ),

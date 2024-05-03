@@ -7,6 +7,8 @@ import 'package:koumi_app/screens/AddVehicule.dart';
 import 'package:koumi_app/screens/DetailTransport.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 
 class VehiculeActeur extends StatefulWidget {
   const VehiculeActeur({super.key});
@@ -209,18 +211,20 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                             "assets/images/default_image.png",
                                             fit: BoxFit.cover,
                                           )
-                                        : Image.network(
-                                            "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
-                                            // "http://10.0.2.2/${e.photoIntrant}",
+                                        : CachedNetworkImage(
+                                            imageUrl:
+                                                "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
                                             fit: BoxFit.cover,
-                                            errorBuilder: (BuildContext context,
-                                                Object exception,
-                                                StackTrace? stackTrace) {
-                                              return Image.asset(
-                                                'assets/images/default_image.png',
-                                                fit: BoxFit.cover,
-                                              );
-                                            },
+                                            placeholder: (context, url) =>
+                                                const Center(
+                                                    child:
+                                                        CircularProgressIndicator()),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    Image.asset(
+                                              'assets/images/default_image.png',
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
                                   ),
                                 ),

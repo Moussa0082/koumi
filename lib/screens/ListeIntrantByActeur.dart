@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Intrant.dart';
@@ -194,24 +195,25 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                         child: SizedBox(
                                           height: 85,
                                           child: e.photoIntrant == null ||
-                                                  e.photoIntrant!.isEmpty 
+                                                  e.photoIntrant!.isEmpty
                                               ? Image.asset(
                                                   "assets/images/default_image.png",
                                                   fit: BoxFit.cover,
                                                 )
-                                              : Image.network(
-                                                  "https://koumi.ml/api-koumi/intrant/${e.idIntrant}/image",
-                                                  // "http://10.0.2.2/${e.photoIntrant}",
+                                              : CachedNetworkImage(
+                                                  imageUrl:
+                                                      "https://koumi.ml/api-koumi/intrant/${e.idIntrant}/image",
                                                   fit: BoxFit.cover,
-                                                  errorBuilder: (BuildContext
-                                                          context,
-                                                      Object exception,
-                                                      StackTrace? stackTrace) {
-                                                    return Image.asset(
-                                                      'assets/images/default_image.png',
-                                                      fit: BoxFit.cover,
-                                                    );
-                                                  },
+                                                  placeholder: (context, url) =>
+                                                      const Center(
+                                                          child:
+                                                              CircularProgressIndicator()),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Image.asset(
+                                                    'assets/images/default_image.png',
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
                                         ),
                                       ),

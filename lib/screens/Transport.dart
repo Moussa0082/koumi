@@ -13,6 +13,8 @@ import 'package:koumi_app/screens/PageTransporteur.dart';
 import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Transport extends StatefulWidget {
@@ -388,19 +390,18 @@ class _TransportState extends State<Transport> {
                                             "assets/images/default_image.png",
                                             fit: BoxFit.cover,
                                           )
-                                        : Image.network(
-                                            "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
-                                            // "http://10.0.2.2/${e.photoIntrant}",
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (BuildContext context,
-                                                Object exception,
-                                                StackTrace? stackTrace) {
-                                              return Image.asset(
-                                                'assets/images/default_image.png',
-                                                fit: BoxFit.cover,
-                                              );
-                                            },
-                                          ),
+                                        : CachedNetworkImage(
+          imageUrl: 
+          "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
+           fit: BoxFit.cover,
+         
+          placeholder: (context, url) =>
+              const Center(child: CircularProgressIndicator()),
+          errorWidget: (context, url, error) => Image.asset(
+                                                      'assets/images/default_image.png',
+                                                      fit: BoxFit.cover,
+                                                    ),
+        ),
                                   ),
                                 ),
                                 // SizedBox(height: 8),

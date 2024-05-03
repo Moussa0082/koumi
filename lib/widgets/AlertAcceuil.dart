@@ -3,6 +3,8 @@ import 'package:koumi_app/Admin/DetailAlerte.dart';
 import 'package:koumi_app/models/Alertes.dart';
 import 'package:koumi_app/service/AlerteService.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 
 class AlertAcceuil extends StatefulWidget {
   const AlertAcceuil({super.key});
@@ -182,14 +184,25 @@ class _AlertAcceuilState extends State<AlertAcceuil> {
                             child: ListTile(
                               leading: alerte.photoAlerte != null &&
                                       !alerte.photoAlerte!.isEmpty
-                                  ? CircleAvatar(
-  radius: 40,
-  backgroundColor: Colors.transparent,
-  backgroundImage: NetworkImage(
-    'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/image',
-  ),
- 
-)
+                                  ? CachedNetworkImage(
+                                      imageUrl:
+                                          'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/image',
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) =>
+                                          const Center(
+                                              child:
+                                                  CircularProgressIndicator()),
+                                      errorWidget: (context, url, error) =>
+                                          CircleAvatar(
+                                              radius: 40,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              backgroundImage:
+                                               AssetImage(
+                                                "assets/images/alt.png",
+                                              )
+                                              ),
+                                    )
 
                                   : CircleAvatar(
   radius: 40,

@@ -23,7 +23,7 @@ import 'package:koumi_app/models/Stock.dart';
 
                List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
         commande = body
-        .where((commande) => commande['statutCommande'] == true)
+        // .where((commande) => commande['statutCommande'] == true)
         .map((e) => Commande.fromMap(e)).toList();
       } else {
         debugPrint("erreur lors de la recuperation des  commande pour l'\ acteur $idActeur");
@@ -31,7 +31,7 @@ import 'package:koumi_app/models/Stock.dart';
     } catch (e) {
       print('Error catch fetching commande for acteur $idActeur: $e');
     }
-        return commande;
+        return commande = [];
         
   }
   
@@ -51,7 +51,7 @@ import 'package:koumi_app/models/Stock.dart';
     } catch (e) {
       print('Error catch fetching commande for acteur proprietaire $acteurProprietaire: $e');
     }
-        return commande;
+        return commande = [];
         
   }
 
@@ -72,7 +72,7 @@ import 'package:koumi_app/models/Stock.dart';
     } catch (e) {
       print('Error fetching all commandes : $e');
     }
-        return commande;
+        return commande = [];
         
   }
 

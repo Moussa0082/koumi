@@ -391,40 +391,42 @@ class _DetailIntrantState extends State<DetailIntrant> {
                   SizedBox(height: 30),
                   !_isEditing ? viewData() : _buildEditing(),
                   SizedBox(height: 10),
-                   isExist == true ? 
-                  widget.intrant.acteur!.idActeur == acteur.idActeur
-                      ? SizedBox()
-                      : Center(
-                          child: SizedBox(
-                            width: 200,
-                            height: 48,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                // _addToCart(widget.stock);
-                                if (widget.intrant.acteur!.idActeur ==
-                                    acteur.idActeur) {
-                                  Snack.error(
-                                      titre: "Alerte",
-                                      message:
-                                          "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
-                                } else {
-                                  Provider.of<CartProvider>(context, listen: false)
-                        .addToCartInt(widget.intrant, 1, "");
-                               }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                  foregroundColor: Colors.orange,
-                                  shape: const StadiumBorder()),
-                              child: Text(
-                                "Ajouter au panier",
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
+                  isExist == true
+                      ? widget.intrant.acteur!.idActeur == acteur.idActeur
+                          ? SizedBox()
+                          : Center(
+                              child: SizedBox(
+                                width: 200,
+                                height: 48,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    // _addToCart(widget.stock);
+                                    if (widget.intrant.acteur!.idActeur ==
+                                        acteur.idActeur) {
+                                      Snack.error(
+                                          titre: "Alerte",
+                                          message:
+                                              "Désolé!, Vous ne pouvez pas commander un intrant qui vous appartient");
+                                    } else {
+                                      Provider.of<CartProvider>(context,
+                                              listen: false)
+                                          .addToCartInt(widget.intrant, 1, "");
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.orange,
+                                      shape: const StadiumBorder()),
+                                  child: Text(
+                                    "Ajouter au panier",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ) : SizedBox(),
-                        const SizedBox(height:10),
-
+                            )
+                      : SizedBox(),
+                  const SizedBox(height: 10),
                 ],
               ),
             ),
@@ -541,7 +543,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
           ),
         ),
         _buildDescription(intrants.descriptionIntrant!),
-      
+
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Container(
@@ -569,32 +571,45 @@ class _DetailIntrantState extends State<DetailIntrant> {
         acteur.idActeur != intrants.acteur!.idActeur
             ? _buildFournissuer()
             : Container(),
-        // acteur.nomActeur != intrants.acteur.nomActeur
-        //     ?
-        Center(
-          child: SizedBox(
-            width: 200,
-            height: 60,
-            child: ElevatedButton(
-              onPressed: () {
-                // _addToCart(widget.stock);
-                if (acteur.idActeur != intrants.acteur!.idActeur) {
-                  Snack.error(
-                      titre: "Alerte",
-                      message:
-                          "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
-                } else {}
-              },
-              style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.orange, shape: const StadiumBorder()),
-              child: Text(
-                "Ajouter au panier",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        )
-        // : Container()
+        // isExist == true
+        //     ? widget.intrant.acteur!.idActeur == acteur.idActeur
+        //         ? SizedBox()
+        //         : Center(
+        //             child: acteur.idActeur != intrants.acteur!.idActeur!
+        //                 ? Center(
+        //                     child: SizedBox(
+        //                       width: 200,
+        //                       height: 60,
+        //                       child: ElevatedButton(
+        //                         onPressed: () {
+        //                           // _addToCart(widget.stock);
+        //                           if (acteur.idActeur ==
+        //                               intrants.acteur!.idActeur) {
+        //                             Snack.error(
+        //                                 titre: "Alerte",
+        //                                 message:
+        //                                     "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
+        //                           } else {
+        //                             Provider.of<CartProvider>(context,
+        //                                     listen: false)
+        //                                 .addToCartInt(widget.intrant, 1, "");
+        //                           }
+        //                         },
+        //                         style: ElevatedButton.styleFrom(
+        //                             foregroundColor: Colors.orange,
+        //                             shape: const StadiumBorder()),
+        //                         child: Text(
+        //                           "Ajouter au panier",
+        //                           style: TextStyle(
+        //                               fontSize: 16,
+        //                               fontWeight: FontWeight.bold),
+        //                         ),
+        //                       ),
+        //                     ),
+        //                   )
+        //                 : Container(),
+        //           )
+        //     : Container(),
       ],
     );
   }
