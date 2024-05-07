@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ActeurProvider with ChangeNotifier {
   Acteur? _acteur;
   Acteur? get acteur => _acteur;
+  bool isLogged = true;
 
    
   
@@ -47,13 +48,34 @@ class ActeurProvider with ChangeNotifier {
     notifyListeners();
   }
 
+
+   
+  String? email = "";
+
+    void verify() async {
+     SharedPreferences 
+    prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+   
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      
+        isLogged = true;
+    } else {
+        isLogged = false;
+    }
+  }
+
   Future<void> logout() async {
     // Supprimer les données utilisateur
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? emailActeur = prefs.getString('emailActeur');
     String? codeActeur = prefs.getString('codeActeur');
+    
     _acteur = null;
 
+// Vérifier si le codeActeur est présent dans SharedPreferences
+  await prefs.clear();
  if (emailActeur == null || emailActeur.isEmpty) {
   // Nettoyer toutes les données de SharedPreferences
   // await prefs.clear();
@@ -63,8 +85,6 @@ class ActeurProvider with ChangeNotifier {
 
   }
 
-// Vérifier si le codeActeur est présent dans SharedPreferences
-  await prefs.clear();
 
   // Réenregistrer le codeActeur dans SharedPreferences
   if(codeActeur != null){
@@ -72,37 +92,9 @@ class ActeurProvider with ChangeNotifier {
    String savedCodeActeur = codeActeur;
   prefs.setString('codeActeur', savedCodeActeur);
   }
-// if (codeActeur.isEmpty) {
-//   // Gérer le cas où le codeActeur est manquant
-//   // Sauvegarder le codeActeur avant de nettoyer les SharedPreferences
-//   // String savedCodeActeur = "VF212";
-
-//   // Nettoyer toutes les données de SharedPreferences
-//   await prefs.clear();
-
-//   // Réenregistrer le codeActeur dans SharedPreferences
-//   prefs.setString('codeActeur', savedCodeActeur);
-// } else {
-//   // // Sauvegarder le codeActeur avant de nettoyer les SharedPreferences
-//   // String savedCodeActeur = "VF212";
-//   //   String savedCodeActeur = codeActeur;
-
-//   // // Nettoyer toutes les données de SharedPreferences
-//   // await prefs.clear();
-
-//   // // Réenregistrer le codeActeur dans SharedPreferences
-//   // prefs.setString('codeActeur', savedCodeActeur);
-
-//   // // // Nettoyer toutes les données de SharedPreferences
-//   // await prefs.clear();
-
-//   // // // Réenregistrer le codeActeur dans SharedPreferences
-//   // prefs.setString('codeActeur', savedCodeActeur);
-// }
-
+  // isLogged = false;
+    verify();
     notifyListeners();
-    // Rediriger vers la page de connexion
-
   
 }
 

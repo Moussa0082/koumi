@@ -214,7 +214,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
     if(widget.isEditable! == true){
      _typeController.text = widget.stock!.typeProduit!;
      _descriptionController.text = widget.stock!.descriptionStock!;
-          debugPrint("id : $id, type : ${widget.stock!.typeProduit!}, desc : ${widget.stock!.descriptionStock!}  acteur : $acteur");
+          debugPrint("id : $id, type : ${widget.stock!.typeProduit!}, desc : ${widget.stock!.descriptionStock!}  acteur : $acteur , forme : ${widget.forme}");
     }
   }
 

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -361,20 +362,38 @@ class _DetailIntrantState extends State<DetailIntrant> {
                       : Center(
                           child: intrants.photoIntrant != null &&
                                   !intrants.photoIntrant!.isEmpty
-                              ? Image.network(
-                                  "https://koumi.ml/api-koumi/intrant/${intrants.idIntrant}/image",
-                                  width: double.infinity,
-                                  height: 200,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (BuildContext context,
-                                      Object exception,
-                                      StackTrace? stackTrace) {
-                                    return Image.asset(
-                                      'assets/images/default_image.png',
-                                      fit: BoxFit.cover,
-                                    );
-                                  },
-                                )
+                              ?
+                              //  Image.network(
+                              //     "https://koumi.ml/api-koumi/intrant/${intrants.idIntrant}/image",
+                              //     width: double.infinity,
+                              //     height: 200,
+                              //     fit: BoxFit.cover,
+                              //     errorBuilder: (BuildContext context,
+                              //         Object exception,
+                              //         StackTrace? stackTrace) {
+                              //       return Image.asset(
+                              //         'assets/images/default_image.png',
+                              //         fit: BoxFit.cover,
+                              //       );
+                              //     },
+                              //   )
+
+       CachedNetworkImage(
+                                                  imageUrl:
+                                                  "https://koumi.ml/api-koumi/intrant/${intrants.idIntrant}/image",
+                                                  fit: BoxFit.cover,
+                                                  placeholder: (context, url) =>
+                                                      const Center(
+                                                          child:
+                                                              CircularProgressIndicator()),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Image.asset(
+                                                    'assets/images/default_image.png',
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                )
+
                               // ? Image.network(
                               //     "http://10.0.2.2/${intrants.photoIntrant!}",
                               //     width: double.infinity,

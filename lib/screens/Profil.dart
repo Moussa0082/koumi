@@ -29,7 +29,7 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 const d_colorPage = Color.fromRGBO(255, 255, 255, 1);
 
 class _ProfilState extends State<Profil> {
-  late Acteur acteur = Acteur();
+  late Acteur acteur= Acteur();
   late List<TypeActeur> typeActeurData = [];
   String type = '';
   late List<ZoneProduction> zoneList = [];
@@ -39,10 +39,13 @@ class _ProfilState extends State<Profil> {
   String? email = "";
 
   void verify() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+     SharedPreferences 
+    prefs = await SharedPreferences.getInstance();
     email = prefs.getString('emailActeur');
+   
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
       typeActeurData = acteur.typeActeur!;
       type = typeActeurData.map((data) => data.libelle).join(', ');
@@ -59,6 +62,7 @@ class _ProfilState extends State<Profil> {
   @override
   void initState() {
     verify();
+   
 
     super.initState();
   }
@@ -555,23 +559,23 @@ class _ProfilState extends State<Profil> {
                           EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                       child: ElevatedButton.icon(
                           onPressed: () async {
-                            final acteurProvider = Provider.of<ActeurProvider>(
-                                context,
-                                listen: false);
+                        final acteurProvider =
+                          Provider.of<ActeurProvider>(context, listen: false);
 
-                            // Déconnexion avec le provider
-                            await acteurProvider.logout();
+                      // Déconnexion avec le provider
+                      await acteurProvider.logout();
+    
 
-                            //                   Navigator.pushReplacement(
-                            // context,
-                            // MaterialPageRoute(builder: (context) => LoginScreen()),
-                            //                        );
-                            Get.off(BottomNavigationPage(),
-                                duration: Duration(
-                                    seconds:
-                                        1), //duration of transitions, default 1 sec
-                                transition: Transition.leftToRight);
-                          },
+                      Get.off(BottomNavigationPage(),
+                          duration: Duration(
+                              seconds:
+                                  1), //duration of transitions, default 1 sec
+                          transition: Transition.leftToRight);
+                      Provider.of<BottomNavigationService>(context,
+                              listen: false)
+                          .changeIndex(0);
+
+                    },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             elevation: 10, // Orange color code

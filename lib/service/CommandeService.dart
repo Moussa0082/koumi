@@ -9,32 +9,35 @@ import 'package:koumi_app/models/Stock.dart';
 
  class CommandeService extends ChangeNotifier{
 
-    final String baseUrl = 'https://koumi.ml/api-koumi/commande/'; // Replace with your API URL
+
+
+      final String baseUrl = 'https://koumi.ml/api-koumi/commande'; // Replace with your API URL
     // final String baseUrl = 'http://10.0.2.2:9000/api-koumi/commande'; // Replace with your API URL
-        List<Commande> commande = [];
+            List<Commande> commandeList = [];
 
 
-
-  Future<List<Commande>> fetchCommandeByActeur(String idActeur) async {
+   Future<List<Commande>> fetchCommandeByActeur(String idActeur) async {
     try {
-      final response = await http.get(Uri.parse(
-          '$baseUrl/getAllCommandeByActeur/${idActeur}'));
-      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
-
-               List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-        commande = body
-        // .where((commande) => commande['statutCommande'] == true)
-        .map((e) => Commande.fromMap(e)).toList();
-        debugPrint("res:  ${response.body}");
-      } else {
-        debugPrint("erreur lors de la recuperation des  commande pour l'\ acteur $idActeur");
-      }
-    } catch (e) {
-      print('Error catch fetching commande for acteur $idActeur: $e');
+    final response = await http.get(Uri.parse('$baseUrl/getAllCommandeByActeur/${idActeur}'));
+    if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+       commandeList = body
+          .map((e) => Commande.fromMap(e))
+          .toList();
+      debugPrint("res:  ${response.body}");
+      return commandeList; // Renvoyer la liste de commandes
+    } else {
+      debugPrint("erreur lors de la recuperation des  commande pour l'\ acteur $idActeur");
+      // Si la réponse n'est pas un statut 200, renvoyer une liste vide
+      return  commandeList = [];
     }
-        return commande = [];
-        
+  } catch (e) {
+    print('Error catch fetching commande for acteur $idActeur: $e');
+    // En cas d'erreur, renvoyer une liste vide
+    return commandeList = [];
   }
+}
+
   
   Future<List<Commande>> fetchCommandeByActeurProprietaire(String acteurProprietaire) async {
     try {
@@ -43,16 +46,18 @@ import 'package:koumi_app/models/Stock.dart';
       if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
 
                List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-        commande = body
+        commandeList = body
         // .where((commande) => commande['statutCommande'] == true)
         .map((e) => Commande.fromMap(e)).toList();
+        return commandeList;
       } else {
         debugPrint("erreur lors de la recuperation des  commande pour l'\ acteur proprietaire $acteurProprietaire");
+       return commandeList = [];
       }
     } catch (e) {
       print('Error catch fetching commande for acteur proprietaire $acteurProprietaire: $e');
     }
-        return commande = [];
+        return commandeList = [];
         
   }
 
@@ -65,20 +70,47 @@ import 'package:koumi_app/models/Stock.dart';
       if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
 
                List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-        commande = body
+        commandeList = body
         .map((e) => Commande.fromMap(e)).toList();
+        return commandeList;
       } else {
         debugPrint("erreur lors de la recuperation des  commandes");
+         return commandeList = [];
       }
     } catch (e) {
       print('Error fetching all commandes : $e');
     }
-        return commande = [];
+        return commandeList = [];
         
   }
 
  void applyChange() {
     notifyListeners();
+  }
+
+
+   Future enableCommande(String id) async {
+    final response = await http.put(Uri.parse('$baseUrl/$id/enable'));
+
+    if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+      applyChange();
+    } else {
+      // Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
+      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      // throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+    }
+  }
+
+  Future disableCommane(String id) async {
+    final response = await http.put(Uri.parse('$baseUrl/$id/disable'));
+
+    if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+      applyChange();
+    } else {
+      // Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
+      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      // throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+    }
   }
 
 //    Future<void> ajouterStocksACommandes() async {

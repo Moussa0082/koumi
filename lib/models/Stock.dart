@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Commande.dart';
+import 'package:koumi_app/models/Forme.dart';
 import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/Unite.dart';
@@ -31,7 +32,6 @@ class Stock {
    Unite? unite;
    Magasin? magasin;
    Acteur? acteur;
-   List<Commande>? commande;
 
   Stock({
     this.idStock,
@@ -54,7 +54,6 @@ class Stock {
      this.unite,
      this.magasin,
      this.acteur,
-    this.commande,
   });
 
   
@@ -83,23 +82,22 @@ class Stock {
       'unite': unite?.toMap(),
       'magasin': magasin?.toMap(),
       'acteur': acteur?.toMap(),
-      'commande': commande?.map((x) => x?.toMap()).toList(),
     };
   }
 
   factory Stock.fromMap(Map<String, dynamic> map) {
   return Stock(
-    idStock: map['idStock'] as String?,
-    codeStock: map['codeStock'] as String?,
+    idStock: map['idStock'] as String,
+    codeStock: map['codeStock'] as String,
     nomProduit: map['nomProduit'] as String,
-    formeProduit: map['formeProduit'] as String?,
-    origineProduit: map['origineProduit'] as String?,
-    dateProduction: map['dateProduction'] as String?,
-    quantiteStock: (map['quantiteStock'] as num?)?.toDouble() ?? 0.0,
-    prix: (map['prix'] as num?)?.toInt() ?? 0,
-    typeProduit: map['typeProduit'] as String?,
+    formeProduit: map['formeProduit'] as String,
+    origineProduit: map['origineProduit'] as String,
+    dateProduction: map['dateProduction'] as String,
+    quantiteStock: (map['quantiteStock'] as num).toDouble(),
+    prix: (map['prix'] as num).toInt(),
+    typeProduit: map['typeProduit'] as String,
     descriptionStock: map['descriptionStock'] as String?,
-    photo: map['photo'] as String?,
+    photo: map['photo'] as String,
     zoneProduction: map['zoneProduction'] != null
         ? ZoneProduction.fromMap(map['zoneProduction'] as Map<String, dynamic>)
         : ZoneProduction(), // Create an empty ZoneProduction if null
@@ -118,10 +116,8 @@ class Stock {
         : Magasin(), // Create an empty Magasin if null
     acteur: map['acteur'] != null
         ? Acteur.fromMap(map['acteur'] as Map<String, dynamic>)
-        : Acteur(), // Create an empty Acteur if null
-    commande: (map['commande'] as List<dynamic>?)
-        ?.map((e) => Commande.fromMap(e as Map<String, dynamic>))
-        .toList(),
+        : Acteur(),
+  
   );
 }
 
@@ -177,7 +173,6 @@ class Stock {
     unite: json['unite'] != null ? Unite.fromJson(json['unite']) : null,
     magasin: json['magasin'] != null ? Magasin.fromJson(json['magasin']) : null,
     acteur: json['acteur'] != null ? Acteur.fromJson(json['acteur']) : null,
-    commande: (json['commande'] as List<dynamic>?)?.map((e) => Commande.fromJson(e)).toList(),
   );
 }
 

@@ -58,29 +58,29 @@ class _StoreScreenState extends State<StoreScreen> {
     }
   }
 
-  void updateMagasinList() async {
-    try {
-      setState(() {
-        magasinListeFuture = getAllMagasin();
-      });
-    } catch (error) {
-      print('Erreur lors de la mise à jour de la liste de stocks: $error');
-    }
-  }
+  // void updateMagasinList() async {
+  //   try {
+  //     setState(() {
+  //       magasinListeFuture = getAllMagasin();
+  //     });
+  //   } catch (error) {
+  //     print('Erreur lors de la mise à jour de la liste de stocks: $error');
+  //   }
+  // }
 
-  Future<List<Magasin>> getAllMagasin() async {
-    if (selectedNiveau1Pays != null) {
-      magasinListe = await MagasinService()
-          .fetchMagasinByRegion(selectedNiveau1Pays!.idNiveau1Pays!);
-    } else if (typeActeurData
-        .map((e) => e.libelle!.toLowerCase())
-        .contains("admin")) {
-      magasinListe = await MagasinService().fetchAllMagasin();
-    } else {
-      magasinListe = await MagasinService().fetchAllMagasin();
-    }
-    return magasinListe;
-  }
+  // Future<List<Magasin>> getAllMagasin() async {
+  //   if (selectedNiveau1Pays != null) {
+  //     magasinListe = await MagasinService()
+  //         .fetchMagasinByRegion(selectedNiveau1Pays!.idNiveau1Pays!);
+  //   } else if (typeActeurData
+  //       .map((e) => e.libelle!.toLowerCase())
+  //       .contains("admin")) {
+  //     magasinListe = await MagasinService().fetchAllMagasin();
+  //   } else {
+  //     magasinListe = await MagasinService().fetchAllMagasin();
+  //   }
+  //   return magasinListe;
+  // }
 
   @override
   void initState() {
@@ -95,7 +95,7 @@ class _StoreScreenState extends State<StoreScreen> {
     _niveau1PaysList =
         http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
-    updateMagasinList();
+    // updateMagasinList();
   }
 
   @override
@@ -143,6 +143,9 @@ class _StoreScreenState extends State<StoreScreen> {
                                 ),
                               ),
                               onTap: () async {
+                                Navigator.of(
+                                                                            context)
+                                                                        .pop();
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -321,12 +324,14 @@ class _StoreScreenState extends State<StoreScreen> {
                     }
 
                     String searchText = "";
-                    List<Magasin> filtereSearch = magasinListe.where((search) {
-                      String libelle = search.nomMagasin!.toLowerCase();
-                      searchText = _searchController.text.trim().toLowerCase();
-                      return libelle.contains(searchText);
-                    }).toList();
-                    return filtereSearch.isEmpty
+                    // List<Magasin> filtereSearch = magasinListe.where((search) {
+                    //   String libelle = search.nomMagasin!.toLowerCase();
+                    //   searchText = _searchController.text.trim().toLowerCase();
+                    //   return libelle.contains(searchText);
+                    // }).toList();
+                    return magasinListe
+                    .where((element) => element.statutMagasin == true)
+                    .isEmpty
                         ? SingleChildScrollView(
                             child: Padding(
                               padding: EdgeInsets.all(10),
@@ -374,8 +379,8 @@ class _StoreScreenState extends State<StoreScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => ProductScreen(
-                                    id: filtereSearch[index].idMagasin,
-                                    nom: filtereSearch[index].nomMagasin),
+                                    id: magasinListe[index].idMagasin,
+                                    nom: magasinListe[index].nomMagasin),
                               ),
                             );
                           },
@@ -400,14 +405,14 @@ class _StoreScreenState extends State<StoreScreen> {
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: Container(
                                     height: 85,
-                                    child: filtereSearch[index].photo == null || filtereSearch[index].photo!.isEmpty
+                                    child: magasinListe[index].photo == null || magasinListe[index].photo!.isEmpty
                                         ? Image.asset(
                                             "assets/images/default_image.png",
                                             fit: BoxFit.cover,
                                           )
                                         : CachedNetworkImage(
                                                   imageUrl:
-                                                      "https://koumi.ml/api-koumi/Magasin/${filtereSearch[index].idMagasin}/image",
+                                                      "https://koumi.ml/api-koumi/Magasin/${magasinListe[index].idMagasin}/image",
                                                   fit: BoxFit.cover,
                                                   placeholder: (context, url) =>
                                                       const Center(
@@ -425,7 +430,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                 // SizedBox(height: 8),
                                 ListTile(
                                   title: Text(
-                                    filtereSearch[index].nomMagasin!,
+                                    magasinListe[index].nomMagasin!,
                                     style: TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold,
@@ -436,7 +441,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                   ),
                                   subtitle: Text(
                                     overflow: TextOverflow.ellipsis,
-                                    filtereSearch[index].localiteMagasin!,
+                                    magasinListe[index].localiteMagasin!,
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -459,7 +464,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            _buildEtat(filtereSearch[index]
+                                            _buildEtat(magasinListe[index]
                                                 .statutMagasin!),
                                             SizedBox(
                                               width: 120,
@@ -471,7 +476,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                                     <PopupMenuEntry<String>>[
                                                   PopupMenuItem<String>(
                                                       child: ListTile(
-                                                    leading: filtereSearch[
+                                                    leading: magasinListe[
                                                                     index]
                                                                 .statutMagasin ==
                                                             false
@@ -485,13 +490,13 @@ class _StoreScreenState extends State<StoreScreen> {
                                                             color: Colors
                                                                 .orange[400]),
                                                     title: Text(
-                                                      filtereSearch[index]
+                                                      magasinListe[index]
                                                                   .statutMagasin ==
                                                               false
                                                           ? "Activer"
                                                           : "Desactiver",
                                                       style: TextStyle(
-                                                        color: filtereSearch[
+                                                        color: magasinListe[
                                                                         index]
                                                                     .statutMagasin ==
                                                                 false
@@ -504,12 +509,12 @@ class _StoreScreenState extends State<StoreScreen> {
                                                     onTap: () async {
                                                       // Changement d'état du magasin ici
 
-                                                      filtereSearch[index]
+                                                      magasinListe[index]
                                                                   .statutMagasin ==
                                                               false
                                                           ? await MagasinService()
                                                               .activerMagasin(
-                                                                  filtereSearch[
+                                                                  magasinListe[
                                                                           index]
                                                                       .idMagasin!)
                                                               .then((value) => {
@@ -549,7 +554,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                                                       })
                                                           : await MagasinService()
                                                               .desactiverMagasin(
-                                                                  filtereSearch[
+                                                                  magasinListe[
                                                                           index]
                                                                       .idMagasin!)
                                                               .then((value) => {
@@ -575,7 +580,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                                         SnackBar(
                                                           content: Row(
                                                             children: [
-                                                              Text(filtereSearch[
+                                                              Text(magasinListe[
                                                                               index]
                                                                           .statutMagasin ==
                                                                       false

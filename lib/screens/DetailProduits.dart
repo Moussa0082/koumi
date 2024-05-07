@@ -141,7 +141,7 @@ class _DetailProduitsState extends State<DetailProduits>
           child: Column(
             mainAxisSize: MainAxisSize.min, // Set mainAxisSize to min
             children: [
-              widget.stock!.photo == null
+              widget.stock!.photo == null || widget.stock!.photo!.isEmpty
                   ? Image.asset(
                       "assets/images/default_image.png",
                       fit: BoxFit.cover,

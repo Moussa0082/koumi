@@ -34,6 +34,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
   String? typeValue;
   late Future _niveau1PaysList;
   late Future<List<Magasin>> magasinListeFuture;
+  late Future<List<Magasin>> magasinListeFuture1;
   bool isExist = false;
   String? email = "";
 
@@ -58,22 +59,21 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
   // }
 
   Future<List<Magasin>> fetchMagasins() async {
-    try {
       if (selectedNiveau1Pays != null) {
         magasinListe = await MagasinService().fetchMagasinByRegionAndActeur(
             acteur.idActeur!, selectedNiveau1Pays!.idNiveau1Pays!);
-      } else {
+      } 
+      return magasinListe;
+  }
+  
+  Future<List<Magasin>> fetchMagasinss() async {
         magasinListe =
             await MagasinService().fetchMagasinByActeur(acteur.idActeur!);
-      }
-      // Once magasins are fetched, setState to trigger UI update
-      // setState(() {});
-    } catch (error) {
-      // Handle error
-      print('Error fetching magasins: $error');
-    }
-    return magasinListe;
+      return magasinListe;
   }
+
+
+  
 
   void updateMagasinList() async {
     try {
@@ -97,8 +97,8 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
     _niveau1PaysList =
         http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
-    updateMagasinList();
-    magasinListeFuture = fetchMagasins();
+    magasinListeFuture = fetchMagasinss();
+    // magasinListeFuture1 = fetchMagasinss();
   }
 
   @override
@@ -129,7 +129,10 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
             IconButton(
                 onPressed: () {
                   setState(() {
-                    magasinListeFuture = fetchMagasins();
+                   
+                    // magasinListeFuture1 = fetchMagasinss() : 
+                    magasinListeFuture = fetchMagasins()
+                    ;
                   });
                 },
                 icon: Icon(Icons.refresh)),
@@ -151,6 +154,9 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                         ),
                       ),
                       onTap: () async {
+                                   Navigator.of(
+                                                                            context)
+                                                                        .pop();
                         // Navigator.push(
                         //     context,
                         //     MaterialPageRoute(
@@ -193,120 +199,160 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
           const SizedBox(height: 10),
 
           // const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            child: FutureBuilder(
-              future: _niveau1PaysList,
-              builder: (_, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return DropdownButtonFormField(
-                    items: [],
-                    onChanged: null,
-                    decoration: InputDecoration(
-                      labelText: 'En cours de chargement ...',
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  );
-                }
-                if (snapshot.hasError) {
-                  return Text("Une erreur s'est produite veuillez reessayer");
-                }
-                if (snapshot.hasData) {
-                  dynamic jsonString = utf8.decode(snapshot.data.bodyBytes);
-                  dynamic responseData = json.decode(jsonString);
-                  if (responseData is List) {
-                    final reponse = responseData;
-                    final niveau1PaysList = reponse
-                        .map((e) => Niveau1Pays.fromMap(e))
-                        .where((con) => con.statutN1 == true)
-                        .toList();
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          //   child: FutureBuilder(
+          //     future: _niveau1PaysList,
+          //     builder: (_, snapshot) {
+          //       if (snapshot.connectionState == ConnectionState.waiting) {
+          //         return DropdownButtonFormField(
+          //           items: [],
+          //           onChanged: null,
+          //           decoration: InputDecoration(
+          //             labelText: 'En cours de chargement ...',
+          //             contentPadding: const EdgeInsets.symmetric(
+          //                 vertical: 10, horizontal: 20),
+          //             border: OutlineInputBorder(
+          //               borderRadius: BorderRadius.circular(8),
+          //             ),
+          //           ),
+          //         );
+          //       }
+          //       if (snapshot.hasError) {
+          //         return Text("Une erreur s'est produite veuillez reessayer");
+          //       }
+          //       if (snapshot.hasData) {
+          //         dynamic jsonString = utf8.decode(snapshot.data.bodyBytes);
+          //         dynamic responseData = json.decode(jsonString);
+          //         if (responseData is List) {
+          //           final reponse = responseData;
+          //           final niveau1PaysList = reponse
+          //               .map((e) => Niveau1Pays.fromMap(e))
+          //               .where((con) => con.statutN1 == true)
+          //               .toList();
 
-                    if (niveau1PaysList.isEmpty) {
-                      return DropdownButtonFormField(
-                        items: [],
-                        onChanged: null,
-                        decoration: InputDecoration(
-                          labelText: '-- Aucune region trouvé --',
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      );
-                    }
+          //           if (niveau1PaysList.isEmpty) {
+          //             return DropdownButtonFormField(
+          //               items: [],
+          //               onChanged: null,
+          //               decoration: InputDecoration(
+          //                 labelText: '-- Aucune region trouvé --',
+          //                 contentPadding: const EdgeInsets.symmetric(
+          //                     vertical: 10, horizontal: 20),
+          //                 border: OutlineInputBorder(
+          //                   borderRadius: BorderRadius.circular(8),
+          //                 ),
+          //               ),
+          //             );
+          //           }
 
-                    return DropdownButtonFormField<String>(
-                      items: niveau1PaysList
-                          .map(
-                            (e) => DropdownMenuItem(
-                              value: e.idNiveau1Pays,
-                              child: Text(e.nomN1!),
-                            ),
-                          )
-                          .toList(),
-                      hint: Text("-- Filtre par region --"),
-                      value: typeValue,
-                      onChanged: (newValue) {
-                        setState(() {
-                          typeValue = newValue;
-                          if (newValue != null) {
-                            selectedNiveau1Pays = niveau1PaysList.firstWhere(
-                              (element) => element.idNiveau1Pays == newValue,
-                            );
-                          }
-                        });
+          //           return DropdownButtonFormField<String>(
+          //             items: niveau1PaysList
+          //                 .map(
+          //                   (e) => DropdownMenuItem(
+          //                     value: e.idNiveau1Pays,
+          //                     child: Text(e.nomN1!),
+          //                   ),
+          //                 )
+          //                 .toList(),
+          //             hint: Text("-- Filtre par region --"),
+          //             value: typeValue,
+          //             onChanged: (newValue) {
+          //               setState(() {
+          //                 typeValue = newValue;
+          //                 if (newValue != null) {
+          //                   selectedNiveau1Pays = niveau1PaysList.firstWhere(
+          //                     (element) => element.idNiveau1Pays == newValue,
+          //                   );
+          //                 }
+          //               });
+          //             },
+          //             decoration: InputDecoration(
+          //               contentPadding: const EdgeInsets.symmetric(
+          //                   vertical: 10, horizontal: 20),
+          //               border: OutlineInputBorder(
+          //                 borderRadius: BorderRadius.circular(8),
+          //               ),
+          //             ),
+          //           );
+          //         } else {
+          //           return DropdownButtonFormField(
+          //             items: [],
+          //             onChanged: null,
+          //             decoration: InputDecoration(
+          //               labelText: '-- Aucune region trouvé --',
+          //               contentPadding: const EdgeInsets.symmetric(
+          //                   vertical: 10, horizontal: 20),
+          //               border: OutlineInputBorder(
+          //                 borderRadius: BorderRadius.circular(8),
+          //               ),
+          //             ),
+          //           );
+          //         }
+          //       }
+          //       return DropdownButtonFormField(
+          //         items: [],
+          //         onChanged: null,
+          //         decoration: InputDecoration(
+          //           labelText: '-- Aucune region trouvé --',
+          //           contentPadding: const EdgeInsets.symmetric(
+          //               vertical: 10, horizontal: 20),
+          //           border: OutlineInputBorder(
+          //             borderRadius: BorderRadius.circular(8),
+          //           ),
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // ),
+           Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.search,
+                      color: Colors.blueGrey[400],
+                      size: 28), // Utiliser une icône de recherche plus grande
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {});
                       },
                       decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                        hintText: 'Rechercher',
+                        border: InputBorder.none,
+                        hintStyle: TextStyle(color: Colors.blueGrey[400]),
                       ),
-                    );
-                  } else {
-                    return DropdownButtonFormField(
-                      items: [],
-                      onChanged: null,
-                      decoration: InputDecoration(
-                        labelText: '-- Aucune region trouvé --',
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    );
-                  }
-                }
-                return DropdownButtonFormField(
-                  items: [],
-                  onChanged: null,
-                  decoration: InputDecoration(
-                    labelText: '-- Aucune region trouvé --',
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                );
-              },
+                  // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
+                  IconButton(
+                    icon: Icon(Icons.clear),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() {});
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 10),
           Consumer<MagasinService>(builder: (context, magasinService, child) {
             return FutureBuilder<List<Magasin>>(
-                future: magasinListeFuture,
-                // selectedNiveau1Pays != null
-                //     ? magasinService.fetchMagasinByRegion(
-                //         selectedNiveau1Pays!.idNiveau1Pays!)
-                //     : magasinService.fetchAllMagasin(),
+                future: 
+                magasinListeFuture,
+            //      selectedNiveau1Pays != null
+            //             ? magasinService.fetchMagasinByRegionAndActeur(
+            // acteur.idActeur!, selectedNiveau1Pays!.idNiveau1Pays!)
+            //             : magasinService.fetchMagasinByActeur(acteur.idActeur!),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -324,41 +370,15 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                   } else {
                     magasinListe = snapshot.data!;
                     // Vous pouvez afficher une image ou un texte ici
-                    if (magasinListe.isEmpty ||
-                        magasinListe.isEmpty &&
-                            _searchController.text.isNotEmpty) {
-                      SingleChildScrollView(
-                        child: Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Center(
-                            child: Column(
-                              children: [
-                                Image.asset('assets/images/notif.jpg'),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  'Aucun magasin trouvé',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 17,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-
+                    
                     String searchText = "";
                     List<Magasin> filtereSearch = magasinListe.where((search) {
                       String libelle = search.nomMagasin!.toLowerCase();
                       searchText = _searchController.text.trim().toLowerCase();
                       return libelle.contains(searchText);
                     }).toList();
-        return filtereSearch.isEmpty
+        return filtereSearch
+        .isEmpty
                         ? SingleChildScrollView(
                             child: Padding(
                               padding: EdgeInsets.all(10),
@@ -394,14 +414,16 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                       ),
                       itemCount: magasinListe.length,
                       itemBuilder: (context, index) {
+                       
+
                         return GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => MyProductScreen(
-                                    id: filtereSearch[index].idMagasin,
-                                    nom: filtereSearch[index].nomMagasin),
+                                    id: magasinListe[index].idMagasin,
+                                    nom: magasinListe[index].nomMagasin),
                               ),
                             );
                           },
@@ -426,14 +448,14 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: Container(
                                     height: 85,
-                                    child: filtereSearch[index].photo == null || filtereSearch[index].photo!.isEmpty
+                                    child: magasinListe[index].photo == null || magasinListe[index].photo!.isEmpty
                                         ? Image.asset(
                                             "assets/images/default_image.png",
                                             fit: BoxFit.cover,
                                           )
                                         : CachedNetworkImage(
                                                   imageUrl:
-                                                      "https://koumi.ml/api-koumi/Magasin/${filtereSearch[index].idMagasin}/image",
+                                                      "https://koumi.ml/api-koumi/Magasin/${magasinListe[index].idMagasin}/image",
                                                   fit: BoxFit.cover,
                                                   placeholder: (context, url) =>
                                                       const Center(
@@ -451,7 +473,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                 // SizedBox(height: 8),
                                 ListTile(
                                   title: Text(
-                                    filtereSearch[index].nomMagasin!,
+                                    magasinListe[index].nomMagasin!,
                                     style: TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold,
@@ -462,8 +484,9 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                   ),
                                   subtitle: Text(
                                     overflow: TextOverflow.ellipsis,
-                                    filtereSearch[index].localiteMagasin!,
+                                    magasinListe[index].niveau1Pays!.nomN1!,
                                     style: TextStyle(
+                                      overflow: TextOverflow.ellipsis,
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black87,
@@ -482,7 +505,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       _buildEtat(
-                                          filtereSearch[index].statutMagasin!),
+                                          magasinListe[index].statutMagasin!),
                                       SizedBox(
                                         width: 120,
                                       ),
@@ -493,7 +516,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                               <PopupMenuEntry<String>>[
                                             PopupMenuItem<String>(
                                                 child: ListTile(
-                                              leading: filtereSearch[index]
+                                              leading: magasinListe[index]
                                                           .statutMagasin ==
                                                       false
                                                   ? Icon(
@@ -504,13 +527,13 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                                       color:
                                                           Colors.orange[400]),
                                               title: Text(
-                                                filtereSearch[index]
+                                                magasinListe[index]
                                                             .statutMagasin ==
                                                         false
                                                     ? "Activer"
                                                     : "Desactiver",
                                                 style: TextStyle(
-                                                  color: filtereSearch[index]
+                                                  color: magasinListe[index]
                                                               .statutMagasin ==
                                                           false
                                                       ? Colors.green
@@ -521,12 +544,12 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                               onTap: () async {
                                                 // Changement d'état du magasin ici
 
-                                                filtereSearch[index]
+                                                magasinListe[index]
                                                             .statutMagasin ==
                                                         false
                                                     ? await MagasinService()
                                                         .activerMagasin(
-                                                            filtereSearch[index]
+                                                            magasinListe[index]
                                                                 .idMagasin!)
                                                         .then((value) => {
                                                               // Mettre à jour la liste des magasins après le changement d'état
@@ -568,7 +591,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                                                 })
                                                     : await MagasinService()
                                                         .desactiverMagasin(
-                                                            filtereSearch[index]
+                                                            magasinListe[index]
                                                                 .idMagasin!)
                                                         .then((value) => {
                                                               Provider.of<MagasinService>(
@@ -591,7 +614,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                                   SnackBar(
                                                     content: Row(
                                                       children: [
-                                                        Text(filtereSearch[
+                                                        Text(magasinListe[
                                                                         index]
                                                                     .statutMagasin ==
                                                                 false
@@ -633,24 +656,24 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                                             child:
                                                                 AddMagasinScreen(
                                                               idMagasin:
-                                                                  filtereSearch[
+                                                                  magasinListe[
                                                                           index]
                                                                       .idMagasin,
                                                               isEditable: true,
                                                               nomMagasin:
-                                                                  filtereSearch[
+                                                                  magasinListe[
                                                                           index]
                                                                       .nomMagasin,
                                                               contactMagasin:
-                                                                  filtereSearch[
+                                                                  magasinListe[
                                                                           index]
                                                                       .contactMagasin,
                                                               localiteMagasin:
-                                                                  filtereSearch[
+                                                                  magasinListe[
                                                                           index]
                                                                       .localiteMagasin,
                                                               niveau1Pays:
-                                                                  filtereSearch[
+                                                                  magasinListe[
                                                                           index]
                                                                       .niveau1Pays!,
                                                               // photo: filteredMagasins[index]['photo']!,

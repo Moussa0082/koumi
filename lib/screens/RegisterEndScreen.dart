@@ -306,7 +306,7 @@ Future<void> _pickImage(ImageSource source) async {
         context: context,
         builder: (context) => AlertDialog(
       title: Text("Erreur lors de l'inscription"),
-      content: Text(errorMessage),
+      content: Text("Une erreur s'est produite veuillez réessayer plus tard"),
       actions: [
         TextButton(
           child: Text("OK"),
@@ -483,8 +483,8 @@ Future<void> _pickImage(ImageSource source) async {
     networkConfig: NetworkConfig(
       // Endpoint pour récupérer les spéculations en fonction des catégories sélectionnées
       // url:url , //e40ijxd5k0n0yrzj5f80,
-      url: 'https://koumi.ml/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
-      // url: 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
+      // url: 'https://koumi.ml/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
+      url: 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
       method: RequestMethod.get,
       headers: {'Content-Type': 'application/json'},
     ),
@@ -524,11 +524,11 @@ Future<void> _pickImage(ImageSource source) async {
     onOptionSelected: (options) {
     
       setState(() {
-         selectedSpec = options.map<Speculation>((item) => item.value!).toList();
-    print("Types sélectionnés : $selectedSpec");
         libelleSpeculation.clear();
         libelleSpeculation.addAll(options.map((data) => data.label).toList());
+         selectedSpec = options.map<Speculation>((item) => item.value!).toList();
         print("Spéculation sélectionnée ${libelleSpeculation.toString()}");
+    print("Types sélectionnés : $selectedSpec");
       });
       // Fermer automatiquement le dialogue
       FocusScope.of(context).unfocus();

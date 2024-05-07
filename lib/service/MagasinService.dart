@@ -133,8 +133,10 @@ class MagasinService extends ChangeNotifier{
         magasin = body.where((magasin) => magasin['statutMagasin'] == true)
         .map((e) => Magasin.fromMap(e)).toList();
       // magasin = data.map((item) => Magasin.fromMap(item)).toList();
+      return magasin;
       } else {
-        throw Exception('Failed to load magasins for region $id');
+        print('Failed to load magasins for region $id');
+        return magasin = [];
       }
     } catch (e) {
       print('Error fetching magasins for region $id: $e');
@@ -147,19 +149,19 @@ class MagasinService extends ChangeNotifier{
     try {
       final response = await http.get(Uri.parse(
           '$baseUrl/getAllMagasinByActeur/${id}'));
-          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
 
                List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
         magasin = body
         .map((e) => Magasin.fromMap(e)).toList();
+        print('succès fecthing magasins for acteur $id');
         return magasin;
       } else {
-        magasin = [];
-        throw Exception('Failed to load magasins for region $id');
+        print('Failed to load magasins for acteur $id');
+        return magasin = [];
       }
     } catch (e) {
-      print('Error fetching magasins for region $id: $e');
+      print('Error fetching magasins for acteur $id: $e');
     }
         return magasin = [];
         
@@ -171,18 +173,19 @@ class MagasinService extends ChangeNotifier{
     try {
       final response = await http.get(Uri.parse(
           '$baseUrl/getAllMagagin'));
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
   // final String jsonString = utf8.decode(response.bodyBytes);
   //       List<dynamic> data = json.decode(jsonString);
                List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
         magasin = body
         // where((magasin) => magasin['statutMagasin'] == true)
         .map((e) => Magasin.fromMap(e)).toList();
+        print('All magasins $magasin ');
         return magasin;
       // magasin = data.map((item) => Magasin.fromMap(item)).toList();
       } else {
-        magasin = [];
-        throw Exception('Failed to load magasins ');
+        print('Failed to load magasins ');
+        return magasin = [];
       }
     } catch (e) {
       print('Error fetching magasins : $e');
@@ -191,31 +194,26 @@ class MagasinService extends ChangeNotifier{
   }
 
    Future<List<Magasin>> fetchMagasinByRegionAndActeur(String idActeur, String idNiveau1Pays) async {
-    // try {
+    try {
       final response = await http.get(Uri.parse(
           '$baseUrl/getAllMagasinByActeurAndNiveau1Pays/${idActeur}/${idNiveau1Pays}'));
-          // 'http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeurAndNiveau1Pays/$idActeur/$idNiveau1Pays'));
       if (response.statusCode == 200 || response.statusCode == 201 ||  response.statusCode == 202) {
   // final String jsonString = utf8.decode(response.bodyBytes);
   //       List<dynamic> data = json.decode(jsonString);
-          print("Fetching data succès");
+          print("Fetching data succès ${idActeur} / ${idNiveau1Pays}");
         List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
         magasin = body.map((e) => Magasin.fromMap(e)).toList();
                 debugPrint("Succes : idActeur : $idActeur , idNiveau1Pays : $idNiveau1Pays , : liste ${magasin.toString()}");
-                  applyChange();
-      // magasin = data.map((item) => Magasin.fromMap(item)).toList();
        return magasin;
       } else {
-        magasin = [];
-        // throw Exception('Failed to load magasins for region $idNiveau1Pays');
+        print('Failed to load magasins for region $idNiveau1Pays | and acteur $idActeur');
+       return magasin = [];
       }
-    // } catch (e) {
-      //  return magasin;
-    //   print('Error fetching magasins for acteur $idActeur et region $idNiveau1Pays: $e');
-    //       throw Exception(" erreur catch ");
-    //       // throw Exception(" erreur catch :  ${e.toString()}");
-return magasin = [];
-    // }
+    } catch (e) {
+      print('Error fetching magasins for acteur $idActeur et region $idNiveau1Pays: $e');
+          // throw Exception(" erreur catch :  ${e.toString()}");
+     return magasin = [];
+    }
   }
 
 

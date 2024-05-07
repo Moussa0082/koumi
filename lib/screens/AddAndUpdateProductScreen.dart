@@ -51,11 +51,11 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
   File? photo;
   String? formeValue;
   late Future _formeList;
-  late Forme forme;
 
   late Future _niveau3List;
   String? n3Value;
   String niveau3 = '';
+  String forme = '';
   List<ParametreGeneraux> paraList = [];
   late ParametreGeneraux para = ParametreGeneraux();
 
@@ -151,7 +151,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
     if (widget.isEditable! == true) {
       _nomController.text = widget.stock!.nomProduit!;
       _formController.text = widget.stock!.formeProduit!;
-      _origineController.text = widget.stock!.origineProduit!;
+      // _origineController.text = widget.stock!.origineProduit!;
       _prixController.text = widget.stock!.prix!.toString();
       _quantiteController.text = widget.stock!.quantiteStock!.toString();
     }
@@ -321,11 +321,13 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                               dynamic responseData = json.decode(jsonString);
 
                               if (responseData is List) {
-                                List<Forme> speList = responseData
+                                 final reponse = responseData;
+                                final formeListe = reponse
                                     .map((e) => Forme.fromMap(e))
+                                    .where((element) => element.statutForme == true)
                                     .toList();
 
-                                if (speList.isEmpty) {
+                                if (formeListe.isEmpty) {
                                   return DropdownButtonFormField(
                                     items: [],
                                     onChanged: null,
@@ -342,7 +344,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                 }
 
                                 return DropdownButtonFormField<String>(
-                                  items: speList
+                                  items: formeListe
                                       .map(
                                         (e) => DropdownMenuItem(
                                           value: e.idForme,
@@ -355,10 +357,9 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                     setState(() {
                                       formeValue = newValue;
                                       if (newValue != null) {
-                                        forme = speList.firstWhere(
-                                          (element) =>
-                                              element.idForme == newValue,
-                                        );
+                                        forme = formeListe
+                                        .map((e) => e.libelleForme)
+                                        .first!;
                                       }
                                     });
                                   },
@@ -623,10 +624,11 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                       SizedBox(
                       child: Padding(
                         padding: const EdgeInsets.only(left: 10.0),
-                        child: photo != null
+                        child: photo != null 
                             ? GestureDetector(
                                 onTap: _showImageSourceDialog,
                                 child: Image.file(
+
                                   photo!,
                                   fit: BoxFit.fitWidth,
                                   height: 150,
@@ -655,14 +657,16 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                           (AddAndUpdateProductEndSreen(
                                             isEditable: widget.isEditable!,
                                             nomProduit: _nomController.text,
-                                            forme: forme.libelleForme!,
+                                            forme: forme,
                                             origine: niveau3,
                                             prix:
                                                 _prixController.text.toString(),
                                             image: photo,
                                             quantite: _quantiteController.text,
                                             stock: widget.stock,
-                                          )))).then((value) => {  
+                                          )))).then((value) => { 
+                                            if(widget.isEditable! == false){
+
                                             _nomController.clear(),
                                             _prixController.clear(),
                                             _quantiteController.clear(),
@@ -670,6 +674,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                               niveau3 == null;
 
                                             })
+                                            } 
                                           });
                             }
                           },

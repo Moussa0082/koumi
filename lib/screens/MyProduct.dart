@@ -176,6 +176,9 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                     ),
                                   ),
                                   onTap: () async {
+                                               Navigator.of(
+                                                                            context)
+                                                                        .pop();
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -196,111 +199,150 @@ class _MyProductScreenState extends State<MyProductScreen> {
           const SizedBox(height: 10),
      
           // const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            child: FutureBuilder(
-              future: _catList,
-              builder: (_, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return DropdownButtonFormField(
-                    items: [],
-                    onChanged: null,
-                    decoration: InputDecoration(
-                      labelText: 'En cours de chargement ',
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  );
-                }
-                if (snapshot.hasError) {
-                  return Text("Une erreur s'est produite veuillez reessayer");
-                }
-                if (snapshot.hasData) {
-                  dynamic jsonString =
-                                utf8.decode(snapshot.data.bodyBytes);
-                            dynamic responseData = json.decode(jsonString);
-                  if (responseData is List) {
-                    final reponse = responseData;
-                    final categorieList = reponse
-                        .map((e) => CategorieProduit.fromMap(e))
-                        .where((con) => con.statutCategorie == true)
-                        .toList();
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          //   child: FutureBuilder(
+          //     future: _catList,
+          //     builder: (_, snapshot) {
+          //       if (snapshot.connectionState == ConnectionState.waiting) {
+          //         return DropdownButtonFormField(
+          //           items: [],
+          //           onChanged: null,
+          //           decoration: InputDecoration(
+          //             labelText: 'En cours de chargement ',
+          //             contentPadding: const EdgeInsets.symmetric(
+          //                 vertical: 10, horizontal: 20),
+          //             border: OutlineInputBorder(
+          //               borderRadius: BorderRadius.circular(8),
+          //             ),
+          //           ),
+          //         );
+          //       }
+          //       if (snapshot.hasError) {
+          //         return Text("Une erreur s'est produite veuillez reessayer");
+          //       }
+          //       if (snapshot.hasData) {
+          //         dynamic jsonString =
+          //                       utf8.decode(snapshot.data.bodyBytes);
+          //                   dynamic responseData = json.decode(jsonString);
+          //         if (responseData is List) {
+          //           final reponse = responseData;
+          //           final categorieList = reponse
+          //               .map((e) => CategorieProduit.fromMap(e))
+          //               .where((con) => con.statutCategorie == true)
+          //               .toList();
 
-                    if (categorieList.isEmpty) {
-                      return DropdownButtonFormField(
-                        items: [],
-                        onChanged: null,
-                        decoration: InputDecoration(
-                          labelText: '-- Aucune categorie trouvé --',
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      );
-                    }
+          //           if (categorieList.isEmpty) {
+          //             return DropdownButtonFormField(
+          //               items: [],
+          //               onChanged: null,
+          //               decoration: InputDecoration(
+          //                 labelText: '-- Aucune categorie trouvé --',
+          //                 contentPadding: const EdgeInsets.symmetric(
+          //                     vertical: 10, horizontal: 20),
+          //                 border: OutlineInputBorder(
+          //                   borderRadius: BorderRadius.circular(8),
+          //                 ),
+          //               ),
+          //             );
+          //           }
 
-                    return DropdownButtonFormField<String>(
-                      items: categorieList
-                          .map(
-                            (e) => DropdownMenuItem(
-                              value: e.idCategorieProduit,
-                              child: Text(e.libelleCategorie!),
-                            ),
-                          )
-                          .toList(),
-                      hint: Text("-- Filtre par categorie --"),
-                      value: typeValue,
-                      onChanged: (newValue) {
-                        setState(() {
-                          typeValue = newValue;
-                          if (newValue != null) {
-                            selectedCat = categorieList.firstWhere(
-                              (element) => element.idCategorieProduit == newValue,
-                            );
-                          }
-                        });
+          //           return DropdownButtonFormField<String>(
+          //             items: categorieList
+          //                 .map(
+          //                   (e) => DropdownMenuItem(
+          //                     value: e.idCategorieProduit,
+          //                     child: Text(e.libelleCategorie!),
+          //                   ),
+          //                 )
+          //                 .toList(),
+          //             hint: Text("-- Filtre par categorie --"),
+          //             value: typeValue,
+          //             onChanged: (newValue) {
+          //               setState(() {
+          //                 typeValue = newValue;
+          //                 if (newValue != null) {
+          //                   selectedCat = categorieList.firstWhere(
+          //                     (element) => element.idCategorieProduit == newValue,
+          //                   );
+          //                 }
+          //               });
+          //             },
+          //             decoration: InputDecoration(
+          //               contentPadding: const EdgeInsets.symmetric(
+          //                   vertical: 10, horizontal: 20),
+          //               border: OutlineInputBorder(
+          //                 borderRadius: BorderRadius.circular(8),
+          //               ),
+          //             ),
+          //           );
+          //         } else {
+          //           return DropdownButtonFormField(
+          //             items: [],
+          //             onChanged: null,
+          //             decoration: InputDecoration(
+          //               labelText: '-- Aucune categorie trouvé --',
+          //               contentPadding: const EdgeInsets.symmetric(
+          //                   vertical: 10, horizontal: 20),
+          //               border: OutlineInputBorder(
+          //                 borderRadius: BorderRadius.circular(8),
+          //               ),
+          //             ),
+          //           );
+          //         }
+          //       }
+          //       return DropdownButtonFormField(
+          //         items: [],
+          //         onChanged: null,
+          //         decoration: InputDecoration(
+          //           labelText: '-- Aucune categorie trouvé --',
+          //           contentPadding: const EdgeInsets.symmetric(
+          //               vertical: 10, horizontal: 20),
+          //           border: OutlineInputBorder(
+          //             borderRadius: BorderRadius.circular(8),
+          //           ),
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // ),
+           Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.search,
+                      color: Colors.blueGrey[400],
+                      size: 28), // Utiliser une icône de recherche plus grande
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {});
                       },
                       decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                        hintText: 'Rechercher',
+                        border: InputBorder.none,
+                        hintStyle: TextStyle(color: Colors.blueGrey[400]),
                       ),
-                    );
-                  } else {
-                    return DropdownButtonFormField(
-                      items: [],
-                      onChanged: null,
-                      decoration: InputDecoration(
-                        labelText: '-- Aucune categorie trouvé --',
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    );
-                  }
-                }
-                return DropdownButtonFormField(
-                  items: [],
-                  onChanged: null,
-                  decoration: InputDecoration(
-                    labelText: '-- Aucune categorie trouvé --',
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                );
-              },
+                  // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
+                  IconButton(
+                    icon: Icon(Icons.clear),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() {});
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 10),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Commande.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/DetailCommande.dart';
 import 'package:koumi_app/service/CommandeService.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -193,12 +194,13 @@ class _CommandeScreenState extends State<CommandeScreen> {
                     String searchText = "";
                     List<Commande> filtereSearch =
                         commandeList.where((search) {
-                      String date = search.dateAjout!;
+                      String code = search.codeCommande!;
+                      String date = search.dateCommande!;
                       searchText = _searchController.text;
-                      return date.contains(searchText);
+                      return searchText.contains(code);
                     }).toList();
                     return 
-                      filtereSearch.isEmpty
+                      commandeList.isEmpty
                         ? SingleChildScrollView(
                             child: Padding(
                               padding: EdgeInsets.all(10),
@@ -224,18 +226,21 @@ class _CommandeScreenState extends State<CommandeScreen> {
                           )
                         :
                     Column(
-                        children: filtereSearch
+                        children: commandeList
                             .map((e) => Padding(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 15),
                                   child: GestureDetector(
                                     onTap: () {
-                                      // Navigator.push(
-                                      //     context,
-                                      //     MaterialPageRoute(
-                                      //         builder: (context) =>
-                                      //             Niveau3Liste(
-                                      //                 niveau2pays: e)));
+                                      Route _createRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => DetailCommandeScreen (),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return child;
+    },
+  );
+}
+                                      Navigator.of(context).push(_createRoute());
                                     },
                                     child: Container(
                                       width: MediaQuery.of(context).size.width *
@@ -255,8 +260,11 @@ class _CommandeScreenState extends State<CommandeScreen> {
                                       child: Column(
                                         children: [
                                           ListTile(
-                                            leading: Image.asset("assets/image/default_image.png"),
-                                            title: Text(e.codeCommande!.toUpperCase(),
+                                            leading: Image.asset("assets/images/cmd.png",
+                                            fit: BoxFit.cover,
+                                            height:40,
+                                            width:40),
+                                            title: Text(e.codeCommande!,
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -264,7 +272,7 @@ class _CommandeScreenState extends State<CommandeScreen> {
                                                       TextOverflow.ellipsis,
                                                 )),
                                             subtitle: Text(
-                                                e.dateAjout!.trim(),
+                                                e.dateCommande!,
                                                 style: const TextStyle(
                                                   color: Colors.black87,
                                                   fontSize: 17,
@@ -368,260 +376,139 @@ class _CommandeScreenState extends State<CommandeScreen> {
                                           //         }
                                           //       });
                                           // }),
-                                          // Container(
-                                          //   alignment: Alignment.bottomRight,
-                                          //   padding: const EdgeInsets.symmetric(
-                                          //       horizontal: 20),
-                                          //   child: Row(
-                                          //     mainAxisAlignment:
-                                          //         MainAxisAlignment
-                                          //             .spaceBetween,
-                                          //     children: [
-                                          //       _buildEtat(e.statutN2),
-                                          //       PopupMenuButton<String>(
-                                          //         padding: EdgeInsets.zero,
-                                          //         itemBuilder: (context) =>
-                                          //             <PopupMenuEntry<String>>[
-                                          //           PopupMenuItem<String>(
-                                          //             child: ListTile(
-                                          //               leading: e.statutN2 ==
-                                          //                       false
-                                          //                   ? Icon(
-                                          //                       Icons.check,
-                                          //                       color: Colors
-                                          //                           .green,
-                                          //                     )
-                                          //                   : Icon(
-                                          //                       Icons
-                                          //                           .disabled_visible,
-                                          //                       color: Colors
-                                          //                               .orange[
-                                          //                           400]),
-                                          //               title:  Text(
-                                          //                  e.statutN2 == false
-                                          //                     ? "Activer"
-                                          //                     : "Desactiver",
-                                          //                 style: TextStyle(
-                                          //                   color:
-                                          //                       e.statutN2 ==
-                                          //                               false
-                                          //                           ? Colors
-                                          //                               .green
-                                          //                           : Colors.orange[
-                                          //                           400],
-                                          //                   fontWeight:
-                                          //                       FontWeight.bold,
-                                          //                 ),
-                                          //               ),
-                                          //               onTap: () async {
-                                          //                  e.statutN2 ==
-                                          //                       false
-                                          //                   ?
-                                          //                 await Niveau2Service()
-                                          //                     .activerNiveau2(e
-                                          //                         .idNiveau2Pays!)
-                                          //                     .then((value) => {
-                                          //                           Provider.of<Niveau2Service>(
-                                          //                                   context,
-                                          //                                   listen:
-                                          //                                       false)
-                                          //                               .applyChange(),
-                                          //                           // setState(
-                                          //                           //     () {
-                                          //                           //   _liste = Niveau2Service().fetchNiveau2ByNiveau1(widget
-                                          //                           //       .niveau1pays
-                                          //                           //       .idNiveau1Pays!);
-                                          //                           // }),
-                                          //                           Navigator.of(
-                                          //                                   context)
-                                          //                               .pop(),
-                                          //                           ScaffoldMessenger.of(
-                                          //                                   context)
-                                          //                               .showSnackBar(
-                                          //                             const SnackBar(
-                                          //                               content:
-                                          //                                   Row(
-                                          //                                 children: [
-                                          //                                   Text("Activer avec succèss "),
-                                          //                                 ],
-                                          //                               ),
-                                          //                               duration:
-                                          //                                   Duration(seconds: 2),
-                                          //                             ),
-                                          //                           )
-                                          //                         })
-                                          //                     .catchError(
-                                          //                         (onError) => {
-                                          //                               ScaffoldMessenger.of(context)
-                                          //                                   .showSnackBar(
-                                          //                                 const SnackBar(
-                                          //                                   content:
-                                          //                                       Row(
-                                          //                                     children: [
-                                          //                                       Text("Une erreur s'est produit"),
-                                          //                                     ],
-                                          //                                   ),
-                                          //                                   duration:
-                                          //                                       Duration(seconds: 5),
-                                          //                                 ),
-                                          //                               ),
-                                          //                               Navigator.of(context)
-                                          //                                   .pop(),
-                                          //                             }) : await Niveau2Service()
-                                          //                         .desactiverNiveau2Pays(e
-                                          //                             .idNiveau2Pays!)
-                                          //                         .then(
-                                          //                             (value) =>
-                                          //                                 {
-                                          //                                   Provider.of<Niveau2Service>(context, listen: false).applyChange(),
-                                          //                                   // setState(
-                                          //                                   //     () {
-                                          //                                   //   _liste = Niveau2Service().fetchNiveau2ByNiveau1(widget
-                                          //                                   //       .niveau1pays
-                                          //                                   //       .idNiveau1Pays!);
-                                          //                                   // }),
-                                          //                                   Navigator.of(context).pop(),
-                                          //                                 })
-                                          //                         .catchError(
-                                          //                             (onError) =>
-                                          //                                 {
-                                          //                                   ScaffoldMessenger.of(context).showSnackBar(
-                                          //                                     const SnackBar(
-                                          //                                       content: Row(
-                                          //                                         children: [
-                                          //                                           Text("Une erreur s'est produit"),
-                                          //                                         ],
-                                          //                                       ),
-                                          //                                       duration: Duration(seconds: 5),
-                                          //                                     ),
-                                          //                                   ),
-                                          //                                   Navigator.of(context).pop(),
-                                          //                                 });
+                                           Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            _buildEtat(e
+                                                .statutCommande!),
+                                            SizedBox(
+                                              width: 310,
+                                            ),
+                                            Expanded(
+                                              child: PopupMenuButton<String>(
+                                                padding: EdgeInsets.zero,
+                                                itemBuilder: (context) =>
+                                                    <PopupMenuEntry<String>>[
+                                                  PopupMenuItem<String>(
+                                                      child: ListTile(
+                                                    leading: e
+                                                .statutCommande! ==
+                                                            false
+                                                        ? Icon(
+                                                            Icons.check,
+                                                            color: Colors.green,
+                                                          )
+                                                        : Icon(
+                                                            Icons
+                                                                .disabled_visible,
+                                                            color: Colors
+                                                                .orange[400]),
+                                                    title: Text(
+                                                      e
+                                                .statutCommande! ==
+                                                              false
+                                                          ? "Relancer"
+                                                          : "Annuler",
+                                                      style: TextStyle(
+                                                        color: e
+                                                .statutCommande! ==
+                                                                false
+                                                            ? Colors.green
+                                                            : Colors.red,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    onTap: () async {
+                                                      // Changement d'état du magasin ici
 
-                                          //                 ScaffoldMessenger.of(
-                                          //                         context)
-                                          //                     .showSnackBar(
-                                          //                   const SnackBar(
-                                          //                     content: Row(
-                                          //                       children: [
-                                          //                         Text(
-                                          //                             "Désactiver avec succèss "),
-                                          //                       ],
-                                          //                     ),
-                                          //                     duration:
-                                          //                         Duration(
-                                          //                             seconds:
-                                          //                                 2),
-                                          //                   ),
-                                          //                 );
-                                          //               },
-                                          //             ),
-                                          //           ),
-                                          //           PopupMenuItem<String>(
-                                          //             child: ListTile(
-                                          //               leading: const Icon(
-                                          //                 Icons.edit,
-                                          //                 color: Colors.green,
-                                          //               ),
-                                          //               title: const Text(
-                                          //                 "Modifier",
-                                          //                 style: TextStyle(
-                                          //                   color: Colors.green,
-                                          //                   fontWeight:
-                                          //                       FontWeight.bold,
-                                          //                 ),
-                                          //               ),
-                                          //               onTap: () async {
-                                          //                 // Ouvrir la boîte de dialogue de modification
-                                          //                 var updatedSousRegion =
-                                          //                     await showDialog(
-                                          //                   context: context,
-                                          //                   builder: (BuildContext
-                                          //                           context) =>
-                                          //                       AlertDialog(
-                                          //                           backgroundColor:
-                                          //                               Colors
-                                          //                                   .white,
-                                          //                           shape:
-                                          //                               RoundedRectangleBorder(
-                                          //                             borderRadius:
-                                          //                                 BorderRadius.circular(
-                                          //                                     16),
-                                          //                           ),
-                                          //                           content: UpdatesNiveau2(
-                                          //                               niveau2pays:
-                                          //                                   e)),
-                                          //                 );
+                                                      e
+                                                .statutCommande! ==
+                                                              false
+                                                          ? await CommandeService()
+                                                              .enableCommande(
+                                                                  e.idCommande!)
+                                                              .then((value) => {
+                                                                    // Mettre à jour la liste des magasins après le changement d'état
+                                                                    Provider.of<CommandeService>(
+                                                                            context,
+                                                                            listen:
+                                                                                false)
+                                                                        .applyChange(),
+                                                                    setState(
+                                                                        () {
+                                                                      _liste =
+                                                                          getAllCommandeByActeur(acteur.idActeur!);
+                                                                    }),
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop(),
+                                                                  })
+                                                              .catchError(
+                                                                  (onError) => {
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          const SnackBar(
+                                                                            content:
+                                                                                Row(
+                                                                              children: [
+                                                                                Text("Une erreur s'est produit"),
+                                                                              ],
+                                                                            ),
+                                                                            duration:
+                                                                                Duration(seconds: 5),
+                                                                          ),
+                                                                        ),
+                                                                        Navigator.of(context)
+                                                                            .pop(),
+                                                                      })
+                                                          : await CommandeService()
+                                                              .disableCommane(
+                                                                  e.idCommande!)
+                                                              .then((value) => {
+                                                                    Provider.of<CommandeService>(
+                                                                            context,
+                                                                            listen:
+                                                                                false)
+                                                                        .applyChange(),
+                                                                    setState(
+                                                                        () {
+                                                                      _liste =
+                                                                          getAllCommandeByActeur(acteur.idActeur!);
+                                                                    }),
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop(),
+                                                                  });
 
-                                          //                 // Si les détails sont modifiés, appliquer les changements
-                                          //                 if (updatedSousRegion !=
-                                          //                     null) {
-                                          //                   Provider.of<Niveau2Service>(
-                                          //                           context,
-                                          //                           listen:
-                                          //                               false)
-                                          //                       .applyChange();
-                                          //                   setState(() {
-                                          //                     _liste =
-                                          //                         updatedSousRegion;
-                                          //                   });
-                                          //                   // Mettre à jour la liste des sous-régions
-                                          //                 }
-                                          //               },
-                                          //             ),
-                                          //           ),
-                                          //           PopupMenuItem<String>(
-                                          //             child: ListTile(
-                                          //               leading: const Icon(
-                                          //                 Icons.delete,
-                                          //                 color: Colors.red,
-                                          //               ),
-                                          //               title: const Text(
-                                          //                 "Supprimer",
-                                          //                 style: TextStyle(
-                                          //                   color: Colors.red,
-                                          //                   fontWeight:
-                                          //                       FontWeight.bold,
-                                          //                 ),
-                                          //               ),
-                                          //               onTap: () async {
-                                          //                 await Niveau2Service()
-                                          //                     .deleteNiveau2Pays(e
-                                          //                         .idNiveau2Pays!)
-                                          //                     .then((value) => {
-                                          //                           Provider.of<Niveau2Service>(
-                                          //                                   context,
-                                          //                                   listen:
-                                          //                                       false)
-                                          //                               .applyChange(),
-                                          //                           Navigator.of(
-                                          //                                   context)
-                                          //                               .pop(),
-                                          //                         })
-                                          //                     .catchError(
-                                          //                         (onError) => {
-                                          //                               ScaffoldMessenger.of(context)
-                                          //                                   .showSnackBar(
-                                          //                                 const SnackBar(
-                                          //                                   content:
-                                          //                                       Row(
-                                          //                                     children: [
-                                          //                                       Text("Impossible de supprimer"),
-                                          //                                     ],
-                                          //                                   ),
-                                          //                                   duration:
-                                          //                                       Duration(seconds: 2),
-                                          //                                 ),
-                                          //                               )
-                                          //                             });
-                                          //               },
-                                          //             ),
-                                          //           ),
-                                          //         ],
-                                          //       ),
-                                          //     ],
-                                          //   ),
-                                          // )
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        SnackBar(
+                                                          content: Row(
+                                                            children: [
+                                                              Text(e.statutCommande ==
+                                                                      false
+                                                                  ? "Relancer avec succèss "
+                                                                  : "Annuler avec succèss"),
+                                                            ],
+                                                          ),
+                                                          duration: Duration(
+                                                              seconds: 2),
+                                                        ),
+                                                      );
+                                                    },
+                                                  )),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
                                         ],
                                       ),
                                     ),

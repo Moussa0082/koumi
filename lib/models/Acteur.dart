@@ -6,56 +6,107 @@ import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 
 class Acteur {
-  final String? idActeur;
-  final String? resetToken;
-  final String? tokenCreationDate;
-  final String? codeActeur;
-  final String? nomActeur;
-  final String? adresseActeur;
-  final String? telephoneActeur;
-  final String? whatsAppActeur;
-  final String? latitude;
-  final String? longitude;
-  final String? photoSiegeActeur;
-  final String? logoActeur;
-  final String? niveau3PaysActeur;
-  final String? password;
-  final String? dateAjout;
-  final String? dateModif;
-  final String? personneModif;
-  final String? localiteActeur;
-  final String? emailActeur;
-  final bool? statutActeur;
-  final List<Speculation>? speculations;
-  final List<TypeActeur>? typeActeur;
+   String? idActeur;
+    String? resetToken;
+    String? tokenCreationDate;
+    String? codeActeur;
+    String? nomActeur;
+    String? adresseActeur;
+    String? telephoneActeur;
+    String? whatsAppActeur;
+    String? latitude;
+    String? longitude;
+    String? photoSiegeActeur;
+    String? logoActeur;
+    String? niveau3PaysActeur;
+    String? password;
+    String? dateAjout;
+    String? dateModif;
+    String? personneModif;
+    String? localiteActeur;
+    String? emailActeur;
+    bool? statutActeur;
+    bool? isConnected;
+    List<Speculation>? speculations;
+    List<TypeActeur>? typeActeur;
 
-  Acteur({
-    this.idActeur,
-    this.resetToken,
-    this.tokenCreationDate,
-    this.codeActeur,
-    this.nomActeur,
-    this.adresseActeur,
-    this.telephoneActeur,
-    this.whatsAppActeur,
-    this.latitude,
-    this.longitude,
-    this.photoSiegeActeur,
-    this.logoActeur,
-    this.niveau3PaysActeur,
-    this.password,
-    this.dateAjout,
-    this.dateModif,
-    this.personneModif,
-    this.localiteActeur,
-    this.emailActeur,
-    this.statutActeur,
-    this.speculations,
-    this.typeActeur,
-  });
+    Acteur({
+         this.idActeur,
+         this.resetToken,
+         this.tokenCreationDate,
+         this.codeActeur,
+         this.nomActeur,
+         this.adresseActeur,
+         this.telephoneActeur,
+         this.whatsAppActeur,
+         this.latitude,
+         this.longitude,
+         this.photoSiegeActeur,
+         this.logoActeur,
+         this.niveau3PaysActeur,
+         this.password,
+         this.dateAjout,
+         this.dateModif,
+         this.personneModif,
+         this.localiteActeur,
+         this.emailActeur,
+         this.statutActeur,
+         this.isConnected,
+         this.speculations,
+         this.typeActeur,
+    });
 
-// Constructeur vide
-  // Acteur();
+    factory Acteur.fromJson(Map<String, dynamic> json) => Acteur(
+        idActeur: json["idActeur"],
+        resetToken: json["resetToken"],
+        tokenCreationDate: json["tokenCreationDate"],
+        codeActeur: json["codeActeur"],
+        nomActeur: json["nomActeur"],
+        adresseActeur: json["adresseActeur"],
+        telephoneActeur: json["telephoneActeur"],
+        whatsAppActeur: json["whatsAppActeur"],
+        latitude: json["latitude"],
+        longitude: json["longitude"],
+        photoSiegeActeur: json["photoSiegeActeur"],
+        logoActeur: json["logoActeur"],
+        niveau3PaysActeur: json["niveau3PaysActeur"],
+        password: json["password"],
+        dateAjout: json["dateAjout"],
+        dateModif: json["dateModif"],
+        personneModif: json["personneModif"],
+        localiteActeur: json["localiteActeur"],
+        emailActeur: json["emailActeur"],
+        statutActeur: json["statutActeur"],
+        isConnected: json["isConnected"],
+        speculations: List<Speculation>.from(json["speculations"].map((x) => Speculation.fromJson(x))),
+        typeActeur: List<TypeActeur>.from(json["typeActeur"].map((x) => TypeActeur.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "idActeur": idActeur,
+        "resetToken": resetToken,
+        "tokenCreationDate": tokenCreationDate,
+        "codeActeur": codeActeur,
+        "nomActeur": nomActeur,
+        "adresseActeur": adresseActeur,
+        "telephoneActeur": telephoneActeur,
+        "whatsAppActeur": whatsAppActeur,
+        "latitude": latitude,
+        "longitude": longitude,
+        "photoSiegeActeur": photoSiegeActeur,
+        "logoActeur": logoActeur,
+        "niveau3PaysActeur": niveau3PaysActeur,
+        "password": password,
+        "dateAjout": dateAjout,
+        "dateModif": dateModif,
+        "personneModif": personneModif,
+        "localiteActeur": localiteActeur,
+        "emailActeur": emailActeur,
+        "statutActeur": statutActeur,
+        "isConnected": isConnected,
+        "speculations": List<dynamic>.from(speculations!.map((x) => x.toJson())),
+        "typeActeur": List<dynamic>.from(typeActeur!.map((x) => x.toJson())),
+    };
 
   // Méthode pour créer une instance d'Acteur à partir des données de SharedPreferences
   factory Acteur.fromSharedPreferencesData(
@@ -160,8 +211,8 @@ class Acteur {
       'localiteActeur': localiteActeur,
       'emailActeur': emailActeur,
       'statutActeur': statutActeur,
-      'speculations': speculations?.map((x) => x?.toMap())?.toList(),
-      'typeActeur': typeActeur?.map((x) => x?.toMap())?.toList(),
+      'speculations': speculations?.map((x) => x.toMap()).toList(),
+      'typeActeur': typeActeur?.map((x) => x.toMap()).toList(),
     };
   }
 
@@ -198,37 +249,6 @@ class Acteur {
     );
   }
 
-  factory Acteur.fromJson(Map<String, dynamic> json) => Acteur(
-        idActeur: json["idActeur"],
-        resetToken: json["resetToken"],
-        tokenCreationDate: json["tokenCreationDate"],
-        codeActeur: json["codeActeur"],
-        nomActeur: json["nomActeur"],
-        adresseActeur: json["adresseActeur"],
-        telephoneActeur: json["telephoneActeur"],
-        whatsAppActeur: json["whatsAppActeur"],
-        latitude: json["latitude"],
-        longitude: json["longitude"],
-        photoSiegeActeur: json["photoSiegeActeur"],
-        logoActeur: json["logoActeur"],
-        niveau3PaysActeur: json["niveau3PaysActeur"],
-        password: json["password"],
-        dateAjout: json["dateAjout"],
-        dateModif: json["dateModif"],
-        personneModif: json["personneModif"],
-        localiteActeur: json["localiteActeur"],
-        emailActeur: json["emailActeur"],
-        statutActeur: json["statutActeur"],
-        typeActeur: (json['typeActeur'] as List)
-            .map((type) => TypeActeur.fromJson(type))
-            .toList(),
-        speculations: (json['speculations'] as List)
-            .map((speculation) => Speculation.fromJson(speculation))
-            .toList(),
-        // typeActeur: List<TypeActeur>.from(json["typeActeur"].map((x) => TypeActeur.fromJson(x))),
-      );
-
-  String toJson() => json.encode(toMap());
 
   // factory Acteur.fromJson(String source) => Acteur.fromMap(json.decode(source) as Map<String, dynamic>);
 

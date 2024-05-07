@@ -37,6 +37,7 @@ class _ProductScreenState extends State<ProductScreen> {
   late TextEditingController _searchController;
   List<Stock> stockListe = [];
   late Future<List<Stock>> stockListeFuture;
+  late Future<List<Stock>> stockListeFuture1;
   CategorieProduit? selectedCat;
   String? typeValue;
   late Future _catList;
@@ -66,16 +67,23 @@ class _ProductScreenState extends State<ProductScreen> {
       stockListe = await StockService()
           .fetchProduitByCategorie(selectedCat!.idCategorieProduit!);
     }
-    if (widget.id != null) {
+    else if(widget.id != null) {
       stockListe = await StockService().fetchStockByMagasin(widget.id!);
-    } else if (selectedCat?.idCategorieProduit != null && widget.id != null) {
+    } else if (selectedCat != null && widget.id != null) {
       stockListe = await StockService().fetchProduitByCategorieAndMagasin(
           selectedCat!.idCategorieProduit!, widget.id!);
-    } else {
+    }
+     else {
       stockListe = await StockService().fetchStock();
     }
     return stockListe;
   }
+
+  // Future<List<Stock>> getAllStocks() async {
+    
+  //     stockListe = await StockService().fetchStock();
+  //   return stockListe;
+  // }
 
   // Méthode pour mettre à jour la liste de stocks
   void updateStockList() async {
@@ -111,8 +119,9 @@ class _ProductScreenState extends State<ProductScreen> {
     _searchController = TextEditingController();
     _catList = http
         .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
-    updateStockList();
+    // updateStockList();
     stockListeFuture = getAllStock();
+    // stockListeFuture1 = getAllStocks();
   }
 
   @override
@@ -160,6 +169,9 @@ class _ProductScreenState extends State<ProductScreen> {
                               ),
                             ),
                             onTap: () async {
+                                         Navigator.of(
+                                                                            context)
+                                                                        .pop();
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -237,11 +249,12 @@ class _ProductScreenState extends State<ProductScreen> {
                       onChanged: (newValue) {
                         setState(() {
                           typeValue = newValue;
-                          // if (newValue != null) {
-                          //   selectedCat = categorieList.firstWhere(
-                          //     (element) => element.idCategorieProduit == newValue,
-                          //   );
-                          // }
+                          if (newValue != null) {
+                            selectedCat = categorieList.firstWhere(
+                              (element) => element.idCategorieProduit == newValue,
+                            );
+                                                        debugPrint("id:${selectedCat!.idCategorieProduit!}");
+                          }
                         });
                       },
                       decoration: InputDecoration(
@@ -286,7 +299,8 @@ class _ProductScreenState extends State<ProductScreen> {
 
           Consumer<StockService>(builder: (context, stockService, child) {
             return FutureBuilder<List<Stock>>(
-                future: stockListeFuture,
+                future: 
+                stockListeFuture  ,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -330,36 +344,12 @@ class _ProductScreenState extends State<ProductScreen> {
                       return libelle.contains(searchText);
                     }).toList();
 
-                    if (stockListe.isEmpty ||
-                        filtereSearch.isEmpty &&
-                            _searchController.text.isNotEmpty) {
-                      SingleChildScrollView(
-                        child: Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Center(
-                            child: Column(
-                              children: [
-                                Image.asset('assets/images/notif.jpg'),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  'Aucun produit trouvé',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 17,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }
+                   
 
-                    return filtereSearch.isEmpty
-                        ? SingleChildScrollView(
+                    return stockListe.where((element) => element.statutSotck == true)
+                    .isEmpty
+                        ? 
+                        SingleChildScrollView(
                             child: Padding(
                               padding: EdgeInsets.all(10),
                               child: Center(
@@ -395,8 +385,8 @@ class _ProductScreenState extends State<ProductScreen> {
                             itemCount: typeActeurData
                                     .map((e) => e.libelle!.toLowerCase())
                                     .contains("admin")
-                                ? filtereSearch.length
-                                : filtereSearch
+                                ? stockListe.length
+                                : stockListe
                                     .where((element) =>
                                         element.statutSotck == true)
                                     .length,
@@ -435,15 +425,15 @@ class _ProductScreenState extends State<ProductScreen> {
                                             BorderRadius.circular(8.0),
                                         child: Container(
                                           height: 85,
-                                          child: filtereSearch[index].photo ==
-                                                  null || filtereSearch[index].photo!.isEmpty
+                                          child: stockListe[index].photo ==
+                                                  null || stockListe[index].photo!.isEmpty
                                               ? Image.asset(
                                                   "assets/images/default_image.png",
                                                   fit: BoxFit.cover,
                                                 )
                                               : CachedNetworkImage(
                                                   imageUrl:
-                                                      "https://koumi.ml/api-koumi/Stock/${filtereSearch[index].idStock}/image",
+                                                      "https://koumi.ml/api-koumi/Stock/${stockListe[index].idStock}/image",
                                                   fit: BoxFit.cover,
                                                   placeholder: (context, url) =>
                                                       const Center(
@@ -461,7 +451,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                       // SizedBox(height: 8),
                                       ListTile(
                                         title: Text(
-                                          filtereSearch[index].nomProduit!,
+                                          stockListe[index].nomProduit!,
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
@@ -472,8 +462,9 @@ class _ProductScreenState extends State<ProductScreen> {
                                         ),
                                         subtitle: Text(
                                           overflow: TextOverflow.ellipsis,
-                                          "${filtereSearch[index].quantiteStock!.toString()} ${filtereSearch[index].unite!.nomUnite} ",
+                                          "${stockListe[index].quantiteStock!.toString()} ${stockListe[index].unite!.nomUnite} ",
                                           style: TextStyle(
+                                            overflow: TextOverflow.ellipsis,
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.black87,
@@ -485,8 +476,8 @@ class _ProductScreenState extends State<ProductScreen> {
                                             horizontal: 15),
                                         child: Text(
                                           para.monnaie != null
-                                              ? "${filtereSearch[index].prix.toString()} ${para.monnaie}"
-                                              : "${filtereSearch[index].prix.toString()} FCFA",
+                                              ? "${stockListe[index].prix.toString()} ${para.monnaie}"
+                                              : "${stockListe[index].prix.toString()} FCFA",
                                           style: TextStyle(
                                             fontSize: 15,
                                             color: Colors.black87,
@@ -511,7 +502,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                                         .spaceBetween,
                                                 children: [
                                                   _buildEtat(
-                                                      filtereSearch[index]
+                                                      stockListe[index]
                                                           .statutSotck!),
                                                   SizedBox(
                                                     width: 120,
@@ -525,7 +516,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                                               String>>[
                                                         PopupMenuItem<String>(
                                                             child: ListTile(
-                                                          leading: filtereSearch[
+                                                          leading: stockListe[
                                                                           index]
                                                                       .statutSotck ==
                                                                   false
@@ -541,13 +532,13 @@ class _ProductScreenState extends State<ProductScreen> {
                                                                           .orange[
                                                                       400]),
                                                           title: Text(
-                                                            filtereSearch[index]
+                                                            stockListe[index]
                                                                         .statutSotck ==
                                                                     false
                                                                 ? "Activer"
                                                                 : "Desactiver",
                                                             style: TextStyle(
-                                                              color: filtereSearch[
+                                                              color: stockListe[
                                                                               index]
                                                                           .statutSotck ==
                                                                       false
@@ -560,12 +551,12 @@ class _ProductScreenState extends State<ProductScreen> {
                                                           ),
                                                           onTap: () async {
                                                             // Changement d'état du magasin ici
-                                                            filtereSearch[index]
+                                                            stockListe[index]
                                                                         .statutSotck ==
                                                                     false
                                                                 ? await StockService()
                                                                     .activerStock(
-                                                                        filtereSearch[index]
+                                                                        stockListe[index]
                                                                             .idStock!)
                                                                     .then(
                                                                         (value) =>
@@ -594,7 +585,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                                                             })
                                                                 : await StockService()
                                                                     .desactiverStock(
-                                                                        filtereSearch[index]
+                                                                        stockListe[index]
                                                                             .idStock!)
                                                                     .then(
                                                                         (value) =>
@@ -612,7 +603,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                                               SnackBar(
                                                                 content: Row(
                                                                   children: [
-                                                                    Text(filtereSearch[index].statutSotck ==
+                                                                    Text(stockListe[index].statutSotck ==
                                                                             false
                                                                         ? "Activer avec succèss "
                                                                         : "Desactiver avec succèss"),
