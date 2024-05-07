@@ -87,23 +87,23 @@ class Stock {
 
   factory Stock.fromMap(Map<String, dynamic> map) {
   return Stock(
-    idStock: map['idStock'] as String,
-    codeStock: map['codeStock'] as String,
-    nomProduit: map['nomProduit'] as String,
-    formeProduit: map['formeProduit'] as String,
-    origineProduit: map['origineProduit'] as String,
-    dateProduction: map['dateProduction'] as String,
+    idStock: map['idStock'] ,
+    codeStock: map['codeStock'] ,
+    nomProduit: map['nomProduit'] ,
+    formeProduit: map['formeProduit'] ,
+    origineProduit: map['origineProduit'] ,
+    dateProduction: map['dateProduction'] ,
     quantiteStock: (map['quantiteStock'] as num).toDouble(),
     prix: (map['prix'] as num).toInt(),
-    typeProduit: map['typeProduit'] as String,
-    descriptionStock: map['descriptionStock'] as String?,
-    photo: map['photo'] as String,
+    typeProduit: map['typeProduit'] ,
+    descriptionStock: map['descriptionStock'] ,
+    photo: map['photo'] ,
     zoneProduction: map['zoneProduction'] != null
         ? ZoneProduction.fromMap(map['zoneProduction'] as Map<String, dynamic>)
         : ZoneProduction(), // Create an empty ZoneProduction if null
-    dateAjout: map['dateAjout'] as String?,
-    dateModif: map['dateModif'] as String?,
-    personneModif: map['personneModif'] as String?,
+    dateAjout: map['dateAjout'] ,
+    dateModif: map['dateModif'] ,
+    personneModif: map['personneModif'] ,
     statutSotck: map['statutSotck'] as bool? ?? false,
     speculation: map['speculation'] != null
         ? Speculation.fromMap(map['speculation'] as Map<String, dynamic>)
