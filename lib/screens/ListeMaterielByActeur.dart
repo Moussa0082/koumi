@@ -106,23 +106,22 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
                                                     DetailMateriel(
                                                         materiel: e)));
                                       },
-                                      child: Container(
-                                          margin: EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: Color.fromARGB(
-                                                250, 250, 250, 250),
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.grey
-                                                    .withOpacity(0.3),
-                                                offset: Offset(0, 2),
-                                                blurRadius: 8,
-                                                spreadRadius: 2,
-                                              ),
-                                            ],
-                                          ),
+                                      child: Card(
+                                          // decoration: BoxDecoration(
+                                          //   color: Color.fromARGB(
+                                          //       250, 250, 250, 250),
+                                          //   borderRadius:
+                                          //       BorderRadius.circular(15),
+                                          //   boxShadow: [
+                                          //     BoxShadow(
+                                          //       color: Colors.grey
+                                          //           .withOpacity(0.3),
+                                          //       offset: Offset(0, 2),
+                                          //       blurRadius: 8,
+                                          //       spreadRadius: 2,
+                                          //     ),
+                                          //   ],
+                                          // ),
                                           child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.stretch,
@@ -132,7 +131,7 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
                                                       BorderRadius.circular(
                                                           8.0),
                                                   child: SizedBox(
-                                                    height: 85,
+                                                    height: 72,
                                                     child: e.photoMateriel ==
                                                             null ||
                                                             e.photoMateriel!
@@ -140,7 +139,7 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
                                                         ? Image.asset(
                                                             "assets/images/default_image.png",
                                                             fit: BoxFit.cover,
-                                                            height: 85,
+                                                            height: 72,
                                                           )
                                                         : 
 CachedNetworkImage(
@@ -179,6 +178,7 @@ CachedNetworkImage(
                                                   subtitle: Text(
                                                     e.localisation,
                                                     style: TextStyle(
+                                                      overflow: TextOverflow.ellipsis,
                                                       fontSize: 15,
                                                       color: Colors.black87,
                                                     ),

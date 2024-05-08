@@ -118,6 +118,7 @@ class _TransportState extends State<Transport> {
                                     ),
                                   ),
                                   onTap: () async {
+                                    Navigator.of(context).pop();
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -140,6 +141,7 @@ class _TransportState extends State<Transport> {
                                     ),
                                   ),
                                   onTap: () async {
+                                    Navigator.of(context).pop();
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -162,6 +164,7 @@ class _TransportState extends State<Transport> {
                                     ),
                                   ),
                                   onTap: () async {
+                                    Navigator.of(context).pop();
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -364,20 +367,20 @@ class _TransportState extends State<Transport> {
                                     builder: (context) =>
                                         DetailTransport(vehicule: e)));
                           },
-                          child: Container(
-                            margin: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Color.fromARGB(250, 250, 250, 250),
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.3),
-                                  offset: Offset(0, 2),
-                                  blurRadius: 8,
-                                  spreadRadius: 2,
-                                ),
-                              ],
-                            ),
+                          child: Card(
+                            // margin: EdgeInsets.all(8),
+                            // decoration: BoxDecoration(
+                            //   color: Color.fromARGB(250, 250, 250, 250),
+                            //   borderRadius: BorderRadius.circular(15),
+                            //   boxShadow: [
+                            //     BoxShadow(
+                            //       color: Colors.grey.withOpacity(0.3),
+                            //       offset: Offset(0, 2),
+                            //       blurRadius: 8,
+                            //       spreadRadius: 2,
+                            //     ),
+                            //   ],
+                            // ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [

@@ -191,10 +191,9 @@ class StockService extends ChangeNotifier {
 
         List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
         stockList = body
-        .where((stock) => stock['statutSotck'] == true)
+        .where((stock) => stock['statutSotck'] == true )
         .map((e) => Stock.fromMap(e)).toList();
-        debugPrint("response body ${stockList.toString()}");
-        debugPrint("stockList all ${stockList.toList()}");
+        debugPrint("response body ");
         return stockList;
       } else {
         print(
@@ -270,7 +269,7 @@ class StockService extends ChangeNotifier {
                 print("Fetching data all stock by id categorie and id magasin");
           List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
         stockList = body
-        .where((stock) => stock['statutSotck'] == true)
+        // .where((stock) => stock['statutSotck'] == true)
         .map((e) => Stock.fromMap(e)).toList();
         debugPrint(stockList.toString());
       } else {
@@ -315,7 +314,7 @@ class StockService extends ChangeNotifier {
                 print("Fetching data all stock by id categorie produit");
           List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
         stockList = body
-        .where((stock) => stock['statutSotck'] == true)
+        // .where((stock) => stock['statutSotck'] == true)
         .map((e) => Stock.fromMap(e)).toList();
         debugPrint(stockList.toString());
         return stockList;

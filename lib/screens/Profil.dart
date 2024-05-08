@@ -82,80 +82,71 @@ class _ProfilState extends State<Profil> {
             style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
         ),
-        body: !isExist
-            ? Center(
-                child: Container(
-                  padding: EdgeInsets.all(
-                      20), // Ajouter un padding pour l'espace autour du contenu
-
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Image.asset("assets/images/lock.png",
-                          width: 100,
-                          height:
-                              100), // Ajuster la taille de l'image selon vos besoins
-                      SizedBox(
-                          height:
-                              20), // Ajouter un espace entre l'image et le texte
-                      Text(
-                        "Vous devez vous connecter pour voir votre profil",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      SizedBox(
-                          height:
-                              20), // Ajouter un espace entre le texte et le bouton
-                      ElevatedButton(
-                        onPressed: () {
-                          Future.microtask(() {
-                            Provider.of<BottomNavigationService>(context,
-                                    listen: false)
-                                .changeIndex(0);
-                          });
-                          Get.to(LoginScreen(),
-                              duration: Duration(
-                                  seconds:
-                                      1), //duration of transitions, default 1 sec
-                              transition: Transition.leftToRight);
-                        },
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                              Colors.transparent),
-                          elevation: MaterialStateProperty.all<double>(
-                              0), // Supprimer l'élévation du bouton
-                          overlayColor: MaterialStateProperty.all<Color>(
-                              Colors.grey.withOpacity(
-                                  0.2)), // Couleur de l'overlay du bouton lorsqu'il est pressé
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18.0),
-                              side: BorderSide(
-                                  color:
-                                      d_colorGreen), // Bordure autour du bouton
-                            ),
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          child: Text(
-                            "Se connecter",
-                            style: TextStyle(fontSize: 16, color: d_colorGreen),
-                          ),
-                        ),
-                      ),
-                    ],
+        body: 
+        Consumer<ActeurProvider>(
+  builder: (context, acteurProvider, child) {
+    // Vérifiez si l'utilisateur est connecté en utilisant isLogged du ActeurProvider
+ return !isExist ?
+       Center(
+        child: Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset("assets/images/lock.png",
+                  width: 100,
+                  height: 100),
+              SizedBox(height: 20),
+              Text(
+                "Vous devez vous connecter pour voir votre profil",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Future.microtask(() {
+                    Provider.of<BottomNavigationService>(context,
+                            listen: false)
+                        .changeIndex(0);
+                  });
+                  Get.to(LoginScreen(),
+                      duration: Duration(seconds: 1),
+                      transition: Transition.leftToRight);
+                },
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.transparent),
+                  elevation: MaterialStateProperty.all<double>(0),
+                  overlayColor: MaterialStateProperty.all<Color>(
+                      Colors.grey.withOpacity(0.2)),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18.0),
+                      side: BorderSide(color: d_colorGreen),
+                    ),
                   ),
                 ),
-              )
-            : SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 10),
+                  child: Text(
+                    "Se connecter",
+                    style: TextStyle(fontSize: 16, color: d_colorGreen),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      )
+    :
+       SingleChildScrollView(
                 child: Column(
                   children: [
                     Padding(
@@ -599,7 +590,8 @@ class _ProfilState extends State<Profil> {
                     )
                   ],
                 ),
-              ));
+              );
+  }));
   }
 
   Widget _buildProfile(String title, String value) {

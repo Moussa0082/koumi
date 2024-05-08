@@ -109,6 +109,7 @@ class _LocationState extends State<Location> {
                               ),
                             ),
                             onTap: () async {
+                              Navigator.of(context).pop();
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -131,6 +132,7 @@ class _LocationState extends State<Location> {
                               ),
                             ),
                             onTap: () async {
+                              Navigator.of(context).pop();
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -306,21 +308,20 @@ class _LocationState extends State<Location> {
                                               builder: (context) =>
                                                   DetailMateriel(materiel: e)));
                                     },
-                                    child: Container(
-                                      margin: EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color:
-                                            Color.fromARGB(250, 250, 250, 250),
-                                        borderRadius: BorderRadius.circular(15),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.3),
-                                            offset: Offset(0, 2),
-                                            blurRadius: 8,
-                                            spreadRadius: 2,
-                                          ),
-                                        ],
-                                      ),
+                                    child: Card(
+                                      // decoration: BoxDecoration(
+                                      //   color:
+                                      //       Color.fromARGB(250, 250, 250, 250),
+                                      //   borderRadius: BorderRadius.circular(15),
+                                      //   boxShadow: [
+                                      //     BoxShadow(
+                                      //       color: Colors.grey.withOpacity(0.3),
+                                      //       offset: Offset(0, 2),
+                                      //       blurRadius: 8,
+                                      //       spreadRadius: 2,
+                                      //     ),
+                                      //   ],
+                                      // ),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.stretch,
@@ -329,7 +330,7 @@ class _LocationState extends State<Location> {
                                             borderRadius:
                                                 BorderRadius.circular(8.0),
                                             child: SizedBox(
-                                              height: 85,
+                                              height: 75,
                                               child: e.photoMateriel == null ||
                                                       e.photoMateriel!.isEmpty
                                                   ? Image.asset(
@@ -355,12 +356,12 @@ class _LocationState extends State<Location> {
                                                     ),
                                             ),
                                           ),
-                                          SizedBox(height: 8),
+                                          // SizedBox(height: 8),
                                           ListTile(
                                             title: Text(
                                               e.nom,
                                               style: TextStyle(
-                                                fontSize: 17,
+                                                fontSize: 16,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.black87,
                                               ),
@@ -370,6 +371,7 @@ class _LocationState extends State<Location> {
                                             subtitle: Text(
                                               e.localisation,
                                               style: TextStyle(
+                                                overflow: TextOverflow.ellipsis,
                                                 fontSize: 15,
                                                 color: Colors.black87,
                                               ),

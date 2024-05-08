@@ -365,7 +365,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                                         (e) => DropdownMenuItem(
                                                           value:
                                                               e.idNiveau3Pays,
-                                                          child: Text(e.nomN3),
+                                                          child: Text(e.nomN3,style: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 15),),
                                                         ),
                                                       )
                                                       .toList(),

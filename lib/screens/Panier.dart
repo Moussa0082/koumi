@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CartItem.dart';
@@ -11,6 +12,7 @@ import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
+import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/CommandeService.dart';
 import 'package:koumi_app/widgets/CartListItem.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
@@ -18,12 +20,19 @@ import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'LoginScreen.dart';
+
 class Panier extends StatefulWidget {
   Panier({super.key});
 
   @override
   State<Panier> createState() => _PanierState();
 }
+
+ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
+const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
+const d_colorPage = Color.fromRGBO(255, 255, 255, 1);
+
 
 class _PanierState extends State<Panier> {
   // int itemCount = widget.cartItems?.length ?? 0;
@@ -178,12 +187,13 @@ class _PanierState extends State<Panier> {
   Widget build(BuildContext context) {
     return LoadingOverlay(
       isLoading: isLoading,
-      child: Scaffold(
+      child:
+       Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.orange,
           title: Text("Panier", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
           centerTitle: true,
-          actions: [
+          actions: !isExist ? null : [
             Consumer<CartProvider>(
                       builder: (context, cartProvider, child) {
                         return badges.Badge(
@@ -207,7 +217,69 @@ class _PanierState extends State<Panier> {
           ],
         ),
         // backgroundColor: Theme.of(context).colorScheme.primary,
-        body: SafeArea(
+        body: 
+        
+         !isExist ?
+       Center(
+        child: Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset("assets/images/lock.png",
+                  width: 100,
+                  height: 100),
+              SizedBox(height: 20),
+              Text(
+                "Vous devez vous connecter pour voir faire des commades",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Future.microtask(() {
+                    Provider.of<BottomNavigationService>(context,
+                            listen: false)
+                        .changeIndex(0);
+                  });
+                  Get.to(LoginScreen(),
+                      duration: Duration(seconds: 1),
+                      transition: Transition.leftToRight);
+                },
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.transparent),
+                  elevation: MaterialStateProperty.all<double>(0),
+                  overlayColor: MaterialStateProperty.all<Color>(
+                      Colors.grey.withOpacity(0.2)),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18.0),
+                      side: BorderSide(color: d_colorGreen),
+                    ),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 10),
+                  child: Text(
+                    "Se connecter",
+                    style: TextStyle(fontSize: 16, color: d_colorGreen),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      )
+    :
+        SafeArea(
           child: Column(
             children: [
      

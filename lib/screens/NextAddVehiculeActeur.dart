@@ -325,6 +325,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                                 onChanged: null,
                                                 decoration: InputDecoration(
                                                   labelText: 'Chargement...',
+                                                  labelStyle:  TextStyle(overflow: TextOverflow.ellipsis,fontSize: 15),
                                                   contentPadding:
                                                       const EdgeInsets
                                                           .symmetric(
@@ -362,6 +363,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                                     onChanged: null,
                                                     decoration: InputDecoration(
                                                       labelText: 'Destination',
+                                                      labelStyle: TextStyle(overflow: TextOverflow.ellipsis,fontSize: 15),
                                                       contentPadding:
                                                           const EdgeInsets
                                                               .symmetric(
@@ -378,62 +380,39 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                                   );
                                                 }
 
-                                                return DropdownButtonFormField<
-                                                    String>(
-                                                  items: niveau3List
-                                                      .map(
-                                                        (e) => DropdownMenuItem(
-                                                          value:
-                                                              e.idNiveau3Pays,
-                                                          child: Text(e.nomN3),
-                                                        ),
-                                                      )
-                                                      .toList(),
-
-                                                  value: selectedDestinationsList[
-                                                      index], // Utilisez l'index pour accéder à la valeur sélectionnée correspondante dans selectedDestinationsList
-                                                  onChanged: (newValue) {
-                                                    setState(() {
-                                                      selectedDestinationsList[
-                                                              index] =
-                                                          newValue; // Mettre à jour avec l'ID de la destination
-                                                      String
-                                                          selectedDestinationName =
-                                                          niveau3List
-                                                              .firstWhere(
-                                                                  (element) =>
-                                                                      element
-                                                                          .idNiveau3Pays ==
-                                                                      newValue)
-                                                              .nomN3;
-                                                      selectedDestinations.add(
-                                                          selectedDestinationName); // Ajouter le nom de la destination à la liste
-                                                      print(
-                                                          "niveau 3 : $selectedDestinationsList");
-                                                      print(
-                                                          "niveau 3 nom  : $selectedDestinations");
-                                                    });
-                                                  },
-                                                  decoration: InputDecoration(
-                                                    labelText: 'Destination',
-                                                    contentPadding:
-                                                        const EdgeInsets
-                                                            .symmetric(
-                                                      horizontal: 20,
-                                                    ),
-                                                    border: OutlineInputBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8),
-                                                    ),
-                                                  ),
-                                                );
+                                                return Expanded(
+  child: DropdownButtonFormField<String>(
+    items: niveau3List.map((e) => DropdownMenuItem(
+      value: e.idNiveau3Pays,
+      child: Text(e.nomN3, style: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 14)), // réduire la taille du texte
+    )).toList(),
+    value: selectedDestinationsList[index],
+    onChanged: (newValue) {
+      setState(() {
+        selectedDestinationsList[index] = newValue;
+        String selectedDestinationName = niveau3List.firstWhere((element) => element.idNiveau3Pays == newValue).nomN3;
+        selectedDestinations.add(selectedDestinationName);
+        print("niveau 3 : $selectedDestinationsList");
+        print("niveau 3 nom  : $selectedDestinations");
+      });
+    },
+    decoration: InputDecoration(
+      labelText: 'Destination',
+      labelStyle: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 15),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12), // réduire le padding
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+    ),
+  ),
+);
                                               } else {
                                                 return DropdownButtonFormField(
                                                   items: [],
                                                   onChanged: null,
                                                   decoration: InputDecoration(
                                                     labelText: 'Destination',
+                                                    labelStyle: TextStyle(overflow: TextOverflow.ellipsis,fontSize: 15),
                                                     contentPadding:
                                                         const EdgeInsets
                                                             .symmetric(
@@ -453,6 +432,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                               onChanged: null,
                                               decoration: InputDecoration(
                                                 labelText: 'Destination',
+                                                labelStyle: TextStyle(overflow: TextOverflow.ellipsis,fontSize: 15),
                                                 contentPadding:
                                                     const EdgeInsets.symmetric(
                                                   horizontal: 20,

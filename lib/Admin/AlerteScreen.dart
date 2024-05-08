@@ -97,6 +97,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                               ),
                             ),
                             onTap: () async {
+                              Navigator.of(context).pop();
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -119,6 +120,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                               ),
                             ),
                             onTap: () async {
+                              Navigator.of(context).pop();
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(

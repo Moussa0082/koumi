@@ -131,6 +131,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                   ),
                                 ),
                                 onTap: () async {
+                                  Navigator.of(context).pop();
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -153,6 +154,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                   ),
                                 ),
                                 onTap: () async {
+                                  Navigator.of(context).pop();
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -336,20 +338,20 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                     ),
                                   );
                                 },
-                                child: Container(
+                                child: Card(
                                   margin: EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: Color.fromARGB(250, 250, 250, 250),
-                                    borderRadius: BorderRadius.circular(15),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.3),
-                                        offset: Offset(0, 2),
-                                        blurRadius: 8,
-                                        spreadRadius: 2,
-                                      ),
-                                    ],
-                                  ),
+                                  // decoration: BoxDecoration(
+                                  //   color: Color.fromARGB(250, 250, 250, 250),
+                                  //   borderRadius: BorderRadius.circular(15),
+                                  //   boxShadow: [
+                                  //     BoxShadow(
+                                  //       color: Colors.grey.withOpacity(0.3),
+                                  //       offset: Offset(0, 2),
+                                  //       blurRadius: 8,
+                                  //       spreadRadius: 2,
+                                  //     ),
+                                  //   ],
+                                  // ),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.stretch,
@@ -386,7 +388,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                         title: Text(
                                           e.nomIntrant!,
                                           style: TextStyle(
-                                            fontSize: 17,
+                                            fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.black87,
                                           ),
@@ -396,7 +398,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                         subtitle: Text(
                                           "${e.quantiteIntrant.toString()} ${e.unite}",
                                           style: TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 15,
                                             color: Colors.black87,
                                           ),
                                         ),

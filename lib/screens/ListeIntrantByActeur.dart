@@ -171,20 +171,20 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                     ),
                                   );
                                 },
-                                child: Container(
+                                child: Card(
                                   margin: EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: Color.fromARGB(250, 250, 250, 250),
-                                    borderRadius: BorderRadius.circular(15),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.3),
-                                        offset: Offset(0, 2),
-                                        blurRadius: 8,
-                                        spreadRadius: 2,
-                                      ),
-                                    ],
-                                  ),
+                                  // decoration: BoxDecoration(
+                                  //   color: Color.fromARGB(250, 250, 250, 250),
+                                  //   borderRadius: BorderRadius.circular(15),
+                                  //   boxShadow: [
+                                  //     BoxShadow(
+                                  //       color: Colors.grey.withOpacity(0.3),
+                                  //       offset: Offset(0, 2),
+                                  //       blurRadius: 8,
+                                  //       spreadRadius: 2,
+                                  //     ),
+                                  //   ],
+                                  // ),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.stretch,
@@ -193,7 +193,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                         borderRadius:
                                             BorderRadius.circular(8.0),
                                         child: SizedBox(
-                                          height: 85,
+                                          height: 72,
                                           child: e.photoIntrant == null ||
                                                   e.photoIntrant!.isEmpty
                                               ? Image.asset(
@@ -217,7 +217,6 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                 ),
                                         ),
                                       ),
-                                      // SizedBox(height: 8),
                                       ListTile(
                                         title: Text(
                                           e.nomIntrant!,
@@ -226,12 +225,13 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                             fontWeight: FontWeight.bold,
                                             color: Colors.black87,
                                           ),
-                                          // maxLines: 1,
-                                          // overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                         subtitle: Text(
                                           "${e.prixIntrant.toString()} ${para.monnaie}",
                                           style: TextStyle(
+                                            overflow: TextOverflow.ellipsis,
                                             fontSize: 15,
                                             color: Colors.black87,
                                           ),
@@ -246,6 +246,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             _buildEtat(e.statutIntrant!),
+
                                             PopupMenuButton<String>(
                                               padding: EdgeInsets.zero,
                                               itemBuilder: (context) =>
@@ -279,12 +280,17 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                             FontWeight.bold,
                                                       ),
                                                     ),
+                                                    
                                                     onTap: () async {
+                                                      
                                                       e.statutIntrant == false
                                                           ? await IntrantService()
                                                               .activerIntrant(
                                                                   e.idIntrant!)
                                                               .then((value) => {
+                                                                Navigator.of(context)
+                                                                            .pop(),
+
                                                                     Provider.of<IntrantService>(
                                                                             context,
                                                                             listen:
@@ -329,13 +335,14 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                                                 Duration(seconds: 5),
                                                                           ),
                                                                         ),
-                                                                        Navigator.of(context)
-                                                                            .pop(),
+                                                                        
                                                                       })
                                                           : await IntrantService()
                                                               .desactiverIntrant(
                                                                   e.idIntrant!)
                                                               .then((value) => {
+                                                                Navigator.of(context)
+                                                                            .pop(),
                                                                     Provider.of<IntrantService>(
                                                                             context,
                                                                             listen:
@@ -347,9 +354,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                                           getListe(
                                                                               acteur.idActeur!);
                                                                     }),
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
+                                                                  
                                                                   })
                                                               .catchError(
                                                                   (onError) => {
@@ -402,10 +407,13 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                       ),
                                                     ),
                                                     onTap: () async {
+                                                      
                                                       await IntrantService()
                                                           .deleteIntrant(
                                                               e.idIntrant!)
                                                           .then((value) => {
+                                                            Navigator.of(context)
+                                                                            .pop(),
                                                                 Provider.of<IntrantService>(
                                                                         context,
                                                                         listen:
@@ -417,9 +425,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                                           acteur
                                                                               .idActeur!);
                                                                 }),
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop(),
+                                                                
                                                               })
                                                           .catchError(
                                                               (onError) => {

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Commande.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/DetailCommande.dart';
+import 'package:koumi_app/screens/LoginScreen.dart';
+import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/CommandeService.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,26 +40,27 @@ class _CommandeScreenState extends State<CommandeScreen> {
   late TextEditingController _searchController;
 
 
-  // bool isExist = false;
-  // String? email = "";
+  bool isExist = false;
+  String? email = "";
 
-  // void verify() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   email = prefs.getString('emailActeur');
-  //   if (email != null) {
-  //     // Si l'email de l'acteur est présent, exécute checkLoggedIn
-  //     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-  //     // typeActeurData = acteur.typeActeur!;
-  //     // type = typeActeurData.map((data) => data.libelle).join(', ');
-  //     setState(() {
-  //       isExist = true;
-  //     });
-  //   } else {
-  //     setState(() {
-  //       isExist = false;
-  //     });
-  //   }
-  // }
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      // typeActeurData = acteur.typeActeur!;
+      // type = typeActeurData.map((data) => data.libelle).join(', ');
+      setState(() {
+        isExist = true;
+          _liste = getAllCommandeByActeur(acteur.idActeur!);
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
+  }
 
 
   Future<List<Commande>> getAllCommandeByActeur(String idActeur) async {
@@ -68,9 +72,7 @@ class _CommandeScreenState extends State<CommandeScreen> {
   void initState() {
     super.initState();
     _searchController = TextEditingController();
-    // verify();
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-          _liste = getAllCommandeByActeur(acteur.idActeur!);
+    verify();
 
     // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
     //     .parametreList!;
@@ -132,7 +134,82 @@ class _CommandeScreenState extends State<CommandeScreen> {
         //   )
         // ],
       ),
-      body: SingleChildScrollView(
+      body: 
+       !isExist
+            ? Center(
+                child: Container(
+                  padding: EdgeInsets.all(
+                      20), // Ajouter un padding pour l'espace autour du contenu
+
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset("assets/images/lock.png",
+                          width: 100,
+                          height:
+                              100), // Ajuster la taille de l'image selon vos besoins
+                      SizedBox(
+                          height:
+                              20), // Ajouter un espace entre l'image et le texte
+                      Text(
+                        "Vous devez vous connecter pour voir vos commandes",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      SizedBox(
+                          height:
+                              20), // Ajouter un espace entre le texte et le bouton
+                      ElevatedButton(
+                        onPressed: () {
+                          Future.microtask(() {
+                            Provider.of<BottomNavigationService>(context,
+                                    listen: false)
+                                .changeIndex(0);
+                          });
+                          Get.to(LoginScreen(),
+                              duration: Duration(
+                                  seconds:
+                                      1), //duration of transitions, default 1 sec
+                              transition: Transition.leftToRight);
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.transparent),
+                          elevation: MaterialStateProperty.all<double>(
+                              0), // Supprimer l'élévation du bouton
+                          overlayColor: MaterialStateProperty.all<Color>(
+                              Colors.grey.withOpacity(
+                                  0.2)), // Couleur de l'overlay du bouton lorsqu'il est pressé
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18.0),
+                              side: BorderSide(
+                                  color:
+                                      d_colorGreen), // Bordure autour du bouton
+                            ),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          child: Text(
+                            "Se connecter",
+                            style: TextStyle(fontSize: 16, color: d_colorGreen),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            :
+      SingleChildScrollView(
         child: Column(children: [
           const SizedBox(height: 10),
           Padding(
@@ -386,7 +463,7 @@ class _CommandeScreenState extends State<CommandeScreen> {
                                             _buildEtat(e
                                                 .statutCommande!),
                                             SizedBox(
-                                              width: 310,
+                                              width: 270,
                                             ),
                                             Expanded(
                                               child: PopupMenuButton<String>(

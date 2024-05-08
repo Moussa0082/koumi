@@ -24,11 +24,16 @@ class AddAndUpdateProductEndSreen extends StatefulWidget {
   
      bool? isEditable;
      late Stock? stock;
-     String  nomProduit, origine, forme,prix , quantite;
+     String?  nomProduit, origine, forme,prix , quantite;
      File? image;
+      Speculation? speculation;
+      Magasin? magasin;
+      Unite? unite;
+      ZoneProduction? zoneProduction;
 
    AddAndUpdateProductEndSreen({super.key, this.isEditable, this.stock, 
-   required this.nomProduit, required this.forme , required this.origine, required this.prix, required this.quantite, this.image
+    this.nomProduit,  this.forme ,  this.origine,  this.prix, 
+    this.quantite, this.image, this.zoneProduction, this.unite, this.magasin, this.speculation
    });
 
   @override
@@ -135,16 +140,16 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
     try {
       
     if(widget.image != null){
-    await StockService().creerStock(nomProduit: widget.nomProduit,
-     origineProduit: widget.origine, prix: widget.prix,
-     formeProduit: widget.forme, quantiteStock: widget.quantite, photo: widget.image,
+    await StockService().creerStock(nomProduit: widget.nomProduit!,
+     origineProduit: widget.origine!, prix: widget.prix!,
+     formeProduit: widget.forme!, quantiteStock: widget.quantite!, photo: widget.image,
      typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
      zoneProduction: zoneProduction, speculation: speculation, unite: unite, 
       magasin: magasin, acteur: acteur);
     }else{
-    await StockService().creerStock(nomProduit: widget.nomProduit,
-         origineProduit: widget.origine, prix: widget.prix,
-     formeProduit: widget.forme, quantiteStock: widget.quantite, 
+    await StockService().creerStock(nomProduit: widget.nomProduit!,
+         origineProduit: widget.origine!, prix: widget.prix!,
+     formeProduit: widget.forme!, quantiteStock: widget.quantite!, 
      typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
      zoneProduction: zoneProduction, speculation: speculation, unite: unite, 
       magasin: magasin, acteur: acteur);
@@ -164,22 +169,22 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
       
     if(widget.image != null){
     await StockService().updateStock(
-      idStock: widget.stock!.idStock!, nomProduit: widget.nomProduit,
-           origineProduit: widget.origine, prix: widget.prix,
-     formeProduit: widget.forme, quantiteStock: widget.quantite, photo: widget.image!,
+      idStock: widget.stock!.idStock!, nomProduit: widget.nomProduit!,
+           origineProduit: widget.origine!, prix: widget.prix!,
+     formeProduit: widget.forme!, quantiteStock: widget.quantite!, photo: widget.image,
      typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
      zoneProduction: widget.stock!.zoneProduction!, speculation: widget.stock!.speculation!,
       unite: widget.stock!.unite!,
       magasin: widget.stock!.magasin!, acteur: acteur);
     }else{
     await StockService().updateStock(
-      idStock: widget.stock!.idStock!, nomProduit: widget.nomProduit,
-      origineProduit: widget.origine, prix: widget.prix,
-     formeProduit: widget.forme, quantiteStock: widget.quantite, 
+      idStock: widget.stock!.idStock!, nomProduit: widget.nomProduit!,
+      origineProduit: widget.origine!, prix: widget.prix!,
+     formeProduit: widget.forme!, quantiteStock: widget.quantite!, 
      typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
-      zoneProduction: widget.stock!.zoneProduction!, speculation: widget.stock!.speculation!,
-      unite: widget.stock!.unite!, 
-      magasin: widget.stock!.magasin!, acteur: acteur);
+      zoneProduction: widget.zoneProduction!, speculation: widget.speculation!,
+      unite: widget.unite!, 
+      magasin: widget.magasin!, acteur: acteur);
    }
     } catch (error) {
         // Handle any exceptions that might occur during the request
@@ -347,7 +352,19 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                 );
                               }
                               if (snapshot.hasError) {
-                            return Text("Une erreur s'est produite veuillez réessayer");
+                            return       DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Probleme de connexion',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
                               }
                               if (snapshot.hasData) {
                                 dynamic jsonString =
@@ -473,7 +490,19 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                 );
                               }
                               if (snapshot.hasError) {
-                            return Text("Une erreur s'est produite veuillez réessayer plus tard");
+                            return  DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Probleme de connexion',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
                               }
                               if (snapshot.hasData) {
                                 dynamic jsonString =
@@ -601,7 +630,19 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                 );
                               }
                               if (snapshot.hasError) {
-                            return Text("Une erreur s'est produite veuillez réessayer plus tard");
+                            return  DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Probleme de connexion',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
                               }
                               if (snapshot.hasData) {
                                 dynamic jsonString =
@@ -725,7 +766,19 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                 );
                               }
                               if (snapshot.hasError) {
-                            return Text("Une erreur s'est produite veuillez réessayer plus tard");
+                            return  DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Probleme de connexion',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
                               }
                               if (snapshot.hasData) {
                                 dynamic jsonString =

@@ -86,6 +86,7 @@ class _SuperficiePageState extends State<SuperficiePage> {
                         overflow: TextOverflow.ellipsis),
                   ),
                   onTap: () async {
+                    Navigator.of(context).pop();
                     Navigator.push(
                         context,
                         MaterialPageRoute(

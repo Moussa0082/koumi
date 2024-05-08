@@ -254,18 +254,19 @@ class _StoreScreenState extends State<StoreScreen> {
                     );
                   }
                 }
-                return DropdownButtonFormField(
-                  items: [],
-                  onChanged: null,
-                  decoration: InputDecoration(
-                    labelText: '-- Aucune region trouvé --',
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                );
+                return  DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Probleme de connexion',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
               },
             ),
           ),
@@ -295,33 +296,7 @@ class _StoreScreenState extends State<StoreScreen> {
                   } else {
                     magasinListe = snapshot.data!;
                     // Vous pouvez afficher une image ou un texte ici
-                    if (magasinListe.isEmpty ||
-                        magasinListe.isEmpty &&
-                            _searchController.text.isNotEmpty) {
-                      SingleChildScrollView(
-                        child: Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Center(
-                            child: Column(
-                              children: [
-                                Image.asset('assets/images/notif.jpg'),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  'Aucun magasin trouvé',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 17,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }
+                 
 
                     String searchText = "";
                     // List<Magasin> filtereSearch = magasinListe.where((search) {
@@ -365,12 +340,14 @@ class _StoreScreenState extends State<StoreScreen> {
                         crossAxisSpacing: 10,
                         childAspectRatio: 0.8,
                       ),
-                      itemCount: typeActeurData
+                      itemCount: isExist == true ? typeActeurData
                               .map((e) => e.libelle!.toLowerCase())
                               .contains("admin")
                           ? magasinListe.length
                           : magasinListe
-                              .where((element) => element.statutMagasin == true)
+                              .where((element) => element.statutMagasin == true && element.acteur?.statutActeur == true)
+                              .length : magasinListe
+                              .where((element) => element.statutMagasin == true && element.acteur?.statutActeur == true)
                               .length,
                       itemBuilder: (context, index) {
                         return GestureDetector(
@@ -384,27 +361,26 @@ class _StoreScreenState extends State<StoreScreen> {
                               ),
                             );
                           },
-                          child: Container(
-                            margin: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Color.fromARGB(250, 250, 250, 250),
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.3),
-                                  offset: Offset(0, 2),
-                                  blurRadius: 8,
-                                  spreadRadius: 2,
-                                ),
-                              ],
-                            ),
+                          child: Card(
+                            // decoration: BoxDecoration(
+                            //   color: Color.fromARGB(250, 250, 250, 250),
+                            //   borderRadius: BorderRadius.circular(15),
+                            //   boxShadow: [
+                            //     BoxShadow(
+                            //       color: Colors.grey.withOpacity(0.3),
+                            //       offset: Offset(0, 2),
+                            //       blurRadius: 8,
+                            //       spreadRadius: 2,
+                            //     ),
+                            //   ],
+                            // ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: Container(
-                                    height: 85,
+                                    height: 72,
                                     child: magasinListe[index].photo == null || magasinListe[index].photo!.isEmpty
                                         ? Image.asset(
                                             "assets/images/default_image.png",
@@ -432,7 +408,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                   title: Text(
                                     magasinListe[index].nomMagasin!,
                                     style: TextStyle(
-                                      fontSize: 17,
+                                      fontSize: 15,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black87,
                                     ),
@@ -443,7 +419,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                     overflow: TextOverflow.ellipsis,
                                     magasinListe[index].localiteMagasin!,
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black87,
                                     ),
@@ -467,7 +443,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                             _buildEtat(magasinListe[index]
                                                 .statutMagasin!),
                                             SizedBox(
-                                              width: 120,
+                                              width: 110,
                                             ),
                                             Expanded(
                                               child: PopupMenuButton<String>(

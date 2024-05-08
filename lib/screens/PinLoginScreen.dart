@@ -85,7 +85,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         return AlertDialog(
           title: const Center(child: Text('Erreur')),
           content: const Text(
-            "Code acteur non trouvé dans les préférences de l'utilisateur",
+            "Une erreur s'est produite veuillez réessayer plus tard",
             textAlign: TextAlign.justify,
             style: TextStyle(color: Colors.black, fontSize: 20),
           ),

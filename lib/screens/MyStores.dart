@@ -427,27 +427,27 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                               ),
                             );
                           },
-                          child: Container(
+                          child: Card(
                             margin: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Color.fromARGB(250, 250, 250, 250),
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.3),
-                                  offset: Offset(0, 2),
-                                  blurRadius: 8,
-                                  spreadRadius: 2,
-                                ),
-                              ],
-                            ),
+                            // decoration: BoxDecoration(
+                            //   color: Color.fromARGB(250, 250, 250, 250),
+                            //   borderRadius: BorderRadius.circular(15),
+                            //   boxShadow: [
+                            //     BoxShadow(
+                            //       color: Colors.grey.withOpacity(0.3),
+                            //       offset: Offset(0, 2),
+                            //       blurRadius: 8,
+                            //       spreadRadius: 2,
+                            //     ),
+                            //   ],
+                            // ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: Container(
-                                    height: 85,
+                                    height: 72,
                                     child: magasinListe[index].photo == null || magasinListe[index].photo!.isEmpty
                                         ? Image.asset(
                                             "assets/images/default_image.png",
@@ -475,7 +475,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                   title: Text(
                                     magasinListe[index].nomMagasin!,
                                     style: TextStyle(
-                                      fontSize: 17,
+                                      fontSize: 15,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black87,
                                     ),
@@ -487,7 +487,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                     magasinListe[index].niveau1Pays!.nomN1!,
                                     style: TextStyle(
                                       overflow: TextOverflow.ellipsis,
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black87,
                                     ),
@@ -507,7 +507,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                       _buildEtat(
                                           magasinListe[index].statutMagasin!),
                                       SizedBox(
-                                        width: 120,
+                                        width: 110,
                                       ),
                                       Expanded(
                                         child: PopupMenuButton<String>(

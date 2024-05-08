@@ -19,8 +19,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 
 class DetailProduits extends StatefulWidget {
-  late Stock? stock;
-  DetailProduits({super.key, this.stock});
+  late Stock stock;
+  DetailProduits({super.key, required this.stock});
 
   @override
   State<DetailProduits> createState() => _DetailProduitsState();
@@ -39,13 +39,14 @@ class _DetailProduitsState extends State<DetailProduits>
   late List<TypeActeur> typeActeurData = [];
   late String type;
   late ValueNotifier<bool> isDialOpenNotifier;
+    late Stock stock;
 
   bool isExist = false;
   String? email = "";
   List<ParametreGeneraux> paraList = [];
   late ParametreGeneraux para = ParametreGeneraux();
 
-  Future<void> verify() async {
+ void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     email = prefs.getString('emailActeur');
     if (email != null) {
@@ -55,7 +56,6 @@ class _DetailProduitsState extends State<DetailProduits>
       type = typeActeurData.map((data) => data.libelle).join(', ');
       setState(() {
         isExist = true;
-        debugPrint("id: ${acteur.idActeur}");
       });
     } else {
       setState(() {
@@ -80,9 +80,10 @@ class _DetailProduitsState extends State<DetailProduits>
   void initState() {
     super.initState();
     isDialOpenNotifier = ValueNotifier<bool>(false);
-    verifyParam();
-    // Initialiser le ValueNotifier
     verify();
+    verifyParam();
+    stock = widget.stock;
+    // Initialiser le ValueNotifier
   }
 
   Future<void> _makePhoneWa(String whatsappNumber) async {
@@ -115,7 +116,7 @@ class _DetailProduitsState extends State<DetailProduits>
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           centerTitle: true,
           title: const Text("Détail Produit"),
-          actions: acteur.idActeur != widget.stock!.acteur!.idActeur
+          actions: acteur.idActeur != widget.stock.acteur!.idActeur
               ? null
               : [
                   isExist == false
@@ -128,20 +129,130 @@ class _DetailProduitsState extends State<DetailProduits>
                                     builder: (context) =>
                                         AddAndUpdateProductScreen(
                                           isEditable: true,
-                                          stock: widget.stock!,
+                                          stock: widget.stock,
                                         )));
                           },
                           icon: Icon(
                             Icons.edit,
                           ),
                         )
+                        //  PopupMenuButton<String>(
+                        //                               padding: EdgeInsets.zero,
+                        //                               itemBuilder: (context) =>
+                        //                                   <PopupMenuEntry<
+                        //                                       String>>[
+                        //                                 PopupMenuItem<String>(
+                        //                                     child: ListTile(
+                        //                                   leading: stockListe[
+                        //                                                   index]
+                        //                                               .statutSotck ==
+                        //                                           false
+                        //                                       ? Icon(
+                        //                                           Icons.check,
+                        //                                           color: Colors
+                        //                                               .green,
+                        //                                         )
+                        //                                       : Icon(
+                        //                                           Icons
+                        //                                               .disabled_visible,
+                        //                                           color: Colors
+                        //                                                   .orange[
+                        //                                               400]),
+                        //                                   title: Text(
+                        //                                     stockListe[index]
+                        //                                                 .statutSotck ==
+                        //                                             false
+                        //                                         ? "Activer"
+                        //                                         : "Desactiver",
+                        //                                     style: TextStyle(
+                        //                                       color: stockListe[
+                        //                                                       index]
+                        //                                                   .statutSotck ==
+                        //                                               false
+                        //                                           ? Colors.green
+                        //                                           : Colors.red,
+                        //                                       fontWeight:
+                        //                                           FontWeight
+                        //                                               .bold,
+                        //                                     ),
+                        //                                   ),
+                        //                                   onTap: () async {
+                        //                                     // Changement d'état du magasin ici
+                        //                                     stockListe[index]
+                        //                                                 .statutSotck ==
+                        //                                             false
+                        //                                         ? await StockService()
+                        //                                             .activerStock(
+                        //                                                 stockListe[index]
+                        //                                                     .idStock!)
+                        //                                             .then(
+                        //                                                 (value) =>
+                        //                                                     {
+                        //                                                       // Mettre à jour la liste des magasins après le changement d'état
+                        //                                                       Provider.of<StockService>(context, listen: false).applyChange(),
+                        //                                                       setState(() {
+                        //                                                         stockListeFuture = StockService().fetchStock();
+                        //                                                       }),
+                        //                                                       Navigator.of(context).pop(),
+                        //                                                     })
+                        //                                             .catchError(
+                        //                                                 (onError) =>
+                        //                                                     {
+                        //                                                       ScaffoldMessenger.of(context).showSnackBar(
+                        //                                                         const SnackBar(
+                        //                                                           content: Row(
+                        //                                                             children: [
+                        //                                                               Text("Une erreur s'est produit"),
+                        //                                                             ],
+                        //                                                           ),
+                        //                                                           duration: Duration(seconds: 5),
+                        //                                                         ),
+                        //                                                       ),
+                        //                                                       Navigator.of(context).pop(),
+                        //                                                     })
+                        //                                         : await StockService()
+                        //                                             .desactiverStock(
+                        //                                                 stockListe[index]
+                        //                                                     .idStock!)
+                        //                                             .then(
+                        //                                                 (value) =>
+                        //                                                     {
+                        //                                                       Provider.of<StockService>(context, listen: false).applyChange(),
+                        //                                                       setState(() {
+                        //                                                         stockListeFuture = StockService().fetchStock();
+                        //                                                       }),
+                        //                                                       Navigator.of(context).pop(),
+                        //                                                     });
+
+                        //                                     ScaffoldMessenger
+                        //                                             .of(context)
+                        //                                         .showSnackBar(
+                        //                                       SnackBar(
+                        //                                         content: Row(
+                        //                                           children: [
+                        //                                             Text(stockListe[index].statutSotck ==
+                        //                                                     false
+                        //                                                 ? "Activer avec succèss "
+                        //                                                 : "Desactiver avec succèss"),
+                        //                                           ],
+                        //                                         ),
+                        //                                         duration:
+                        //                                             Duration(
+                        //                                                 seconds:
+                        //                                                     2),
+                        //                                       ),
+                        //                                     );
+                        //                                   },
+                        //                                 )),
+                        //                               ],
+                        //                             ),
                 ],
         ),
         body: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min, // Set mainAxisSize to min
             children: [
-              widget.stock!.photo == null || widget.stock!.photo!.isEmpty
+              widget.stock.photo == null || widget.stock.photo!.isEmpty
                   ? Image.asset(
                       "assets/images/default_image.png",
                       fit: BoxFit.cover,
@@ -150,7 +261,7 @@ class _DetailProduitsState extends State<DetailProduits>
                     )
                   : CachedNetworkImage(
                       imageUrl:
-                          'https://koumi.ml/api-koumi/Stock/${widget.stock!.idStock}/image',
+                          'https://koumi.ml/api-koumi/Stock/${widget.stock.idStock}/image',
                       width: double.infinity,
                       height: 200,
                       placeholder: (context, url) =>
@@ -182,7 +293,7 @@ class _DetailProduitsState extends State<DetailProduits>
                       ),
                       child: Center(
                         child: Text(
-                          widget.stock!.nomProduit!.toUpperCase(),
+                          widget.stock.nomProduit!.toUpperCase(),
                           style: const TextStyle(
                               overflow: TextOverflow.ellipsis,
                               fontSize: 20,
@@ -199,7 +310,7 @@ class _DetailProduitsState extends State<DetailProduits>
                               fontSize: 20, fontStyle: FontStyle.italic),
                         ),
                         Text(
-                            widget.stock!
+                            widget.stock
                                 .formeProduit!, // Use optional chaining and ??
                             style: TextStyle(
                                 fontSize: 20,
@@ -214,7 +325,7 @@ class _DetailProduitsState extends State<DetailProduits>
                         Text("Quantité : ",
                             style: TextStyle(
                                 fontSize: 20, fontStyle: FontStyle.italic)),
-                        Text(widget.stock!.quantiteStock!.toInt().toString(),
+                        Text(widget.stock.quantiteStock!.toInt().toString(),
                             style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -229,7 +340,7 @@ class _DetailProduitsState extends State<DetailProduits>
                             style: TextStyle(
                                 fontSize: 20, fontStyle: FontStyle.italic)),
                         Text(
-                          widget.stock!.unite!.nomUnite!,
+                          widget.stock.unite!.nomUnite!,
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -264,9 +375,9 @@ class _DetailProduitsState extends State<DetailProduits>
                         trimExpandedText: "Lire moins",
                         style: TextStyle(
                             fontSize: 16, fontStyle: FontStyle.italic),
-                        widget.stock!.descriptionStock == null
+                        widget.stock.descriptionStock == null
                             ? "A Henley shirt is a collarless pullover shirt, by a round neckline and a placket about 3 to 5 inches (8 to 13 cm) long and usually having 2–5 buttons."
-                            : widget.stock!.descriptionStock!,
+                            : widget.stock.descriptionStock!,
                       ),
                     ),
                     Container(
@@ -292,7 +403,7 @@ class _DetailProduitsState extends State<DetailProduits>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '${widget.stock!.prix!.toInt()} (${para.monnaie})', // Convertir en entier
+                            '${widget.stock.prix!.toInt()} (${para.monnaie})', // Convertir en entier
                             style: const TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           ),
@@ -321,7 +432,7 @@ class _DetailProduitsState extends State<DetailProduits>
                             style: TextStyle(
                                 fontSize: 20, fontStyle: FontStyle.italic)),
                         Text(
-                          widget.stock!.speculation!.nomSpeculation!,
+                          widget.stock.speculation!.nomSpeculation!,
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -338,7 +449,7 @@ class _DetailProduitsState extends State<DetailProduits>
                             style: TextStyle(
                                 fontSize: 20, fontStyle: FontStyle.italic)),
                         Text(
-                          widget.stock!.typeProduit!,
+                          widget.stock.typeProduit!,
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -369,7 +480,7 @@ class _DetailProduitsState extends State<DetailProduits>
                     ),
                     const SizedBox(height: 20),
                     isExist == true
-                        ? widget.stock!.acteur!.idActeur == acteur.idActeur
+                        ? widget.stock.acteur!.idActeur == acteur.idActeur
                             ? SizedBox()
                             : Center(
                                 child: SizedBox(
@@ -378,7 +489,7 @@ class _DetailProduitsState extends State<DetailProduits>
                                   child: ElevatedButton(
                                     onPressed: () {
                                       // _addToCart(widget.stock);
-                                      if (widget.stock!.acteur!.idActeur ==
+                                      if (widget.stock.acteur!.idActeur ==
                                           acteur.idActeur) {
                                         Snack.error(
                                             titre: "Alerte",
@@ -387,7 +498,7 @@ class _DetailProduitsState extends State<DetailProduits>
                                       } else {
                                         Provider.of<CartProvider>(context,
                                                 listen: false)
-                                            .addToCart(widget.stock!, 1, "");
+                                            .addToCart(widget.stock, 1, "");
                                       }
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -403,13 +514,14 @@ class _DetailProduitsState extends State<DetailProduits>
                                 ),
                               )
                         : SizedBox(),
+                                          const SizedBox(height: 10),
                   ],
                 ),
               )
             ],
           ),
         ),
-        floatingActionButton: acteur.idActeur != widget.stock!.acteur!.idActeur
+        floatingActionButton: acteur.idActeur != stock.acteur!.idActeur
             ? SpeedDial(
                 // animatedIcon: AnimatedIcons.close_menu,
                 backgroundColor: d_colorGreen,
@@ -430,7 +542,7 @@ class _DetailProduitsState extends State<DetailProduits>
                     ),
                     onTap: () {
                       final String whatsappNumber =
-                          widget.stock!.acteur!.whatsAppActeur!;
+                          widget.stock.acteur!.whatsAppActeur!;
                       _makePhoneWa(whatsappNumber);
                     },
                   ),
@@ -444,7 +556,7 @@ class _DetailProduitsState extends State<DetailProduits>
                     ),
                     onTap: () {
                       final String numberPhone =
-                          widget.stock!.acteur!.telephoneActeur!;
+                          widget.stock.acteur!.telephoneActeur!;
                       _makePhoneCall(numberPhone);
                     },
                   )
@@ -457,47 +569,13 @@ class _DetailProduitsState extends State<DetailProduits>
                       .value; // Inverser la valeur du ValueNotifier
                 },
               )
-            : SizedBox());
+            : Container());
   }
 
-  // void _addToCart(Stock stock) {
-  //   var existingItem = _cartItems.firstWhere(
-  //     (item) => item.stock == stock,
-  //     orElse: () => CartItem(stock: stock),
-  //   );
 
-  //   if (existingItem.quantity == 1) {
-  //     _cartItems.remove(existingItem);
-  //     Snack.error(titre: "Erreur", message: "Produit déjà existant au panier");
-  //   } else {
-  //     existingItem.quantity++;
-  //     Snack.success(titre: "Succès", message: "Produit déjà existant au panier qté " + existingItem.quantity.toString());
-  //   }
-  // }
 }
 
-class CartStorage {
-  static const String _keyCartItems = 'cartItems';
 
-  static Future<List<String>> getCartItems() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getStringList(_keyCartItems) ?? [];
-  }
-
-  static Future<void> addToCart(String productId) async {
-    final List<String> cartItems = await getCartItems();
-    cartItems.add(productId);
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_keyCartItems, cartItems);
-  }
-
-  static Future<void> removeFromCart(String productId) async {
-    final List<String> cartItems = await getCartItems();
-    cartItems.remove(productId);
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_keyCartItems, cartItems);
-  }
-}
 
 class DetailScreen extends StatelessWidget {
   @override

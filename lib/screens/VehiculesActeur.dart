@@ -88,6 +88,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                       ),
                     ),
                     onTap: () async {
+                      Navigator.of(context).pop();
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -185,27 +186,27 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                     builder: (context) =>
                                         DetailTransport(vehicule: e)));
                           },
-                          child: Container(
-                            margin: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Color.fromARGB(250, 250, 250, 250),
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.3),
-                                  offset: Offset(0, 2),
-                                  blurRadius: 8,
-                                  spreadRadius: 2,
-                                ),
-                              ],
-                            ),
+                          child: Card(
+                            
+                            // decoration: BoxDecoration(
+                            //   color: Color.fromARGB(250, 250, 250, 250),
+                            //   borderRadius: BorderRadius.circular(15),
+                            //   boxShadow: [
+                            //     BoxShadow(
+                            //       color: Colors.grey.withOpacity(0.3),
+                            //       offset: Offset(0, 2),
+                            //       blurRadius: 8,
+                            //       spreadRadius: 2,
+                            //     ),
+                            //   ],
+                            // ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: SizedBox(
-                                    height: 85,
+                                    height: 72,
                                     child: e.photoVehicule == null ||  e.photoVehicule!.isEmpty
                                         ? Image.asset(
                                             "assets/images/default_image.png",
@@ -243,6 +244,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                   subtitle: Text(
                                     e.localisation,
                                     style: TextStyle(
+                                      overflow: TextOverflow.ellipsis,
                                       fontSize: 15,
                                       color: Colors.black87,
                                     ),
@@ -285,6 +287,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                 ),
                                               ),
                                               onTap: () async {
+                                                
                                                 e.statutVehicule == false
                                                     ? await VehiculeService()
                                                         .activerVehicules(

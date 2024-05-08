@@ -82,7 +82,8 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                         ),
                       ),
                       onTap: () async {
-                        Get.to(AddMaterielByType(typeMateriel: type));
+                        Navigator.of(context).pop();
+                        Get.to(AddMaterielByType(typeMateriel: type), transition: Transition.leftToRightWithFade);
                       },
                     ),
                   ),

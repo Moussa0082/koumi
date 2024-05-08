@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ActeurProvider with ChangeNotifier {
   Acteur? _acteur;
   Acteur? get acteur => _acteur;
-  bool isLogged = true;
+  bool isLogged = false;
 
    
   
@@ -25,6 +25,14 @@ class ActeurProvider with ChangeNotifier {
     String? whatsAppActeur = prefs.getString('whatsAppActeur');
     String? niveau3PaysActeur = prefs.getString('niveau3PaysActeur');
     String? localiteActeur = prefs.getString('localiteActeur');
+
+      if (emailActeur != null) {
+    // L'utilisateur est connecté
+    isLogged = true;
+  } else {
+    // L'utilisateur n'est pas connecté
+    isLogged = false;
+  }
 
     if (emailActeur != null && password != null && userTypeList != null &&
         idActeur != null && nomActeur != null && adresseActeur!= null &&
@@ -49,22 +57,7 @@ class ActeurProvider with ChangeNotifier {
   }
 
 
-   
-  String? email = "";
-
-    void verify() async {
-     SharedPreferences 
-    prefs = await SharedPreferences.getInstance();
-    email = prefs.getString('emailActeur');
-   
-    if (email != null) {
-      // Si l'email de l'acteur est présent, exécute checkLoggedIn
-      
-        isLogged = true;
-    } else {
-        isLogged = false;
-    }
-  }
+  
 
   Future<void> logout() async {
     // Supprimer les données utilisateur
@@ -92,8 +85,8 @@ class ActeurProvider with ChangeNotifier {
    String savedCodeActeur = codeActeur;
   prefs.setString('codeActeur', savedCodeActeur);
   }
-  // isLogged = false;
-    verify();
+  // Mettre à jour l'état de la connexion
+      isLogged = false;
     notifyListeners();
   
 }

@@ -158,42 +158,10 @@ class _MyProductScreenState extends State<MyProductScreen> {
                   });
                 },
                 icon: Icon(Icons.refresh)),
-                   PopupMenuButton<String>(
-                          padding: EdgeInsets.zero,
-                          itemBuilder: (context) {
-                            return <PopupMenuEntry<String>>[
-                              PopupMenuItem<String>(
-                                child: ListTile(
-                                  leading: const Icon(
-                                    Icons.add,
-                                    color: Colors.green,
-                                  ),
-                                  title: const Text(
-                                    "Ajouter produit",
-                                    style: TextStyle(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  onTap: () async {
-                                               Navigator.of(
-                                                                            context)
-                                                                        .pop();
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                AddAndUpdateProductScreen(isEditable: false,)));
-                                  },
-                                ),
-                              ),
-                              
-                              
-                            ];
-                          },
-                        )
+                  
                      
-                ]),
+                ]
+                ),
       body: SingleChildScrollView(
         child: Column(children: [
           const SizedBox(height: 10),
@@ -499,257 +467,212 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                     ),
                                   );
                                 },
-                                child: Container(
-                                  margin: EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: Color.fromARGB(250, 250, 250, 250),
-                                    borderRadius: BorderRadius.circular(15),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.3),
-                                        offset: Offset(0, 2),
-                                        blurRadius: 8,
-                                        spreadRadius: 2,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        child: Container(
-                                          height: 90,
-                                          child: filtereSearch[index].photo == null || filtereSearch[index].photo!.isEmpty  
-                                              ? Image.asset(
-                                                  "assets/images/default_image.png",
-                                                  fit: BoxFit.cover,
-                                                )
-                                              : CachedNetworkImage(
-                                                  imageUrl:
-                                                      "https://koumi.ml/api-koumi/Stock/${filtereSearch[index].idStock}/image",
-                                                  fit: BoxFit.cover,
-                                                  placeholder: (context, url) =>
-                                                      const Center(
-                                                          child:
-                                                              CircularProgressIndicator()),
-                                                  errorWidget:
-                                                      (context, url, error) =>
-                                                          Image.asset(
-                                                    'assets/images/default_image.png',
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                        ),
-                                      ),
-                                      // SizedBox(height: 8),
-                                      ListTile(
-                                        title: Text(
-                                          filtereSearch[index].nomProduit!,
-                                          style: TextStyle(
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black87,
+                                child:Card(
+  // margin: EdgeInsets.all(8),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      ClipRRect(
+        borderRadius: BorderRadius.circular(8.0),
+        child: SizedBox(
+          height: 77,
+          child: filtereSearch[index].photo == null ||
+                  filtereSearch[index].photo!.isEmpty
+              ? Image.asset(
+                  "assets/images/default_image.png",
+                  fit: BoxFit.cover,
+                )
+              : CachedNetworkImage(
+                  imageUrl:
+                      "https://koumi.ml/api-koumi/Stock/${filtereSearch[index].idStock}/image",
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => Image.asset(
+                    'assets/images/default_image.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+        ),
+      ),
+      ListTile(
+        title: Text(
+          filtereSearch[index].nomProduit!,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: Text(
+          para.monnaie != null
+              ? "${filtereSearch[index].prix.toString()} ${para.monnaie}"
+              : "${filtereSearch[index].prix.toString()} FCFA",
+          style: TextStyle(
+            overflow: TextOverflow.ellipsis,
+            fontSize: 16,
+            color: Colors.black87,
+          ),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildEtat(filtereSearch[index].statutSotck!),
+            SizedBox(width: 100),
+            Expanded(
+              child: PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                itemBuilder: (context) => <PopupMenuEntry<String>>[
+                  PopupMenuItem<String>(
+                    child: ListTile(
+                      leading: filtereSearch[index].statutSotck == false
+                          ? Icon(
+                              Icons.check,
+                              color: Colors.green,
+                            )
+                          : Icon(
+                              Icons.disabled_visible,
+                              color: Colors.orange[400],
+                            ),
+                      title: Text(
+                        filtereSearch[index].statutSotck == false
+                            ? "Activer"
+                            : "Desactiver",
+                        style: TextStyle(
+                          color: filtereSearch[index].statutSotck == false
+                              ? Colors.green
+                              : Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onTap: () async {
+                        // Changement d'état du magasin ici
+                        filtereSearch[index].statutSotck == false
+                            ? await StockService()
+                                .activerStock(filtereSearch[index].idStock!)
+                                .then((value) => {
+                                      Provider.of<StockService>(context,
+                                              listen: false)
+                                          .applyChange(),
+                                      setState(() {
+                                        stockListeFuture = StockService()
+                                            .fetchStockByActeur(
+                                                acteur.idActeur!);
+                                      }),
+                                      Navigator.of(context).pop(),
+                                    })
+                                .catchError((onError) => {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Row(
+                                            children: [
+                                              Text(
+                                                  "Une erreur s'est produite"),
+                                            ],
                                           ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        subtitle: Text(
-                                          overflow: TextOverflow.ellipsis,
-                                         "${filtereSearch[index].quantiteStock!.toString()} ${filtereSearch[index].unite!.nomUnite} ",
-                                          style:TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black87,
-                                          ),
-                                        ),
-                                      
-                                      ),
-                                           Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 15),
-                                        child: Text(
-                                          para.monnaie != null
-                                              ? 
-                                              "${filtereSearch[index].prix.toString()} ${para.monnaie}"
-                                              :
-                                               "${filtereSearch[index].prix.toString()} FCFA",
-                                          style: TextStyle(
-                                            overflow: TextOverflow.ellipsis,
-                                            fontSize: 16,
-                                            color: Colors.black87,
-                                          ),
+                                          duration: Duration(seconds: 5),
                                         ),
                                       ),
-                                      //  _buildItem(
-                                      //         "Localité :", filtereSearch[index].localiteMagasin!),
-                                          //  _buildItem(
-                                          //     "Acteur :", e.acteur!.typeActeur!.map((e) => e.libelle!).join(','))
-                                           Padding(
-                                                                                        padding: const EdgeInsets.symmetric(horizontal:8.0),
-                                                                                        child: Row(
-                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                               children: [
-                                                 _buildEtat(filtereSearch[index].statutSotck!),
-                                                 SizedBox(width: 120,),
-                                                 Expanded(
-                                                   child: PopupMenuButton<String>(
-                                                     padding: EdgeInsets.zero,
-                                                     itemBuilder: (context) =>
-                                                         <PopupMenuEntry<String>>[
-                                                       PopupMenuItem<String>(
-                                                         child: ListTile(
-                                                           leading: filtereSearch[index].statutSotck == false ? Icon(
-                                                             Icons.check,
-                                                             color: Colors.green,
-                                                           ): Icon(
-                                                            Icons.disabled_visible,
-                                                            color:Colors.orange[400]
-                                                           ),
-                                                           title:  Text(
-                                                            filtereSearch[index].statutSotck == false ? "Activer" : "Desactiver",
-                                                             style: TextStyle(
-                                                               color: filtereSearch[index].statutSotck == false ? Colors.green : Colors.red,
-                                                               fontWeight: FontWeight.bold,
-                                                             ),
-                                                           ),
-                                                           
-                                                           onTap: () async {
-                                                                             // Changement d'état du magasin ici
-                                                                      
-                                                                          filtereSearch[index].statutSotck == false ?  await StockService().activerStock(filtereSearch[index].idStock!).then((value) => {
-                                                                               // Mettre à jour la liste des magasins après le changement d'état
-                                                                               Provider.of<StockService>(
-                                                                        context,
-                                                                        listen:
-                                                                            false)
-                                                                    .applyChange(),
-                                                                               setState(() {
-                                       stockListeFuture =  StockService().fetchStockByActeur(acteur.idActeur!);
-                                                                               }),
-                                                                               Navigator.of(context).pop(),
-                                                                     })
-                                                                 .catchError((onError) => {
-                                                                       ScaffoldMessenger.of(context)
-                                                                           .showSnackBar(
-                                                                         const SnackBar(
-                                                                           content: Row(
-                                                                             children: [
-                                                                               Text(
-                                                                                   "Une erreur s'est produit"),
-                                                                             ],
-                                                                           ),
-                                                                           duration:
-                                                                               Duration(seconds: 5),
-                                                                         ),
-                                                                       ),
-                                                                       Navigator.of(context).pop(),
-                                                                     }): await StockService()
-                                                                 .desactiverStock(filtereSearch[index].idStock!)
-                                                                 .then((value) => {
-                                                                    Provider.of<StockService>(
-                                                                        context,
-                                                                        listen:
-                                                                            false)
-                                                                    .applyChange(),
-                                                                   setState(() {
-                                       stockListeFuture =  StockService().fetchStockByActeur(acteur.idActeur!);
-                                                                               }),
-                                                                       Navigator.of(context).pop(),
-                                                                 
-                                                                     });
-                                                   
-                                                             ScaffoldMessenger.of(context)
-                                                                 .showSnackBar(
-                                                                SnackBar(
-                                                                 content: Row(
-                                                                   children: [
-                                                                     Text(filtereSearch[index].statutSotck == false ? "Activer avec succèss " : "Desactiver avec succèss"),
-                                                                   ],
-                                                                 ),
-                                                                 duration: Duration(seconds: 2),
-                                                               ),
-                                                             );
-                                                           },
-                                                         )
-                                                      
-                                           ),
-                                                  PopupMenuItem<String>(
-                                                             child: ListTile(
-                                                               leading: const Icon(
-                                                                 Icons.delete,
-                                                                 color: Colors.red,
-                                                               ),
-                                                               title: const Text(
-                                                                 "Supprimer",
-                                                                 style: TextStyle(
-                                                                   color: Colors.red,
-                                                                   fontWeight: FontWeight.bold,
-                                                                 ),
-                                                               ),
-                                                               onTap: () async {
-                                                                 await StockService()
-                                                                     .deleteStock(
-                                                                         filtereSearch[index].idStock!)
-                                                                     .then((value) => {
-                                                                            Provider.of<StockService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                          setState(() {
-                                                                         stockListeFuture = StockService().fetchStockByActeur(acteur.idActeur!);
-                                                                           }),
-                                                                           Navigator.of(context).pop(),
+                                      Navigator.of(context).pop(),
+                                    })
+                            : await StockService()
+                                .desactiverStock(
+                                    filtereSearch[index].idStock!)
+                                .then((value) => {
+                                      Provider.of<StockService>(context,
+                                              listen: false)
+                                          .applyChange(),
+                                      setState(() {
+                                        stockListeFuture = StockService()
+                                            .fetchStockByActeur(
+                                                acteur.idActeur!);
+                                      }),
+                                      Navigator.of(context).pop(),
+                                    });
 
-                                                                           ScaffoldMessenger.of(context)
-                                                                               .showSnackBar(
-                                                                          
-                                                                             const SnackBar(
-                                                                               content: Row(
-                                                                                 children: [
-                                                                                   Text(
-                                                                                       "Produit supprimer avec succès"),
-                                                                                 ],
-                                                                               ),
-                                                                               duration:
-                                                                                   Duration(seconds: 2),
-                                                                             ),
-                                                                           
-                                                                           )
-                                                                         })
-                                                                     .catchError((onError) => {
-                                                                           ScaffoldMessenger.of(context)
-                                                                               .showSnackBar(
-                                                                             const SnackBar(
-                                                                               content: Row(
-                                                                                 children: [
-                                                                                   Text(
-                                                                                       "Impossible de supprimer"),
-                                                                                 ],
-                                                                               ),
-                                                                               duration:
-                                                                                   Duration(seconds: 2),
-                                                                             ),
-                                                                           )
-                                                                         });
-                                                               },
-                                                             ),
-                                                           ),      
-                                                      
-                                                     ],
-                                                   ),
-                                                 ),
-                                               ],
-                                                                                        ),
-                                                                                      ),
-                                          
-                                     
-                                    ],
-                                  ),
-                                ),
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Row(
+                            children: [
+                              Text(filtereSearch[index].statutSotck == false
+                                  ? "Activer avec succèss "
+                                  : "Desactiver avec succèss"),
+                            ],
+                          ),
+                          duration: Duration(seconds: 2),
+                        ));
+                      },
+                    ),
+                  ),
+                  PopupMenuItem<String>(
+                    child: ListTile(
+                      leading: const Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                      ),
+                      title: const Text(
+                        "Supprimer",
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onTap: () async {
+                        await StockService()
+                            .deleteStock(filtereSearch[index].idStock!)
+                            .then((value) => {
+                                  Provider.of<StockService>(context,
+                                          listen: false)
+                                      .applyChange(),
+                                  setState(() {
+                                    stockListeFuture = StockService()
+                                        .fetchStockByActeur(acteur.idActeur!);
+                                  }),
+                                  Navigator.of(context).pop(),
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Row(
+                                        children: [
+                                          Text("Produit supprimer avec succès"),
+                                        ],
+                                      ),
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  )
+                                })
+                            .catchError((onError) => {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(
+                                    const SnackBar(
+                                      content: Row(
+                                        children: [
+                                          Text("Impossible de supprimer"),
+                                        ],
+                                      ),
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  )
+                                });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  ),
+  )
                               );
                             },
                           );
