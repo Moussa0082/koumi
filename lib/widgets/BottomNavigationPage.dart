@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/screens/Acceuil.dart';
+import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/Panier.dart';
 import 'package:koumi_app/screens/Product.dart';
 import 'package:koumi_app/screens/Produit.dart';
@@ -40,7 +41,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
   ];
   List pages = <Widget>[
     const Accueil(),
-    ProductScreen(),
+    CommandeScreen(),
     Panier(),
     const Profil()
   ];
@@ -106,8 +107,8 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
             ),
             BottomNavigationBarItem(
               backgroundColor: d_color,
-              icon: Icon(Icons.agriculture),
-              label: "Produit",
+              icon: Icon(Icons.list_alt_sharp),
+              label: "Commandes",
             ),
             BottomNavigationBarItem(
               backgroundColor: d_color,

@@ -104,35 +104,22 @@ class _CommandeScreenState extends State<CommandeScreen> {
             },
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: Text(
-          "Commande",
+          "Mes Commandes",
           style:
               const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
-        // actions: [
-        //   PopupMenuButton<String>(
-        //     padding: EdgeInsets.zero,
-        //     itemBuilder: (context) => <PopupMenuEntry<String>>[
-        //       PopupMenuItem<String>(
-        //         child: ListTile(
-        //           leading: const Icon(
-        //             Icons.add,
-        //             color: Colors.green,
-        //           ),
-        //           title: Text(
-        //             "Ajouter un ${para.libelleNiveau2Pays}",
-        //             style: TextStyle(
-        //                 color: Colors.green,
-        //                 fontWeight: FontWeight.bold,
-        //                 overflow: TextOverflow.ellipsis),
-        //           ),
-        //           onTap: () async {
-        //             _showDialog();
-        //           },
-        //         ),
-        //       ),
-        //     ],
-        //   )
-        // ],
+        actions: [
+          IconButton(
+                onPressed: () {
+                  setState(() {
+        isExist = true;
+          _liste = getAllCommandeByActeur(acteur.idActeur!);
+      });
+                },
+                icon: Icon(Icons.refresh)),
+                  
+                
+        ],
       ),
       body: 
        !isExist

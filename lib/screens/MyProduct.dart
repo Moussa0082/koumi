@@ -475,7 +475,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
       ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
         child: SizedBox(
-          height: 77,
+          height: 72,
           child: filtereSearch[index].photo == null ||
                   filtereSearch[index].photo!.isEmpty
               ? Image.asset(
@@ -499,6 +499,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
         title: Text(
           filtereSearch[index].nomProduit!,
           style: TextStyle(
+            overflow: TextOverflow.ellipsis,
             fontSize: 15,
             fontWeight: FontWeight.bold,
             color: Colors.black87,

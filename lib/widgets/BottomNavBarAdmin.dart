@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:koumi_app/Admin/AcceuilAdmin.dart';
 import 'package:koumi_app/Admin/ProfilA.dart';
+import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/Panier.dart';
 import 'package:koumi_app/screens/Product.dart';
 import 'package:koumi_app/screens/Produit.dart';
@@ -34,7 +35,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
 
   List pages = <Widget>[
     const AcceuilAdmin(),
-    ProductScreen(),
+    CommandeScreen(),
     Panier(),
      ProfilA()
   ];
@@ -107,12 +108,12 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
             ),
             BottomNavigationBarItem(
               backgroundColor: d_color,
-              icon: Icon(Icons.agriculture),
-              label: "Produit",
+              icon: Icon(Icons.list_alt_sharp),
+              label: "Commandes",
             ),
             BottomNavigationBarItem(
               backgroundColor: d_color,
-              icon: Icon(Icons.shopping_cart),
+              icon: Icon(Icons.list_alt_sharp),
               label: "Panier",
             ),
             BottomNavigationBarItem(

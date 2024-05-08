@@ -121,7 +121,7 @@ class _ProductScreenState extends State<ProductScreen> {
         .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
     // updateStockList();
     stockListeFuture = getAllStock();
-    // stockListeFuture1 = getAllStocks();
+    stockListeFuture1 = getAllStocks();
   }
 
   @override
@@ -369,11 +369,10 @@ class _ProductScreenState extends State<ProductScreen> {
             ),
           ),
           const SizedBox(height: 10),
-
           Consumer<StockService>(builder: (context, stockService, child) {
             return FutureBuilder<List<Stock>>(
                 future: selectedCat != null ?
-                getAllStock() : getAllStocks(),
+                stockListeFuture : stockListeFuture1,
                 // stockListeFuture  ,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {

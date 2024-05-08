@@ -82,6 +82,9 @@ class _DetailProduitsState extends State<DetailProduits>
     verify();
     verifyParam();
     stock = widget.stock;
+    setState(() {
+      stock = widget.stock;
+    });
     // Initialiser le ValueNotifier
     isDialOpenNotifier = ValueNotifier<bool>(false);
   }
@@ -277,7 +280,9 @@ class _DetailProduitsState extends State<DetailProduits>
                       ),
                       child: Center(
                         child: Text(
+                          maxLines: 2,
                           widget.stock.nomProduit!.toUpperCase(),
+                            textAlign: TextAlign.right,
                           style: const TextStyle(
                               overflow: TextOverflow.ellipsis,
                               fontSize: 20,
@@ -294,10 +299,12 @@ class _DetailProduitsState extends State<DetailProduits>
                               fontSize: 20, fontStyle: FontStyle.italic),
                         ),
                         Text(
+                          textAlign:TextAlign.right,
                             widget.stock
                                 .formeProduit!, // Use optional chaining and ??
                             style: TextStyle(
                                 fontSize: 20,
+                                overflow: TextOverflow.ellipsis,
                                 fontWeight: FontWeight.bold,
                                 fontStyle: FontStyle.italic)),
                       ],
@@ -307,11 +314,14 @@ class _DetailProduitsState extends State<DetailProduits>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text("Quantité : ",
+                        maxLines: 2,
                             style: TextStyle(
+
                                 fontSize: 20, fontStyle: FontStyle.italic)),
                         Text(widget.stock.quantiteStock!.toInt().toString(),
                             style: TextStyle(
                                 fontSize: 20,
+                                overflow: TextOverflow.ellipsis,
                                 fontWeight: FontWeight.bold,
                                 fontStyle: FontStyle.italic)),
                       ],
@@ -324,8 +334,11 @@ class _DetailProduitsState extends State<DetailProduits>
                             style: TextStyle(
                                 fontSize: 20, fontStyle: FontStyle.italic)),
                         Text(
+                          maxLines: 2,
+                          textAlign: TextAlign.right,
                           widget.stock.unite!.nomUnite!,
                           style: TextStyle(
+                            overflow: TextOverflow.ellipsis,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             fontStyle: FontStyle.italic,
@@ -389,6 +402,7 @@ class _DetailProduitsState extends State<DetailProduits>
                           Text(
                             '${widget.stock.prix!.toInt()} (${para.monnaie})', // Convertir en entier
                             style: const TextStyle(
+                              overflow: TextOverflow.ellipsis,
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                           RatingBar.builder(
@@ -415,12 +429,17 @@ class _DetailProduitsState extends State<DetailProduits>
                         Text("Speculation : ",
                             style: TextStyle(
                                 fontSize: 20, fontStyle: FontStyle.italic)),
-                        Text(
-                          widget.stock.speculation!.nomSpeculation!,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic,
+                        Expanded(
+                          child: Text(
+                            maxLines: 2,
+                            textAlign: TextAlign.right,
+                            widget.stock.speculation!.nomSpeculation!,
+                            style: TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic,
+                            ),
                           ),
                         ),
                       ],
@@ -432,12 +451,17 @@ class _DetailProduitsState extends State<DetailProduits>
                         Text("Type Produit : ",
                             style: TextStyle(
                                 fontSize: 20, fontStyle: FontStyle.italic)),
-                        Text(
-                          widget.stock.typeProduit!,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic,
+                        Flexible(
+                          child: Text(
+                            maxLines: 2,
+                             textAlign: TextAlign.right,
+                            widget.stock.typeProduit!,
+                            style: TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic,
+                            ),
                           ),
                         ),
                       ],

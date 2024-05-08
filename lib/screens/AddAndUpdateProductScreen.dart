@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -638,7 +639,8 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                   width: 300,
                                 ),
                               )
-                            : SizedBox(
+                            :  widget.stock!.photo == null || widget.stock!.photo!.isEmpty ?
+                             SizedBox(
                                 child: IconButton(
                                   onPressed: _showImageSourceDialog,
                                   icon: const Icon(
@@ -646,7 +648,42 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                     size: 60,
                                   ),
                                 ),
-                              ),
+                              ) 
+                              : Center(
+                          child: widget.stock!.photo != null &&
+                                  !widget.stock!.photo!.isEmpty
+                              ?
+                              
+                          GestureDetector(
+                            onTap: _showImageSourceDialog,
+                            child: CachedNetworkImage(
+                              height: 120,
+                              width: 150,
+                                                    imageUrl:
+                                                    "https://koumi.ml/api-koumi/Stock/${widget.stock!.idStock}/image",
+                                                    fit: BoxFit.cover,
+                                                    placeholder: (context, url) =>
+                                                        const Center(
+                                                            child:
+                                                                CircularProgressIndicator()),
+                                                    errorWidget:
+                                                        (context, url, error) =>
+                                                            Image.asset(
+                                                      'assets/images/default_image.png',
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                          )
+
+                             
+                              : Image.asset(
+                                  "assets/images/default_image.png",
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: 200,
+                                ),
+                        )
+                              ,
                       ),
                     ),
                       const SizedBox(height: 20),

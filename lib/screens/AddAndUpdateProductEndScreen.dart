@@ -26,14 +26,11 @@ class AddAndUpdateProductEndSreen extends StatefulWidget {
      late Stock? stock;
      String?  nomProduit, origine, forme,prix , quantite;
      File? image;
-      Speculation? speculation;
-      Magasin? magasin;
-      Unite? unite;
-      ZoneProduction? zoneProduction;
+     
 
    AddAndUpdateProductEndSreen({super.key, this.isEditable, this.stock, 
     this.nomProduit,  this.forme ,  this.origine,  this.prix, 
-    this.quantite, this.image, this.zoneProduction, this.unite, this.magasin, this.speculation
+    this.quantite, this.image
    });
 
   @override
@@ -111,9 +108,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
   await updateProduit().then((_) {
     _typeController.clear();
       _descriptionController.clear();
-      setState(() {
-        isLoading = false;
-      });
+      
       Navigator.of(context).pop();
      });
      _typeController.clear();
@@ -173,18 +168,18 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
            origineProduit: widget.origine!, prix: widget.prix!,
      formeProduit: widget.forme!, quantiteStock: widget.quantite!, photo: widget.image,
      typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
-     zoneProduction: widget.stock!.zoneProduction!, speculation: widget.stock!.speculation!,
+     zoneProduction: zoneProduction, speculation: speculation,
       unite: widget.stock!.unite!,
-      magasin: widget.stock!.magasin!, acteur: acteur);
+      magasin: magasin, acteur: acteur);
     }else{
     await StockService().updateStock(
       idStock: widget.stock!.idStock!, nomProduit: widget.nomProduit!,
       origineProduit: widget.origine!, prix: widget.prix!,
      formeProduit: widget.forme!, quantiteStock: widget.quantite!, 
      typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
-      zoneProduction: widget.zoneProduction!, speculation: widget.speculation!,
-      unite: widget.unite!, 
-      magasin: widget.magasin!, acteur: acteur);
+      zoneProduction: zoneProduction, speculation: speculation,
+      unite: unite, 
+      magasin: magasin, acteur: acteur);
    }
     } catch (error) {
         // Handle any exceptions that might occur during the request
@@ -220,6 +215,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
      _typeController.text = widget.stock!.typeProduit!;
      _descriptionController.text = widget.stock!.descriptionStock!;
           debugPrint("id : $id, type : ${widget.stock!.typeProduit!}, desc : ${widget.stock!.descriptionStock!}  acteur : $acteur , forme : ${widget.forme}");
+          // debugPrint("spec : ${widget.speculation}, magasin : ${widget.magasin}, zone : ${widget.zoneProduction}   , unite : ${widget.unite}");
     }
   }
 
@@ -392,7 +388,6 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                       ),
                                     );
                                   }
-                    
                                   return DropdownButtonFormField<String>(
                                   isExpanded: true,
                                     items: speculationListe

@@ -137,13 +137,13 @@ class StockService extends ChangeNotifier {
         final errorMessage =
             json.decode(utf8.decode(responsed.bodyBytes))['message'];
                     debugPrint(' erreur : ${errorMessage}');
-        throw Exception(
+        print(
             'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
       }
     } catch (e) {
-                Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
+                Get.snackbar("Erreur de connexion", "Veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
       debugPrint("catch erreur : $e");
-      throw Exception(
+      print(
           'Une erreur s\'est produite lors de la modification du produit : $e');
     }
   }
@@ -193,7 +193,7 @@ class StockService extends ChangeNotifier {
         stockList = body
         .where((stock) => stock['statutSotck'] == true )
         .map((e) => Stock.fromMap(e)).toList();
-        debugPrint("response body ");
+        debugPrint("response body all stock");
         return stockList;
       } else {
         print(
@@ -219,7 +219,7 @@ class StockService extends ChangeNotifier {
         print("Fetching data all stocks by acteur");
         List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
         stockList = body.map((e) => Stock.fromMap(e)).toList();
-        debugPrint(stockList.toString());
+        // debugPrint(stockList.toString());
         return stockList;
       } else {
         print(
@@ -248,7 +248,7 @@ class StockService extends ChangeNotifier {
         stockList = body
         // .where((stock) => stock['statutSotck'] == true)
         .map((e) => Stock.fromMap(e)).toList();
-        debugPrint(stockList.toString());
+        // debugPrint(stockList.toString());
         return stockList;
       } else {
         debugPrint('Failed to load stock');
@@ -271,7 +271,7 @@ class StockService extends ChangeNotifier {
         stockList = body
         // .where((stock) => stock['statutSotck'] == true)
         .map((e) => Stock.fromMap(e)).toList();
-        debugPrint(stockList.toString());
+        // debugPrint(stockList.toString());
       } else {
         debugPrint('Failed to load stock');
         return stockList = [];
@@ -295,7 +295,7 @@ class StockService extends ChangeNotifier {
         stockList = body
         // .where((stock) => stock['statutSotck'] == true)
         .map((e) => Stock.fromMap(e)).toList();
-        debugPrint(stockList.toString());
+        // debugPrint(stockList.toString());
       } else {
         print('Failed to load stock');
         return stockList = [];
@@ -316,7 +316,7 @@ class StockService extends ChangeNotifier {
         stockList = body
         // .where((stock) => stock['statutSotck'] == true)
         .map((e) => Stock.fromMap(e)).toList();
-        debugPrint(stockList.toString());
+        // debugPrint(stockList.toString());
         return stockList;
       } else {
         print('Failed to load stock');
@@ -337,7 +337,7 @@ class StockService extends ChangeNotifier {
       if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
         List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
         stockList = body.map((e) => Stock.fromMap(e)).toList();
-        debugPrint(stockList.toString());
+        // debugPrint(stockList.toString());
         print("Fetching data all stock by id magasin ${stockList}");
         return stockList;
       } else {
