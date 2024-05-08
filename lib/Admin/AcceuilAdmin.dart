@@ -3,7 +3,6 @@ import 'package:koumi_app/Admin/ActeurScreen.dart';
 import 'package:koumi_app/Admin/AlerteScreen.dart';
 import 'package:koumi_app/Admin/CategoriePage.dart';
 import 'package:koumi_app/Admin/FiliereScreen.dart';
-import 'package:koumi_app/Admin/ProduitA.dart';
 import 'package:koumi_app/Admin/ProfilA.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -238,7 +237,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
       child: PageView(
         children: [
           const AcceuilAdmin(),
-          const ProduitA(),
+           ProductScreen(),
           Panier(),
           const ProfilA()
         ],

@@ -218,6 +218,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                     }
 
                     return DropdownButtonFormField<String>(
+                      isExpanded: true,
                       items: typeList
                           .map(
                             (e) => DropdownMenuItem(

@@ -338,6 +338,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
 
                                                 if (niveau3List.isEmpty) {
                                                   return DropdownButtonFormField(
+                                                    isExpanded: true,
                                                     items: [],
                                                     onChanged: null,
                                                     decoration: InputDecoration(
@@ -369,6 +370,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                                         ),
                                                       )
                                                       .toList(),
+                                                      isExpanded: true,
 
                                                   value: selectedDestinationsList[
                                                       index], // Utilisez l'index pour accéder à la valeur sélectionnée correspondante dans selectedDestinationsList

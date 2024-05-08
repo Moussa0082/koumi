@@ -44,7 +44,7 @@ class ConnectionVerify extends GetxController {
     Get.rawSnackbar(
       titleText: Container(
         width: double.infinity,
-        height: Get.size.height * 0.954,
+        height: Get.size.height * 0.9,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

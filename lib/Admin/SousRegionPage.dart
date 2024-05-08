@@ -723,6 +723,7 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                 }
 
                                 return DropdownButtonFormField<String>(
+                                  isExpanded: true,
                                   items: continentList
                                       .map(
                                         (e) => DropdownMenuItem(

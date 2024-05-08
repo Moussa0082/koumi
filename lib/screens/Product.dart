@@ -75,17 +75,15 @@ class _ProductScreenState extends State<ProductScreen> {
       stockListe = await StockService().fetchProduitByCategorieAndMagasin(
           selectedCat!.idCategorieProduit!, widget.id!);
     }
-     else {
-      stockListe = await StockService().fetchStock();
-    }
+    
     return stockListe;
   }
 
-  // Future<List<Stock>> getAllStocks() async {
+  Future<List<Stock>> getAllStocks() async {
     
-  //     stockListe = await StockService().fetchStock();
-  //   return stockListe;
-  // }
+      stockListe = await StockService().fetchStock();
+    return stockListe;
+  }
 
   // Méthode pour mettre à jour la liste de stocks
   void updateStockList() async {
@@ -309,6 +307,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     }
 
                     return DropdownButtonFormField<String>(
+                      isExpanded: true,
                       items: categorieList
                           .map(
                             (e) => DropdownMenuItem(
@@ -373,8 +372,9 @@ class _ProductScreenState extends State<ProductScreen> {
 
           Consumer<StockService>(builder: (context, stockService, child) {
             return FutureBuilder<List<Stock>>(
-                future: 
-                stockListeFuture  ,
+                future: selectedCat != null ?
+                getAllStock() : getAllStocks(),
+                // stockListeFuture  ,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -460,13 +460,17 @@ class _ProductScreenState extends State<ProductScreen> {
                             ),
                             itemCount: stockListe.length,
                             itemBuilder: (context, index) {
+                              var e = stockListe
+                                  // .where((element) =>
+                                  //     element.statutSotck == true)
+                                  .elementAt(index);
                               return GestureDetector(
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => DetailProduits(
-                                        stock: stockListe[index],
+                                        stock: e,
                                       ),
                                     ),
                                   );
@@ -535,7 +539,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                       // SizedBox(height: 8),
                                       ListTile(
                                         title: Text(
-                                          stockListe[index].nomProduit!,
+                                          e.nomProduit!,
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,

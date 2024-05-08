@@ -394,7 +394,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   }
                     
                                   return DropdownButtonFormField<String>(
-                                  
+                                  isExpanded: true,
                                     items: speculationListe
                                         .map(
                                           (e) => DropdownMenuItem(
@@ -532,7 +532,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   }
                     
                                   return DropdownButtonFormField<String>(
-                                    
+                                    isExpanded: true,
                                     items: magasinListe
                                         .map(
                                           (e) => DropdownMenuItem(
@@ -672,7 +672,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   }
                     
                                   return DropdownButtonFormField<String>(
-                                   
+                                   isExpanded: true,
                                     items: uniteListe
                                         .map(
                                           (e) => DropdownMenuItem(
@@ -808,7 +808,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                   }
                     
                                   return DropdownButtonFormField<String>(
-                              
+                                isExpanded: true,
                                     items: zoneListe
                                         .map(
                                           (e) => DropdownMenuItem(

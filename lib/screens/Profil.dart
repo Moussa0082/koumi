@@ -557,7 +557,7 @@ class _ProfilState extends State<Profil> {
                       await acteurProvider.logout();
     
 
-                      Get.off(BottomNavigationPage(),
+                      Get.offAll(BottomNavigationPage(),
                           duration: Duration(
                               seconds:
                                   1), //duration of transitions, default 1 sec
@@ -591,7 +591,8 @@ class _ProfilState extends State<Profil> {
                   ],
                 ),
               );
-  }));
+  })
+  );
   }
 
   Widget _buildProfile(String title, String value) {

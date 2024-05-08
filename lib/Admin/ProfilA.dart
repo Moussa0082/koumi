@@ -315,7 +315,7 @@ class _ProfilAState extends State<ProfilA> {
                       await acteurProvider.logout();
     
 
-                      Get.off(BottomNavigationPage(),
+                      Get.offAll(BottomNavigationPage(),
                           duration: Duration(
                               seconds:
                                   1), //duration of transitions, default 1 sec

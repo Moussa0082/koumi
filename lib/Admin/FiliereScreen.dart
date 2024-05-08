@@ -820,6 +820,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                 }
 
                                 return DropdownButtonFormField<String>(
+                                  isExpanded: true,
                                   items: filiereList
                                       .map(
                                         (e) => DropdownMenuItem(

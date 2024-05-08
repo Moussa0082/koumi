@@ -622,6 +622,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                               }
 
                               return DropdownButtonFormField<String>(
+                                isExpanded: true,
                                 //     validator: (value) {
                                 //   if (value == null || value.isEmpty) {
                                 //     return 'Veuillez sélectionner une region.';

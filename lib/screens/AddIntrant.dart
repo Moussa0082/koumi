@@ -277,6 +277,7 @@ class _AddIntrantState extends State<AddIntrant> {
                               }
 
                               return DropdownButtonFormField<String>(
+                                isExpanded: true,
                                 items: filiereList
                                     .map(
                                       (e) => DropdownMenuItem(
@@ -411,6 +412,7 @@ class _AddIntrantState extends State<AddIntrant> {
                                     }
 
                                     return DropdownButtonFormField<String>(
+                                      isExpanded: true,
                                       items: categorieListe
                                           .map(
                                             (e) => DropdownMenuItem(

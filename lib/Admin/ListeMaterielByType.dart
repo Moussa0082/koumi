@@ -143,23 +143,23 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                     DetailMateriel(
                                                         materiel: e)));
                                       },
-                                      child: Container(
+                                      child: Card(
                                           margin: EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: Color.fromARGB(
-                                                250, 250, 250, 250),
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.grey
-                                                    .withOpacity(0.3),
-                                                offset: Offset(0, 2),
-                                                blurRadius: 8,
-                                                spreadRadius: 2,
-                                              ),
-                                            ],
-                                          ),
+                                          // decoration: BoxDecoration(
+                                          //   color: Color.fromARGB(
+                                          //       250, 250, 250, 250),
+                                          //   borderRadius:
+                                          //       BorderRadius.circular(15),
+                                          //   boxShadow: [
+                                          //     BoxShadow(
+                                          //       color: Colors.grey
+                                          //           .withOpacity(0.3),
+                                          //       offset: Offset(0, 2),
+                                          //       blurRadius: 8,
+                                          //       spreadRadius: 2,
+                                          //     ),
+                                          //   ],
+                                          // ),
                                           child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.stretch,
@@ -177,12 +177,12 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                         ? Image.asset(
                                                             "assets/images/default_image.png",
                                                             fit: BoxFit.cover,
-                                                            height: 85,
+                                                            height: 72,
                                                           )
                                                         : Image.network(
                                                             "https://koumi.ml/api-koumi/Materiel/${e.idMateriel}/image",
                                                             fit: BoxFit.cover,
-                                                            height: 85,
+                                                            height: 72,
                                                             errorBuilder:
                                                                 (BuildContext
                                                                         context,
@@ -195,7 +195,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                                 'assets/images/default_image.png',
                                                                 fit: BoxFit
                                                                     .cover,
-                                                                height: 80,
+                                                                height: 72,
                                                               );
                                                             },
                                                           ),
@@ -211,12 +211,13 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                           FontWeight.bold,
                                                       color: Colors.black87,
                                                     ),
-                                                    // maxLines: 1,
-                                                    // overflow: TextOverflow.ellipsis,
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
                                                   ),
                                                   subtitle: Text(
                                                     e.localisation,
                                                     style: TextStyle(
+                                                      overflow: TextOverflow.ellipsis,
                                                       fontSize: 15,
                                                       color: Colors.black87,
                                                     ),

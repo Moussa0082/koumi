@@ -380,32 +380,31 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                                   );
                                                 }
 
-                                                return Expanded(
-  child: DropdownButtonFormField<String>(
-    items: niveau3List.map((e) => DropdownMenuItem(
-      value: e.idNiveau3Pays,
-      child: Text(e.nomN3, style: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 14)), // réduire la taille du texte
-    )).toList(),
-    value: selectedDestinationsList[index],
-    onChanged: (newValue) {
-      setState(() {
-        selectedDestinationsList[index] = newValue;
-        String selectedDestinationName = niveau3List.firstWhere((element) => element.idNiveau3Pays == newValue).nomN3;
-        selectedDestinations.add(selectedDestinationName);
-        print("niveau 3 : $selectedDestinationsList");
-        print("niveau 3 nom  : $selectedDestinations");
-      });
-    },
-    decoration: InputDecoration(
-      labelText: 'Destination',
-      labelStyle: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 15),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12), // réduire le padding
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-    ),
-  ),
-);
+                                                return DropdownButtonFormField<String>(
+                                                  isExpanded: true,
+                                                  items: niveau3List.map((e) => DropdownMenuItem(
+                                                    value: e.idNiveau3Pays,
+                                                    child: Text(e.nomN3, overflow: TextOverflow.ellipsis, style: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 14)), // réduire la taille du texte
+                                                  )).toList(),
+                                                  value: selectedDestinationsList[index],
+                                                  onChanged: (newValue) {
+                                                    setState(() {
+                                                      selectedDestinationsList[index] = newValue;
+                                                      String selectedDestinationName = niveau3List.firstWhere((element) => element.idNiveau3Pays == newValue).nomN3;
+                                                      selectedDestinations.add(selectedDestinationName);
+                                                      print("niveau 3 : $selectedDestinationsList");
+                                                      print("niveau 3 nom  : $selectedDestinations");
+                                                    });
+                                                  },
+                                                  decoration: InputDecoration(
+                                                    labelText: 'Destination',
+                                                    labelStyle: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 15),
+                                                    contentPadding: const EdgeInsets.symmetric(horizontal: 6), // réduire le padding
+                                                    border: OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(8),
+                                                    ),
+                                                  ),
+                                                );
                                               } else {
                                                 return DropdownButtonFormField(
                                                   items: [],
@@ -455,6 +454,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                             FilteringTextInputFormatter
                                                 .digitsOnly,
                                           ],
+                                          
                                           decoration: InputDecoration(
                                             hintText: "Prix",
                                             contentPadding:

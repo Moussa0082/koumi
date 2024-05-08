@@ -698,6 +698,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                   }
 
                                   return DropdownButtonFormField<String>(
+                                    isExpanded: true,
                                     items: niveauList
                                         .map(
                                           (e) => DropdownMenuItem(

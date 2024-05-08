@@ -333,6 +333,7 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
                                 }
 
                                 return DropdownButtonFormField<String>(
+                                  isExpanded: true,
                                   items: niveau3List
                                       .map(
                                         (e) => DropdownMenuItem(

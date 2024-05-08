@@ -99,7 +99,18 @@ class _updateSousRegionsState extends State<updateSousRegions> {
                   future: _continentList,
                   builder: (_, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Chargement ...',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
                     }
                     if (snapshot.hasError) {
                       return Text("${snapshot.error}");
@@ -116,6 +127,7 @@ class _updateSousRegionsState extends State<updateSousRegions> {
                       }
 
                       return DropdownButtonFormField<String>(
+                        isExpanded: true,
                         items: continentList
                             .map(
                               (e) => DropdownMenuItem(

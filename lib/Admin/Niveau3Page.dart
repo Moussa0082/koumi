@@ -413,6 +413,7 @@ class _Niveau3PageState extends State<Niveau3Page> {
                                                                           niveau3pays:
                                                                               e)),
                                                             );
+                                                            
 
                                                             if (updatedSousRegion !=
                                                                 null) {
@@ -984,6 +985,7 @@ class _AddDialogState extends State<AddDialog> {
                           }
 
                           return DropdownButtonFormField<String>(
+                            isExpanded: true,
                             items: niveau1List
                                 .map(
                                   (e) => DropdownMenuItem(
@@ -1072,6 +1074,7 @@ class _AddDialogState extends State<AddDialog> {
                           }
 
                           return DropdownButtonFormField<String>(
+                            isExpanded: true,
                             items: niveauList
                                 .map(
                                   (e) => DropdownMenuItem(

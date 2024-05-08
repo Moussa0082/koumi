@@ -117,7 +117,18 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                     future: _paysList,
                     builder: (_, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
+                        return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Chargement ...',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
                       }
                       if (snapshot.hasError) {
                         return Text("${snapshot.error}");
@@ -137,6 +148,7 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                         }
         
                         return DropdownButtonFormField<String>(
+                          isExpanded: true,
                           items: paysList
                               .map(
                                 (e) => DropdownMenuItem(
@@ -176,7 +188,18 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                     future: _niveauList,
                     builder: (_, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
+                        return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Chargement ...',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
                       }
                       if (snapshot.hasError) {
                         return Text("${snapshot.error}");
@@ -196,6 +219,7 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                         }
         
                         return DropdownButtonFormField<String>(
+                          isExpanded: true,
                           items: niveauList
                               .map(
                                 (e) => DropdownMenuItem(

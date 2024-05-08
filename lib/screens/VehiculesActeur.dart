@@ -187,7 +187,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                         DetailTransport(vehicule: e)));
                           },
                           child: Card(
-                            
+                            margin: EdgeInsets.all(8),
                             // decoration: BoxDecoration(
                             //   color: Color.fromARGB(250, 250, 250, 250),
                             //   borderRadius: BorderRadius.circular(15),

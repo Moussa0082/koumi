@@ -824,6 +824,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                 }
 
                                 return DropdownButtonFormField<String>(
+                                  isExpanded: true,
                                   items: filiereList
                                       .map(
                                         (e) => DropdownMenuItem(
@@ -1144,6 +1145,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                 }
 
                                 return DropdownButtonFormField<String>(
+                                  isExpanded: true,
                                   items: filiereList
                                       .map(
                                         (e) => DropdownMenuItem(

@@ -675,6 +675,7 @@ class _PaysPageState extends State<PaysPage> {
                                   }
 
                                   return DropdownButtonFormField<String>(
+                                    isExpanded: true,
                                     items: regionList
                                         .map(
                                           (e) => DropdownMenuItem(

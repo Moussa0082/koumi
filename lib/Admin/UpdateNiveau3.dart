@@ -56,10 +56,12 @@ class _UpdateNiveau3State extends State<UpdateNiveau3> {
             ListTile(
               title: Text(
                 "Modification",
+                
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                   fontSize: 18,
+   overflow: TextOverflow.ellipsis
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -93,6 +95,7 @@ class _UpdateNiveau3State extends State<UpdateNiveau3> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 6),
                     ),
                   ),
                   // SizedBox(height: 16),
@@ -158,67 +161,86 @@ class _UpdateNiveau3State extends State<UpdateNiveau3> {
                   //   },
                   // ),
                   SizedBox(height: 16),
-                  FutureBuilder(
-                    future: _niveauList,
-                    builder: (_, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      }
-                      if (snapshot.hasError) {
-                        return Text("${snapshot.error}");
-                      }
-                      if (snapshot.hasData) {
-                        final reponse =
-                            json.decode((snapshot.data.body)) as List;
-                        final niveauList = reponse
-                            .map((e) => Niveau2Pays.fromMap(e))
-                            .where((con) => con.statutN2 == true)
-                            .toList();
+                 FutureBuilder(
+  future: _niveauList,
+  builder: (_, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Chargement ...',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+    }
+    if (snapshot.hasError) {
+      return Text("${snapshot.error}");
+    }
+    if (snapshot.hasData) {
+      final reponse = json.decode((snapshot.data.body)) as List;
+      final niveauList = reponse
+          .map((e) => Niveau2Pays.fromMap(e))
+          .where((con) => con.statutN2 == true)
+          .toList();
 
-                        if (niveauList.isEmpty) {
-                          return Text(
-                            'Aucun donné disponible',
-                            style: TextStyle(overflow: TextOverflow.ellipsis),
-                          );
-                        }
+      if (niveauList.isEmpty) {
+        return Text(
+          'Aucun donné disponible',
+          style: TextStyle(overflow: TextOverflow.ellipsis),
+        );
+      }
 
-                        return DropdownButtonFormField<String>(
-                          items: niveauList
-                              .map(
-                                (e) => DropdownMenuItem(
-                                  value: e.idNiveau2Pays,
-                                  child: Text(e.nomN2),
-                                ),
-                              )
-                              .toList(),
-                          value: niveau2Value,
-                          onChanged: (newValue) {
-                            setState(() {
-                              niveau2Value = newValue;
-                              if (newValue != null) {
-                                niveau2 = niveauList.firstWhere((element) =>
-                                    element.idNiveau2Pays == newValue);
-                                debugPrint(
-                                    "niveau select :${niveau2.toString()}");
-                                // typeSelected = true;
-                              }
-                            });
-                          },
-                          decoration: InputDecoration(
-                            labelText:
-                                'Sélectionner un ${para.libelleNiveau2Pays}',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        );
-                      }
-                      return Text(
-                        'Aucune donnée disponible',
-                        style: TextStyle(overflow: TextOverflow.ellipsis),
-                      );
-                    },
+      return IntrinsicWidth(
+        child: DropdownButtonFormField<String>(
+          isExpanded: true,
+          items: niveauList
+              .map(
+                (e) => DropdownMenuItem(
+                  value: e.idNiveau2Pays,
+                  child: Text(
+                    e.nomN2,
+                    style: TextStyle(
+                      overflow: TextOverflow.ellipsis,
+                      fontSize: 15,
+                    ),
                   ),
+                ),
+              )
+              .toList(),
+          value: niveau2Value,
+          onChanged: (newValue) {
+            setState(() {
+              niveau2Value = newValue;
+              if (newValue != null) {
+                niveau2 = niveauList.firstWhere(
+                    (element) => element.idNiveau2Pays == newValue);
+                debugPrint("niveau select :${niveau2.toString()}");
+              }
+            });
+          },
+          decoration: InputDecoration(
+            labelText: 'Sélectionner un ${para.libelleNiveau2Pays}',
+            labelStyle: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 15),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 6), // Ajouter un padding horizontal
+          ),
+        ),
+      );
+    }
+    return Text(
+      'Aucune donnée disponible',
+      style: TextStyle(overflow: TextOverflow.ellipsis),
+    );
+  },
+),
+
                   SizedBox(height: 16),
                   TextFormField(
                     validator: (value) {
@@ -234,6 +256,7 @@ class _UpdateNiveau3State extends State<UpdateNiveau3> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 6),
                     ),
                   ),
                   SizedBox(height: 20),

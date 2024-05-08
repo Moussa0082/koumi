@@ -79,30 +79,14 @@ class _DetailProduitsState extends State<DetailProduits>
   @override
   void initState() {
     super.initState();
-    isDialOpenNotifier = ValueNotifier<bool>(false);
     verify();
     verifyParam();
     stock = widget.stock;
     // Initialiser le ValueNotifier
+    isDialOpenNotifier = ValueNotifier<bool>(false);
   }
 
-  Future<void> _makePhoneWa(String whatsappNumber) async {
-    final Uri launchUri = Uri(
-      scheme: 'https',
-      host: 'wa.me',
-      path: whatsappNumber,
-    );
-    print(Uri);
-    await launchUrl(launchUri);
-  }
 
-  Future<void> _makePhoneCall(String phoneNumber) async {
-    final Uri launchUri = Uri(
-      scheme: 'tel',
-      path: phoneNumber,
-    );
-    await launchUrl(launchUri);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -521,55 +505,124 @@ class _DetailProduitsState extends State<DetailProduits>
             ],
           ),
         ),
-        floatingActionButton: acteur.idActeur != stock.acteur!.idActeur
-            ? SpeedDial(
-                // animatedIcon: AnimatedIcons.close_menu,
-                backgroundColor: d_colorGreen,
-                foregroundColor: Colors.white,
-                overlayColor: Colors.black,
-                overlayOpacity: 0.4,
-                spacing: 12,
-                icon: Icons.phone,
 
-                children: [
-                  SpeedDialChild(
-                    child: FaIcon(FontAwesomeIcons.whatsapp),
-                    label: 'Par wathsApp',
-                    labelStyle: TextStyle(
-                      color: Colors.black,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    onTap: () {
-                      final String whatsappNumber =
-                          widget.stock.acteur!.whatsAppActeur!;
-                      _makePhoneWa(whatsappNumber);
-                    },
-                  ),
-                  SpeedDialChild(
-                    child: Icon(Icons.phone),
-                    label: 'Par téléphone ',
-                    labelStyle: TextStyle(
-                      color: Colors.black,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    onTap: () {
-                      final String numberPhone =
-                          widget.stock.acteur!.telephoneActeur!;
-                      _makePhoneCall(numberPhone);
+    //     floatingActionButton: 
+    //     widget.stock.acteur!.idActeur != acteur.idActeur ?
+    // SpeedDial(
+    //   backgroundColor: d_colorGreen,
+    //   foregroundColor: Colors.white,
+    //   overlayColor: Colors.black,
+    //   overlayOpacity: 0.4,
+    //   spacing: 12,
+    //   icon: Icons.phone,
+    //   children: [
+    //     SpeedDialChild(
+    //       child: FaIcon(FontAwesomeIcons.whatsapp),
+    //       label: 'Par WhatsApp',
+    //       labelStyle: TextStyle(
+    //         color: Colors.black,
+    //         fontSize: 15,
+    //         fontWeight: FontWeight.w500,
+    //       ),
+    //       onTap: () {
+    //         final String whatsappNumber = widget.stock.acteur!.whatsAppActeur!;
+    //         _makePhoneWa(whatsappNumber);
+    //       },
+    //     ),
+    //     SpeedDialChild(
+    //       child: Icon(Icons.phone),
+    //       label: 'Par téléphone',
+    //       labelStyle: TextStyle(
+    //         color: Colors.black,
+    //         fontSize: 15,
+    //         fontWeight: FontWeight.w500,
+    //       ),
+    //       onTap: () {
+    //         final String numberPhone = widget.stock.acteur!.telephoneActeur!;
+    //         _makePhoneCall(numberPhone);
+    //       },
+    //     )
+    //   ],
+    //   // État du Speed Dial (ouvert ou fermé)
+    //   openCloseDial: isDialOpenNotifier,
+    //   // Fonction appelée lorsque le bouton principal est pressé
+    //   onPress: () {
+    //     isDialOpenNotifier.value = !isDialOpenNotifier.value;
+    //   },
+    // )
+    // :
+    // Container()
+      floatingActionButton: acteur.idActeur != stock.acteur!.idActeur
+                ? SpeedDial(
+                    // animatedIcon: AnimatedIcons.close_menu,
+
+                    backgroundColor: d_colorGreen,
+                    foregroundColor: Colors.white,
+                    overlayColor: Colors.black,
+                    overlayOpacity: 0.7,
+                    spacing: 12,
+                    icon: Icons.phone,
+
+                    children: [
+                      SpeedDialChild(
+                        child: FaIcon(FontAwesomeIcons.whatsapp),
+                        label: 'Par wathsApp',
+                        labelStyle: TextStyle(
+                          color: Colors.black,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        onTap: () {
+                          final String whatsappNumber =
+                              stock.acteur!.whatsAppActeur!;
+                          _makePhoneWa(whatsappNumber);
+                        },
+                      ),
+                      SpeedDialChild(
+                        child: Icon(Icons.phone),
+                        label: 'Par téléphone ',
+                        labelStyle: TextStyle(
+                          color: Colors.black,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        onTap: () {
+                          final String numberPhone =
+                              stock.acteur!.telephoneActeur!;
+                          _makePhoneCall(numberPhone);
+                        },
+                      )
+                    ],
+                    // État du Speed Dial (ouvert ou fermé)
+                    openCloseDial: isDialOpenNotifier,
+                    // Fonction appelée lorsque le bouton principal est pressé
+                    onPress: () {
+                      isDialOpenNotifier.value = !isDialOpenNotifier
+                          .value; // Inverser la valeur du ValueNotifier
                     },
                   )
-                ],
-                // État du Speed Dial (ouvert ou fermé)
-                openCloseDial: isDialOpenNotifier,
-                // Fonction appelée lorsque le bouton principal est pressé
-                onPress: () {
-                  isDialOpenNotifier.value = !isDialOpenNotifier
-                      .value; // Inverser la valeur du ValueNotifier
-                },
-              )
-            : Container());
+                : Container() 
+    //// Si l'utilisateur est connecté et que le stock lui appartient, ne pas afficher le bouton de téléphone
+);
+  }
+
+
+   Future<void> _makePhoneWa(String whatsappNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'https',
+      host: 'wa.me',
+      path: whatsappNumber,
+    );
+    print(Uri);
+    await launchUrl(launchUri);
+  }
+
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    await launchUrl(launchUri);
   }
 
 

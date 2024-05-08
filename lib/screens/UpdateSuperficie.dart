@@ -278,6 +278,7 @@ class _UpdateSuperficieState extends State<UpdateSuperficie> {
                               }
 
                               return DropdownButtonFormField<String>(
+                                isExpanded: true,
                                 items: speList
                                     .map(
                                       (e) => DropdownMenuItem(
@@ -393,6 +394,7 @@ class _UpdateSuperficieState extends State<UpdateSuperficie> {
                           }
 
                           return DropdownButtonFormField<String>(
+                            isExpanded: true,
                             items: campListe
                                 .map(
                                   (e) => DropdownMenuItem(

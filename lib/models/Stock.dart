@@ -123,58 +123,10 @@ class Stock {
 
 
 
-  // String toJson() => json.encode(toMap());
-   Map<String, dynamic> toJson() {
-    return {
-         'idStock': idStock,
-      'codeStock': codeStock,
-      'nomProduit': nomProduit,
-      'formeProduit': formeProduit,
-      'origineProduit': origineProduit,
-      'dateProduction': dateProduction,
-      'quantiteStock': quantiteStock,
-      'prix': prix,
-      'typeProduit': typeProduit,
-      'descriptionStock': descriptionStock,
-      'photo': photo,
-      'zoneProduction': zoneProduction?.toMap(),
-      'dateAjout': dateAjout,
-      'dateModif': dateModif,
-      'personneModif': personneModif,
-      'statutSotck': statutSotck,
-      'speculation': speculation?.toMap(),
-      'unite': unite?.toMap(),
-      'magasin': magasin?.toMap(),
-      'acteur': acteur?.toMap(),
-    };
-  }
+  String toJson() => json.encode(toMap());
 
-  // factory Stock.fromJson(String source) => Stock.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Stock.fromJson(String source) => Stock.fromMap(json.decode(source) as Map<String, dynamic>);
 
- factory Stock.fromJson(Map<String, dynamic> json) {
-  return Stock(
-    idStock: json['idStock'],
-    codeStock: json['codeStock'],
-    nomProduit: json['nomProduit'],
-    formeProduit: json['formeProduit'],
-    origineProduit: json['origineProduit'],
-    dateProduction: json['dateProduction'],
-    quantiteStock: json['quantiteStock']?.toDouble(),
-    prix: json['prix'],
-    typeProduit: json['typeProduit'],
-    descriptionStock: json['descriptionStock'],
-    photo: json['photo'],
-    zoneProduction: json['zoneProduction'] != null ? ZoneProduction.fromJson(json['zoneProduction']) : null,
-    dateAjout: json['dateAjout'],
-    dateModif: json['dateModif'],
-    personneModif: json['personneModif'],
-    statutSotck: json['statutSotck'],
-    speculation: json['speculation'] != null ? Speculation.fromJson(json['speculation']) : null,
-    unite: json['unite'] != null ? Unite.fromJson(json['unite']) : null,
-    magasin: json['magasin'] != null ? Magasin.fromJson(json['magasin']) : null,
-    acteur: json['acteur'] != null ? Acteur.fromJson(json['acteur']) : null,
-  );
-}
 
 
   

@@ -55,6 +55,7 @@ class _AccueilState extends State<Accueil> {
     // TODO: implement initState
     super.initState();
     verify();
+    final acteurProvider = Provider.of<ActeurProvider>(context, listen: false).isLogged;
     // Get.put(ConnectionVerify(), permanent: true);
   }
 
@@ -66,9 +67,9 @@ class _AccueilState extends State<Accueil> {
       body: ListView(
         children: [
           SizedBox(height: 180, child: Carrousel()),
-          const SizedBox(
-            height: 10,
-          ),
+          // const SizedBox(
+          //   height: 10,
+          // ),
           isExist ? SizedBox(height: 100, child: AlertAcceuil()) : Container(),
           const SizedBox(
             height: 10,

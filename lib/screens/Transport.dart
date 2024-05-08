@@ -257,6 +257,7 @@ class _TransportState extends State<Transport> {
                     }
 
                     return DropdownButtonFormField<String>(
+                      isExpanded: true,
                       items: vehiculeList
                           .map(
                             (e) => DropdownMenuItem(
@@ -368,7 +369,7 @@ class _TransportState extends State<Transport> {
                                         DetailTransport(vehicule: e)));
                           },
                           child: Card(
-                            // margin: EdgeInsets.all(8),
+                            margin: EdgeInsets.all(8),
                             // decoration: BoxDecoration(
                             //   color: Color.fromARGB(250, 250, 250, 250),
                             //   borderRadius: BorderRadius.circular(15),

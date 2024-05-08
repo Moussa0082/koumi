@@ -107,6 +107,7 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
                                                         materiel: e)));
                                       },
                                       child: Card(
+                                        margin: EdgeInsets.all(8),
                                           // decoration: BoxDecoration(
                                           //   color: Color.fromARGB(
                                           //       250, 250, 250, 250),

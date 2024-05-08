@@ -222,6 +222,7 @@ class _AddSuperficieState extends State<AddSuperficie> {
                                 }
 
                                 return DropdownButtonFormField<String>(
+                                  isExpanded: true,
                                   items: niveau3List
                                       .map(
                                         (e) => DropdownMenuItem(
@@ -352,6 +353,7 @@ class _AddSuperficieState extends State<AddSuperficie> {
                                   }
 
                                   return DropdownButtonFormField<String>(
+                                    isExpanded: true,
                                     items: speList
                                         .map(
                                           (e) => DropdownMenuItem(
@@ -472,6 +474,7 @@ class _AddSuperficieState extends State<AddSuperficie> {
                               }
 
                               return DropdownButtonFormField<String>(
+                                isExpanded: true,
                                 items: campListe
                                     .map(
                                       (e) => DropdownMenuItem(

@@ -468,7 +468,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                   );
                                 },
                                 child:Card(
-  // margin: EdgeInsets.all(8),
+  margin: EdgeInsets.all(8),
   child: Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [

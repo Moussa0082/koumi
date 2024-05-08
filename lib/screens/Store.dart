@@ -211,6 +211,7 @@ class _StoreScreenState extends State<StoreScreen> {
                     }
 
                     return DropdownButtonFormField<String>(
+                      isExpanded: true,
                       items: niveau1PaysList
                           .map(
                             (e) => DropdownMenuItem(
@@ -356,12 +357,14 @@ class _StoreScreenState extends State<StoreScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => ProductScreen(
+                                  
                                     id: magasinListe[index].idMagasin,
                                     nom: magasinListe[index].nomMagasin),
                               ),
                             );
                           },
                           child: Card(
+                            margin: EdgeInsets.all(8),
                             // decoration: BoxDecoration(
                             //   color: Color.fromARGB(250, 250, 250, 250),
                             //   borderRadius: BorderRadius.circular(15),

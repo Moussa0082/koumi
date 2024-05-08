@@ -344,6 +344,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                 }
 
                                 return DropdownButtonFormField<String>(
+                                  isExpanded: true,
                                   items: formeListe
                                       .map(
                                         (e) => DropdownMenuItem(
@@ -476,6 +477,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                 }
 
                                 return DropdownButtonFormField<String>(
+                                  isExpanded: true,
                                   items: niveau3List
                                       .map(
                                         (e) => DropdownMenuItem(

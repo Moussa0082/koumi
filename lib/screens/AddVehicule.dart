@@ -279,6 +279,7 @@ class _AddVehiculeState extends State<AddVehicule> {
                                 }
 
                                 return DropdownButtonFormField<String>(
+                                  isExpanded: true,
                                   items: vehiculeList
                                       .map(
                                         (e) => DropdownMenuItem(
@@ -408,6 +409,7 @@ class _AddVehiculeState extends State<AddVehicule> {
                                 }
 
                                 return DropdownButtonFormField<String>(
+                                  isExpanded: true,
                                   items: niveau3List
                                       .map(
                                         (e) => DropdownMenuItem(

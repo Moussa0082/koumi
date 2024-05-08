@@ -283,6 +283,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                                 }
 
                                 return DropdownButtonFormField<String>(
+                                  isExpanded: true,
                                   items: niveau3List
                                       .map(
                                         (e) => DropdownMenuItem(

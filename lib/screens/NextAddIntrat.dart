@@ -253,6 +253,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                               }
 
                               return DropdownButtonFormField<String>(
+                                isExpanded: true,
                                 items: speList
                                     .map(
                                       (e) => DropdownMenuItem(
