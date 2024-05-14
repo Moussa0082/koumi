@@ -218,11 +218,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                     // Fonction de retour
                     Navigator.pop(context);
                   },
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: Colors.black,
-                    size: 30,
-                  ),
+                  icon: const Icon(Icons.arrow_back_ios),
                   iconSize: 30,
                   splashRadius: 20,
                   padding: EdgeInsets.zero,

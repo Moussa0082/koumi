@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/CodePays.dart';
 import 'package:koumi_app/Admin/UpdateNiveau3.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
@@ -874,11 +875,11 @@ class _AddDialogState extends State<AddDialog> {
   void initState() {
     verifyParam();
     _niveau1List =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+        http.get(Uri.parse('$apiOnlineUrl/niveau1Pays/read'));
 
     // _niveau2List == null;
     _niveau2List = http.get(Uri.parse(
-        'https://koumi.ml/api-koumi/niveau2Pays/listeNiveau2PaysByIdNiveau1Pays/${niveau1Pays.idNiveau1Pays}'));
+        '$apiOnlineUrl/niveau2Pays/listeNiveau2PaysByIdNiveau1Pays/${niveau1Pays.idNiveau1Pays}'));
 
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau2Pays/read'));
     super.initState();
@@ -1004,7 +1005,7 @@ class _AddDialogState extends State<AddDialog> {
                                         element.idNiveau1Pays == newValue,
                                   );
                                   _niveau2List = http.get(Uri.parse(
-                                      'https://koumi.ml/api-koumi/niveau2Pays/listeNiveau2PaysByIdNiveau1Pays/${newValue}'));
+                                      '$apiOnlineUrl/niveau2Pays/listeNiveau2PaysByIdNiveau1Pays/${newValue}'));
                                   // Appel de la méthode pour mettre à jour _niveau2List
                                   // updateNiveau2List(newValue);
                                 }

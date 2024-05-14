@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:koumi_app/Admin/NotificationDetail.dart';
 import 'package:koumi_app/api/firebase_api.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/MessageWa.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -477,7 +478,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         child: MultiSelectDropDown.network(
                           networkConfig: NetworkConfig(
                             // url:'http://10.0.2.2:9000/api-koumi/typeActeur/read',
-                            url: 'https://koumi.ml/api-koumi/typeActeur/read',
+                            url: '$apiOnlineUrl/typeActeur/read',
                             method: RequestMethod.get,
                             headers: {
                               'Content-Type': 'application/json',
@@ -675,7 +676,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         child: MultiSelectDropDown.network(
                           networkConfig: NetworkConfig(
                             // url: 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
-                            url: 'https://koumi.ml/api-koumi/typeActeur/read',
+                            url: '$apiOnlineUrl/typeActeur/read',
                             method: RequestMethod.get,
                             headers: {
                               'Content-Type': 'application/json',

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
@@ -61,9 +62,9 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     type = widget.typeVoitures!;
     _typeList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/TypeVoiture/read'));
+        http.get(Uri.parse('$apiOnlineUrl/TypeVoiture/read'));
     _niveau3List =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
+        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/read'));
     // _typeList =
     //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
     // _niveau3List =

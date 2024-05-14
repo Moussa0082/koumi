@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Commande.dart';
 import 'package:koumi_app/models/CommandeAvecStocks.dart';
 import 'package:koumi_app/models/Stock.dart';
@@ -11,7 +12,7 @@ import 'package:koumi_app/models/Stock.dart';
 
 
 
-      final String baseUrl = 'https://koumi.ml/api-koumi/commande'; // Replace with your API URL
+      final String baseUrl = '$apiOnlineUrl/commande'; // Replace with your API URL
     // final String baseUrl = 'http://10.0.2.2:9000/api-koumi/commande'; // Replace with your API URL
             List<Commande> commandeList = [];
 

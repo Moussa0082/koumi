@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/models/Acteur.dart';
@@ -342,7 +343,8 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                 child: Column(
                                                   children: [
                                                     Flexible(
-                                                      child: Image.network(
+                                                      child:
+                                                       Image.network(
                                                         "https://koumi.ml/api-koumi/parametreGeneraux/${param.idParametreGeneraux!}/image",
                                                         scale: 1,
                                                         fit: BoxFit.fill,
@@ -392,21 +394,26 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                             : SizedBox(
                                                 width: 110,
                                                 height: 150,
-                                                child: Image.network(
-                                                  "https://koumi.ml/api-koumi/parametreGeneraux/${param.idParametreGeneraux!}/image",
-                                                  scale: 1,
-                                                  fit: BoxFit.fill,
-                                                  errorBuilder: (BuildContext
-                                                          context,
-                                                      Object exception,
-                                                      StackTrace? stackTrace) {
-                                                    return Image.asset(
-                                                      'assets/images/default_image.png',
-                                                      scale: 1,
-                                                      fit: BoxFit.fill,
-                                                    );
-                                                  },
-                                                ),
+                                                child: 
+                                                CachedNetworkImage(
+                   width: double.infinity,
+                    height: 200,
+                    
+                                                  imageUrl:
+                                                      "https://koumi.ml/api-koumi/parametreGeneraux/${param.idParametreGeneraux!}/image",
+                                                  fit: BoxFit.cover,
+                                                  placeholder: (context, url) =>
+                                                      const Center(
+                                                          child:
+                                                              CircularProgressIndicator()),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Image.asset(
+                                                    'assets/images/default_image.png',
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                )
+                                                
                                               ),
                                     title: isEditing
                                         ? TextFormField(

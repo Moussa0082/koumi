@@ -282,7 +282,8 @@ class _ProfilState extends State<Profil> {
                                               builder: (context) =>
                                                   const ParametreGenerauxPage()));
                                     },
-                                    child: type.toLowerCase() == 'admin'
+                                    child: 
+                                    type.toLowerCase() == 'admin'
                                         ? Text(
                                             "Parametre Généraux",
                                             style: TextStyle(
@@ -308,9 +309,17 @@ class _ProfilState extends State<Profil> {
                         ),
                       ),
                     ),
-                    type.toLowerCase() == 'producteur' ||
-                            type.toLowerCase() == 'commerçant' ||
-                            type.toLowerCase() == 'commercant'
+                    // type.toLowerCase() == 'producteur' ||
+                    //         type.toLowerCase() == 'commerçant' ||
+                    //         type.toLowerCase() == 'commercant'
+                                              (typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("producteur") ||
+      typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("commerçant") || typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("commercant"))
                         ? Padding(
                             padding: const EdgeInsets.symmetric(
                                 vertical: 15, horizontal: 10),
@@ -425,9 +434,17 @@ class _ProfilState extends State<Profil> {
                             ),
                           )
                         : Container(),
-                    type.toLowerCase() == 'producteur' ||
-                            type.toLowerCase() == 'commerçant' ||
-                            type.toLowerCase() == 'commercant'
+                    // type.toLowerCase() == 'producteur' ||
+                    //         type.toLowerCase() == 'commerçant' ||
+                    //         type.toLowerCase() == 'commercant'
+                             (typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("producteur") ||
+      typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("commerçant") || typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("commercant"))
                         ? Padding(
                             padding: const EdgeInsets.symmetric(
                                 vertical: 15, horizontal: 10),

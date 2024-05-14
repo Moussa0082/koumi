@@ -12,12 +12,14 @@ import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:readmore/readmore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -542,7 +544,22 @@ class _DetailIntrantState extends State<DetailIntrant> {
             ),
           ),
         ),
-        _buildDescription(intrants.descriptionIntrant!),
+        // _buildDescription(intrants.descriptionIntrant!),
+        Padding(
+                      padding: EdgeInsets.symmetric(vertical: defaultPadding),
+                      child: ReadMoreText(
+                        colorClickableText: Colors.orange,
+                        trimLines: 2,
+                        trimMode: TrimMode.Line,
+                        trimCollapsedText: "Lire plus",
+                        trimExpandedText: "Lire moins",
+                        style: TextStyle(
+                            fontSize: 16, fontStyle: FontStyle.italic),
+                        intrants.descriptionIntrant == null
+                            ? "A Henley shirt is a collarless pullover shirt, by a round neckline and a placket about 3 to 5 inches (8 to 13 cm) long and usually having 2–5 buttons."
+                            : intrants.descriptionIntrant!,
+                      ),
+                    ),
 
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),

@@ -10,6 +10,7 @@ import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
+import 'package:koumi_app/service/StockService.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
@@ -103,10 +104,113 @@ class _DetailProduitsState extends State<DetailProduits>
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           centerTitle: true,
           title: const Text("Détail Produit"),
-          actions: acteur.idActeur != widget.stock.acteur!.idActeur
-              ? null
-              : [
-                  isExist == false
+          actions: isExist == true
+              ? 
+              (
+      typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("admin")) ? [
+             PopupMenuButton<String>(
+                                                      padding: EdgeInsets.zero,
+                                                      itemBuilder: (context) =>
+                                                          <PopupMenuEntry<
+                                                              String>>[
+                                                        PopupMenuItem<String>(
+                                                            child: ListTile(
+                                                          leading: widget.stock.statutSotck ==
+                                                                  false
+                                                              ? Icon(
+                                                                  Icons.check,
+                                                                  color: Colors
+                                                                      .green,
+                                                                )
+                                                              : Icon(
+                                                                  Icons
+                                                                      .disabled_visible,
+                                                                  color: Colors
+                                                                          .orange[
+                                                                      400]),
+                                                          title: Text(
+                                                            widget.stock.statutSotck ==
+                                                                    false
+                                                                ? "Activer"
+                                                                : "Desactiver",
+                                                            style: TextStyle(
+                                                              color: widget.stock.statutSotck ==
+                                                                      false
+                                                                  ? Colors.green
+                                                                  : Colors.red,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                          onTap: () async {
+                                                            // Changement d'état du magasin ici
+                                                            
+                                                                        widget.stock.statutSotck ==
+                                                                    false
+                                                                ? await StockService()
+                                                                    .activerStock(
+                                                                        widget.stock.idStock!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                             
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 5),
+                                                                                ),
+                                                                              ),
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                : await StockService()
+                                                                    .desactiverStock(
+                                                                        widget.stock.idStock!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                             
+                                                                              Navigator.of(context).pop(),
+                                                                            });
+
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                              SnackBar(
+                                                                content: Row(
+                                                                  children: [
+                                                                    Text(widget.stock.statutSotck ==
+                                                                            false
+                                                                        ? "Activer avec succèss "
+                                                                        : "Desactiver avec succèss"),
+                                                                  ],
+                                                                ),
+                                                                duration:
+                                                                    Duration(
+                                                                        seconds:
+                                                                            2),
+                                                              ),
+                                                            );
+                                                          },
+                                                        )),
+                                                      ],
+                                                    ),
+          ] : null
+
+              : 
+               [
+                  acteur.idActeur != widget.stock.acteur!.idActeur
                       ? SizedBox()
                       : IconButton(
                           onPressed: () {
@@ -123,116 +227,7 @@ class _DetailProduitsState extends State<DetailProduits>
                             Icons.edit,
                           ),
                         )
-                        //  PopupMenuButton<String>(
-                        //                               padding: EdgeInsets.zero,
-                        //                               itemBuilder: (context) =>
-                        //                                   <PopupMenuEntry<
-                        //                                       String>>[
-                        //                                 PopupMenuItem<String>(
-                        //                                     child: ListTile(
-                        //                                   leading: stockListe[
-                        //                                                   index]
-                        //                                               .statutSotck ==
-                        //                                           false
-                        //                                       ? Icon(
-                        //                                           Icons.check,
-                        //                                           color: Colors
-                        //                                               .green,
-                        //                                         )
-                        //                                       : Icon(
-                        //                                           Icons
-                        //                                               .disabled_visible,
-                        //                                           color: Colors
-                        //                                                   .orange[
-                        //                                               400]),
-                        //                                   title: Text(
-                        //                                     stockListe[index]
-                        //                                                 .statutSotck ==
-                        //                                             false
-                        //                                         ? "Activer"
-                        //                                         : "Desactiver",
-                        //                                     style: TextStyle(
-                        //                                       color: stockListe[
-                        //                                                       index]
-                        //                                                   .statutSotck ==
-                        //                                               false
-                        //                                           ? Colors.green
-                        //                                           : Colors.red,
-                        //                                       fontWeight:
-                        //                                           FontWeight
-                        //                                               .bold,
-                        //                                     ),
-                        //                                   ),
-                        //                                   onTap: () async {
-                        //                                     // Changement d'état du magasin ici
-                        //                                     stockListe[index]
-                        //                                                 .statutSotck ==
-                        //                                             false
-                        //                                         ? await StockService()
-                        //                                             .activerStock(
-                        //                                                 stockListe[index]
-                        //                                                     .idStock!)
-                        //                                             .then(
-                        //                                                 (value) =>
-                        //                                                     {
-                        //                                                       // Mettre à jour la liste des magasins après le changement d'état
-                        //                                                       Provider.of<StockService>(context, listen: false).applyChange(),
-                        //                                                       setState(() {
-                        //                                                         stockListeFuture = StockService().fetchStock();
-                        //                                                       }),
-                        //                                                       Navigator.of(context).pop(),
-                        //                                                     })
-                        //                                             .catchError(
-                        //                                                 (onError) =>
-                        //                                                     {
-                        //                                                       ScaffoldMessenger.of(context).showSnackBar(
-                        //                                                         const SnackBar(
-                        //                                                           content: Row(
-                        //                                                             children: [
-                        //                                                               Text("Une erreur s'est produit"),
-                        //                                                             ],
-                        //                                                           ),
-                        //                                                           duration: Duration(seconds: 5),
-                        //                                                         ),
-                        //                                                       ),
-                        //                                                       Navigator.of(context).pop(),
-                        //                                                     })
-                        //                                         : await StockService()
-                        //                                             .desactiverStock(
-                        //                                                 stockListe[index]
-                        //                                                     .idStock!)
-                        //                                             .then(
-                        //                                                 (value) =>
-                        //                                                     {
-                        //                                                       Provider.of<StockService>(context, listen: false).applyChange(),
-                        //                                                       setState(() {
-                        //                                                         stockListeFuture = StockService().fetchStock();
-                        //                                                       }),
-                        //                                                       Navigator.of(context).pop(),
-                        //                                                     });
-
-                        //                                     ScaffoldMessenger
-                        //                                             .of(context)
-                        //                                         .showSnackBar(
-                        //                                       SnackBar(
-                        //                                         content: Row(
-                        //                                           children: [
-                        //                                             Text(stockListe[index].statutSotck ==
-                        //                                                     false
-                        //                                                 ? "Activer avec succèss "
-                        //                                                 : "Desactiver avec succèss"),
-                        //                                           ],
-                        //                                         ),
-                        //                                         duration:
-                        //                                             Duration(
-                        //                                                 seconds:
-                        //                                                     2),
-                        //                                       ),
-                        //                                     );
-                        //                                   },
-                        //                                 )),
-                        //                               ],
-                        //                             ),
+                        
                 ],
         ),
         body: SingleChildScrollView(

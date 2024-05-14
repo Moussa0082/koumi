@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/PaysList.dart';
 import 'package:koumi_app/Admin/UpdateSousRegions.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Continent.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/SousRegion.dart';
@@ -44,7 +45,7 @@ class _SousRegionPageState extends State<SousRegionPage> {
     // continents = widget.continent;
     // _liste = getSousRegionListe();
     _continentList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/continent/read'));
+        http.get(Uri.parse('$apiOnlineUrl/continent/read'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/continent/read'));
     _searchController = TextEditingController();
 

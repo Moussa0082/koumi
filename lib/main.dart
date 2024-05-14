@@ -41,6 +41,7 @@ import 'package:koumi_app/service/TypeVoitureService.dart';
 import 'package:koumi_app/service/UniteService.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
+import 'package:koumi_app/view/item/item_screen.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:koumi_app/widgets/connection_verify.dart';
 import 'package:koumi_app/widgets/notification_controller.dart';
@@ -50,10 +51,10 @@ import 'package:provider/provider.dart';
 
 
 void main() async {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  // await FirebaseApi().initNotification();
-  // await AwesomeNotifications().initialize(
+  //  WidgetsFlutterBinding.ensureInitialized();
+  //  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  //  await FirebaseApi().initNotification();
+  // await AwesomeNotifications().initial ize(
   //    'resource://@drawable/launcher_icon',
   //   [
   //   Not
@@ -170,8 +171,8 @@ class _MyAppState extends State<MyApp> {
         '/BottomNavigationPage': (context) => const BottomNavigationPage(),
         // '/notificationPage':(context) =>  NotificationPage(),
       },
-       home: const SplashScreen(),
-      // home: LoginScreen(), 
+      //  home:  ItemScreen(),
+      home: const SplashScreen(), 
     );
   }
 }

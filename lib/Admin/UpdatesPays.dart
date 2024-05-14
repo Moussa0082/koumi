@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/SousRegion.dart';
 import 'package:koumi_app/service/PaysService.dart';
@@ -31,7 +32,7 @@ class _UpdatesPaysState extends State<UpdatesPays> {
   void initState() {
     super.initState();
     _sousRegionList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/sousRegion/read'));
+        http.get(Uri.parse('$apiOnlineUrl/sousRegion/read'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/sousRegion/read'));
     payss = widget.pays;
     sousValue = payss.sousRegion.idSousRegion;

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:koumi_app/screens/Acceuil.dart';
 import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/Panier.dart';
 import 'package:koumi_app/screens/Product.dart';
-import 'package:koumi_app/screens/Produit.dart';
+import 'package:koumi_app/screens/Products.dart';
 import 'package:koumi_app/screens/Profil.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:provider/provider.dart';
+
+import 'connection_verify.dart';
 
 class BottomNavigationPage extends StatefulWidget {
   const BottomNavigationPage({super.key});
@@ -41,7 +44,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
   ];
   List pages = <Widget>[
     const Accueil(),
-    CommandeScreen(),
+    ProductsScreen(),
     Panier(),
     const Profil()
   ];
@@ -65,6 +68,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
       Provider.of<BottomNavigationService>(context, listen: false)
           .changeIndex(0);
     });
+    Get.put(ConnectionVerify(), permanent: true);
   }
 
   @override
@@ -108,7 +112,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
             BottomNavigationBarItem(
               backgroundColor: d_color,
               icon: Icon(Icons.list_alt_sharp),
-              label: "Commandes",
+              label: "Produits",
             ),
             BottomNavigationBarItem(
               backgroundColor: d_color,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -15,7 +16,7 @@ import 'package:provider/provider.dart';
 
 class MagasinService extends ChangeNotifier{
 
-    static const String baseUrl = 'https://koumi.ml/api-koumi/Magasin';
+    static const String baseUrl = '$apiOnlineUrl/Magasin';
     // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Magasin';
     List<Magasin> magasin = [];
  

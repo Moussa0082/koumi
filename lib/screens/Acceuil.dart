@@ -7,7 +7,9 @@ import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart';
+import 'package:koumi_app/screens/MyProduct.dart';
 import 'package:koumi_app/screens/Product.dart';
+import 'package:koumi_app/screens/Products.dart';
 import 'package:koumi_app/screens/Store.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/Weather.dart';
@@ -120,8 +122,9 @@ class _AccueilState extends State<Accueil> {
       child: InkWell(
           onTap: () {
             if (index == 9) {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProductScreen()));
+                Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => MyProductScreen()));
+             
             } else if (index == 8) {
               Navigator.push(
                   context,

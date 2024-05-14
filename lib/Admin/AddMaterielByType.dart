@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
@@ -67,9 +68,9 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
     verifyTypeMateriel();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _typeList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
+        http.get(Uri.parse('$apiOnlineUrl/TypeMateriel/read'));
     _niveau3List =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
+        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/read'));
     // _typeList =
     //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
     // _niveau3List =

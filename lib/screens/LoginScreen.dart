@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -87,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final String emailActeur = emailController.text;
     final String password = passwordController.text;
 
-    const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
+    const String baseUrl = '$apiOnlineUrl/acteur/login';
     // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
     const String defaultProfileImage = 'assets/images/profil.jpg';
@@ -203,14 +204,18 @@ class _LoginScreenState extends State<LoginScreen> {
           //   context,
           //   MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
           // );
-          Get.off(BottomNavBarAdmin());
+          Get.off(BottomNavBarAdmin(),
+                      duration: Duration(seconds: 1),
+                      transition: Transition.leftToRight);
         } else {
           // Navigator.pushReplacement(
           //   context,
           //   MaterialPageRoute(
           //       builder: (context) => const BottomNavigationPage()),
           // );
-          Get.off(BottomNavigationPage());
+          Get.off(BottomNavigationPage(),
+                      duration: Duration(seconds: 1),
+                      transition: Transition.leftToRight);
         }
       } else {
         // Traitement en cas d'échec
@@ -326,7 +331,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final String emailActeur = emailController.text;
     final String password = passwordController.text;
 
-    const String baseUrl = 'https://koumi.ml/api-koumi/acteur/login';
+    const String baseUrl = '$apiOnlineUrl/acteur/login';
 
     // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/login';
 
@@ -413,14 +418,18 @@ class _LoginScreenState extends State<LoginScreen> {
           //   context,
           //   MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
           // );
-          Get.off(BottomNavBarAdmin());
+          Get.off(BottomNavBarAdmin(),
+                      duration: Duration(seconds: 1),
+                      transition: Transition.leftToRight);
         } else {
           // Navigator.pushReplacement(
           //   context,
           //   MaterialPageRoute(
           //       builder: (context) => const BottomNavigationPage()),
           // );
-          Get.off(BottomNavigationPage());
+          Get.off(BottomNavigationPage(),
+                      duration: Duration(seconds: 1),
+                      transition: Transition.leftToRight);
         }
       } else {
         // Traitement en cas d'échec
@@ -653,12 +662,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           GestureDetector(
                             onTap: () {
                               print("ho");
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ForgetPassScreen(),
-                                ),
-                              );
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => ForgetPassScreen(),
+                              //   ),
+                              // );
+                              Get.to(ForgetPassScreen(),
+                      duration: Duration(seconds: 1),
+                      transition: Transition.leftToRight);
                             },
                             child: const Text(
                               "Mot de passe oublié ",
@@ -729,11 +741,15 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              RegisterScreen()));
+                                  // Navigator.push(
+                                  //     context,
+                                  //     MaterialPageRoute(
+                                  //         builder: (context) =>
+                                  //             RegisterScreen()));
+                                  
+                                Get.to(RegisterScreen(),
+                      duration: Duration(seconds: 1),
+                      transition: Transition.leftToRight);
                                 },
                                 child: const Text(
                                   "S'inscrire",

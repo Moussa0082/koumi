@@ -8,6 +8,7 @@ import 'package:flutter_multi_formatter/widgets/country_dropdown.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/screens/RegisterEndScreen.dart';
@@ -399,8 +400,8 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: MultiSelectDropDown.network(
                           networkConfig: NetworkConfig(
-                            // url: 'https://koumi.ml/api-koumi/typeActeur/read',
-                            url: 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
+                            url: '$apiOnlineUrl/typeActeur/read',
+                            // url: 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
                             method: RequestMethod.get,
                             headers: {
                               'Content-Type': 'application/json',

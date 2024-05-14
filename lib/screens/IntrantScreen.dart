@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Intrant.dart';
@@ -72,7 +73,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
     }
     _searchController = TextEditingController();
     _typeList = http
-        .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
+        .get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
     // http.get(
     //     Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
   }
@@ -106,11 +107,20 @@ class _IntrantScreenState extends State<IntrantScreen> {
           ),
           actions: !isExist
               ? null
-              : (type.toLowerCase() == 'admin' ||
-                          type.toLowerCase() == 'fournisseur' ||
-                          type.toLowerCase() == 'fournisseurs') ||
-                      type.toLowerCase() == 'commerçant' ||
-                      type.toLowerCase() == 'commercant'
+              : 
+              // (type.toLowerCase() == 'admin' ||
+              //             type.toLowerCase() == 'fournisseur' ||
+              //             type.toLowerCase() == 'fournisseurs') ||
+              //         type.toLowerCase() == 'commerçant' ||
+              //         type.toLowerCase() == 'commercant'
+                       (typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("fournisseur") ||
+      typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("admin") || typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("fournisseurs"))
                   ? [
                       PopupMenuButton<String>(
                         padding: EdgeInsets.zero,

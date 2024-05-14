@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Speculation.dart';
@@ -13,8 +14,7 @@ import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:path/path.dart';
 
 class StockService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/Stock';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Stock';
+  static const String baseUrl = '$apiOnlineUrl/Stock';
 
   List<Stock> stockList = [];
   // List<dynamic> stockListe = [];
@@ -137,6 +137,7 @@ class StockService extends ChangeNotifier {
         final errorMessage =
             json.decode(utf8.decode(responsed.bodyBytes))['message'];
                     debugPrint(' erreur : ${errorMessage}');
+                    Get.snackbar("Une erreur s'est produit", "Veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
         print(
             'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
       }
@@ -182,6 +183,8 @@ class StockService extends ChangeNotifier {
     }
   }
 
+
+
   Future<List<Stock>> fetchStock() async {
     try {
       final response =
@@ -191,7 +194,7 @@ class StockService extends ChangeNotifier {
 
         List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
         stockList = body
-        .where((stock) => stock['statutSotck'] == true )
+        // .where((stock) => stock['statutSotck'] == true )
         .map((e) => Stock.fromMap(e)).toList();
         debugPrint("response body all stock");
         return stockList;
@@ -233,6 +236,53 @@ class StockService extends ChangeNotifier {
     }
     return stockList = [];
   }
+
+  //  Future<List<Stock>> fetchStock() async {
+  //   try {
+  //     isLoading = true;
+  //   final response = await http.get(Uri.parse('$baseUrl/getAllStocks?page=$page&size=$size'));
+  //     // final response =
+  //     //     await http.get(Uri.parse('$baseUrl/getAllStocks'));
+
+  //     if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+
+  //       // List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+  //       // stockList.addAll(json.decode(response.body)['_embedded']['stocks']);
+  //       //  final jsonData = json.decode(response.body);
+  //       // final List<dynamic> body = jsonData['content'];
+  //       // stockList.addAll(body);
+  //       // isLoading = false;
+  //       // stockList = body
+  //       // // .where((stock) => stock['statutSotck'] == true )
+  //       // .map((e) => Stock.fromMap(e)).toList();
+  //       // debugPrint("response body all stock");
+  //       // return stockList;
+  //        final jsonData = json.decode(response.body);
+  //   final List<dynamic> body = jsonData['content'];
+    
+  //   // Déclaration explicite du type de stockList
+  //    stockList = body
+  //       .map((e) => Stock.fromMap(e))
+  //       .toList();
+
+  //   isLoading = false;
+  //   debugPrint("response body all stock");
+  //   return stockList;
+  //     } else {
+  //       print(
+  //           'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+  //       // throw Exception(jsonDecode(response.body)["message"]);
+  //       return stockList = [];
+  //     }
+  //   } catch (e) {
+  //     print(
+  //         'Une erreur s\'est produite lors de la récupération des stocks: $e  ');
+      
+  //   }
+  //            return stockList = [];
+  
+  // }
+
 
 
   

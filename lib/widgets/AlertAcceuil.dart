@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:koumi_app/Admin/DetailAlerte.dart';
 import 'package:koumi_app/models/Alertes.dart';
 import 'package:koumi_app/service/AlerteService.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 class AlertAcceuil extends StatefulWidget {
@@ -41,14 +42,11 @@ class _AlertAcceuilState extends State<AlertAcceuil> {
                   ),
                   child: Center(
                     child: ListTile(
-                      leading: CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.transparent,
-                          backgroundImage: AssetImage(
-                            "assets/images/alt.png",
-                          )),
-
-                      title: Text("Aucun alerte",
+                      leading: Lottie.asset(
+                      "assets/images/alerte.json",
+                      fit: BoxFit.cover,
+                    ),
+                      title: Text("En cours de chargement ...",
                           style: const TextStyle(
                             color: Colors.black,
                             fontSize: 18,
@@ -79,20 +77,47 @@ class _AlertAcceuilState extends State<AlertAcceuil> {
                     ],
                   ),
                   child: Center(
-                    child: ListTile(
-                      leading: CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.transparent,
-                          backgroundImage: AssetImage(
-                            "assets/images/alt.png",
-                          )),
-
-                      title: Text("Aucun alerte",
+                    child: Row(
+                      children: [
+                        // ListTile(
+                        //   leading: CircleAvatar(
+                        //       radius: 40,
+                        //       backgroundColor: Colors.transparent,
+                        //       backgroundImage: AssetImage(
+                        //         "assets/images/alt.png",
+                        //       )
+                        //       ),
+                        
+                        //   title: Text("Aucun alerte",
+                        //       style: const TextStyle(
+                        //         color: Colors.black,
+                        //         fontSize: 18,
+                        //         overflow: TextOverflow.ellipsis,
+                        //       )),
+                        // ),
+                        Align(
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    width: 80,
+                    height: 80,
+                    child: Lottie.asset(
+                      "assets/images/alerte.json",
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(width:40),
+                 Center(
+                   child: Text("Aucun alerte",
                           style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            overflow: TextOverflow.ellipsis,
-                          )),
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  overflow: TextOverflow.ellipsis,
+                                )
+                   ),
+                 ),
+                      ],
                     ),
                   ),
                 ),
@@ -129,12 +154,11 @@ class _AlertAcceuilState extends State<AlertAcceuil> {
                         ),
                         child: Center(
                           child: ListTile(
-                            leading: CircleAvatar(
-                                radius: 40,
-                                backgroundColor: Colors.transparent,
-                                backgroundImage: AssetImage(
-                                  "assets/images/alt.png",
-                                )),
+                            leading: Lottie.asset(
+                      "assets/images/alerte.json",
+                      fit: BoxFit.cover,
+                    ),
+                  
 
                             title: Text("Aucun alerte",
                                 style: const TextStyle(
@@ -191,15 +215,11 @@ class _AlertAcceuilState extends State<AlertAcceuil> {
  
 )
 
-                                  : CircleAvatar(
-  radius: 40,
-  backgroundColor: Colors.transparent,
-  backgroundImage: AssetImage(
-                                        "assets/images/alt.png",
-                                    
-                                      )
-  
-),
+                                  : Lottie.asset(
+                      "assets/images/alerte.json",
+                      fit: BoxFit.cover,
+                    ),
+                  
 
                                    
                               title: Text(
@@ -212,11 +232,11 @@ class _AlertAcceuilState extends State<AlertAcceuil> {
                                     fontSize: 18,
                                     overflow: TextOverflow.ellipsis,
                                   )),
-                              trailing: Image.asset(
-                                "assets/images/alt.png",
-                                width: 80,
-                                height: 80,
-                              ),
+                              trailing: Lottie.asset(
+                      "assets/images/alerte.json",
+                      fit: BoxFit.cover,
+                    ),
+                  
                             ),
                           ),
                         ),

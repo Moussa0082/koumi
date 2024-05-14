@@ -35,7 +35,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
 
   List pages = <Widget>[
     const AcceuilAdmin(),
-    CommandeScreen(),
+    ProductScreen(),
     Panier(),
      ProfilA()
   ];
@@ -109,11 +109,11 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
             BottomNavigationBarItem(
               backgroundColor: d_color,
               icon: Icon(Icons.list_alt_sharp),
-              label: "Commandes",
+              label: "Produits",
             ),
             BottomNavigationBarItem(
               backgroundColor: d_color,
-              icon: Icon(Icons.list_alt_sharp),
+              icon: Icon(Icons.shopping_cart),
               label: "Panier",
             ),
             BottomNavigationBarItem(

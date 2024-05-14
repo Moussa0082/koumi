@@ -98,17 +98,17 @@ class _CommandeScreenState extends State<CommandeScreen> {
       appBar: AppBar(
         centerTitle: true,
         toolbarHeight: 100,
-        leading: IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+        // leading: IconButton(
+        //     onPressed: () {
+        //       Navigator.of(context).pop();
+        //     },
+        //     icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: Text(
           "Mes Commandes",
           style:
               const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
-        actions: [
+        actions: !isExist ? null : [
           IconButton(
                 onPressed: () {
                   setState(() {
@@ -244,6 +244,31 @@ class _CommandeScreenState extends State<CommandeScreen> {
                         color: Colors.orange,
                       ),
                     );
+                  }
+                  if(snapshot.hasError){
+                    SingleChildScrollView(
+                            child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Center(
+                                child: Column(
+                                  children: [
+                                    Image.asset('assets/images/notif.jpg'),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      'Une erreur s\'est produite veuiller réessayer plus tard',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 17,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
                   }
 
                   if (!snapshot.hasData) {

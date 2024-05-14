@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/SpeculationPage.dart';
 import 'package:koumi_app/Admin/UpdatesCategorie.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Filiere.dart';
@@ -54,12 +55,12 @@ class _CategoriPageState extends State<CategoriPage> {
 
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _filiereList = http
-        .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+        .get(Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
     // .get( Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
 
     // _categorieList = http.get( Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
     _categorieList = http
-        .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
+        .get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
     _liste = getCat();
     _searchController = TextEditingController();
   }
@@ -676,9 +677,8 @@ class _CategoriPageState extends State<CategoriPage> {
                                                                               setState(() {
                                                                                 _categorieList = http
                                                                                     .
-                                                                                    // get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
 
-                                                                                    get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
+                                                                                    get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
                                                                               }),
                                                                               Navigator.of(context).pop(),
                                                                             })
@@ -930,7 +930,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                               .
                                               //  get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
                                               get(Uri.parse(
-                                                  'https://koumi.ml/api-koumi/Categorie/allCategorie'));
+                                                  '$apiOnlineUrl/Categorie/allCategorie'));
                                           filiereValue = null;
                                         }),
                                         libelleController.clear(),

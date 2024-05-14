@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Campagne.dart';
 import 'package:koumi_app/models/Intrant.dart';
@@ -9,7 +10,7 @@ import 'package:koumi_app/models/Campagne.dart';
 import 'package:path/path.dart';
 
 class CampagneService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/Campagne';
+  static const String baseUrl = '$apiOnlineUrl/Campagne';
   // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Campagne';
 
   List<Campagne> campagneList = [];

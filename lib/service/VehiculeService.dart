@@ -3,13 +3,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:path/path.dart';
 
 class VehiculeService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/vehicule';
+  static const String baseUrl = '$apiOnlineUrl/vehicule';
   // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/vehicule';
 
   List<Vehicule> vehiculeList = [];

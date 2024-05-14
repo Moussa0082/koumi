@@ -2,7 +2,9 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Conseil.dart';
+import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/widgets/PlayerWidget.dart';
+import 'package:readmore/readmore.dart';
 import 'package:video_player/video_player.dart';
 
 class DetailConseil extends StatefulWidget {
@@ -257,18 +259,19 @@ class _DetailConseilState extends State<DetailConseil> {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            conseils.descriptionConseil,
-            style: TextStyle(
-              color: Colors.black87,
-              fontWeight: FontWeight.w500,
-              fontStyle: FontStyle.italic,
-              fontSize: 18,
-            ),
-          ),
-        ),
+      Padding(
+                      padding: EdgeInsets.symmetric(vertical: defaultPadding),
+                      child: ReadMoreText(
+                        colorClickableText: Colors.orange,
+                        trimLines: 2,
+                        trimMode: TrimMode.Line,
+                        trimCollapsedText: "Lire plus",
+                        trimExpandedText: "Lire moins",
+                        style: TextStyle(
+                            fontSize: 16, fontStyle: FontStyle.italic),
+                       conseils.descriptionConseil
+                      ),
+                    ),
       ],
     );
   }

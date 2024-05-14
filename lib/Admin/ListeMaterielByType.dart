@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:koumi_app/Admin/AddMaterielByType.dart';
@@ -179,26 +180,26 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                             fit: BoxFit.cover,
                                                             height: 72,
                                                           )
-                                                        : Image.network(
-                                                            "https://koumi.ml/api-koumi/Materiel/${e.idMateriel}/image",
-                                                            fit: BoxFit.cover,
-                                                            height: 72,
-                                                            errorBuilder:
-                                                                (BuildContext
-                                                                        context,
-                                                                    Object
-                                                                        exception,
-                                                                    StackTrace?
-                                                                        stackTrace) {
-                                                              return Image
-                                                                  .asset(
-                                                                'assets/images/default_image.png',
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                                height: 72,
-                                                              );
-                                                            },
-                                                          ),
+                                                        : 
+                                                        CachedNetworkImage(
+                   width: double.infinity,
+                    height: 200,
+                    
+                                                  imageUrl:
+                                                      "https://koumi.ml/api-koumi/Materiel/${e.idMateriel}/image",
+                                                  fit: BoxFit.cover,
+                                                  placeholder: (context, url) =>
+                                                      const Center(
+                                                          child:
+                                                              CircularProgressIndicator()),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Image.asset(
+                                                    'assets/images/default_image.png',
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                )
+                                                        
                                                   ),
                                                 ),
                                                 SizedBox(height: 2),

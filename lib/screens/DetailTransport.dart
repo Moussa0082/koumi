@@ -15,11 +15,13 @@ import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:readmore/readmore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -467,8 +469,10 @@ class _DetailTransportState extends State<DetailTransport> {
                 _isEditing ? _buildEditing() : _buildData(),
                 !_isEditing ? _buildPanel() : Container(),
                 !_isEditing
-                    ? _buildDescription(
+                    ? 
+                    _buildDescription(
                         'Description : ', vehicules.description!)
+                        
                     : Container(),
               ],
             ),
@@ -877,17 +881,19 @@ class _DetailTransportState extends State<DetailTransport> {
                   overflow: TextOverflow.ellipsis,
                   fontSize: 18),
             ),
-            Text(
-              value,
-              textAlign: TextAlign.justify,
-              softWrap: true,
-              style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w800,
-                // overflow: TextOverflow.ellipsis,
-                fontSize: 16,
-              ),
-            )
+            Padding(
+                      padding: EdgeInsets.symmetric(vertical: defaultPadding),
+                      child: ReadMoreText(
+                        colorClickableText: Colors.orange,
+                        trimLines: 2,
+                        trimMode: TrimMode.Line,
+                        trimCollapsedText: "Lire plus",
+                        trimExpandedText: "Lire moins",
+                        style: TextStyle(
+                            fontSize: 16, fontStyle: FontStyle.italic),
+                        value
+                      ),
+                    ),
           ],
         ),
       ),

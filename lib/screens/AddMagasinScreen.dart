@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -424,7 +425,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // fetchNiveau1PaysList();
     niveau1PaysList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+        http.get(Uri.parse('$apiOnlineUrl/niveau1Pays/read'));
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
   }
 

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Filiere.dart';
 import 'package:koumi_app/models/Forme.dart';
@@ -157,11 +158,11 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
       _quantiteController.text = widget.stock!.quantiteStock!.toString();
     }
     _formeList = http
-        .get(Uri.parse('https://koumi.ml/api-koumi/formeproduit/getAllForme/'));
+        .get(Uri.parse('$apiOnlineUrl/formeproduit/getAllForme/'));
     // 'http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
     _niveau3List =
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
-        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
+        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/read'));
     verifyParam();
   }
 
@@ -639,7 +640,8 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                   width: 300,
                                 ),
                               )
-                            :  widget.stock!.photo == null || widget.stock!.photo!.isEmpty ?
+                            :  widget.isEditable == false ?
+                            // :  widget.stock!.photo == null || widget.stock!.photo!.isEmpty ?
                              SizedBox(
                                 child: IconButton(
                                   onPressed: _showImageSourceDialog,

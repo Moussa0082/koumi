@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Continent.dart';
 import 'package:koumi_app/models/SousRegion.dart';
 import 'package:koumi_app/service/SousRegionService.dart';
@@ -27,7 +28,7 @@ class _updateSousRegionsState extends State<updateSousRegions> {
     continents = widget.sousRegion.continent;
     continentValue = widget.sousRegion.continent.idContinent;
     _continentList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/continent/read'));
+        http.get(Uri.parse('$apiOnlineUrl/continent/read'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/continent/read'));
     super.initState();
   }

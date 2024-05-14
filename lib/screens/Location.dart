@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/DetailMateriel.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Materiel.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
@@ -71,7 +72,7 @@ class _LocationState extends State<Location> {
       para = paraList[0];
     }
     _typeList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
+        http.get(Uri.parse('$apiOnlineUrl/TypeMateriel/read'));
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
   }
 

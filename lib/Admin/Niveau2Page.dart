@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/CodePays.dart';
 import 'package:koumi_app/Admin/UpdatesNiveau2.dart';
 import 'package:koumi_app/Admin/niveau3Liste.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
@@ -56,10 +57,10 @@ class _Niveau2PageState extends State<Niveau2Page> {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
     para = paraList[0];
-    _paysList = http.get(Uri.parse('https://koumi.ml/api-koumi/pays/read'));
+    _paysList = http.get(Uri.parse('$apiOnlineUrl/pays/read'));
     // _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
     _niveauList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+        http.get(Uri.parse('$apiOnlineUrl/niveau1Pays/read'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
   }
 

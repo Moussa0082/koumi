@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Speculation.dart';
@@ -75,7 +76,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
             id = acteur.idActeur;
     magasinListe =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
+        http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByActeur/${id}'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
       setState(() {
         isExist = true;
@@ -195,16 +196,16 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
 
     verify();
     magasinListe =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
+        http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByActeur/${id}'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
     speculationListe =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/Speculation/getAllSpeculation'));
+        http.get(Uri.parse('$apiOnlineUrl/Speculation/getAllSpeculation'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation'));
     uniteListe =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/Unite/getAllUnite'));
+        http.get(Uri.parse('$apiOnlineUrl/Unite/getAllUnite'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Unite/getAllUnite'));
     zoneListe =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/ZoneProduction/getAllZone'));
+        http.get(Uri.parse('$apiOnlineUrl/ZoneProduction/getAllZone'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/ZoneProduction/getAllZone'));
 
         

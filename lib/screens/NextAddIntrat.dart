@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:intl/intl.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Forme.dart';
@@ -157,7 +158,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // _formeList = fetchList();
     _formeList = http
-        .get(Uri.parse('https://koumi.ml/api-koumi/formeproduit/getAllForme/'));
+        .get(Uri.parse('$apiOnlineUrl/formeproduit/getAllForme/'));
     // Uri.parse('http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
   }
 

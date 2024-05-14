@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
@@ -65,36 +66,31 @@ class _ProductScreenState extends State<ProductScreen> {
   }
 
   Future<List<Stock>> getAllStock() async {
-    if (selectedCat != null) {
-      stockListe = await StockService()
-          .fetchProduitByCategorie(selectedCat!.idCategorieProduit!);
-    }
-    else if(widget.id != null) {
+    if(widget.id != null) {
       stockListe = await StockService().fetchStockByMagasin(widget.id!);
-    } else if (selectedCat != null && widget.id != null) {
+    
+    }
+     else if (selectedCat != null && widget.id != null) {
       stockListe = await StockService().fetchProduitByCategorieAndMagasin(
           selectedCat!.idCategorieProduit!, widget.id!);
     }
+    // else{
+    //   stockListe = await StockService().fetchStock();
+    // }
     
     return stockListe;
   }
 
   Future<List<Stock>> getAllStocks() async {
-    
-      stockListe = await StockService().fetchStock();
+     if (selectedCat != null) {
+      stockListe = await StockService()
+          .fetchProduitByCategorie(selectedCat!.idCategorieProduit!);
+    }
+      // stockListe = await StockService().fetchStock();
     return stockListe;
   }
 
-  // Méthode pour mettre à jour la liste de stocks
-  void updateStockList() async {
-    try {
-      setState(() {
-        stockListeFuture = getAllStock();
-      });
-    } catch (error) {
-      print('Erreur lors de la mise à jour de la liste de stocks: $error');
-    }
-  }
+  
 
   void verifyParam() {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
@@ -118,10 +114,12 @@ class _ProductScreenState extends State<ProductScreen> {
     verify();
     _searchController = TextEditingController();
     _catList = http
-        .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
+        .get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
     // updateStockList();
     stockListeFuture = getAllStock();
+    // stockListeFuture1 = getAllStocks();
     stockListeFuture1 = getAllStocks();
+  
   }
 
   @override
@@ -279,7 +277,19 @@ class _ProductScreenState extends State<ProductScreen> {
                   );
                 }
                 if (snapshot.hasError) {
-                  return Text("Une erreur s'est produite veuillez reessayer");
+                 return  DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText:"Une erreur s'est produite veuiller réessayer",
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
                 }
                 if (snapshot.hasData) {
                   dynamic jsonString = utf8.decode(snapshot.data.bodyBytes);
@@ -370,10 +380,9 @@ class _ProductScreenState extends State<ProductScreen> {
           ),
           const SizedBox(height: 10),
           Consumer<StockService>(builder: (context, stockService, child) {
-            return FutureBuilder<List<Stock>>(
-                future: selectedCat != null ?
-                stockListeFuture : stockListeFuture1,
-                // stockListeFuture  ,
+            return FutureBuilder(
+                future:  selectedCat == null ? 
+                stockService.fetchStock() :  stockService.fetchProduitByCategorie(selectedCat!.idCategorieProduit!),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -421,7 +430,7 @@ class _ProductScreenState extends State<ProductScreen> {
 
                     return 
                     stockListe
-                    // .where((element) => element.statutSotck == true )
+                    .where((element) => element.statutSotck == true )
                     .isEmpty
                         ? 
                         SingleChildScrollView(

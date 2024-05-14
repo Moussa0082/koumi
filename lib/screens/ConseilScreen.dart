@@ -83,11 +83,11 @@ class _ConseilScreenState extends State<ConseilScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          actions: type.toLowerCase() == 'fournisseur' ||
+          actions: 
+          type.toLowerCase() == 'fournisseur' ||
                   type.toLowerCase() == 'commerçant' ||
                   type.toLowerCase() == 'transporteur' ||
                   type.toLowerCase() == 'transformeur' ||
-                  type.toLowerCase() == 'producteur' ||
                   type.toLowerCase() == 'commerçant' ||
                   type.toLowerCase() == 'commercant'
               ? null

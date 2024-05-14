@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
@@ -93,7 +94,7 @@ class _StoreScreenState extends State<StoreScreen> {
     // magasinListeFuture = getAllMagasin();
     _searchController = TextEditingController();
     _niveau1PaysList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
+        http.get(Uri.parse('$apiOnlineUrl/niveau1Pays/read'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
     // updateMagasinList();
   }
@@ -124,7 +125,77 @@ class _StoreScreenState extends State<StoreScreen> {
             ),
             actions: !isExist
                 ? null
-                : [
+                :               (typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("commercant") ||
+      typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("admin") ||
+      typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("commerçant") ||
+      typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("producteur")) ?  [
+                  
+         
+            PopupMenuButton<String>(
+              padding: EdgeInsets.zero,
+              itemBuilder: (context) {
+                return <PopupMenuEntry<String>>[
+                  PopupMenuItem<String>(
+                    child: ListTile(
+                      leading: const Icon(
+                        Icons.add,
+                        color: Colors.green,
+                      ),
+                      title: const Text(
+                        "Ajouter Magasin",
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onTap: () async {
+                                   Navigator.of(
+                                                                            context)
+                                                                        .pop();
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) =>
+                        //             AddMagasinScreen(isEditable: false,)));
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    AddMagasinScreen(
+                              isEditable: false,
+                            ),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              var begin = Offset(
+                                  0.0, 1.0); // Commencer en bas de l'écran
+                              var end = Offset.zero; // Finir en haut de l'écran
+                              var curve = Curves.ease;
+                              var tween = Tween(begin: begin, end: end)
+                                  .chain(CurveTween(curve: curve));
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                            transitionDuration: const Duration(
+                                milliseconds: 1900), // Durée de la transition
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ];
+              },
+            ),
                     PopupMenuButton<String>(
                       padding: EdgeInsets.zero,
                       itemBuilder: (context) {
@@ -156,8 +227,8 @@ class _StoreScreenState extends State<StoreScreen> {
                           ),
                         ];
                       },
-                    )
-                  ]),
+                    ) 
+                  ] : null),
         body: SingleChildScrollView(
             child: Column(children: [
           const SizedBox(height: 10),

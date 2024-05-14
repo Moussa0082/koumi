@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
@@ -66,7 +67,7 @@ class _TransportState extends State<Transport> {
     verify();
     _searchController = TextEditingController();
     _typeList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/TypeVoiture/read'));
+        http.get(Uri.parse('$apiOnlineUrl/TypeVoiture/read'));
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
     super.initState();
   }
@@ -98,8 +99,14 @@ class _TransportState extends State<Transport> {
           actions: !isExist
               ? null
               : [
-                  (type.toLowerCase() == 'admin' ||
-                          type.toLowerCase() == 'transporteur')
+                 (typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("transporteur") ||
+      typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("admin"))
+                  // (type.toLowerCase() == 'admin' ||
+                  //         type.toLowerCase() == 'transporteur')
                       ? PopupMenuButton<String>(
                           padding: EdgeInsets.zero,
                           itemBuilder: (context) {
