@@ -85,8 +85,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   Future<List<Stock>> getAllStock() async {
      if (selectedCat != null) {
-      stockListe = await StockService()
-          .fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!);
+      stockListe = await 
+          StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!);
     }
     else if(widget.id != null) {
     stockListe = await StockService().fetchStockByMagasinWithPagination(widget.id!);
@@ -192,18 +192,24 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
 }
    void _scrollListener1() {
-  if (selectedCat != null &&  scrollableController1.position.pixels >=
+  if ( scrollableController1.position.pixels >=
           scrollableController1.position.maxScrollExtent - 200 &&
       hasMore &&
-      !isLoading ) {
+      !isLoading) {
     // if (selectedCat != null) {
       // Incrementez la page et récupérez les stocks par catégorie
       debugPrint("yes - fetch by category");
       setState(() {
           // Rafraîchir les données ici
       page++;
-     fetchStockByCategorie(selectedCat!.idCategorieProduit!);
         });
+   
+    fetchStockByCategorie(selectedCat!.idCategorieProduit!).then((value) {
+        setState(() {
+          // Rafraîchir les données ici
+          debugPrint("page inc all ${page}");
+        });
+      });
     } 
     debugPrint("no");
 
@@ -269,9 +275,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Future<List<Stock>> fetchStockByCategorie(String idCategorie,{bool refresh = false}) async {
     if (isLoading == true) return [];
 
-    // setState(() {
+    setState(() {
       isLoading = true;
-    // });
+    });
 
     if (refresh) {
       setState(() {
@@ -282,7 +288,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByCategorieWithPagination?idCategorie=$idCategorie&page=${page}&size=${size}'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByCategorieWithPagination?idCategorie=$idCategorie&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -585,8 +591,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               selectedCat = categorieList.firstWhere(
                                 (element) => element.idCategorieProduit == newValue,
                               );
-                              stockListeFuture1 = fetchStockByCategorie(selectedCat!.idCategorieProduit!);                                                          debugPrint("id:${selectedCat!.idCategorieProduit!}");
-                            }
+  stockListeFuture1 =  StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!);       
+                        // stockListeFuture1 = fetchStockByCategorie(selectedCat!.idCategorieProduit!); 
+                       }
                           });
                         },
                         decoration: InputDecoration(
@@ -645,18 +652,18 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   // Rafraîchir les données ici
                 });
                   debugPrint("refresh page ${page}");
-                selectedCat != null ?StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!) : 
+                // selectedCat != null ?StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!) : 
                 setState(() {
                   stockListeFuture = fetchStock();
-                });;
+                });
                               },
               child: selectedCat == null ?
               SingleChildScrollView(
                 controller: scrollableController,
                 child: Consumer<StockService>(builder: (context, stockService, child) {
                           return FutureBuilder<List<Stock>>(
-                                        future: stockListeFuture,
-                                        // stockService.fetchProduitByCategorie(selectedCat!.idCategorieProduit!) :  stockListeFuture,
+                                        future: 
+                                        stockListeFuture,
                                         builder: (context, snapshot) {
                                           if (snapshot.connectionState == ConnectionState.waiting) {
                           return const Center(
@@ -774,10 +781,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           );
         }
 
-                    
-                                  
-                                               
-                                    
+                                                    
                      
                                     // var e = stockListe
                                     //     // .where((element) =>
@@ -1030,13 +1034,16 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                           }
                                         });}
                         ),
-              ) :
+              ) : 
+              
               SingleChildScrollView(
                 controller: scrollableController1,
                 child: Consumer<StockService>(builder: (context, stockService, child) {
                           return FutureBuilder<List<Stock>>(
-                                        future:   stockListeFuture1,
-                                        // StockService().fetchProduitByCategorie(selectedCat!.idCategorieProduit!) :  stockListeFuture,
+                                        future: 
+                                         stockListeFuture1, 
+                                        // StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!),
+                                        // fetchStockByCategorie(selectedCat!.idCategorieProduit!) ,
                                         builder: (context, snapshot) {
                                           if (snapshot.connectionState == ConnectionState.waiting) {
                           return const Center(

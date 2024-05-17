@@ -238,7 +238,6 @@ class StockService extends ChangeNotifier {
       final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksWithPagination?page=$page&size=$size'));
 
       if (response.statusCode == 200) {
-        debugPrint("url: $response");
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 
