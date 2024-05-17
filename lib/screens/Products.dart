@@ -19,6 +19,7 @@ import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 
 
 
@@ -669,11 +670,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                         stockListeFuture,
                                         builder: (context, snapshot) {
                                           if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.orange,
-                            ),
-                          );
+                          return _buildShimmerEffect();
+                          // const Center(
+                          //   child: CircularProgressIndicator(
+                          //     color: Colors.orange,
+                          //   ),
+                          // );
                                           }
                                                if (snapshot.hasError == true) {
                           return SingleChildScrollView(
@@ -765,7 +767,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                     ),
                                   ),
                                 )
-                              :  GridView.builder(
+                              :  
+                              GridView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -776,13 +779,15 @@ class _ProductsScreenState extends State<ProductsScreen> {
       ),
       itemCount: stockListe.length + (isLoading ? 1 : 0),
       itemBuilder: (context, index) {
-        if (index == stockListe.length) {
-          return Center(
-            child: CircularProgressIndicator(
-              color: Colors.orange,
-            ),
-          );
-        }
+        if (index == stockListe.length && hasMore && isLoading) {
+      return Center(
+        child: CircularProgressIndicator(
+          color: Colors.orange,
+        ),
+      );
+    }
+
+    if (index >= stockListe.length) return null; 
 
                                                     
                      
@@ -804,22 +809,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                       child: Card(
                                         margin: EdgeInsets.all(8),
                                         
-                                  //       isExist == true ?
-                                  // typeActeurData
-                                  //         .map((e) => e.libelle!.toLowerCase())
-                                  //         .contains("admin")
-                                  //     ? stockListe.where((element) =>
-                                  //             element.statutSotck == true || element.statutSotck == false )  .
-                                  //     length
-                                  //     : stockListe
-                                  //         .where((element) =>
-                                  //             element.statutSotck == true && element.acteur?.statutActeur == true)
-                                  //         .length : stockListe
-                                  //         .where((element) =>
-                                  //             element.statutSotck == true && element.acteur?.statutActeur == true)
-                                  //         .length 
-                                        // ),
-                                    
+                                 
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.stretch,
@@ -888,146 +878,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                                 ),
                                               ),
                                             ),
-                                            //  _buildItem(
-                                            //         "Localité :", filtereSearch[index].localiteMagasin!),
-                                            //  _buildItem(
-                                            //     "Acteur :", e.acteur!.typeActeur!.map((e) => e.libelle!).join(','))
-                                            // typeActeurData
-                                            //         .map((e) =>
-                                            //             e.libelle!.toLowerCase())
-                                            //         .contains("admin")
-                                            //     ? Padding(
-                                            //         padding:
-                                            //             const EdgeInsets.symmetric(
-                                            //                 horizontal: 8.0),
-                                            //         child: Row(
-                                            //           mainAxisAlignment:
-                                            //               MainAxisAlignment
-                                            //                   .spaceBetween,
-                                            //           children: [
-                                            //             _buildEtat(
-                                            //                 stockListe[index]
-                                            //                     .statutSotck!),
-                                            //             SizedBox(
-                                            //               width: 120,
-                                            //             ),
-                                            //             Expanded(
-                                            //               child:
-                                            //               //     PopupMenuButton<String>(
-                                                          //   padding: EdgeInsets.zero,
-                                                          //   itemBuilder: (context) =>
-                                                          //       <PopupMenuEntry<
-                                                          //           String>>[
-                                                          //     PopupMenuItem<String>(
-                                                          //         child: ListTile(
-                                                          //       leading: stockListe[
-                                                          //                       index]
-                                                          //                   .statutSotck ==
-                                                          //               false
-                                                          //           ? Icon(
-                                                          //               Icons.check,
-                                                          //               color: Colors
-                                                          //                   .green,
-                                                          //             )
-                                                          //           : Icon(
-                                                          //               Icons
-                                                          //                   .disabled_visible,
-                                                          //               color: Colors
-                                                          //                       .orange[
-                                                          //                   400]),
-                                                          //       title: Text(
-                                                          //         stockListe[index]
-                                                          //                     .statutSotck ==
-                                                          //                 false
-                                                          //             ? "Activer"
-                                                          //             : "Desactiver",
-                                                          //         style: TextStyle(
-                                                          //           color: stockListe[
-                                                          //                           index]
-                                                          //                       .statutSotck ==
-                                                          //                   false
-                                                          //               ? Colors.green
-                                                          //               : Colors.red,
-                                                          //           fontWeight:
-                                                          //               FontWeight
-                                                          //                   .bold,
-                                                          //         ),
-                                                          //       ),
-                                                          //       onTap: () async {
-                                                          //         // Changement d'état du magasin ici
-                                                          //         stockListe[index]
-                                                          //                     .statutSotck ==
-                                                          //                 false
-                                                          //             ? await StockService()
-                                                          //                 .activerStock(
-                                                          //                     stockListe[index]
-                                                          //                         .idStock!)
-                                                          //                 .then(
-                                                          //                     (value) =>
-                                                          //                         {
-                                                          //                           // Mettre à jour la liste des magasins après le changement d'état
-                                                          //                           Provider.of<StockService>(context, listen: false).applyChange(),
-                                                          //                           setState(() {
-                                                          //                             stockListeFuture = StockService().fetchStock();
-                                                          //                           }),
-                                                          //                           Navigator.of(context).pop(),
-                                                          //                         })
-                                                          //                 .catchError(
-                                                          //                     (onError) =>
-                                                          //                         {
-                                                          //                           ScaffoldMessenger.of(context).showSnackBar(
-                                                          //                             const SnackBar(
-                                                          //                               content: Row(
-                                                          //                                 children: [
-                                                          //                                   Text("Une erreur s'est produit"),
-                                                          //                                 ],
-                                                          //                               ),
-                                                          //                               duration: Duration(seconds: 5),
-                                                          //                             ),
-                                                          //                           ),
-                                                          //                           Navigator.of(context).pop(),
-                                                          //                         })
-                                                          //             : await StockService()
-                                                          //                 .desactiverStock(
-                                                          //                     stockListe[index]
-                                                          //                         .idStock!)
-                                                          //                 .then(
-                                                          //                     (value) =>
-                                                          //                         {
-                                                          //                           Provider.of<StockService>(context, listen: false).applyChange(),
-                                                          //                           setState(() {
-                                                          //                             stockListeFuture = StockService().fetchStock();
-                                                          //                           }),
-                                                          //                           Navigator.of(context).pop(),
-                                                          //                         });
-                                    
-                                                          //         ScaffoldMessenger
-                                                          //                 .of(context)
-                                                          //             .showSnackBar(
-                                                          //           SnackBar(
-                                                          //             content: Row(
-                                                          //               children: [
-                                                          //                 Text(stockListe[index].statutSotck ==
-                                                          //                         false
-                                                          //                     ? "Activer avec succèss "
-                                                          //                     : "Desactiver avec succèss"),
-                                                          //               ],
-                                                          //             ),
-                                                          //             duration:
-                                                          //                 Duration(
-                                                          //                     seconds:
-                                                          //                         2),
-                                                          //           ),
-                                                          //         );
-                                                          //       },
-                                                          //     )),
-                                                          //   ],
-                                                          // ),
-                                                //         ),
-                                                //       ],
-                                                //     ),
-                                                //   )
-                                                // : SizedBox(),
+                                           
                                           ],
                                         ),
                                       )
@@ -1049,11 +900,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                         // fetchStockByCategorie(selectedCat!.idCategorieProduit!) ,
                                         builder: (context, snapshot) {
                                           if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.orange,
-                            ),
-                          );
+                           
+                          return _buildShimmerEffect();
+                          // const Center(
+                          //   child: CircularProgressIndicator(
+                          //     color: Colors.orange,
+                          //   ),
+                          // );
                                           }
                                                if (snapshot.hasError == true) {
                           return SingleChildScrollView(
@@ -1120,7 +973,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           return 
                           stockListe
                           // .where((element) => element.statutSotck == true )
-                          .isEmpty
+                          .isEmpty && isLoading == false
                               ? 
                               SingleChildScrollView(
                                   child: Padding(
@@ -1145,7 +998,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                     ),
                                   ),
                                 )
-                              :  GridView.builder(
+                              :  stockListe
+                          // .where((element) => element.statutSotck == true )
+                          .isEmpty && isLoading == true
+                              ? _buildShimmerEffect() :
+                               GridView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -1156,23 +1013,22 @@ class _ProductsScreenState extends State<ProductsScreen> {
       ),
       itemCount: stockListe.length + (!isLoading ? 1 : 0),
       itemBuilder: (context, index) {
-        if (index == stockListe.length) {
-          return Center(
-            child: CircularProgressIndicator(
-              color: Colors.orange,
-            ),
-          );
-        }
+        if (index == stockListe.length && hasMore && isLoading) {
+      return Center(
+        child: CircularProgressIndicator(
+          color: Colors.orange,
+        ),
+      );
+    }
+
+    if (index >= stockListe.length) return null; 
 
                     
                                   
+                                   
                                                
                                     
                      
-                                    // var e = stockListe
-                                    //     // .where((element) =>
-                                    //     //     element.statutSotck == true)
-                                    //     .elementAt(index-1);
                                     return GestureDetector(
                                       onTap: () {
                                         Navigator.push(
@@ -1186,23 +1042,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                       },
                                       child: Card(
                                         margin: EdgeInsets.all(8),
-                                        
-                                  //       isExist == true ?
-                                  // typeActeurData
-                                  //         .map((e) => e.libelle!.toLowerCase())
-                                  //         .contains("admin")
-                                  //     ? stockListe.where((element) =>
-                                  //             element.statutSotck == true || element.statutSotck == false )  .
-                                  //     length
-                                  //     : stockListe
-                                  //         .where((element) =>
-                                  //             element.statutSotck == true && element.acteur?.statutActeur == true)
-                                  //         .length : stockListe
-                                  //         .where((element) =>
-                                  //             element.statutSotck == true && element.acteur?.statutActeur == true)
-                                  //         .length 
-                                        // ),
-                                    
+                                 
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.stretch,
@@ -1271,146 +1111,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                                 ),
                                               ),
                                             ),
-                                            //  _buildItem(
-                                            //         "Localité :", filtereSearch[index].localiteMagasin!),
-                                            //  _buildItem(
-                                            //     "Acteur :", e.acteur!.typeActeur!.map((e) => e.libelle!).join(','))
-                                            // typeActeurData
-                                            //         .map((e) =>
-                                            //             e.libelle!.toLowerCase())
-                                            //         .contains("admin")
-                                            //     ? Padding(
-                                            //         padding:
-                                            //             const EdgeInsets.symmetric(
-                                            //                 horizontal: 8.0),
-                                            //         child: Row(
-                                            //           mainAxisAlignment:
-                                            //               MainAxisAlignment
-                                            //                   .spaceBetween,
-                                            //           children: [
-                                            //             _buildEtat(
-                                            //                 stockListe[index]
-                                            //                     .statutSotck!),
-                                            //             SizedBox(
-                                            //               width: 120,
-                                            //             ),
-                                            //             Expanded(
-                                            //               child:
-                                            //               //     PopupMenuButton<String>(
-                                                          //   padding: EdgeInsets.zero,
-                                                          //   itemBuilder: (context) =>
-                                                          //       <PopupMenuEntry<
-                                                          //           String>>[
-                                                          //     PopupMenuItem<String>(
-                                                          //         child: ListTile(
-                                                          //       leading: stockListe[
-                                                          //                       index]
-                                                          //                   .statutSotck ==
-                                                          //               false
-                                                          //           ? Icon(
-                                                          //               Icons.check,
-                                                          //               color: Colors
-                                                          //                   .green,
-                                                          //             )
-                                                          //           : Icon(
-                                                          //               Icons
-                                                          //                   .disabled_visible,
-                                                          //               color: Colors
-                                                          //                       .orange[
-                                                          //                   400]),
-                                                          //       title: Text(
-                                                          //         stockListe[index]
-                                                          //                     .statutSotck ==
-                                                          //                 false
-                                                          //             ? "Activer"
-                                                          //             : "Desactiver",
-                                                          //         style: TextStyle(
-                                                          //           color: stockListe[
-                                                          //                           index]
-                                                          //                       .statutSotck ==
-                                                          //                   false
-                                                          //               ? Colors.green
-                                                          //               : Colors.red,
-                                                          //           fontWeight:
-                                                          //               FontWeight
-                                                          //                   .bold,
-                                                          //         ),
-                                                          //       ),
-                                                          //       onTap: () async {
-                                                          //         // Changement d'état du magasin ici
-                                                          //         stockListe[index]
-                                                          //                     .statutSotck ==
-                                                          //                 false
-                                                          //             ? await StockService()
-                                                          //                 .activerStock(
-                                                          //                     stockListe[index]
-                                                          //                         .idStock!)
-                                                          //                 .then(
-                                                          //                     (value) =>
-                                                          //                         {
-                                                          //                           // Mettre à jour la liste des magasins après le changement d'état
-                                                          //                           Provider.of<StockService>(context, listen: false).applyChange(),
-                                                          //                           setState(() {
-                                                          //                             stockListeFuture = StockService().fetchStock();
-                                                          //                           }),
-                                                          //                           Navigator.of(context).pop(),
-                                                          //                         })
-                                                          //                 .catchError(
-                                                          //                     (onError) =>
-                                                          //                         {
-                                                          //                           ScaffoldMessenger.of(context).showSnackBar(
-                                                          //                             const SnackBar(
-                                                          //                               content: Row(
-                                                          //                                 children: [
-                                                          //                                   Text("Une erreur s'est produit"),
-                                                          //                                 ],
-                                                          //                               ),
-                                                          //                               duration: Duration(seconds: 5),
-                                                          //                             ),
-                                                          //                           ),
-                                                          //                           Navigator.of(context).pop(),
-                                                          //                         })
-                                                          //             : await StockService()
-                                                          //                 .desactiverStock(
-                                                          //                     stockListe[index]
-                                                          //                         .idStock!)
-                                                          //                 .then(
-                                                          //                     (value) =>
-                                                          //                         {
-                                                          //                           Provider.of<StockService>(context, listen: false).applyChange(),
-                                                          //                           setState(() {
-                                                          //                             stockListeFuture = StockService().fetchStock();
-                                                          //                           }),
-                                                          //                           Navigator.of(context).pop(),
-                                                          //                         });
-                                    
-                                                          //         ScaffoldMessenger
-                                                          //                 .of(context)
-                                                          //             .showSnackBar(
-                                                          //           SnackBar(
-                                                          //             content: Row(
-                                                          //               children: [
-                                                          //                 Text(stockListe[index].statutSotck ==
-                                                          //                         false
-                                                          //                     ? "Activer avec succèss "
-                                                          //                     : "Desactiver avec succèss"),
-                                                          //               ],
-                                                          //             ),
-                                                          //             duration:
-                                                          //                 Duration(
-                                                          //                     seconds:
-                                                          //                         2),
-                                                          //           ),
-                                                          //         );
-                                                          //       },
-                                                          //     )),
-                                                          //   ],
-                                                          // ),
-                                                //         ),
-                                                //       ],
-                                                //     ),
-                                                //   )
-                                                // : SizedBox(),
+                                          
                                           ],
                                         ),
                                       )
@@ -1427,6 +1128,75 @@ class _ProductsScreenState extends State<ProductsScreen> {
       ),
     );
   }
+
+
+ Widget _buildShimmerEffect(){
+  return   Center(
+        child: GridView.builder(
+            shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 0.8,
+      ),
+          itemCount: 6, // Number of shimmer items to display
+          itemBuilder: (context, index) {
+            return Card(
+              margin: EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 85,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 16,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    subtitle: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 15,
+                        color: Colors.grey,
+                        margin: EdgeInsets.only(top: 4),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 15,
+                        color: Colors.grey,
+                        margin: EdgeInsets.only(top: 4),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+ }
 
   Widget _buildItem(String title, String value) {
     return Padding(
