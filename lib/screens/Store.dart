@@ -125,7 +125,9 @@ class _StoreScreenState extends State<StoreScreen> {
             ),
             actions: !isExist
                 ? null
-                :               (typeActeurData
+                :                [
+                  
+          (typeActeurData
           .map((e) => e.libelle!.toLowerCase())
           .contains("commercant") ||
       typeActeurData
@@ -136,99 +138,96 @@ class _StoreScreenState extends State<StoreScreen> {
           .contains("commerçant") ||
       typeActeurData
           .map((e) => e.libelle!.toLowerCase())
-          .contains("producteur")) ?  [
-                  
-         
+          .contains("producteur")) ?
             PopupMenuButton<String>(
-              padding: EdgeInsets.zero,
-              itemBuilder: (context) {
-                return <PopupMenuEntry<String>>[
-                  PopupMenuItem<String>(
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.add,
-                        color: Colors.green,
-                      ),
-                      title: const Text(
-                        "Ajouter Magasin",
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onTap: () async {
-                                   Navigator.of(
-                                                                            context)
-                                                                        .pop();
-                        // Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //         builder: (context) =>
-                        //             AddMagasinScreen(isEditable: false,)));
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) =>
-                                    AddMagasinScreen(
-                              isEditable: false,
-                            ),
-                            transitionsBuilder: (context, animation,
-                                secondaryAnimation, child) {
-                              var begin = Offset(
-                                  0.0, 1.0); // Commencer en bas de l'écran
-                              var end = Offset.zero; // Finir en haut de l'écran
-                              var curve = Curves.ease;
-                              var tween = Tween(begin: begin, end: end)
-                                  .chain(CurveTween(curve: curve));
-                              return SlideTransition(
-                                position: animation.drive(tween),
-                                child: child,
-                              );
-                            },
-                            transitionDuration: const Duration(
-                                milliseconds: 1900), // Durée de la transition
-                          ),
-                        );
-                      },
+          padding: EdgeInsets.zero,
+          itemBuilder: (context) {
+            return <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.add,
+                    color: Colors.green,
+                  ),
+                  title: const Text(
+                    "Ajouter magasin",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ];
-              },
-            ),
-                    PopupMenuButton<String>(
-                      padding: EdgeInsets.zero,
-                      itemBuilder: (context) {
-                        return <PopupMenuEntry<String>>[
-                          PopupMenuItem<String>(
-                            child: ListTile(
-                              leading: const Icon(
-                                Icons.remove_red_eye,
-                                color: Colors.green,
-                              ),
-                              title: const Text(
-                                "Mes boutiques",
-                                style: TextStyle(
-                                  color: Colors.green,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              onTap: () async {
-                                Navigator.of(
-                                                                            context)
-                                                                        .pop();
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            MyStoresScreen()));
-                              },
-                            ),
-                          ),
-                        ];
-                      },
-                    ) 
-                  ] : null),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AddMagasinScreen(
+                          isEditable: false,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              PopupMenuItem<String>(
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.remove_red_eye,
+                    color: Colors.green,
+                  ),
+                  title: const Text(
+                    "Mes boutiques",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MyStoresScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ];
+          },
+        )
+      : PopupMenuButton<String>(
+          padding: EdgeInsets.zero,
+          itemBuilder: (context) {
+            return <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.remove_red_eye,
+                    color: Colors.green,
+                  ),
+                  title: const Text(
+                    "Mes boutiques",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MyStoresScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ];
+          },
+        ),   
+                  ] ,),
         body: SingleChildScrollView(
             child: Column(children: [
           const SizedBox(height: 10),

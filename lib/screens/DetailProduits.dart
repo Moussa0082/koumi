@@ -104,112 +104,108 @@ class _DetailProduitsState extends State<DetailProduits>
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           centerTitle: true,
           title: const Text("Détail Produit"),
-          actions: isExist == true
-              ? 
-              (
-      typeActeurData
-          .map((e) => e.libelle!.toLowerCase())
-          .contains("admin")) ? [
-             PopupMenuButton<String>(
-                                                      padding: EdgeInsets.zero,
-                                                      itemBuilder: (context) =>
-                                                          <PopupMenuEntry<
-                                                              String>>[
-                                                        PopupMenuItem<String>(
-                                                            child: ListTile(
-                                                          leading: widget.stock.statutSotck ==
-                                                                  false
-                                                              ? Icon(
-                                                                  Icons.check,
-                                                                  color: Colors
-                                                                      .green,
-                                                                )
-                                                              : Icon(
-                                                                  Icons
-                                                                      .disabled_visible,
-                                                                  color: Colors
-                                                                          .orange[
-                                                                      400]),
-                                                          title: Text(
-                                                            widget.stock.statutSotck ==
-                                                                    false
-                                                                ? "Activer"
-                                                                : "Desactiver",
-                                                            style: TextStyle(
-                                                              color: widget.stock.statutSotck ==
-                                                                      false
-                                                                  ? Colors.green
-                                                                  : Colors.red,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          onTap: () async {
-                                                            // Changement d'état du magasin ici
+          actions:  isExist ?
+      //         (widget.stock.acteur!.idActeur != acteur.idActeur! &&
+      // typeActeurData
+      //     .map((e) => e.libelle!.toLowerCase())
+      //     .contains("admin") ) ?
+           [
+            //  PopupMenuButton<String>(
+            //                                           padding: EdgeInsets.zero,
+            //                                           itemBuilder: (context) =>
+            //                                               <PopupMenuEntry<
+            //                                                   String>>[
+            //                                             PopupMenuItem<String>(
+            //                                                 child: ListTile(
+            //                                               leading: widget.stock.statutSotck ==
+            //                                                       false
+            //                                                   ? Icon(
+            //                                                       Icons.check,
+            //                                                       color: Colors
+            //                                                           .green,
+            //                                                     )
+            //                                                   : Icon(
+            //                                                       Icons
+            //                                                           .disabled_visible,
+            //                                                       color: Colors
+            //                                                               .orange[
+            //                                                           400]),
+            //                                               title: Text(
+            //                                                 widget.stock.statutSotck ==
+            //                                                         false
+            //                                                     ? "Activer"
+            //                                                     : "Desactiver",
+            //                                                 style: TextStyle(
+            //                                                   color: widget.stock.statutSotck ==
+            //                                                           false
+            //                                                       ? Colors.green
+            //                                                       : Colors.red,
+            //                                                   fontWeight:
+            //                                                       FontWeight
+            //                                                           .bold,
+            //                                                 ),
+            //                                               ),
+            //                                               onTap: () async {
+            //                                                 // Changement d'état du magasin ici
                                                             
-                                                                        widget.stock.statutSotck ==
-                                                                    false
-                                                                ? await StockService()
-                                                                    .activerStock(
-                                                                        widget.stock.idStock!)
-                                                                    .then(
-                                                                        (value) =>
-                                                                            {
+            //                                                             widget.stock.statutSotck ==
+            //                                                         false
+            //                                                     ? await StockService()
+            //                                                         .activerStock(
+            //                                                             widget.stock.idStock!)
+            //                                                         .then(
+            //                                                             (value) =>
+            //                                                                 {
                                                                              
-                                                                              Navigator.of(context).pop(),
-                                                                            })
-                                                                    .catchError(
-                                                                        (onError) =>
-                                                                            {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Une erreur s'est produit"),
-                                                                                    ],
-                                                                                  ),
-                                                                                  duration: Duration(seconds: 5),
-                                                                                ),
-                                                                              ),
-                                                                              Navigator.of(context).pop(),
-                                                                            })
-                                                                : await StockService()
-                                                                    .desactiverStock(
-                                                                        widget.stock.idStock!)
-                                                                    .then(
-                                                                        (value) =>
-                                                                            {
+            //                                                                   Navigator.of(context).pop(),
+            //                                                                 })
+            //                                                         .catchError(
+            //                                                             (onError) =>
+            //                                                                 {
+            //                                                                   ScaffoldMessenger.of(context).showSnackBar(
+            //                                                                     const SnackBar(
+            //                                                                       content: Row(
+            //                                                                         children: [
+            //                                                                           Text("Une erreur s'est produit"),
+            //                                                                         ],
+            //                                                                       ),
+            //                                                                       duration: Duration(seconds: 5),
+            //                                                                     ),
+            //                                                                   ),
+            //                                                                   Navigator.of(context).pop(),
+            //                                                                 })
+            //                                                     : await StockService()
+            //                                                         .desactiverStock(
+            //                                                             widget.stock.idStock!)
+            //                                                         .then(
+            //                                                             (value) =>
+            //                                                                 {
                                                                              
-                                                                              Navigator.of(context).pop(),
-                                                                            });
+            //                                                                   Navigator.of(context).pop(),
+            //                                                                 });
 
-                                                            ScaffoldMessenger
-                                                                    .of(context)
-                                                                .showSnackBar(
-                                                              SnackBar(
-                                                                content: Row(
-                                                                  children: [
-                                                                    Text(widget.stock.statutSotck ==
-                                                                            false
-                                                                        ? "Activer avec succèss "
-                                                                        : "Desactiver avec succèss"),
-                                                                  ],
-                                                                ),
-                                                                duration:
-                                                                    Duration(
-                                                                        seconds:
-                                                                            2),
-                                                              ),
-                                                            );
-                                                          },
-                                                        )),
-                                                      ],
-                                                    ),
-          ] : null
-
-              : 
-               [
+            //                                                 ScaffoldMessenger
+            //                                                         .of(context)
+            //                                                     .showSnackBar(
+            //                                                   SnackBar(
+            //                                                     content: Row(
+            //                                                       children: [
+            //                                                         Text(widget.stock.statutSotck ==
+            //                                                                 false
+            //                                                             ? "Activer avec succèss "
+            //                                                             : "Desactiver avec succèss"),
+            //                                                       ],
+            //                                                     ),
+            //                                                     duration:
+            //                                                         Duration(
+            //                                                             seconds:
+            //                                                                 2),
+            //                                                   ),
+            //                                                 );
+            //                                               },
+            //                                             )),
+            //                                           ],
+            //                                         ),
                   acteur.idActeur != widget.stock.acteur!.idActeur
                       ? SizedBox()
                       : IconButton(
@@ -227,8 +223,11 @@ class _DetailProduitsState extends State<DetailProduits>
                             Icons.edit,
                           ),
                         )
+          ] : null
+
+              
                         
-                ],
+                
         ),
         body: SingleChildScrollView(
           child: Column(

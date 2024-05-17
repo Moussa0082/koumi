@@ -41,7 +41,6 @@ import 'package:koumi_app/service/TypeVoitureService.dart';
 import 'package:koumi_app/service/UniteService.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
-import 'package:koumi_app/view/item/item_screen.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:koumi_app/widgets/connection_verify.dart';
 import 'package:koumi_app/widgets/notification_controller.dart';

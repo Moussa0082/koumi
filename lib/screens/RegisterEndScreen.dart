@@ -485,49 +485,54 @@ Future<void> _pickImage(ImageSource source) async {
   padding: const EdgeInsets.symmetric(horizontal: 16),
   child: MultiSelectDropDown.network(
     networkConfig: NetworkConfig(
-      url: '$apiOnlineUrl/Speculation/getAllSpeculation',
+      // Endpoint pour récupérer les spéculations en fonction des catégories sélectionnées
+      // url:url , //e40ijxd5k0n0yrzj5f80,
+      url: '$apiOnlineUrl/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
+      // url: 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
       method: RequestMethod.get,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8', // Ajout de l'encodage UTF-8 dans les en-têtes
-      },
+      headers: {'Content-Type': 'application/json'},
     ),
     chipConfig: const ChipConfig(wrapType: WrapType.wrap),
-    responseParser: (response) {
-      // Convertir la réponse en chaîne de caractères
-      String responseBody = utf8.decode(response.bodyBytes);
-      // Parser la chaîne de caractères JSON en une liste dynamique
-      List<dynamic> decodedResponse = jsonDecode(responseBody);
+ responseParser: (response) {
+        // List<dynamic> decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
+ 
+  listeSpeculations = (response as List<dynamic>).map((e) {
+    return Speculation(
+      idSpeculation: e['idSpeculation'] as String,
+      nomSpeculation: e['nomSpeculation'] as String,
+      statutSpeculation: e['statutSpeculation'] as bool,
+      // Assurez-vous de correspondre aux clés JSON avec les noms de propriétés de votre classe TypeActeur
+      // Ajoutez d'autres champs si nécessaire
+    );
+  }).toList();
 
-      // Maintenant, vous pouvez continuer à traiter decodedResponse
-      listeSpeculations = decodedResponse.map((e){
-        return Speculation(
-          idSpeculation: e['idSpeculation'] as String,
-          nomSpeculation: e['nomSpeculation'] as String,
-          statutSpeculation: e['statutSpeculation'] as bool,
-        );
-      }).toList();
+  // Filtrer les types avec un libellé différent de "admin" et dont le statutTypeActeur est true
+  final filteredTypes = listeSpeculations.where((speculation) => speculation.statutSpeculation == true).toList();
+ 
+  // Créer des ValueItems pour les types filtrés
+  final List<ValueItem<Speculation>> valueItems = filteredTypes.map((speculation) {
+    return ValueItem<Speculation>(
+      label: speculation.nomSpeculation!,
+      value: speculation,
+    );
+  }).toList();
 
-      final filteredTypes = listeSpeculations.where((speculation) => speculation.statutSpeculation == true).toList();
+  return Future<List<ValueItem<Speculation>>>.value(valueItems);
+},
 
-      final List<ValueItem<Speculation>> valueItems = filteredTypes.map((speculation) {
-        return ValueItem<Speculation>(
-          label: speculation.nomSpeculation!,
-          value: speculation,
-        );
-      }).toList();
 
-      return Future<List<ValueItem<Speculation>>>.value(valueItems);
-    },
+
     controller: _controllerSpeculation,
     hint: 'Sélectionner une spéculation',
     fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
     onOptionSelected: (options) {
+    
       setState(() {
+         selectedSpec = options.map<Speculation>((item) => item.value!).toList();
+    print("Types sélectionnés : $selectedSpec");
         libelleSpeculation.clear();
         libelleSpeculation.addAll(options.map((data) => data.label).toList());
-        selectedSpec = options.map<Speculation>((item) => item.value!).toList();
         print("Spéculation sélectionnée ${libelleSpeculation.toString()}");
-        print("Types sélectionnés : $selectedSpec");
       });
       // Fermer automatiquement le dialogue
       FocusScope.of(context).unfocus();

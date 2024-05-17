@@ -31,7 +31,7 @@ class AddAndUpdateProductEndSreen extends StatefulWidget {
 
    AddAndUpdateProductEndSreen({super.key, this.isEditable, this.stock, 
     this.nomProduit,  this.forme ,  this.origine,  this.prix, 
-    this.quantite, this.image
+    this.quantite,  this.image
    });
 
   @override
@@ -215,7 +215,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
     if(widget.isEditable! == true){
      _typeController.text = widget.stock!.typeProduit!;
      _descriptionController.text = widget.stock!.descriptionStock!;
-          debugPrint("id : $id, type : ${widget.stock!.typeProduit!}, desc : ${widget.stock!.descriptionStock!}  acteur : $acteur , forme : ${widget.forme}");
+          debugPrint("id : $id,   acteur : $acteur , forme : ${widget.forme}");
           // debugPrint("spec : ${widget.speculation}, magasin : ${widget.magasin}, zone : ${widget.zoneProduction}   , unite : ${widget.unite}");
     }
   }
@@ -823,7 +823,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                           zoneProduction.nomZoneProduction = zoneListe
                                               .map((e) => e.nomZoneProduction!)
                                               .first;
-                                          print("zone de production : ${speculation}");
+                                          print("zone de production : ${zoneProduction}");
                                         }
                                       });
                                     },

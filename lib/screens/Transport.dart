@@ -353,7 +353,34 @@ class _TransportState extends State<Transport> {
                       searchText = _searchController.text.toLowerCase();
                       return libelle.contains(searchText);
                     }).toList();
-                    return GridView.builder(
+                    return
+                     vehiculeListe.isEmpty ?
+                      
+      SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Center(
+              child: Column(
+                children: [
+                  Image.asset('assets/images/notif.jpg'),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Aucune vehiucle de transport trouvé' ,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 17,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        )
+                    :
+                     GridView.builder(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

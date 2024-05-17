@@ -67,11 +67,11 @@ class _ProductScreenState extends State<ProductScreen> {
 
   Future<List<Stock>> getAllStock() async {
     if(widget.id != null) {
-      stockListe = await StockService().fetchStockByMagasin(widget.id!);
+      stockListe = await StockService().fetchStockByMagasinWithPagination(widget.id!);
     
     }
      else if (selectedCat != null && widget.id != null) {
-      stockListe = await StockService().fetchProduitByCategorieAndMagasin(
+      stockListe = await StockService().fetchStockByCategorieAndMagasinWithPagination(
           selectedCat!.idCategorieProduit!, widget.id!);
     }
     // else{
@@ -84,7 +84,7 @@ class _ProductScreenState extends State<ProductScreen> {
   Future<List<Stock>> getAllStocks() async {
      if (selectedCat != null) {
       stockListe = await StockService()
-          .fetchProduitByCategorie(selectedCat!.idCategorieProduit!);
+          .fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!);
     }
       // stockListe = await StockService().fetchStock();
     return stockListe;
@@ -382,7 +382,7 @@ class _ProductScreenState extends State<ProductScreen> {
           Consumer<StockService>(builder: (context, stockService, child) {
             return FutureBuilder(
                 future:  selectedCat == null ? 
-                stockService.fetchStock() :  stockService.fetchProduitByCategorie(selectedCat!.idCategorieProduit!),
+                stockService.fetchStock() :  stockService.fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(

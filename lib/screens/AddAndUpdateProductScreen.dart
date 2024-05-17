@@ -628,7 +628,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                       ),
                       SizedBox(
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 10.0),
+                        padding: const EdgeInsets.all(10.0),
                         child: photo != null 
                             ? GestureDetector(
                                 onTap: _showImageSourceDialog,
@@ -637,7 +637,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                   photo!,
                                   fit: BoxFit.fitWidth,
                                   height: 150,
-                                  width: 300,
+                                  width: 200,
                                 ),
                               )
                             :  widget.isEditable == false ?
@@ -699,7 +699,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                           (AddAndUpdateProductEndSreen(
                                             isEditable: widget.isEditable!,
                                             nomProduit: _nomController.text,
-                                            forme: forme,
+                                            forme: formeValue,
                                             origine: niveau3,
                                             prix:
                                                 _prixController.text.toString(),

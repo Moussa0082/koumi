@@ -39,6 +39,12 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
   bool isExist = false;
   String? email = "";
 
+      int page = 0;
+   bool isLoading = false;
+   int size = 4;
+   bool hasMore = true;
+       ScrollController scrollableController = ScrollController();
+
   //  Future <void>verify() async {
   //   SharedPreferences prefs = await SharedPreferences.getInstance();
   //   email = prefs.getString('emailActeur');
@@ -76,19 +82,86 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
 
   
 
-  void updateMagasinList() async {
-    try {
+  Future<List<Magasin>> fetchMagasinByActeur(String idMagasin,{bool refresh = false}) async {
+    // if (_stockService.isLoading == true) return [];
+
+    setState(() {
+      isLoading = true;
+    });
+
+    if (refresh) {
       setState(() {
-        magasinListeFuture = fetchMagasins();
+        magasinListe.clear();
+       page = 0;
+        hasMore = true;
       });
-    } catch (error) {
-      print('Erreur lors de la mise à jour de la liste de stocks: $error');
     }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinsByActeurWithPagination?idActeur=$idMagasin&page=${page}&size=${size}'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+          setState(() {
+           hasMore = false;
+          });
+        } else {
+          setState(() {
+           List<Magasin> newMagasin = body.map((e) => Magasin.fromMap(e)).toList();
+          magasinListe.addAll(newMagasin);
+          });
+        }
+
+        debugPrint("response body all intrant by acteur with pagination ${page} par défilement soit ${magasinListe.length}");
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des stocks: $e');
+    } finally {
+      setState(() {
+       isLoading = false;
+      });
+    }
+    return magasinListe;
   }
+
+
+  void _scrollListener() {
+  if (scrollableController.position.pixels >=
+          scrollableController.position.maxScrollExtent - 200 &&
+      hasMore &&
+      !isLoading ) {
+    // if (selectedCat != null) {
+      // Incrementez la page et récupérez les stocks par catégorie
+      debugPrint("yes - fetch magasin by acteur");
+      setState(() {
+          // Rafraîchir les données ici
+      page++;
+        });
+      fetchMagasinByActeur(acteur.idActeur!).then((value) {
+        setState(() {
+          // Rafraîchir les données ici
+        });
+      });
+    
+  }else{
+    debugPrint("no");
+
+
+    }  }
 
   @override
   void initState() {
     super.initState();
+     WidgetsBinding.instance.addPostFrameCallback((_){
+    //write or call your logic
+    //code will run when widget rendering complete
+  scrollableController.addListener(_scrollListener);
+  });
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // typeActeurData = acteur.typeActeur!;
     // // selectedType == null;
@@ -98,7 +171,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
     _niveau1PaysList =
         http.get(Uri.parse('$apiOnlineUrl/niveau1Pays/read'));
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
-    magasinListeFuture = fetchMagasinss();
+    magasinListeFuture = fetchMagasinByActeur(acteur.idActeur!);
     // magasinListeFuture1 = fetchMagasinss();
   }
 
@@ -140,158 +213,90 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                 
            
           ]),
-      body: SingleChildScrollView(
-        child: Column(children: [
-          const SizedBox(height: 10),
-
-          // const SizedBox(height: 10),
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-          //   child: FutureBuilder(
-          //     future: _niveau1PaysList,
-          //     builder: (_, snapshot) {
-          //       if (snapshot.connectionState == ConnectionState.waiting) {
-          //         return DropdownButtonFormField(
-          //           items: [],
-          //           onChanged: null,
-          //           decoration: InputDecoration(
-          //             labelText: 'En cours de chargement ...',
-          //             contentPadding: const EdgeInsets.symmetric(
-          //                 vertical: 10, horizontal: 20),
-          //             border: OutlineInputBorder(
-          //               borderRadius: BorderRadius.circular(8),
-          //             ),
-          //           ),
-          //         );
-          //       }
-          //       if (snapshot.hasError) {
-          //         return Text("Une erreur s'est produite veuillez reessayer");
-          //       }
-          //       if (snapshot.hasData) {
-          //         dynamic jsonString = utf8.decode(snapshot.data.bodyBytes);
-          //         dynamic responseData = json.decode(jsonString);
-          //         if (responseData is List) {
-          //           final reponse = responseData;
-          //           final niveau1PaysList = reponse
-          //               .map((e) => Niveau1Pays.fromMap(e))
-          //               .where((con) => con.statutN1 == true)
-          //               .toList();
-
-          //           if (niveau1PaysList.isEmpty) {
-          //             return DropdownButtonFormField(
-          //               items: [],
-          //               onChanged: null,
-          //               decoration: InputDecoration(
-          //                 labelText: '-- Aucune region trouvé --',
-          //                 contentPadding: const EdgeInsets.symmetric(
-          //                     vertical: 10, horizontal: 20),
-          //                 border: OutlineInputBorder(
-          //                   borderRadius: BorderRadius.circular(8),
-          //                 ),
-          //               ),
-          //             );
-          //           }
-
-          //           return DropdownButtonFormField<String>(
-          //             items: niveau1PaysList
-          //                 .map(
-          //                   (e) => DropdownMenuItem(
-          //                     value: e.idNiveau1Pays,
-          //                     child: Text(e.nomN1!),
-          //                   ),
-          //                 )
-          //                 .toList(),
-          //             hint: Text("-- Filtre par region --"),
-          //             value: typeValue,
-          //             onChanged: (newValue) {
-          //               setState(() {
-          //                 typeValue = newValue;
-          //                 if (newValue != null) {
-          //                   selectedNiveau1Pays = niveau1PaysList.firstWhere(
-          //                     (element) => element.idNiveau1Pays == newValue,
-          //                   );
-          //                 }
-          //               });
-          //             },
-          //             decoration: InputDecoration(
-          //               contentPadding: const EdgeInsets.symmetric(
-          //                   vertical: 10, horizontal: 20),
-          //               border: OutlineInputBorder(
-          //                 borderRadius: BorderRadius.circular(8),
-          //               ),
-          //             ),
-          //           );
-          //         } else {
-          //           return DropdownButtonFormField(
-          //             items: [],
-          //             onChanged: null,
-          //             decoration: InputDecoration(
-          //               labelText: '-- Aucune region trouvé --',
-          //               contentPadding: const EdgeInsets.symmetric(
-          //                   vertical: 10, horizontal: 20),
-          //               border: OutlineInputBorder(
-          //                 borderRadius: BorderRadius.circular(8),
-          //               ),
-          //             ),
-          //           );
-          //         }
-          //       }
-          //       return DropdownButtonFormField(
-          //         items: [],
-          //         onChanged: null,
-          //         decoration: InputDecoration(
-          //           labelText: '-- Aucune region trouvé --',
-          //           contentPadding: const EdgeInsets.symmetric(
-          //               vertical: 10, horizontal: 20),
-          //           border: OutlineInputBorder(
-          //             borderRadius: BorderRadius.circular(8),
-          //           ),
-          //         ),
-          //       );
-          //     },
-          //   ),
-          // ),
-           Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.search,
-                      color: Colors.blueGrey[400],
-                      size: 28), // Utiliser une icône de recherche plus grande
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Rechercher',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(color: Colors.blueGrey[400]),
+      body: 
+      RefreshIndicator(
+         onRefresh:() async{
+                                setState(() {
+                   page =0;
+                  // Rafraîchir les données ici
+              fetchMagasinByActeur(acteur.idActeur!);
+                });
+                  debugPrint("refresh page ${page}");
+                              },
+        child: Container(
+          child: NestedScrollView(
+            headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+              
+             return  <Widget>
+              [
+                SliverToBoxAdapter(
+                  child: Column(
+                    children:[
+        
+              const SizedBox(height: 10),
+            
+         Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.search,
+                        color: Colors.blueGrey[400],
+                        size: 28), // Utiliser une icône de recherche plus grande
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Rechercher',
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(color: Colors.blueGrey[400]),
+                        ),
                       ),
                     ),
-                  ),
-                  // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
-                  IconButton(
-                    icon: Icon(Icons.clear),
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() {});
-                    },
-                  ),
-                ],
+                    // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
+                    IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() {});
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Consumer<MagasinService>(builder: (context, magasinService, child) {
+            ),           
+              const SizedBox(height: 10),
+                    ]
+                  )
+                ),
+            
+            ];
+            
+            
+          },
+          body: 
+              RefreshIndicator(
+                onRefresh:() async{
+                                  setState(() {
+                     page =0;
+                    // Rafraîchir les données ici
+                fetchMagasinByActeur(acteur.idActeur!);
+                  });
+                    debugPrint("refresh page ${page}");
+                                },
+                child: SingleChildScrollView(
+                  controller: scrollableController,
+                  child: 
+                 Consumer<MagasinService>(builder: (context, magasinService, child) {
             return FutureBuilder<List<Magasin>>(
                 future: 
                 magasinListeFuture,
@@ -358,10 +363,15 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                         crossAxisSpacing: 10,
                         childAspectRatio: 0.8,
                       ),
-                      itemCount: magasinListe.length,
+                      itemCount: magasinListe.length +1,
                       itemBuilder: (context, index) {
-                       
-
+                       if(index == magasinListe.length){
+                        return Center(
+                          child:CircularProgressIndicator(
+                          )
+                        );
+                       }
+                    if(index < magasinListe.length)
                         return GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -730,260 +740,16 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                   }
                 });
           }),
-          //     Consumer<MagasinService>(builder: (context, magasinService, child) {
-          //       return FutureBuilder<List<Magasin>>(
-          //           future:
-          //           magasinListeFuture,
-          //           // selectedNiveau1Pays != null
-          //           //     ? magasinService.fetchMagasinByRegionAndActeur(acteur.idActeur!,selectedNiveau1Pays!.idNiveau1Pays!)
-          //           //     : magasinService.fetchMagasinByActeur(
-          //           //         acteur.idActeur!),
-          //           builder: (context, snapshot) {
-          //             if (snapshot.connectionState == ConnectionState.waiting) {
-          //               return const Center(
-          //                 child: CircularProgressIndicator(
-          //                   color: Colors.orange,
-          //                 ),
-          //               );
-          //             }
-
-          //             if (!snapshot.hasData) {
-          //               return const Padding(
-          //                 padding: EdgeInsets.all(10),
-          //                 child: Center(child: Text("Aucun donné trouvé")),
-          //               );
-          //             } else {
-          //               magasinListe = snapshot.data!;
-          //                                              if (magasinListe.isEmpty) {
-          // // Vous pouvez afficher une image ou un texte ici
-          // return
-          // SingleChildScrollView(
-          //     child: Padding(
-          //       padding: EdgeInsets.all(10),
-          //       child: Center(
-          //         child: Column(
-          //           children: [
-          //             Image.asset('assets/images/notif.jpg'),
-          //             SizedBox(
-          //               height: 10,
-          //             ),
-          //             Text(
-          //               'Aucun magasin trouvé' ,
-          //               style: TextStyle(
-          //                 color: Colors.black,
-          //                 fontSize: 17,
-          //                 overflow: TextOverflow.ellipsis,
-          //               ),
-          //             ),
-          //           ],
-          //         ),
-          //       ),
-          //     ),
-          //   );
-          //    }
-          //               String searchText = "";
-          //               List<Magasin> filtereSearch =
-          //                   magasinListe.where((search) {
-          //                 String libelle = search.nomMagasin!.toLowerCase();
-          //                 searchText = _searchController.text.trim().toLowerCase();
-          //                 return libelle.contains(searchText);
-          //               }).toList();
-          //               return Wrap(
-          //                 // spacing: 10, // Espacement horizontal entre les conteneurs
-          //                 // runSpacing:
-          //                 //     10, // Espacement vertical entre les lignes de conteneurs
-          //                 children: filtereSearch
-          //                   //  .where((element) => element.statutMagasin == true)
-          //                     .map((e) => Padding(
-          //                           padding: EdgeInsets.all(10),
-          //                           child: SizedBox(
-          //                             width:
-          //                                 MediaQuery.of(context).size.width * 0.45,
-          //                             child: GestureDetector(
-          //                               onTap: () {
-          //                                 Navigator.push(
-          //                                     context,
-          //                                     MaterialPageRoute(
-          //                                         builder: (context) =>
-          //                                             MyProductScreen(
-          //                                               id:e.idMagasin!, nom:e.nomMagasin
-          //                                                 )));
-          //                               },
-          //                               child: Container(
-          //                                decoration: BoxDecoration(
-          //                               color: Color.fromARGB(250, 250, 250, 250),
-          //                               borderRadius: BorderRadius.circular(15),
-          //                               boxShadow: [
-          //                                 BoxShadow(
-          //                                   color: Colors.grey.withOpacity(0.3),
-          //                                   offset: Offset(0, 2),
-          //                                   blurRadius: 8,
-          //                                   spreadRadius: 2,
-          //                                 ),
-          //                               ],
-          //                             ),
-          //                                 child: Column(
-          //                                   crossAxisAlignment:
-          //                                       CrossAxisAlignment.stretch,
-          //                                   children: [
-          //                                     ClipRRect(
-          //                                       borderRadius:
-          //                                           BorderRadius.circular(8.0),
-          //                                       child: SizedBox(
-          //                                         height: 90,
-          //                                         child: e.photo == null
-          //                                             ? Image.asset(
-          //                                                 "assets/images/magasin.png",
-          //                                                 fit: BoxFit.cover,
-          //                                               )
-          //                                             : Image.network(
-          //                                                 "https://koumi.ml/api-koumi/Magasin/${e.idMagasin}/image",
-          //                                                 fit: BoxFit.cover,
-          //                                                 errorBuilder:
-          //                                                     (BuildContext
-          //                                                             context,
-          //                                                         Object
-          //                                                             exception,
-          //                                                         StackTrace?
-          //                                                             stackTrace) {
-          //                                                   return Image.asset(
-          //                                                     'assets/images/magasin.png',
-          //                                                     fit: BoxFit.cover,
-          //                                                   );
-          //                                                 },
-          //                                               ),
-          //                                       ),
-          //                                     ),
-          //                                     Padding(
-          //                                       padding: const EdgeInsets.symmetric(
-          //                                           horizontal: 10, vertical: 5),
-          //                                       child: Text(
-          //                                         e.nomMagasin!,
-          //                                         style: TextStyle(
-          //                                           fontSize: 18,
-          //                                           fontWeight: FontWeight.bold,
-          //                                           color: d_colorGreen,
-          //                                         ),
-          //                                       ),
-          //                                     ),
-          //                                     // _buildEtat(e.statutMagasin!),
-          //                                    SizedBox(height: 1),
-          //                                      Container(
-          //                                             alignment:
-          //                                                       Alignment.bottomRight,
-          //                                          child: Padding(
-          //                                                                                       padding: const EdgeInsets.symmetric(horizontal:8.0),
-          //                                                                                       child: Row(
-          //                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //                                              children: [
-          //                                                _buildEtat(e.statutMagasin!),
-          //                                                SizedBox(width: 120,),
-          //                                                Expanded(
-          //                                                  child: PopupMenuButton<String>(
-          //                                                    padding: EdgeInsets.zero,
-          //                                                    itemBuilder: (context) =>
-          //                                                        <PopupMenuEntry<String>>[
-          //                                                      PopupMenuItem<String>(
-          //                                                        child: ListTile(
-          //                                                          leading: e.statutMagasin == false? Icon(
-          //                                                            Icons.check,
-          //                                                            color: Colors.green,
-          //                                                            //FlyBox-3BA0B5
-          //                                                          ): Icon(
-          //                                                           Icons.disabled_visible,
-          //                                                           color:Colors.orange[400]
-          //                                                          ),
-          //                                                          title:  Text(
-          //                                                           e.statutMagasin == false ? "Activer" : "Desactiver",
-          //                                                            style: TextStyle(
-          //                                                              color: e.statutMagasin == false ? Colors.green : Colors.red,
-          //                                                              fontWeight: FontWeight.bold,
-          //                                                            ),
-          //                                                          ),
-
-          //                                                          onTap: () async {
-          //                             // Changement d'état du magasin ici
-
-          //                          e.statutMagasin == false ?  await MagasinService().activerMagasin(e.idMagasin!).then((value) => {
-          //                               // Mettre à jour la liste des magasins après le changement d'état
-          //                               Provider.of<MagasinService>(
-          //                                                                       context,
-          //                                                                       listen:
-          //                                                                           false)
-          //                                                                   .applyChange(),
-          //                               setState(() {
-          //                                magasinListeFuture =  MagasinService().fetchMagasinByActeur(acteur.idActeur!);
-          //                               }),
-          //                               Navigator.of(context).pop(),
-          //                                                                    })
-          //                                                                .catchError((onError) => {
-          //                                                                      ScaffoldMessenger.of(context)
-          //                                                                          .showSnackBar(
-          //                                                                        const SnackBar(
-          //                                                                          content: Row(
-          //                                                                            children: [
-          //                                                                              Text(
-          //                                                                                  "Une erreur s'est produit"),
-          //                                                                            ],
-          //                                                                          ),
-          //                                                                          duration:
-          //                                                                              Duration(seconds: 5),
-          //                                                                        ),
-          //                                                                      ),
-          //                                                                      Navigator.of(context).pop(),
-          //                                                                    }): await MagasinService()
-          //                                                                .desactiverMagasin(e.idMagasin!)
-          //                                                                .then((value) => {
-          //                                                                   Provider.of<MagasinService>(
-          //                                                                       context,
-          //                                                                       listen:
-          //                                                                           false)
-          //                                                                   .applyChange(),
-          //                                                                           setState(() {
-          //                                                  magasinListeFuture =  MagasinService().fetchMagasinByActeur(acteur.idActeur!);
-          //                                                  }),
-          //                                                                      Navigator.of(context).pop(),
-
-          //                                                                    });
-
-          //                                                            ScaffoldMessenger.of(context)
-          //                                                                .showSnackBar(
-          //                                                               SnackBar(
-          //                                                                content: Row(
-          //                                                                  children: [
-          //                                                                    Text(e.statutMagasin == false ? "Activer avec succèss " : "Desactiver avec succèss"),
-          //                                                                  ],
-          //                                                                ),
-          //                                                                duration: Duration(seconds: 2),
-          //                                                              ),
-          //                                                            );
-          //                                                          },
-          //                                                        )
-
-          //                                          ),
-
-          //                                                    ],
-          //                                                  ),
-          //                                                ),
-          //                                              ],
-          //                                                                                       ),
-          //                                                                                     ),
-          //                                            )
-          //                                   ],
-          //                                 ),
-          //                               ),
-          //                             ),
-          //                           ),
-          //                         ))
-          //                     .toList(),
-          //               );
-          //             }
-          //           });
-          //     }),
-        ]),
-      ),
-    );
+                  
+                )
+              )
+              )
+              )
+              )
+              );
+  
   }
+  
 
   Widget _buildItem(String title, String value) {
     return Padding(
@@ -1028,3 +794,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
     );
   }
 }
+
+/*
+
+*/

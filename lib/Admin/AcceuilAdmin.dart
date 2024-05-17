@@ -88,7 +88,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
           const SizedBox(
             height: 10,
           ),
-          SizedBox(height: 100, child: AlertAcceuil()),
+          // SizedBox(height: 100, child: AlertAcceuil()),
           const SizedBox(
             height: 10,
           ),

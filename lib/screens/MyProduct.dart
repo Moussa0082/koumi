@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
@@ -51,6 +52,119 @@ class _MyProductScreenState extends State<MyProductScreen> {
   bool isExist = false;
   String? email = "";
     late Future <List<Stock>> stockListeFuture;
+
+    ScrollController scrollableController = ScrollController();
+
+   int page = 0;
+   bool isLoading = false;
+   int size = 4;
+   bool hasMore = true;
+
+
+   
+
+    Future<List<Stock>> fetchStockByActeur(String idActeur,{bool refresh = false}) async {
+    // if (_stockService.isLoading == true) return [];
+
+    setState(() {
+      isLoading = true;
+    });
+
+    if (refresh) {
+      setState(() {
+        stockListe.clear();
+       page = 0;
+        hasMore = true;
+      });
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByActeurWithPagination?idActeur=$idActeur&page=${page}&size=${size}'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+          setState(() {
+           hasMore = false;
+          });
+        } else {
+          setState(() {
+           List<Stock> newIntrant = body.map((e) => Stock.fromMap(e)).toList();
+          stockListe.addAll(newIntrant);
+          });
+        }
+
+        debugPrint("response body all intrant by acteur with pagination ${page} par défilement soit ${stockListe.length}");
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des stocks: $e');
+    } finally {
+      setState(() {
+       isLoading = false;
+      });
+    }
+    return stockListe;
+  }
+    Future<List<Stock>> fetchStockByMagasinAndActeur(String idMagasin,String idActeur,{bool refresh = false}) async {
+    // if (_stockService.isLoading == true) return [];
+
+    setState(() {
+      isLoading = true;
+    });
+
+    if (refresh) {
+      setState(() {
+        stockListe.clear();
+       page = 0;
+        hasMore = true;
+      });
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByMagasinAndActeurWithPagination?idMagasin=$idMagasin&idActeur=$idActeur&page=${page}&size=${size}'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+          setState(() {
+           hasMore = false;
+          });
+        } else {
+          setState(() {
+           List<Stock> newStock = body.map((e) => Stock.fromMap(e)).toList();
+          stockListe.addAll(newStock);
+          });
+        }
+
+        debugPrint("response body all stock by acteur with pagination ${page} par défilement soit ${stockListe.length}");
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des stocks: $e');
+    } finally {
+      setState(() {
+       isLoading = false;
+      });
+    }
+    return stockListe;
+  }
+
+   Future<List<Stock>> fetchAllStock() async{
+    if(widget.id != null){
+           stockListe = await fetchStockByMagasinAndActeur(widget.id!,acteur.idActeur!);
+    }else{
+      stockListe = await fetchStockByActeur(acteur.idActeur!);
+    }
+    return stockListe;
+  }
+
    
       void verifyParam() {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
@@ -74,7 +188,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
       type = typeActeurData.map((data) => data.libelle).join(', ');
       setState(() {
         isExist = true;
-        stockListeFuture =  getAllStocksByMagasinAndActeur();
+        stockListeFuture =  fetchAllStock();
       });
     } else {
       setState(() {
@@ -84,47 +198,65 @@ class _MyProductScreenState extends State<MyProductScreen> {
   }
 
 
-  Future <List<Stock>> getAllStocksByMagasinAndActeur() async{
-      if(selectedCat != null && widget.id != null){
-        stockListe = await StockService().fetchProduitByCategorieProduitMagAndActeur(selectedCat!.idCategorieProduit!, widget.id!,acteur.idActeur!);
-      }else if(selectedCat != null){
-        stockListe = await StockService().fetchProduitByCategorieAndActeur(selectedCat!.idCategorieProduit!, acteur.idActeur!);
-      } else if(widget.id != null && selectedCat == null){
-        stockListe = await StockService().fetchStockByMagasin(widget.id!);
-      }
-      else{
-              stockListe = await  StockService().fetchStockByActeur(
-                        acteur.idActeur!);
-      }
-      return stockListe;
-              
-   }
+ 
 
-   void updateStockList() async {
-  try {
-  
-    setState(() {
-      stockListeFuture = getAllStocksByMagasinAndActeur();
-    });
-  } catch (error) {
-    print('Erreur lors de la mise à jour de la liste de stocks: $error');
+     void _scrollListener() {
+  if (scrollableController.position.pixels >=
+          scrollableController.position.maxScrollExtent - 200 &&
+      hasMore &&
+      !isLoading && widget.id == null) {
+    // if (selectedCat != null) {
+      // Incrementez la page et récupérez les stocks par catégorie
+      debugPrint("yes - fetch stock by acteur");
+      setState(() {
+          // Rafraîchir les données ici
+      page++;
+        });
+      fetchStockByActeur(acteur.idActeur!).then((value) {
+        setState(() {
+          // Rafraîchir les données ici
+        });
+      });
+    
+  }else if(scrollableController.position.pixels >=
+          scrollableController.position.maxScrollExtent - 200 &&
+      hasMore &&
+      !isLoading && widget.id != null){
+       debugPrint("yes - fetch stock by magasin and acteur");
+      setState(() {
+          // Rafraîchir les données ici
+      page++;
+        });
+      fetchStockByMagasinAndActeur(widget.id!,acteur.idActeur!).then((value) {
+        setState(() {
+          // Rafraîchir les données ici
+        });
+      });
+  }else{
+    debugPrint("no");
+
   }
-}
-
+     }
 
   @override
   void initState() {
     super.initState();
+      WidgetsBinding.instance.addPostFrameCallback((_){
+    //write or call your logic
+    //code will run when widget rendering complete
+  scrollableController.addListener(_scrollListener);
+  });
     verify();
-    // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+            stockListeFuture =  fetchAllStock();
     // typeActeurData = acteur.typeActeur!;
     // // selectedType == null;
     // type = typeActeurData.map((data) => data.libelle).join(', ');
-    
 
     _searchController = TextEditingController();
     _catList =
-        http.get(Uri.parse('http://koumi.ml/api-koumi/Categorie/allCategorie'));
+        http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
         verifyParam();
   }
@@ -132,7 +264,9 @@ class _MyProductScreenState extends State<MyProductScreen> {
   @override
   void dispose() {
     _searchController
-        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+        .dispose(); 
+        // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+        scrollableController.dispose();
     super.dispose();
   }
 
@@ -149,250 +283,167 @@ class _MyProductScreenState extends State<MyProductScreen> {
           //     },
           //     icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
-            'Mes Produit',
+            'Mes Produits',
             style: const TextStyle(
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
-          actions: !isExist ? null :  [
-             IconButton(
-                onPressed: () {
-                  setState(() {
-                    stockListeFuture = getAllStocksByMagasinAndActeur();
-                  });
-                },
-                icon: Icon(Icons.refresh)),
+          // actions: !isExist ? null :  [
+          //    IconButton(
+          //       onPressed: () {
+          //         setState(() {
+          //           stockListeFuture = fetchAllStock();
+          //         });
+          //       },
+          //       icon: Icon(Icons.refresh)),
                   
                      
-                ]
+          //       ]
                 ),
       body: 
-       !isExist
-            ? Center(
-                child: Container(
-                  padding: EdgeInsets.all(
-                      20), // Ajouter un padding pour l'espace autour du contenu
-
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Image.asset("assets/images/lock.png",
-                          width: 100,
-                          height:
-                              100), // Ajuster la taille de l'image selon vos besoins
-                      SizedBox(
-                          height:
-                              20), // Ajouter un espace entre l'image et le texte
-                      Text(
-                        "Vous devez vous connecter pour voir vos produits",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      SizedBox(
-                          height:
-                              20), // Ajouter un espace entre le texte et le bouton
-                      ElevatedButton(
-                        onPressed: () {
-                          Future.microtask(() {
-                            Provider.of<BottomNavigationService>(context,
-                                    listen: false)
-                                .changeIndex(0);
-                          });
-                          Get.to(LoginScreen(),
-                              duration: Duration(
-                                  seconds:
-                                      1), //duration of transitions, default 1 sec
-                              transition: Transition.leftToRight);
-                        },
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                              Colors.transparent),
-                          elevation: MaterialStateProperty.all<double>(
-                              0), // Supprimer l'élévation du bouton
-                          overlayColor: MaterialStateProperty.all<Color>(
-                              Colors.grey.withOpacity(
-                                  0.2)), // Couleur de l'overlay du bouton lorsqu'il est pressé
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18.0),
-                              side: BorderSide(
-                                  color:
-                                      d_colorGreen), // Bordure autour du bouton
-                            ),
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          child: Text(
-                            "Se connecter",
-                            style: TextStyle(fontSize: 16, color: d_colorGreen),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+      
+      !isExist ?
+       Center(
+        child: Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset("assets/images/lock.png",
+                  width: 100,
+                  height: 100),
+              SizedBox(height: 20),
+              Text(
+                "Vous devez vous connecter pour vos produits",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
-              )
-            :
-      SingleChildScrollView(
-        child: Column(children: [
-          const SizedBox(height: 10),
-     
-          // const SizedBox(height: 10),
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-          //   child: FutureBuilder(
-          //     future: _catList,
-          //     builder: (_, snapshot) {
-          //       if (snapshot.connectionState == ConnectionState.waiting) {
-          //         return DropdownButtonFormField(
-          //           items: [],
-          //           onChanged: null,
-          //           decoration: InputDecoration(
-          //             labelText: 'En cours de chargement ',
-          //             contentPadding: const EdgeInsets.symmetric(
-          //                 vertical: 10, horizontal: 20),
-          //             border: OutlineInputBorder(
-          //               borderRadius: BorderRadius.circular(8),
-          //             ),
-          //           ),
-          //         );
-          //       }
-          //       if (snapshot.hasError) {
-          //         return Text("Une erreur s'est produite veuillez reessayer");
-          //       }
-          //       if (snapshot.hasData) {
-          //         dynamic jsonString =
-          //                       utf8.decode(snapshot.data.bodyBytes);
-          //                   dynamic responseData = json.decode(jsonString);
-          //         if (responseData is List) {
-          //           final reponse = responseData;
-          //           final categorieList = reponse
-          //               .map((e) => CategorieProduit.fromMap(e))
-          //               .where((con) => con.statutCategorie == true)
-          //               .toList();
-
-          //           if (categorieList.isEmpty) {
-          //             return DropdownButtonFormField(
-          //               items: [],
-          //               onChanged: null,
-          //               decoration: InputDecoration(
-          //                 labelText: '-- Aucune categorie trouvé --',
-          //                 contentPadding: const EdgeInsets.symmetric(
-          //                     vertical: 10, horizontal: 20),
-          //                 border: OutlineInputBorder(
-          //                   borderRadius: BorderRadius.circular(8),
-          //                 ),
-          //               ),
-          //             );
-          //           }
-
-          //           return DropdownButtonFormField<String>(
-          //             items: categorieList
-          //                 .map(
-          //                   (e) => DropdownMenuItem(
-          //                     value: e.idCategorieProduit,
-          //                     child: Text(e.libelleCategorie!),
-          //                   ),
-          //                 )
-          //                 .toList(),
-          //             hint: Text("-- Filtre par categorie --"),
-          //             value: typeValue,
-          //             onChanged: (newValue) {
-          //               setState(() {
-          //                 typeValue = newValue;
-          //                 if (newValue != null) {
-          //                   selectedCat = categorieList.firstWhere(
-          //                     (element) => element.idCategorieProduit == newValue,
-          //                   );
-          //                 }
-          //               });
-          //             },
-          //             decoration: InputDecoration(
-          //               contentPadding: const EdgeInsets.symmetric(
-          //                   vertical: 10, horizontal: 20),
-          //               border: OutlineInputBorder(
-          //                 borderRadius: BorderRadius.circular(8),
-          //               ),
-          //             ),
-          //           );
-          //         } else {
-          //           return DropdownButtonFormField(
-          //             items: [],
-          //             onChanged: null,
-          //             decoration: InputDecoration(
-          //               labelText: '-- Aucune categorie trouvé --',
-          //               contentPadding: const EdgeInsets.symmetric(
-          //                   vertical: 10, horizontal: 20),
-          //               border: OutlineInputBorder(
-          //                 borderRadius: BorderRadius.circular(8),
-          //               ),
-          //             ),
-          //           );
-          //         }
-          //       }
-          //       return DropdownButtonFormField(
-          //         items: [],
-          //         onChanged: null,
-          //         decoration: InputDecoration(
-          //           labelText: '-- Aucune categorie trouvé --',
-          //           contentPadding: const EdgeInsets.symmetric(
-          //               vertical: 10, horizontal: 20),
-          //           border: OutlineInputBorder(
-          //             borderRadius: BorderRadius.circular(8),
-          //           ),
-          //         ),
-          //       );
-          //     },
-          //   ),
-          // ),
-           Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                borderRadius: BorderRadius.circular(25),
               ),
-              child: Row(
-                children: [
-                  Icon(Icons.search,
-                      color: Colors.blueGrey[400],
-                      size: 28), // Utiliser une icône de recherche plus grande
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Rechercher',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(color: Colors.blueGrey[400]),
-                      ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Future.microtask(() {
+                    Provider.of<BottomNavigationService>(context,
+                            listen: false)
+                        .changeIndex(0);
+                  });
+                  Get.to(LoginScreen(),
+                      duration: Duration(seconds: 1),
+                      transition: Transition.leftToRight);
+                },
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.transparent),
+                  elevation: MaterialStateProperty.all<double>(0),
+                  overlayColor: MaterialStateProperty.all<Color>(
+                      Colors.grey.withOpacity(0.2)),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18.0),
+                      side: BorderSide(color: d_colorGreen),
                     ),
                   ),
-                  // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
-                  IconButton(
-                    icon: Icon(Icons.clear),
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() {});
-                    },
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 10),
+                  child: Text(
+                    "Se connecter",
+                    style: TextStyle(fontSize: 16, color: d_colorGreen),
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-          const SizedBox(height: 10),
-      Consumer<StockService>(builder: (context, stockService, child) {
+        ),
+      )
+    :
+      RefreshIndicator(
+         onRefresh:() async{
+                                setState(() {
+                   page =0;
+                  // Rafraîchir les données ici
+            stockListeFuture =  fetchAllStock();
+                });
+                  debugPrint("refresh page ${page}");
+                              },
+        child: Container(
+          child: NestedScrollView(
+            headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+              
+             return  <Widget>
+              [
+                SliverToBoxAdapter(
+                  child: Column(
+                    children:[
+        
+              const SizedBox(height: 10),
+            
+         Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.search,
+                        color: Colors.blueGrey[400],
+                        size: 28), // Utiliser une icône de recherche plus grande
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Rechercher',
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(color: Colors.blueGrey[400]),
+                        ),
+                      ),
+                    ),
+                    // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
+                    IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() {});
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),           
+              const SizedBox(height: 10),
+                    ]
+                  )
+                ),
+            
+            ];
+            
+            
+          },
+          body: 
+              RefreshIndicator(
+                onRefresh:() async{
+                                  setState(() {
+                     page =0;
+                    // Rafraîchir les données ici
+               stockListeFuture = fetchAllStock();
+                  });
+                    debugPrint("refresh page ${page}");
+                                },
+                child: SingleChildScrollView(
+                  controller: scrollableController,
+                  child: 
+                        Consumer<StockService>(builder: (context, stockService, child) {
             return FutureBuilder<List<Stock>>(
                 future: stockListeFuture,
                 builder: (context, snapshot) {
@@ -758,280 +809,13 @@ class _MyProductScreenState extends State<MyProductScreen> {
                   }
                 });
           }),
-      
-      //   Consumer<StockService>(builder: (context, stockService, child) {
-      //       return FutureBuilder<List<Stock>>(
-      //           future: stockListeFuture,
-      //           // selectedCat != null
-      //           //     ? stockService.fetchProduitByCategorieAndActeur(
-      //           //         selectedCat!.idCategorieProduit!, acteur.idActeur!)
-      //           //     : stockService.fetchStockByActeur(acteur.idActeur!),
-      //           builder: (context, snapshot) {
-      //             if (snapshot.connectionState == ConnectionState.waiting) {
-      //               return const Center(
-      //                 child: CircularProgressIndicator(
-      //                   color: Colors.orange,
-      //                 ),
-      //               );
-      //             }
-
-      //             if (!snapshot.hasData) {
-      //               return 
-      // SingleChildScrollView(
-      //     child: Padding(
-      //       padding: EdgeInsets.all(10),
-      //       child: Center(
-      //         child: Column(
-      //           children: [
-      //             Image.asset('assets/images/notif.jpg'),
-      //             SizedBox(
-      //               height: 10,
-      //             ),
-      //             Text(
-      //               'Aucun produit trouvé' ,
-      //               style: TextStyle(
-      //                 color: Colors.black,
-      //                 fontSize: 17,
-      //                 overflow: TextOverflow.ellipsis,
-      //               ),
-      //             ),
-      //           ],
-      //         ),
-      //       ),
-      //     ),
-      //   );
-      //             } else {
-      //               stockListe = snapshot.data!;
-      //                if (stockListe.isEmpty) {
-      // // Vous pouvez afficher une image ou un texte ici
-      // return 
-      // SingleChildScrollView(
-      //     child: Padding(
-      //       padding: EdgeInsets.all(10),
-      //       child: Center(
-      //         child: Column(
-      //           children: [
-      //             Image.asset('assets/images/notif.jpg'),
-      //             SizedBox(
-      //               height: 10,
-      //             ),
-      //             Text(
-      //               'Aucun produit trouvé' ,
-      //               style: TextStyle(
-      //                 color: Colors.black,
-      //                 fontSize: 17,
-      //                 overflow: TextOverflow.ellipsis,
-      //               ),
-      //             ),
-      //           ],
-      //         ),
-      //       ),
-      //     ),
-      //   );
-      //    }
-      //               String searchText = "";
-      //               List<Stock> filtereSearch =
-      //                   stockListe.where((search) {
-      //                 String libelle = search.nomProduit!.toLowerCase();
-      //                 searchText = _searchController.text.trim().toLowerCase();
-      //                 return libelle.contains(searchText);
-      //               }).toList();
-      //               return Wrap(
-      //                 // spacing: 10, // Espacement horizontal entre les conteneurs
-      //                 // runSpacing:
-      //                 //     10, // Espacement vertical entre les lignes de conteneurs
-      //                 children: filtereSearch
-      //                   //  .where((element) => element.statutSotck == true)
-      //                     .map((e) => Padding(
-      //                           padding: EdgeInsets.all(10),
-      //                           child: SizedBox(
-      //                             width:
-      //                                 MediaQuery.of(context).size.width * 0.45,
-      //                             child: GestureDetector(
-      //                               onTap: () {
-      //                                 Navigator.push(
-      //                                     context,
-      //                                     MaterialPageRoute(
-      //                                         builder: (context) =>
-      //                                             DetailProduits(
-      //                                                 stock: e)));
-      //                               },
-      //                               child: Container(
-      //                                 decoration: BoxDecoration(
-      //                               color: Color.fromARGB(250, 250, 250, 250),
-      //                               borderRadius: BorderRadius.circular(15),
-      //                               boxShadow: [
-      //                                 BoxShadow(
-      //                                   color: Colors.grey.withOpacity(0.3),
-      //                                   offset: Offset(0, 2),
-      //                                   blurRadius: 8,
-      //                                   spreadRadius: 2,
-      //                                 ),
-      //                               ],
-      //                             ),
-      //                                 child: Column(
-      //                                   crossAxisAlignment:
-      //                                       CrossAxisAlignment.stretch,
-      //                                   children: [
-      //                                     ClipRRect(
-      //                                       borderRadius:
-      //                                           BorderRadius.circular(8.0),
-      //                                       child: SizedBox(
-      //                                         height: 90,
-      //                                         child: e.photo == null
-      //                                             ? Image.asset(
-      //                                                 "assets/images/default_image.png",
-      //                                                 fit: BoxFit.cover,
-      //                                               )
-      //                                             : Image.network(
-      //                                                 "https://koumi.ml/api-koumi/Stock/${e.idStock}/image",
-      //                                                 fit: BoxFit.cover,
-      //                                                 errorBuilder:
-      //                                                     (BuildContext
-      //                                                             context,
-      //                                                         Object
-      //                                                             exception,
-      //                                                         StackTrace?
-      //                                                             stackTrace) {
-      //                                                   return Image.asset(
-      //                                                     'assets/images/default_image.png',
-      //                                                     fit: BoxFit.cover,
-      //                                                   );
-      //                                                 },
-      //                                               ),
-      //                                       ),
-      //                                     ),
-      //                                     Padding(
-      //                                       padding: const EdgeInsets.symmetric(
-      //                                           horizontal: 10, vertical: 5),
-      //                                       child: Text(
-      //                                         e.nomProduit!,
-      //                                         style: TextStyle(
-      //                                           fontSize: 18,
-      //                                           fontWeight: FontWeight.bold,
-      //                                           color: d_colorGreen,
-      //                                         ),
-      //                                       ),
-      //                                     ),
-      //                                     // _buildEtat(e.statutSotck!),
-      //                                     _buildItem(
-      //                                         "Prix :", e.prix!.toString()),
-      //                                     SizedBox(height: 2),
-      //                                       Container(
-      //                                             alignment:
-      //                                                       Alignment.bottomRight,
-      //                                          child: Padding(
-      //                                                                                       padding: const EdgeInsets.symmetric(horizontal:8.0),
-      //                                                                                       child: Row(
-      //                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //                                              children: [
-      //                                                _buildEtat(e.statutSotck!),
-      //                                                SizedBox(width: 120,),
-      //                                                Expanded(
-      //                                                  child: PopupMenuButton<String>(
-      //                                                    padding: EdgeInsets.zero,
-      //                                                    itemBuilder: (context) =>
-      //                                                        <PopupMenuEntry<String>>[
-      //                                                     PopupMenuItem<String>(
-      //                                                        child: ListTile(
-      //                                                          leading: e.statutSotck == false? Icon(
-      //                                                            Icons.check,
-      //                                                            color: Colors.green,
-      //                                                          ): Icon(
-      //                                                           Icons.disabled_visible,
-      //                                                           color:Colors.orange[400]
-      //                                                          ),
-      //                                                          title:  Text(
-      //                                                           e.statutSotck == false ? "Activer" : "Desactiver",
-      //                                                            style: TextStyle(
-      //                                                              color: e.statutSotck == false ? Colors.green : Colors.red,
-      //                                                              fontWeight: FontWeight.bold,
-      //                                                            ),
-      //                                                          ),
-                                                               
-      //                                                          onTap: () async {
-      //                             // Changement d'état du magasin ici
-                           
-      //                          e.statutSotck == false ?  await StockService().activerStock(e.idStock!).then((value) => {
-      //                               // Mettre à jour la liste des stock après le changement d'état
-      //                               Provider.of<StockService>(
-      //                                                                       context,
-      //                                                                       listen:
-      //                                                                           false)
-      //                                                                   .applyChange(),
-      //                               setState(() {
-      //                                  stockListeFuture =  StockService().fetchStockByActeur(acteur.idActeur!);
-      //                               }),
-      //                               Navigator.of(context).pop(),
-      //                                                                    })
-      //                                                                .catchError((onError) => {
-      //                                                                      ScaffoldMessenger.of(context)
-      //                                                                          .showSnackBar(
-      //                                                                        const SnackBar(
-      //                                                                          content: Row(
-      //                                                                            children: [
-      //                                                                              Text(
-      //                                                                                  "Une erreur s'est produit"),
-      //                                                                            ],
-      //                                                                          ),
-      //                                                                          duration:
-      //                                                                              Duration(seconds: 5),
-      //                                                                        ),
-      //                                                                      ),
-      //                                                                      Navigator.of(context).pop(),
-      //                                                                    }): await StockService()
-      //                                                                .desactiverStock(e.idStock!)
-      //                                                                .then((value) => {
-      //                                                                   Provider.of<StockService>(
-      //                                                                       context,
-      //                                                                       listen:
-      //                                                                           false)
-      //                                                                   .applyChange(),
-      //                                                                           setState(() {
-      //                                                  stockListeFuture =  StockService().fetchStockByActeur(acteur.idActeur!);
-      //                                                  }),
-      //                                                                      Navigator.of(context).pop(),
-                                                                     
-      //                                                                    });
-                                                       
-      //                                                            ScaffoldMessenger.of(context)
-      //                                                                .showSnackBar(
-      //                                                               SnackBar(
-      //                                                                content: Row(
-      //                                                                  children: [
-      //                                                                    Text(e.statutSotck == false ? "Activer avec succèss " : "Desactiver avec succèss"),
-      //                                                                  ],
-      //                                                                ),
-      //                                                                duration: Duration(seconds: 2),
-      //                                                              ),
-      //                                                            );
-      //                                                          },
-      //                                                        )
-                                                          
-      //                                          ),
-                                                          
-                                                          
-      //                                                    ],
-      //                                                  ),
-      //                                                ),
-      //                                              ],
-      //                                                                                       ),
-      //                                                                                     ),
-      //                                            ),
-      //                                   ],
-      //                                 ),
-      //                               ),
-      //                             ),
-      //                           ),
-      //                         ))
-      //                     .toList(),
-      //               );
-      //             }
-      //           });
-      //     }) 
-      //    ,
-        ]),
+                  
+                ),
+              ),
+          ),
+        ),
       ),
+       
     );
   }
 
@@ -1064,7 +848,8 @@ class _MyProductScreenState extends State<MyProductScreen> {
   }
 
 
-  Widget _buildEtat(bool isState) {
+ 
+ Widget _buildEtat(bool isState) {
     return Container(
       width: 15,
       height: 15,
@@ -1078,3 +863,4 @@ class _MyProductScreenState extends State<MyProductScreen> {
 
 
 }
+
