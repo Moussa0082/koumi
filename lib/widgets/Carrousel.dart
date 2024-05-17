@@ -158,21 +158,21 @@ int page = 0;
   Widget buildImageSlider(String imagePath, String text) {
     return Stack(
       children: [
-        // Image.asset(
-        //                                               'assets/images/default_image.png',
-        //                                               fit: BoxFit.cover,
-        //                                             ),
-        CachedNetworkImage(
-         imageUrl: imagePath ,
-         placeholder: (context, url) =>
-              const Center(child: CircularProgressIndicator()),
-          errorWidget: (context, url, error) => Image.asset(
+        Image.asset(
                                                       'assets/images/default_image.png',
                                                       fit: BoxFit.cover,
                                                     ),
-          fit: BoxFit.cover,
-          width: double.infinity,
-        ),
+        // CachedNetworkImage(
+        //  imageUrl: imagePath ,
+        //  placeholder: (context, url) =>
+        //       const Center(child: CircularProgressIndicator()),
+        //   errorWidget: (context, url, error) => Image.asset(
+        //                                               'assets/images/default_image.png',
+        //                                               fit: BoxFit.cover,
+        //                                             ),
+        //   fit: BoxFit.cover,
+        //   width: double.infinity,
+        // ),
         Positioned(
           bottom: 20,
           left: 20,

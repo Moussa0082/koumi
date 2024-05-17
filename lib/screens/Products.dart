@@ -195,7 +195,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   if ( scrollableController1.position.pixels >=
           scrollableController1.position.maxScrollExtent - 200 &&
       hasMore &&
-      !isLoading) {
+      !isLoading && selectedCat != null) {
     // if (selectedCat != null) {
       // Incrementez la page et récupérez les stocks par catégorie
       debugPrint("yes - fetch by category");
@@ -204,7 +204,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       page++;
         });
    
-    fetchStockByCategorie(selectedCat!.idCategorieProduit!).then((value) {
+    fetchStockByCategorie().then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -249,7 +249,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           });
         } else {
           setState(() {
-                  List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
+          List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
           stockListe.addAll(newStocks);
           });
         }
@@ -272,7 +272,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
 
 
-  Future<List<Stock>> fetchStockByCategorie(String idCategorie,{bool refresh = false}) async {
+  Future<List<Stock>> fetchStockByCategorie({bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -288,7 +288,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByCategorieWithPagination?idCategorie=$idCategorie&page=$page&size=$size'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByCategorieWithPagination?idCategorie=${selectedCat!.idCategorieProduit}&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -591,9 +591,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               selectedCat = categorieList.firstWhere(
                                 (element) => element.idCategorieProduit == newValue,
                               );
-  stockListeFuture1 =  StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!);       
-                        // stockListeFuture1 = fetchStockByCategorie(selectedCat!.idCategorieProduit!); 
                        }
+  // stockListeFuture1 =  StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!);       
+                        // stockListeFuture1 = fetchStockByCategorie(selectedCat!.idCategorieProduit!); 
+                          page = 0;
+                hasMore = true;
+                fetchStockByCategorie(refresh: true);
                           });
                         },
                         decoration: InputDecoration(
