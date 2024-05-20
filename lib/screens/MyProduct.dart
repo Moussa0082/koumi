@@ -248,8 +248,8 @@ class _MyProductScreenState extends State<MyProductScreen> {
   });
     verify();
 
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-            stockListeFuture =  fetchAllStock();
+    // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+            // stockListeFuture =  fetchAllStock();
     // typeActeurData = acteur.typeActeur!;
     // // selectedType == null;
     // type = typeActeurData.map((data) => data.libelle).join(', ');

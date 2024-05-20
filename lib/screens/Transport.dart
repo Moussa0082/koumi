@@ -515,3 +515,38 @@ Padding(
     );
   }
 }
+
+
+/*
+ stockListe
+                            // .where((element) => element.statutSotck == true )
+                            .isEmpty && isLoading == false
+                                ? 
+                                SingleChildScrollView(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Center(
+                                        child: Column(
+                                          children: [
+                                            Image.asset('assets/images/notif.jpg'),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Text(
+                                              'Aucun produit trouvé',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 17,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                :  stockListe
+                            // .where((element) => element.statutSotck == true )
+                            .isEmpty && isLoading == true
+                                ? _buildShimmerEffect() :
+*/
