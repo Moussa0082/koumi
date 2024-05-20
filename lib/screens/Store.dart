@@ -59,29 +59,7 @@ class _StoreScreenState extends State<StoreScreen> {
     }
   }
 
-  // void updateMagasinList() async {
-  //   try {
-  //     setState(() {
-  //       magasinListeFuture = getAllMagasin();
-  //     });
-  //   } catch (error) {
-  //     print('Erreur lors de la mise à jour de la liste de stocks: $error');
-  //   }
-  // }
-
-  // Future<List<Magasin>> getAllMagasin() async {
-  //   if (selectedNiveau1Pays != null) {
-  //     magasinListe = await MagasinService()
-  //         .fetchMagasinByRegion(selectedNiveau1Pays!.idNiveau1Pays!);
-  //   } else if (typeActeurData
-  //       .map((e) => e.libelle!.toLowerCase())
-  //       .contains("admin")) {
-  //     magasinListe = await MagasinService().fetchAllMagasin();
-  //   } else {
-  //     magasinListe = await MagasinService().fetchAllMagasin();
-  //   }
-  //   return magasinListe;
-  // }
+ 
 
   @override
   void initState() {

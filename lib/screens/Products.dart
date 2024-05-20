@@ -109,67 +109,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
     return stockListe;
   }
 
-  // Future<List<Stock>> getAll() async {
-    
-  //     setState(() {
-  //       if(selectedCat != null)
-  //       stockListeFutureNew = getAllStock();
-  //     });
-  //   return stockListe;
-  // }
 
-// void _scrollListener() {
-//   if (scrollableController.position.pixels >=
-//       scrollableController.position.maxScrollExtent - 200 &&
-//       hasMore) {
-    
-//     if (selectedCat == null ) {
-//        debugPrint("yes - fetch all stocks");
-//       setState(() {
-//         page++;
-//        debugPrint("yes - fetch all stocks page: $page");
-//       });
-//       fetchStock()
-//       // .then((value) {
-//       //   setState(() {
-//       //     debugPrint("page inc ${_stockService.page}");
-//       //   });
-//       // })
-//       ;
-//     } else  {
-
-    
-//        debugPrint("yes - fetch by category");
-//       setState(() {
-//         page++;
-//       });
-//      fetchStockByCategorie(selectedCat!.idCategorieProduit!)
-//       // .then((value) {
-//       //   setState(() {
-//       //     debugPrint("page inc ${_stockService.page}");
-//       //   });
-//       // })
-//       ;
-//     }
-//   } else {
-//     debugPrint("no");
-//   }
-// }
    
    void _scrollListener() {
-  // if (selectedCat != null &&  scrollableController1.position.pixels >=
-  //         scrollableController1.position.maxScrollExtent - 200 &&
-  //     hasMore &&
-  //     !isLoading ) {
-  //   // if (selectedCat != null) {
-  //     // Incrementez la page et récupérez les stocks par catégorie
-  //     debugPrint("yes - fetch by category");
-  //     setState(() {
-  //         // Rafraîchir les données ici
-  //     page++;
-  //    fetchStockByCategorie(selectedCat!.idCategorieProduit!);
-  //       });
-  //   }
+  
     if( scrollableController.position.pixels >=
           scrollableController.position.maxScrollExtent - 200 &&
       hasMore &&
@@ -502,6 +445,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
                 
                 ),
+
       body:Container(
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
@@ -1196,7 +1140,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         crossAxisSpacing: 10,
         childAspectRatio: 0.8,
       ),
-          itemCount: 4, // Number of shimmer items to display
+          itemCount: 6, // Number of shimmer items to display
           itemBuilder: (context, index) {
             return Card(
               margin: EdgeInsets.all(8),

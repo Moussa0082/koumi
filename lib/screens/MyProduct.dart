@@ -20,6 +20,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 
 import 'LoginScreen.dart';
 
@@ -212,7 +213,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
           // Rafraîchir les données ici
       page++;
         });
-      fetchStockByActeur(acteur.idActeur!).then((value) {
+     fetchStockByActeur(acteur.idActeur!).then((value) {
         setState(() {
           // Rafraîchir les données ici
         });
@@ -366,7 +367,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                 setState(() {
                    page =0;
                   // Rafraîchir les données ici
-            stockListeFuture =  fetchAllStock();
+            stockListeFuture =  StockService().fetchStock();
                 });
                   debugPrint("refresh page ${page}");
                               },
@@ -433,26 +434,23 @@ class _MyProductScreenState extends State<MyProductScreen> {
           body: 
               RefreshIndicator(
                 onRefresh:() async{
-                                  setState(() {
-                     page =0;
-                    // Rafraîchir les données ici
-               stockListeFuture = fetchAllStock();
-                  });
+                                setState(() {
+                   page =0;
+                  // Rafraîchir les données ici
+            stockListeFuture =  StockService().fetchStock();
+                });
                     debugPrint("refresh page ${page}");
                                 },
                 child: SingleChildScrollView(
-                  controller: scrollableController,
+                                    controller: scrollableController,
+
                   child: 
                         Consumer<StockService>(builder: (context, stockService, child) {
             return FutureBuilder<List<Stock>>(
                 future: stockListeFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.orange,
-                      ),
-                    );
+                    return _buildShimmerEffect();
                   }
 
                       if (!snapshot.hasData) {
@@ -584,7 +582,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
                             filtereSearch
                                 .length ,
                             itemBuilder: (context, index) {
-                             
+                              if(index < stockListe.length){
                               return GestureDetector(
                                 onTap: () {
                                   Navigator.push(
@@ -645,7 +643,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
               : "${filtereSearch[index].prix.toString()} FCFA",
           style: TextStyle(
             overflow: TextOverflow.ellipsis,
-            fontSize: 16,
+            fontSize: 15,
             color: Colors.black87,
           ),
         ),
@@ -693,6 +691,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                               listen: false)
                                           .applyChange(),
                                       setState(() {
+                                        page ++;
                                         stockListeFuture = StockService()
                                             .fetchStockByActeur(
                                                 acteur.idActeur!);
@@ -722,6 +721,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                               listen: false)
                                           .applyChange(),
                                       setState(() {
+                                        page++;
                                         stockListeFuture = StockService()
                                             .fetchStockByActeur(
                                                 acteur.idActeur!);
@@ -763,6 +763,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                           listen: false)
                                       .applyChange(),
                                   setState(() {
+                                    page++;
                                     stockListeFuture = StockService()
                                         .fetchStockByActeur(acteur.idActeur!);
                                   }),
@@ -804,6 +805,20 @@ class _MyProductScreenState extends State<MyProductScreen> {
   ),
   )
                               );
+                            }else{
+                               return isLoading == true ? 
+                                         Padding(
+                                           padding: const EdgeInsets.symmetric(horizontal: 32),
+                                           child: Center(
+                                             child:
+                                             const Center(
+                                                                 child: CircularProgressIndicator(
+                                  color: Colors.orange,
+                                                                 ),
+                                                               )
+                                           ),
+                                         ) : Container();
+                            }
                             },
                           );
                   }
@@ -847,7 +862,73 @@ class _MyProductScreenState extends State<MyProductScreen> {
     );
   }
 
-
+ Widget _buildShimmerEffect(){
+  return   Center(
+        child: GridView.builder(
+            shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 0.8,
+      ),
+          itemCount: 6, // Number of shimmer items to display
+          itemBuilder: (context, index) {
+            return Card(
+              margin: EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 85,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 16,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    subtitle: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 15,
+                        color: Colors.grey,
+                        margin: EdgeInsets.only(top: 4),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 15,
+                        color: Colors.grey,
+                        margin: EdgeInsets.only(top: 4),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+ }
  
  Widget _buildEtat(bool isState) {
     return Container(

@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
 
 
 class VehiculeActeur extends StatefulWidget {
@@ -32,6 +33,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
   late TextEditingController _searchController;
   List<Vehicule> vehiculeListe = [];
   late Future<List<Vehicule>> _liste;
+  
   // late Future liste;
 
   Future<List<Vehicule>> getVehicule(String id) async {
@@ -48,7 +50,48 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
    int size = 4;
    bool hasMore = true;
 
+    void _scrollListener() {
+  // if (selectedCat != null &&  scrollableController1.position.pixels >=
+  //         scrollableController1.position.maxScrollExtent - 200 &&
+  //     hasMore &&
+  //     !isLoading ) {
+  //   // if (selectedCat != null) {
+  //     // Incrementez la page et récupérez les stocks par catégorie
+  //     debugPrint("yes - fetch by category");
+  //     setState(() {
+  //         // Rafraîchir les données ici
+  //     page++;
+  //    fetchStockByCategorie(selectedCat!.idCategorieProduit!);
+  //       });
+  //   }
+    if( scrollableController.position.pixels >=
+          scrollableController.position.maxScrollExtent - 200 &&
+      hasMore &&
+      !isLoading){
+      // Incrementez la page et récupérez les stocks généraux
+      setState(() {
+          // Rafraîchir les données ici
+        page++;
+        });
+      debugPrint("yes - fetch vehicule by acteur");
+      fetchVehiculeByActeur(acteur.idActeur!).then((value) {
+        setState(() {
+          // Rafraîchir les données ici
+          debugPrint("page inc all ${page}");
+        });
+      });
+    // }
+  // } 
+  // else {
+  }
+    debugPrint("no");
+
+}
+
  
+ 
+ 
+
     Future<List<Vehicule>> fetchVehiculeByActeur(String idActeur,{bool refresh = false}) async {
     // if (_stockService.isLoading == true) return [];
 
@@ -104,8 +147,12 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
     typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
-    _liste = fetchVehiculeByActeur(acteur.idActeur!);
-
+    _liste = VehiculeService().fetchVehiculeByActeur(acteur.idActeur!);
+     WidgetsBinding.instance.addPostFrameCallback((_){
+    //write or call your logic
+    //code will run when widget rendering complete
+  scrollableController.addListener(_scrollListener);
+  });
     super.initState();
   }
 
@@ -113,6 +160,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
   void dispose() {
     _searchController
         .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+        scrollableController.dispose();
     super.dispose();
   }
 
@@ -167,7 +215,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                 setState(() {
                    page =0;
                   // Rafraîchir les données ici
-             _liste = fetchVehiculeByActeur(acteur.idActeur!);
+             _liste = VehiculeService().fetchVehiculeByActeur(acteur.idActeur!);
                 });
                   debugPrint("refresh page ${page}");
                               },
@@ -237,7 +285,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                   setState(() {
                      page =0;
                     // Rafraîchir les données ici
-               _liste = fetchVehiculeByActeur(acteur.idActeur!);
+               _liste = VehiculeService().fetchVehiculeByActeur(acteur.idActeur!);
                   });
                     debugPrint("refresh page ${page}");
                                 },
@@ -250,11 +298,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                 future: _liste,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.orange,
-                      ),
-                    );
+                    return _buildShimmerEffect();
                   }
 
                   if (!snapshot.hasData) {
@@ -307,8 +351,9 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                         crossAxisSpacing: 10,
                         childAspectRatio: 0.8,
                       ),
-                      itemCount: filtereSearch.length,
+                      itemCount: filtereSearch.length+1,
                       itemBuilder: (context, index) {
+                        if(index < filtereSearch.length){
                         var e = filtereSearch
                             .where((element) => element.statutVehicule == true)
                             .elementAt(index);
@@ -433,8 +478,9 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                                           false)
                                                                   .applyChange(),
                                                               setState(() {
+                                                                page++;
                                                                 _liste =
-                                                                    getVehicule(
+                                                                   VehiculeService().fetchVehiculeByActeur(
                                                                         acteur
                                                                             .idActeur!);
                                                               }),
@@ -490,8 +536,9 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                                           false)
                                                                   .applyChange(),
                                                               setState(() {
+                                                                page++;
                                                                 _liste =
-                                                                    getVehicule(
+                                                                   VehiculeService().fetchVehiculeByActeur(
                                                                         acteur
                                                                             .idActeur!);
                                                               }),
@@ -561,9 +608,11 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                                   listen: false)
                                                               .applyChange(),
                                                           setState(() {
-                                                            _liste = getVehicule(
-                                                                acteur
-                                                                    .idActeur!);
+                                                            page++;
+                                                                _liste =
+                                                                   VehiculeService().fetchVehiculeByActeur(
+                                                                        acteur
+                                                                            .idActeur!);
                                                           }),
                                                           Navigator.of(context)
                                                               .pop(),
@@ -598,6 +647,20 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                             ),
                           ),
                         );
+                      }else{
+                                return isLoading == true ? 
+                                         Padding(
+                                           padding: const EdgeInsets.symmetric(horizontal: 32),
+                                           child: Center(
+                                             child:
+                                             const Center(
+                                                                 child: CircularProgressIndicator(
+                                  color: Colors.orange,
+                                                                 ),
+                                                               )
+                                           ),
+                                         ) : Container();
+                      }
                       },
                     );
                   }
@@ -621,6 +684,75 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
       ),
     );
   }
+
+
+    Widget _buildShimmerEffect(){
+  return   Center(
+        child: GridView.builder(
+            shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 0.8,
+      ),
+          itemCount: 6, // Number of shimmer items to display
+          itemBuilder: (context, index) {
+            return Card(
+              margin: EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 85,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 16,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    subtitle: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 15,
+                        color: Colors.grey,
+                        margin: EdgeInsets.only(top: 4),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 15,
+                        color: Colors.grey,
+                        margin: EdgeInsets.only(top: 4),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+ }
 
   Widget _buildItem(String title, String value) {
     return Padding(
