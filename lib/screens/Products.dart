@@ -597,7 +597,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           page = 0;
                 hasMore = true;
                 fetchStockByCategorie(refresh: true);
-                  if (scrollableController1.hasClients) {
+                  if (page == 0 && isLoading == true) {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       scrollableController1.jumpTo(0.0);
     });
@@ -791,8 +791,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                           crossAxisSpacing: 10,
                                           childAspectRatio: 0.8,
                                         ),
-                                        // itemCount: stockListe.length + 1 ,
-                                        itemCount: stockListe.length + (isLoading ? 1 : 0),
+                                        itemCount: stockListe.length + 1 ,
+                                        // itemCount: stockListe.length + (isLoading ? 1 : 0),
                                         itemBuilder: (context, index) {
                                         //     if (index == stockListe.length) {
                                         // return 
@@ -1047,7 +1047,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                            childAspectRatio: 0.8,
                                          ),
                                          itemCount: stockListe.length +1,
-                                         // itemCount: stockListe.length + (!isLoading ? 1 : 0),
+                                        //  itemCount: stockListe.length + (!isLoading ? 1 : 0),
                                          itemBuilder: (context, index) {
                                          //   if (index == stockListe.length) {
                                          // return 
@@ -1196,7 +1196,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         crossAxisSpacing: 10,
         childAspectRatio: 0.8,
       ),
-          itemCount: 6, // Number of shimmer items to display
+          itemCount: 4, // Number of shimmer items to display
           itemBuilder: (context, index) {
             return Card(
               margin: EdgeInsets.all(8),
