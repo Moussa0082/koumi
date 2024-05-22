@@ -651,6 +651,10 @@ class _AddMaterielState extends State<AddMateriel> {
                                                       context,
                                                       listen: false)
                                                   .applyChange(),
+                                                  setState(() {
+                                                _isLoading = false;
+                                              }),
+                                              Navigator.pop(context),
                                                    ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 const SnackBar(
@@ -717,6 +721,10 @@ class _AddMaterielState extends State<AddMateriel> {
                                                       context,
                                                       listen: false)
                                                   .applyChange(),
+                                                  setState(() {
+                                                _isLoading = false;
+                                              }),
+                                              Navigator.pop(context),
                                                    ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 const SnackBar(

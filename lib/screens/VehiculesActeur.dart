@@ -69,15 +69,14 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
       hasMore &&
       !isLoading){
       // Incrementez la page et récupérez les stocks généraux
+      debugPrint("yes - fetch vehicule by acteur");
       setState(() {
           // Rafraîchir les données ici
         page++;
         });
-      debugPrint("yes - fetch vehicule by acteur");
       fetchVehiculeByActeur(acteur.idActeur!).then((value) {
         setState(() {
           // Rafraîchir les données ici
-          debugPrint("page inc all ${page}");
         });
       });
     // }
@@ -130,7 +129,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
         print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
     } catch (e) {
-      print('Une erreur s\'est produite lors de la récupération des stocks: $e');
+      print('Une erreur s\'est produite lors de la récupération des vehicules: $e');
     } finally {
       setState(() {
        isLoading = false;
@@ -367,18 +366,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                           },
                           child: Card(
                             margin: EdgeInsets.all(8),
-                            // decoration: BoxDecoration(
-                            //   color: Color.fromARGB(250, 250, 250, 250),
-                            //   borderRadius: BorderRadius.circular(15),
-                            //   boxShadow: [
-                            //     BoxShadow(
-                            //       color: Colors.grey.withOpacity(0.3),
-                            //       offset: Offset(0, 2),
-                            //       blurRadius: 8,
-                            //       spreadRadius: 2,
-                            //     ),
-                            //   ],
-                            // ),
+                            
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [

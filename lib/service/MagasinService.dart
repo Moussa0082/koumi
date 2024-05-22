@@ -158,12 +158,49 @@ class MagasinService extends ChangeNotifier{
         print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
     } catch (e) {
-      print('Une erreur s\'est produite lors de la récupération des stocks: $e');
+      print('Une erreur s\'est produite lors de la récupération des magasins: $e');
     } finally {
        isLoading = false;
     }
     return magasin;
   }
+    Future<List<Magasin>> fetchMagasinByNiveau1PaysWithPagination(String idNiveau1Pays,{bool refresh = false}) async {
+    // if (_stockService.isLoading == true) return [];
+
+      isLoading = true;
+
+    if (refresh) {
+        magasin.clear();
+       page = 0;
+        hasMore = true;
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByNiveau1PaysWithPagination?idNiveau1Pays=$idNiveau1Pays&page=${page}&size=${size}'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+           hasMore = false;
+        } else {
+           List<Magasin> newMagasin = body.map((e) => Magasin.fromMap(e)).toList();
+          magasin.addAll(newMagasin);
+        }
+
+        debugPrint("response body all magasin by niveau 1 pays with pagination ${page} par défilement soit ${magasin.length}");
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des magasins: $e');
+    } finally {
+       isLoading = false;
+    }
+    return magasin;
+  }
+
     Future<List<Magasin>> fetchAllMagasin({bool refresh = false}) async {
     // if (_stockService.isLoading == true) return [];
 
@@ -189,12 +226,12 @@ class MagasinService extends ChangeNotifier{
           magasin.addAll(newMagasin);
         }
 
-        debugPrint("response body all magasin by acteur with pagination ${page} par défilement soit ${magasin.length}");
+        debugPrint("response body all magasin  with pagination ${page} par défilement soit ${magasin.length}");
       } else {
         print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
     } catch (e) {
-      print('Une erreur s\'est produite lors de la récupération des stocks: $e');
+      print('Une erreur s\'est produite lors de la récupération des magasins: $e');
     } finally {
        isLoading = false;
     }

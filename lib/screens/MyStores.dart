@@ -200,20 +200,21 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
             style: const TextStyle(
                 color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
-          actions:  [
-            IconButton(
-                onPressed: () {
-                  setState(() {
+          // actions:  [
+          //   IconButton(
+          //       onPressed: () {
+          //         setState(() {
                    
-                    // magasinListeFuture1 = fetchMagasinss() : 
-                    magasinListeFuture = fetchMagasins()
-                    ;
-                  });
-                },
-                icon: Icon(Icons.refresh)),
+          //           // magasinListeFuture1 = fetchMagasinss() : 
+          //           magasinListeFuture = fetchMagasins()
+          //           ;
+          //         });
+          //       },
+          //       icon: Icon(Icons.refresh)),
                 
            
-          ]),
+          // ]
+          ),
       body: 
       Container(
         child: NestedScrollView(
@@ -351,15 +352,10 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                       crossAxisSpacing: 10,
                       childAspectRatio: 0.8,
                     ),
-                    itemCount: magasinListe.length +1,
+                    itemCount: filtereSearch.length +1,
                     itemBuilder: (context, index) {
-                     if(index == magasinListe.length){
-                      return Center(
-                        child:CircularProgressIndicator(
-                        )
-                      );
-                     }
-                  if(index < magasinListe.length){
+                     
+                  if(index < filtereSearch.length){
       
                   
                       return GestureDetector(
@@ -368,8 +364,8 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => MyProductScreen(
-                                  id: magasinListe[index].idMagasin,
-                                  nom: magasinListe[index].nomMagasin),
+                                  id: filtereSearch[index].idMagasin,
+                                  nom: filtereSearch[index].nomMagasin),
                             ),
                           );
                         },
@@ -394,14 +390,14 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                 borderRadius: BorderRadius.circular(8.0),
                                 child: Container(
                                   height: 72,
-                                  child: magasinListe[index].photo == null || magasinListe[index].photo!.isEmpty
+                                  child: filtereSearch[index].photo == null || filtereSearch[index].photo!.isEmpty
                                       ? Image.asset(
                                           "assets/images/default_image.png",
                                           fit: BoxFit.cover,
                                         )
                                       : CachedNetworkImage(
                                                 imageUrl:
-                                                    "https://koumi.ml/api-koumi/Magasin/${magasinListe[index].idMagasin}/image",
+                                                    "https://koumi.ml/api-koumi/Magasin/${filtereSearch[index].idMagasin}/image",
                                                 fit: BoxFit.cover,
                                                 placeholder: (context, url) =>
                                                     const Center(
@@ -419,7 +415,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                               // SizedBox(height: 8),
                               ListTile(
                                 title: Text(
-                                  magasinListe[index].nomMagasin!,
+                                  filtereSearch[index].nomMagasin!,
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
@@ -430,7 +426,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                 ),
                                 subtitle: Text(
                                   overflow: TextOverflow.ellipsis,
-                                  magasinListe[index].niveau1Pays!.nomN1!,
+                                  filtereSearch[index].niveau1Pays!.nomN1!,
                                   style: TextStyle(
                                     overflow: TextOverflow.ellipsis,
                                     fontSize: 14,
@@ -451,7 +447,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     _buildEtat(
-                                        magasinListe[index].statutMagasin!),
+                                        filtereSearch[index].statutMagasin!),
                                     SizedBox(
                                       width: 110,
                                     ),
@@ -462,7 +458,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                             <PopupMenuEntry<String>>[
                                           PopupMenuItem<String>(
                                               child: ListTile(
-                                            leading: magasinListe[index]
+                                            leading: filtereSearch[index]
                                                         .statutMagasin ==
                                                     false
                                                 ? Icon(
@@ -473,13 +469,13 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                                     color:
                                                         Colors.orange[400]),
                                             title: Text(
-                                              magasinListe[index]
+                                              filtereSearch[index]
                                                           .statutMagasin ==
                                                       false
                                                   ? "Activer"
                                                   : "Desactiver",
                                               style: TextStyle(
-                                                color: magasinListe[index]
+                                                color: filtereSearch[index]
                                                             .statutMagasin ==
                                                         false
                                                     ? Colors.green
@@ -490,12 +486,12 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                             onTap: () async {
                                               // Changement d'état du magasin ici
       
-                                              magasinListe[index]
+                                              filtereSearch[index]
                                                           .statutMagasin ==
                                                       false
                                                   ? await MagasinService()
                                                       .activerMagasin(
-                                                          magasinListe[index]
+                                                          filtereSearch[index]
                                                               .idMagasin!)
                                                       .then((value) => {
                                                             // Mettre à jour la liste des magasins après le changement d'état
@@ -538,7 +534,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                                               })
                                                   : await MagasinService()
                                                       .desactiverMagasin(
-                                                          magasinListe[index]
+                                                          filtereSearch[index]
                                                               .idMagasin!)
                                                       .then((value) => {
                                                             Provider.of<MagasinService>(
@@ -562,7 +558,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                                 SnackBar(
                                                   content: Row(
                                                     children: [
-                                                      Text(magasinListe[
+                                                      Text(filtereSearch[
                                                                       index]
                                                                   .statutMagasin ==
                                                               false
@@ -604,24 +600,24 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
                                                           child:
                                                               AddMagasinScreen(
                                                             idMagasin:
-                                                                magasinListe[
+                                                                filtereSearch[
                                                                         index]
                                                                     .idMagasin,
                                                             isEditable: true,
                                                             nomMagasin:
-                                                                magasinListe[
+                                                                filtereSearch[
                                                                         index]
                                                                     .nomMagasin,
                                                             contactMagasin:
-                                                                magasinListe[
+                                                                filtereSearch[
                                                                         index]
                                                                     .contactMagasin,
                                                             localiteMagasin:
-                                                                magasinListe[
+                                                                filtereSearch[
                                                                         index]
                                                                     .localiteMagasin,
                                                             niveau1Pays:
-                                                                magasinListe[
+                                                                filtereSearch[
                                                                         index]
                                                                     .niveau1Pays!,
                                                             // photo: filteredMagasins[index]['photo']!,

@@ -90,14 +90,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
       stockListe = await 
           StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!);
     }
-    else if(widget.id != null) {
-    stockListe = await StockService().fetchStockByMagasinWithPagination(widget.id!);
-    
-    }
-     else if (selectedCat != null && widget.id != null) {
-      stockListe = await StockService().fetchStockByCategorieAndMagasinWithPagination(
-          selectedCat!.idCategorieProduit!, widget.id!);
-    }
     
     return stockListe;
   }
@@ -113,7 +105,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
    
    void _scrollListener() {
   
-    if( scrollableController.position.pixels >=
+    if(scrollableController.position.pixels >=
           scrollableController.position.maxScrollExtent - 200 &&
       hasMore &&
       !isLoading && selectedCat== null){
@@ -129,9 +121,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           debugPrint("page inc all ${page}");
         });
       });
-    // }
-  // } 
-  // else {
+ 
   }
     debugPrint("no");
 
@@ -625,11 +615,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                         builder: (context, snapshot) {
                                           if (snapshot.connectionState == ConnectionState.waiting) {
                           return _buildShimmerEffect();
-                          // const Center(
-                          //   child: CircularProgressIndicator(
-                          //     color: Colors.orange,
-                          //   ),
-                          // );
+                          
                                           }
                                                if (snapshot.hasError == true) {
                           return SingleChildScrollView(

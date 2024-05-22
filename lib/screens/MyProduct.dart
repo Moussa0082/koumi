@@ -92,12 +92,12 @@ class _MyProductScreenState extends State<MyProductScreen> {
           });
         } else {
           setState(() {
-           List<Stock> newIntrant = body.map((e) => Stock.fromMap(e)).toList();
-          stockListe.addAll(newIntrant);
+           List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
+          stockListe.addAll(newStocks);
           });
         }
 
-        debugPrint("response body all intrant by acteur with pagination ${page} par défilement soit ${stockListe.length}");
+        debugPrint("response body all stocks by acteur with pagination ${page} par défilement soit ${stockListe.length}");
       } else {
         print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
@@ -111,7 +111,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
     return stockListe;
   }
     Future<List<Stock>> fetchStockByMagasinAndActeur(String idMagasin,String idActeur,{bool refresh = false}) async {
-    // if (_stockService.isLoading == true) return [];
+    if (isLoading == true) return [];
 
     setState(() {
       isLoading = true;
@@ -161,7 +161,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
     if(widget.id != null){
            stockListe = await fetchStockByMagasinAndActeur(widget.id!,acteur.idActeur!);
     }else{
-      stockListe = await fetchStockByActeur(acteur.idActeur!);
+      stockListe = await StockService().fetchStockByActeur(acteur.idActeur!);
     }
     return stockListe;
   }
@@ -367,7 +367,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                 setState(() {
                    page =0;
                   // Rafraîchir les données ici
-            stockListeFuture =  StockService().fetchStock();
+            stockListeFuture =  fetchAllStock();
                 });
                   debugPrint("refresh page ${page}");
                               },
@@ -437,7 +437,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                 setState(() {
                    page =0;
                   // Rafraîchir les données ici
-            stockListeFuture =  StockService().fetchStock();
+            stockListeFuture =  StockService().fetchStockByActeur(acteur.idActeur!);
                 });
                     debugPrint("refresh page ${page}");
                                 },
@@ -580,9 +580,9 @@ class _MyProductScreenState extends State<MyProductScreen> {
                             ),
                             itemCount: 
                             filtereSearch
-                                .length ,
+                                .length +1,
                             itemBuilder: (context, index) {
-                              if(index < stockListe.length){
+                              if(index < filtereSearch.length){
                               return GestureDetector(
                                 onTap: () {
                                   Navigator.push(

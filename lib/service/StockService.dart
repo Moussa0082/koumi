@@ -191,33 +191,7 @@ class StockService extends ChangeNotifier {
 
 
 
-  // Future<List<Stock>> fetchStock() async {
-  //   try {
-  //     final response =
-  //         await http.get(Uri.parse('$baseUrl/getAllStocks'));
-
-  //     if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
-
-  //       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-  //       stockList = body
-  //       // .where((stock) => stock['statutSotck'] == true )
-  //       .map((e) => Stock.fromMap(e)).toList();
-  //       debugPrint("response body all stock");
-  //       return stockList;
-  //     } else {
-  //       print(
-  //           'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
-  //       // throw Exception(jsonDecode(response.body)["message"]);
-  //       return stockList = [];
-  //     }
-  //   } catch (e) {
-  //     print(
-  //         'Une erreur s\'est produite lors de la récupération des stocks: $e  ');
-      
-  //   }
-  //            return stockList = [];
   
-  // }
 
    Future<List<Stock>> fetchStock({bool refresh = false }) async {
     if (isLoading) return [];
@@ -452,7 +426,7 @@ class StockService extends ChangeNotifier {
           stockList.addAll(newIntrant);
         }
 
-        debugPrint("response body all intrant by acteur with pagination ${page} par défilement soit ${stockList.length}");
+        debugPrint("response body all stock by acteur with pagination ${page} par défilement soit ${stockList.length}");
       } else {
         print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
@@ -463,6 +437,7 @@ class StockService extends ChangeNotifier {
     }
     return stockList;
   }
+
     Future<List<Stock>> fetchStockByMagasinAndActeur(String idMagasin,String idActeur,{bool refresh = false}) async {
     // if (_stockService.isLoading == true) return [];
 
