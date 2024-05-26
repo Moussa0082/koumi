@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:koumi_app/screens/Acceuil.dart';
 import 'package:koumi_app/screens/CommandeScreen.dart';
+import 'package:koumi_app/screens/MyProduct.dart';
 import 'package:koumi_app/screens/Panier.dart';
 import 'package:koumi_app/screens/Product.dart';
 import 'package:koumi_app/screens/Products.dart';
@@ -44,7 +45,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
   ];
   List pages = <Widget>[
     const Accueil(),
-    ProductsScreen(),
+    MyProductScreen(),
     Panier(),
     const Profil()
   ];

@@ -170,7 +170,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
      formeProduit: widget.forme!, quantiteStock: widget.quantite!, photo: widget.image,
      typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
      zoneProduction: zoneProduction, speculation: speculation,
-      unite: widget.stock!.unite!,
+      unite: unite,
       magasin: magasin, acteur: acteur);
     }else{
     await StockService().updateStock(
@@ -185,7 +185,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
     } catch (error) {
         // Handle any exceptions that might occur during the request
         final String errorMessage = error.toString();
-        debugPrint("no update" + errorMessage);
+        debugPrint("no update " + errorMessage);
       } 
 
 
@@ -197,16 +197,12 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
     verify();
     magasinListe =
         http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByActeur/${id}'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
     speculationListe =
         http.get(Uri.parse('$apiOnlineUrl/Speculation/getAllSpeculation'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation'));
     uniteListe =
         http.get(Uri.parse('$apiOnlineUrl/Unite/getAllUnite'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Unite/getAllUnite'));
     zoneListe =
         http.get(Uri.parse('$apiOnlineUrl/ZoneProduction/getAllZone'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/ZoneProduction/getAllZone'));
 
         
     debugPrint("nom : ${widget.nomProduit}, bool : ${widget.isEditable} ,image : ${widget.image.toString()} , forme: ${widget.forme}, origine : ${widget.origine}, qte : ${widget.quantite}, prix : ${widget.prix}");
@@ -215,7 +211,11 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
     if(widget.isEditable! == true){
      _typeController.text = widget.stock!.typeProduit!;
      _descriptionController.text = widget.stock!.descriptionStock!;
-          debugPrint("id : $id,   acteur : $acteur , forme : ${widget.forme}");
+          debugPrint("id : $id,  forme : ${widget.forme}");
+        magasin = widget.stock!.magasin!;
+        speculation = widget.stock!.speculation!;
+        unite = widget.stock!.unite!;
+        zoneProduction = widget.stock!.zoneProduction!;
           // debugPrint("spec : ${widget.speculation}, magasin : ${widget.magasin}, zone : ${widget.zoneProduction}   , unite : ${widget.unite}");
     }
   }
@@ -406,9 +406,9 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                       setState(() {
                                         speculation.idSpeculation = newValue;
                                         if (newValue != null) {
-                                          speculation.nomSpeculation = speculationListe
-                                              .map((e) => e.nomSpeculation!)
-                                              .first;
+                                      speculation = speculationListe.firstWhere(
+                         (spec) => spec.idSpeculation == newValue,
+                      );
                                           print("speculation : ${speculation}");
                                         }
                                       });
@@ -545,9 +545,9 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                       setState(() {
                                         magasin.idMagasin = newValue;
                                         if (newValue != null) {
-                                          magasin.nomMagasin = magasinListe
-                                              .map((e) => e.nomMagasin!)
-                                              .first;
+                                          magasin = magasinListe.firstWhere(
+                    (magasin) => magasin.idMagasin == newValue,
+                  );
                                           print("magasin : ${magasin.nomMagasin}");
                                         }
                                       });
@@ -684,9 +684,9 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                       setState(() {
                                         unite.idUnite = newValue;
                                         if (newValue != null) {
-                                          unite.nomUnite = uniteListe
-                                              .map((e) => e.nomUnite!)
-                                              .first;
+                                             unite = uniteListe.firstWhere(
+                             (unite) => unite.idUnite == newValue,
+                          );
                                           print("unité : ${unite.nomUnite}");
                                         }
                                       });
@@ -820,9 +820,9 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                       setState(() {
                                         zoneProduction.idZoneProduction = newValue;
                                         if (newValue != null) {
-                                          zoneProduction.nomZoneProduction = zoneListe
-                                              .map((e) => e.nomZoneProduction!)
-                                              .first;
+                                   zoneProduction = zoneListe.firstWhere(
+                             (zone) => zone.idZoneProduction == newValue,
+                                );
                                           print("zone de production : ${zoneProduction}");
                                         }
                                       });
@@ -878,6 +878,8 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                               // Handle button press action here
                               if (_formKey.currentState!.validate()) {
                                 handleButtonPress();
+                                    // debugPrint("zone : ${zoneProduction.nomZoneProduction}, unite : ${unite.nomUnite} , magasin: ${magasin.nomMagasin}, spec : ${speculation.nomSpeculation}");
+
                               }
                             },
                             style: ElevatedButton.styleFrom(

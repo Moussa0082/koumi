@@ -41,9 +41,9 @@ class _ProfilAState extends State<ProfilA> {
         appBar: AppBar(
           centerTitle: true,
           toolbarHeight: 100,
-          leading: IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+          // leading: IconButton(
+          //     onPressed: () {},
+          //     icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: const Text(
             "Mon Profil",
             style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
@@ -132,8 +132,8 @@ class _ProfilAState extends State<ProfilA> {
                                     _buildProfile('Adresse', ac.adresseActeur!),
                                     _buildProfile(
                                         'Localité', ac.localiteActeur!),
-                                    _buildProfile(
-                                        'Pays', ac.niveau3PaysActeur!),
+                                    // _buildProfile(
+                                    //     'Pays', ac.niveau3PaysActeur!),
                                   ],
                                 ),
                               ),

@@ -156,6 +156,8 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
       // _origineController.text = widget.stock!.origineProduit!;
       _prixController.text = widget.stock!.prix!.toString();
       _quantiteController.text = widget.stock!.quantiteStock!.toString();
+      forme = widget.stock!.formeProduit!;
+      niveau3 = widget.stock!.origineProduit!;
     }
     _formeList = http
         .get(Uri.parse('$apiOnlineUrl/formeproduit/getAllForme/'));
@@ -361,15 +363,16 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                       formeValue = newValue;
                                       if (newValue != null) {
                                         forme = formeListe
-                                        .map((e) => e.libelleForme)
-                                        .first!;
+                            .firstWhere((e) => e.idForme == newValue)
+                            .libelleForme!;
                                       }
+                                      debugPrint("fr : ${forme}");
                                     });
                                   },
                                   decoration: InputDecoration(
                                     labelText: widget.isEditable == false
                                         ? 'Sélectionner la forme'
-                                        : widget.stock!.formeProduit!,
+                                        : widget.stock!.formeProduit,
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -453,16 +456,15 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                   utf8.decode(snapshot.data.bodyBytes);
                               dynamic responseData = json.decode(jsonString);
 
-                              // dynamic responseData =
-                              //     json.decode(snapshot.data.body);
+                             
                               if (responseData is List) {
                                 final reponse = responseData;
-                                final niveau3List = reponse
+                                final niveau3Liste = reponse
                                     .map((e) => Niveau3Pays.fromMap(e))
                                     .where((con) => con.statutN3 == true)
                                     .toList();
 
-                                if (niveau3List.isEmpty) {
+                                if (niveau3Liste.isEmpty) {
                                   return DropdownButtonFormField(
                                     items: [],
                                     onChanged: null,
@@ -480,7 +482,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
 
                                 return DropdownButtonFormField<String>(
                                   isExpanded: true,
-                                  items: niveau3List
+                                  items: niveau3Liste
                                       .map(
                                         (e) => DropdownMenuItem(
                                           value: e.idNiveau3Pays,
@@ -493,17 +495,17 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                     setState(() {
                                       n3Value = newValue;
                                       if (newValue != null) {
-                                        niveau3 = niveau3List
-                                            .map((e) => e.nomN3)
-                                            .first;
-                                        print("niveau 3 : ${niveau3}");
+                                        niveau3 = niveau3Liste
+                            .firstWhere((e) => e.idNiveau3Pays == newValue)
+                            .nomN3;
                                       }
+                                        print("niveau 3 origne : ${niveau3}");
                                     });
                                   },
                                   decoration: InputDecoration(
                                     labelText: widget.isEditable == false
                                         ? 'Selectionner une localité'
-                                        : widget.stock!.origineProduit!,
+                                        : widget.stock!.origineProduit,
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -678,12 +680,15 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                           )
 
                              
-                              : Image.asset(
-                                  "assets/images/default_image.png",
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height: 200,
+                              : SizedBox(
+                                child: IconButton(
+                                  onPressed: _showImageSourceDialog,
+                                  icon: const Icon(
+                                    Icons.add_a_photo_rounded,
+                                    size: 60,
+                                  ),
                                 ),
+                              ) 
                         )
                               ,
                       ),
@@ -692,6 +697,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                       ElevatedButton(
                           onPressed: () async {
                             if (formkey.currentState!.validate()) {
+                              debugPrint("forme: ${forme} , formeValue : ${formeValue}, origin : ${niveau3} , value : ${n3Value}");
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -699,7 +705,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                           (AddAndUpdateProductEndSreen(
                                             isEditable: widget.isEditable!,
                                             nomProduit: _nomController.text,
-                                            forme: formeValue,
+                                            forme: forme,
                                             origine: niveau3,
                                             prix:
                                                 _prixController.text.toString(),

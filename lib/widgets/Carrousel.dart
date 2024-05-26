@@ -96,7 +96,7 @@ class Carrousels extends StatelessWidget {
 }
 
 class Carrousel extends StatefulWidget {
-  Carrousel({super.key});
+   Carrousel({super.key});
 
   @override
   _CarrouselState createState() => _CarrouselState();
@@ -162,17 +162,26 @@ int page = 0;
         //                                               'assets/images/default_image.png',
         //                                               fit: BoxFit.cover,
         //                                             ),
-        CachedNetworkImage(
-         imageUrl: imagePath ,
-         placeholder: (context, url) =>
-              const Center(child: CircularProgressIndicator()),
-          errorWidget: (context, url, error) => Image.asset(
-                                                      'assets/images/default_image.png',
-                                                      fit: BoxFit.cover,
-                                                    ),
-          fit: BoxFit.cover,
-          width: double.infinity,
+        Container(
+        decoration: BoxDecoration(
+          // border: Border.all(color: Colors.white, width: 4.0), // Bordure noire de 4.0 de largeur
+          borderRadius: BorderRadius.circular(12.0), // Bordure arrondie
         ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20.0), // Bordure arrondie pour les coins des images
+          child: CachedNetworkImage(
+            imageUrl: imagePath,
+            placeholder: (context, url) =>
+                const Center(child: CircularProgressIndicator()),
+            errorWidget: (context, url, error) => Image.asset(
+              'assets/images/default_image.png',
+              fit: BoxFit.cover,
+            ),
+            fit: BoxFit.cover,
+            width: double.infinity,
+          ),
+        ),
+      ),
         Positioned(
           bottom: 20,
           left: 20,
@@ -181,7 +190,7 @@ int page = 0;
             color: Colors.black54,
             child: Text(
               text,
-              style: const TextStyle(color: Colors.white, fontSize: 16, overflow: TextOverflow.ellipsis),
+              style: const TextStyle(color: Colors.white, fontSize: 17, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.bold),
             ),
           ),
         ),

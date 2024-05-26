@@ -661,31 +661,32 @@ class _StoreScreenState extends State<StoreScreen> {
                                     title: Text(
                                       magasinListe[index].nomMagasin!,
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 17,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black87,
                                       ),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                     ),
+                                    
                                     subtitle: Text(
                                       overflow: TextOverflow.ellipsis,
                                       magasinListe[index].localiteMagasin!,
                                       style: TextStyle(
-                                        fontSize: 14,
+                                        fontSize: 15,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black87,
                                       ),
                                     ),
                                   ),
                                   //  _buildItem(
-                                  //         "Localité :", filtereSearch[index].localiteMagasin!),
+                                  //         "Tel:", magasinListe[index].contactMagasin!),
                                   // typeActeurData
                                   //         .map((e) => e.libelle!.toLowerCase())
                                   //         .contains("admin")
                                   //     ?
-                                  //     //  _buildItem(
-                                  //     //     "Acteur :", e.acteur!.typeActeur!.map((e) => e.libelle!).join(','))
+                                       _buildItem(
+                                          "Proprietaire :", magasinListe[index].acteur!.typeActeur!.map((e) => e.libelle!).join(','))
                                   //     Padding(
                                   //         padding: const EdgeInsets.symmetric(
                                   //             horizontal: 8.0),
@@ -1110,37 +1111,38 @@ class _StoreScreenState extends State<StoreScreen> {
       );
  }
 
-  // Widget _buildItem(String title, String value) {
-  //   return Padding(
-  //     padding: const EdgeInsets.all(8.0),
-  //     child: Row(
-  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //       children: [
-  //         Expanded(
-  //           child: Text(
-  //             title,
-  //             style: const TextStyle(
-  //                 color: Colors.black87,
-  //                 fontWeight: FontWeight.w800,
-  //                 fontStyle: FontStyle.italic,
-  //                 overflow: TextOverflow.ellipsis,
-  //                 fontSize: 16),
-  //           ),
-  //         ),
-  //         Expanded(
-  //           child: Text(
-  //             value,
-  //             style: const TextStyle(
-  //                 color: Colors.black,
-  //                 fontWeight: FontWeight.w800,
-  //                 overflow: TextOverflow.ellipsis,
-  //                 fontSize: 16),
-  //           ),
-  //         )
-  //       ],
-  //     ),
-  //   );
-  // }
+  Widget _buildItem(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w800,
+                  fontStyle: FontStyle.italic,
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 16),
+            ),
+          ),
+          const SizedBox(width:5),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w800,
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 16),
+            ),
+          )
+        ],
+      ),
+    );
+  }
 
   Widget _buildEtat(bool isState) {
     return Container(

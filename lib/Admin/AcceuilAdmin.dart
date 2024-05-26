@@ -150,7 +150,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MyProductScreen(),
+                    builder: (context) => ProductsScreen(),
                   ));
               // builder: (context) =>  ProduitScreen()));
             } else if (index == 8) {
@@ -239,7 +239,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
       child: PageView(
         children: [
           const AcceuilAdmin(),
-           ProductScreen(),
+           MyProductScreen(),
           Panier(),
           const ProfilA()
         ],

@@ -12,6 +12,7 @@ import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ParametreGenerauxPage extends StatefulWidget {
   const ParametreGenerauxPage({Key? key}) : super(key: key);
@@ -149,7 +150,9 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                   },
                   icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen),
                 ),
-          title: type.toLowerCase() == 'admin'
+          title: typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("admin")
               ? Text(
                   "Parametre Généraux",
                   style: TextStyle(
@@ -164,7 +167,9 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                       color: d_colorGreen,
                       fontWeight: FontWeight.bold),
                 ),
-          actions: type.toLowerCase() == 'admin'
+          actions: typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("admin")
               ? [
                   isEditing
                       ? IconButton(
@@ -276,11 +281,8 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                   future: paramService.fetchParametre(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.orange,
-                        ),
-                      );
+                      return 
+                         buildShimmerEffect();
                     }
                     if (snapshot.hasError) {
                       return const Padding(
@@ -1084,6 +1086,217 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
       ),
     );
   }
+
+  Widget buildShimmerEffect() {
+     return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.height * 0.02,
+            horizontal: MediaQuery.of(context).size.width * 0.05,
+          ),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              height: 200,
+              width: MediaQuery.of(context).size.width * 0.9,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    offset: const Offset(0, 2),
+                    blurRadius: 5,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: Container(
+                      width: 110,
+                      height: 150,
+                      color: Colors.white,
+                    ),
+                    title: Container(
+                      width: double.infinity,
+                      height: 20,
+                      color: Colors.white,
+                    ),
+                    subtitle: Container(
+                      width: double.infinity,
+                      height: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const Padding(
+                    padding: EdgeInsets.all(10.0),
+                    child: Divider(height: 2, color: Colors.green),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    height: 80,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.height * 0.01,
+            horizontal: MediaQuery.of(context).size.width * 0.05,
+          ),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              height: 110,
+              width: MediaQuery.of(context).size.width * 0.9,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    offset: const Offset(0, 2),
+                    blurRadius: 5,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          height: 20,
+                          color: Colors.white,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          height: 20,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(10.0),
+                    child: Divider(height: 2, color: Colors.green),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          height: 20,
+                          color: Colors.white,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          height: 20,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.all(10),
+          child: Text("Autre information"),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.height * 0.02,
+            horizontal: MediaQuery.of(context).size.width * 0.05,
+          ),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              height: 400,
+              width: MediaQuery.of(context).size.width * 0.9,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    offset: const Offset(0, 2),
+                    blurRadius: 5,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          height: 20,
+                          color: Colors.white,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          height: 20,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(5.0),
+                    child: Divider(height: 1, color: Colors.green),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          height: 20,
+                          color: Colors.white,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          height: 20,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+
 
   Widget _buildProfil(String title, String value) {
     return Padding(

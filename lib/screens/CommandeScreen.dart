@@ -9,6 +9,7 @@ import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/CommandeService.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 
 class CommandeScreen extends StatefulWidget {
   const CommandeScreen({super.key});
@@ -239,11 +240,7 @@ class _CommandeScreenState extends State<CommandeScreen> {
                 future: _liste,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.orange,
-                      ),
-                    );
+                    return buildShimmerEffect();
                   }
                   if(snapshot.hasError){
                     SingleChildScrollView(
@@ -858,6 +855,83 @@ class _CommandeScreenState extends State<CommandeScreen> {
                   ),
                 ),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+   Widget buildShimmerEffect() {
+   return SingleChildScrollView(
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Column(
+          children: List.generate(
+            6,
+            (index) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              child: GestureDetector(
+                onTap: () {
+                  // Handle onTap action
+                },
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        offset: const Offset(0, 2),
+                        blurRadius: 5,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: Container(
+                          width: 80,
+                          height: 80,
+                          color: Colors.grey[300]!,
+                        ),
+                        title: Container(
+                          width: double.infinity,
+                          height: 20,
+                          color: Colors.grey[300]!,
+                        ),
+                        subtitle: Container(
+                          width: double.infinity,
+                          height: 20,
+                          color: Colors.grey[300]!,
+                        ),
+                      ),
+                      Container(
+                        alignment: Alignment.bottomRight,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              width: 100,
+                              height: 20,
+                              color: Colors.grey[300]!,
+                            ),
+                            Container(
+                              width: 100,
+                              height: 20,
+                              color: Colors.grey[300]!,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         ),

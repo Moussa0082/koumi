@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:koumi_app/models/Pays.dart';
 
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -18,7 +19,7 @@ class Acteur {
     String? longitude;
     String? photoSiegeActeur;
     String? logoActeur;
-    String? niveau3PaysActeur;
+    // String? niveau3PaysActeur;
     String? password;
     String? dateAjout;
     String? dateModif;
@@ -28,6 +29,7 @@ class Acteur {
     bool? statutActeur;
     bool? isConnected;
     List<Speculation>? speculations;
+    Pays? pays;
     List<TypeActeur>? typeActeur;
 
     Acteur({
@@ -43,7 +45,7 @@ class Acteur {
          this.longitude,
          this.photoSiegeActeur,
          this.logoActeur,
-         this.niveau3PaysActeur,
+        //  this.niveau3PaysActeur,
          this.password,
          this.dateAjout,
          this.dateModif,
@@ -53,6 +55,7 @@ class Acteur {
          this.statutActeur,
          this.isConnected,
          this.speculations,
+         this.pays,
          this.typeActeur,
     });
 
@@ -69,7 +72,7 @@ class Acteur {
         longitude: json["longitude"],
         photoSiegeActeur: json["photoSiegeActeur"],
         logoActeur: json["logoActeur"],
-        niveau3PaysActeur: json["niveau3PaysActeur"],
+        // niveau3PaysActeur: json["niveau3PaysActeur"],
         password: json["password"],
         dateAjout: json["dateAjout"],
         dateModif: json["dateModif"],
@@ -78,6 +81,7 @@ class Acteur {
         emailActeur: json["emailActeur"],
         statutActeur: json["statutActeur"],
         isConnected: json["isConnected"],
+        pays: Pays.fromJson(json["pays"]),
         speculations: List<Speculation>.from(json["speculations"].map((x) => Speculation.fromJson(x))),
         typeActeur: List<TypeActeur>.from(json["typeActeur"].map((x) => TypeActeur.fromJson(x))),
     );
@@ -95,7 +99,7 @@ class Acteur {
         "longitude": longitude,
         "photoSiegeActeur": photoSiegeActeur,
         "logoActeur": logoActeur,
-        "niveau3PaysActeur": niveau3PaysActeur,
+        // "niveau3PaysActeur": niveau3PaysActeur,
         "password": password,
         "dateAjout": dateAjout,
         "dateModif": dateModif,
@@ -105,6 +109,7 @@ class Acteur {
         "statutActeur": statutActeur,
         "isConnected": isConnected,
         "speculations": List<dynamic>.from(speculations!.map((x) => x.toJson())),
+        "pays": pays?.toJson(),
         "typeActeur": List<dynamic>.from(typeActeur!.map((x) => x.toJson())),
     };
 
@@ -135,60 +140,11 @@ class Acteur {
         adresseActeur: adressActeur,
         telephoneActeur: telephoneActeur,
         whatsAppActeur: whatsAppActeur,
-        niveau3PaysActeur: niveau3PaysActeur,
+        // niveau3PaysActeur: niveau3PaysActeur,
         localiteActeur: localiteActeur);
   }
 
-  Acteur copyWith({
-    String? idActeur,
-    String? resetToken,
-    String? tokenCreationDate,
-    String? codeActeur,
-    String? nomActeur,
-    String? adresseActeur,
-    String? telephoneActeur,
-    String? whatsAppActeur,
-    String? latitude,
-    String? longitude,
-    String? photoSiegeActeur,
-    String? logoActeur,
-    String? niveau3PaysActeur,
-    String? password,
-    String? dateAjout,
-    String? dateModif,
-    String? personneModif,
-    String? localiteActeur,
-    String? emailActeur,
-    bool? statutActeur,
-    List<Speculation>? speculations,
-    List<TypeActeur>? typeActeur,
-  }) {
-    return Acteur(
-      idActeur: idActeur ?? this.idActeur,
-      resetToken: resetToken ?? this.resetToken,
-      tokenCreationDate: tokenCreationDate ?? this.tokenCreationDate,
-      codeActeur: codeActeur ?? this.codeActeur,
-      nomActeur: nomActeur ?? this.nomActeur,
-      adresseActeur: adresseActeur ?? this.adresseActeur,
-      telephoneActeur: telephoneActeur ?? this.telephoneActeur,
-      whatsAppActeur: whatsAppActeur ?? this.whatsAppActeur,
-      latitude: latitude ?? this.latitude,
-      longitude: longitude ?? this.longitude,
-      photoSiegeActeur: photoSiegeActeur ?? this.photoSiegeActeur,
-      logoActeur: logoActeur ?? this.logoActeur,
-      niveau3PaysActeur: niveau3PaysActeur ?? this.niveau3PaysActeur,
-      password: password ?? this.password,
-      dateAjout: dateAjout ?? this.dateAjout,
-      dateModif: dateModif ?? this.dateModif,
-      personneModif: personneModif ?? this.personneModif,
-      localiteActeur: localiteActeur ?? this.localiteActeur,
-      emailActeur: emailActeur ?? this.emailActeur,
-      statutActeur: statutActeur ?? this.statutActeur,
-      speculations: speculations ?? this.speculations,
-      typeActeur: typeActeur ?? this.typeActeur,
-    );
-  }
-
+ 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'idActeur': idActeur,
@@ -203,7 +159,7 @@ class Acteur {
       'longitude': longitude,
       'photoSiegeActeur': photoSiegeActeur,
       'logoActeur': logoActeur,
-      'niveau3PaysActeur': niveau3PaysActeur,
+      // 'niveau3PaysActeur': niveau3PaysActeur,
       'password': password,
       'dateAjout': dateAjout,
       'dateModif': dateModif,
@@ -211,6 +167,7 @@ class Acteur {
       'localiteActeur': localiteActeur,
       'emailActeur': emailActeur,
       'statutActeur': statutActeur,
+      'pays':pays?.toMap(),
       'speculations': speculations?.map((x) => x.toMap()).toList(),
       'typeActeur': typeActeur?.map((x) => x.toMap()).toList(),
     };
@@ -230,7 +187,7 @@ class Acteur {
       longitude: map['longitude'],
       photoSiegeActeur: map['photoSiegeActeur'],
       logoActeur: map['logoActeur'],
-      niveau3PaysActeur: map['niveau3PaysActeur'],
+      // niveau3PaysActeur: map['niveau3PaysActeur'],
       password: map['password'],
       dateAjout: map['dateAjout'],
       dateModif: map['dateModif'],
@@ -252,62 +209,6 @@ class Acteur {
 
   // factory Acteur.fromJson(String source) => Acteur.fromMap(json.decode(source) as Map<String, dynamic>);
 
-  @override
-  String toString() {
-    return 'Acteur(idActeur: $idActeur, resetToken: $resetToken, tokenCreationDate: $tokenCreationDate, codeActeur: $codeActeur, nomActeur: $nomActeur, adresseActeur: $adresseActeur, telephoneActeur: $telephoneActeur, whatsAppActeur: $whatsAppActeur, latitude: $latitude, longitude: $longitude, photoSiegeActeur: $photoSiegeActeur, logoActeur: $logoActeur, niveau3PaysActeur: $niveau3PaysActeur, password: $password, dateAjout: $dateAjout, dateModif: $dateModif, personneModif: $personneModif, localiteActeur: $localiteActeur, emailActeur: $emailActeur, statutActeur: $statutActeur, speculations: $speculations, typeActeur: $typeActeur)';
-  }
+  
 
-  @override
-  bool operator ==(covariant Acteur other) {
-    if (identical(this, other)) return true;
-
-    return other.idActeur == idActeur &&
-        other.resetToken == resetToken &&
-        other.tokenCreationDate == tokenCreationDate &&
-        other.codeActeur == codeActeur &&
-        other.nomActeur == nomActeur &&
-        other.adresseActeur == adresseActeur &&
-        other.telephoneActeur == telephoneActeur &&
-        other.whatsAppActeur == whatsAppActeur &&
-        other.latitude == latitude &&
-        other.longitude == longitude &&
-        other.photoSiegeActeur == photoSiegeActeur &&
-        other.logoActeur == logoActeur &&
-        other.niveau3PaysActeur == niveau3PaysActeur &&
-        other.password == password &&
-        other.dateAjout == dateAjout &&
-        other.dateModif == dateModif &&
-        other.personneModif == personneModif &&
-        other.localiteActeur == localiteActeur &&
-        other.emailActeur == emailActeur &&
-        other.statutActeur == statutActeur &&
-        listEquals(other.speculations, speculations) &&
-        listEquals(other.typeActeur, typeActeur);
-  }
-
-  @override
-  int get hashCode {
-    return idActeur.hashCode ^
-        resetToken.hashCode ^
-        tokenCreationDate.hashCode ^
-        codeActeur.hashCode ^
-        nomActeur.hashCode ^
-        adresseActeur.hashCode ^
-        telephoneActeur.hashCode ^
-        whatsAppActeur.hashCode ^
-        latitude.hashCode ^
-        longitude.hashCode ^
-        photoSiegeActeur.hashCode ^
-        logoActeur.hashCode ^
-        niveau3PaysActeur.hashCode ^
-        password.hashCode ^
-        dateAjout.hashCode ^
-        dateModif.hashCode ^
-        personneModif.hashCode ^
-        localiteActeur.hashCode ^
-        emailActeur.hashCode ^
-        statutActeur.hashCode ^
-        speculations.hashCode ^
-        typeActeur.hashCode;
-  }
-}
+ }

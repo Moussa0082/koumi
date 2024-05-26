@@ -233,8 +233,8 @@ class _ProfilState extends State<Profil> {
                                               'Adresse', ac.adresseActeur!),
                                           _buildProfile(
                                               'Localité', ac.localiteActeur!),
-                                          _buildProfile(
-                                              'Pays', ac.niveau3PaysActeur!),
+                                          // _buildProfile(
+                                          //     'Pays', ac.niveau3PaysActeur!),
                                         ],
                                       ),
                                     ),

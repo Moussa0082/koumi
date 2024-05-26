@@ -67,49 +67,6 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
   Set<String> loadedRegions =
       {}; // Ensemble pour garder une trace des régions pour lesquelles les magasins ont déjà été chargés
 
-//   void fetchRegions() async {
-//   try {
-//     final response = await http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
-//     if (response.statusCode == 200) {
-//       List<dynamic> data = json.decode(response.body);
-
-//       // Filtrer les éléments avec statutN1 == true
-//         setState(() {
-//           niveau1Pays = data
-//               .where((niv) => niv['statutN1'] == true)
-//               .map((item) => Niveau1Pays(
-//                     idNiveau1Pays: item['idNiveau1Pays'] as String,
-//                     nomN1: item['nomN1'] as String,
-//                   ))
-//               .toList();
-//         });
-
-//     } else {
-//       throw Exception('Failed to load regions');
-//     }
-//   } catch (e) {
-//     print('Error fetching regions: $e');
-//   }
-// }
-
-//   Future<void> fetchNiveau1PaysList() async {
-//   try {
-//     final response = await http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-//     if (response.statusCode == 200) {
-//         final String jsonString = utf8.decode(response.bodyBytes);
-//        Future<List<dynamic>> data = json.decode(jsonString);
-//       setState(() {
-//         niveau1PaysList = data;
-//       });
-//     } else {
-//       // Gérer les erreurs de requête HTTP
-//       print('Erreur de récupération des données: ${response.statusCode}');
-//     }
-//   } catch (e) {
-//     // Gérer les erreurs autres que les erreurs HTTP
-//     print('Erreur: $e');
-//   }
-// }
 
   Future<void> updateMagasin() async {
     final nomMagasin = nomMagasinController.text;
@@ -126,7 +83,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                 localiteMagasin: localiteMagasin,
                 photo: widget.photo,
                 acteur: acteur,
-                niveau1Pays: widget.niveau1Pays!)
+                niveau1Pays: niveau1Pays)
             .then((value) => showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -155,7 +112,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                 contactMagasin: contactMagasin,
                 localiteMagasin: localiteMagasin,
                 acteur: acteur,
-                niveau1Pays: widget.niveau1Pays!)
+                niveau1Pays: niveau1Pays)
             .then((value) => showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -212,6 +169,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
           isLoading = false;
         });
         Provider.of<MagasinService>(context, listen: false).applyChange();
+         Navigator.of(context).pop();
       });
     } else {
       await updateMagasin().then((_) {
@@ -219,6 +177,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
         setState(() {
           isLoading = false;
         });
+        Navigator.of(context).pop();
       });
     }
   }
@@ -415,6 +374,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
       contactMagasinController.text = widget.contactMagasin!;
       localiteMagasinController.text = widget.localiteMagasin!;
       // photos = widget.photo!;
+      niveau1Pays = widget.niveau1Pays!;
       niveauPaysValue = widget.niveau1Pays!.idNiveau1Pays;
       debugPrint("Id Magasin " +
           widget.idMagasin! +
@@ -624,18 +584,11 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
 
                               return DropdownButtonFormField<String>(
                                 isExpanded: true,
-                                //     validator: (value) {
-                                //   if (value == null || value.isEmpty) {
-                                //     return 'Veuillez sélectionner une region.';
-                                //   }
-                                //   return null;
-                                // },
+                               
                                 items: niveau1List
                                     .map(
                                       (e) => DropdownMenuItem(
-                                        value: widget.isEditable! == false
-                                            ? e.idNiveau1Pays
-                                            : widget.niveau1Pays!.idNiveau1Pays,
+                                        value: e.idNiveau1Pays,
                                         child: Text(e.nomN1!),
                                       ),
                                     )
@@ -644,9 +597,10 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                                 onChanged: (newValue) {
                                   setState(() {
                                     niveau1Pays.idNiveau1Pays = newValue;
-                                    if (newValue != null) {
-                                      niveau1Pays.nomN1 =
-                                          niveau1List.map((e) => e.nomN1).first;
+                                    if (newValue != null){
+                                            niveau1Pays = niveau1List.firstWhere(
+                             (niveau1Pays) => niveau1Pays.idNiveau1Pays == newValue,
+                                );
                                       print("niveau 1 : ${niveau1Pays}");
                                     }
                                   });
@@ -720,6 +674,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                             // Handle button press action here
                             if (_formKey.currentState!.validate()) {
                               _handleButtonPress();
+                              // debugPrint("n1 : ${niveau1Pays}");
                             }
                           },
                           style: ElevatedButton.styleFrom(

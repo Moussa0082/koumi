@@ -174,7 +174,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
           // codeActeur: responseBody['codeActeur'],
           telephoneActeur: responseBody['telephoneActeur'],
           whatsAppActeur: responseBody['whatsAppActeur'],
-          niveau3PaysActeur: responseBody['niveau3PaysActeur'],
+          // niveau3PaysActeur: responseBody['niveau3PaysActeur'],
           dateAjout: responseBody['dateAjout'],
           localiteActeur: responseBody['localiteActeur'],
           emailActeur: emailActeur,

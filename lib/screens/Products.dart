@@ -39,7 +39,7 @@ const d_colorPage = Color.fromRGBO(255, 255, 255, 1);
 
 class _ProductsScreenState extends State<ProductsScreen> {
   
-  static const String baseUrl = '$apiOnlineUrl/Stock';
+  // static const String baseUrl = '$apiOnlineUrl/Stock';
   //  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Stock';
   
   

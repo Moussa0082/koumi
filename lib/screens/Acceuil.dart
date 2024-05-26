@@ -68,7 +68,8 @@ class _AccueilState extends State<Accueil> {
       appBar: const CustomAppBar(),
       body: ListView(
         children: [
-          SizedBox(height: 180, child: isExist ? Carrousel(): Carrousels()),
+          SizedBox(height: 180, child:  Carrousel()),
+          // SizedBox(height: 180, child: isExist ? Carrousel(): Carrousels()),
           // const SizedBox(
           //   height: 10,
           // ),
@@ -123,7 +124,7 @@ class _AccueilState extends State<Accueil> {
           onTap: () {
             if (index == 9) {
                 Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MyProductScreen()));
+                  MaterialPageRoute(builder: (context) => ProductsScreen()));
              
             } else if (index == 8) {
               Navigator.push(
