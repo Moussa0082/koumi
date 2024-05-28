@@ -19,7 +19,7 @@ class Acteur {
     String? longitude;
     String? photoSiegeActeur;
     String? logoActeur;
-    // String? niveau3PaysActeur;
+    String? niveau3PaysActeur;
     String? password;
     String? dateAjout;
     String? dateModif;
@@ -45,7 +45,7 @@ class Acteur {
          this.longitude,
          this.photoSiegeActeur,
          this.logoActeur,
-        //  this.niveau3PaysActeur,
+         this.niveau3PaysActeur,
          this.password,
          this.dateAjout,
          this.dateModif,
@@ -72,7 +72,7 @@ class Acteur {
         longitude: json["longitude"],
         photoSiegeActeur: json["photoSiegeActeur"],
         logoActeur: json["logoActeur"],
-        // niveau3PaysActeur: json["niveau3PaysActeur"],
+        niveau3PaysActeur: json["niveau3PaysActeur"],
         password: json["password"],
         dateAjout: json["dateAjout"],
         dateModif: json["dateModif"],
@@ -99,7 +99,7 @@ class Acteur {
         "longitude": longitude,
         "photoSiegeActeur": photoSiegeActeur,
         "logoActeur": logoActeur,
-        // "niveau3PaysActeur": niveau3PaysActeur,
+        "niveau3PaysActeur": niveau3PaysActeur,
         "password": password,
         "dateAjout": dateAjout,
         "dateModif": dateModif,
@@ -140,7 +140,7 @@ class Acteur {
         adresseActeur: adressActeur,
         telephoneActeur: telephoneActeur,
         whatsAppActeur: whatsAppActeur,
-        // niveau3PaysActeur: niveau3PaysActeur,
+        niveau3PaysActeur: niveau3PaysActeur,
         localiteActeur: localiteActeur);
   }
 
@@ -159,7 +159,7 @@ class Acteur {
       'longitude': longitude,
       'photoSiegeActeur': photoSiegeActeur,
       'logoActeur': logoActeur,
-      // 'niveau3PaysActeur': niveau3PaysActeur,
+      'niveau3PaysActeur': niveau3PaysActeur,
       'password': password,
       'dateAjout': dateAjout,
       'dateModif': dateModif,
@@ -187,7 +187,7 @@ class Acteur {
       longitude: map['longitude'],
       photoSiegeActeur: map['photoSiegeActeur'],
       logoActeur: map['logoActeur'],
-      // niveau3PaysActeur: map['niveau3PaysActeur'],
+      niveau3PaysActeur: map['niveau3PaysActeur'],
       password: map['password'],
       dateAjout: map['dateAjout'],
       dateModif: map['dateModif'],

@@ -31,6 +31,9 @@ class _PaysPageState extends State<PaysPage> {
   final formkey = GlobalKey<FormState>();
   TextEditingController libelleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  TextEditingController niveau1PaysController = TextEditingController();
+  TextEditingController niveau2PaysController = TextEditingController();
+  TextEditingController niveau3PaysController = TextEditingController();
   late SousRegion sousRegion;
   List<Pays> paysList = [];
   late Future<List<Pays>> _liste;
@@ -95,6 +98,7 @@ class _PaysPageState extends State<PaysPage> {
                         overflow: TextOverflow.ellipsis),
                   ),
                   onTap: () async {
+                     if(mounted)
                     _showDialog();
                   },
                 ),
@@ -740,6 +744,57 @@ class _PaysPageState extends State<PaysPage> {
                           ),
                         ),
                       ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: niveau1PaysController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Libelle niveau 1 pays",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: niveau2PaysController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Libelle niveau 2 pays",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: niveau3PaysController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Libelle niveau 3 pays",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
                       SizedBox(height: 20),
                       ElevatedButton.icon(
                         onPressed: () async {
@@ -751,6 +806,9 @@ class _PaysPageState extends State<PaysPage> {
                                   .addPays(
                                       nomPays: libelle,
                                       descriptionPays: description,
+                                      libelleNiveau1Pays: niveau1PaysController.text,
+                                      libelleNiveau2Pays: niveau2PaysController.text,
+                                      libelleNiveau3Pays: niveau3PaysController.text,
                                       sousRegion: sousRegion)
                                   .then((value) => {
                                         Provider.of<PaysService>(context,
@@ -771,6 +829,9 @@ class _PaysPageState extends State<PaysPage> {
                                         ),
                                         libelleController.clear(),
                                         descriptionController.clear(),
+                                        niveau1PaysController.clear(),
+                                        niveau2PaysController.clear(),
+                                        niveau3PaysController.clear(),
                                         setState(() {
                                           sousRegion == null;
                                         }),

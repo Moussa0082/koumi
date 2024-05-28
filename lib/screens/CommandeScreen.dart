@@ -269,12 +269,29 @@ class _CommandeScreenState extends State<CommandeScreen> {
                   }
 
                   if (!snapshot.hasData) {
-                    return Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Center(
-                          child:
-                              Text("Aucune commande trouvé")),
-                    );
+                    return SingleChildScrollView(
+                            child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Center(
+                                child: Column(
+                                  children: [
+                                    Image.asset('assets/images/notif.jpg'),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      'Aucune commande trouvé',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 17,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
                   } else {
                     commandeList = snapshot.data!;
                     String searchText = "";

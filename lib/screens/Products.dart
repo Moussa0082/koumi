@@ -684,7 +684,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                     
                           return 
                           stockListe
-                          // .where((element) => element.statutSotck == true )
+                          // .where((element) => element.statutSotck == true && element.acteur!.statutActeur! == true)
                           .isEmpty
                               ? 
                               SingleChildScrollView(

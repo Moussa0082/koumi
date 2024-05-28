@@ -23,6 +23,9 @@ class _UpdatesPaysState extends State<UpdatesPays> {
   final formkey = GlobalKey<FormState>();
   TextEditingController libelleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+    TextEditingController niveau1PaysController = TextEditingController();
+  TextEditingController niveau2PaysController = TextEditingController();
+  TextEditingController niveau3PaysController = TextEditingController();
   late SousRegion sousRegion;
   String? sousValue;
   late Future _sousRegionList;
@@ -38,6 +41,9 @@ class _UpdatesPaysState extends State<UpdatesPays> {
     sousValue = payss.sousRegion.idSousRegion;
     libelleController.text = payss.nomPays;
     descriptionController.text = payss.descriptionPays;
+    niveau1PaysController.text = payss.libelleNiveau1Pays!;
+    niveau2PaysController.text = payss.libelleNiveau2Pays!;
+    niveau3PaysController.text = payss.libelleNiveau3Pays!;
     sousRegion = payss.sousRegion;
   }
 
@@ -140,14 +146,21 @@ class _UpdatesPaysState extends State<UpdatesPays> {
                           value: sousValue,
                           onChanged: (newValue) {
                             setState(() {
-                              sousValue = newValue;
-                              if (newValue != null) {
-                                sousRegion = sousList.firstWhere((element) =>
-                                    element.idSousRegion == newValue);
-                                debugPrint(
-                                    "con select ${sousRegion.idSousRegion.toString()}");
-                                // typeSelected = true;
-                              }
+                              // sousValue = newValue;
+                              // if (newValue != null) {
+                              //   sousRegion = sousList.firstWhere((element) =>
+                              //       element.idSousRegion == newValue);
+                              //   debugPrint(
+                              //       "con select ${sousRegion.idSousRegion.toString()}");
+                              //   // typeSelected = true;
+                              // }
+                               sousValue = newValue;
+                                    if (newValue != null){
+                                            sousRegion = sousList.firstWhere(
+                             (sousRegion) => sousRegion.idSousRegion == newValue,
+                                );
+                                      print("niveau 1 : ${sousRegion}");
+                                    }
                             });
                           },
                           decoration: InputDecoration(
@@ -181,6 +194,57 @@ class _UpdatesPaysState extends State<UpdatesPays> {
                       ),
                     ),
                   ),
+                  SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: niveau1PaysController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Libelle niveau 1 pays",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: niveau2PaysController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Libelle niveau 2 pays",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: niveau3PaysController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Libelle niveau 3 pays",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
                   SizedBox(height: 20),
                   ElevatedButton.icon(
                     onPressed: () async {
@@ -193,6 +257,9 @@ class _UpdatesPaysState extends State<UpdatesPays> {
                                   idPays: payss.idPays!,
                                   nomPays: libelle,
                                   descriptionPays: description,
+                                  libelleNiveau1Pays: niveau1PaysController.text,
+                                      libelleNiveau2Pays: niveau2PaysController.text,
+                                      libelleNiveau3Pays: niveau3PaysController.text,
                                   sousRegion: sousRegion)
                               .then((value) => {
                                     Provider.of<PaysService>(context,
@@ -202,6 +269,9 @@ class _UpdatesPaysState extends State<UpdatesPays> {
                                             listen: false)
                                         .applyChange(),
                                     libelleController.clear(),
+                                    niveau1PaysController.clear(),
+                                    niveau2PaysController.clear(),
+                                    niveau3PaysController.clear(),
                                     descriptionController.clear(),
                                     setState(() {
                                       sousRegion == null;
@@ -221,6 +291,10 @@ class _UpdatesPaysState extends State<UpdatesPays> {
                             ),
                           );
                         }
+                        debugPrint("sous region $sousRegion");
+                        debugPrint("l1 ${niveau1PaysController.text}");
+                        debugPrint("l2 ${niveau2PaysController.text}");
+                        debugPrint("l3 ${niveau3PaysController.text}");
                       }
                     },
                     style: ElevatedButton.styleFrom(

@@ -17,12 +17,18 @@ class PaysService extends ChangeNotifier {
   Future<void> addPays({
     required String nomPays,
     required String descriptionPays,
+    required String libelleNiveau1Pays,
+    required String libelleNiveau2Pays,
+    required String libelleNiveau3Pays,
     required SousRegion sousRegion,
   }) async {
     var addPays = jsonEncode({
       'idPays': null,
       'nomPays': nomPays,
       'descriptionPays': descriptionPays,
+      'libelleNiveau1Pays': libelleNiveau1Pays,
+      'libelleNiveau2Pays': libelleNiveau2Pays,
+      'libelleNiveau3Pays': libelleNiveau3Pays,
       'sousRegion': sousRegion.toMap()
     });
 
@@ -40,12 +46,18 @@ class PaysService extends ChangeNotifier {
     required String idPays,
     required String nomPays,
     required String descriptionPays,
+    required String libelleNiveau1Pays,
+    required String libelleNiveau2Pays,
+    required String libelleNiveau3Pays,
     required SousRegion sousRegion,
   }) async {
     var addPays = jsonEncode({
       'idPays': idPays,
       'nomPays': nomPays,
       'descriptionPays': descriptionPays,
+      'libelleNiveau1Pays': libelleNiveau1Pays,
+      'libelleNiveau2Pays': libelleNiveau2Pays,
+      'libelleNiveau3Pays': libelleNiveau3Pays,
       'sousRegion': sousRegion.toMap()
     });
 

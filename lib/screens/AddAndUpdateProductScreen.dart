@@ -144,7 +144,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
 
   @override
   void initState() {
-    // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // typeActeurData = acteur.typeActeur!;
     // type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
@@ -164,7 +164,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
     // 'http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
     _niveau3List =
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
-        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/read'));
+        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
     verifyParam();
   }
 

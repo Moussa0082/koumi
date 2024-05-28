@@ -10,6 +10,9 @@ class Pays {
   final String? personneModif;
   final bool statutPays;
   final String? dateAjout;
+  final String? libelleNiveau1Pays;
+  final String? libelleNiveau2Pays;
+  final String? libelleNiveau3Pays;
   final String? dateModif;
   final SousRegion sousRegion;
   Pays({
@@ -20,6 +23,9 @@ class Pays {
     this.personneModif,
     required this.statutPays,
     this.dateAjout,
+    this.libelleNiveau1Pays,
+    this.libelleNiveau2Pays,
+    this.libelleNiveau3Pays,
     this.dateModif,
     required this.sousRegion,
   });
@@ -32,6 +38,9 @@ class Pays {
     String? personneModif,
     bool? statutPays,
     String? dateAjout,
+    String? libelleNiveau1Pays,
+    String? libelleNiveau2Pays,
+    String? libelleNiveau3Pays,
     String? dateModif,
     SousRegion? sousRegion,
   }) {
@@ -43,6 +52,9 @@ class Pays {
       personneModif: personneModif ?? this.personneModif,
       statutPays: statutPays ?? this.statutPays,
       dateAjout: dateAjout ?? this.dateAjout,
+      libelleNiveau1Pays: libelleNiveau1Pays ?? this.libelleNiveau1Pays,
+      libelleNiveau2Pays: libelleNiveau2Pays ?? this.libelleNiveau2Pays,
+      libelleNiveau3Pays: libelleNiveau3Pays ?? this.libelleNiveau3Pays,
       dateModif: dateModif ?? this.dateModif,
       sousRegion: sousRegion ?? this.sousRegion,
     );
@@ -57,6 +69,9 @@ class Pays {
       'personneModif': personneModif,
       'statutPays': statutPays,
       'dateAjout': dateAjout,
+      'libelleNiveau1Pays': libelleNiveau1Pays,
+      'libelleNiveau2Pays': libelleNiveau2Pays,
+      'libelleNiveau3Pays': libelleNiveau3Pays,
       'dateModif': dateModif,
       'sousRegion': sousRegion.toMap(),
     };
@@ -71,6 +86,9 @@ class Pays {
       personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       statutPays: map['statutPays'] as bool,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
+      libelleNiveau1Pays: map['libelleNiveau1Pays'] != null ? map['libelleNiveau1Pays'] as String : null,
+      libelleNiveau2Pays: map['libelleNiveau2Pays'] != null ? map['libelleNiveau2Pays'] as String : null,
+      libelleNiveau3Pays: map['libelleNiveau3Pays'] != null ? map['libelleNiveau3Pays'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
       sousRegion: SousRegion.fromMap(map['sousRegion'] as Map<String,dynamic>),
     );
@@ -80,10 +98,10 @@ class Pays {
 
   factory Pays.fromJson(String source) => Pays.fromMap(json.decode(source) as Map<String, dynamic>);
 
-  @override
-  String toString() {
-    return 'Pays(idPays: $idPays, codePays: $codePays, nomPays: $nomPays, descriptionPays: $descriptionPays, personneModif: $personneModif, statutPays: $statutPays, dateAjout: $dateAjout, dateModif: $dateModif, sousRegion: $sousRegion)';
-  }
+  // @override
+  // String toString() {
+  //   return 'Pays(idPays: $idPays, codePays: $codePays, nomPays: $nomPays, descriptionPays: $descriptionPays, personneModif: $personneModif, statutPays: $statutPays, dateAjout: $dateAjout, dateModif: $dateModif, sousRegion: $sousRegion)';
+  // }
 
   @override
   bool operator ==(covariant Pays other) {
@@ -97,6 +115,9 @@ class Pays {
       other.personneModif == personneModif &&
       other.statutPays == statutPays &&
       other.dateAjout == dateAjout &&
+      other.libelleNiveau1Pays == libelleNiveau1Pays &&
+      other.libelleNiveau2Pays == libelleNiveau2Pays &&
+      other.libelleNiveau3Pays == libelleNiveau3Pays &&
       other.dateModif == dateModif &&
       other.sousRegion == sousRegion;
   }
@@ -110,6 +131,9 @@ class Pays {
       personneModif.hashCode ^
       statutPays.hashCode ^
       dateAjout.hashCode ^
+      libelleNiveau1Pays.hashCode ^
+      libelleNiveau2Pays.hashCode ^
+      libelleNiveau3Pays.hashCode ^
       dateModif.hashCode ^
       sousRegion.hashCode;
   }

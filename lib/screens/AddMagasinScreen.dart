@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
+import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/MagasinService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
@@ -24,6 +25,7 @@ class AddMagasinScreen extends StatefulWidget {
   String? idMagasin = "";
   File? photo;
   late Niveau1Pays? niveau1Pays;
+
   AddMagasinScreen(
       {super.key,
       this.isEditable,
@@ -47,6 +49,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
 
   File? photos;
   String? imageSrc;
+  String? libelleNiveau1Pays;
 
   Niveau1Pays niveau1Pays = Niveau1Pays();
 
@@ -60,12 +63,43 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
   List<ParametreGeneraux> paraList = [];
   List<Map<String, dynamic>> regionsData = [];
   bool isLoading = false;
+  bool isLoadingLibelle = true;
 
   late Future niveau1PaysList;
   final String message = "Encore quelques secondes";
 
   Set<String> loadedRegions =
       {}; // Ensemble pour garder une trace des régions pour lesquelles les magasins ont déjà été chargés
+
+    
+  Future<String> getLibelleNiveau1PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau1Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau1Pays');
+    }
+}
+
+     Future<void> fetchLibelleNiveau1Pays() async {
+    try {
+      String libelle = await getLibelleNiveau1PaysByActor(acteur.idActeur!);
+      setState(() {
+        libelleNiveau1Pays = libelle;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+      });
+      print('Error: $e');
+    }
+  }
+
+  
+
 
 
   Future<void> updateMagasin() async {
@@ -385,8 +419,9 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // fetchNiveau1PaysList();
     niveau1PaysList =
-        http.get(Uri.parse('$apiOnlineUrl/niveau1Pays/read'));
+        http.get(Uri.parse('$apiOnlineUrl/niveau1Pays/listeNiveau1PaysByNomPays/${acteur.niveau3PaysActeur}'));
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+    fetchLibelleNiveau1Pays();
   }
 
 // hh
@@ -526,12 +561,21 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                       const SizedBox(height: 10),
 
                       //Contact magasin
+                      isLoadingLibelle ?
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text("Chargement ................",style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),)),
+                      )
+                      :
                       Padding(
                         padding: const EdgeInsets.all(8),
                         child: Align(
                             alignment: Alignment.topLeft,
                             child: Text(
-                              "Region *",
+                             libelleNiveau1Pays != null ? libelleNiveau1Pays!.toString() : "Region *",
                               style: TextStyle(
                                   fontSize: 15, fontWeight: FontWeight.bold),
                             )),

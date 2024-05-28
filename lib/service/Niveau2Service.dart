@@ -89,7 +89,7 @@ class Niveau2Service extends ChangeNotifier {
       return niveauList;
     } else {
       niveauList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête fetch n2 by pays avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }
