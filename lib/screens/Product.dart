@@ -436,7 +436,10 @@ class _ProductScreenState extends State<ProductScreen> {
                                         child: Container(
                                           height: 85,
                                           child: filtereSearch[index].photo ==
-                                                  null
+                                                      null ||
+                                                  filtereSearch[index]
+                                                      .photo!
+                                                      .isEmpty
                                               ? Image.asset(
                                                   "assets/images/default_image.png",
                                                   fit: BoxFit.cover,

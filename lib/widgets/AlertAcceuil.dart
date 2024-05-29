@@ -3,8 +3,6 @@ import 'package:koumi_app/Admin/DetailAlerte.dart';
 import 'package:koumi_app/models/Alertes.dart';
 import 'package:koumi_app/service/AlerteService.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-
 
 class AlertAcceuil extends StatefulWidget {
   const AlertAcceuil({super.key});
@@ -49,7 +47,6 @@ class _AlertAcceuilState extends State<AlertAcceuil> {
                           backgroundImage: AssetImage(
                             "assets/images/alt.png",
                           )),
-
                       title: Text("Aucun alerte",
                           style: const TextStyle(
                             color: Colors.black,
@@ -88,7 +85,6 @@ class _AlertAcceuilState extends State<AlertAcceuil> {
                           backgroundImage: AssetImage(
                             "assets/images/alt.png",
                           )),
-
                       title: Text("Aucun alerte",
                           style: const TextStyle(
                             color: Colors.black,
@@ -137,7 +133,6 @@ class _AlertAcceuilState extends State<AlertAcceuil> {
                                 backgroundImage: AssetImage(
                                   "assets/images/alt.png",
                                 )),
-
                             title: Text("Aucun alerte",
                                 style: const TextStyle(
                                   color: Colors.black,
@@ -150,7 +145,6 @@ class _AlertAcceuilState extends State<AlertAcceuil> {
                                 backgroundImage: AssetImage(
                                   "assets/images/alt.png",
                                 )),
-
                           ),
                         ),
                       ),
@@ -184,37 +178,19 @@ class _AlertAcceuilState extends State<AlertAcceuil> {
                             child: ListTile(
                               leading: alerte.photoAlerte != null &&
                                       !alerte.photoAlerte!.isEmpty
-                                  ? CachedNetworkImage(
-                                      imageUrl:
-                                          'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/image',
-                                      fit: BoxFit.cover,
-                                      placeholder: (context, url) =>
-                                          const Center(
-                                              child:
-                                                  CircularProgressIndicator()),
-                                      errorWidget: (context, url, error) =>
-                                          CircleAvatar(
-                                              radius: 40,
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                              backgroundImage:
-                                               AssetImage(
-                                                "assets/images/alt.png",
-                                              )
-                                              ),
+                                  ? CircleAvatar(
+                                      radius: 40,
+                                      backgroundColor: Colors.transparent,
+                                      backgroundImage: NetworkImage(
+                                        'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/image',
+                                      ),
                                     )
-
                                   : CircleAvatar(
-  radius: 40,
-  backgroundColor: Colors.transparent,
-  backgroundImage: AssetImage(
+                                      radius: 40,
+                                      backgroundColor: Colors.transparent,
+                                      backgroundImage: AssetImage(
                                         "assets/images/alt.png",
-                                    
-                                      )
-  
-),
-
-                                   
+                                      )),
                               title: Text(
                                   alerte != null
                                       ? alerte.titreAlerte!

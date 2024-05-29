@@ -148,17 +148,18 @@ class _DetailProduitsState extends State<DetailProduits>
                       width: double.infinity,
                       height: 200,
                     )
-                  : CachedNetworkImage(
-                      imageUrl:
-                          'https://koumi.ml/api-koumi/Stock/${widget.stock!.idStock}/image',
+                  : Image.network(
+                      'https://koumi.ml/api-koumi/Stock/${widget.stock!.idStock}/image',
                       width: double.infinity,
                       height: 200,
-                      placeholder: (context, url) =>
-                          const Center(child: CircularProgressIndicator()),
-                      errorWidget: (context, url, error) => Image.asset(
-                        'assets/images/default_image.png',
-                        fit: BoxFit.cover,
-                      ),
+                      fit: BoxFit.cover,
+                      errorBuilder: (BuildContext context, Object exception,
+                          StackTrace? stackTrace) {
+                        return Image.asset(
+                          'assets/images/default_image.png',
+                          fit: BoxFit.cover,
+                        );
+                      },
                     ),
               const SizedBox(height: defaultPadding * 0.300),
               Container(
