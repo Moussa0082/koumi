@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -10,6 +11,7 @@ import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:path/path.dart' as path;
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -48,7 +50,107 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
   late List<TypeActeur> typeActeurData = [];
   late String type;
 
+
+
   late ParametreGenerauxProvider parProvider;
+
+
+    bool isLoadingLibelle = true;
+    String? libelleNiveau1Pays;
+    String? libelleNiveau2Pays;
+    String? libelleNiveau3Pays;
+    String? monnaie;
+    String? tauxDollar;
+    String? tauxYuan;
+    
+ 
+    
+  Future<String> getLibelleNiveau1PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau1Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau1Pays');
+    }
+}
+  Future<String> getLibelleNiveau2PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau2Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau2Pays');
+    }
+}
+  Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+}
+  Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load monnaie');
+    }
+}
+
+  Future<String> getTauxDollarByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/tauxDollar/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load tauxDollar');
+    }
+}
+  Future<String> getTauxYuanByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/tauxYuan/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load tauxYUAN');
+    }
+}
+
+     Future<void> fetchPaysDataByActor() async {
+    try {
+      String libelle1 = await getLibelleNiveau1PaysByActor(acteur.idActeur!);
+      String libelle2 = await getLibelleNiveau2PaysByActor(acteur.idActeur!);
+      String libelle3 = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+      String tauxDollars = await getTauxDollarByActor(acteur.idActeur!);
+      String tauxYuans = await getTauxYuanByActor(acteur.idActeur!);
+      setState(() { 
+        libelleNiveau1Pays = libelle1;
+        libelleNiveau2Pays = libelle2;
+        libelleNiveau3Pays = libelle3;
+        tauxYuan = tauxYuans;
+        tauxDollar = tauxDollars;
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
 
   Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
@@ -133,6 +235,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
+    fetchPaysDataByActor();
   }
 
   @override
@@ -195,17 +298,17 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                         emailStructure: param.emailStructure!,
                                         telephoneStructure:
                                             param.telephoneStructure!,
-                                        monnaie: param.monnaie!,
-                                        tauxDollar: param.tauxDollar!,
-                                        tauxYuan: param.tauxYuan!,
+                                        monnaie: monnaie!,
+                                        tauxDollar: tauxDollar!,
+                                        tauxYuan: tauxYuan!,
                                         whattsAppStructure:
                                             param.whattsAppStructure!,
                                         libelleNiveau1Pays:
-                                            param.libelleNiveau1Pays!,
+                                            libelleNiveau1Pays!,
                                         libelleNiveau2Pays:
-                                            param.libelleNiveau2Pays!,
+                                            libelleNiveau2Pays!,
                                         libelleNiveau3Pays:
-                                            param.libelleNiveau3Pays!,
+                                            libelleNiveau3Pays!,
                                         localiteStructure:
                                             param.localiteStructure!)
                                     .then((value) => {
@@ -227,9 +330,9 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                         sigleSysteme: param.sigleSysteme!,
                                         nomSysteme: param.nomSysteme!,
                                         logoSysteme: photo,
-                                        monnaie: param.monnaie!,
-                                        tauxDollar: param.tauxDollar!,
-                                        tauxYuan: param.tauxYuan!,
+                                        monnaie: monnaie!,
+                                        tauxDollar: tauxDollar!,
+                                        tauxYuan: tauxYuan!,
                                         descriptionSysteme:
                                             param.descriptionSysteme!,
                                         sloganSysteme: param.sloganSysteme!,
@@ -241,11 +344,11 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                         whattsAppStructure:
                                             param.whattsAppStructure!,
                                         libelleNiveau1Pays:
-                                            param.libelleNiveau1Pays!,
+                                            libelleNiveau1Pays!,
                                         libelleNiveau2Pays:
-                                            param.libelleNiveau2Pays!,
+                                            libelleNiveau2Pays!,
                                         libelleNiveau3Pays:
-                                            param.libelleNiveau3Pays!,
+                                            libelleNiveau3Pays!,
                                         localiteStructure:
                                             param.localiteStructure!)
                                     .then((value) => {
@@ -812,10 +915,10 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                             ? Expanded(
                                                 child: TextFormField(
                                                   initialValue:
-                                                      param.libelleNiveau1Pays,
+                                                      libelleNiveau1Pays,
                                                   onChanged: (value) {
                                                     setState(() {
-                                                      param.libelleNiveau1Pays =
+                                                      libelleNiveau1Pays =
                                                           value;
                                                     });
                                                   },
@@ -823,7 +926,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                   //     libelleNiveau1PaysController
                                                 ),
                                               )
-                                            : Text(param.libelleNiveau1Pays!,
+                                            : Text(libelleNiveau1Pays != null ? libelleNiveau1Pays! : "",
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -858,16 +961,16 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                             ? Expanded(
                                                 child: TextFormField(
                                                   initialValue:
-                                                      param.libelleNiveau2Pays,
+                                                      libelleNiveau2Pays,
                                                   onChanged: (value) {
-                                                    param.libelleNiveau2Pays =
+                                                    libelleNiveau2Pays =
                                                         value;
                                                   },
                                                   // controller:
                                                   //     libelleNiveau2PaysController
                                                 ),
                                               )
-                                            : Text(param.libelleNiveau2Pays!,
+                                            : Text(libelleNiveau2Pays != null ? libelleNiveau2Pays! : "",
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -902,16 +1005,16 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                             ? Expanded(
                                                 child: TextFormField(
                                                   initialValue:
-                                                      param.libelleNiveau1Pays,
+                                                      libelleNiveau1Pays,
                                                   onChanged: (value) {
-                                                    param.libelleNiveau3Pays =
+                                                    libelleNiveau3Pays =
                                                         value;
                                                   },
                                                   // controller:
                                                   //     libelleNiveau3PaysController
                                                 ),
                                               )
-                                            : Text(param.libelleNiveau3Pays!,
+                                            : Text(libelleNiveau3Pays != null ? libelleNiveau3Pays! : "",
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -964,15 +1067,15 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                         isEditing
                                             ? Expanded(
                                                 child: TextFormField(
-                                                  initialValue: param.monnaie,
+                                                  initialValue: monnaie,
                                                   onChanged: (value) {
-                                                    param.monnaie = value;
+                                                    monnaie = value;
                                                   },
                                                   // controller:
                                                   //     nomStructureController
                                                 ),
                                               )
-                                            : Text(param.monnaie!,
+                                            : Text(monnaie != null ? monnaie! : "",
                                                 style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
@@ -1007,17 +1110,17 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                             ? Expanded(
                                                 child: TextFormField(
                                                   initialValue:
-                                                      param.tauxDollar,
+                                                      tauxDollar,
                                                   onChanged: (value) {
-                                                    param.tauxDollar = value;
+                                                    tauxDollar = value;
                                                   },
                                                   // controller:
                                                   //     sigleStructureController,
                                                 ),
                                               )
                                             : Text(
-                                                param.tauxDollar! != null
-                                                    ? param.tauxDollar!
+                                                tauxDollar != null
+                                                    ? tauxDollar!
                                                     : '',
                                                 style: const TextStyle(
                                                   color: Colors.black,
@@ -1052,17 +1155,17 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                         isEditing
                                             ? Expanded(
                                                 child: TextFormField(
-                                                  initialValue: param.tauxYuan,
+                                                  initialValue: tauxYuan,
                                                   onChanged: (value) {
-                                                    param.tauxYuan = value;
+                                                    tauxYuan = value;
                                                   },
                                                   // controller:
                                                   //     sigleStructureController,
                                                 ),
                                               )
                                             : Text(
-                                                param.tauxYuan! != null
-                                                    ? param.tauxYuan!
+                                                tauxYuan != null
+                                                    ? tauxYuan!
                                                     : '',
                                                 style: const TextStyle(
                                                   color: Colors.black,

@@ -26,6 +26,9 @@ class _UpdatesPaysState extends State<UpdatesPays> {
     TextEditingController niveau1PaysController = TextEditingController();
   TextEditingController niveau2PaysController = TextEditingController();
   TextEditingController niveau3PaysController = TextEditingController();
+    TextEditingController monnaieController = TextEditingController();
+  TextEditingController tauxDollarController = TextEditingController();
+  TextEditingController tauxYuanController = TextEditingController();
   late SousRegion sousRegion;
   String? sousValue;
   late Future _sousRegionList;
@@ -36,15 +39,31 @@ class _UpdatesPaysState extends State<UpdatesPays> {
     super.initState();
     _sousRegionList =
         http.get(Uri.parse('$apiOnlineUrl/sousRegion/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/sousRegion/read'));
     payss = widget.pays;
-    sousValue = payss.sousRegion.idSousRegion;
-    libelleController.text = payss.nomPays;
-    descriptionController.text = payss.descriptionPays;
+    sousValue = payss.sousRegion!.idSousRegion;
+    libelleController.text = payss.nomPays!;
+    descriptionController.text = payss.descriptionPays!;
     niveau1PaysController.text = payss.libelleNiveau1Pays!;
     niveau2PaysController.text = payss.libelleNiveau2Pays!;
     niveau3PaysController.text = payss.libelleNiveau3Pays!;
-    sousRegion = payss.sousRegion;
+    if (payss.monnaie != null) {
+      monnaieController.text = payss.monnaie!;
+    } else {
+      monnaieController.text = "";
+    }
+    if (payss.tauxDollar != null) {
+    tauxDollarController.text = payss.tauxDollar!;
+    } else {
+        tauxDollarController.text = "";
+
+    }
+    if (payss.tauxYuan != null) {
+    tauxYuanController.text = payss.tauxYuan!;
+    } else {
+        tauxYuanController.text = "";
+
+    }
+    sousRegion = payss.sousRegion!;
   }
 
   @override
@@ -245,6 +264,57 @@ class _UpdatesPaysState extends State<UpdatesPays> {
                           ),
                         ),
                       ),
+                       SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: monnaieController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Monnaie",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: tauxDollarController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Taux Dollar",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: tauxYuanController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Taux Yuan",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
                   SizedBox(height: 20),
                   ElevatedButton.icon(
                     onPressed: () async {
@@ -260,6 +330,9 @@ class _UpdatesPaysState extends State<UpdatesPays> {
                                   libelleNiveau1Pays: niveau1PaysController.text,
                                       libelleNiveau2Pays: niveau2PaysController.text,
                                       libelleNiveau3Pays: niveau3PaysController.text,
+                                      monnaie: monnaieController.text,
+                                      tauxDollar: tauxDollarController.text,
+                                      tauxYuan: tauxYuanController.text,
                                   sousRegion: sousRegion)
                               .then((value) => {
                                     Provider.of<PaysService>(context,

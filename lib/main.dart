@@ -44,6 +44,7 @@ import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:koumi_app/widgets/connection_verify.dart';
 import 'package:koumi_app/widgets/notification_controller.dart';
+import 'package:koumi_app/controller/dependency_injection.dart';
 import 'package:provider/provider.dart';
 
 // final navigatorKey = GlofbalKey<NavigatorState>();
@@ -130,6 +131,7 @@ void main() async {
     ChangeNotifierProvider(create: (context) => FormeService()),
     ChangeNotifierProvider(create: (context) => BottomNavigationService())
   ], child: MyApp()));
+    // DependencyInjection.init();
   // Get.put(ConnectionVerify(), permanent: true);
 }
 

@@ -3,9 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/CodePays.dart';
+import 'package:koumi_app/constants.dart';
+import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/Niveau3Service.dart';
 import 'package:provider/provider.dart';
@@ -23,10 +26,40 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _Niveau3ListeState extends State<Niveau3Liste> {
   late ParametreGeneraux para;
+   late Acteur acteur;
   List<Niveau3Pays> niveau3Liste = [];
   List<ParametreGeneraux> paraList = [];
   late TextEditingController _searchController;
   late Future<List<Niveau3Pays>> _liste;
+  bool isLoadingLibelle = true;
+    String? libelleNiveau3Pays;
+ 
+  Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+ }
+
+     Future<void> fetchPaysDataByActor() async {
+    try {
+      String libelle3 = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
+
+      setState(() { 
+        libelleNiveau3Pays = libelle3;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
 
   Future<List<Niveau3Pays>> getSousListe() async {
     return await Niveau3Service()
@@ -38,8 +71,10 @@ class _Niveau3ListeState extends State<Niveau3Liste> {
     _searchController = TextEditingController();
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     para = paraList[0];
     _liste = getSousListe();
+    fetchPaysDataByActor();
     super.initState();
   }
 
@@ -126,7 +161,7 @@ class _Niveau3ListeState extends State<Niveau3Liste> {
                             padding: EdgeInsets.all(10),
                             child: Center(
                                 child: Text(
-                                    "Aucun ${para.libelleNiveau3Pays} trouvé")),
+                                    "Aucun ${libelleNiveau3Pays} trouvé")),
                           );
                         } else {
                           niveau3Liste = snapshot.data!;
@@ -168,7 +203,7 @@ class _Niveau3ListeState extends State<Niveau3Liste> {
                                                       .niveau2Pays!
                                                       .niveau1Pays
                                                       .pays!
-                                                      .nomPays),
+                                                      .nomPays!),
                                                   title: Text(
                                                       e.nomN3.toUpperCase(),
                                                       style: const TextStyle(

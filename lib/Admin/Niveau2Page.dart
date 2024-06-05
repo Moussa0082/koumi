@@ -6,11 +6,13 @@ import 'package:koumi_app/Admin/CodePays.dart';
 import 'package:koumi_app/Admin/UpdatesNiveau2.dart';
 import 'package:koumi_app/Admin/niveau3Liste.dart';
 import 'package:koumi_app/constants.dart';
+import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Pays.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/Niveau1Service.dart';
 import 'package:koumi_app/service/Niveau2Service.dart';
@@ -30,6 +32,7 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _Niveau2PageState extends State<Niveau2Page> {
   late ParametreGeneraux para; 
+   late Acteur acteur;
   List<Niveau2Pays> niveauList = [];
   List<Niveau3Pays> niveau3List = [];
   final formkey = GlobalKey<FormState>();
@@ -50,18 +53,50 @@ class _Niveau2PageState extends State<Niveau2Page> {
     return response;
   }
 
+  bool isLoadingLibelle = true;
+    String? libelleNiveau2Pays;
+ 
+  Future<String> getLibelleNiveau2PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau2Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau2Pays');
+    }
+ }
+
+     Future<void> fetchPaysDataByActor() async {
+    try {
+      String libelle2 = await getLibelleNiveau2PaysByActor(acteur.idActeur!);
+
+      setState(() { 
+        libelleNiveau2Pays = libelle2;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
+
+
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController();
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
+              acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     para = paraList[0];
+            acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _paysList = http.get(Uri.parse('$apiOnlineUrl/pays/read'));
-    // _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
     _niveauList =
         http.get(Uri.parse('$apiOnlineUrl/niveau1Pays/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
+        fetchPaysDataByActor();
   }
 
   @override
@@ -84,7 +119,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
             },
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: Text(
-          "Niveau 2 : ${para.libelleNiveau2Pays}",
+          "Niveau 2 : ${libelleNiveau2Pays}",
           style:
               const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
@@ -99,7 +134,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
                     color: Colors.green,
                   ),
                   title: Text(
-                    "Ajouter un ${para.libelleNiveau2Pays}",
+                    "Ajouter un ${libelleNiveau2Pays}",
                     style: TextStyle(
                         color: Colors.green,
                         fontWeight: FontWeight.bold,
@@ -169,7 +204,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
                       padding: EdgeInsets.all(10),
                       child: Center(
                           child:
-                              Text("Aucun ${para.libelleNiveau2Pays} trouvé")),
+                              Text("Aucun ${libelleNiveau2Pays} trouvé")),
                     );
                   } else {
                     niveauList = snapshot.data!;
@@ -213,7 +248,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                         children: [
                                           ListTile(
                                             leading: CodePays().getFlag(
-                                                e.niveau1Pays.pays!.nomPays),
+                                                e.niveau1Pays.pays!.nomPays!),
                                             title: Text(e.nomN2.toUpperCase(),
                                                 style: const TextStyle(
                                                   color: Colors.black,
@@ -610,7 +645,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
               children: [
                 ListTile(
                   title: Text(
-                    "Ajouter un(e) ${para.libelleNiveau2Pays}",
+                    "Ajouter un(e) ${libelleNiveau2Pays}",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -644,7 +679,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
                         },
                         controller: libelleController,
                         decoration: InputDecoration(
-                          labelText: "Nom du ${para.libelleNiveau2Pays}",
+                          labelText: "Nom du ${libelleNiveau2Pays}",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -787,7 +822,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                  SnackBar(
                                   content: Row(
                                     children: [
-                                      Text("${para.libelleNiveau2Pays} ajouté avec success"),
+                                      Text("${libelleNiveau2Pays} ajouté avec success"),
                                     ],
                                   ),
                                   duration: Duration(seconds: 5),
@@ -807,7 +842,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                   content: Row(
                                     children: [
                                       Text(
-                                          "${para.libelleNiveau2Pays} existe déjà"),
+                                          "${libelleNiveau2Pays} existe déjà"),
                                     ],
                                   ),
                                   duration: Duration(seconds: 5),

@@ -7,6 +7,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
@@ -74,6 +75,36 @@ class _DetailTransportState extends State<DetailTransport> {
 
   bool isExist = false;
   String? email = "";
+   bool isLoadingLibelle = true;
+   String? monnaie;
+
+
+   Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load monnaie');
+    }
+}
+
+ Future<void> fetchPaysDataByActor() async {
+    try {
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+      setState(() { 
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -140,6 +171,7 @@ class _DetailTransportState extends State<DetailTransport> {
     //     .parametreList!;
     // para = paraList[0];
     verifyParam();
+    fetchPaysDataByActor();
     _niveau3List =
         http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
 
@@ -882,7 +914,7 @@ class _DetailTransportState extends State<DetailTransport> {
                   fontSize: 18),
             ),
             Padding(
-                      padding: EdgeInsets.symmetric(vertical: defaultPadding),
+                     padding: EdgeInsets.all(8),
                       child: ReadMoreText(
                         colorClickableText: Colors.orange,
                         trimLines: 2,
@@ -973,7 +1005,7 @@ class _DetailTransportState extends State<DetailTransport> {
                     int prix =
                         vehicules.prixParDestination.values.elementAt(index);
                     return _buildItem(
-                        destination, "${prix.toString()} ${para.monnaie}");
+                        destination, "${prix.toString()} ${monnaie}");
                   }),
                 ),
               ),

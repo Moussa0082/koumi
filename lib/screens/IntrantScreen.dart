@@ -54,6 +54,37 @@ class _IntrantScreenState extends State<IntrantScreen> {
     late Future<List<Intrant>> intrantListeFuture;
     late Future<List<Intrant>> intrantListeFuture1;
 
+    bool isLoadingLibelle = true;
+    String? monnaie;
+
+
+   Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load monnaie');
+    }
+}
+
+ Future<void> fetchPaysDataByActor() async {
+    try {
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+      setState(() { 
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
+
 
 
   void _scrollListener() {
@@ -668,9 +699,9 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 15),
                                           child: Text(
-                                            para.monnaie != null
-                                                ? "${intrantListe[index].prixIntrant.toString()} ${para.monnaie}"
-                                                : "${intrantListe[index].prixIntrant.toString()} FCFA",
+                                            monnaie != null
+                                                ? "${intrantListe[index].prixIntrant.toString()} ${monnaie}"
+                                                : "${intrantListe[index].prixIntrant.toString()} '' ",
                                             style: TextStyle(
                                               fontSize: 15,
                                               color: Colors.black87,

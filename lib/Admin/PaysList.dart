@@ -131,7 +131,7 @@ class _PaysListState extends State<PaysList> {
                         paysList = snapshot.data!;
                         String searchText = "";
                         List<Pays> filteredPaysSearch = paysList.where((pays) {
-                          String nomPays = pays.nomPays.toLowerCase();
+                          String nomPays = pays.nomPays!.toLowerCase();
                           searchText = _searchController.text.toLowerCase();
                           return nomPays.contains(searchText);
                         }).toList();
@@ -162,9 +162,9 @@ class _PaysListState extends State<PaysList> {
                                           children: [
                                             ListTile(
                                                 leading: CodePays()
-                                                    .getFlag(e.nomPays),
+                                                    .getFlag(e.nomPays!),
                                                 title: Text(
-                                                    e.nomPays.toUpperCase(),
+                                                    e.nomPays!.toUpperCase(),
                                                     style: const TextStyle(
                                                       color: Colors.black,
                                                       fontSize: 20,
@@ -172,7 +172,7 @@ class _PaysListState extends State<PaysList> {
                                                           TextOverflow.ellipsis,
                                                     )),
                                                 subtitle: Text(
-                                                    e.descriptionPays.trim(),
+                                                    e.descriptionPays!.trim(),
                                                     style: const TextStyle(
                                                       color: Colors.black87,
                                                       fontSize: 17,
@@ -192,7 +192,7 @@ class _PaysListState extends State<PaysList> {
                                                     MainAxisAlignment
                                                         .spaceBetween,
                                                 children: [
-                                                  _buildEtat(e.statutPays),
+                                                  _buildEtat(e.statutPays!),
                                                   PopupMenuButton<String>(
                                                     padding: EdgeInsets.zero,
                                                     itemBuilder: (context) =>

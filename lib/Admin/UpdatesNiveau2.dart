@@ -154,7 +154,7 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                               .map(
                                 (e) => DropdownMenuItem(
                                   value: e.idPays,
-                                  child: Text(e.nomPays),
+                                  child: Text(e.nomPays!),
                                 ),
                               )
                               .toList(),

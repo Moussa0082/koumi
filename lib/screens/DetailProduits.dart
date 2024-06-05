@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Stock.dart';
@@ -11,6 +12,7 @@ import 'package:koumi_app/providers/CartProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/service/StockService.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
@@ -47,6 +49,37 @@ class _DetailProduitsState extends State<DetailProduits>
   List<ParametreGeneraux> paraList = [];
   late ParametreGeneraux para = ParametreGeneraux();
 
+  bool isLoadingLibelle = true;
+   String? monnaie;
+
+
+   Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load monnaie');
+    }
+}
+
+ Future<void> fetchPaysDataByActor() async {
+    try {
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+      setState(() { 
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
+
  void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     email = prefs.getString('emailActeur');
@@ -65,27 +98,28 @@ class _DetailProduitsState extends State<DetailProduits>
     }
   }
 
-  void verifyParam() {
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+  // void verifyParam() {
+  //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+  //       .parametreList!;
 
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
-    } else {
-      // Gérer le cas où la liste est null ou vide, par exemple :
-      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
-    }
-  }
+  //   if (paraList.isNotEmpty) {
+  //     para = paraList[0];
+  //   } else {
+  //     // Gérer le cas où la liste est null ou vide, par exemple :
+  //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+  //   }
+  // }
 
   @override
   void initState() {
     super.initState();
     verify();
-    verifyParam();
+    // verifyParam();
     stock = widget.stock;
     setState(() {
       stock = widget.stock;
     });
+    fetchPaysDataByActor();
     // Initialiser le ValueNotifier
     isDialOpenNotifier = ValueNotifier<bool>(false);
   }
@@ -357,7 +391,7 @@ class _DetailProduitsState extends State<DetailProduits>
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(vertical: defaultPadding),
+                      padding: EdgeInsets.all(8),
                       child: ReadMoreText(
                         colorClickableText: Colors.orange,
                         trimLines: 2,
@@ -394,7 +428,7 @@ class _DetailProduitsState extends State<DetailProduits>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '${widget.stock.prix!.toInt()} (${para.monnaie})', // Convertir en entier
+                            '${widget.stock.prix!.toInt()} (${monnaie})', // Convertir en entier
                             style: const TextStyle(
                               overflow: TextOverflow.ellipsis,
                                 fontSize: 20, fontWeight: FontWeight.bold),

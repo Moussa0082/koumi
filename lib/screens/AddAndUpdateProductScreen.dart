@@ -60,6 +60,69 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
   String forme = '';
   List<ParametreGeneraux> paraList = [];
   late ParametreGeneraux para = ParametreGeneraux();
+    bool isLoadingLibelle = true;
+    String? libelleNiveau3Pays;
+
+    String? monnaie;
+
+
+   Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+    if (response.statusCode == 200) {
+      print("monnaie : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load monnaie');
+    }
+}
+
+ Future<void> fetchPaysDataByActor() async {
+    try {
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+      setState(() { 
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
+
+
+
+ 
+    
+  Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+}
+
+     Future<void> fetchLibelleNiveau3Pays() async {
+    try {
+      String libelle = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
+      setState(() {
+        libelleNiveau3Pays = libelle;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+      });
+      print('Error: $e');
+    }
+  }
+
 
   Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
@@ -161,11 +224,11 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
     }
     _formeList = http
         .get(Uri.parse('$apiOnlineUrl/formeproduit/getAllForme/'));
-    // 'http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
     _niveau3List =
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
         http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
     verifyParam();
+    fetchLibelleNiveau3Pays();
+    fetchPaysDataByActor();
   }
 
   @override
@@ -416,6 +479,15 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                       SizedBox(
                         height: 10,
                       ),
+                       isLoadingLibelle ?
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text("Chargement ................",style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),)),
+                      )
+                      :
                       Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: 22,
@@ -423,7 +495,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Text(
-                            "Origine du produit",
+                           libelleNiveau3Pays != null ? libelleNiveau3Pays!.toUpperCase() : "Origine du produit",
                             style:
                                 TextStyle(color: (Colors.black), fontSize: 18),
                           ),
@@ -553,7 +625,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Text(
-                            "Prix du produit en (${para.monnaie})",
+                            "Prix du produit en (${monnaie})",
                             style:
                                 TextStyle(color: (Colors.black), fontSize: 18),
                           ),
@@ -575,7 +647,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                             FilteringTextInputFormatter.digitsOnly,
                           ],
                           decoration: InputDecoration(
-                            hintText: "Prix du produit en (${para.monnaie})",
+                            hintText: "Prix du produit en (${monnaie})",
                             contentPadding: const EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 20),
                             border: OutlineInputBorder(

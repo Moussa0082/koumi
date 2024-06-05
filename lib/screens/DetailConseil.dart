@@ -260,7 +260,7 @@ class _DetailConseilState extends State<DetailConseil> {
           ),
         ),
       Padding(
-                      padding: EdgeInsets.symmetric(vertical: defaultPadding),
+                     padding: EdgeInsets.all(8),
                       child: ReadMoreText(
                         colorClickableText: Colors.orange,
                         trimLines: 2,

@@ -34,6 +34,9 @@ class _PaysPageState extends State<PaysPage> {
   TextEditingController niveau1PaysController = TextEditingController();
   TextEditingController niveau2PaysController = TextEditingController();
   TextEditingController niveau3PaysController = TextEditingController();
+  TextEditingController monnaieController = TextEditingController();
+  TextEditingController tauxDollarController = TextEditingController();
+  TextEditingController tauxYuanController = TextEditingController();
   late SousRegion sousRegion;
   List<Pays> paysList = [];
   late Future<List<Pays>> _liste;
@@ -168,7 +171,7 @@ class _PaysPageState extends State<PaysPage> {
                         paysList = snapshot.data!;
                         String searchText = "";
                         List<Pays> filteredPaysSearch = paysList.where((pays) {
-                          String nomPays = pays.nomPays.toLowerCase();
+                          String nomPays = pays.nomPays!.toLowerCase();
                           searchText = _searchController.text.toLowerCase();
                           return nomPays.contains(searchText);
                         }).toList();
@@ -207,9 +210,9 @@ class _PaysPageState extends State<PaysPage> {
                                           child: Column(
                                             children: [
                                               ListTile(
-                                                  leading: getFlag(e.nomPays),
+                                                  leading: getFlag(e.nomPays!),
                                                   title: Text(
-                                                      e.nomPays.toUpperCase(),
+                                                      e.nomPays!.toUpperCase(),
                                                       style: const TextStyle(
                                                         color: Colors.black,
                                                         fontSize: 20,
@@ -217,7 +220,7 @@ class _PaysPageState extends State<PaysPage> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      e.descriptionPays.trim(),
+                                                      e.descriptionPays!.trim(),
                                                       style: const TextStyle(
                                                         color: Colors.black87,
                                                         fontSize: 17,
@@ -335,7 +338,7 @@ class _PaysPageState extends State<PaysPage> {
                                                       MainAxisAlignment
                                                           .spaceBetween,
                                                   children: [
-                                                    _buildEtat(e.statutPays),
+                                                    _buildEtat(e.statutPays!),
                                                     PopupMenuButton<String>(
                                                       padding: EdgeInsets.zero,
                                                       itemBuilder: (context) =>
@@ -795,6 +798,56 @@ class _PaysPageState extends State<PaysPage> {
                           ),
                         ),
                       ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: monnaieController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Monnaie",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: tauxDollarController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Taux Dollar",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: tauxYuanController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Taux Yuan",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
                       SizedBox(height: 20),
                       ElevatedButton.icon(
                         onPressed: () async {
@@ -809,6 +862,9 @@ class _PaysPageState extends State<PaysPage> {
                                       libelleNiveau1Pays: niveau1PaysController.text,
                                       libelleNiveau2Pays: niveau2PaysController.text,
                                       libelleNiveau3Pays: niveau3PaysController.text,
+                                      monnaie:monnaieController.text,
+                                      tauxDollar: tauxDollarController.text,
+                                      tauxYuan: tauxYuanController.text,
                                       sousRegion: sousRegion)
                                   .then((value) => {
                                         Provider.of<PaysService>(context,

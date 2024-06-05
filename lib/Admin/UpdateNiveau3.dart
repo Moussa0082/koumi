@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
+import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'dart:convert';
 
 import 'package:koumi_app/models/ParametreGeneraux.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/Niveau3Service.dart';
 import 'package:provider/provider.dart';
@@ -27,8 +29,41 @@ class _UpdateNiveau3State extends State<UpdateNiveau3> {
   List<ParametreGeneraux> paraList = [];
   late Niveau2Pays niveau2;
   late Future _paysList;
+  late Acteur acteur;
   String? niveau2Value;
   late Future _niveauList;
+
+
+   bool isLoadingLibelle = true;
+    String? libelleNiveau3Pays;
+ 
+  Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+ }
+
+     Future<void> fetchPaysDataByActor() async {
+    try {
+      String libelle3 = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
+
+      setState(() { 
+        libelleNiveau3Pays = libelle3;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
+
 
   @override
   void initState() {
@@ -36,6 +71,8 @@ class _UpdateNiveau3State extends State<UpdateNiveau3> {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
     para = paraList[0];
+     fetchPaysDataByActor();
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _niveauList =
         http.get(Uri.parse('$apiOnlineUrl/niveau2Pays/read'));
         // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau2Pays/read'));
@@ -57,7 +94,6 @@ class _UpdateNiveau3State extends State<UpdateNiveau3> {
             ListTile(
               title: Text(
                 "Modification",
-                
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -92,7 +128,7 @@ class _UpdateNiveau3State extends State<UpdateNiveau3> {
                     },
                     controller: libelleController,
                     decoration: InputDecoration(
-                      labelText: "Nom du ${para.libelleNiveau3Pays}",
+                      labelText: "Nom du ${libelleNiveau3Pays}",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),

@@ -265,7 +265,7 @@ class _DetailAlerteState extends State<DetailAlerte> {
           ),
         ),
          Padding(
-                      padding: EdgeInsets.symmetric(vertical: defaultPadding),
+                      padding: EdgeInsets.all(8),
                       child: ReadMoreText(
                         colorClickableText: Colors.orange,
                         trimLines: 2,

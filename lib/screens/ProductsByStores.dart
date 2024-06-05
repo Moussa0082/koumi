@@ -61,6 +61,37 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
    int size = 4;
   bool hasMore = true;
 
+      bool isLoadingLibelle = true;
+    String? monnaie;
+
+
+   Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load monnaie');
+    }
+}
+
+ Future<void> fetchPaysDataByActor() async {
+    try {
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+      setState(() { 
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
+
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -286,8 +317,7 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
     // updateStockList();
       
     stockListeFuture = stockListeFuture1 = getAllStock();
-    // stockListeFutureNew = getAll();
-    //  getAllStocks();
+    fetchPaysDataByActor();
   }
 
   @override
@@ -803,9 +833,9 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                                                 padding: const EdgeInsets.symmetric(
                                                     horizontal: 15),
                                                 child: Text(
-                                                  para.monnaie != null
-                                                      ? "${stockListe[index].prix.toString()} ${para.monnaie}"
-                                                      : "${stockListe[index].prix.toString()} FCFA",
+                                                  monnaie != null
+                                                      ? "${stockListe[index].prix.toString()} ${monnaie}"
+                                                      : "${stockListe[index].prix.toString()} ",
                                                   style: TextStyle(
                                                     fontSize: 15,
                                                     color: Colors.black87,
@@ -1057,8 +1087,8 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                                                 padding: const EdgeInsets.symmetric(
                                                     horizontal: 15),
                                                 child: Text(
-                                                  para.monnaie != null
-                                                      ? "${stockListe[index].prix.toString()} ${para.monnaie}"
+                                                  monnaie != null
+                                                      ? "${stockListe[index].prix.toString()} ${monnaie}"
                                                       : "${stockListe[index].prix.toString()} FCFA",
                                                   style: TextStyle(
                                                     fontSize: 15,

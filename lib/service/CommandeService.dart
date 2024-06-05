@@ -21,11 +21,12 @@ import 'package:koumi_app/models/Stock.dart';
     try {
     final response = await http.get(Uri.parse('$baseUrl/getAllCommandeByActeur/${idActeur}'));
     if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+      print("succes commande fetch by acteur qui a commandé");
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
        commandeList = body
           .map((e) => Commande.fromMap(e))
           .toList();
-      debugPrint("res:  ${response.body}");
+      // debugPrint("res:  ${response.body}");
       return commandeList; // Renvoyer la liste de commandes
     } else {
       debugPrint("erreur lors de la recuperation des  commande pour l'\ acteur $idActeur");
@@ -46,6 +47,7 @@ import 'package:koumi_app/models/Stock.dart';
           '$baseUrl/getAllCommandeByActeurProprietaire/${acteurProprietaire}'));
       if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
 
+     print("succes commande fetch by proprietaire");
                List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
         commandeList = body
         // .where((commande) => commande['statutCommande'] == true)

@@ -61,6 +61,11 @@ class _DetailMaterielState extends State<DetailMateriel> {
   bool isExist = false;
   String? email = "";
 
+  
+    bool isLoadingLibelle = true;
+    String? monnaie;
+
+
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     email = prefs.getString('emailActeur');
@@ -79,15 +84,31 @@ class _DetailMaterielState extends State<DetailMateriel> {
     }
   }
 
-  void verifyParam() {
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+     Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
 
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
     } else {
-      // Gérer le cas où la liste est null ou vide, par exemple :
-      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+      throw Exception('Failed to load monnaie');
+    }
+}
+
+Future<void> fetchPaysDataByActor() async {
+    try {
+     
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+      setState(() { 
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
     }
   }
 
@@ -254,10 +275,9 @@ class _DetailMaterielState extends State<DetailMateriel> {
   void initState() {
     super.initState();
     verify();
-    verifyParam();
+
     _niveau3List =
         http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/read'));
-    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
     materiels = widget.materiel;
     _nomController.text = materiels.nom;
     _descriptionController.text = materiels.description;
@@ -265,6 +285,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
     _localiteController.text = materiels.localisation;
     _prixController.text = materiels.prixParHeure.toString();
     isDialOpenNotifier = ValueNotifier<bool>(false);
+    fetchPaysDataByActor();
   }
 
   @override
@@ -426,7 +447,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
         // !isExist ? _buildItem('Prix par heure : ',
         //     "${materiels.prixParHeure.toString()} ${para.monnaie}"):
         _buildItem('Prix par heure : ',
-            "${materiels.prixParHeure.toString()} ${para.monnaie}"),
+            "${materiels.prixParHeure.toString()} ${monnaie}"),
         _buildItem('Date d\'ajout : ', materiels.dateAjout!),
         _buildDescription('Description : ', materiels.description)
       ],
@@ -521,7 +542,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
                   fontSize: 18),
             ),
              Padding(
-                      padding: EdgeInsets.symmetric(vertical: defaultPadding),
+                      padding: EdgeInsets.all(8),
                       child: ReadMoreText(
                         colorClickableText: Colors.orange,
                         trimLines: 2,

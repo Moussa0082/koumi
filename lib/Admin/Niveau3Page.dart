@@ -5,10 +5,12 @@ import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/CodePays.dart';
 import 'package:koumi_app/Admin/UpdateNiveau3.dart';
 import 'package:koumi_app/constants.dart';
+import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/Niveau2Service.dart';
 import 'package:koumi_app/service/Niveau3Service.dart';
@@ -227,7 +229,7 @@ class _Niveau3PageState extends State<Niveau3Page> {
                                                     .niveau2Pays!
                                                     .niveau1Pays
                                                     .pays!
-                                                    .nomPays),
+                                                    .nomPays!),
                                                 title:
                                                     Text(e.nomN3.toUpperCase(),
                                                         style: const TextStyle(
@@ -854,34 +856,60 @@ class _AddDialogState extends State<AddDialog> {
   late Niveau2Pays niveau2;
   String? niveau2Value;
   late Future _niveau2List;
-
+ late Acteur acteur;
   String? niveau1Value;
   late Future _niveau1List;
   late Niveau1Pays niveau1Pays = Niveau1Pays();
 
-  void verifyParam() {
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+  // void verifyParam() {
+  //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+  //       .parametreList!;
 
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
+  //   if (paraList.isNotEmpty) {
+  //     para = paraList[0];
+  //   } else {
+  //     // Gérer le cas où la liste est null ou vide, par exemple :
+  //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+  //   }
+  // }
+  bool isLoadingLibelle = true;
+    String? libelleNiveau3Pays;
+ 
+  Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
     } else {
-      // Gérer le cas où la liste est null ou vide, par exemple :
-      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+ }
+
+     Future<void> fetchPaysDataByActor() async {
+    try {
+      String libelle3 = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
+
+      setState(() { 
+        libelleNiveau3Pays = libelle3;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
     }
   }
 
   @override
   void initState() {
-    verifyParam();
     _niveau1List =
         http.get(Uri.parse('$apiOnlineUrl/niveau1Pays/read'));
-
-    // _niveau2List == null;
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _niveau2List = http.get(Uri.parse(
         '$apiOnlineUrl/niveau2Pays/listeNiveau2PaysByIdNiveau1Pays/${niveau1Pays.idNiveau1Pays}'));
-
-    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau2Pays/read'));
+      fetchPaysDataByActor();
     super.initState();
   }
 
@@ -903,7 +931,7 @@ class _AddDialogState extends State<AddDialog> {
           children: [
             ListTile(
               title: Text(
-                "Ajouter un(e) ${para.libelleNiveau3Pays}",
+                "Ajouter un(e) ${libelleNiveau3Pays}",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -937,7 +965,7 @@ class _AddDialogState extends State<AddDialog> {
                     },
                     controller: libelleController,
                     decoration: InputDecoration(
-                      labelText: "Nom du ${para.libelleNiveau3Pays}",
+                      labelText: "Nom du ${libelleNiveau3Pays}",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -1157,7 +1185,7 @@ class _AddDialogState extends State<AddDialog> {
                                         content: Row(
                                           children: [
                                             Text(
-                                                "${para.libelleNiveau3Pays} ajouté avec success"),
+                                                "${libelleNiveau3Pays} ajouté avec success"),
                                           ],
                                         ),
                                         duration: Duration(seconds: 5),
@@ -1178,7 +1206,7 @@ class _AddDialogState extends State<AddDialog> {
                               content: Row(
                                 children: [
                                   Text(
-                                      "Cette ${para.libelleNiveau3Pays} existe déjà"),
+                                      "Cette ${libelleNiveau3Pays} existe déjà"),
                                 ],
                               ),
                               duration: Duration(seconds: 5),

@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/Admin/DetailAlerte.dart';
 import 'package:koumi_app/constants.dart';
 import 'dart:convert';
 import 'dart:async';
@@ -12,9 +14,9 @@ import 'package:koumi_app/widgets/carousel_loading.dart';
 import 'package:shimmer/shimmer.dart';
 
 
-List imageList = [
-  {"id": 1, "image_path": 'assets/images/koumi1.png'},
-  {"id": 2, "image_path": 'assets/images/koumi2.jpg'},
+ List<Map<String, String>> imageList = [
+  {"image_path": 'assets/images/koumi1.png'},
+  { "image_path": 'assets/images/koumi2.jpg'},
 ];
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
@@ -47,7 +49,7 @@ class Carrousels extends StatelessWidget {
                 child: CarouselSlider(
                   items: imageList
                       .map((item) => Image.asset(
-                            item['image_path'],
+                            item['image_path']!,
                             fit: BoxFit.cover,
                             width: double.infinity,
                           ))
@@ -106,6 +108,7 @@ class _CarrouselState extends State<Carrousel> {
   final CarouselController carouselController = CarouselController();
   int currentIndex = 0;
   List<Alertes> alertesList = [];
+   
   bool isLoading = true;
 
   @override
@@ -131,7 +134,7 @@ int page = 0;
       if (contentType.contains('application/json')) {
         String jsonString = utf8.decode(response.bodyBytes);
         Map<String, dynamic> body = jsonDecode(jsonString);
-        List<dynamic> alertes = body['content'];
+        List<dynamic>  alertes = body['content'];
         return alertes.map((e) => Alertes.fromMap(e)).toList();
       } else {
         print('La réponse n\'est pas au format JSON : $contentType');
@@ -147,54 +150,75 @@ int page = 0;
   return [];
 }
 
-  List<Widget> getImageSliders() {
-    return alertesList.isEmpty
-        ? imageList.map((item) => buildImageSlider(item['image_path'], '')).toList()
-        : alertesList.map((alert) => buildImageSlider
-        ("https://koumi.ml/api-koumi/alertes/${alert.idAlerte}/image",
-         alert.titreAlerte!)).toList();
-  }
+ 
 
-  Widget buildImageSlider(String imagePath, String text) {
-    return Stack(
-      children: [
-        // Image.asset(
-        //                                               'assets/images/default_image.png',
-        //                                               fit: BoxFit.cover,
-        //                                             ),
-        Container(
-        decoration: BoxDecoration(
-          // border: Border.all(color: Colors.white, width: 4.0), // Bordure noire de 4.0 de largeur
-          borderRadius: BorderRadius.circular(12.0), // Bordure arrondie
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20.0), // Bordure arrondie pour les coins des images
-          child: CachedNetworkImage(
-            imageUrl: imagePath,
-            placeholder: (context, url) =>
-                const Center(child: CircularProgressIndicator()),
-            errorWidget: (context, url, error) => Image.asset(
-              'assets/images/default_image.png',
+
+List<Widget> getImageSliders(List<Alertes> alertesList, List<Map<String, String>> imageList) {
+  if (alertesList.isEmpty) {
+    return imageList.asMap().entries.map((entry) => buildImageSlider(
+      entry.value['image_path'] ?? 'assets/images/default_image.png',
+      '',
+      entry.key,
+      []
+    )).toList();
+  } else {
+    return alertesList.asMap().entries.map((entry) => buildImageSlider(
+      "https://koumi.ml/api-koumi/alertes/${entry.value.idAlerte}/image",
+      entry.value.titreAlerte ?? '',
+      entry.key,
+      alertesList
+    )).toList();
+  }
+}
+
+  Widget buildImageSlider(String imagePath, String text, int index, List<Alertes> alertesList) {
+  return GestureDetector(
+    onTap: () {
+      Get.to(
+        () => DetailAlerte(alertes: alertesList[index]),
+        transition: Transition.leftToRightWithFade,duration: Duration(seconds: 2)
+      );
+    },
+      child: Stack(
+        children: [
+          // Image.asset(
+          //                                               'assets/images/default_image.png',
+          //                                               fit: BoxFit.cover,
+          //                                             ),
+          Container(
+          decoration: BoxDecoration(
+            // border: Border.all(color: Colors.white, width: 4.0), // Bordure noire de 4.0 de largeur
+            borderRadius: BorderRadius.circular(12.0), // Bordure arrondie
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20.0), // Bordure arrondie pour les coins des images
+            child: CachedNetworkImage(
+              imageUrl: imagePath,
+              placeholder: (context, url) =>
+                  const Center(child: CircularProgressIndicator()),
+              errorWidget: (context, url, error) => Image.asset(
+                'assets/images/default_image.png',
+                fit: BoxFit.cover,
+              ),
               fit: BoxFit.cover,
+              width: double.infinity,
             ),
-            fit: BoxFit.cover,
-            width: double.infinity,
           ),
         ),
+          Positioned(
+            bottom: 20,
+            left: 20,
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              color: Colors.black54,
+              child: Text(
+                text,
+                style: const TextStyle(color: Colors.white, fontSize: 17, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ],
       ),
-        Positioned(
-          bottom: 20,
-          left: 20,
-          child: Container(
-            padding: const EdgeInsets.all(8.0),
-            color: Colors.black54,
-            child: Text(
-              text,
-              style: const TextStyle(color: Colors.white, fontSize: 17, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -214,7 +238,7 @@ int page = 0;
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                     ),
                     child: CarouselSlider(
-                      items: getImageSliders(),
+                      items: getImageSliders(alertesList, imageList),
                       carouselController: carouselController,
                       options: CarouselOptions(
                         scrollPhysics: const BouncingScrollPhysics(),

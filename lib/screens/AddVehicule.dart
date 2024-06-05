@@ -43,12 +43,42 @@ class _AddVehiculeState extends State<AddVehicule> {
   bool _isLoading = false;
   final formkey = GlobalKey<FormState>();
 
+       bool isLoadingLibelle = true;
+    String? libelleNiveau3Pays;
+
   void _handleButtonPress() async {
     // Afficher l'indicateur de chargement
     setState(() {
       _isLoading = true;
     });
   }
+
+   Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+}
+
+     Future<void> fetchLibelleNiveau3Pays() async {
+    try {
+      String libelle = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
+      setState(() {
+        libelleNiveau3Pays = libelle;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+      });
+      print('Error: $e');
+    }
+  }
+
 
   @override
   void initState() {
@@ -57,12 +87,11 @@ class _AddVehiculeState extends State<AddVehicule> {
 
     _typeList =
         http.get(Uri.parse('$apiOnlineUrl/TypeVoiture/read'));
-    _niveau3List =
-        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/read'));
+     _niveau3List =
+        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
     // _typeList =
     //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
-    // _niveau3List =
-    //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+      fetchLibelleNiveau3Pays();
   }
 
   @override
@@ -344,6 +373,15 @@ class _AddVehiculeState extends State<AddVehicule> {
                       SizedBox(
                         height: 10,
                       ),
+                      isLoadingLibelle ?
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text("Chargement ................",style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),)),
+                      )
+                      :
                       Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: 22,
@@ -351,7 +389,7 @@ class _AddVehiculeState extends State<AddVehicule> {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Text(
-                            "Localité",
+                           libelleNiveau3Pays != null ? libelleNiveau3Pays!.toUpperCase() : "Localité",
                             style:
                                 TextStyle(color: (Colors.black), fontSize: 18),
                           ),

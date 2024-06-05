@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
@@ -17,6 +18,7 @@ import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:path/path.dart' as path;
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
@@ -54,6 +56,36 @@ class _DetailIntrantState extends State<DetailIntrant> {
   late Intrant intrants;
   bool isExist = false;
   String? email = "";
+   bool isLoadingLibelle = true;
+   String? monnaie;
+
+
+   Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load monnaie');
+    }
+}
+
+ Future<void> fetchPaysDataByActor() async {
+    try {
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+      setState(() { 
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -92,6 +124,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
     // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
     //     .parametreList!;
     // para = paraList[0];
+    fetchPaysDataByActor();
     verifyParam();
     intrants = widget.intrant;
     _nomController.text = intrants.nomIntrant!;
@@ -546,7 +579,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
         ),
         // _buildDescription(intrants.descriptionIntrant!),
         Padding(
-                      padding: EdgeInsets.symmetric(vertical: defaultPadding),
+                     padding: EdgeInsets.all(8),
                       child: ReadMoreText(
                         colorClickableText: Colors.orange,
                         trimLines: 2,
@@ -647,10 +680,10 @@ class _DetailIntrantState extends State<DetailIntrant> {
         _buildItem('Nom intrant ', intrants.nomIntrant!),
         _buildItem('Quantité ', intrants.quantiteIntrant.toString()),
         _buildItem('Date péremption ', intrants.dateExpiration!),
-        para.monnaie != null
+        monnaie != null
             ? _buildItem(
-                'Prix ', '${intrants.prixIntrant.toString()} ${para.monnaie}')
-            : _buildItem('Prix ', '${intrants.prixIntrant.toString()} FCFA'),
+                'Prix ', '${intrants.prixIntrant.toString()} ${monnaie}')
+            : _buildItem('Prix ', '${intrants.prixIntrant.toString()} ${monnaie}'),
         _buildItem('Unité ', '${intrants.unite}'),
         _buildItem('Forme ', '${intrants.forme!.libelleForme}'),
         _buildItem('Statut ',

@@ -61,7 +61,36 @@ class _MyProductScreenState extends State<MyProductScreen> {
    int size = 4;
    bool hasMore = true;
 
+       bool isLoadingLibelle = true;
+    String? monnaie;
 
+
+   Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load monnaie');
+    }
+}
+
+ Future<void> fetchPaysDataByActor() async {
+    try {
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+      setState(() { 
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
    
 
     Future<List<Stock>> fetchStockByActeur(String idActeur,{bool refresh = false}) async {
@@ -248,7 +277,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
   scrollableController.addListener(_scrollListener);
   });
     verify();
-
+   fetchPaysDataByActor();
     // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
             // stockListeFuture =  fetchAllStock();
     // typeActeurData = acteur.typeActeur!;
@@ -638,8 +667,8 @@ class _MyProductScreenState extends State<MyProductScreen> {
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
         child: Text(
-          para.monnaie != null
-              ? "${filtereSearch[index].prix.toString()} ${para.monnaie}"
+          monnaie != null
+              ? "${filtereSearch[index].prix.toString()} ${monnaie}"
               : "${filtereSearch[index].prix.toString()} FCFA",
           style: TextStyle(
             overflow: TextOverflow.ellipsis,

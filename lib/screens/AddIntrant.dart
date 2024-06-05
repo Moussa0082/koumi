@@ -50,7 +50,6 @@ class _AddIntrantState extends State<AddIntrant> {
   late Future _categorieList;
   late ParametreGeneraux para = ParametreGeneraux();
   List<ParametreGeneraux> paraList = [];
-  // late CategorieProduit categorieProduit;
   late CategorieProduit categorieProduit = CategorieProduit();
   late Future<List<CategorieProduit>> _liste;
 
@@ -147,13 +146,11 @@ class _AddIntrantState extends State<AddIntrant> {
     super.initState();
     verifyParam();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    // _categorieList = fetchCategorieList(); // _categorieList = http.get(
-    // _filiereList = fetchFiliereList();
+    
+
     _filiereList = http.get(
-        // Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
     Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
     _categorieList = http.get(Uri.parse(
-        // 'http://10.0.2.2:9000/api-koumi/Categorie/allCategorieByFiliere/${filiere.idFiliere}'));
     '$apiOnlineUrl/Categorie/allCategorieByFiliere/${filiere.idFiliere}'));
   }
 

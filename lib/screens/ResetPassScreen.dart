@@ -209,12 +209,16 @@ void handleSendButton(BuildContext context) async {
                 child: Text("Nouveau mot de passe", style: TextStyle(color: (Colors.black), fontSize: 18),),
               ),
               // debut  mot de pass
+              const SizedBox(height:10),
                 TextFormField(
                   controller: passwordController,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                      labelText: "Nouveau mot de passe",
+                   decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                      // labelText: "Nouveau mot de passe",
                       hintText: "Entrez votre nouveau mot de passe",
                       suffixIcon: IconButton(
                         onPressed: () {
@@ -231,11 +235,7 @@ void handleSendButton(BuildContext context) async {
                           color: Colors.grey,
                         ),
                       ),
-                      // icon: const Icon(
-                      //   Icons.lock_outline,
-                      //   color: Color(0xFF9A6ABB),
-                      //   size: 20,
-                      // )
+                     
                       ),
                   keyboardType: TextInputType.phone,
                   obscureText: _obscureText,
@@ -261,12 +261,16 @@ void handleSendButton(BuildContext context) async {
                 child: Text("Confirm mot de passe", style: TextStyle(color: (Colors.black), fontSize: 18),),
               ),
               // debut  mot de pass
+              const SizedBox(height:10),
                 TextFormField(
                   controller: confirmPasswordController,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                      labelText: "Confirmer mot de passe",
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                      // labelText: "Confirmer mot de passe",
                       hintText: "Entrez votre confirmer votre mot de passe",
                       suffixIcon: IconButton(
                         onPressed: () {

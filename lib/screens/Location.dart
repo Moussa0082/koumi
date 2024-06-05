@@ -56,6 +56,37 @@ class _LocationState extends State<Location> {
    int size = 4;
   bool hasMore = true;
 
+      bool isLoadingLibelle = true;
+    String? monnaie;
+
+
+   Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load monnaie');
+    }
+}
+
+ Future<void> fetchPaysDataByActor() async {
+    try {
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+      setState(() { 
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
+
 
    void _scrollListener() {
   
@@ -245,6 +276,7 @@ class _LocationState extends State<Location> {
     if (paraList.isNotEmpty) {
       para = paraList[0];
     }
+    fetchPaysDataByActor();
     _typeList =
         http.get(Uri.parse('$apiOnlineUrl/TypeMateriel/read'));
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
@@ -652,7 +684,7 @@ class _LocationState extends State<Location> {
                                               padding: const EdgeInsets.symmetric(
                                                   horizontal: 15),
                                               child: Text(
-                                                 "${materielListe[index].prixParHeure.toString()} ${para.monnaie}"
+                                                 "${materielListe[index].prixParHeure.toString()} ${monnaie}"
                                                     ,
                                                 style: TextStyle(
                                                   fontSize: 15,

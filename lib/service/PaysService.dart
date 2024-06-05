@@ -20,6 +20,9 @@ class PaysService extends ChangeNotifier {
     required String libelleNiveau1Pays,
     required String libelleNiveau2Pays,
     required String libelleNiveau3Pays,
+    required String monnaie,
+    required String tauxDollar,
+    required String tauxYuan,
     required SousRegion sousRegion,
   }) async {
     var addPays = jsonEncode({
@@ -29,6 +32,9 @@ class PaysService extends ChangeNotifier {
       'libelleNiveau1Pays': libelleNiveau1Pays,
       'libelleNiveau2Pays': libelleNiveau2Pays,
       'libelleNiveau3Pays': libelleNiveau3Pays,
+      'monnaie': monnaie,
+      'tauxDollar': tauxDollar,
+      'tauxYuan': tauxYuan,
       'sousRegion': sousRegion.toMap()
     });
 
@@ -49,6 +55,9 @@ class PaysService extends ChangeNotifier {
     required String libelleNiveau1Pays,
     required String libelleNiveau2Pays,
     required String libelleNiveau3Pays,
+    required String monnaie,
+    required String tauxDollar,
+    required String tauxYuan,
     required SousRegion sousRegion,
   }) async {
     var addPays = jsonEncode({
@@ -58,6 +67,9 @@ class PaysService extends ChangeNotifier {
       'libelleNiveau1Pays': libelleNiveau1Pays,
       'libelleNiveau2Pays': libelleNiveau2Pays,
       'libelleNiveau3Pays': libelleNiveau3Pays,
+      'monnaie': monnaie,
+      'tauxDollar': tauxDollar,
+      'tauxYuan': tauxYuan,
       'sousRegion': sousRegion.toMap()
     });
 
@@ -83,6 +95,39 @@ class PaysService extends ChangeNotifier {
       paysList = [];
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+    }
+  }
+
+   Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+}
+
+   Future<String> getLibelleNiveau2PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau2Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+}
+
+   Future<String> getLibelleNiveau1PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau1Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
     }
   }
 
