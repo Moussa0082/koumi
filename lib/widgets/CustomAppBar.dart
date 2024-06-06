@@ -139,6 +139,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     ),
                     subtitle: Text(
                       type,
+                      
                       style: const TextStyle(
                           color: d_colorOr,
                           fontSize: 18,

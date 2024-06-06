@@ -1,48 +1,79 @@
-import 'dart:convert';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 
 class Magasin {
-   String? idMagasin;
-  final String? codeMagasin;
-   String? nomMagasin;
-  // final String? niveau3PaysMagasin;
-   String? latitude;
-   String? longitude;
-  final String? localiteMagasin;
-  final String? contactMagasin;
-   String? personneModif;
-  final bool? statutMagasin;
-   String? dateAjout;
-   String? dateModif;
-   String? photo;
-  final Acteur? acteur;
-  final Niveau1Pays? niveau1Pays;
+    String? idMagasin;
+    String? codeMagasin;
+    String? nomMagasin;
+    String? latitude;
+    String? longitude;
+    String? localiteMagasin;
+    String? contactMagasin;
+    String? personneModif;
+    bool? statutMagasin;
+    String? dateAjout;
+    String? dateModif;
+    String? photo;
+    Acteur? acteur;
+    Niveau1Pays? niveau1Pays;
 
-  Magasin( {
-     this.idMagasin,
-     this.codeMagasin,
-     this.nomMagasin,
-    //  this.niveau3PaysMagasin,
-     this.latitude,
-     this.longitude,
-     this.localiteMagasin,
-     this.contactMagasin,
-    this.personneModif,
-     this.statutMagasin,
-    this.dateAjout,
-    this.dateModif,
-    this.photo,
-     this.acteur,
-     this.niveau1Pays
-  });
+    Magasin({
+         this.idMagasin,
+         this.codeMagasin,
+         this.nomMagasin,
+         this.latitude,
+         this.longitude,
+         this.localiteMagasin,
+         this.contactMagasin,
+         this.personneModif,
+         this.statutMagasin,
+         this.dateAjout,
+         this.dateModif,
+         this.photo,
+         this.acteur,
+         this.niveau1Pays,
+    });
+
+    factory Magasin.fromJson(Map<String, dynamic> json) => Magasin(
+        idMagasin: json["idMagasin"],
+        codeMagasin: json["codeMagasin"],
+        nomMagasin: json["nomMagasin"],
+        latitude: json["latitude"],
+        longitude: json["longitude"],
+        localiteMagasin: json["localiteMagasin"],
+        contactMagasin: json["contactMagasin"],
+        personneModif: json["personneModif"],
+        statutMagasin: json["statutMagasin"],
+        dateAjout: json["dateAjout"],
+        dateModif: json["dateModif"],
+        photo: json["photo"],
+        acteur: Acteur.fromJson(json["acteur"]),
+        niveau1Pays: Niveau1Pays.fromJson(json["niveau1Pays"]),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "idMagasin": idMagasin,
+        "codeMagasin": codeMagasin,
+        "nomMagasin": nomMagasin,
+        "latitude": latitude,
+        "longitude": longitude,
+        "localiteMagasin": localiteMagasin,
+        "contactMagasin": contactMagasin,
+        "personneModif": personneModif,
+        "statutMagasin": statutMagasin,
+        "dateAjout": dateAjout,
+        "dateModif": dateModif,
+        "photo": photo,
+        "acteur": acteur?.toJson(),
+        "niveau1Pays": niveau1Pays?.toJson(),
+    };
 
   Magasin copyWith({
     String? idMagasin,
     String? codeMagasin,
     String? nomMagasin,
-    String? niveau3PaysMagasin,
     String? latitude,
     String? longitude,
     String? localiteMagasin,
@@ -59,7 +90,6 @@ class Magasin {
       idMagasin: idMagasin ?? this.idMagasin,
       codeMagasin: codeMagasin ?? this.codeMagasin,
       nomMagasin: nomMagasin ?? this.nomMagasin,
-      // niveau3PaysMagasin: niveau3PaysMagasin ?? this.niveau3PaysMagasin,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       localiteMagasin: localiteMagasin ?? this.localiteMagasin,
@@ -79,7 +109,6 @@ class Magasin {
       'idMagasin': idMagasin,
       'codeMagasin': codeMagasin,
       'nomMagasin': nomMagasin,
-      // 'niveau3PaysMagasin': niveau3PaysMagasin,
       'latitude': latitude,
       'longitude': longitude,
       'localiteMagasin': localiteMagasin,
@@ -94,49 +123,10 @@ class Magasin {
     };
   }
 
-  factory Magasin.fromMap(Map<String, dynamic> map) {
-    return Magasin(
-      idMagasin: map['idMagasin'] as String,
-      codeMagasin: map['codeMagasin'] as String,
-      nomMagasin: map['nomMagasin'] as String,
-      // niveau3PaysMagasin: map['niveau3PaysMagasin'] as String,
-      latitude: map['latitude']  != null ? map['latitude'] as String : null,
-      longitude: map['longitude'] != null ? map['longitude'] as String : null,
-      localiteMagasin: map['localiteMagasin'] as String,
-      contactMagasin: map['contactMagasin'] as String,
-      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
-      statutMagasin: map['statutMagasin'] as bool,
-      dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
-      dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
-      photo: map['photo'] != null ? map['photo'] as String : null,
-      acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
-      niveau1Pays: Niveau1Pays.fromMap(map['niveau1Pays'] as Map<String,dynamic>),
-    );
-  }
-
-  // String toJson() => json.encode(toMap());
-   Map<String, dynamic> toJson() => {
-        "idMagasin": idMagasin,
-        "codeMagasin": codeMagasin,
-        "nomMagasin": nomMagasin,
-        "latitude": latitude,
-        "longitude": longitude,
-        "localiteMagasin": localiteMagasin,
-        "contactMagasin": contactMagasin,
-        "personneModif": personneModif,
-        "statutMagasin": statutMagasin,
-        "dateAjout": dateAjout,
-        "dateModif": dateModif,
-        "photo": photo,
-        "acteur": acteur?.toJson(),
-        "niveau1Pays": niveau1Pays?.toJson(),
-    };
-
-  factory Magasin.fromJson(String source) => Magasin.fromMap(json.decode(source) as Map<String, dynamic>);
-
+  
   @override
   String toString() {
-    return 'Magasin(idMagasin: $idMagasin, codeMagasin: $codeMagasin, nomMagasin: $nomMagasin,latitude: $latitude, longitude: $longitude, localiteMagasin: $localiteMagasin, contactMagasin: $contactMagasin, personneModif: $personneModif, statutMagasin: $statutMagasin, dateAjout: $dateAjout, dateModif: $dateModif, photo: $photo, acteur: $acteur, niveau1Pays: $niveau1Pays';
+    return 'Magasin(idMagasin: $idMagasin, codeMagasin: $codeMagasin, nomMagasin: $nomMagasin, latitude: $latitude, longitude: $longitude, localiteMagasin: $localiteMagasin, contactMagasin: $contactMagasin, personneModif: $personneModif, statutMagasin: $statutMagasin, dateAjout: $dateAjout, dateModif: $dateModif, photo: $photo, acteur: $acteur, niveau1Pays: $niveau1Pays)';
   }
 
   @override
@@ -147,7 +137,6 @@ class Magasin {
       other.idMagasin == idMagasin &&
       other.codeMagasin == codeMagasin &&
       other.nomMagasin == nomMagasin &&
-      // other.niveau3PaysMagasin == niveau3PaysMagasin &&
       other.latitude == latitude &&
       other.longitude == longitude &&
       other.localiteMagasin == localiteMagasin &&
@@ -166,7 +155,6 @@ class Magasin {
     return idMagasin.hashCode ^
       codeMagasin.hashCode ^
       nomMagasin.hashCode ^
-      // niveau3PaysMagasin.hashCode ^
       latitude.hashCode ^
       longitude.hashCode ^
       localiteMagasin.hashCode ^
@@ -179,4 +167,25 @@ class Magasin {
       acteur.hashCode ^
       niveau1Pays.hashCode;
   }
+
+  factory Magasin.fromMap(Map<String, dynamic> map) {
+    return Magasin(
+      idMagasin: map['idMagasin'] != null ? map['idMagasin'] as String : null,
+      codeMagasin: map['codeMagasin'] != null ? map['codeMagasin'] as String : null,
+      nomMagasin: map['nomMagasin'] != null ? map['nomMagasin'] as String : null,
+      latitude: map['latitude'] != null ? map['latitude'] as String : null,
+      longitude: map['longitude'] != null ? map['longitude'] as String : null,
+      localiteMagasin: map['localiteMagasin'] != null ? map['localiteMagasin'] as String : null,
+      contactMagasin: map['contactMagasin'] != null ? map['contactMagasin'] as String : null,
+      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
+      statutMagasin: map['statutMagasin'] != null ? map['statutMagasin'] as bool : null,
+      dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
+      dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
+      photo: map['photo'] != null ? map['photo'] as String : null,
+      acteur: map['acteur'] != null ? Acteur.fromMap(map['acteur'] as Map<String,dynamic>) : null,
+      niveau1Pays: map['niveau1Pays'] != null ? Niveau1Pays.fromMap(map['niveau1Pays'] as Map<String,dynamic>) : null,
+    );
+  }
+
+
 }

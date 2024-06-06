@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
@@ -60,6 +61,8 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
   // List<String>? n3Value = [];
   String niveau3 = '';
   List<String> selectedDestinations = [];
+   bool isLoadingLibelle = true;
+    String? libelleNiveau3Pays;
 
   // Méthode pour ajouter une nouvelle destination et prix
   // void addDestinationAndPrix() {
@@ -118,14 +121,42 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
     });
   }
 
+  Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+}
+
+     Future<void> fetchLibelleNiveau3Pays() async {
+    try {
+      String libelle = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
+      setState(() {
+        libelleNiveau3Pays = libelle;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+      });
+      print('Error: $e');
+    }
+  }
+
+
+
   @override
   void initState() {
     super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     prixParDestinations = {};
-    _niveau3List =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
-    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+       _niveau3List =
+        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
+     fetchLibelleNiveau3Pays();
   }
 
   Future<File> saveImagePermanently(String imagePath) async {
@@ -220,22 +251,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(
-                // height: 150,
-                child: Padding(
-                    padding: const EdgeInsets.only(left: 10.0),
-                    child: photo != null
-                        ? Image.file(
-                            photo!,
-                            fit: BoxFit.fitWidth,
-                            height: 150,
-                            width: 300,
-                          )
-                        : Container()),
-              ),
-              SizedBox(
-                height: 30,
-              ),
+             
               Form(
                   key: formkey,
                   child: Column(
@@ -309,6 +325,28 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Row(
                                     children: [
+                                       isLoadingLibelle ?
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text("Chargement ................",style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),)),
+                      )
+                      :
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 22,
+                        ),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                           libelleNiveau3Pays != null ? libelleNiveau3Pays!.toUpperCase() : "Localité",
+                            style:
+                                TextStyle(color: (Colors.black), fontSize: 18),
+                          ),
+                        ),
+                      ),
                                       Expanded(
                                         child: FutureBuilder(
                                           future: _niveau3List,
@@ -340,6 +378,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                                 onChanged: null,
                                                 decoration: InputDecoration(
                                                   labelText: 'Chargement...',
+                                                  labelStyle:  TextStyle(overflow: TextOverflow.ellipsis,fontSize: 15),
                                                   contentPadding:
                                                       const EdgeInsets
                                                           .symmetric(
@@ -377,6 +416,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                                     onChanged: null,
                                                     decoration: InputDecoration(
                                                       labelText: 'Destination',
+                                                      labelStyle: TextStyle(overflow: TextOverflow.ellipsis,fontSize: 15),
                                                       contentPadding:
                                                           const EdgeInsets
                                                               .symmetric(
@@ -393,53 +433,28 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                                   );
                                                 }
 
-                                                return DropdownButtonFormField<
-                                                    String>(
-                                                  items: niveau3List
-                                                      .map(
-                                                        (e) => DropdownMenuItem(
-                                                          value:
-                                                              e.idNiveau3Pays,
-                                                          child: Text(e.nomN3),
-                                                        ),
-                                                      )
-                                                      .toList(),
-
-                                                  value: selectedDestinationsList[
-                                                      index], // Utilisez l'index pour accéder à la valeur sélectionnée correspondante dans selectedDestinationsList
+                                                return DropdownButtonFormField<String>(
+                                                  isExpanded: true,
+                                                  items: niveau3List.map((e) => DropdownMenuItem(
+                                                    value: e.idNiveau3Pays,
+                                                    child: Text(e.nomN3, overflow: TextOverflow.ellipsis, style: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 14)), // réduire la taille du texte
+                                                  )).toList(),
+                                                  value: selectedDestinationsList[index],
                                                   onChanged: (newValue) {
                                                     setState(() {
-                                                      selectedDestinationsList[
-                                                              index] =
-                                                          newValue; // Mettre à jour avec l'ID de la destination
-                                                      String
-                                                          selectedDestinationName =
-                                                          niveau3List
-                                                              .firstWhere(
-                                                                  (element) =>
-                                                                      element
-                                                                          .idNiveau3Pays ==
-                                                                      newValue)
-                                                              .nomN3;
-                                                      selectedDestinations.add(
-                                                          selectedDestinationName); // Ajouter le nom de la destination à la liste
-                                                      print(
-                                                          "niveau 3 : $selectedDestinationsList");
-                                                      print(
-                                                          "niveau 3 nom  : $selectedDestinations");
+                                                      selectedDestinationsList[index] = newValue;
+                                                      String selectedDestinationName = niveau3List.firstWhere((element) => element.idNiveau3Pays == newValue).nomN3;
+                                                      selectedDestinations.add(selectedDestinationName);
+                                                      print("niveau 3 : $selectedDestinationsList");
+                                                      print("niveau 3 nom  : $selectedDestinations");
                                                     });
                                                   },
                                                   decoration: InputDecoration(
                                                     labelText: 'Destination',
-                                                    contentPadding:
-                                                        const EdgeInsets
-                                                            .symmetric(
-                                                      horizontal: 20,
-                                                    ),
+                                                    labelStyle: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 15),
+                                                    contentPadding: const EdgeInsets.symmetric(horizontal: 6), // réduire le padding
                                                     border: OutlineInputBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8),
+                                                      borderRadius: BorderRadius.circular(8),
                                                     ),
                                                   ),
                                                 );
@@ -449,6 +464,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                                   onChanged: null,
                                                   decoration: InputDecoration(
                                                     labelText: 'Destination',
+                                                    labelStyle: TextStyle(overflow: TextOverflow.ellipsis,fontSize: 15),
                                                     contentPadding:
                                                         const EdgeInsets
                                                             .symmetric(
@@ -468,6 +484,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                               onChanged: null,
                                               decoration: InputDecoration(
                                                 labelText: 'Destination',
+                                                labelStyle: TextStyle(overflow: TextOverflow.ellipsis,fontSize: 15),
                                                 contentPadding:
                                                     const EdgeInsets.symmetric(
                                                   horizontal: 20,
@@ -490,6 +507,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                             FilteringTextInputFormatter
                                                 .digitsOnly,
                                           ],
+                                          
                                           decoration: InputDecoration(
                                             hintText: "Prix",
                                             contentPadding:
@@ -516,14 +534,29 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                         children: destinationPrixFields,
                       ),
                       SizedBox(
-                        child: IconButton(
-                          onPressed: _showImageSourceDialog,
-                          icon: const Icon(
-                            Icons.add_a_photo_rounded,
-                            size: 60,
-                          ),
-                        ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10.0),
+                        child: photo != null
+                            ? GestureDetector(
+                                onTap: _showImageSourceDialog,
+                                child: Image.file(
+                                  photo!,
+                                  fit: BoxFit.fitWidth,
+                                  height: 150,
+                                  width: 300,
+                                ),
+                              )
+                            : SizedBox(
+                                child: IconButton(
+                                  onPressed: _showImageSourceDialog,
+                                  icon: const Icon(
+                                    Icons.add_a_photo_rounded,
+                                    size: 60,
+                                  ),
+                                ),
+                              ),
                       ),
+                    ),
                       const SizedBox(height: 20),
                       ElevatedButton(
                           onPressed: () async {

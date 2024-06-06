@@ -1,63 +1,130 @@
-
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Filiere.dart';
 import 'package:koumi_app/models/Forme.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
+import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductEndScreen.dart';
-import 'package:path_provider/path_provider.dart' ;
+import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class AddAndUpdateProductScreen extends StatefulWidget {
-  bool? isEditable ;
+  bool? isEditable;
   final Stock? stock;
-   AddAndUpdateProductScreen({super.key, this.isEditable, this.stock});
+  AddAndUpdateProductScreen({super.key, this.isEditable, this.stock});
 
   @override
-  State<AddAndUpdateProductScreen> createState() => _AddAndUpdateProductScreenState();
+  State<AddAndUpdateProductScreen> createState() =>
+      _AddAndUpdateProductScreenState();
 }
 
- const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
+const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
-
-     final formkey = GlobalKey<FormState>();
-     TextEditingController _prixController = TextEditingController();
-     TextEditingController _quantiteController = TextEditingController();
+  final formkey = GlobalKey<FormState>();
+  TextEditingController _prixController = TextEditingController();
+  TextEditingController _quantiteController = TextEditingController();
   TextEditingController _nomController = TextEditingController();
   TextEditingController _formController = TextEditingController();
   TextEditingController _origineController = TextEditingController();
 
   late Acteur acteur;
-   late Stock stock = Stock();
+  late Stock stock = Stock();
   late List<TypeActeur> typeActeurData = [];
   late String type;
   late TextEditingController _searchController;
   List<Filiere> filiereListe = [];
-   String? imageSrc;
+  String? imageSrc;
   File? photo;
-   String? formeValue;
+  String? formeValue;
   late Future _formeList;
-  late Forme forme;
 
   late Future _niveau3List;
   String? n3Value;
   String niveau3 = '';
+  String forme = '';
+  List<ParametreGeneraux> paraList = [];
+  late ParametreGeneraux para = ParametreGeneraux();
+    bool isLoadingLibelle = true;
+    String? libelleNiveau3Pays;
+
+    String? monnaie;
 
 
-    Future<File> saveImagePermanently(String imagePath) async {
+   Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+    if (response.statusCode == 200) {
+      print("monnaie : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load monnaie');
+    }
+}
+
+ Future<void> fetchPaysDataByActor() async {
+    try {
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+      setState(() { 
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
+
+
+
+ 
+    
+  Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+}
+
+     Future<void> fetchLibelleNiveau3Pays() async {
+    try {
+      String libelle = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
+      setState(() {
+        libelleNiveau3Pays = libelle;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+      });
+      print('Error: $e');
+    }
+  }
+
+
+  Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
     final name = path.basename(imagePath);
     final image = File('${directory.path}/$name');
@@ -125,49 +192,63 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
       },
     );
   }
-   
+
+  void verifyParam() {
+    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+        .parametreList!;
+
+    if (paraList.isNotEmpty) {
+      para = paraList[0];
+    } else {
+      // Gérer le cas où la liste est null ou vide, par exemple :
+      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+    }
+  }
 
   @override
   void initState() {
-    // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // typeActeurData = acteur.typeActeur!;
     // type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
 
     super.initState();
-    if(widget.isEditable! == true){
-     _nomController.text = widget.stock!.nomProduit!;
-     _formController.text = widget.stock!.formeProduit!;
-     _origineController.text = widget.stock!.origineProduit!;
+    if (widget.isEditable! == true) {
+      _nomController.text = widget.stock!.nomProduit!;
+      _formController.text = widget.stock!.formeProduit!;
+      // _origineController.text = widget.stock!.origineProduit!;
       _prixController.text = widget.stock!.prix!.toString();
       _quantiteController.text = widget.stock!.quantiteStock!.toString();
+      forme = widget.stock!.formeProduit!;
+      niveau3 = widget.stock!.origineProduit!;
     }
-        _formeList = http.get(Uri.parse(
-        'https:koumi.ml/api-koumi/formeproduit/getAllForme/'));
-        // 'http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
-            _niveau3List =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
+    _formeList = http
+        .get(Uri.parse('$apiOnlineUrl/formeproduit/getAllForme/'));
+    _niveau3List =
+        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
+    verifyParam();
+    fetchLibelleNiveau3Pays();
+    fetchPaysDataByActor();
   }
 
-   
-     @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
-          centerTitle: true,
-          toolbarHeight: 100,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-          title: Text(
-            widget.isEditable! ?  'Modifier de produit' :  'Ajout de produit' ,
-            style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
-          ),
-         ),
+        centerTitle: true,
+        toolbarHeight: 100,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+        title: Text(
+          widget.isEditable! ? 'Modifier de produit' : 'Ajout de produit',
+          style:
+              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(children: [
           // const SizedBox(height: 10),
@@ -278,77 +359,20 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                           ),
                         ),
                       ),
-                     Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      child: FutureBuilder(
-                        future: _formeList,
-                        // future: speculationService.fetchSpeculationByCategorie(categorieProduit.idCategorieProduit!),
-                        builder: (_, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return DropdownButtonFormField(
-                              items: [],
-                              onChanged: null,
-                              decoration: InputDecoration(
-                                labelText: 'En cours de chargement ...',
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            );
-                          }
-
-                          if (snapshot.hasData) {
-                            dynamic jsonString =
-                                utf8.decode(snapshot.data.bodyBytes);
-                            dynamic responseData = json.decode(jsonString);
-
-                            if (responseData is List) {
-                              List<Forme> speList = responseData
-                                  .map((e) => Forme.fromMap(e))
-                                  .toList();
-
-                              if (speList.isEmpty) {
-                                return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Aucune forme trouvé',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                              }
-
-                              return DropdownButtonFormField<String>(
-                                items: speList
-                                    .map(
-                                      (e) => DropdownMenuItem(
-                                        value: e.idForme,
-                                        child: Text(e.libelleForme!),
-                                      ),
-                                    )
-                                    .toList(),
-                                value: formeValue,
-                                onChanged: (newValue) {
-                                  setState(() {
-                                    formeValue = newValue;
-                                    if (newValue != null) {
-                                      forme = speList.firstWhere(
-                                        (element) =>
-                                            element.idForme == newValue,
-                                      );
-                                    }
-                                  });
-                                },
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        child: FutureBuilder(
+                          future: _formeList,
+                          // future: speculationService.fetchSpeculationByCategorie(categorieProduit.idCategorieProduit!),
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
                                 decoration: InputDecoration(
-                                  labelText: 'Sélectionner la forme',
+                                  labelText: 'En cours de chargement ...',
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(
@@ -356,8 +380,86 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                   ),
                                 ),
                               );
+                            }
+
+                            if (snapshot.hasData) {
+                              dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+
+                              if (responseData is List) {
+                                 final reponse = responseData;
+                                final formeListe = reponse
+                                    .map((e) => Forme.fromMap(e))
+                                    .where((element) => element.statutForme == true)
+                                    .toList();
+
+                                if (formeListe.isEmpty) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Aucune forme trouvé',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return DropdownButtonFormField<String>(
+                                  isExpanded: true,
+                                  items: formeListe
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idForme,
+                                          child: Text(e.libelleForme!),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: formeValue,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      formeValue = newValue;
+                                      if (newValue != null) {
+                                        forme = formeListe
+                            .firstWhere((e) => e.idForme == newValue)
+                            .libelleForme!;
+                                      }
+                                      debugPrint("fr : ${forme}");
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: widget.isEditable == false
+                                        ? 'Sélectionner la forme'
+                                        : widget.stock!.formeProduit,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                // Handle case when response data is not a list
+                                return  DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Probleme de connexion',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                              }
                             } else {
-                              // Handle case when response data is not a list
                               return DropdownButtonFormField(
                                 items: [],
                                 onChanged: null,
@@ -371,26 +473,21 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                 ),
                               );
                             }
-                          } else {
-                            return DropdownButtonFormField(
-                              items: [],
-                              onChanged: null,
-                              decoration: InputDecoration(
-                                labelText: 'Aucune forme trouvé',
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            );
-                          }
-                        },
+                          },
+                        ),
                       ),
-                    ),
                       SizedBox(
                         height: 10,
                       ),
+                       isLoadingLibelle ?
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text("Chargement ................",style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),)),
+                      )
+                      :
                       Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: 22,
@@ -398,7 +495,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Text(
-                            "Origine du produit",
+                           libelleNiveau3Pays != null ? libelleNiveau3Pays!.toUpperCase() : "Origine du produit",
                             style:
                                 TextStyle(color: (Colors.black), fontSize: 18),
                           ),
@@ -425,22 +522,21 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                 ),
                               );
                             }
-                          
+
                             if (snapshot.hasData) {
-                               dynamic jsonString =
+                              dynamic jsonString =
                                   utf8.decode(snapshot.data.bodyBytes);
                               dynamic responseData = json.decode(jsonString);
 
-                              // dynamic responseData =
-                              //     json.decode(snapshot.data.body);
+                             
                               if (responseData is List) {
                                 final reponse = responseData;
-                                final niveau3List = reponse
+                                final niveau3Liste = reponse
                                     .map((e) => Niveau3Pays.fromMap(e))
                                     .where((con) => con.statutN3 == true)
                                     .toList();
 
-                                if (niveau3List.isEmpty) {
+                                if (niveau3Liste.isEmpty) {
                                   return DropdownButtonFormField(
                                     items: [],
                                     onChanged: null,
@@ -457,7 +553,8 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                 }
 
                                 return DropdownButtonFormField<String>(
-                                  items: niveau3List
+                                  isExpanded: true,
+                                  items: niveau3Liste
                                       .map(
                                         (e) => DropdownMenuItem(
                                           value: e.idNiveau3Pays,
@@ -470,15 +567,17 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                     setState(() {
                                       n3Value = newValue;
                                       if (newValue != null) {
-                                        niveau3 = niveau3List
-                                            .map((e) => e.nomN3)
-                                            .first;
-                                        print("niveau 3 : ${niveau3}");
+                                        niveau3 = niveau3Liste
+                            .firstWhere((e) => e.idNiveau3Pays == newValue)
+                            .nomN3;
                                       }
+                                        print("niveau 3 origne : ${niveau3}");
                                     });
                                   },
                                   decoration: InputDecoration(
-                                    labelText: 'Selectionner une localité',
+                                    labelText: widget.isEditable == false
+                                        ? 'Selectionner une localité'
+                                        : widget.stock!.origineProduit,
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(
@@ -526,7 +625,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Text(
-                            "Prix du produit",
+                            "Prix du produit en (${monnaie})",
                             style:
                                 TextStyle(color: (Colors.black), fontSize: 18),
                           ),
@@ -548,7 +647,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                             FilteringTextInputFormatter.digitsOnly,
                           ],
                           decoration: InputDecoration(
-                            hintText: "Prix du produit",
+                            hintText: "Prix du produit en (${monnaie})",
                             contentPadding: const EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 20),
                             border: OutlineInputBorder(
@@ -557,8 +656,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                           ),
                         ),
                       ),
-                      
-                       SizedBox(
+                      SizedBox(
                         height: 10,
                       ),
                       Padding(
@@ -585,7 +683,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                             return null;
                           },
                           controller: _quantiteController,
-                          keyboardType: TextInputType.text,
+                          keyboardType: TextInputType.phone,
                           inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.digitsOnly,
                           ],
@@ -602,36 +700,102 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                       SizedBox(
                         height: 10,
                       ),
-                      
                       SizedBox(
-                        child: photo != null
-                        ? Image.file(
-                            photo!,
-                            fit: BoxFit.fitWidth,
-                            height: 100,
-                            width: 150,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: photo != null 
+                            ? GestureDetector(
+                                onTap: _showImageSourceDialog,
+                                child: Image.file(
+
+                                  photo!,
+                                  fit: BoxFit.fitWidth,
+                                  height: 150,
+                                  width: 200,
+                                ),
+                              )
+                            :  widget.isEditable == false ?
+                            // :  widget.stock!.photo == null || widget.stock!.photo!.isEmpty ?
+                             SizedBox(
+                                child: IconButton(
+                                  onPressed: _showImageSourceDialog,
+                                  icon: const Icon(
+                                    Icons.add_a_photo_rounded,
+                                    size: 60,
+                                  ),
+                                ),
+                              ) 
+                              : Center(
+                          child: widget.stock!.photo != null &&
+                                  !widget.stock!.photo!.isEmpty
+                              ?
+                              
+                          GestureDetector(
+                            onTap: _showImageSourceDialog,
+                            child: CachedNetworkImage(
+                              height: 120,
+                              width: 150,
+                                                    imageUrl:
+                                                    "https://koumi.ml/api-koumi/Stock/${widget.stock!.idStock}/image",
+                                                    fit: BoxFit.cover,
+                                                    placeholder: (context, url) =>
+                                                        const Center(
+                                                            child:
+                                                                CircularProgressIndicator()),
+                                                    errorWidget:
+                                                        (context, url, error) =>
+                                                            Image.asset(
+                                                      'assets/images/default_image.png',
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
                           )
-                        :  IconButton(
-                          onPressed: _showImageSourceDialog,
-                          icon: const Icon(
-                            Icons.add_a_photo_rounded,
-                            size: 60,
-                          ),
-                        ),
+
+                             
+                              : SizedBox(
+                                child: IconButton(
+                                  onPressed: _showImageSourceDialog,
+                                  icon: const Icon(
+                                    Icons.add_a_photo_rounded,
+                                    size: 60,
+                                  ),
+                                ),
+                              ) 
+                        )
+                              ,
                       ),
+                    ),
                       const SizedBox(height: 20),
                       ElevatedButton(
                           onPressed: () async {
-                   
-
                             if (formkey.currentState!.validate()) {
-                              Navigator.push(context, MaterialPageRoute(builder:
-               (context)=> (AddAndUpdateProductEndSreen(isEditable:widget.isEditable!,
-                              nomProduit: _nomController.text, forme: forme.libelleForme!,
-                              origine: _origineController.text, prix: _prixController.text.toString(),
-                              image: photo,
-                              quantite: _quantiteController.text, stock: widget.stock,
-                              ))));
+                              debugPrint("forme: ${forme} , formeValue : ${formeValue}, origin : ${niveau3} , value : ${n3Value}");
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          (AddAndUpdateProductEndSreen(
+                                            isEditable: widget.isEditable!,
+                                            nomProduit: _nomController.text,
+                                            forme: forme,
+                                            origine: niveau3,
+                                            prix:
+                                                _prixController.text.toString(),
+                                            image: photo,
+                                            quantite: _quantiteController.text,
+                                            stock: widget.stock,
+                                          )))).then((value) => { 
+                                            if(widget.isEditable! == false){
+
+                                            _nomController.clear(),
+                                            _prixController.clear(),
+                                            _quantiteController.clear(),
+                                            setState(() {
+                                              niveau3 == null;
+
+                                            })
+                                            } 
+                                          });
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -642,18 +806,16 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                             minimumSize: const Size(290, 45),
                           ),
                           child: Text(
-                           "Suivant" ,
+                            "Suivant",
                             style: TextStyle(
                               fontSize: 20,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),
                           )),
-                          
-                            SizedBox(
+                      SizedBox(
                         height: 10,
                       ),
-
                     ],
                   ))
             ],
@@ -690,6 +852,4 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
       ),
     );
   }
-
-
 }

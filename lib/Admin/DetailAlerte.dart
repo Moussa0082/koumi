@@ -1,8 +1,11 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Alertes.dart';
+import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/widgets/PlayerWidget.dart';
+import 'package:readmore/readmore.dart';
 import 'package:video_player/video_player.dart';
 
 class DetailAlerte extends StatefulWidget {
@@ -123,20 +126,26 @@ class _DetailAlerteState extends State<DetailAlerte> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             alerte.photoAlerte != null && !alerte.photoAlerte!.isEmpty
-                ? Image.network(
-                    'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/image',
-                    // "http://10.0.2.2/${e.photoIntrant}",
-                    width: double.infinity,
+                ? 
+                CachedNetworkImage(
+                   width: double.infinity,
                     height: 200,
-                    fit: BoxFit.cover,
-                    errorBuilder: (BuildContext context, Object exception,
-                        StackTrace? stackTrace) {
-                      return Image.asset(
-                        'assets/images/default_image.png',
-                        fit: BoxFit.cover,
-                      );
-                    },
-                  )
+                    
+                                                  imageUrl:
+                                                      'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/image',
+                                                  fit: BoxFit.cover,
+                                                  placeholder: (context, url) =>
+                                                      const Center(
+                                                          child:
+                                                              CircularProgressIndicator()),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Image.asset(
+                                                    'assets/images/default_image.png',
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                )
+                
                 : Image.asset(
                     "assets/images/default_image.png",
                     fit: BoxFit.cover,
@@ -255,18 +264,19 @@ class _DetailAlerteState extends State<DetailAlerte> {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            alerte.descriptionAlerte!,
-            style: TextStyle(
-              color: Colors.black87,
-              fontWeight: FontWeight.w500,
-              fontStyle: FontStyle.italic,
-              fontSize: 18,
-            ),
-          ),
-        ),
+         Padding(
+                      padding: EdgeInsets.all(8),
+                      child: ReadMoreText(
+                        colorClickableText: Colors.orange,
+                        trimLines: 2,
+                        trimMode: TrimMode.Line,
+                        trimCollapsedText: "Lire plus",
+                        trimExpandedText: "Lire moins",
+                        style: TextStyle(
+                            fontSize: 18, fontStyle: FontStyle.italic),
+                        alerte.descriptionAlerte!
+                      ),
+                    ),
       ],
     );
   }

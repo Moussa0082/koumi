@@ -7,7 +7,10 @@ import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart';
+import 'package:koumi_app/screens/MesCommande.dart';
+import 'package:koumi_app/screens/MyProduct.dart';
 import 'package:koumi_app/screens/Product.dart';
+import 'package:koumi_app/screens/Products.dart';
 import 'package:koumi_app/screens/Store.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/Weather.dart';
@@ -55,6 +58,7 @@ class _AccueilState extends State<Accueil> {
     // TODO: implement initState
     super.initState();
     verify();
+    // final acteurProvider = Provider.of<ActeurProvider>(context, listen: false).isLogged;
     // Get.put(ConnectionVerify(), permanent: true);
   }
 
@@ -65,11 +69,12 @@ class _AccueilState extends State<Accueil> {
       appBar: const CustomAppBar(),
       body: ListView(
         children: [
-          SizedBox(height: 180, child: Carrousel()),
-          const SizedBox(
-            height: 10,
-          ),
-          isExist ? SizedBox(height: 100, child: AlertAcceuil()) : Container(),
+          SizedBox(height: 180, child:  Carrousel()),
+          // SizedBox(height: 180, child: isExist ? Carrousel(): Carrousels()),
+          // const SizedBox(
+          //   height: 10,
+          // ),
+          // isExist ? SizedBox(height: 100, child: Carrousel()) : Carrousels(),
           const SizedBox(
             height: 10,
           ),
@@ -119,8 +124,9 @@ class _AccueilState extends State<Accueil> {
       child: InkWell(
           onTap: () {
             if (index == 9) {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProductScreen()));
+                Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ProductsScreen()));
+             
             } else if (index == 8) {
               Navigator.push(
                   context,
@@ -144,7 +150,7 @@ class _AccueilState extends State<Accueil> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const CommandeScreen()));
+                      builder: (context) => const MesCommande()));
             } else if (index == 2) {
               Navigator.push(
                   context,

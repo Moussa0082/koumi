@@ -7,6 +7,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
@@ -15,11 +16,13 @@ import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:readmore/readmore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -72,6 +75,36 @@ class _DetailTransportState extends State<DetailTransport> {
 
   bool isExist = false;
   String? email = "";
+   bool isLoadingLibelle = true;
+   String? monnaie;
+
+
+   Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load monnaie');
+    }
+}
+
+ Future<void> fetchPaysDataByActor() async {
+    try {
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+      setState(() { 
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -138,6 +171,7 @@ class _DetailTransportState extends State<DetailTransport> {
     //     .parametreList!;
     // para = paraList[0];
     verifyParam();
+    fetchPaysDataByActor();
     _niveau3List =
         http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
 
@@ -405,7 +439,7 @@ class _DetailTransportState extends State<DetailTransport> {
                 style: const TextStyle(
                     color: d_colorGreen, fontWeight: FontWeight.bold),
               ),
-              actions: acteur.nomActeur == vehicules.acteur.nomActeur
+              actions: acteur.idActeur == vehicules.acteur.idActeur
                   ? [
                       _isEditing
                           ? IconButton(
@@ -467,13 +501,15 @@ class _DetailTransportState extends State<DetailTransport> {
                 _isEditing ? _buildEditing() : _buildData(),
                 !_isEditing ? _buildPanel() : Container(),
                 !_isEditing
-                    ? _buildDescription(
+                    ? 
+                    _buildDescription(
                         'Description : ', vehicules.description!)
+                        
                     : Container(),
               ],
             ),
           ),
-          floatingActionButton: acteur.nomActeur != vehicules.acteur.nomActeur
+          floatingActionButton: acteur.idActeur != vehicules.acteur.idActeur
               ? SpeedDial(
                   // animatedIcon: AnimatedIcons.close_menu,
                   backgroundColor: d_colorGreen,
@@ -776,7 +812,7 @@ class _DetailTransportState extends State<DetailTransport> {
             '${vehicules.statutVehicule ? 'Disponible' : 'Non disponible'}'),
         !isExist
             ? Container()
-            : acteur.nomActeur != vehicules.acteur.nomActeur
+            : acteur.idActeur != vehicules.acteur.idActeur
                 ? _buildItem('Propriètaire : ', vehicules.acteur.nomActeur!)
                 : Container(),
         // _buildItem('Description : ', vehicules.description!),
@@ -877,17 +913,19 @@ class _DetailTransportState extends State<DetailTransport> {
                   overflow: TextOverflow.ellipsis,
                   fontSize: 18),
             ),
-            Text(
-              value,
-              textAlign: TextAlign.justify,
-              softWrap: true,
-              style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w800,
-                // overflow: TextOverflow.ellipsis,
-                fontSize: 16,
-              ),
-            )
+            Padding(
+                     padding: EdgeInsets.all(8),
+                      child: ReadMoreText(
+                        colorClickableText: Colors.orange,
+                        trimLines: 2,
+                        trimMode: TrimMode.Line,
+                        trimCollapsedText: "Lire plus",
+                        trimExpandedText: "Lire moins",
+                        style: TextStyle(
+                            fontSize: 16, fontStyle: FontStyle.italic),
+                        value
+                      ),
+                    ),
           ],
         ),
       ),
@@ -967,7 +1005,7 @@ class _DetailTransportState extends State<DetailTransport> {
                     int prix =
                         vehicules.prixParDestination.values.elementAt(index);
                     return _buildItem(
-                        destination, "${prix.toString()} ${para.monnaie}");
+                        destination, "${prix.toString()} ${monnaie}");
                   }),
                 ),
               ),

@@ -2,11 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 
 class Niveau3Service extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/niveau3Pays';
+  static const String baseUrl = '$apiOnlineUrl/nivveau3Pays';
   // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/nivveau3Pays';
 
   List<Niveau3Pays> niveauList = [];
@@ -56,7 +57,7 @@ class Niveau3Service extends ChangeNotifier {
     }
   }
 
-   Future<List<Niveau3Pays>> fetchNiveau3Pays() async {
+  Future<List<Niveau3Pays>> fetchNiveau3Pays() async {
     final response = await http.get(Uri.parse('$baseUrl/read'));
 
     if (response.statusCode == 200) {
@@ -83,7 +84,7 @@ class Niveau3Service extends ChangeNotifier {
       return niveauList;
     } else {
       niveauList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête fetch n3 by pays avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }

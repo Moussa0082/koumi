@@ -16,6 +16,7 @@ import 'package:koumi_app/service/AlerteService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/CampagneService.dart';
 import 'package:koumi_app/service/CategorieService.dart';
+import 'package:koumi_app/service/CommandeService.dart';
 import 'package:koumi_app/service/ConseilService.dart';
 import 'package:koumi_app/service/ContinentService.dart';
 import 'package:koumi_app/service/FiliereService.dart';
@@ -43,15 +44,17 @@ import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:koumi_app/widgets/connection_verify.dart';
 import 'package:koumi_app/widgets/notification_controller.dart';
+import 'package:koumi_app/controller/dependency_injection.dart';
 import 'package:provider/provider.dart';
 
 // final navigatorKey = GlofbalKey<NavigatorState>();
 
+
 void main() async {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  // await FirebaseApi().initNotification();
-  // await AwesomeNotifications().initialize(
+    // WidgetsFlutterBinding.ensureInitialized();
+    // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    // await FirebaseApi().initNotification();
+  // await AwesomeNotifications().initial ize(
   //    'resource://@drawable/launcher_icon',
   //   [
   //   Not
@@ -92,6 +95,7 @@ void main() async {
   //   );
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => MagasinService()),
+    ChangeNotifierProvider(create: (context) => CommandeService()),
     ChangeNotifierProvider(create: (context) => CartProvider()),
     ChangeNotifierProvider(create: (context) => ActeurService()),
     ChangeNotifierProvider(create: (context) => TypeActeurService()),
@@ -127,6 +131,7 @@ void main() async {
     ChangeNotifierProvider(create: (context) => FormeService()),
     ChangeNotifierProvider(create: (context) => BottomNavigationService())
   ], child: MyApp()));
+    // DependencyInjection.init();
   // Get.put(ConnectionVerify(), permanent: true);
 }
 
@@ -167,8 +172,8 @@ class _MyAppState extends State<MyApp> {
         '/BottomNavigationPage': (context) => const BottomNavigationPage(),
         // '/notificationPage':(context) =>  NotificationPage(),
       },
-       home: const SplashScreen(),
-      // home: LoginScreen(), 
+      //  home:  ItemScreen(),
+      home: const SplashScreen(), 
     );
   }
 }

@@ -1,11 +1,19 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:koumi_app/Admin/DetailMateriel.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Materiel.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
+
 
 class ListeMaterielByActeur extends StatefulWidget {
   const ListeMaterielByActeur({super.key});
@@ -26,18 +34,108 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
   late Future futureList;
   bool _isActive = false;
   bool _isNotActive = false;
+     int page = 0;
+   bool isLoading = false;
+   int size = 4;
+   bool hasMore = true;
+       ScrollController scrollableController = ScrollController();
+       late TextEditingController _searchController;
+   
+    Future<List<Materiel>> fetchMaterielByActeur(String idActeur,{bool refresh = false}) async {
+    if (isLoading == true) return [];
 
-  Future<List<Materiel>> getListe(String id) async {
-    final response = await MaterielService().fetchMaterielByActeur(id);
-    return response;
+    setState(() {
+      isLoading = true;
+    });
+
+    if(mounted)
+    if (refresh) {
+      setState(() {
+        materielListe.clear();
+       page = 0;
+        hasMore = true;
+      });
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Materiel/getAllMaterielsByActeurWithPagination?idActeur=$idActeur&page=${page}&size=${size}'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+          setState(() {
+           hasMore = false;
+          });
+        } else {
+          setState(() {
+           List<Materiel> newMateriel = body.map((e) => Materiel.fromMap(e)).toList();
+          materielListe.addAll(newMateriel);
+          });
+        }
+
+        debugPrint("response body all materiel by acteur with pagination ${page} par défilement soit ${materielListe.length}");
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des materiels: $e');
+    } finally {
+      setState(() {
+       isLoading = false;
+      });
+    }
+    return materielListe;
   }
+
+
+      void _scrollListener() {
+  if (scrollableController.position.pixels >=
+          scrollableController.position.maxScrollExtent - 200 &&
+      hasMore &&
+      !isLoading && acteur.idActeur != null) {
+    // if (selectedCat != null) {
+      // Incrementez la page et récupérez les stocks par catégorie
+      debugPrint("yes - fetch materiel  by acteur");
+      setState(() {
+          // Rafraîchir les données ici
+      page++;
+        });
+      fetchMaterielByActeur(acteur.idActeur!).then((value) {
+        setState(() {
+          // Rafraîchir les données ici
+        });
+      });
+    
+  }
+    debugPrint("no");
+
+
+}
 
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    futureListe = getListe(acteur.idActeur!);
+    futureListe = MaterielService().fetchMaterielByActeurWithPagination(acteur.idActeur!);
     super.initState();
+     _searchController = TextEditingController();
+     WidgetsBinding.instance.addPostFrameCallback((_){
+    //code will run when widget rendering complete
+  scrollableController.addListener(_scrollListener);
+  });
   }
+
+
+     @override
+  void dispose() {
+    _searchController
+        .dispose(); 
+        // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+        scrollableController.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -52,338 +150,481 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
               const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Consumer<MaterielService>(
-              builder: (context, materielService, child) {
-                return FutureBuilder(
-                    future: futureListe,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.orange,
-                          ),
-                        );
-                      }
-
-                      if (!snapshot.hasData) {
-                        return const Padding(
+      body: Container(
+        child: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            
+           return  <Widget>
+            [
+              SliverToBoxAdapter(
+                child: Column(
+                  children:[
+      
+            const SizedBox(height: 10),
+          
+       Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.search,
+                      color: Colors.blueGrey[400],
+                      size: 28), // Utiliser une icône de recherche plus grande
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Rechercher',
+                        border: InputBorder.none,
+                        hintStyle: TextStyle(color: Colors.blueGrey[400]),
+                      ),
+                    ),
+                  ),
+                  // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
+                  IconButton(
+                    icon: Icon(Icons.clear),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() {});
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),           
+            const SizedBox(height: 10),
+                  ]
+                )
+              ),
+          
+          ];
+          
+          
+        },
+        body: 
+            RefreshIndicator(
+              onRefresh: () async{
+                setState(() {
+                  hasMore = true;
+                  page =0;
+             futureListe = MaterielService().fetchMaterielByActeurWithPagination(acteur.idActeur!);
+                });                  
+      
+              },
+              child: SingleChildScrollView(
+                controller: scrollableController,
+                child: 
+                      Consumer<MaterielService>(
+                            builder: (context, materielService, child) {
+              return FutureBuilder(
+                  future: futureListe,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return _buildShimmerEffect();
+                    }
+              
+                    if (!snapshot.hasData) {
+                      return SingleChildScrollView(
+                        child: Padding(
                           padding: EdgeInsets.all(10),
-                          child: Center(child: Text("Aucun matériel trouvé")),
-                        );
-                      } else {
-                        materielListe = snapshot.data!;
-                        return materielListe.isEmpty
-                            ? Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Center(
-                                    child: Text("Aucun matériel trouvé")),
-                              )
-                            : GridView.builder(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  mainAxisSpacing: 10,
-                                  crossAxisSpacing: 10,
-                                  childAspectRatio: 0.8,
-                                ),
-                                itemCount: materielListe.length,
-                                itemBuilder: (context, index) {
-                                  var e = materielListe.elementAt(index);
-                                  return GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    DetailMateriel(
-                                                        materiel: e)));
-                                      },
-                                      child: Container(
-                                          margin: EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: Color.fromARGB(
-                                                250, 250, 250, 250),
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.grey
-                                                    .withOpacity(0.3),
-                                                offset: Offset(0, 2),
-                                                blurRadius: 8,
-                                                spreadRadius: 2,
+                          child: Center(
+                            child: Column(
+              children: [
+                Image.asset('assets/images/notif.jpg'),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Aucun materiel trouvé' ,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 17,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    } else {
+                      materielListe = snapshot.data!;
+                      String searchText = "";
+                         List<Materiel> filtereSearch =
+                      materielListe.where((search) {
+                    String libelle = search.nom.toLowerCase();
+                    searchText = _searchController.text.trim().toLowerCase();
+                    return libelle.contains(searchText);
+                  }).toList();
+                    if(filtereSearch.isEmpty && _searchController.text.isNotEmpty){   
+                   return SingleChildScrollView(
+                        child: Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Center(
+                            child: Column(
+              children: [
+                Image.asset('assets/images/notif.jpg'),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Aucun magasin trouvé' ,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 17,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+                            ),
+                          ),
+                        ),
+                      );
+                }
+                      return materielListe.isEmpty && isLoading == false
+                          ? SingleChildScrollView(
+                        child: Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Center(
+                            child: Column(
+              children: [
+                Image.asset('assets/images/notif.jpg'),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Aucun matériel trouvé' ,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 17,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+                            ),
+                          ),
+                        ),
+                      )
+                          : 
+                          GridView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 10,
+                                crossAxisSpacing: 10,
+                                childAspectRatio: 0.8,
+                              ),
+                              itemCount: materielListe.length + 1,
+                              itemBuilder: (context, index) {
+                                if(index<materielListe.length){
+                                // var e = filtereSearch
+                                // .where((element) => element.statut== true)
+                                // .elementAt(index);
+              
+                              
+                                return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DetailMateriel(
+                                                      materiel: materielListe[index])));
+                                    },
+                                    child: Card(
+                                      margin: EdgeInsets.all(8),
+                                       
+                                        child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        8.0),
+                                                child: SizedBox(
+                                                  height: 72,
+                                                  child: materielListe[index].photoMateriel ==
+                                                          null ||
+                                                          materielListe[index].photoMateriel!
+                                                              .isEmpty
+                                                      ? Image.asset(
+                                                          "assets/images/default_image.png",
+                                                          fit: BoxFit.cover,
+                                                          height: 72,
+                                                        )
+                                                      : 
+                                      CachedNetworkImage(
+                                                          imageUrl:
+                                                              "https://koumi.ml/api-koumi/Materiel/${materielListe[index].idMateriel}/image",
+                                                          fit: BoxFit.cover,
+                                                          placeholder: (context,
+                                                                  url) =>
+                                                              const Center(
+                                                                  child:
+                                                                      CircularProgressIndicator()),
+                                                          errorWidget:
+                                                              (context, url,
+                                                                      error) =>
+                                                                  Image.asset(
+                                                            'assets/images/default_image.png',
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        ),
+                                                ),
                                               ),
-                                            ],
-                                          ),
-                                          child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.stretch,
-                                              children: [
-                                                ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          8.0),
-                                                  child: SizedBox(
-                                                    height: 85,
-                                                    child: e.photoMateriel ==
-                                                            null ||
-                                                            e.photoMateriel!
-                                                                .isEmpty
-                                                        ? Image.asset(
-                                                            "assets/images/default_image.png",
-                                                            fit: BoxFit.cover,
-                                                            height: 90,
-                                                          )
-                                                        : Image.network(
-                                                            "https://koumi.ml/api-koumi/Materiel/${e.idMateriel}/image",
-                                                            fit: BoxFit.cover,
-                                                            height: 90,
-                                                            errorBuilder:
-                                                                (BuildContext
-                                                                        context,
-                                                                    Object
-                                                                        exception,
-                                                                    StackTrace?
-                                                                        stackTrace) {
-                                                              return Image
-                                                                  .asset(
-                                                                'assets/images/default_image.png',
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                                height: 80,
+                                              SizedBox(height: 2),
+                                              ListTile(
+                                                title: Text(
+                                                  materielListe[index].nom,
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold,
+                                                    color: Colors.black87,
+                                                  ),
+                                                 maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                subtitle: Text(
+                                                  materielListe[index].localisation,
+                                                  style: TextStyle(
+                                                    overflow: TextOverflow.ellipsis,
+                                                    fontSize: 15,
+                                                    color: Colors.black87,
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                alignment:
+                                                    Alignment.bottomRight,
+                                                padding: const EdgeInsets
+                                                    .symmetric(
+                                                    horizontal: 10),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    _buildEtat(materielListe[index].statut!),
+                                                    PopupMenuButton<String>(
+                                                      padding:
+                                                          EdgeInsets.zero,
+                                                      itemBuilder:
+                                                          (context) =>
+                                                              <PopupMenuEntry<
+                                                                  String>>[
+                                                        PopupMenuItem<String>(
+                                                          child: ListTile(
+                                                            leading: materielListe[index].statut ==
+                                                                    false
+                                                                ? Icon(
+                                                                    Icons
+                                                                        .check,
+                                                                    color: Colors
+                                                                        .green)
+                                                                : Icon(
+                                                                    Icons
+                                                                        .disabled_visible,
+                                                                    color: Colors
+                                                                            .orange[
+                                                                        400],
+                                                                  ),
+                                                            title: Text(
+                                                              materielListe[index].statut ==
+                                                                      false
+                                                                  ? "Activer"
+                                                                  : "Desactiver",
+                                                              style:
+                                                                  TextStyle(
+                                                                color: materielListe[index].statut ==
+                                                                        false
+                                                                    ? Colors
+                                                                        .green
+                                                                    : Colors.orange[
+                                                                        400],
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                            onTap: () async {
+                                                              materielListe[index].statut ==
+                                                                      false
+                                                                  ? await MaterielService()
+                                                                      .activerMateriel(
+                                                                          materielListe[index].idMateriel!)
+                                                                      .then((value) =>
+                                                                          {
+                                                                            Provider.of<MaterielService>(context, listen: false).applyChange(),
+                                                                            setState(() {
+                                                                              futureListe = fetchMaterielByActeur(acteur.idActeur!);
+                                                                            }),
+                                                                            Navigator.of(context).pop(),
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              const SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Activer avec succèss "),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: Duration(seconds: 2),
+                                                                              ),
+                                                                            )
+                                                                          })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Une erreur s'est produit"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
+                                                                                ),
+                                                                                Navigator.of(context).pop(),
+                                                                              })
+                                                                  : await MaterielService()
+                                                                      .desactiverMateriel(
+                                                                          materielListe[index].idMateriel!)
+                                                                      .then((value) =>
+                                                                          {
+                                                                            Provider.of<MaterielService>(context, listen: false).applyChange(),
+                                                                            setState(() {
+                                                                              futureListe = fetchMaterielByActeur(acteur.idActeur!);
+                                                                            }),
+                                                                            Navigator.of(context).pop(),
+                                                                          })
+                                                                      .catchError((onError) =>
+                                                                          {
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              const SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Une erreur s'est produit"),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: Duration(seconds: 5),
+                                                                              ),
+                                                                            ),
+                                                                            Navigator.of(context).pop(),
+                                                                          });
+              
+                                                              ScaffoldMessenger.of(
+                                                                      context)
+                                                                  .showSnackBar(
+                                                                const SnackBar(
+                                                                  content:
+                                                                      Row(
+                                                                    children: [
+                                                                      Text(
+                                                                          "Désactiver avec succèss "),
+                                                                    ],
+                                                                  ),
+                                                                  duration: Duration(
+                                                                      seconds:
+                                                                          2),
+                                                                ),
                                                               );
                                                             },
                                                           ),
-                                                  ),
-                                                ),
-                                                SizedBox(height: 2),
-                                                ListTile(
-                                                  title: Text(
-                                                    e.nom,
-                                                    style: TextStyle(
-                                                      fontSize: 17,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black87,
-                                                    ),
-                                                    // maxLines: 1,
-                                                    // overflow: TextOverflow.ellipsis,
-                                                  ),
-                                                  subtitle: Text(
-                                                    e.localisation,
-                                                    style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.black87,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Container(
-                                                  alignment:
-                                                      Alignment.bottomRight,
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 10),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      _buildEtat(e.statut!),
-                                                      PopupMenuButton<String>(
-                                                        padding:
-                                                            EdgeInsets.zero,
-                                                        itemBuilder:
-                                                            (context) =>
-                                                                <PopupMenuEntry<
-                                                                    String>>[
-                                                          PopupMenuItem<String>(
-                                                            child: ListTile(
-                                                              leading: e.statut ==
-                                                                      false
-                                                                  ? Icon(
-                                                                      Icons
-                                                                          .check,
-                                                                      color: Colors
-                                                                          .green)
-                                                                  : Icon(
-                                                                      Icons
-                                                                          .disabled_visible,
-                                                                      color: Colors
-                                                                              .orange[
-                                                                          400],
-                                                                    ),
-                                                              title: Text(
-                                                                e.statut ==
-                                                                        false
-                                                                    ? "Activer"
-                                                                    : "Desactiver",
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: e.statut ==
-                                                                          false
-                                                                      ? Colors
-                                                                          .green
-                                                                      : Colors.orange[
-                                                                          400],
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
+                                                        ),
+                                                        PopupMenuItem<String>(
+                                                          child: ListTile(
+                                                            leading:
+                                                                const Icon(
+                                                              Icons.delete,
+                                                              color:
+                                                                  Colors.red,
+                                                            ),
+                                                            title: const Text(
+                                                              "Supprimer",
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .red,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
                                                               ),
-                                                              onTap: () async {
-                                                                e.statut ==
-                                                                        false
-                                                                    ? await MaterielService()
-                                                                        .activerMateriel(e
-                                                                            .idMateriel!)
-                                                                        .then((value) =>
-                                                                            {
-                                                                              Provider.of<MaterielService>(context, listen: false).applyChange(),
-                                                                              setState(() {
-                                                                                futureListe = getListe(acteur.idActeur!);
-                                                                              }),
-                                                                              Navigator.of(context).pop(),
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Activer avec succèss "),
-                                                                                    ],
-                                                                                  ),
-                                                                                  duration: Duration(seconds: 2),
+                                                            ),
+                                                            onTap: () async {
+                                                              await MaterielService()
+                                                                  .deleteMateriel(
+                                                                      materielListe[index].idMateriel!)
+                                                                  .then(
+                                                                      (value) =>
+                                                                          {
+                                                                            Provider.of<MaterielService>(context, listen: false).applyChange(),
+                                                                            setState(() {
+                                                                              futureListe = fetchMaterielByActeur(acteur.idActeur!);
+                                                                            }),
+                                                                            Navigator.of(context).pop(),
+                                                                          })
+                                                                  .catchError(
+                                                                      (onError) =>
+                                                                          {
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              const SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Impossible de supprimer"),
+                                                                                  ],
                                                                                 ),
-                                                                              )
-                                                                            })
-                                                                        .catchError(
-                                                                            (onError) =>
-                                                                                {
-                                                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                                                    const SnackBar(
-                                                                                      content: Row(
-                                                                                        children: [
-                                                                                          Text("Une erreur s'est produit"),
-                                                                                        ],
-                                                                                      ),
-                                                                                      duration: Duration(seconds: 5),
-                                                                                    ),
-                                                                                  ),
-                                                                                  Navigator.of(context).pop(),
-                                                                                })
-                                                                    : await MaterielService()
-                                                                        .desactiverMateriel(e
-                                                                            .idMateriel!)
-                                                                        .then((value) =>
-                                                                            {
-                                                                              Provider.of<MaterielService>(context, listen: false).applyChange(),
-                                                                              setState(() {
-                                                                                futureListe = getListe(acteur.idActeur!);
-                                                                              }),
-                                                                              Navigator.of(context).pop(),
-                                                                            })
-                                                                        .catchError((onError) =>
-                                                                            {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Une erreur s'est produit"),
-                                                                                    ],
-                                                                                  ),
-                                                                                  duration: Duration(seconds: 5),
-                                                                                ),
+                                                                                duration: Duration(seconds: 2),
                                                                               ),
-                                                                              Navigator.of(context).pop(),
-                                                                            });
-
-                                                                ScaffoldMessenger.of(
-                                                                        context)
-                                                                    .showSnackBar(
-                                                                  const SnackBar(
-                                                                    content:
-                                                                        Row(
-                                                                      children: [
-                                                                        Text(
-                                                                            "Désactiver avec succèss "),
-                                                                      ],
-                                                                    ),
-                                                                    duration: Duration(
-                                                                        seconds:
-                                                                            2),
-                                                                  ),
-                                                                );
-                                                              },
-                                                            ),
+                                                                            )
+                                                                          });
+                                                            },
                                                           ),
-                                                          PopupMenuItem<String>(
-                                                            child: ListTile(
-                                                              leading:
-                                                                  const Icon(
-                                                                Icons.delete,
-                                                                color:
-                                                                    Colors.red,
-                                                              ),
-                                                              title: const Text(
-                                                                "Supprimer",
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .red,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                              onTap: () async {
-                                                                await MaterielService()
-                                                                    .deleteMateriel(e
-                                                                        .idMateriel!)
-                                                                    .then(
-                                                                        (value) =>
-                                                                            {
-                                                                              Provider.of<MaterielService>(context, listen: false).applyChange(),
-                                                                              setState(() {
-                                                                                futureListe = getListe(acteur.idActeur!);
-                                                                              }),
-                                                                              Navigator.of(context).pop(),
-                                                                            })
-                                                                    .catchError(
-                                                                        (onError) =>
-                                                                            {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                const SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Impossible de supprimer"),
-                                                                                    ],
-                                                                                  ),
-                                                                                  duration: Duration(seconds: 2),
-                                                                                ),
-                                                                              )
-                                                                            });
-                                                              },
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
                                                 ),
-                                              ])));
-                                },
-                              );
-                      }
-                    });
-              },
-            )
-          ],
-        ),
-      ),
-    );
+                                              ),
+                                            ])
+                                            )
+                                            );
+                                            }else{
+                                          return isLoading == true ? 
+                                         Padding(
+                                           padding: const EdgeInsets.symmetric(horizontal: 32),
+                                           child: Center(
+                                             child:
+                                             const Center(
+                                                                 child: CircularProgressIndicator(
+                                  color: Colors.orange,
+                                                                 ),
+                                                               )
+                                           ),
+                                         ) : Container();
+                                         }
+                              },
+                            );
+                    }
+                  });
+                            },
+                          )
+                
+              ),
+            ),
+          )));
   }
 
   Widget _buildEtat(bool isState) {
@@ -396,6 +637,76 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
       ),
     );
   }
+
+
+   Widget _buildShimmerEffect(){
+  return   Center(
+        child: GridView.builder(
+            shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 0.8,
+      ),
+          itemCount: 6, // Number of shimmer items to display
+          itemBuilder: (context, index) {
+            return Card(
+              margin: EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 85,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 16,
+                        color: Colors.grey,
+                      ),
+                    ), 
+                    subtitle: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 15,
+                        color: Colors.grey,
+                        margin: EdgeInsets.only(top: 4),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 15,
+                        color: Colors.grey,
+                        margin: EdgeInsets.only(top: 4),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+ }
+
 
   Widget _buildItem(String title, String value) {
     return Padding(
@@ -427,3 +738,10 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
     );
   }
 }
+
+
+
+
+ /*
+ 
+ */

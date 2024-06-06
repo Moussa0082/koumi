@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/SousRegion.dart';
 import 'package:koumi_app/service/PaysService.dart';
@@ -22,6 +23,12 @@ class _UpdatesPaysState extends State<UpdatesPays> {
   final formkey = GlobalKey<FormState>();
   TextEditingController libelleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+    TextEditingController niveau1PaysController = TextEditingController();
+  TextEditingController niveau2PaysController = TextEditingController();
+  TextEditingController niveau3PaysController = TextEditingController();
+    TextEditingController monnaieController = TextEditingController();
+  TextEditingController tauxDollarController = TextEditingController();
+  TextEditingController tauxYuanController = TextEditingController();
   late SousRegion sousRegion;
   String? sousValue;
   late Future _sousRegionList;
@@ -31,13 +38,32 @@ class _UpdatesPaysState extends State<UpdatesPays> {
   void initState() {
     super.initState();
     _sousRegionList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/sousRegion/read'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/sousRegion/read'));
+        http.get(Uri.parse('$apiOnlineUrl/sousRegion/read'));
     payss = widget.pays;
-    sousValue = payss.sousRegion.idSousRegion;
-    libelleController.text = payss.nomPays;
-    descriptionController.text = payss.descriptionPays;
-    sousRegion = payss.sousRegion;
+    sousValue = payss.sousRegion!.idSousRegion;
+    libelleController.text = payss.nomPays!;
+    descriptionController.text = payss.descriptionPays!;
+    niveau1PaysController.text = payss.libelleNiveau1Pays!;
+    niveau2PaysController.text = payss.libelleNiveau2Pays!;
+    niveau3PaysController.text = payss.libelleNiveau3Pays!;
+    if (payss.monnaie != null) {
+      monnaieController.text = payss.monnaie!;
+    } else {
+      monnaieController.text = "";
+    }
+    if (payss.tauxDollar != null) {
+    tauxDollarController.text = payss.tauxDollar!;
+    } else {
+        tauxDollarController.text = "";
+
+    }
+    if (payss.tauxYuan != null) {
+    tauxYuanController.text = payss.tauxYuan!;
+    } else {
+        tauxYuanController.text = "";
+
+    }
+    sousRegion = payss.sousRegion!;
   }
 
   @override
@@ -96,7 +122,18 @@ class _UpdatesPaysState extends State<UpdatesPays> {
                     future: _sousRegionList,
                     builder: (_, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
+                        return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Chargement ...',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
                       }
                       if (snapshot.hasError) {
                         return Text("${snapshot.error}");
@@ -116,6 +153,7 @@ class _UpdatesPaysState extends State<UpdatesPays> {
                         }
         
                         return DropdownButtonFormField<String>(
+                          isExpanded: true,
                           items: sousList
                               .map(
                                 (e) => DropdownMenuItem(
@@ -127,14 +165,21 @@ class _UpdatesPaysState extends State<UpdatesPays> {
                           value: sousValue,
                           onChanged: (newValue) {
                             setState(() {
-                              sousValue = newValue;
-                              if (newValue != null) {
-                                sousRegion = sousList.firstWhere((element) =>
-                                    element.idSousRegion == newValue);
-                                debugPrint(
-                                    "con select ${sousRegion.idSousRegion.toString()}");
-                                // typeSelected = true;
-                              }
+                              // sousValue = newValue;
+                              // if (newValue != null) {
+                              //   sousRegion = sousList.firstWhere((element) =>
+                              //       element.idSousRegion == newValue);
+                              //   debugPrint(
+                              //       "con select ${sousRegion.idSousRegion.toString()}");
+                              //   // typeSelected = true;
+                              // }
+                               sousValue = newValue;
+                                    if (newValue != null){
+                                            sousRegion = sousList.firstWhere(
+                             (sousRegion) => sousRegion.idSousRegion == newValue,
+                                );
+                                      print("niveau 1 : ${sousRegion}");
+                                    }
                             });
                           },
                           decoration: InputDecoration(
@@ -168,6 +213,108 @@ class _UpdatesPaysState extends State<UpdatesPays> {
                       ),
                     ),
                   ),
+                  SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: niveau1PaysController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Libelle niveau 1 pays",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: niveau2PaysController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Libelle niveau 2 pays",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: niveau3PaysController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Libelle niveau 3 pays",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                       SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: monnaieController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Monnaie",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: tauxDollarController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Taux Dollar",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: tauxYuanController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Taux Yuan",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
                   SizedBox(height: 20),
                   ElevatedButton.icon(
                     onPressed: () async {
@@ -180,6 +327,12 @@ class _UpdatesPaysState extends State<UpdatesPays> {
                                   idPays: payss.idPays!,
                                   nomPays: libelle,
                                   descriptionPays: description,
+                                  libelleNiveau1Pays: niveau1PaysController.text,
+                                      libelleNiveau2Pays: niveau2PaysController.text,
+                                      libelleNiveau3Pays: niveau3PaysController.text,
+                                      monnaie: monnaieController.text,
+                                      tauxDollar: tauxDollarController.text,
+                                      tauxYuan: tauxYuanController.text,
                                   sousRegion: sousRegion)
                               .then((value) => {
                                     Provider.of<PaysService>(context,
@@ -189,6 +342,9 @@ class _UpdatesPaysState extends State<UpdatesPays> {
                                             listen: false)
                                         .applyChange(),
                                     libelleController.clear(),
+                                    niveau1PaysController.clear(),
+                                    niveau2PaysController.clear(),
+                                    niveau3PaysController.clear(),
                                     descriptionController.clear(),
                                     setState(() {
                                       sousRegion == null;
@@ -208,6 +364,10 @@ class _UpdatesPaysState extends State<UpdatesPays> {
                             ),
                           );
                         }
+                        debugPrint("sous region $sousRegion");
+                        debugPrint("l1 ${niveau1PaysController.text}");
+                        debugPrint("l2 ${niveau2PaysController.text}");
+                        debugPrint("l3 ${niveau3PaysController.text}");
                       }
                     },
                     style: ElevatedButton.styleFrom(

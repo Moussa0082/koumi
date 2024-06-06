@@ -2,13 +2,14 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/SousRegion.dart';
 import 'package:path/path.dart';
 
 class Niveau1Service extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/niveau1Pays';
+  static const String baseUrl = '$apiOnlineUrl/niveau1Pays';
   // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/niveau1Pays';
 
   List<Niveau1Pays> niveauList = [];
@@ -86,7 +87,7 @@ class Niveau1Service extends ChangeNotifier {
       return niveauList;
     } else {
       niveauList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête fetch n1 by pays avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }

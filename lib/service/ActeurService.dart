@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -10,7 +11,7 @@ import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ActeurService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/acteur';
+  static const String baseUrl = '$apiOnlineUrl/acteur';
   // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur';
 
   List<Acteur> acteurList = [];

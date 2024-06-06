@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/CodePays.dart';
 import 'package:koumi_app/Admin/Niveau2List.dart';
 import 'package:koumi_app/Admin/UpdateNiveau1.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
@@ -44,7 +45,7 @@ class _Niveau1PageState extends State<Niveau1Page> {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
     para = paraList[0];
-    _paysList = http.get(Uri.parse('https://koumi.ml/api-koumi/pays/read'));
+    _paysList = http.get(Uri.parse('$apiOnlineUrl/pays/read'));
     // _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
     _searchController = TextEditingController();
   }
@@ -199,7 +200,7 @@ class _Niveau1PageState extends State<Niveau1Page> {
                                           children: [
                                             ListTile(
                                               leading: CodePays()
-                                                  .getFlag(e.pays!.nomPays),
+                                                  .getFlag(e.pays!.nomPays!),
                                               title:
                                                   Text(e.nomN1!.toUpperCase(),
                                                       style: const TextStyle(
@@ -651,11 +652,12 @@ class _Niveau1PageState extends State<Niveau1Page> {
                                   }
 
                                   return DropdownButtonFormField<String>(
+                                    isExpanded: true,
                                     items: paysList
                                         .map(
                                           (e) => DropdownMenuItem(
                                             value: e.idPays,
-                                            child: Text(e.nomPays),
+                                            child: Text(e.nomPays!),
                                           ),
                                         )
                                         .toList(),
@@ -724,6 +726,7 @@ class _Niveau1PageState extends State<Niveau1Page> {
                                       descriptionN1: description,
                                       pays: pays)
                                   .then((value) => {
+                                    Navigator.of(context).pop(),
                                         Provider.of<Niveau1Service>(context,
                                                 listen: false)
                                             .applyChange(),
@@ -734,15 +737,25 @@ class _Niveau1PageState extends State<Niveau1Page> {
                                         setState(() {
                                           pays == null;
                                         }),
-                                        Navigator.of(context).pop()
+                                         ScaffoldMessenger.of(context).showSnackBar(
+                                 SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Text("${para.libelleNiveau1Pays} ajouté avec success"),
+                                    ],
+                                  ),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              )
+                                        // Navigator.of(context).pop()
                                       });
                             } catch (e) {
                               final String errorMessage = e.toString();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
+                                 SnackBar(
                                   content: Row(
                                     children: [
-                                      Text("Une erreur s'est produit"),
+                                      Text("${para.libelleNiveau1Pays} existe déjà"),
                                     ],
                                   ),
                                   duration: Duration(seconds: 5),

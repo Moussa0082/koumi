@@ -2,9 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
+import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Pays.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/Niveau1Service.dart';
 import 'package:provider/provider.dart';
@@ -29,8 +32,39 @@ class _UpdatesNiveau1State extends State<UpdatesNiveau1> {
   List<ParametreGeneraux> paraList = [];
   late Niveau1Pays niveau;
   String? paysValue;
+  late Acteur acteur;
   late Future _paysList;
   late Pays pays;
+
+  bool isLoadingLibelle = true;
+    String? libelleNiveau1Pays;
+ 
+  Future<String> getLibelleNiveau1PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau1Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau1Pays');
+    }
+ }
+
+     Future<void> fetchPaysDataByActor() async {
+    try {
+      String libelle1 = await getLibelleNiveau1PaysByActor(acteur.idActeur!);
+
+      setState(() { 
+        libelleNiveau1Pays = libelle1;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
 
   @override
   void initState() {
@@ -38,9 +72,10 @@ class _UpdatesNiveau1State extends State<UpdatesNiveau1> {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
     para = paraList[0];
-    _paysList = http.get(Uri.parse('https://koumi.ml/api-koumi/pays/read'));
+    _paysList = http.get(Uri.parse('$apiOnlineUrl/pays/read'));
     // _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
-
+    fetchPaysDataByActor();
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     niveau = widget.niveau1pays;
     libelleController.text = niveau.nomN1!;
     descriptionController.text = niveau.descriptionN1!;
@@ -94,7 +129,7 @@ class _UpdatesNiveau1State extends State<UpdatesNiveau1> {
                     },
                     controller: libelleController,
                     decoration: InputDecoration(
-                      labelText: "Nom du ${para.libelleNiveau1Pays}",
+                      labelText: "Nom du ${libelleNiveau1Pays}",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -105,7 +140,18 @@ class _UpdatesNiveau1State extends State<UpdatesNiveau1> {
                     future: _paysList,
                     builder: (_, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
+                       return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Chargement ...',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
                       }
                       if (snapshot.hasError) {
                         return Text("${snapshot.error}");
@@ -125,11 +171,12 @@ class _UpdatesNiveau1State extends State<UpdatesNiveau1> {
                         }
         
                         return DropdownButtonFormField<String>(
+                          isExpanded: true,
                           items: paysList
                               .map(
                                 (e) => DropdownMenuItem(
                                   value: e.idPays,
-                                  child: Text(e.nomPays),
+                                  child: Text(e.nomPays!),
                                 ),
                               )
                               .toList(),

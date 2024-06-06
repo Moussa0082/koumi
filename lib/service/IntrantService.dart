@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Forme.dart';
@@ -12,9 +13,13 @@ import 'package:path/path.dart';
 
 class IntrantService extends ChangeNotifier {
   // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/intrant';
-  static const String baseUrl = 'https://koumi.ml/api-koumi/intrant';
+  static const String baseUrl = '$apiOnlineUrl/intrant';
 
   List<Intrant> intrantList = [];
+    int page = 0;
+  bool isLoading = false;
+   int size = 4;
+  bool hasMore = true;
 
   Future<void> creerIntrant(
       {required String nomIntrant,
@@ -113,71 +118,159 @@ class IntrantService extends ChangeNotifier {
     }
   }
 
-  Future<List<Intrant>> fetchIntrant() async {
-    try {
-      final response = await http.get(Uri.parse('$baseUrl/read'));
+  
+ 
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        print("Fetching data");
-        List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-        intrantList = body.map((e) => Intrant.fromMap(e)).toList();
-        debugPrint(intrantList.toString());
-        return intrantList;
+
+   Future<List<Intrant>> fetchIntrant({bool refresh = false }) async {
+    if (isLoading) return [];
+
+      isLoading = true;
+
+    if (refresh) {
+    
+        intrantList.clear();
+        page = 0;
+        hasMore = true;
+     
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/intrant/getAllIntrantsWithPagination?page=$page&size=$size'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+         
+            hasMore = false;
+          
+        } else {
+          
+            List<Intrant> newIntrant = body.map((e) => Intrant.fromMap(e)).toList();
+          intrantList.addAll(newIntrant);
+          // page++;
+          
+        }
+
+        debugPrint("response body all intrant with pagination $page par défilement soit ${intrantList.length}");
+       return intrantList;
       } else {
-        intrantList = [];
-        print(
-            'Échec de la requête avec le code d\'état: ${response.statusCode}');
-        throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        return [];
       }
     } catch (e) {
-      throw Exception(e.toString());
+      print('Une erreur s\'est produite lors de la récupération des intrants: $e');
+    } finally {
+     
+        isLoading = false;
+      
     }
+    return intrantList;
   }
 
-  Future<List<Intrant>> fetchIntrantByActeur(String idActeur) async {
-    try {
-      final response =
-          await http.get(Uri.parse('$baseUrl/listeIntrantByActeur/$idActeur'));
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        print("Fetching data");
-        List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-        intrantList = body.map((e) => Intrant.fromMap(e)).toList();
-        debugPrint(intrantList.toString());
-        return intrantList;
+   Future<List<Intrant>> fetchIntrantByCategorieWithPagination(String idCategorie,{bool refresh = false }) async {
+    if (isLoading) return [];
+
+      isLoading = true;
+    
+    if (refresh) {
+    
+        intrantList.clear();
+        page = 0;
+        hasMore = true;
+     
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/intrant/getAllIntrantsByCategorieWithPagination?idCategorie=$idCategorie&page=$page&size=$size'));
+
+      if (response.statusCode == 200) {
+        // debugPrint("url: $response");
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+         
+            hasMore = false;
+          
+        } else {
+          
+            List<Intrant> newIntrants = body.map((e) => Intrant.fromMap(e)).toList();
+          intrantList.addAll(newIntrants);
+          // page++;
+          
+        }
+
+        debugPrint("response body intrant by categorie with pagination $page par défilement soit ${intrantList.length}");
+       return intrantList;
       } else {
-        intrantList = [];
-        print(
-            'Échec de la requête avec le code d\'état: ${response.statusCode}');
-        throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        return [];
       }
     } catch (e) {
-      throw Exception(e.toString());
+      print('Une erreur s\'est produite lors de la récupération des intrants: $e');
+    } finally {
+     
+        isLoading = false;
+      
     }
+    return intrantList;
   }
+  
+   Future<List<Intrant>> fetchIntrantByActeurWithPagination(String idActeur,{bool refresh = false }) async {
+    if (isLoading) return [];
 
-  Future<List<Intrant>> fetchIntrantByCategorie(String idCategorie) async {
+      isLoading = true;
+    
+    if (refresh) {
+    
+        intrantList.clear();
+        page = 0;
+        hasMore = true;
+     
+    }
+
     try {
-      final response = await http
-          .get(Uri.parse('$baseUrl/listeIntrantByCategorie/$idCategorie'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/intrant/getAllIntrantsByActeurWithPagination?idActeur=$idActeur&page=$page&size=$size'));
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        print("Fetching data");
-        List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-        intrantList = body.map((e) => Intrant.fromMap(e)).toList();
-        debugPrint(intrantList.toString());
-        return intrantList;
+      if (response.statusCode == 200) {
+        // debugPrint("url: $response");
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+         
+            hasMore = false;
+          
+        } else {
+          
+            List<Intrant> newIntrants = body.map((e) => Intrant.fromMap(e)).toList();
+          intrantList.addAll(newIntrants);
+          // page++;
+          
+        }
+
+        debugPrint("response body intrant by acteur with pagination $page par défilement soit ${intrantList.length}");
+       return intrantList;
       } else {
-        intrantList = [];
-        print(
-            'Échec de la requête avec le code d\'état: ${response.statusCode}');
-        throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        return [];
       }
     } catch (e) {
-      throw Exception(e.toString());
+      print('Une erreur s\'est produite lors de la récupération des intrants: $e');
+    } finally {
+     
+        isLoading = false;
+      
     }
+    return intrantList;
   }
 
+
+  
   Future deleteIntrant(String idIntrant) async {
     final response = await http.delete(Uri.parse('$baseUrl/delete/$idIntrant'));
 

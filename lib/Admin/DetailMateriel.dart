@@ -1,21 +1,25 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Materiel.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:readmore/readmore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -57,6 +61,11 @@ class _DetailMaterielState extends State<DetailMateriel> {
   bool isExist = false;
   String? email = "";
 
+  
+    bool isLoadingLibelle = true;
+    String? monnaie;
+
+
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     email = prefs.getString('emailActeur');
@@ -75,15 +84,31 @@ class _DetailMaterielState extends State<DetailMateriel> {
     }
   }
 
-  void verifyParam() {
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+     Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
 
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
     } else {
-      // Gérer le cas où la liste est null ou vide, par exemple :
-      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+      throw Exception('Failed to load monnaie');
+    }
+}
+
+Future<void> fetchPaysDataByActor() async {
+    try {
+     
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+      setState(() { 
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
     }
   }
 
@@ -250,10 +275,9 @@ class _DetailMaterielState extends State<DetailMateriel> {
   void initState() {
     super.initState();
     verify();
-    verifyParam();
+
     _niveau3List =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
-    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/read'));
     materiels = widget.materiel;
     _nomController.text = materiels.nom;
     _descriptionController.text = materiels.description;
@@ -261,6 +285,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
     _localiteController.text = materiels.localisation;
     _prixController.text = materiels.prixParHeure.toString();
     isDialOpenNotifier = ValueNotifier<bool>(false);
+    fetchPaysDataByActor();
   }
 
   @override
@@ -293,7 +318,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
                 style: const TextStyle(
                     color: d_colorGreen, fontWeight: FontWeight.bold),
               ),
-              actions: acteur.nomActeur == materiels.acteur.nomActeur
+              actions: acteur.idActeur == materiels.acteur.idActeur
                   ? [
                       _isEditing
                           ? IconButton(
@@ -329,20 +354,26 @@ class _DetailMaterielState extends State<DetailMateriel> {
                                           )
                     : materiels.photoMateriel != null &&
                             materiels.photoMateriel!.isNotEmpty
-                        ? Image.network(
-                            'https://koumi.ml/api-koumi/Materiel/${materiels.idMateriel}/image',
-                            // "http://10.0.2.2/${e.photoIntrant}",
-                            width: double.infinity,
-                            height: 200,
-                            fit: BoxFit.cover,
-                            errorBuilder: (BuildContext context,
-                                Object exception, StackTrace? stackTrace) {
-                              return Image.asset(
-                                'assets/images/default_image.png',
-                                fit: BoxFit.cover,
-                              );
-                            },
-                          )
+                        ? 
+                        CachedNetworkImage(
+                   width: double.infinity,
+                    height: 200,
+                    
+                                                  imageUrl:
+                                                      'https://koumi.ml/api-koumi/Materiel/${materiels.idMateriel}/image',
+                                                  fit: BoxFit.cover,
+                                                  placeholder: (context, url) =>
+                                                      const Center(
+                                                          child:
+                                                              CircularProgressIndicator()),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Image.asset(
+                                                    'assets/images/default_image.png',
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                )
+                       
                         : Image.asset(
                             "assets/images/default_image.png",
                             fit: BoxFit.cover,
@@ -354,7 +385,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
               ],
             ),
           ),
-          floatingActionButton: acteur.nomActeur != materiels.acteur.nomActeur
+          floatingActionButton: acteur.idActeur != materiels.acteur.idActeur
               ? SpeedDial(
                   // animatedIcon: AnimatedIcons.close_menu,
                   backgroundColor: d_colorGreen,
@@ -416,7 +447,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
         // !isExist ? _buildItem('Prix par heure : ',
         //     "${materiels.prixParHeure.toString()} ${para.monnaie}"):
         _buildItem('Prix par heure : ',
-            "${materiels.prixParHeure.toString()} ${para.monnaie}"),
+            "${materiels.prixParHeure.toString()} ${monnaie}"),
         _buildItem('Date d\'ajout : ', materiels.dateAjout!),
         _buildDescription('Description : ', materiels.description)
       ],
@@ -510,17 +541,19 @@ class _DetailMaterielState extends State<DetailMateriel> {
                   overflow: TextOverflow.ellipsis,
                   fontSize: 18),
             ),
-            Text(
-              value,
-              textAlign: TextAlign.justify,
-              softWrap: true,
-              style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w800,
-                // overflow: TextOverflow.ellipsis,
-                fontSize: 16,
-              ),
-            )
+             Padding(
+                      padding: EdgeInsets.all(8),
+                      child: ReadMoreText(
+                        colorClickableText: Colors.orange,
+                        trimLines: 2,
+                        trimMode: TrimMode.Line,
+                        trimCollapsedText: "Lire plus",
+                        trimExpandedText: "Lire moins",
+                        style: TextStyle(
+                            fontSize: 16, fontStyle: FontStyle.italic),
+                        value
+                      ),
+                    ),
           ],
         ),
       ),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/AddCategorie.dart';
 import 'package:koumi_app/Admin/UpdatesFiliere.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Filiere.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
@@ -49,7 +50,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
     //     .parametreList!;
     // para = paraList[0];
     _filiereList = http
-        .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+        .get(Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
     // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
     _liste = getFil();
   }
@@ -462,7 +463,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                                             Provider.of<FiliereService>(context, listen: false).applyChange(),
                                                                             Navigator.of(context).pop(),
                                                                             setState(() {
-                                                                              _filiereList = http.get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+                                                                              _filiereList = http.get(Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
                                                                               // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
                                                                             })
                                                                           })
@@ -658,9 +659,19 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                         Provider.of<FiliereService>(context,
                                                 listen: false)
                                             .applyChange(),
+                                               ScaffoldMessenger.of(context).showSnackBar(
+                                 SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Text("Filière ajouté avec success"),
+                                    ],
+                                  ),
+                                  duration: Duration(seconds: 5),
+                                ),
+                              ),
                                         setState(() {
                                           _filiereList = http.get(Uri.parse(
-                                              'https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+                                              '$apiOnlineUrl/Filiere/getAllFiliere/'));
                                           // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
                                         }),
                                         libelleController.clear(),
@@ -673,7 +684,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                 const SnackBar(
                                   content: Row(
                                     children: [
-                                      Text("Une erreur s'est produite"),
+                                      Text("Cette filière existe déjà"),
                                     ],
                                   ),
                                   duration: Duration(seconds: 5),
@@ -810,6 +821,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                 }
 
                                 return DropdownButtonFormField<String>(
+                                  isExpanded: true,
                                   items: filiereList
                                       .map(
                                         (e) => DropdownMenuItem(
@@ -909,7 +921,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                             content: Row(
                                               children: [
                                                 Text(
-                                                    "Catégorie ajouter avec success"),
+                                                    "Catégorie ajouté avec success"),
                                               ],
                                             ),
                                             duration: Duration(seconds: 3),
@@ -922,7 +934,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                 const SnackBar(
                                   content: Row(
                                     children: [
-                                      Text("Une erreur s'est produit"),
+                                      Text("Cette catgorie existe déjà"),
                                     ],
                                   ),
                                   duration: Duration(seconds: 5),

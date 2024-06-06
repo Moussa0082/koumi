@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Campagne.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
@@ -48,6 +49,35 @@ class _AddSuperficieState extends State<AddSuperficie> {
   DateTime selectedDate = DateTime.now();
   late Acteur acteur;
   bool _isLoading = false;
+    bool isLoadingLibelle = true;
+    String? libelleNiveau3Pays;
+
+    Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+}
+
+     Future<void> fetchLibelleNiveau3Pays() async {
+    try {
+      String libelle = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
+      setState(() {
+        libelleNiveau3Pays = libelle;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+      });
+      print('Error: $e');
+    }
+  }
+
 
   @override
   void initState() {
@@ -57,13 +87,13 @@ class _AddSuperficieState extends State<AddSuperficie> {
     _liste = getCampListe();
 
     _speculationList = http.get(
-        Uri.parse('https://koumi.ml/api-koumi/Speculation/getAllSpeculation'));
+        Uri.parse('$apiOnlineUrl/Speculation/getAllSpeculation'));
     // 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation'));
     // _speculationList = fetchSpeculationList();
     _niveau3List =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
-    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
-  }
+        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
+        fetchLibelleNiveau3Pays(); 
+ }
 
   List<String?> selectedIntrantList = [];
 
@@ -156,6 +186,15 @@ class _AddSuperficieState extends State<AddSuperficie> {
                       SizedBox(
                         height: 10,
                       ),
+                          isLoadingLibelle ?
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text("Chargement ................",style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),)),
+                      )
+                      :
                       Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: 22,
@@ -163,7 +202,7 @@ class _AddSuperficieState extends State<AddSuperficie> {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Text(
-                            "Localité",
+                           libelleNiveau3Pays != null ? libelleNiveau3Pays!.toUpperCase() : "Localité",
                             style:
                                 TextStyle(color: (Colors.black), fontSize: 18),
                           ),
@@ -222,6 +261,7 @@ class _AddSuperficieState extends State<AddSuperficie> {
                                 }
 
                                 return DropdownButtonFormField<String>(
+                                  isExpanded: true,
                                   items: niveau3List
                                       .map(
                                         (e) => DropdownMenuItem(
@@ -352,6 +392,7 @@ class _AddSuperficieState extends State<AddSuperficie> {
                                   }
 
                                   return DropdownButtonFormField<String>(
+                                    isExpanded: true,
                                     items: speList
                                         .map(
                                           (e) => DropdownMenuItem(
@@ -472,6 +513,7 @@ class _AddSuperficieState extends State<AddSuperficie> {
                               }
 
                               return DropdownButtonFormField<String>(
+                                isExpanded: true,
                                 items: campListe
                                     .map(
                                       (e) => DropdownMenuItem(

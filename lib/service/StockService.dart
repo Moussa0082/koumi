@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Magasin.dart';
 import 'package:koumi_app/models/Speculation.dart';
@@ -13,10 +14,15 @@ import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:path/path.dart';
 
 class StockService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/Stock';
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Stock';
+  static const String baseUrl = '$apiOnlineUrl/Stock';
 
   List<Stock> stockList = [];
+  int page = 0;
+  bool isLoading = false;
+   int size = 4;
+  bool hasMore = true;
+
+
   // List<dynamic> stockListe = [];
   // addStock
 
@@ -68,7 +74,7 @@ class StockService extends ChangeNotifier {
               Get.snackbar("Succès", "Produit ajouté avec succès",duration: Duration(seconds: 3));
         debugPrint('stock service ${donneesResponse.toString()}');
       } else {
-          //  Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer plus tard",duration: Duration(seconds: 3));
+           Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer plus tard",duration: Duration(seconds: 3));
          
         throw Exception(
             'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
@@ -76,9 +82,9 @@ class StockService extends ChangeNotifier {
     } catch (e) {
               debugPrint('stock service erreur $e');
 
-      Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
-      throw Exception(
-          'Une erreur s\'est produite lors de l\'ajout de acteur : $e');
+      Get.snackbar("Erreur de connexion", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 5));
+      // throw Exception(
+      //     'Une erreur s\'est produite lors de l\'ajout de acteur : $e');
     }
   }
 
@@ -137,13 +143,14 @@ class StockService extends ChangeNotifier {
         final errorMessage =
             json.decode(utf8.decode(responsed.bodyBytes))['message'];
                     debugPrint(' erreur : ${errorMessage}');
-        throw Exception(
+                    Get.snackbar("Une erreur s'est produit", "Veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
+        print(
             'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
       }
     } catch (e) {
-                Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
+                Get.snackbar("Erreur de connexion", "Veuiller réessayer ultérieurement",duration: Duration(seconds: 3));
       debugPrint("catch erreur : $e");
-      throw Exception(
+      print(
           'Une erreur s\'est produite lors de la modification du produit : $e');
     }
   }
@@ -182,114 +189,200 @@ class StockService extends ChangeNotifier {
     }
   }
 
-  Future<List<Stock>> fetchStock() async {
-    try {
-      final response =
-          await http.get(Uri.parse('https://koumi.ml/api-koumi/Stock/getAllStocks'));
-          // await http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Stock/getAllStocks'));
 
-      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
 
-        List<dynamic> body = jsonDecode(response.body);
-        debugPrint("response body ${body.toString()}");
-        stockList = body
-      // where((stock) => stock['statutSotck'] == true)
-        .map((e) => Stock.fromMap(e)).toList();
-        debugPrint("stockList all ${stockList.toList()}");
-        return stockList;
-      } else {
-        stockList = [];
-        print(
-            'Échec de la requête avec le code d\'état: ${response.statusCode}');
-        throw Exception(jsonDecode(response.body)["message"]);
-      }
-    } catch (e) {
-      print(
-          'Une erreur s\'est produite lors de la récupération des stocks: $e');
-      // throw Exception(e.toString());
-    }
-              return stockList;
   
-  }
 
-  Future<List<Stock>> fetchStockByActeur(String id) async {
+   Future<List<Stock>> fetchStock({bool refresh = false }) async {
+    if (isLoading) return [];
+
+      isLoading = true;
+
+    if (refresh) {
+    
+        stockList.clear();
+        page = 0;
+        hasMore = true;
+     
+    }
+
     try {
-      final response =
-          await http.get(Uri.parse('$baseUrl/getAllStocksByActeurs/$id'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksWithPagination?page=$page&size=$size'));
 
-      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
-        print("Fetching data all stocks by acteur");
-        List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-        stockList = body.map((e) => Stock.fromMap(e)).toList();
-        debugPrint(stockList.toString());
-        return stockList;
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+         
+            hasMore = false;
+          
+        } else {
+          
+            List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
+          stockList.addAll(newStocks);
+          // page++;
+          
+        }
+
+        debugPrint("response body all stock with pagination $page par défilement soit ${stockList.length}");
+       return stockList;
       } else {
-        stockList = [];
-        print(
-            'Échec de la requête avec le code d\'état: ${response.statusCode}');
-        throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        return [];
       }
     } catch (e) {
-            print('Error fetching magasins : $e');
-      // throw Exception(e.toString());
+      print('Une erreur s\'est produite lors de la récupération des stocks: $e');
+    } finally {
+     
+        isLoading = false;
+      
     }
-        return stockList;
+    return stockList;
   }
 
+
+   Future<List<Stock>> fetchStockByCategorieWithPagination(String idCategorie,{bool refresh = false }) async {
+    if (isLoading) return [];
+
+      isLoading = true;
+    
+    if (refresh) {
+    
+        stockList.clear();
+        page = 0;
+        hasMore = true;
+     
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByCategorieWithPagination?idCategorie=$idCategorie&page=$page&size=$size'));
+
+      if (response.statusCode == 200) {
+        // debugPrint("url: $response");
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+         
+            hasMore = false;
+          
+        } else {
+          
+            List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
+          stockList.addAll(newStocks);
+          // page++;
+          
+        }
+
+        debugPrint("response body stock by categorie with pagination $page par défilement soit ${stockList.length}");
+       return stockList;
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des stocks: $e');
+    } finally {
+     
+        isLoading = false;
+      
+    }
+    return stockList;
+  }
+ 
+  
+  
+
+
+ 
+
+  
 
   
    Future<List<Stock>> fetchProduitByCategorieProduitMagAndActeur(String idCategorie, String idMagasin, String idActeur) async {
     try {
       final response = await http.get(Uri.parse(
         
-          'https://koumi.ml/api-koumi/Stock/categorieAndActeur/$idCategorie/$idMagasin/$idActeur'));
-          // 'http://10.0.2.2:9000/api-koumi/Stock/categorieAndActeur/$idCategorie/$idMagasin/$idActeur'));
+          '$baseUrl/categorieAndActeur/$idCategorie/$idMagasin/$idActeur'));
+
       if (response.statusCode == 200) {
                 print("Fetching data all stock by id ,categorie, magasin and acteur");
         List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
         stockList = body
         // .where((stock) => stock['statutSotck'] == true)
         .map((e) => Stock.fromMap(e)).toList();
-        debugPrint(stockList.toString());
+        // debugPrint(stockList.toString());
         return stockList;
       } else {
-        stockList = [];
         debugPrint('Failed to load stock');
+        return stockList = [];
       }
     } catch (e) {
-      print('Error fetching stock: $e');
+      print('Error fetching stock by id ,categorie, magasin and acteur: $e');
     }
-    return stockList;
+    return stockList = [];
   }
 
-  Future<List<Stock>> fetchProduitByCategorieAndMagasin(String idCategorie, String idMagasin) async {
+  
+  Future<List<Stock>> fetchStockByCategorieAndMagasinWithPagination(String idCategorie,String idMagasin,{bool refresh = false }) async {
+    if (isLoading) return [];
+
+    
+      isLoading = true;
+    
+
+    if (refresh) {
+    
+        stockList.clear();
+        page = 0;
+        hasMore = true;
+     
+    }
+
     try {
-      final response = await http.get(Uri.parse(
-          'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
-          // 'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByCategorieAndMagasinWithPagination?idCategorie=$idCategorie&idMagasin=$idMagasin&page=$page&size=$size'));
+
       if (response.statusCode == 200) {
-                print("Fetching data all stock by id categorie and id magasin");
-          List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-        stockList = body
-        .where((stock) => stock['statutSotck'] == true)
-        .map((e) => Stock.fromMap(e)).toList();
-        debugPrint(stockList.toString());
+        // debugPrint("url: $response");
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+         
+            hasMore = false;
+          
+        } else {
+          
+            List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
+          stockList.addAll(newStocks);
+          // page++;
+          
+        }
+
+        debugPrint("response body stock by categorie and magasin with pagination $page par défilement soit ${stockList.length}");
+       return stockList;
       } else {
-        debugPrint('Failed to load stock');
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        return [];
       }
     } catch (e) {
-      print('Error fetching stock: $e');
+      print('Une erreur s\'est produite lors de la récupération des stocks: $e');
+    } finally {
+     
+        isLoading = false;
+      
     }
     return stockList;
   }
+  
 
 
    
    Future<List<Stock>> fetchProduitByCategorieAndActeur(String idCategorie, String idActeur) async {
     try {
       final response = await http.get(
-          Uri.parse('https://koumi.ml/api-koumi/Stock/categorieAndIdActeur/$idCategorie/$idActeur'));
-          // Uri.parse('http://10.0.2.2:9000/api-koumi/Stock/categorieAndIdActeur/$idCategorie/$idActeur'));
+          Uri.parse('$baseUrl/categorieAndIdActeur/$idCategorie/$idActeur'));
        if (response.statusCode == 200) {
                     // await Future.delayed(Duration(seconds: 2));
                             print("Fetching data all stock by id categorie and id acteur");
@@ -297,61 +390,143 @@ class StockService extends ChangeNotifier {
         stockList = body
         // .where((stock) => stock['statutSotck'] == true)
         .map((e) => Stock.fromMap(e)).toList();
-        debugPrint(stockList.toString());
+        // debugPrint(stockList.toString());
       } else {
-        throw Exception('Failed to load stock');
+        print('Failed to load stock');
+        return stockList = [];
       }
     } catch (e) {
-      print('Error fetching stock: $e');
+      print('Error fetching stock by id categorie and id acteu: $e');
+    }
+    return stockList = [];
+  }
+
+   Future<List<Stock>> fetchStockByActeur(String idActeur,{bool refresh = false}) async {
+    // if (_stockService.isLoading == true) return [];
+
+      isLoading = true;
+
+    if (refresh) {
+        stockList.clear();
+       page = 0;
+        hasMore = true;
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByActeurWithPagination?idActeur=$idActeur&page=${page}&size=${size}'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+           hasMore = false;
+        } else {
+           List<Stock> newIntrant = body.map((e) => Stock.fromMap(e)).toList();
+          stockList.addAll(newIntrant);
+        }
+
+        debugPrint("response body all stock by acteur with pagination ${page} par défilement soit ${stockList.length}");
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des stocks: $e');
+    } finally {
+       isLoading = false;
     }
     return stockList;
   }
 
-   Future<List<Stock>> fetchProduitByCategorie(String id) async {
+    Future<List<Stock>> fetchStockByMagasinAndActeur(String idMagasin,String idActeur,{bool refresh = false}) async {
+    // if (_stockService.isLoading == true) return [];
+
+      isLoading = true;
+
+    if (refresh) {
+        stockList.clear();
+       page = 0;
+        hasMore = true;
+    
+    }
+
     try {
-      final response = await http.get(
-          Uri.parse('https://koumi.ml/api-koumi/Stock/categorieProduit/$id'));
-          // Uri.parse('http://10.0.2.2:9000/api-koumi/Stock/categorieProduit/$id'));
-       if (response.statusCode == 200) {
-                print("Fetching data all stock by id categorie produit");
-          List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-        stockList = body
-        .where((stock) => stock['statutSotck'] == true)
-        .map((e) => Stock.fromMap(e)).toList();
-        debugPrint(stockList.toString());
-        return stockList;
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByMagasinAndActeurWithPagination?idMagasin=$idMagasin&idActeur=$idActeur&page=${page}&size=${size}'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+           hasMore = false;
+        } else {
+           List<Stock> newStock = body.map((e) => Stock.fromMap(e)).toList();
+          stockList.addAll(newStock);
+        }
+
+        debugPrint("response body all stock by acteur with pagination ${page} par défilement soit ${stockList.length}");
       } else {
-        stockList = [];
-        throw Exception('Failed to load stock');
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
     } catch (e) {
-      print('Error fetching stock: $e');
+      print('Une erreur s\'est produite lors de la récupération des stocks: $e');
+    } finally {
+       isLoading = false;
     }
     return stockList;
   }
+ 
+    Future<List<Stock>> fetchStockByMagasinWithPagination(String idMagasin,{bool refresh = false }) async {
+    if (isLoading) return [];
 
+    
+      isLoading = true;
+    
 
-  Future<List<Stock>> fetchStockByMagasin(String id) async {
+    if (refresh) {
+    
+        stockList.clear();
+        page = 0;
+        hasMore = true;
+     
+    }
+
     try {
-      final response = await http
-          .get(Uri.parse('$baseUrl/getAllStocksByIdMagasin/$id'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByMagasinWithPagination?idMagasin=$idMagasin&page=$page&size=$size'));
 
-      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
-        print("Fetching data all stock by id magasin");
-        List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-        stockList = body.map((e) => Stock.fromMap(e)).toList();
-        debugPrint(stockList.toString());
-        return stockList;
+      if (response.statusCode == 200) {
+        // debugPrint("url: $response");
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+         
+            hasMore = false;
+          
+        } else {
+          
+            List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
+          stockList.addAll(newStocks);
+          // page++;
+          
+        }
+
+        debugPrint("response body  stock by magasin with pagination $page par défilement soit ${stockList.length}");
+       return stockList;
       } else {
-        stockList = [];
-        print(
-            'Échec de la requête avec le code d\'état: ${response.statusCode}');
-        throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        return [];
       }
     } catch (e) {
-      throw Exception(e.toString());
+      print('Une erreur s\'est produite lors de la récupération des stocks: $e');
+    } finally {
+     
+        isLoading = false;
+      
     }
+    return stockList;
   }
+  
 
   Future deleteStock(String id) async {
     final response =
@@ -397,24 +572,24 @@ class StockService extends ChangeNotifier {
 
 
 
-// class StockController extends GetxController {
-//    List<Stock> stockListen = [];
-//    List<Stock> stockListe1 = [];
-//    List<Stock> stockListe2 = [];
-//   var isLoadingn = true.obs;
-//   var isLoading1 = true.obs;
-//   var isLoading2 = true.obs;
+class StockController extends GetxController {
+   List<Stock> stockListen = [];
+   List<Stock> stockListe1 = [];
+   List<Stock> stockListe2 = [];
+  var isLoadingn = true.obs;
+  var isLoading1 = true.obs;
+  var isLoading2 = true.obs;
  
 
 
-//   void clearStockListen() {
-//     stockListen.clear();
-//   }
+  void clearStockListen() {
+    stockListen.clear();
+  }
 
   
-//    void clearStockListe1() {
-//     stockListe1.clear();
-//   }
+   void clearStockListe1() {
+    stockListe1.clear();
+  }
 
 
 //    Future<void> fetchProduitByCategorieProduit(String idCategorie, String idMagasin, String idActeur) async {
@@ -422,7 +597,7 @@ class StockService extends ChangeNotifier {
 //       final response = await http.get(Uri.parse(
         
 //           'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin/$idActeur'));
-//           'http://10.0.2.2:9000/api-koumi/Stock/categorieProduit/$idCategorie/$idMagasin/$idActeur'));
+//           // 'http://10.0.2.2:9000/api-koumi/Stock/categorieProduit/$idCategorie/$idMagasin/$idActeur'));
 //       if (response.statusCode == 200) {
 //         final String jsonString = utf8.decode(response.bodyBytes);
 //         List<dynamic> data = json.decode(jsonString);
@@ -470,8 +645,8 @@ class StockService extends ChangeNotifier {
 //   Future<void> fetchProduitByCategorieAndMagasin(String idCategorie, String idMagasin) async {
 //     try {
 //       final response = await http.get(Uri.parse(
-//           // 'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
-//           'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
+//           'https://koumi.ml/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
+//           // 'http://10.0.2.2:9000/api-koumi/Stock/categorieAndMagasin/$idCategorie/$idMagasin'));
 //       if (response.statusCode == 200) {
 //         final String jsonString = utf8.decode(response.bodyBytes);
 //         List<dynamic> data = json.decode(jsonString);
@@ -580,4 +755,4 @@ class StockService extends ChangeNotifier {
 //     }
 //   }
 
-//  }
+ }

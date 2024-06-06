@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:koumi_app/Admin/AcceuilAdmin.dart';
-import 'package:koumi_app/Admin/ProduitA.dart';
 import 'package:koumi_app/Admin/ProfilA.dart';
+import 'package:koumi_app/screens/CommandeScreen.dart';
+import 'package:koumi_app/screens/MyProduct.dart';
 import 'package:koumi_app/screens/Panier.dart';
 import 'package:koumi_app/screens/Product.dart';
+import 'package:koumi_app/screens/Products.dart';
 import 'package:koumi_app/screens/Produit.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:provider/provider.dart';
@@ -35,7 +37,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
 
   List pages = <Widget>[
     const AcceuilAdmin(),
-    ProductScreen(),
+    MyProductScreen(),
     Panier(),
      ProfilA()
   ];
@@ -108,8 +110,8 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
             ),
             BottomNavigationBarItem(
               backgroundColor: d_color,
-              icon: Icon(Icons.agriculture),
-              label: "Produit",
+              icon: Icon(Icons.list_alt_sharp),
+              label: "Produits",
             ),
             BottomNavigationBarItem(
               backgroundColor: d_color,

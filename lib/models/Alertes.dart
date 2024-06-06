@@ -12,6 +12,8 @@ class Alertes {
   final String? personneModif;
   final String? descriptionAlerte;
   final String? audioAlerte;
+  final String? pays;
+  final String? codePays;
   final bool? statutAlerte;
 
   
@@ -26,6 +28,8 @@ class Alertes {
     this.personneModif,
     this.descriptionAlerte,
     this.audioAlerte,
+    this.pays,
+    this.codePays,
     this.statutAlerte,
   });
 
@@ -42,6 +46,8 @@ class Alertes {
     String? personneModif,
     String? descriptionAlerte,
     String? audioAlerte,
+    String? pays,
+    String? codePays,
     bool? statutAlerte,
   }) {
     return Alertes(
@@ -55,6 +61,8 @@ class Alertes {
       personneModif: personneModif ?? this.personneModif,
       descriptionAlerte: descriptionAlerte ?? this.descriptionAlerte,
       audioAlerte: audioAlerte ?? this.audioAlerte,
+      pays: pays ?? this.pays,
+      codePays: codePays ?? this.codePays,
       statutAlerte: statutAlerte ?? this.statutAlerte,
     );
   }
@@ -71,6 +79,8 @@ class Alertes {
       'personneModif': personneModif,
       'descriptionAlerte': descriptionAlerte,
       'audioAlerte': audioAlerte,
+      'pays': pays,
+      'codePays': codePays,
       'statutAlerte': statutAlerte,
     };
   }
@@ -87,6 +97,8 @@ class Alertes {
       personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       descriptionAlerte: map['descriptionAlerte'] != null ? map['descriptionAlerte'] as String : null,
       audioAlerte: map['audioAlerte'] != null ? map['audioAlerte'] as String : null,
+      pays: map['pays'] != null ? map['pays'] as String : null,
+      codePays: map['codePays'] != null ? map['codePays'] as String : null,
       statutAlerte: map['statutAlerte'] != null ? map['statutAlerte'] as bool : null,
     );
   }
@@ -97,7 +109,7 @@ class Alertes {
 
   @override
   String toString() {
-    return 'Alertes(idAlerte: $idAlerte, codeAlerte: $codeAlerte, titreAlerte: $titreAlerte, videoAlerte: $videoAlerte, photoAlerte: $photoAlerte, dateAjout: $dateAjout, dateModif: $dateModif, personneModif: $personneModif, descriptionAlerte: $descriptionAlerte, audioAlerte: $audioAlerte, statutAlerte: $statutAlerte)';
+    return 'Alertes(idAlerte: $idAlerte, codeAlerte: $codeAlerte, titreAlerte: $titreAlerte, videoAlerte: $videoAlerte, photoAlerte: $photoAlerte, dateAjout: $dateAjout, pays: $pays, codePays:$codePays, dateModif: $dateModif, personneModif: $personneModif, descriptionAlerte: $descriptionAlerte, audioAlerte: $audioAlerte, statutAlerte: $statutAlerte)';
   }
 
   @override
@@ -115,6 +127,8 @@ class Alertes {
       other.personneModif == personneModif &&
       other.descriptionAlerte == descriptionAlerte &&
       other.audioAlerte == audioAlerte &&
+      other.pays == pays &&
+      other.codePays == codePays &&
       other.statutAlerte == statutAlerte;
   }
 
@@ -130,6 +144,8 @@ class Alertes {
       personneModif.hashCode ^
       descriptionAlerte.hashCode ^
       audioAlerte.hashCode ^
+      pays.hashCode ^
+      codePays.hashCode ^
       statutAlerte.hashCode;
   }
 }

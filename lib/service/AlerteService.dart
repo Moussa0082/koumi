@@ -3,19 +3,22 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Alertes.dart';
 import 'package:path/path.dart';
 
 class AlertesService extends ChangeNotifier {
   // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/alertes';
-  static const String baseUrl = 'https://koumi.ml/api-koumi/alertes';
+  static const String baseUrl = '$apiOnlineUrl/alertes';
 
   List<Alertes> alertesList = [];
 
   Future<void> creerAlertes({
       required String titreAlerte,
       required String descriptionAlerte,
+      required String pays,
+      required String codePays,
       File? audioAlerte,
       File? photoAlerte,
       File? videoAlerte,
@@ -42,6 +45,8 @@ class AlertesService extends ChangeNotifier {
       requete.fields['alerte'] = jsonEncode({
         'titreAlerte': titreAlerte,
         'descriptionAlerte': descriptionAlerte,
+        'pays': pays,
+        'codePays': codePays,
         'audioAlerte': '',
         'photoAlerte': '',
         'videoAlerte': '',
@@ -67,6 +72,8 @@ class AlertesService extends ChangeNotifier {
       {required String idAlerte,
       required String titreAlerte,
       required String descriptionAlerte,
+      required String pays,
+      required String codePays,
       File? audioAlerte,
       File? photoAlerte,
       File? videoAlerte,
@@ -95,6 +102,8 @@ class AlertesService extends ChangeNotifier {
         'idAlerte':idAlerte,
         'titreAlerte': titreAlerte,
         'descriptionAlerte': descriptionAlerte,
+        'pays': pays,
+        'codePays': codePays,
         'audioAlerte': '',
         'photoAlerte': '',
         'videoAlerte': '',

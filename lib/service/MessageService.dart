@@ -3,12 +3,13 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/MessageWa.dart';
 import 'package:path/path.dart';
 
 class MessageService extends ChangeNotifier{
 
-  static const String baseUrl = 'https://koumi.ml/api-koumi/send';
+  static const String baseUrl = '$apiOnlineUrl/send';
   // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/send';
   List<MessageWa> messageList = [];
   

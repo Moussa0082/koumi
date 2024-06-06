@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Filiere.dart';
@@ -49,7 +50,6 @@ class _AddIntrantState extends State<AddIntrant> {
   late Future _categorieList;
   late ParametreGeneraux para = ParametreGeneraux();
   List<ParametreGeneraux> paraList = [];
-  // late CategorieProduit categorieProduit;
   late CategorieProduit categorieProduit = CategorieProduit();
   late Future<List<CategorieProduit>> _liste;
 
@@ -146,14 +146,12 @@ class _AddIntrantState extends State<AddIntrant> {
     super.initState();
     verifyParam();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    // _categorieList = fetchCategorieList(); // _categorieList = http.get(
-    // _filiereList = fetchFiliereList();
+    
+
     _filiereList = http.get(
-        // Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
-    Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+    Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
     _categorieList = http.get(Uri.parse(
-        // 'http://10.0.2.2:9000/api-koumi/Categorie/allCategorieByFiliere/${filiere.idFiliere}'));
-    'https://koumi.ml/api-koumi/Categorie/allCategorieByFiliere/${filiere.idFiliere}'));
+    '$apiOnlineUrl/Categorie/allCategorieByFiliere/${filiere.idFiliere}'));
   }
 
   // Future<List<Filiere>> fetchFiliereList() async {
@@ -277,6 +275,7 @@ class _AddIntrantState extends State<AddIntrant> {
                               }
 
                               return DropdownButtonFormField<String>(
+                                isExpanded: true,
                                 items: filiereList
                                     .map(
                                       (e) => DropdownMenuItem(
@@ -297,7 +296,7 @@ class _AddIntrantState extends State<AddIntrant> {
                                       );
                                       debugPrint("valeur : $newValue");
                                       _categorieList = http.get(Uri.parse(
-                                          'https://koumi.ml/api-koumi/Categorie/allCategorieByFiliere/${newValue}'
+                                          '$apiOnlineUrl/Categorie/allCategorieByFiliere/${newValue}'
                                           // 'http://10.0.2.2:9000/api-koumi/Categorie/allCategorieByFiliere/${newValue}'
                                           ));
                                     }
@@ -411,6 +410,7 @@ class _AddIntrantState extends State<AddIntrant> {
                                     }
 
                                     return DropdownButtonFormField<String>(
+                                      isExpanded: true,
                                       items: categorieListe
                                           .map(
                                             (e) => DropdownMenuItem(

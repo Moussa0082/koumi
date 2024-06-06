@@ -3,15 +3,23 @@ import 'dart:convert';
 import 'package:koumi_app/models/SousRegion.dart';
 
 class Pays {
-  final String? idPays;
-  final String codePays;
-  final String nomPays;
-  final String descriptionPays;
-  final String? personneModif;
-  final bool statutPays;
-  final String? dateAjout;
-  final String? dateModif;
-  final SousRegion sousRegion;
+ String? idPays;
+    String? codePays;
+    String? nomPays;
+    String? libelleNiveau1Pays;
+    String? libelleNiveau2Pays;
+    String? libelleNiveau3Pays;
+    String? monnaie;
+    String? tauxDollar;
+    String? tauxYuan;
+    String? tauxEuro;
+    String? descriptionPays;
+    String? whattsAppPays;
+    String? personneModif;
+    bool? statutPays;
+    String? dateAjout;
+    String? dateModif;
+    SousRegion? sousRegion;
   Pays({
     this.idPays,
     required this.codePays,
@@ -20,33 +28,49 @@ class Pays {
     this.personneModif,
     required this.statutPays,
     this.dateAjout,
+    this.libelleNiveau1Pays,
+    this.libelleNiveau2Pays,
+    this.libelleNiveau3Pays,
+    this.monnaie,
+    this.tauxDollar,
+    this.tauxYuan,
+    this.tauxEuro,
     this.dateModif,
     required this.sousRegion,
   });
 
-  Pays copyWith({
-    String? idPays,
-    String? codePays,
-    String? nomPays,
-    String? descriptionPays,
-    String? personneModif,
-    bool? statutPays,
-    String? dateAjout,
-    String? dateModif,
-    SousRegion? sousRegion,
-  }) {
-    return Pays(
-      idPays: idPays ?? this.idPays,
-      codePays: codePays ?? this.codePays,
-      nomPays: nomPays ?? this.nomPays,
-      descriptionPays: descriptionPays ?? this.descriptionPays,
-      personneModif: personneModif ?? this.personneModif,
-      statutPays: statutPays ?? this.statutPays,
-      dateAjout: dateAjout ?? this.dateAjout,
-      dateModif: dateModif ?? this.dateModif,
-      sousRegion: sousRegion ?? this.sousRegion,
-    );
-  }
+  // Pays copyWith({
+  //   String? idPays,
+  //   String? codePays,
+  //   String? nomPays,
+  //   String? descriptionPays,
+  //   String? personneModif,
+  //   bool? statutPays,
+  //   String? dateAjout,
+  //   String? libelleNiveau1Pays,
+  //   String? libelleNiveau2Pays,
+  //   String? libelleNiveau3Pays,
+  //   String? monnaie,
+  //   String? tauxDollar,
+  //   String? tauxYuan,
+  //   String? dateModif,
+  //   SousRegion? sousRegion,
+  // }) {
+  //   return Pays(
+  //     idPays: idPays ?? this.idPays,
+  //     codePays: codePays ?? this.codePays,
+  //     nomPays: nomPays ?? this.nomPays,
+  //     descriptionPays: descriptionPays ?? this.descriptionPays,
+  //     personneModif: personneModif ?? this.personneModif,
+  //     statutPays: statutPays ?? this.statutPays,
+  //     dateAjout: dateAjout ?? this.dateAjout,
+  //     libelleNiveau1Pays: libelleNiveau1Pays ?? this.libelleNiveau1Pays,
+  //     libelleNiveau2Pays: libelleNiveau2Pays ?? this.libelleNiveau2Pays,
+  //     libelleNiveau3Pays: libelleNiveau3Pays ?? this.libelleNiveau3Pays,
+  //     dateModif: dateModif ?? this.dateModif,
+  //     sousRegion: sousRegion ?? this.sousRegion,
+  //   );
+  // }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -57,8 +81,15 @@ class Pays {
       'personneModif': personneModif,
       'statutPays': statutPays,
       'dateAjout': dateAjout,
+      'libelleNiveau1Pays': libelleNiveau1Pays,
+      'libelleNiveau2Pays': libelleNiveau2Pays,
+      'libelleNiveau3Pays': libelleNiveau3Pays,
+      'monnaie':monnaie,
+      'tauxDollar':tauxDollar,
+      'tauxYuan':tauxYuan,
+      'tauxEuro':tauxEuro,
       'dateModif': dateModif,
-      'sousRegion': sousRegion.toMap(),
+      'sousRegion': sousRegion?.toMap(),
     };
   }
 
@@ -71,7 +102,14 @@ class Pays {
       personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       statutPays: map['statutPays'] as bool,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
+      libelleNiveau1Pays: map['libelleNiveau1Pays'] != null ? map['libelleNiveau1Pays'] as String : null,
+      libelleNiveau2Pays: map['libelleNiveau2Pays'] != null ? map['libelleNiveau2Pays'] as String : null,
+      libelleNiveau3Pays: map['libelleNiveau3Pays'] != null ? map['libelleNiveau3Pays'] as String : null,
+      monnaie: map['monnaie'] != null ? map['monnaie'] as String : null,
+      tauxDollar: map['tauxDollar'] != null ? map['tauxDollar'] as String : null,
+      tauxYuan: map['tauxYuan'] != null ? map['tauxYuan'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
+      tauxEuro: map['tauxEuro'] != null ? map['tauxEuro'] as String : null,
       sousRegion: SousRegion.fromMap(map['sousRegion'] as Map<String,dynamic>),
     );
   }
@@ -80,37 +118,9 @@ class Pays {
 
   factory Pays.fromJson(String source) => Pays.fromMap(json.decode(source) as Map<String, dynamic>);
 
-  @override
-  String toString() {
-    return 'Pays(idPays: $idPays, codePays: $codePays, nomPays: $nomPays, descriptionPays: $descriptionPays, personneModif: $personneModif, statutPays: $statutPays, dateAjout: $dateAjout, dateModif: $dateModif, sousRegion: $sousRegion)';
-  }
+  // @override
+  // String toString() {
+  //   return 'Pays(idPays: $idPays, codePays: $codePays, nomPays: $nomPays, descriptionPays: $descriptionPays, personneModif: $personneModif, statutPays: $statutPays, dateAjout: $dateAjout, dateModif: $dateModif, sousRegion: $sousRegion)';
+  // }
 
-  @override
-  bool operator ==(covariant Pays other) {
-    if (identical(this, other)) return true;
-  
-    return 
-      other.idPays == idPays &&
-      other.codePays == codePays &&
-      other.nomPays == nomPays &&
-      other.descriptionPays == descriptionPays &&
-      other.personneModif == personneModif &&
-      other.statutPays == statutPays &&
-      other.dateAjout == dateAjout &&
-      other.dateModif == dateModif &&
-      other.sousRegion == sousRegion;
-  }
-
-  @override
-  int get hashCode {
-    return idPays.hashCode ^
-      codePays.hashCode ^
-      nomPays.hashCode ^
-      descriptionPays.hashCode ^
-      personneModif.hashCode ^
-      statutPays.hashCode ^
-      dateAjout.hashCode ^
-      dateModif.hashCode ^
-      sousRegion.hashCode;
-  }
 }

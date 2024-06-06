@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:koumi_app/Admin/AddZone.dart';
 import 'package:koumi_app/Admin/UpdateZone.dart';
@@ -174,21 +175,26 @@ class _ZoneState extends State<Zone> {
                                                   height: 150,
                                                   width: double.infinity,
                                                 )
-                                              : Image.network(
-                                                  "https://koumi.ml/api-koumi/ZoneProduction/${zone.idZoneProduction}/image",
-                                                  fit: BoxFit.fitWidth,
-                                                  height: 150,
-                                                  width: double.infinity,
-                                                   errorBuilder: (BuildContext
-                                                          context,
-                                                      Object exception,
-                                                      StackTrace? stackTrace) {
-                                                    return Image.asset(
-                                                      'assets/images/default_image.png',
-                                                      fit: BoxFit.cover,
-                                                    );
-                                                  },
-                                                ),
+                                              : 
+                                              CachedNetworkImage(
+                   width: double.infinity,
+                    height: 150,
+                    
+                                                  imageUrl:
+                                                      "https://koumi.ml/api-koumi/ZoneProduction/${zone.idZoneProduction}/image",
+                                                  fit: BoxFit.cover,
+                                                  placeholder: (context, url) =>
+                                                      const Center(
+                                                          child:
+                                                              CircularProgressIndicator()),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Image.asset(
+                                                    'assets/images/default_image.png',
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                )
+                                             
                                               // : Image.network(
                                               //     "http://10.0.2.2/${zone.photoZone!}",
                                               //     fit: BoxFit.fitWidth,

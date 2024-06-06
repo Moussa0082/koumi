@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
@@ -44,8 +45,22 @@ class _AddMaterielState extends State<AddMateriel> {
   String? typeValue;
   late TypeMateriel typeMateriel;
   bool isExist = false;
+    String? monnaie;
   late ParametreGeneraux para = ParametreGeneraux();
   List<ParametreGeneraux> paraList = [];
+     bool isLoadingLibelle = true;
+    String? libelleNiveau3Pays;
+
+     Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load monnaie');
+    }
+}
 
   void verifyParam() {
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
@@ -59,19 +74,64 @@ class _AddMaterielState extends State<AddMateriel> {
     }
   }
 
+ 
+  Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+ }
+
+     Future<void> fetchPaysDataByActor() async {
+    try {
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+      setState(() { 
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
+
+  
+
+     Future<void> fetchLibelleNiveau3Pays() async {
+    try {
+      String libelle = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
+      setState(() {
+        libelleNiveau3Pays = libelle;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+      });
+      print('Error: $e');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     verifyParam();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _typeList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/TypeMateriel/read'));
-    _niveau3List =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
+        http.get(Uri.parse('$apiOnlineUrl/TypeMateriel/read'));
     // _typeList =
     //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
-    // _niveau3List =
-    //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
+        _niveau3List =
+        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
+     fetchLibelleNiveau3Pays();
+     fetchPaysDataByActor();
   }
 
   Future<File> saveImagePermanently(String imagePath) async {
@@ -140,7 +200,7 @@ class _AddMaterielState extends State<AddMateriel> {
           ),
         );
       },
-    );
+    ); 
   }
 
   void _handleButtonPress() async {
@@ -252,19 +312,28 @@ class _AddMaterielState extends State<AddMateriel> {
                         SizedBox(
                           height: 10,
                         ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 22,
-                          ),
-                          child: Align(
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              "Localité",
-                              style: TextStyle(
-                                  color: (Colors.black), fontSize: 18),
-                            ),
+                      isLoadingLibelle ?
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text("Chargement ................",style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),)),
+                      )
+                      :
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 22,
+                        ),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                           libelleNiveau3Pays != null ? libelleNiveau3Pays!.toUpperCase() : "Localité",
+                            style:
+                                TextStyle(color: (Colors.black), fontSize: 18),
                           ),
                         ),
+                      ),
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 10, horizontal: 20),
@@ -319,6 +388,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                   }
 
                                   return DropdownButtonFormField<String>(
+                                    isExpanded: true,
                                     items: niveau3List
                                         .map(
                                           (e) => DropdownMenuItem(
@@ -451,6 +521,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                   }
 
                                   return DropdownButtonFormField<String>(
+                                    isExpanded: true,
                                     items: materielList
                                         .map(
                                           (e) => DropdownMenuItem(
@@ -563,7 +634,7 @@ class _AddMaterielState extends State<AddMateriel> {
                           child: Align(
                             alignment: Alignment.topLeft,
                             child: Text(
-                              "PrixPrix (${para.monnaie}) par heure",
+                              "PrixPrix (${monnaie}) par heure",
                               style: TextStyle(
                                   color: (Colors.black), fontSize: 18),
                             ),
@@ -648,15 +719,11 @@ class _AddMaterielState extends State<AddMateriel> {
                                                       context,
                                                       listen: false)
                                                   .applyChange(),
-                                              _etatController.clear(),
-                                              _nomController.clear(),
-                                              _descriptionController.clear(),
-                                              setState(() {
+                                                  setState(() {
                                                 _isLoading = false;
-                                                n3Value = null;
                                               }),
                                               Navigator.pop(context),
-                                              ScaffoldMessenger.of(context)
+                                                   ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 const SnackBar(
                                                   content: Row(
@@ -696,7 +763,16 @@ class _AddMaterielState extends State<AddMateriel> {
                                                   duration:
                                                       Duration(seconds: 5),
                                                 ),
-                                              )
+                                              ),
+                                              _etatController.clear(),
+                                              _nomController.clear(),
+                                              _descriptionController.clear(),
+                                              setState(() {
+                                                _isLoading = false;
+                                                n3Value = null;
+                                              }),
+                                              Navigator.pop(context),
+                                             
                                             });
                                   } else {
                                     await MaterielService()
@@ -713,15 +789,11 @@ class _AddMaterielState extends State<AddMateriel> {
                                                       context,
                                                       listen: false)
                                                   .applyChange(),
-                                              _etatController.clear(),
-                                              _nomController.clear(),
-                                              _descriptionController.clear(),
-                                              setState(() {
+                                                  setState(() {
                                                 _isLoading = false;
-                                                n3Value = null;
                                               }),
                                               Navigator.pop(context),
-                                              ScaffoldMessenger.of(context)
+                                                   ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 const SnackBar(
                                                   content: Row(
@@ -761,7 +833,16 @@ class _AddMaterielState extends State<AddMateriel> {
                                                   duration:
                                                       Duration(seconds: 5),
                                                 ),
-                                              )
+                                              ),
+                                              _etatController.clear(),
+                                              _nomController.clear(),
+                                              _descriptionController.clear(),
+                                              setState(() {
+                                                _isLoading = false;
+                                                n3Value = null;
+                                              }),
+                                              Navigator.pop(context),
+                                              
                                             });
                                   }
                                 } catch (e) {

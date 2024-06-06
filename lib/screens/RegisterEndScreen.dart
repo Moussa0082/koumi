@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/service/SpeculationService.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:path/path.dart';
@@ -76,6 +78,7 @@ final MultiSelectController _controllerSpeculation = MultiSelectController();
    List<Speculation> listeSpeculations = [];
 
     List<Speculation> selectedSpec = [];
+    String responses = "";
 
 
    List<String> idsCategorieProduit = [];
@@ -228,6 +231,7 @@ Future<void> _pickImage(ImageSource source) async {
       typeActeur: widget.typeActeur, // Convertir les IDs en chaînes de caractères
       password: password,
       speculations: selectedSpec
+      
 
         ).then((value) => 
                  showDialog(
@@ -305,7 +309,7 @@ Future<void> _pickImage(ImageSource source) async {
         context: context,
         builder: (context) => AlertDialog(
       title: Text("Erreur lors de l'inscription"),
-      content: Text(errorMessage),
+      content: Text("Une erreur s'est produite veuillez réessayer plus tard"),
       actions: [
         TextButton(
           child: Text("OK"),
@@ -318,13 +322,14 @@ Future<void> _pickImage(ImageSource source) async {
       } 
    }
 
+    
+
 
     @override
   void initState() {
     // TODO: implement initState
     super.initState();
-   
-    debugPrint("Adresse : " + widget.adresse +  " Type : ${widget.typeActeur}"+   " Tel : ${widget.telephoneActeur}"+
+    debugPrint("Adresse : " + widget.adresse +  " Type : ${widget.typeActeur}"+   " Tel : ${widget.telephoneActeur}"+ "pays : ${widget.pays}" +
     " Localisation :  " + widget.localistaion + " Whats app : " + widget.numeroWhatsApp + "Email :" + widget.email
   
     );
@@ -482,7 +487,7 @@ Future<void> _pickImage(ImageSource source) async {
     networkConfig: NetworkConfig(
       // Endpoint pour récupérer les spéculations en fonction des catégories sélectionnées
       // url:url , //e40ijxd5k0n0yrzj5f80,
-      url: 'https://koumi.ml/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
+      url: '$apiOnlineUrl/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
       // url: 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
       method: RequestMethod.get,
       headers: {'Content-Type': 'application/json'},

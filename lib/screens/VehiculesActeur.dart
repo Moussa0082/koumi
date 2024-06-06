@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/Vehicule.dart';
@@ -7,6 +10,11 @@ import 'package:koumi_app/screens/AddVehicule.dart';
 import 'package:koumi_app/screens/DetailTransport.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
+
 
 class VehiculeActeur extends StatefulWidget {
   const VehiculeActeur({super.key});
@@ -25,6 +33,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
   late TextEditingController _searchController;
   List<Vehicule> vehiculeListe = [];
   late Future<List<Vehicule>> _liste;
+  
   // late Future liste;
 
   Future<List<Vehicule>> getVehicule(String id) async {
@@ -33,14 +42,116 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
     return response;
   }
 
+
+    ScrollController scrollableController = ScrollController();
+
+   int page = 0;
+   bool isLoading = false;
+   int size = 4;
+   bool hasMore = true;
+
+    void _scrollListener() {
+  // if (selectedCat != null &&  scrollableController1.position.pixels >=
+  //         scrollableController1.position.maxScrollExtent - 200 &&
+  //     hasMore &&
+  //     !isLoading ) {
+  //   // if (selectedCat != null) {
+  //     // Incrementez la page et récupérez les stocks par catégorie
+  //     debugPrint("yes - fetch by category");
+  //     setState(() {
+  //         // Rafraîchir les données ici
+  //     page++;
+  //    fetchStockByCategorie(selectedCat!.idCategorieProduit!);
+  //       });
+  //   }
+    if( scrollableController.position.pixels >=
+          scrollableController.position.maxScrollExtent - 200 &&
+      hasMore &&
+      !isLoading){
+      // Incrementez la page et récupérez les stocks généraux
+      debugPrint("yes - fetch vehicule by acteur");
+      setState(() {
+          // Rafraîchir les données ici
+        page++;
+        });
+      fetchVehiculeByActeur(acteur.idActeur!).then((value) {
+        setState(() {
+          // Rafraîchir les données ici
+        });
+      });
+    // }
+  // } 
+  // else {
+  }
+    debugPrint("no");
+
+}
+
+ 
+ 
+ 
+
+    Future<List<Vehicule>> fetchVehiculeByActeur(String idActeur,{bool refresh = false}) async {
+    // if (_stockService.isLoading == true) return [];
+
+    setState(() {
+      isLoading = true;
+    });
+
+    if (refresh) {
+      setState(() {
+        vehiculeListe.clear();
+       page = 0;
+        hasMore = true;
+      });
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getAllVehiculesByActeurWithPagination?idActeur=$idActeur&page=${page}&size=${size}'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+          setState(() {
+           hasMore = false;
+          });
+        } else {
+          setState(() {
+           List<Vehicule> newVehicule = body.map((e) => Vehicule.fromMap(e)).toList();
+          vehiculeListe.addAll(newVehicule);
+          });
+        }
+
+        debugPrint("response body all vehicule by acteur with pagination ${page} par défilement soit ${vehiculeListe.length}");
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des vehicules: $e');
+    } finally {
+      setState(() {
+       isLoading = false;
+      });
+    }
+    return vehiculeListe;
+  }  
+
+
+
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
-    _liste = getVehicule(acteur.idActeur!);
-
+    _liste = VehiculeService().fetchVehiculeByActeur(acteur.idActeur!);
+     WidgetsBinding.instance.addPostFrameCallback((_){
+    //write or call your logic
+    //code will run when widget rendering complete
+  scrollableController.addListener(_scrollListener);
+  });
     super.initState();
   }
 
@@ -48,6 +159,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
   void dispose() {
     _searchController
         .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+        scrollableController.dispose();
     super.dispose();
   }
 
@@ -86,6 +198,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                       ),
                     ),
                     onTap: () async {
+                      Navigator.of(context).pop();
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -96,54 +209,95 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
               ],
             )
           ]),
-      body: SingleChildScrollView(
-        child: Column(children: [
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.search,
-                      color: Colors.blueGrey[400]), // Couleur de l'icône
-                  SizedBox(
-                      width:
-                          10), // Espacement entre l'icône et le champ de recherche
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Rechercher',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(
-                            color: Colors
-                                .blueGrey[400]), // Couleur du texte d'aide
+      body: RefreshIndicator(
+         onRefresh:() async{
+                                setState(() {
+                   page =0;
+                  // Rafraîchir les données ici
+             _liste = VehiculeService().fetchVehiculeByActeur(acteur.idActeur!);
+                });
+                  debugPrint("refresh page ${page}");
+                              },
+        child: Container(
+          child: NestedScrollView(
+            headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+              
+             return  <Widget>
+              [
+                SliverToBoxAdapter(
+                  child: Column(
+                    children:[
+        
+              const SizedBox(height: 10),
+            
+         Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.search,
+                        color: Colors.blueGrey[400],
+                        size: 28), // Utiliser une icône de recherche plus grande
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Rechercher',
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(color: Colors.blueGrey[400]),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
+                    IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() {});
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Consumer<VehiculeService>(builder: (context, vehiculeService, child) {
+            ),           
+              const SizedBox(height: 10),
+                    ]
+                  )
+                ),
+            
+            ];
+            
+            
+          },
+          body: 
+              RefreshIndicator(
+                onRefresh:() async{
+                                  setState(() {
+                     page =0;
+                    // Rafraîchir les données ici
+               _liste = VehiculeService().fetchVehiculeByActeur(acteur.idActeur!);
+                  });
+                    debugPrint("refresh page ${page}");
+                                },
+                child: SingleChildScrollView(
+                  controller: scrollableController,
+                  child: 
+  
+                    Consumer<VehiculeService>(builder: (context, vehiculeService, child) {
             return FutureBuilder(
                 future: _liste,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.orange,
-                      ),
-                    );
+                    return _buildShimmerEffect();
                   }
 
                   if (!snapshot.hasData) {
@@ -161,6 +315,32 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                       return libelle.contains(searchText);
                     }).toList();
                     return 
+                    vehiculeListe.isEmpty ?
+                      
+      SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Center(
+              child: Column(
+                children: [
+                  Image.asset('assets/images/notif.jpg'),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Aucune vehiucle trouvé' ,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 17,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        )
+                    :
                                   GridView.builder(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
@@ -170,8 +350,9 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                         crossAxisSpacing: 10,
                         childAspectRatio: 0.8,
                       ),
-                      itemCount: filtereSearch.length,
+                      itemCount: filtereSearch.length+1,
                       itemBuilder: (context, index) {
+                        if(index < filtereSearch.length){
                         var e = filtereSearch
                             .where((element) => element.statutVehicule == true)
                             .elementAt(index);
@@ -183,44 +364,35 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                     builder: (context) =>
                                         DetailTransport(vehicule: e)));
                           },
-                          child: Container(
+                          child: Card(
                             margin: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Color.fromARGB(250, 250, 250, 250),
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.3),
-                                  offset: Offset(0, 2),
-                                  blurRadius: 8,
-                                  spreadRadius: 2,
-                                ),
-                              ],
-                            ),
+                            
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: SizedBox(
-                                    height: 90,
+                                    height: 72,
                                     child: e.photoVehicule == null ||  e.photoVehicule!.isEmpty
                                         ? Image.asset(
                                             "assets/images/default_image.png",
                                             fit: BoxFit.cover,
                                           )
-                                        : Image.network(
-                                            "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
-                                            // "http://10.0.2.2/${e.photoIntrant}",
+                                        : CachedNetworkImage(
+                                            imageUrl:
+                                                "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
                                             fit: BoxFit.cover,
-                                            errorBuilder: (BuildContext context,
-                                                Object exception,
-                                                StackTrace? stackTrace) {
-                                              return Image.asset(
-                                                'assets/images/default_image.png',
-                                                fit: BoxFit.cover,
-                                              );
-                                            },
+                                            placeholder: (context, url) =>
+                                                const Center(
+                                                    child:
+                                                        CircularProgressIndicator()),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    Image.asset(
+                                              'assets/images/default_image.png',
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
                                   ),
                                 ),
@@ -229,17 +401,18 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                   title: Text(
                                     e.nomVehicule,
                                     style: TextStyle(
-                                      fontSize: 17,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black87,
                                     ),
-                                    // maxLines: 1,
-                                    // overflow: TextOverflow.ellipsis,
+                                   maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   subtitle: Text(
                                     e.localisation,
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      overflow: TextOverflow.ellipsis,
+                                      fontSize: 15,
                                       color: Colors.black87,
                                     ),
                                   ),
@@ -281,6 +454,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                 ),
                                               ),
                                               onTap: () async {
+                                                
                                                 e.statutVehicule == false
                                                     ? await VehiculeService()
                                                         .activerVehicules(
@@ -292,8 +466,9 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                                           false)
                                                                   .applyChange(),
                                                               setState(() {
+                                                                page++;
                                                                 _liste =
-                                                                    getVehicule(
+                                                                   VehiculeService().fetchVehiculeByActeur(
                                                                         acteur
                                                                             .idActeur!);
                                                               }),
@@ -349,8 +524,9 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                                           false)
                                                                   .applyChange(),
                                                               setState(() {
+                                                                page++;
                                                                 _liste =
-                                                                    getVehicule(
+                                                                   VehiculeService().fetchVehiculeByActeur(
                                                                         acteur
                                                                             .idActeur!);
                                                               }),
@@ -420,9 +596,11 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                                                                   listen: false)
                                                               .applyChange(),
                                                           setState(() {
-                                                            _liste = getVehicule(
-                                                                acteur
-                                                                    .idActeur!);
+                                                            page++;
+                                                                _liste =
+                                                                   VehiculeService().fetchVehiculeByActeur(
+                                                                        acteur
+                                                                            .idActeur!);
                                                           }),
                                                           Navigator.of(context)
                                                               .pop(),
@@ -457,14 +635,31 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                             ),
                           ),
                         );
+                      }else{
+                                return isLoading == true ? 
+                                         Padding(
+                                           padding: const EdgeInsets.symmetric(horizontal: 32),
+                                           child: Center(
+                                             child:
+                                             const Center(
+                                                                 child: CircularProgressIndicator(
+                                  color: Colors.orange,
+                                                                 ),
+                                                               )
+                                           ),
+                                         ) : Container();
+                      }
                       },
                     );
                   }
                 });
           })
-        ]),
-      ),
-    );
+                )
+              )
+              )
+              )));
+              
+    
   }
 
   Widget _buildEtat(bool isState) {
@@ -477,6 +672,75 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
       ),
     );
   }
+
+
+    Widget _buildShimmerEffect(){
+  return   Center(
+        child: GridView.builder(
+            shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 0.8,
+      ),
+          itemCount: 6, // Number of shimmer items to display
+          itemBuilder: (context, index) {
+            return Card(
+              margin: EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 85,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 16,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    subtitle: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 15,
+                        color: Colors.grey,
+                        margin: EdgeInsets.only(top: 4),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 15,
+                        color: Colors.grey,
+                        margin: EdgeInsets.only(top: 4),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+ }
 
   Widget _buildItem(String title, String value) {
     return Padding(
@@ -506,3 +770,8 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
     );
   }
 }
+
+/*
+
+
+*/

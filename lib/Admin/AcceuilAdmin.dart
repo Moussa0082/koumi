@@ -3,7 +3,6 @@ import 'package:koumi_app/Admin/ActeurScreen.dart';
 import 'package:koumi_app/Admin/AlerteScreen.dart';
 import 'package:koumi_app/Admin/CategoriePage.dart';
 import 'package:koumi_app/Admin/FiliereScreen.dart';
-import 'package:koumi_app/Admin/ProduitA.dart';
 import 'package:koumi_app/Admin/ProfilA.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -12,8 +11,11 @@ import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart';
+import 'package:koumi_app/screens/MesCommande.dart';
+import 'package:koumi_app/screens/MyProduct.dart';
 import 'package:koumi_app/screens/Panier.dart';
 import 'package:koumi_app/screens/Product.dart';
+import 'package:koumi_app/screens/Products.dart';
 import 'package:koumi_app/screens/Store.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/Weather.dart';
@@ -87,7 +89,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
           const SizedBox(
             height: 10,
           ),
-          SizedBox(height: 100, child: AlertAcceuil()),
+          // SizedBox(height: 100, child: AlertAcceuil()),
           const SizedBox(
             height: 10,
           ),
@@ -149,7 +151,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProductScreen(),
+                    builder: (context) => ProductsScreen(),
                   ));
               // builder: (context) =>  ProduitScreen()));
             } else if (index == 8) {
@@ -175,7 +177,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const CommandeScreen()));
+                      builder: (context) => const MesCommande()));
             } else if (index == 2) {
               Navigator.push(
                   context,
@@ -238,7 +240,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
       child: PageView(
         children: [
           const AcceuilAdmin(),
-          const ProduitA(),
+           MyProductScreen(),
           Panier(),
           const ProfilA()
         ],

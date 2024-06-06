@@ -1,4 +1,9 @@
+import 'dart:convert';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
@@ -7,6 +12,7 @@ import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/DetailIntrant.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ListeIntrantByActeur extends StatefulWidget {
   const ListeIntrantByActeur({super.key});
@@ -27,29 +33,145 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
   List<ParametreGeneraux> paraList = [];
   late ParametreGeneraux para = ParametreGeneraux();
 
-  Future<List<Intrant>> getListe(String id) async {
-    final response = await IntrantService().fetchIntrantByActeur(id);
-    return response;
+   int page = 0;
+   bool isLoading = false;
+   int size = 4;
+   bool hasMore = true;
+       ScrollController scrollableController = ScrollController();
+
+           bool isLoadingLibelle = true;
+    String? monnaie;
+
+
+   Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load monnaie');
+    }
+}
+
+ Future<void> fetchPaysDataByActor() async {
+    try {
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+      setState(() { 
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
   }
+
+
+
+    Future<List<Intrant>> fetchIntrantByActeur(String idActeur,{bool refresh = false}) async {
+    // if (_stockService.isLoading == true) return [];
+
+    setState(() {
+      isLoading = true;
+    });
+
+    if (refresh) {
+      setState(() {
+        intrantListe.clear();
+       page = 0;
+        hasMore = true;
+      });
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/intrant/getAllIntrantsByActeurWithPagination?idActeur=$idActeur&page=${page}&size=${size}'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+          setState(() {
+           hasMore = false;
+          });
+        } else {
+          setState(() {
+           List<Intrant> newIntrant = body.map((e) => Intrant.fromMap(e)).toList();
+          intrantListe.addAll(newIntrant);
+          });
+        }
+
+        debugPrint("response body all intrant by acteur with pagination ${page} par défilement soit ${intrantListe.length}");
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des intrant: $e');
+    } finally {
+      setState(() {
+       isLoading = false;
+      });
+    }
+    return intrantListe;
+  }
+
+
+      void _scrollListener() {
+  if (scrollableController.position.pixels >=
+          scrollableController.position.maxScrollExtent - 200 &&
+      hasMore &&
+      !isLoading ) {
+    // if (selectedCat != null) {
+      // Incrementez la page et récupérez les stocks par catégorie
+      debugPrint("yes - fetch intrant by acteur");
+      setState(() {
+          // Rafraîchir les données ici
+      page++;
+        });
+      fetchIntrantByActeur(acteur.idActeur!).then((value) {
+        setState(() {
+          // Rafraîchir les données ici
+        });
+      });
+    
+  }else{
+    debugPrint("no");
+
+  }
+
+}
+
 
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    futureList = getListe(acteur.idActeur!);
+    futureList = fetchIntrantByActeur(acteur.idActeur!);
+    // futureList = getListe(acteur.idActeur!);
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
 
     if (paraList.isNotEmpty) {
       para = paraList[0];
     }
+    WidgetsBinding.instance.addPostFrameCallback((_){
+    //write or call your logic
+    //code will run when widget rendering complete
+  scrollableController.addListener(_scrollListener);
+  });
+
   }
 
   @override
   void dispose() {
     _searchController
         .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+        scrollableController.dispose();
     super.dispose();
   }
 
@@ -66,17 +188,27 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
             },
             icon: const Icon(Icons.arrow_back_ios)),
         title: const Text(
-          "Mes intrants ",
+          "Mes intrants",
           style: TextStyle(
             color: d_colorGreen,
-            fontSize: 18,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(children: [
-          Padding(
+      body: Container(
+        child: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            
+           return  <Widget>
+            [
+              SliverToBoxAdapter(
+                child: Column(
+                  children:[
+      
+            const SizedBox(height: 10),
+          
+       Padding(
             padding: const EdgeInsets.all(10.0),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 10),
@@ -114,38 +246,95 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                 ],
               ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Consumer<IntrantService>(builder: (context, intrantService, child) {
+          ),           
+            const SizedBox(height: 10),
+                  ]
+                )
+              ),
+          
+          ];
+          
+          
+        },
+        body: 
+            RefreshIndicator(
+              onRefresh:() async{
+                                setState(() {
+                                  hasMore = true;
+                   page =0;
+                  // Rafraîchir les données ici
+               futureList = IntrantService().fetchIntrantByActeurWithPagination(acteur.idActeur!, refresh: true);
+                });
+                  debugPrint("refresh page ${page}");
+                              },
+              child: SingleChildScrollView(
+                controller: scrollableController,
+                child: 
+                 Consumer<IntrantService>(builder: (context, intrantService, child) {
             return FutureBuilder(
                 future: futureList,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.orange,
-                      ),
-                    );
+                    return _buildShimmerEffect();
                   }
-
+      
                   if (!snapshot.hasData) {
-                    return const Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Center(child: Text("Aucun donné trouvé")),
-                    );
+                    return SingleChildScrollView(
+                        child: Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Center(
+                            child: Column(
+              children: [
+                Image.asset('assets/images/notif.jpg'),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Aucun intrant trouvé' ,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 17,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+                            ),
+                          ),
+                        ),
+                      );
                   } else {
                     intrantListe = snapshot.data!;
                     String searchText = "";
                     List<Intrant> filtereSearch = intrantListe.where((search) {
-                      String libelle = search.nomIntrant.toLowerCase();
+                      String libelle = search.nomIntrant!.toLowerCase();
                       searchText = _searchController.text.toLowerCase();
                       return libelle.contains(searchText);
                     }).toList();
                     return intrantListe.isEmpty
-                        ? Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Center(child: Text("Aucun donné trouvé")),
-                          )
+                        ? 
+                        SingleChildScrollView(
+                        child: Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Center(
+                            child: Column(
+              children: [
+                Image.asset('assets/images/notif.jpg'),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Aucun intrant trouvé' ,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 17,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+                            ),
+                          ),
+                        ),
+                      )
                         : GridView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
@@ -156,34 +345,24 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                               crossAxisSpacing: 10,
                               childAspectRatio: 0.8,
                             ),
-                            itemCount: intrantListe.length,
+                            itemCount: filtereSearch.length+1,
                             itemBuilder: (context, index) {
-                              var e = intrantListe.elementAt(index);
+                              // var e = intrantListe.elementAt(index);
+                              if(index < filtereSearch.length){
                               return GestureDetector(
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => DetailIntrant(
-                                        intrant: e,
+                                        intrant: filtereSearch[index],
                                       ),
                                     ),
                                   );
                                 },
-                                child: Container(
+                                child: Card(
                                   margin: EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: Color.fromARGB(250, 250, 250, 250),
-                                    borderRadius: BorderRadius.circular(15),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.3),
-                                        offset: Offset(0, 2),
-                                        blurRadius: 8,
-                                        spreadRadius: 2,
-                                      ),
-                                    ],
-                                  ),
+                                 
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.stretch,
@@ -192,45 +371,46 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                         borderRadius:
                                             BorderRadius.circular(8.0),
                                         child: SizedBox(
-                                          height: 90,
-                                          child: e.photoIntrant == null ||
-                                                  e.photoIntrant!.isEmpty 
+                                          height: 72,
+                                          child: intrantListe[index].photoIntrant == null ||
+                                                  intrantListe[index].photoIntrant!.isEmpty
                                               ? Image.asset(
                                                   "assets/images/default_image.png",
                                                   fit: BoxFit.cover,
                                                 )
-                                              : Image.network(
-                                                  "https://koumi.ml/api-koumi/intrant/${e.idIntrant}/image",
-                                                  // "http://10.0.2.2/${e.photoIntrant}",
+                                              : CachedNetworkImage(
+                                                  imageUrl:
+                                                      "https://koumi.ml/api-koumi/intrant/${intrantListe[index].idIntrant}/image",
                                                   fit: BoxFit.cover,
-                                                  errorBuilder: (BuildContext
-                                                          context,
-                                                      Object exception,
-                                                      StackTrace? stackTrace) {
-                                                    return Image.asset(
-                                                      'assets/images/default_image.png',
-                                                      fit: BoxFit.cover,
-                                                    );
-                                                  },
+                                                  placeholder: (context, url) =>
+                                                      const Center(
+                                                          child:
+                                                              CircularProgressIndicator()),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Image.asset(
+                                                    'assets/images/default_image.png',
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
                                         ),
                                       ),
-                                      // SizedBox(height: 8),
                                       ListTile(
                                         title: Text(
-                                          e.nomIntrant,
+                                          filtereSearch[index].nomIntrant!,
                                           style: TextStyle(
-                                            fontSize: 17,
+                                            fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.black87,
                                           ),
-                                          // maxLines: 1,
-                                          // overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                         subtitle: Text(
-                                          "${e.prixIntrant.toString()} ${para.monnaie}",
+                                          "${filtereSearch[index].prixIntrant.toString()} ${monnaie}",
                                           style: TextStyle(
-                                            fontSize: 16,
+                                            overflow: TextOverflow.ellipsis,
+                                            fontSize: 15,
                                             color: Colors.black87,
                                           ),
                                         ),
@@ -243,14 +423,15 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            _buildEtat(e.statutIntrant!),
+                                            _buildEtat(filtereSearch[index].statutIntrant!),
+      
                                             PopupMenuButton<String>(
                                               padding: EdgeInsets.zero,
                                               itemBuilder: (context) =>
                                                   <PopupMenuEntry<String>>[
                                                 PopupMenuItem<String>(
                                                   child: ListTile(
-                                                    leading: e.statutIntrant ==
+                                                    leading: filtereSearch[index].statutIntrant ==
                                                             false
                                                         ? Icon(
                                                             Icons.check,
@@ -263,12 +444,12 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                                 .orange[400],
                                                           ),
                                                     title: Text(
-                                                      e.statutIntrant == false
+                                                      filtereSearch[index].statutIntrant == false
                                                           ? "Activer"
                                                           : "Desactiver",
                                                       style: TextStyle(
                                                         color:
-                                                            e.statutIntrant ==
+                                                            filtereSearch[index].statutIntrant ==
                                                                     false
                                                                 ? Colors.green
                                                                 : Colors.orange[
@@ -277,21 +458,27 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                             FontWeight.bold,
                                                       ),
                                                     ),
+                                                    
                                                     onTap: () async {
-                                                      e.statutIntrant == false
+                                                      
+                                                      filtereSearch[index].statutIntrant == false
                                                           ? await IntrantService()
                                                               .activerIntrant(
-                                                                  e.idIntrant!)
+                                                                  filtereSearch[index].idIntrant!)
                                                               .then((value) => {
+                                                                Navigator.of(context)
+                                                                            .pop(),
+      
                                                                     Provider.of<IntrantService>(
                                                                             context,
                                                                             listen:
                                                                                 false)
                                                                         .applyChange(),
-                                                                    setState(
+                                                                     setState(
                                                                         () {
+                                                                          page++;
                                                                       futureList =
-                                                                          getListe(
+                                                                          IntrantService().fetchIntrantByActeurWithPagination(
                                                                               acteur.idActeur!);
                                                                     }),
                                                                     Navigator.of(
@@ -327,13 +514,14 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                                                 Duration(seconds: 5),
                                                                           ),
                                                                         ),
-                                                                        Navigator.of(context)
-                                                                            .pop(),
+                                                                        
                                                                       })
                                                           : await IntrantService()
                                                               .desactiverIntrant(
-                                                                  e.idIntrant!)
+                                                                  filtereSearch[index].idIntrant!)
                                                               .then((value) => {
+                                                                Navigator.of(context)
+                                                                            .pop(),
                                                                     Provider.of<IntrantService>(
                                                                             context,
                                                                             listen:
@@ -341,13 +529,12 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                                         .applyChange(),
                                                                     setState(
                                                                         () {
+                                                                          page++;
                                                                       futureList =
-                                                                          getListe(
+                                                                          IntrantService().fetchIntrantByActeurWithPagination(
                                                                               acteur.idActeur!);
                                                                     }),
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
+                                                                  
                                                                   })
                                                               .catchError(
                                                                   (onError) => {
@@ -367,7 +554,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                                         Navigator.of(context)
                                                                             .pop(),
                                                                       });
-
+      
                                                       ScaffoldMessenger.of(
                                                               context)
                                                           .showSnackBar(
@@ -400,24 +587,26 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                                       ),
                                                     ),
                                                     onTap: () async {
+                                                      
                                                       await IntrantService()
                                                           .deleteIntrant(
-                                                              e.idIntrant!)
+                                                              filtereSearch[index].idIntrant!)
                                                           .then((value) => {
+                                                            Navigator.of(context)
+                                                                            .pop(),
                                                                 Provider.of<IntrantService>(
                                                                         context,
                                                                         listen:
                                                                             false)
                                                                     .applyChange(),
-                                                                setState(() {
-                                                                  futureList =
-                                                                      getListe(
-                                                                          acteur
-                                                                              .idActeur!);
-                                                                }),
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop(),
+                                                                setState(
+                                                                        () {
+                                                                          page++;
+                                                                      futureList =
+                                                                          IntrantService().fetchIntrantByActeurWithPagination(
+                                                                              acteur.idActeur!);
+                                                                    }),
+                                                                
                                                               })
                                                           .catchError(
                                                               (onError) => {
@@ -448,15 +637,101 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                   ),
                                 ),
                               );
+                               }else{
+                                        return isLoading == true ? 
+                                       Padding(
+                                         padding: const EdgeInsets.symmetric(horizontal: 32),
+                                         child: Center(
+                                           child:
+                                           const Center(
+                                                               child: CircularProgressIndicator(
+                                color: Colors.orange,
+                                                               ),
+                                                             )
+                                         ),
+                                       ) : Container();
+                                       }
                             },
                           );
                   }
                 });
           })
-        ]),
+                
+              ),
+            ),
+        ),
       ),
     );
   }
+
+
+   Widget _buildShimmerEffect(){
+  return   Center(
+        child: GridView.builder(
+            shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 0.8,
+      ),
+          itemCount: 6, // Number of shimmer items to display
+          itemBuilder: (context, index) {
+            return Card(
+              margin: EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 85,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 16,
+                        color: Colors.grey,
+                      ),
+                    ), 
+                    subtitle: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 15,
+                        color: Colors.grey,
+                        margin: EdgeInsets.only(top: 4),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 15,
+                        color: Colors.grey,
+                        margin: EdgeInsets.only(top: 4),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+ }
 
   Widget _buildEtat(bool isState) {
     return Container(
@@ -499,3 +774,5 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
     );
   }
 }
+
+

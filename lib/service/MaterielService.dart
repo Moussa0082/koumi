@@ -3,16 +3,22 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Materiel.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:path/path.dart';
 
 class MaterielService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/Materiel';
+  static const String baseUrl = '$apiOnlineUrl/Materiel';
   // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Materiel';
 
   List<Materiel> materielList = [];
+  int page = 0;
+  bool isLoading = false;
+   int size = 4;
+  bool hasMore = true;
+
 
   Future<void> addMateriel({
     required int prixParHeure,
@@ -110,36 +116,36 @@ class MaterielService extends ChangeNotifier {
     }
   }
 
-  Future<List<Materiel>> fetchMateriel() async {
-    final response = await http.get(Uri.parse('$baseUrl/list'));
+  // Future<List<Materiel>> fetchMateriel() async {
+  //   final response = await http.get(Uri.parse('$baseUrl/list'));
 
-    if (response.statusCode == 200) {
-      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-      materielList = body.map((item) => Materiel.fromMap(item)).toList();
-      debugPrint(response.body);
-      return materielList;
-    } else {
-      materielList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
-      throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
-    }
-  }
+  //   if (response.statusCode == 200) {
+  //     List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+  //     materielList = body.map((item) => Materiel.fromMap(item)).toList();
+  //     debugPrint(response.body);
+  //     return materielList;
+  //   } else {
+  //     materielList = [];
+  //     print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+  //     throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+  //   }
+  // }
 
-  Future<List<Materiel>> fetchMaterielByActeur(String idActeur) async {
-    final response =
-        await http.get(Uri.parse('$baseUrl/readByActeur/$idActeur'));
+  // Future<List<Materiel>> fetchMaterielByActeur(String idActeur) async {
+  //   final response =
+  //       await http.get(Uri.parse('$baseUrl/readByActeur/$idActeur'));
 
-    if (response.statusCode == 200) {
-      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-      materielList = body.map((item) => Materiel.fromMap(item)).toList();
-      debugPrint(response.body);
-      return materielList;
-    } else {
-      materielList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
-      throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
-    }
-  }
+  //   if (response.statusCode == 200) {
+  //     List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+  //     materielList = body.map((item) => Materiel.fromMap(item)).toList();
+  //     debugPrint(response.body);
+  //     return materielList;
+  //   } else {
+  //     materielList = [];
+  //     print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+  //     throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+  //   }
+  // }
 
   Future<List<Materiel>> fetchMaterielByType(String id) async {
     final response =
@@ -155,6 +161,150 @@ class MaterielService extends ChangeNotifier {
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
        return  materielList = [];
     }
+  }
+ 
+   Future<List<Materiel>> fetchMateriel({bool refresh = false }) async {
+    // if (isLoading) return [];
+
+      isLoading = true;
+
+    if (refresh) {
+    
+        materielList.clear();
+        page = 0;
+        hasMore = true;
+     
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Materiel/getAllMaterielsWithPagination?page=$page&size=$size'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+         
+            hasMore = false;
+          
+        } else {
+          
+            List<Materiel> newMateriels = body.map((e) => Materiel.fromMap(e)).toList();
+          materielList.addAll(newMateriels);
+          
+        }
+
+        debugPrint("response body all materiel with pagination $page par défilement soit ${materielList.length}");
+       return materielList;
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des materiels: $e');
+    } finally {
+     
+        isLoading = false;
+      
+    }
+    return materielList;
+  }
+
+
+   Future<List<Materiel>> fetchMaterielByTypeWithPagination(String idTypeMateriel,{bool refresh = false }) async {
+    // if (isLoading) return [];
+
+      isLoading = true;
+    
+    if (refresh) {
+    
+        materielList.clear();
+        page = 0;
+        hasMore = true;
+     
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Materiel/getAllMaterielsByTypeMaterielWithPagination?idTypeMateriel=$idTypeMateriel&page=$page&size=$size'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+         
+            hasMore = false;
+          
+        } else {
+          
+            List<Materiel> newMateriels = body.map((e) => Materiel.fromMap(e)).toList();
+          materielList.addAll(newMateriels);
+          // page++;
+          
+        }
+
+        debugPrint("response body materiel by type with pagination $page par défilement soit ${materielList.length}");
+       return materielList;
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des materiels: $e');
+    } finally {
+     
+        isLoading = false;
+      
+    }
+    return materielList;
+  }
+
+   Future<List<Materiel>> fetchMaterielByActeurWithPagination(String idActeur,{bool refresh = false }) async {
+    if (isLoading) return [];
+
+      isLoading = true;
+    
+    if (refresh) {
+    
+        materielList.clear();
+        page = 0;
+        hasMore = true;
+     
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Materiel/getAllMaterielsByActeurWithPagination?idActeur=$idActeur&page=$page&size=$size'));
+
+      if (response.statusCode == 200) {
+        // debugPrint("url: $response");
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+         
+            hasMore = false;
+          
+        } else {
+          
+            List<Materiel> newMateriels = body.map((e) => Materiel.fromMap(e)).toList();
+          materielList.addAll(newMateriels);
+          
+        }
+
+        debugPrint("response body materiel by acteur with pagination $page par défilement soit ${materielList.length}");
+       return materielList;
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des materiels: $e');
+    } finally {
+     
+        isLoading = false;
+      
+    }
+    return materielList;
   }
  
 

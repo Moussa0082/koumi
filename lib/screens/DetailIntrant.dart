@@ -1,21 +1,27 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/CartProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
+import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:path/path.dart' as path;
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:readmore/readmore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -50,6 +56,36 @@ class _DetailIntrantState extends State<DetailIntrant> {
   late Intrant intrants;
   bool isExist = false;
   String? email = "";
+   bool isLoadingLibelle = true;
+   String? monnaie;
+
+
+   Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load monnaie');
+    }
+}
+
+ Future<void> fetchPaysDataByActor() async {
+    try {
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+      setState(() { 
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -88,10 +124,11 @@ class _DetailIntrantState extends State<DetailIntrant> {
     // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
     //     .parametreList!;
     // para = paraList[0];
+    fetchPaysDataByActor();
     verifyParam();
     intrants = widget.intrant;
-    _nomController.text = intrants.nomIntrant;
-    _descriptionController.text = intrants.descriptionIntrant;
+    _nomController.text = intrants.nomIntrant!;
+    _descriptionController.text = intrants.descriptionIntrant!;
     _quantiteController.text = intrants.quantiteIntrant.toString();
     _prixController.text = intrants.prixIntrant.toString();
     _dateController.text = intrants.dateExpiration!;
@@ -323,7 +360,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                   style: const TextStyle(
                       color: d_colorGreen, fontWeight: FontWeight.bold),
                 ),
-                actions: acteur.nomActeur == intrants.acteur.nomActeur
+                actions: acteur.idActeur == intrants.acteur!.idActeur
                     ? [
                         _isEditing
                             ? IconButton(
@@ -360,26 +397,25 @@ class _DetailIntrantState extends State<DetailIntrant> {
                       : Center(
                           child: intrants.photoIntrant != null &&
                                   !intrants.photoIntrant!.isEmpty
-                              ? Image.network(
-                                  "https://koumi.ml/api-koumi/intrant/${intrants.idIntrant}/image",
-                                  width: double.infinity,
-                                  height: 200,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (BuildContext context,
-                                      Object exception,
-                                      StackTrace? stackTrace) {
-                                    return Image.asset(
-                                      'assets/images/default_image.png',
-                                      fit: BoxFit.cover,
-                                    );
-                                  },
-                                )
-                              // ? Image.network(
-                              //     "http://10.0.2.2/${intrants.photoIntrant!}",
-                              //     width: double.infinity,
-                              //     height: 200,
-                              //     fit: BoxFit.cover,
-                              //   )
+                              ?
+                              
+       CachedNetworkImage(
+                                                  imageUrl:
+                                                  "https://koumi.ml/api-koumi/intrant/${intrants.idIntrant}/image",
+                                                  fit: BoxFit.cover,
+                                                  placeholder: (context, url) =>
+                                                      const Center(
+                                                          child:
+                                                              CircularProgressIndicator()),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Image.asset(
+                                                    'assets/images/default_image.png',
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                )
+
+                             
                               : Image.asset(
                                   "assets/images/default_image.png",
                                   fit: BoxFit.cover,
@@ -388,11 +424,48 @@ class _DetailIntrantState extends State<DetailIntrant> {
                                 ),
                         ),
                   SizedBox(height: 30),
-                  !_isEditing ? viewData() : _buildEditing()
+                  !_isEditing ? viewData() : _buildEditing(),
+                  SizedBox(height: 10),
+                  isExist == true
+                      ? widget.intrant.acteur!.idActeur == acteur.idActeur
+                          ? SizedBox()
+                          : Center(
+                              child: SizedBox(
+                                width: 200,
+                                height: 48,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    // _addToCart(widget.stock);
+                                    if (widget.intrant.acteur!.idActeur ==
+                                        acteur.idActeur) {
+                                      Snack.error(
+                                          titre: "Alerte",
+                                          message:
+                                              "Désolé!, Vous ne pouvez pas commander un intrant qui vous appartient");
+                                    } else {
+                                      Provider.of<CartProvider>(context,
+                                              listen: false)
+                                          .addToCartInt(widget.intrant, 1, "");
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.orange,
+                                      shape: const StadiumBorder()),
+                                  child: Text(
+                                    "Ajouter au panier",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            )
+                      : SizedBox(),
+                  const SizedBox(height: 10),
                 ],
               ),
             ),
-            floatingActionButton: acteur.nomActeur != intrants.acteur.nomActeur
+            floatingActionButton: acteur.idActeur != intrants.acteur!.idActeur
                 ? SpeedDial(
                     // animatedIcon: AnimatedIcons.close_menu,
 
@@ -414,7 +487,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         ),
                         onTap: () {
                           final String whatsappNumber =
-                              intrants.acteur.whatsAppActeur!;
+                              intrants.acteur!.whatsAppActeur!;
                           _makePhoneWa(whatsappNumber);
                         },
                       ),
@@ -428,7 +501,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         ),
                         onTap: () {
                           final String numberPhone =
-                              intrants.acteur.telephoneActeur!;
+                              intrants.acteur!.telephoneActeur!;
                           _makePhoneCall(numberPhone);
                         },
                       )
@@ -475,7 +548,7 @@ class _DetailIntrantState extends State<DetailIntrant> {
             ),
             child: Center(
               child: Text(
-                intrants.nomIntrant.toUpperCase(),
+                intrants.nomIntrant!.toUpperCase(),
                 style: const TextStyle(
                     overflow: TextOverflow.ellipsis,
                     fontSize: 20,
@@ -504,28 +577,23 @@ class _DetailIntrantState extends State<DetailIntrant> {
             ),
           ),
         ),
-        _buildDescription(intrants.descriptionIntrant),
-        // acteur.nomActeur != intrants.acteur.nomActeur
-        //     ? Padding(
-        //         padding: const EdgeInsets.symmetric(horizontal: 10),
-        //         child: Container(
-        //           height: 40,
-        //           width: MediaQuery.of(context).size.width,
-        //           decoration: const BoxDecoration(
-        //             color: Colors.orangeAccent,
-        //           ),
-        //           child: Center(
-        //             child: Text(
-        //               'Fournisseur',
-        //               style: const TextStyle(
-        //                   overflow: TextOverflow.ellipsis,
-        //                   fontSize: 20,
-        //                   fontWeight: FontWeight.bold),
-        //             ),
-        //           ),
-        //         ),
-        //       )
-        //     : Container(),
+        // _buildDescription(intrants.descriptionIntrant!),
+        Padding(
+                     padding: EdgeInsets.all(8),
+                      child: ReadMoreText(
+                        colorClickableText: Colors.orange,
+                        trimLines: 2,
+                        trimMode: TrimMode.Line,
+                        trimCollapsedText: "Lire plus",
+                        trimExpandedText: "Lire moins",
+                        style: TextStyle(
+                            fontSize: 16, fontStyle: FontStyle.italic),
+                        intrants.descriptionIntrant == null
+                            ? "A Henley shirt is a collarless pullover shirt, by a round neckline and a placket about 3 to 5 inches (8 to 13 cm) long and usually having 2–5 buttons."
+                            : intrants.descriptionIntrant!,
+                      ),
+                    ),
+
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Container(
@@ -550,35 +618,48 @@ class _DetailIntrantState extends State<DetailIntrant> {
         _buildItem(
             'Filière  ', intrants.categorieProduit!.filiere!.libelleFiliere!),
         _buildItem('Date d\'ajout ', '${intrants.dateAjout}' ?? 'N/A'),
-        acteur.nomActeur != intrants.acteur.nomActeur
+        acteur.idActeur != intrants.acteur!.idActeur
             ? _buildFournissuer()
             : Container(),
-        // acteur.nomActeur != intrants.acteur.nomActeur
-        //     ?
-        Center(
-          child: SizedBox(
-            width: 200,
-            height: 60,
-            child: ElevatedButton(
-              onPressed: () {
-                // _addToCart(widget.stock);
-                if (acteur.nomActeur != intrants.acteur.nomActeur) {
-                  Snack.error(
-                      titre: "Alerte",
-                      message:
-                          "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
-                } else {}
-              },
-              style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.orange, shape: const StadiumBorder()),
-              child: Text(
-                "Ajouter au panier",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        )
-        // : Container()
+        // isExist == true
+        //     ? widget.intrant.acteur!.idActeur == acteur.idActeur
+        //         ? SizedBox()
+        //         : Center(
+        //             child: acteur.idActeur != intrants.acteur!.idActeur!
+        //                 ? Center(
+        //                     child: SizedBox(
+        //                       width: 200,
+        //                       height: 60,
+        //                       child: ElevatedButton(
+        //                         onPressed: () {
+        //                           // _addToCart(widget.stock);
+        //                           if (acteur.idActeur ==
+        //                               intrants.acteur!.idActeur) {
+        //                             Snack.error(
+        //                                 titre: "Alerte",
+        //                                 message:
+        //                                     "Désolé!, Vous ne pouvez pas commander un produit qui vous appartient");
+        //                           } else {
+        //                             Provider.of<CartProvider>(context,
+        //                                     listen: false)
+        //                                 .addToCartInt(widget.intrant, 1, "");
+        //                           }
+        //                         },
+        //                         style: ElevatedButton.styleFrom(
+        //                             foregroundColor: Colors.orange,
+        //                             shape: const StadiumBorder()),
+        //                         child: Text(
+        //                           "Ajouter au panier",
+        //                           style: TextStyle(
+        //                               fontSize: 16,
+        //                               fontWeight: FontWeight.bold),
+        //                         ),
+        //                       ),
+        //                     ),
+        //                   )
+        //                 : Container(),
+        //           )
+        //     : Container(),
       ],
     );
   }
@@ -596,15 +677,15 @@ class _DetailIntrantState extends State<DetailIntrant> {
   _buildData() {
     return Column(
       children: [
-        _buildItem('Nom intrant ', intrants.nomIntrant),
+        _buildItem('Nom intrant ', intrants.nomIntrant!),
         _buildItem('Quantité ', intrants.quantiteIntrant.toString()),
         _buildItem('Date péremption ', intrants.dateExpiration!),
-        para.monnaie != null
+        monnaie != null
             ? _buildItem(
-                'Prix ', '${intrants.prixIntrant.toString()} ${para.monnaie}')
-            : _buildItem('Prix ', '${intrants.prixIntrant.toString()} FCFA'),
+                'Prix ', '${intrants.prixIntrant.toString()} ${monnaie}')
+            : _buildItem('Prix ', '${intrants.prixIntrant.toString()} ${monnaie}'),
         _buildItem('Unité ', '${intrants.unite}'),
-        _buildItem('Forme ', '${intrants.forme.libelleForme}'),
+        _buildItem('Forme ', '${intrants.forme!.libelleForme}'),
         _buildItem('Statut ',
             '${intrants.statutIntrant! ? 'Disponible' : 'Non disponible'}'),
       ],
@@ -614,8 +695,8 @@ class _DetailIntrantState extends State<DetailIntrant> {
   _buildFournissuer() {
     return Column(
       children: [
-        _buildItem('Nom du fournisseur ', intrants.acteur.nomActeur!),
-        _buildItem('Contact ', intrants.acteur.telephoneActeur!),
+        _buildItem('Nom du fournisseur ', intrants.acteur!.nomActeur!),
+        _buildItem('Contact ', intrants.acteur!.telephoneActeur!),
       ],
     );
   }

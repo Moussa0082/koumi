@@ -96,7 +96,6 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
     // Affichez la boîte de dialogue de chargement
 
     try {
-      ActeurService acteurService = ActeurService();
       final emailActeur = emailController.text;
       final whatsAppActeur = whatsAppController.text;
 
@@ -170,13 +169,13 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => CodeConfirmScreen(
-                              isVisible: isVisible,
-                              emailActeur: emailController.text,
-                              whatsAppActeur: whatsAppController.text)));
+                  // Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //         builder: (context) => CodeConfirmScreen(
+                  //             isVisible: isVisible,
+                  //             emailActeur: emailController.text,
+                  //             whatsAppActeur: whatsAppController.text)));
                 },
                 child: const Text('OK'),
               ),
@@ -218,11 +217,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                     // Fonction de retour
                     Navigator.pop(context);
                   },
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: Colors.black,
-                    size: 30,
-                  ),
+                  icon: const Icon(Icons.arrow_back_ios),
                   iconSize: 30,
                   splashRadius: 20,
                   padding: EdgeInsets.zero,
@@ -232,7 +227,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
               Center(child: Image.asset('assets/images/fg-pass.png')),
               // connexion
               const Text(
-                " Mot de passe oublier  ",
+                " Mot de passe oublié  ",
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -310,11 +305,13 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                       visible: isVisible,
                       child: TextFormField(
                         controller: emailController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          // labelText: "Email",
+                         decoration: InputDecoration(
                           hintText: "Entrez votre adresse email",
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                         keyboardType: TextInputType.text,
                         validator: (val) {
@@ -337,11 +334,13 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                       visible: !isVisible,
                       child: TextFormField(
                         controller: whatsAppController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          // labelText: "Numéro WhatsApp",
+                         decoration: InputDecoration(
                           hintText: "Entrez votre numéro WhatsApp",
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                         keyboardType: TextInputType.phone,
                         validator: (val) {

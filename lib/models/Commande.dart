@@ -1,56 +1,108 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/Stock.dart';
 
 class Commande {
-  String? idCommande;
-  String? codeCommande;
-  String? dateCommande;
-  final List<Stock>? stock;
-  final List<dynamic>? materielList;
-  String? photoSignature;
-  String? idClient;
-  String? idCommercant;
-  String? personneAjout;
-  String? dateAjout;
-  String? personneModif;
-   Acteur? acteur;
-  String? dateModif;
+    String? idCommande;
+    String? codeCommande;
+    String? descriptionCommande;
+    bool? statutCommande;
+    bool? statutCommandeLivrer;
+    bool? statutConfirmation;
+    String? dateCommande;
+    double? quantiteDemande;
+    String? nomProduit;
+    String? codeAcheteur;
+    String? dateModif;
+    Acteur? acteur;
+    Acteur? acteurProprietaire;
+    String? personneModif;
 
-  Commande({
-    this.idCommande,
-     this.codeCommande,
-     this.dateCommande,
-     this.stock,
-     this.materielList,
-     this.photoSignature,
-     this.idClient,
-     this.idCommercant,
-     this.personneAjout,
-     this.dateAjout,
-     this.personneModif,
-     this.acteur,
-     this.dateModif,
-  });
+    Commande({
+         this.idCommande,
+         this.codeCommande,
+         this.descriptionCommande,
+         this.statutCommande,
+         this.statutCommandeLivrer,
+         this.statutConfirmation,
+         this.dateCommande,
+         this.quantiteDemande,
+         this.nomProduit,
+         this.codeAcheteur,
+         this.dateModif,
+         this.acteur,
+         this.acteurProprietaire,
+         this.personneModif,
+    });
 
-  factory Commande.fromMap(Map<String, dynamic> map) {
+    factory Commande.fromJson(Map<String, dynamic> json) => Commande(
+        idCommande: json["idCommande"],
+        codeCommande: json["codeCommande"],
+        descriptionCommande: json["descriptionCommande"],
+        statutCommande: json["statutCommande"],
+        statutCommandeLivrer: json["statutCommandeLivrer"],
+        statutConfirmation: json["statutConfirmation"],
+        dateCommande: json["dateCommande"],
+        quantiteDemande: json["quantiteDemande"],
+        nomProduit: json["nomProduit"],
+        codeAcheteur: json["codeAcheteur"],
+        dateModif: json["dateModif"],
+        acteur: Acteur.fromJson(json["acteur"]),
+        acteurProprietaire: Acteur.fromJson(json["acteurProprietaire"]),
+        personneModif: json["personneModif"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "idCommande": idCommande,
+        "codeCommande": codeCommande,
+        "descriptionCommande": descriptionCommande,
+        "statutCommande": statutCommande,
+        "statutCommandeLivrer": statutCommandeLivrer,
+        "statutConfirmation": statutConfirmation,
+        "dateCommande": dateCommande,
+        "quantiteDemande": quantiteDemande,
+        "nomProduit": nomProduit,
+        "codeAcheteur": codeAcheteur,
+        "dateModif": dateModif,
+        "acteur": acteur?.toJson(),
+        "acteurProprietaire": acteurProprietaire?.toJson(),
+        "personneModif": personneModif,
+    };
+
+  Commande copyWith({
+    String? idCommande,
+    String? codeCommande,
+    String? descriptionCommande,
+    bool? statutCommande,
+    bool? statutCommandeLivrer,
+    bool? statutConfirmation,
+    String? dateCommande,
+    double? quantiteDemande,
+    String? nomProduit,
+    String? codeAcheteur,
+    String? dateModif,
+    Acteur? acteur,
+    Acteur? acteurProprietaire,
+    String? personneModif,
+  }) {
     return Commande(
-      idCommande: map['idCommande'] as String?,
-      codeCommande: map['codeCommande'] as String,
-      dateCommande: map['dateCommande'] as String,
-      stock: List<Stock>.from(map['stock'].map((x) => x)),
-      materielList: List<dynamic>.from(
-          map['materielList'].map((x) => x)),
-      photoSignature: map['photoSignature'] as String?,
-      idClient: map['idClient'] as String?,
-      idCommercant: map['idCommercant'] as String?,
-      personneAjout: map['personneAjout'] as String?,
-      dateAjout: map['dateAjout'] as String?,
-      personneModif: map['personneModif'] as String?,
-      // acteur: map['acteur'] as String?,
-      acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
-      dateModif: map['dateModif'] as String?,
+      idCommande: idCommande ?? this.idCommande,
+      codeCommande: codeCommande ?? this.codeCommande,
+      descriptionCommande: descriptionCommande ?? this.descriptionCommande,
+      statutCommande: statutCommande ?? this.statutCommande,
+      statutCommandeLivrer: statutCommandeLivrer ?? this.statutCommandeLivrer,
+      statutConfirmation: statutConfirmation ?? this.statutConfirmation,
+      dateCommande: dateCommande ?? this.dateCommande,
+      quantiteDemande: quantiteDemande ?? this.quantiteDemande,
+      nomProduit: nomProduit ?? this.nomProduit,
+      codeAcheteur: codeAcheteur ?? this.codeAcheteur,
+      dateModif: dateModif ?? this.dateModif,
+      acteur: acteur ?? this.acteur,
+      acteurProprietaire: acteurProprietaire ?? this.acteurProprietaire,
+      personneModif: personneModif ?? this.personneModif,
     );
   }
 
@@ -58,22 +110,96 @@ class Commande {
     return <String, dynamic>{
       'idCommande': idCommande,
       'codeCommande': codeCommande,
+      'descriptionCommande': descriptionCommande,
+      'statutCommande': statutCommande,
+      'statutCommandeLivrer': statutCommandeLivrer,
+      'statutConfirmation': statutConfirmation,
       'dateCommande': dateCommande,
-      'stock': stock,
-      'materielList': materielList,
-      'photoSignature': photoSignature,
-      'idClient': idClient,
-      'idCommercant': idCommercant,
-      'personneAjout': personneAjout,
-      'dateAjout': dateAjout,
-      'personneModif': personneModif,
-       'acteur': acteur,
+      'quantiteDemande': quantiteDemande,
+      'nomProduit': nomProduit,
+      'codeAcheteur': codeAcheteur,
       'dateModif': dateModif,
+      'acteur': acteur?.toMap(),
+      'acteurProprietaire': acteurProprietaire?.toMap(),
+      'personneModif': personneModif,
     };
   }
 
-  String toJson() => json.encode(toMap());
+  factory Commande.fromMap(Map<String, dynamic> map) {
+    return Commande(
+      idCommande: map['idCommande'] != null ? map['idCommande'] as String : null,
+      codeCommande: map['codeCommande'] != null ? map['codeCommande'] as String : null,
+      descriptionCommande: map['descriptionCommande'] != null ? map['descriptionCommande'] as String : null,
+      statutCommande: map['statutCommande'] != null ? map['statutCommande'] as bool : null,
+      statutCommandeLivrer: map['statutCommandeLivrer'] != null ? map['statutCommandeLivrer'] as bool : null,
+      statutConfirmation: map['statutConfirmation'] != null ? map['statutConfirmation'] as bool : null,
+      dateCommande: map['dateCommande'] != null ? map['dateCommande'] as String : null,
+      quantiteDemande: map['quantiteDemande'] != null ? map['quantiteDemande'] as double : null,
+      nomProduit: map['nomProduit'] != null ? map['nomProduit'] as String : null,
+      codeAcheteur: map['codeAcheteur'] != null ? map['codeAcheteur'] as String : null,
+      dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
+      acteur: map['acteur'] != null ? Acteur.fromMap(map['acteur'] as Map<String,dynamic>) : null,
+      acteurProprietaire: map['acteurProprietaire'] != null ? Acteur.fromMap(map['acteurProprietaire'] as Map<String,dynamic>) : null,
+      personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
+    );
+  }
 
-  factory Commande.fromJson(String source) =>
-      Commande.fromMap(json.decode(source));
+  // String toJson() => json.encode(toMap());
+
+  // factory Commande.fromJson(String source) => Commande.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() {
+    return 'Commande(idCommande: $idCommande, codeCommande: $codeCommande, descriptionCommande: $descriptionCommande, statutCommande: $statutCommande, statutCommandeLivrer: $statutCommandeLivrer, statutConfirmation: $statutConfirmation, dateCommande: $dateCommande, quantiteDemande: $quantiteDemande, nomProduit: $nomProduit, codeAcheteur: $codeAcheteur, dateModif: $dateModif, acteur: $acteur, acteurProprietaire: $acteurProprietaire, personneModif: $personneModif)';
+  }
+
+  @override
+  bool operator ==(covariant Commande other) {
+    if (identical(this, other)) return true;
+  
+    return 
+      other.idCommande == idCommande &&
+      other.codeCommande == codeCommande &&
+      other.descriptionCommande == descriptionCommande &&
+      other.statutCommande == statutCommande &&
+      other.statutCommandeLivrer == statutCommandeLivrer &&
+      other.statutConfirmation == statutConfirmation &&
+      other.dateCommande == dateCommande &&
+      other.quantiteDemande == quantiteDemande &&
+      other.nomProduit == nomProduit &&
+      other.codeAcheteur == codeAcheteur &&
+      other.dateModif == dateModif &&
+      other.acteur == acteur &&
+      other.acteurProprietaire == acteurProprietaire &&
+      other.personneModif == personneModif;
+  }
+
+  @override
+  int get hashCode {
+    return idCommande.hashCode ^
+      codeCommande.hashCode ^
+      descriptionCommande.hashCode ^
+      statutCommande.hashCode ^
+      statutCommandeLivrer.hashCode ^
+      statutConfirmation.hashCode ^
+      dateCommande.hashCode ^
+      quantiteDemande.hashCode ^
+      nomProduit.hashCode ^
+      codeAcheteur.hashCode ^
+      dateModif.hashCode ^
+      acteur.hashCode ^
+      acteurProprietaire.hashCode ^
+      personneModif.hashCode;
+  }
 }
+
+
+
+ 
+
+  
+
+
+  // String toJson() => json.encode(toMap());
+
+

@@ -8,7 +8,11 @@ import 'package:koumi_app/Admin/PaysPage.dart';
 import 'package:koumi_app/Admin/SousRegionPage.dart';
 import 'package:koumi_app/Admin/TypeMaterielPage.dart';
 import 'package:koumi_app/Admin/UnitePage.dart';
+import 'package:koumi_app/constants.dart';
+import 'package:http/http.dart' as http;
+import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/TypeVehicule.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +30,103 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 class _ParametreState extends State<Parametre> {
   late ParametreGeneraux params = ParametreGeneraux();
   List<ParametreGeneraux> paramList = [];
+   late Acteur acteur;
+      bool isLoadingLibelle = true;
+    String? libelleNiveau1Pays;
+    String? libelleNiveau2Pays;
+    String? libelleNiveau3Pays;
+    String? monnaie;
+    String? tauxDollar;
+    String? tauxYuan;
+    
+ 
+    
+  Future<String> getLibelleNiveau1PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau1Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau1Pays');
+    }
+}
+  Future<String> getLibelleNiveau2PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau2Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau2Pays');
+    }
+}
+  Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+}
+  Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load monnaie');
+    }
+}
+
+  Future<String> getTauxDollarByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/tauxDollar/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load tauxDollar');
+    }
+}
+  Future<String> getTauxYuanByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/tauxYuan/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load tauxYUAN');
+    }
+}
+
+     Future<void> fetchPaysDataByActor() async {
+    try {
+      String libelle1 = await getLibelleNiveau1PaysByActor(acteur.idActeur!);
+      String libelle2 = await getLibelleNiveau2PaysByActor(acteur.idActeur!);
+      String libelle3 = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+      String tauxDollar = await getTauxDollarByActor(acteur.idActeur!);
+      String tauxYuan = await getTauxYuanByActor(acteur.idActeur!);
+      setState(() { 
+        libelleNiveau1Pays = libelle1;
+        libelleNiveau2Pays = libelle2;
+        libelleNiveau3Pays = libelle3;
+        tauxYuan = tauxYuan;
+        tauxDollar = tauxDollar;
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
 
   void verifyParam() {
     paramList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
@@ -43,6 +144,8 @@ class _ParametreState extends State<Parametre> {
   void initState() {
     super.initState();
     verifyParam();
+    fetchPaysDataByActor();
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
   }
 
   @override
@@ -116,7 +219,8 @@ class _ParametreState extends State<Parametre> {
                               ),
                             ),
                   title: Text(
-                    params.nomSysteme! ?? "Koumi",
+                    params.nomSysteme != null ?
+                    params.nomSysteme!: "Koumi",
                     style: const TextStyle(
                       fontSize: 22,
                       color: Colors.black,
@@ -125,7 +229,8 @@ class _ParametreState extends State<Parametre> {
                     ),
                   ),
                   subtitle: Text(
-                    params.sloganSysteme! ?? "Koumi",
+                    params.sloganSysteme != null ?
+                    params.sloganSysteme! : "Koumi",
                     textAlign: TextAlign.justify,
                     style: const TextStyle(
                       fontSize: 17,
@@ -203,7 +308,7 @@ class _ParametreState extends State<Parametre> {
                     ),
                     getList(
                         "region.png",
-                        params.libelleNiveau1Pays!,
+                        libelleNiveau1Pays != null ? libelleNiveau1Pays! : "Niveau 1",
                         const Niveau1Page(),
                         const Icon(
                           Icons.chevron_right_sharp,
@@ -218,7 +323,9 @@ class _ParametreState extends State<Parametre> {
                     ),
                     getList(
                         "region.png",
-                        params.libelleNiveau2Pays!,
+                        libelleNiveau2Pays != null
+                            ? libelleNiveau2Pays!
+                            : "Niveau 2",
                         const Niveau2Page(),
                         const Icon(
                           Icons.chevron_right_sharp,
@@ -233,7 +340,9 @@ class _ParametreState extends State<Parametre> {
                     ),
                     getList(
                         "region.png",
-                        params.libelleNiveau3Pays!,
+                        libelleNiveau3Pays != null
+                            ? libelleNiveau3Pays!
+                            : "Niveau 3",
                         const Niveau3Page(),
                         const Icon(
                           Icons.chevron_right_sharp,

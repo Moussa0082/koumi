@@ -145,7 +145,8 @@ class _UpdateZoneState extends State<UpdateZone> {
                         height: 150,
                       )
                     
-                        : Image.network(
+                        : 
+                        Image.network(
                            "https://koumi.ml/api-koumi/ZoneProduction/${zoneProd.idZoneProduction}/image",
                            fit: BoxFit.fitWidth,
                         height: 150,

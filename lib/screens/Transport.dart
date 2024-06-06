@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
@@ -13,7 +15,10 @@ import 'package:koumi_app/screens/PageTransporteur.dart';
 import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 
 class Transport extends StatefulWidget {
   const Transport({super.key});
@@ -36,6 +41,181 @@ class _TransportState extends State<Transport> {
   late Future _typeList;
   bool isExist = false;
   String? email = "";
+   int page = 0;
+   bool isLoading = false;
+   int size = 4;
+  bool hasMore = true;
+    ScrollController scrollableController = ScrollController();
+    ScrollController scrollableController1 = ScrollController();
+    late Future<List<Vehicule>> vehiculeListeFuture;
+    late Future<List<Vehicule>> vehiculeListeFuture1;
+
+ 
+
+  void _scrollListener() {
+ 
+    if( scrollableController.position.pixels >=
+          scrollableController.position.maxScrollExtent - 200 &&
+      hasMore &&
+      !isLoading && selectedType== null){
+      // Incrementez la page et récupérez les stocks généraux
+      setState(() {
+          // Rafraîchir les données ici
+        page++;
+        });
+      debugPrint("yes - fetch all vehicule");
+      fetchVehicule().then((value) {
+        setState(() {
+          // Rafraîchir les données ici
+          debugPrint("page inc all ${page}");
+        });
+      });
+    // }
+  // } 
+  // else {
+  }
+    debugPrint("no");
+
+}
+   void _scrollListener1() {
+  if ( scrollableController1.position.pixels >=
+          scrollableController1.position.maxScrollExtent - 200 &&
+      hasMore &&
+      !isLoading && selectedType != null) {
+    // if (selectedCat != null) {
+      // Incrementez la page et récupérez les stocks par catégorie
+      debugPrint("yes - fetch by type");
+      setState(() {
+          // Rafraîchir les données ici
+      page++;
+        });
+   
+    fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!).then((value) {
+        setState(() {
+          // Rafraîchir les données ici
+          debugPrint("page inc all ${page}");
+        });
+      });
+    } 
+    debugPrint("no");
+
+}
+
+  Future<List<Vehicule>> fetchVehiculeByTypeVoitureWithPagination(String idTypeVoiture,{bool refresh = false }) async {
+    if (isLoading) return [];
+      setState(() {
+      isLoading = true;
+      });
+      
+    if (refresh) {
+       setState(() {
+        vehiculeListe.clear();
+        page = 0;
+        hasMore = true;
+       });
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getAllVehiculesByTypeVoitureWithPagination?idTypeVoiture=$idTypeVoiture&page=$page&size=$size'));
+
+      if (response.statusCode == 200) {
+        // debugPrint("url: $response");
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+          setState(() {
+            hasMore = false;
+          });
+        } else {
+           setState(() {
+            List<Vehicule> newVehicule = body.map((e) => Vehicule.fromMap(e)).toList();
+          vehiculeListe.addAll(newVehicule);
+          // page++;
+           });
+          
+        }
+
+        debugPrint("response body vehicle by type vehicule with pagination $page par défilement soit ${vehiculeListe.length}");
+       return vehiculeListe;
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des vehicules: $e');
+    } finally {
+         setState(() {
+        isLoading = false;
+         });
+    }
+    return vehiculeListe;
+  }
+ 
+  Future<List<Vehicule>> fetchVehicule({bool refresh = false }) async {
+    if (isLoading) return [];
+         
+      setState(() {
+      isLoading = true;
+      });
+
+    if (refresh) {
+     setState(() {
+       
+        vehiculeListe.clear();
+        page = 0;
+        hasMore = true;
+     });
+     
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getAllVehiculesWithPagination?page=$page&size=$size'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+            setState(() {
+            hasMore = false;
+            });
+        } else {
+            setState(() {
+            List<Vehicule> newVehicule = body.map((e) => Vehicule.fromMap(e)).toList();
+          vehiculeListe.addAll(newVehicule);
+          // page++;
+            });
+        }
+
+        debugPrint("response body all vehicle with pagination $page par défilement soit ${vehiculeListe.length}");
+       return vehiculeListe;
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des vehicules: $e');
+    } finally {
+       setState(() {
+        isLoading = false;
+       });
+    }
+    return vehiculeListe;
+  }
+
+
+    Future<List<Vehicule>> getAllVehicule() async {
+     if (selectedType != null) {
+      vehiculeListe = await 
+          VehiculeService().fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!);
+    }
+    
+    
+    return vehiculeListe;
+  }
+
+
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -47,6 +227,7 @@ class _TransportState extends State<Transport> {
       type = typeActeurData.map((data) => data.libelle).join(', ');
       setState(() {
         isExist = true;
+        // vehiculeListeFuture1 = VehiculeService().fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!);
       });
     } else {
       setState(() {
@@ -62,17 +243,31 @@ class _TransportState extends State<Transport> {
     // // selectedType == null;
     // type = typeActeurData.map((data) => data.libelle).join(', ');
     verify();
+        vehiculeListeFuture = VehiculeService().fetchVehicule();
     _searchController = TextEditingController();
     _typeList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/TypeVoiture/read'));
-    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
-    super.initState();
+        http.get(Uri.parse('$apiOnlineUrl/TypeVoiture/read'));
+WidgetsBinding.instance.addPostFrameCallback((_){
+    //write or call your logic
+    //code will run when widget rendering complete
+  scrollableController.addListener(_scrollListener);
+  });
+WidgetsBinding.instance.addPostFrameCallback((_){
+    //write or call your logic
+    //code will run when widget rendering complete
+  scrollableController1.addListener(_scrollListener1);
+  });
+  vehiculeListeFuture = VehiculeService().fetchVehicule();
+  vehiculeListeFuture1 = getAllVehicule();
+
+      super.initState();
   }
 
   @override
   void dispose() {
     _searchController
         .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+        scrollableController.dispose();
     super.dispose();
   }
 
@@ -96,8 +291,14 @@ class _TransportState extends State<Transport> {
           actions: !isExist
               ? null
               : [
-                  (type.toLowerCase() == 'admin' ||
-                          type.toLowerCase() == 'transporteur')
+                 (typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("transporteur") ||
+      typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("admin"))
+                  // (type.toLowerCase() == 'admin' ||
+                  //         type.toLowerCase() == 'transporteur')
                       ? PopupMenuButton<String>(
                           padding: EdgeInsets.zero,
                           itemBuilder: (context) {
@@ -116,6 +317,7 @@ class _TransportState extends State<Transport> {
                                     ),
                                   ),
                                   onTap: () async {
+                                    Navigator.of(context).pop();
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -138,6 +340,7 @@ class _TransportState extends State<Transport> {
                                     ),
                                   ),
                                   onTap: () async {
+                                    Navigator.of(context).pop();
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -160,6 +363,7 @@ class _TransportState extends State<Transport> {
                                     ),
                                   ),
                                   onTap: () async {
+                                    Navigator.of(context).pop();
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -201,42 +405,120 @@ class _TransportState extends State<Transport> {
                           },
                         )
                 ]),
-      body: SingleChildScrollView(
-        child: Column(children: [
-          const SizedBox(height: 10),
-         
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            child: FutureBuilder(
-              future: _typeList,
-              builder: (_, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return DropdownButtonFormField(
-                    items: [],
-                    onChanged: null,
-                    decoration: InputDecoration(
-                      labelText: 'Chargement...',
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+      body:
+       RefreshIndicator(
+        onRefresh: () async{
+          setState(() {
+            page=0;
+          });
+          selectedType == null ?
+          setState(() {
+          vehiculeListeFuture =   
+          VehiculeService().fetchVehicule() ;
+          }) :
+          setState(() {
+            
+         vehiculeListeFuture1 = VehiculeService().fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!);
+          }); 
+        },
+        child: Container(
+        child: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            
+           return  <Widget>
+            [
+              SliverToBoxAdapter(
+                child: Column(
+                  children:[
+      
+            const SizedBox(height: 10),
+          
+            // const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              child: FutureBuilder(
+                future: _typeList,
+                builder: (_, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return DropdownButtonFormField(
+                      items: [],
+                      onChanged: null,
+                      decoration: InputDecoration(
+                        labelText: 'Chargement...',
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                    ),
-                  );
-                }
-
-                if (snapshot.hasData) {
-                  dynamic jsonString = utf8.decode(snapshot.data.bodyBytes);
-                  dynamic responseData = json.decode(jsonString);
-                  // dynamic responseData = json.decode(snapshot.data.body);
-                  if (responseData is List) {
-                    final reponse = responseData;
-                    final vehiculeList = reponse
-                        .map((e) => TypeVoiture.fromMap(e))
-                        .where((con) => con.statutType == true)
-                        .toList();
-
-                    if (vehiculeList.isEmpty) {
+                    );
+                  }
+        
+                  if (snapshot.hasData) {
+                    dynamic jsonString = utf8.decode(snapshot.data.bodyBytes);
+                    dynamic responseData = json.decode(jsonString);
+                    // dynamic responseData = json.decode(snapshot.data.body);
+                    if (responseData is List) {
+                      final reponse = responseData;
+                      final vehiculeList = reponse
+                          .map((e) => TypeVoiture.fromMap(e))
+                          .where((con) => con.statutType == true)
+                          .toList();
+        
+                      if (vehiculeList.isEmpty) {
+                        return DropdownButtonFormField(
+                          items: [],
+                          onChanged: null,
+                          decoration: InputDecoration(
+                            labelText: '-- Aucun type de véhicule trouvé --',
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        );
+                      }
+        
+                      return DropdownButtonFormField<String>(
+                        isExpanded: true,
+                        items: vehiculeList
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e.idTypeVoiture,
+                                child: Text(e.nom!),
+                              ),
+                            )
+                            .toList(),
+                        hint: Text("-- Filtre par type de véhicule --"),
+                        value: typeValue,
+                        onChanged: (newValue) {
+                          setState(() {
+                            typeValue = newValue;
+                            if (newValue != null) {
+                              selectedType = vehiculeList.firstWhere(
+                                (element) => element.idTypeVoiture == newValue,
+                              );
+                            }
+                            page = 0;
+                  hasMore = true;
+                  fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!,refresh: true);
+                    if (page == 0 && isLoading == true) {
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+        scrollableController1.jumpTo(0.0);
+            });
+          }
+                          });
+                        },
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      );
+                    } else {
                       return DropdownButtonFormField(
                         items: [],
                         onChanged: null,
@@ -250,203 +532,465 @@ class _TransportState extends State<Transport> {
                         ),
                       );
                     }
-
-                    return DropdownButtonFormField<String>(
-                      items: vehiculeList
-                          .map(
-                            (e) => DropdownMenuItem(
-                              value: e.idTypeVoiture,
-                              child: Text(e.nom!),
-                            ),
-                          )
-                          .toList(),
-                      hint: Text("-- Filtre par type de véhicule --"),
-                      value: typeValue,
-                      onChanged: (newValue) {
-                        setState(() {
-                          typeValue = newValue;
-                          if (newValue != null) {
-                            selectedType = vehiculeList.firstWhere(
-                              (element) => element.idTypeVoiture == newValue,
-                            );
-                          }
-                        });
-                      },
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    );
-                  } else {
-                    return DropdownButtonFormField(
-                      items: [],
-                      onChanged: null,
-                      decoration: InputDecoration(
-                        labelText: '-- Aucun type de véhicule trouvé --',
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    );
                   }
-                }
-                return DropdownButtonFormField(
-                  items: [],
-                  onChanged: null,
-                  decoration: InputDecoration(
-                    labelText: '-- Aucun type de véhicule trouvé --',
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                  return DropdownButtonFormField(
+                    items: [],
+                    onChanged: null,
+                    decoration: InputDecoration(
+                      labelText: '-- Aucun type de véhicule trouvé --',
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Consumer<VehiculeService>(builder: (context, vehiculeService, child) {
-            return FutureBuilder<List<Vehicule>>(
-                future: selectedType != null
-                    ? vehiculeService.fetchVehiculeByTypeVehicule(
-                        selectedType!.idTypeVoiture!)
-                    : vehiculeService.fetchVehicule(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.orange,
-                      ),
-                    );
-                  }
-
-                  if (!snapshot.hasData) {
-                    return const Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Center(child: Text("Aucun donné trouvé")),
-                    );
-                  } else {
-                    vehiculeListe = snapshot.data!;
-                    String searchText = "";
-                    List<Vehicule> filtereSearch =
-                        vehiculeListe.where((search) {
-                      String libelle = search.nomVehicule.toLowerCase();
-                      searchText = _searchController.text.toLowerCase();
-                      return libelle.contains(searchText);
-                    }).toList();
-                    return GridView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 10,
-                        childAspectRatio: 0.8,
-                      ),
-                      itemCount: filtereSearch.length,
-                      itemBuilder: (context, index) {
-                        var e = filtereSearch
-                            .where((element) => element.statutVehicule == true)
-                            .elementAt(index);
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        DetailTransport(vehicule: e)));
-                          },
-                          child: Container(
-                            margin: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Color.fromARGB(250, 250, 250, 250),
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.3),
-                                  offset: Offset(0, 2),
-                                  blurRadius: 8,
-                                  spreadRadius: 2,
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  child: SizedBox(
-                                    height: 90,
-                                    child: e.photoVehicule == null ||  e.photoVehicule!.isEmpty
-                                        ? Image.asset(
-                                            "assets/images/default_image.png",
-                                            fit: BoxFit.cover,
-                                          )
-                                        : Image.network(
-                                            "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
-                                            // "http://10.0.2.2/${e.photoIntrant}",
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (BuildContext context,
-                                                Object exception,
-                                                StackTrace? stackTrace) {
-                                              return Image.asset(
-                                                'assets/images/default_image.png',
-                                                fit: BoxFit.cover,
-                                              );
-                                            },
-                                          ),
-                                  ),
-                                ),
-                                // SizedBox(height: 8),
-                                ListTile(
-                                  title: Text(
-                                    e.nomVehicule,
-                                    style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  subtitle: Text(
-                                   "${ e.nbKilometrage.toString()} Km",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                ),
-Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15),
-                                  child: Text(
-                                    e.localisation,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
+            const SizedBox(height: 10),
+                  ]
+                )
+              ),
+          
+          ];
+          
+          
+        },
+        body: 
+            RefreshIndicator(
+              onRefresh: () async{
+          setState(() {
+            page=0;
+          });
+          selectedType == null ?
+          setState(() {
+          vehiculeListeFuture =   
+          VehiculeService().fetchVehicule() ;
+          }) :
+          setState(() {
+            
+         vehiculeListeFuture1 = VehiculeService().fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!);
+          }); 
+        },
+              child: selectedType == null ?
+               SingleChildScrollView(
+              controller: scrollableController,
+              child: Consumer<VehiculeService>(builder: (context, vehiculeService, child) {
+                return FutureBuilder<List<Vehicule>>(
+                    future: vehiculeListeFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return _buildShimmerEffect();
+                      }
+                      
+                      if (!snapshot.hasData) {
+                        return const Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Center(child: Text("Aucun donné trouvé")),
                         );
-                      },
-                    );
-                  }
-                });
-          }),
-        ]),
+                      } else {
+                        vehiculeListe = snapshot.data!;
+                        String searchText = "";
+                        List<Vehicule> filtereSearch =
+                            vehiculeListe.where((search) {
+                          String libelle = search.nomVehicule.toLowerCase();
+                          searchText = _searchController.text.toLowerCase();
+                          return libelle.contains(searchText);
+                        }).toList();
+                        return
+                         vehiculeListe.isEmpty ?
+                          
+                      SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Image.asset('assets/images/notif.jpg'),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        'Aucune vehiucle de transport trouvé' ,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 17,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+                        )
+                        :
+                         GridView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 10,
+                            crossAxisSpacing: 10,
+                            childAspectRatio: 0.8,
+                          ),
+                          itemCount: vehiculeListe.length+1,
+                          itemBuilder: (context, index) {
+                            if(index < vehiculeListe.length){
+                            var e = filtereSearch
+                                .where((element) => element.statutVehicule == true)
+                                .elementAt(index);
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            DetailTransport(vehicule: e)));
+                              },
+                              child: Card(
+                                margin: EdgeInsets.all(8),
+                                // decoration: BoxDecoration(
+                                //   color: Color.fromARGB(250, 250, 250, 250),
+                                //   borderRadius: BorderRadius.circular(15),
+                                //   boxShadow: [
+                                //     BoxShadow(
+                                //       color: Colors.grey.withOpacity(0.3),
+                                //       offset: Offset(0, 2),
+                                //       blurRadius: 8,
+                                //       spreadRadius: 2,
+                                //     ),
+                                //   ],
+                                // ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: SizedBox(
+                                        height: 85,
+                                        child: e.photoVehicule == null ||  e.photoVehicule!.isEmpty
+                                            ? Image.asset(
+                                                "assets/images/default_image.png",
+                                                fit: BoxFit.cover,
+                                              )
+                                            : CachedNetworkImage(
+              imageUrl: 
+              "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
+               fit: BoxFit.cover,
+                         
+              placeholder: (context, url) =>
+                  const Center(child: CircularProgressIndicator()),
+              errorWidget: (context, url, error) => Image.asset(
+                                                          'assets/images/default_image.png',
+                                                          fit: BoxFit.cover,
+                                                        ),
+                        ),
+                                      ),
+                                    ),
+                                    // SizedBox(height: 8),
+                                    ListTile(
+                                      title: Text(
+                                        e.nomVehicule,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      subtitle: Text(
+                                       "${ e.nbKilometrage.toString()} Km",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ),
+                      Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15),
+                                      child: Text(
+                                        e.localisation,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            );
+                            }else{
+                                              return isLoading == true ? 
+                                             Padding(
+                                               padding: const EdgeInsets.symmetric(horizontal: 32),
+                                               child: Center(
+                                                 child:
+                                                 const Center(
+                                                                     child: CircularProgressIndicator(
+                                      color: Colors.orange,
+                                                                     ),
+                                                                   )
+                                               ),
+                                             ) : Container();
+                                             }
+                          },
+                        );
+                      }
+                    });
+              }),
+            ) :
+             SingleChildScrollView(
+              controller: scrollableController1,
+              child: Consumer<VehiculeService>(builder: (context, vehiculeService, child) {
+                return FutureBuilder<List<Vehicule>>(
+                    future: 
+                        vehiculeListeFuture1,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return _buildShimmerEffect();
+                      }
+                      
+                      if (!snapshot.hasData) {
+                        return const Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Center(child: Text("Aucun donné trouvé")),
+                        );
+                      } else {
+                        vehiculeListe = snapshot.data!;
+                        String searchText = "";
+                        List<Vehicule> filtereSearch =
+                            vehiculeListe.where((search) {
+                          String libelle = search.nomVehicule.toLowerCase();
+                          searchText = _searchController.text.toLowerCase();
+                          return libelle.contains(searchText);
+                        }).toList();
+                        return
+                         vehiculeListe.isEmpty && isLoading == false
+                          ?
+                          
+                      SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Image.asset('assets/images/notif.jpg'),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        'Aucune vehiucle de transport trouvé' ,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 17,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+                        )
+                        :  vehiculeListe
+                          .isEmpty && isLoading == true
+                              ? _buildShimmerEffect() :
+                         GridView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 10,
+                            crossAxisSpacing: 10,
+                            childAspectRatio: 0.8,
+                          ),
+                          itemCount: vehiculeListe.length+1,
+                          itemBuilder: (context, index) {
+                            if(index < vehiculeListe.length){
+                            var e = vehiculeListe
+                                .where((element) => element.statutVehicule == true)
+                                .elementAt(index);
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            DetailTransport(vehicule: e)));
+                              },
+                              child: Card(
+                                margin: EdgeInsets.all(8),
+                                // decoration: BoxDecoration(
+                                //   color: Color.fromARGB(250, 250, 250, 250),
+                                //   borderRadius: BorderRadius.circular(15),
+                                //   boxShadow: [
+                                //     BoxShadow(
+                                //       color: Colors.grey.withOpacity(0.3),
+                                //       offset: Offset(0, 2),
+                                //       blurRadius: 8,
+                                //       spreadRadius: 2,
+                                //     ),
+                                //   ],
+                                // ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: SizedBox(
+                                        height: 85,
+                                        child: e.photoVehicule == null ||  e.photoVehicule!.isEmpty
+                                            ? Image.asset(
+                                                "assets/images/default_image.png",
+                                                fit: BoxFit.cover,
+                                              )
+                                            : CachedNetworkImage(
+              imageUrl: 
+              "https://koumi.ml/api-koumi/vehicule/${e.idVehicule}/image",
+               fit: BoxFit.cover,
+                         
+              placeholder: (context, url) =>
+                  const Center(child: CircularProgressIndicator()),
+              errorWidget: (context, url, error) => Image.asset(
+                                                          'assets/images/default_image.png',
+                                                          fit: BoxFit.cover,
+                                                        ),
+                        ),
+                                      ),
+                                    ),
+                                    // SizedBox(height: 8),
+                                    ListTile(
+                                      title: Text(
+                                        e.nomVehicule,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      subtitle: Text(
+                                       "${ e.nbKilometrage.toString()} Km",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ),
+                      Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15),
+                                      child: Text(
+                                        e.localisation,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            );
+                            }else{
+                                              return isLoading == true ? 
+                                             Padding(
+                                               padding: const EdgeInsets.symmetric(horizontal: 32),
+                                               child: Center(
+                                                 child:
+                                                 const Center(
+                                                                     child: CircularProgressIndicator(
+                                      color: Colors.orange,
+                                                                     ),
+                                                                   )
+                                               ),
+                                             ) : Container();
+                                             }
+                          },
+                        );
+                      }
+                    });
+              }),
+            ),
       ),
+    )
+    )
+    )
     );
   }
+
+
+   Widget _buildShimmerEffect(){
+  return   Center(
+        child: GridView.builder(
+            shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 0.8,
+      ),
+          itemCount: 6, // Number of shimmer items to display
+          itemBuilder: (context, index) {
+            return Card(
+              margin: EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 85,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 16,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    subtitle: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 15,
+                        color: Colors.grey,
+                        margin: EdgeInsets.only(top: 4),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        height: 15,
+                        color: Colors.grey,
+                        margin: EdgeInsets.only(top: 4),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+ }
 
   Widget _buildItem(String title, String value) {
     return Padding(
@@ -476,3 +1020,38 @@ Padding(
     );
   }
 }
+
+
+/*
+ stockListe
+                            // .where((element) => element.statutSotck == true )
+                            .isEmpty && isLoading == false
+                                ? 
+                                SingleChildScrollView(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Center(
+                                        child: Column(
+                                          children: [
+                                            Image.asset('assets/images/notif.jpg'),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Text(
+                                              'Aucun produit trouvé',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 17,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                :  stockListe
+                            // .where((element) => element.statutSotck == true )
+                            .isEmpty && isLoading == true
+                                ? _buildShimmerEffect() :
+*/

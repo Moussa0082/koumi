@@ -57,9 +57,12 @@ class _DetailsActeurState extends State<DetailsActeur> {
                         totalWidth: 185,
                         cornerRadius: 185,
                         color: Colors.black,
-                        image: NetworkImage(
+                        image: 
+                        
+                        NetworkImage(
                           'https://koumi.ml/api-koumi/acteur/${acteurs.idActeur}/image',
                         ),
+                        
                       ),
               ),
             ),
@@ -111,7 +114,7 @@ class _DetailsActeurState extends State<DetailsActeur> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildProfile("whatsApp", acteurs.whatsAppActeur!),
-                  _buildProfile("Pays", acteurs.niveau3PaysActeur!),
+                  // _buildProfile("Pays", acteurs.niveau3PaysActeur!),
                   _buildProfile("Localité", acteurs.localiteActeur!),
                 ],
               ),

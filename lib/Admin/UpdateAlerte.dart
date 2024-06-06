@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:image_picker/image_picker.dart';
@@ -44,6 +45,8 @@ class _UpdateAlertedState extends State<UpdateAlerted> {
   double _progressValue = 0;
   bool _hasUploadStarted = false;
   late Alertes alerte;
+  String selectedCountry ="";
+  String selectedCountryCode ="";
 
   void setProgress(double value) async {
     setState(() {
@@ -200,6 +203,10 @@ class _UpdateAlertedState extends State<UpdateAlerted> {
     _tokenAudioController.text = alerte.audioAlerte!;
     _tokenImageController.text = alerte.photoAlerte!;
     _tokenTextController.text = alerte.videoAlerte!;
+    selectedCountry = alerte.pays != null ? alerte.pays! : "" ;
+    selectedCountryCode = alerte.codePays != null ? alerte.codePays! : "";
+
+    
   }
 
   @override
@@ -338,6 +345,49 @@ class _UpdateAlertedState extends State<UpdateAlerted> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
+                              ),
+                            ),
+                          ),
+                                                    SizedBox(
+                            height: 10,
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 22,
+                            ),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Text(
+                                "Pays Alerte",
+                                style: TextStyle(
+                                    color: (Colors.black), fontSize: 18),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            child: Container(
+                               decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                                  border: Border.all(
+                                    color: Colors.black26, // Couleur de la bordure
+                                    width: 2, // Largeur de la bordure
+                                  ),
+                                ),
+                              child: CountryCodePicker(
+                                backgroundColor: Colors.transparent, // Fond transparent pour le picker
+                                onChanged: (CountryCode countryCode) {
+                                  setState(() {
+                                    selectedCountry = countryCode.name!;
+                                    selectedCountryCode = countryCode.code!;
+                                    print("Pays : $selectedCountry");
+                                  });
+                                },
+                                  initialSelection: selectedCountry, // Set initial selection based on detected country code
+                                showCountryOnly: true,
+                                showOnlyCountryWhenClosed: true,
+                                alignLeft: true,
                               ),
                             ),
                           ),
@@ -490,6 +540,8 @@ class _UpdateAlertedState extends State<UpdateAlerted> {
                                               idAlerte: alerte.idAlerte!,
                                               titreAlerte: titre,
                                               descriptionAlerte: description,
+                                              pays: selectedCountry,
+                                              codePays: selectedCountryCode.isNotEmpty ? selectedCountryCode : "ML",
                                               videoAlerte: _videoUploaded,
                                               photoAlerte: photoUploaded,
                                               audioAlerte: audiosUploaded)
@@ -541,6 +593,8 @@ class _UpdateAlertedState extends State<UpdateAlerted> {
                                           .updateAlertes(
                                               idAlerte: alerte.idAlerte!,
                                               titreAlerte: titre,
+                                              pays: selectedCountry,
+                                              codePays: selectedCountryCode.isNotEmpty ? selectedCountryCode : "ML",
                                               descriptionAlerte: description)
                                           .then((value) => {
                                                 _titreController.clear(),

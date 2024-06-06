@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:intl/intl.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Forme.dart';
@@ -61,6 +62,37 @@ class _NextAddIntratState extends State<NextAddIntrat> {
   String? formeValue;
   late Future _formeList;
   late Forme forme;
+
+      bool isLoadingLibelle = true;
+    String? monnaie;
+
+
+   Future<String> getMonnaieByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load monnaie');
+    }
+}
+
+ Future<void> fetchPaysDataByActor() async {
+    try {
+      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+      setState(() { 
+        monnaie = monnaies;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
 
   Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
@@ -156,8 +188,9 @@ class _NextAddIntratState extends State<NextAddIntrat> {
     verifyParam();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // _formeList = fetchList();
+    fetchPaysDataByActor();
     _formeList = http
-        .get(Uri.parse('https://koumi.ml/api-koumi/formeproduit/getAllForme/'));
+        .get(Uri.parse('$apiOnlineUrl/formeproduit/getAllForme/'));
     // Uri.parse('http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
   }
 
@@ -253,6 +286,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                               }
 
                               return DropdownButtonFormField<String>(
+                                isExpanded: true,
                                 items: speList
                                     .map(
                                       (e) => DropdownMenuItem(
@@ -321,7 +355,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: Text(
-                          "Prix (${para.monnaie}) intrant",
+                          "Prix (${monnaie}) intrant",
                           style: TextStyle(color: (Colors.black), fontSize: 18),
                         ),
                       ),
@@ -585,7 +619,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                   content: Row(
                                     children: [
                                       Text(
-                                        "Une erreur s'est produite",
+                                        "Erreur de connexion !",
                                         style: TextStyle(
                                             overflow: TextOverflow.ellipsis),
                                       ),

@@ -3,6 +3,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -64,7 +65,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
    Future<void> loginUser() async {
 
 
-    const String baseUrl = 'https://koumi.ml/api-koumi/acteur/pinLogin';
+    const String baseUrl = '$apiOnlineUrl/acteur/pinLogin';
     // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/pinLogin';
 
     const String defaultProfileImage = 'assets/images/profil.jpg';
@@ -85,7 +86,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         return AlertDialog(
           title: const Center(child: Text('Erreur')),
           content: const Text(
-            "Code acteur non trouvé dans les préférences de l'utilisateur",
+            "Une erreur s'est produite veuillez réessayer plus tard",
             textAlign: TextAlign.justify,
             style: TextStyle(color: Colors.black, fontSize: 20),
           ),
@@ -173,7 +174,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
           // codeActeur: responseBody['codeActeur'],
           telephoneActeur: responseBody['telephoneActeur'],
           whatsAppActeur: responseBody['whatsAppActeur'],
-          niveau3PaysActeur: responseBody['niveau3PaysActeur'],
+          // niveau3PaysActeur: responseBody['niveau3PaysActeur'],
           dateAjout: responseBody['dateAjout'],
           localiteActeur: responseBody['localiteActeur'],
           emailActeur: emailActeur,

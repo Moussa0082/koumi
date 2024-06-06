@@ -3,16 +3,21 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:path/path.dart';
 
 class VehiculeService extends ChangeNotifier {
-  static const String baseUrl = 'https://koumi.ml/api-koumi/vehicule';
+  static const String baseUrl = '$apiOnlineUrl/vehicule';
   // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/vehicule';
 
   List<Vehicule> vehiculeList = [];
+    int page = 0;
+  bool isLoading = false;
+   int size = 4;
+  bool hasMore = true;
 
   Future<void> addVehicule(
       {required String nomVehicule,
@@ -114,21 +119,7 @@ class VehiculeService extends ChangeNotifier {
     }
   }
 
-  Future<List<Vehicule>> fetchVehicule() async {
-    final response = await http.get(Uri.parse('$baseUrl/read'));
-
-    if (response.statusCode == 200) {
-      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-      debugPrint(response.body.toString());
-      vehiculeList = body.map((item) => Vehicule.fromMap(item)).toList();
-      debugPrint(response.body);
-      return vehiculeList;
-    } else {
-      vehiculeList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
-      throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
-    }
-  }
+  
 
   Future<List<Vehicule>> fetchVehiculeByTypeVehicule(String id) async {
     final response = await http.get(Uri.parse('$baseUrl/listeVehiculeByType/$id'));
@@ -146,22 +137,142 @@ class VehiculeService extends ChangeNotifier {
     }
   }
 
-  Future<List<Vehicule>> fetchVehiculeByActeur(String id) async {
-    final response =
-        await http.get(Uri.parse('$baseUrl/listeVehiculeByActeur/$id'));
 
-    if (response.statusCode == 200) {
-      List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-      debugPrint("Body : ${response.body.toString()}");
-      vehiculeList = body.map((item) => Vehicule.fromMap(item)).toList();
-      debugPrint(response.body);
-      return vehiculeList;
-    } else {
-      vehiculeList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
-      throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+    Future<List<Vehicule>> fetchVehicule({bool refresh = false }) async {
+    if (isLoading) return [];
+
+      isLoading = true;
+
+    if (refresh) {
+    
+        vehiculeList.clear();
+        page = 0;
+        hasMore = true;
+     
     }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getAllVehiculesWithPagination?page=$page&size=$size'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+         
+            hasMore = false;
+          
+        } else {
+          
+            List<Vehicule> newVehicule = body.map((e) => Vehicule.fromMap(e)).toList();
+          vehiculeList.addAll(newVehicule);
+          // page++;
+          
+        }
+
+        debugPrint("response body all vehicle with pagination $page par défilement soit ${vehiculeList.length}");
+       return vehiculeList;
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des vehicules: $e');
+    } finally {
+     
+        isLoading = false;
+      
+    }
+    return vehiculeList;
   }
+
+
+   Future<List<Vehicule>> fetchVehiculeByTypeVoitureWithPagination(String idTypeVoiture,{bool refresh = false }) async {
+    if (isLoading) return [];
+
+      isLoading = true;
+    
+    if (refresh) {
+    
+        vehiculeList.clear();
+        page = 0;
+        hasMore = true;
+     
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getAllVehiculesByTypeVoitureWithPagination?idTypeVoiture=$idTypeVoiture&page=$page&size=$size'));
+
+      if (response.statusCode == 200) {
+        // debugPrint("url: $response");
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+         
+            hasMore = false;
+          
+        } else {
+          
+            List<Vehicule> newVehicule = body.map((e) => Vehicule.fromMap(e)).toList();
+          vehiculeList.addAll(newVehicule);
+          // page++;
+          
+        }
+
+        debugPrint("response body vehicle by type vehicule with pagination $page par défilement soit ${vehiculeList.length}");
+       return vehiculeList;
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des vehicule: $e');
+    } finally {
+     
+        isLoading = false;
+      
+    }
+    return vehiculeList;
+  }
+ 
+  Future<List<Vehicule>> fetchVehiculeByActeur(String idActeur,{bool refresh = false}) async {
+    // if (_stockService.isLoading == true) return [];
+
+      isLoading = true;
+
+    if (refresh) {
+        vehiculeList.clear();
+       page = 0;
+        hasMore = true;
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getAllVehiculesByActeurWithPagination?idActeur=$idActeur&page=${page}&size=${size}'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+           hasMore = false;
+        } else {
+           List<Vehicule> newVehicule = body.map((e) => Vehicule.fromMap(e)).toList();
+          vehiculeList.addAll(newVehicule);
+        }
+
+        debugPrint("response body all vehicule by acteur with pagination ${page} par défilement soit ${vehiculeList.length}");
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des vehicule: $e');
+    } finally {
+       isLoading = false;
+    }
+    return vehiculeList;
+  }
+
 
   Future<void> deleteVehicule(String idVehicule) async {
     final response =

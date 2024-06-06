@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
@@ -48,12 +49,44 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
   bool _isLoading = false;
   final formkey = GlobalKey<FormState>();
 
+  bool isLoadingLibelle = true;
+    String? libelleNiveau3Pays;
+
   void _handleButtonPress() async {
     // Afficher l'indicateur de chargement
     setState(() {
       _isLoading = true;
     });
+
+   }
+
+    Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
   }
+
+     Future<void> fetchLibelleNiveau3Pays() async {
+    try {
+      String libelle = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
+      setState(() {
+        libelleNiveau3Pays = libelle;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+      });
+      print('Error: $e');
+    }
+  }
+
+
 
   @override
   void initState() {
@@ -61,9 +94,10 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     type = widget.typeVoitures!;
     _typeList =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/TypeVoiture/read'));
+        http.get(Uri.parse('$apiOnlineUrl/TypeVoiture/read'));
     _niveau3List =
-        http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
+        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
+     fetchLibelleNiveau3Pays();
     // _typeList =
     //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
     // _niveau3List =
@@ -217,6 +251,15 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                       SizedBox(
                         height: 10,
                       ),
+                       isLoadingLibelle ?
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text("Chargement ................",style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),)),
+                      )
+                      :
                       Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: 22,
@@ -224,7 +267,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Text(
-                            "Localité",
+                           libelleNiveau3Pays != null ? libelleNiveau3Pays!.toUpperCase() : "Localité",
                             style:
                                 TextStyle(color: (Colors.black), fontSize: 18),
                           ),
@@ -283,6 +326,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                                 }
 
                                 return DropdownButtonFormField<String>(
+                                  isExpanded: true,
                                   items: niveau3List
                                       .map(
                                         (e) => DropdownMenuItem(

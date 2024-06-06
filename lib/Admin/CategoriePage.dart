@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/SpeculationPage.dart';
 import 'package:koumi_app/Admin/UpdatesCategorie.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Filiere.dart';
@@ -54,12 +55,12 @@ class _CategoriPageState extends State<CategoriPage> {
 
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _filiereList = http
-        .get(Uri.parse('https://koumi.ml/api-koumi/Filiere/getAllFiliere/'));
+        .get(Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
     // .get( Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
 
     // _categorieList = http.get( Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
     _categorieList = http
-        .get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
+        .get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
     _liste = getCat();
     _searchController = TextEditingController();
   }
@@ -676,9 +677,8 @@ class _CategoriPageState extends State<CategoriPage> {
                                                                               setState(() {
                                                                                 _categorieList = http
                                                                                     .
-                                                                                    // get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
 
-                                                                                    get(Uri.parse('https://koumi.ml/api-koumi/Categorie/allCategorie'));
+                                                                                    get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
                                                                               }),
                                                                               Navigator.of(context).pop(),
                                                                             })
@@ -824,6 +824,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                 }
 
                                 return DropdownButtonFormField<String>(
+                                  isExpanded: true,
                                   items: filiereList
                                       .map(
                                         (e) => DropdownMenuItem(
@@ -911,16 +912,6 @@ class _CategoriPageState extends State<CategoriPage> {
                                         Provider.of<CategorieService>(context,
                                                 listen: false)
                                             .applyChange(),
-                                        setState(() {
-                                          _categorieList = http
-                                              .
-                                              //  get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
-                                              get(Uri.parse(
-                                                  'https://koumi.ml/api-koumi/Categorie/allCategorie'));
-                                          filiereValue = null;
-                                        }),
-                                        libelleController.clear(),
-                                        descriptionController.clear(),
                                         Navigator.of(context).pop(),
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
@@ -928,12 +919,22 @@ class _CategoriPageState extends State<CategoriPage> {
                                             content: Row(
                                               children: [
                                                 Text(
-                                                    "Catégorie ajouter avec success"),
+                                                    "Catégorie ajouté avec success"),
                                               ],
                                             ),
                                             duration: Duration(seconds: 3),
                                           ),
-                                        )
+                                        ),
+                                        setState(() {
+                                          _categorieList = http
+                                              .
+                                              //  get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
+                                              get(Uri.parse(
+                                                  '$apiOnlineUrl/Categorie/allCategorie'));
+                                          filiereValue = null;
+                                        }),
+                                        libelleController.clear(),
+                                        descriptionController.clear(),
                                       });
                             } catch (e) {
                               final String errorMessage = e.toString();
@@ -941,7 +942,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                 const SnackBar(
                                   content: Row(
                                     children: [
-                                      Text("Une erreur s'est produit"),
+                                      Text("Cette categorie existe déjà"),
                                     ],
                                   ),
                                   duration: Duration(seconds: 5),
@@ -1144,6 +1145,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                 }
 
                                 return DropdownButtonFormField<String>(
+                                  isExpanded: true,
                                   items: filiereList
                                       .map(
                                         (e) => DropdownMenuItem(

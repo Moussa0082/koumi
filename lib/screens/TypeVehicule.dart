@@ -335,19 +335,38 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                       <PopupMenuEntry<String>>[
                                                     PopupMenuItem<String>(
                                                       child: ListTile(
-                                                        leading: const Icon(
-                                                          Icons.check,
-                                                          color: Colors.green,
-                                                        ),
-                                                        title: const Text(
-                                                          "Activer",
+                                                        leading: e.statutType ==
+                                                                    false
+                                                                ? Icon(
+                                                                    Icons.check,
+                                                                    color: Colors
+                                                                        .green,
+                                                                  )
+                                                                : Icon(
+                                                                    Icons
+                                                                        .disabled_visible,
+                                                                    color: Colors
+                                                                            .orange[
+                                                                        400],
+                                                                  ),
+                                                        title:  Text(
+                                                          e.statutType ==
+                                                                  false
+                                                              ? "Activer"
+                                                              : "Desactiver",
                                                           style: TextStyle(
-                                                            color: Colors.green,
+                                                            color: e.statutType ==
+                                                                    false
+                                                                ? Colors.green
+                                                                : Colors.orange[
+                                                                    400],
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                           ),
                                                         ),
                                                         onTap: () async {
+                                                           e.statutType == false
+                                                          ? 
                                                           await TypeVoitureService()
                                                               .activerType(e
                                                                   .idTypeVoiture!)
@@ -392,29 +411,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                                         ),
                                                                         Navigator.of(context)
                                                                             .pop(),
-                                                                      });
-                                                        },
-                                                      ),
-                                                    ),
-                                                    PopupMenuItem<String>(
-                                                      child: ListTile(
-                                                        leading: Icon(
-                                                          Icons
-                                                              .disabled_visible,
-                                                          color: Colors
-                                                              .orange[400],
-                                                        ),
-                                                        title: Text(
-                                                          "Désactiver",
-                                                          style: TextStyle(
-                                                            color: Colors
-                                                                .orange[400],
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                        onTap: () async {
-                                                          await TypeVoitureService()
+                                                                      }) :  await TypeVoitureService()
                                                               .desactiverType(e
                                                                   .idTypeVoiture!)
                                                               .then((value) => {

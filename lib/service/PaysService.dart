@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/SousRegion.dart';
 import 'package:path/path.dart';
@@ -8,7 +9,7 @@ import 'package:path/path.dart';
 
 class PaysService extends ChangeNotifier {
 
-  static const String baseUrl = 'https://koumi.ml/api-koumi/pays';
+  static const String baseUrl = '$apiOnlineUrl/pays';
   // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/pays';
 
    List<Pays> paysList = [];
@@ -16,12 +17,24 @@ class PaysService extends ChangeNotifier {
   Future<void> addPays({
     required String nomPays,
     required String descriptionPays,
+    required String libelleNiveau1Pays,
+    required String libelleNiveau2Pays,
+    required String libelleNiveau3Pays,
+    required String monnaie,
+    required String tauxDollar,
+    required String tauxYuan,
     required SousRegion sousRegion,
   }) async {
     var addPays = jsonEncode({
       'idPays': null,
       'nomPays': nomPays,
       'descriptionPays': descriptionPays,
+      'libelleNiveau1Pays': libelleNiveau1Pays,
+      'libelleNiveau2Pays': libelleNiveau2Pays,
+      'libelleNiveau3Pays': libelleNiveau3Pays,
+      'monnaie': monnaie,
+      'tauxDollar': tauxDollar,
+      'tauxYuan': tauxYuan,
       'sousRegion': sousRegion.toMap()
     });
 
@@ -39,12 +52,24 @@ class PaysService extends ChangeNotifier {
     required String idPays,
     required String nomPays,
     required String descriptionPays,
+    required String libelleNiveau1Pays,
+    required String libelleNiveau2Pays,
+    required String libelleNiveau3Pays,
+    required String monnaie,
+    required String tauxDollar,
+    required String tauxYuan,
     required SousRegion sousRegion,
   }) async {
     var addPays = jsonEncode({
       'idPays': idPays,
       'nomPays': nomPays,
       'descriptionPays': descriptionPays,
+      'libelleNiveau1Pays': libelleNiveau1Pays,
+      'libelleNiveau2Pays': libelleNiveau2Pays,
+      'libelleNiveau3Pays': libelleNiveau3Pays,
+      'monnaie': monnaie,
+      'tauxDollar': tauxDollar,
+      'tauxYuan': tauxYuan,
       'sousRegion': sousRegion.toMap()
     });
 
@@ -70,6 +95,39 @@ class PaysService extends ChangeNotifier {
       paysList = [];
       print('Échec de la requête avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
+    }
+  }
+
+   Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+}
+
+   Future<String> getLibelleNiveau2PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau2Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+}
+
+   Future<String> getLibelleNiveau1PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau1Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
     }
   }
 

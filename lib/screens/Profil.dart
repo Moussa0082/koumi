@@ -29,7 +29,7 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 const d_colorPage = Color.fromRGBO(255, 255, 255, 1);
 
 class _ProfilState extends State<Profil> {
-  late Acteur acteur = Acteur();
+  late Acteur acteur= Acteur();
   late List<TypeActeur> typeActeurData = [];
   String type = '';
   late List<ZoneProduction> zoneList = [];
@@ -39,10 +39,13 @@ class _ProfilState extends State<Profil> {
   String? email = "";
 
   void verify() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+     SharedPreferences 
+    prefs = await SharedPreferences.getInstance();
     email = prefs.getString('emailActeur');
+   
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
       typeActeurData = acteur.typeActeur!;
       type = typeActeurData.map((data) => data.libelle).join(', ');
@@ -59,6 +62,7 @@ class _ProfilState extends State<Profil> {
   @override
   void initState() {
     verify();
+   
 
     super.initState();
   }
@@ -78,80 +82,71 @@ class _ProfilState extends State<Profil> {
             style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
         ),
-        body: !isExist
-            ? Center(
-                child: Container(
-                  padding: EdgeInsets.all(
-                      20), // Ajouter un padding pour l'espace autour du contenu
-
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Image.asset("assets/images/lock.png",
-                          width: 100,
-                          height:
-                              100), // Ajuster la taille de l'image selon vos besoins
-                      SizedBox(
-                          height:
-                              20), // Ajouter un espace entre l'image et le texte
-                      Text(
-                        "Vous devez vous connecter pour voir votre profil",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      SizedBox(
-                          height:
-                              20), // Ajouter un espace entre le texte et le bouton
-                      ElevatedButton(
-                        onPressed: () {
-                          Future.microtask(() {
-                            Provider.of<BottomNavigationService>(context,
-                                    listen: false)
-                                .changeIndex(0);
-                          });
-                          Get.to(LoginScreen(),
-                              duration: Duration(
-                                  seconds:
-                                      1), //duration of transitions, default 1 sec
-                              transition: Transition.leftToRight);
-                        },
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                              Colors.transparent),
-                          elevation: MaterialStateProperty.all<double>(
-                              0), // Supprimer l'élévation du bouton
-                          overlayColor: MaterialStateProperty.all<Color>(
-                              Colors.grey.withOpacity(
-                                  0.2)), // Couleur de l'overlay du bouton lorsqu'il est pressé
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18.0),
-                              side: BorderSide(
-                                  color:
-                                      d_colorGreen), // Bordure autour du bouton
-                            ),
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          child: Text(
-                            "Se connecter",
-                            style: TextStyle(fontSize: 16, color: d_colorGreen),
-                          ),
-                        ),
-                      ),
-                    ],
+        body: 
+        Consumer<ActeurProvider>(
+  builder: (context, acteurProvider, child) {
+    // Vérifiez si l'utilisateur est connecté en utilisant isLogged du ActeurProvider
+ return !isExist ?
+       Center(
+        child: Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset("assets/images/lock.png",
+                  width: 100,
+                  height: 100),
+              SizedBox(height: 20),
+              Text(
+                "Vous devez vous connecter pour voir votre profil",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Future.microtask(() {
+                    Provider.of<BottomNavigationService>(context,
+                            listen: false)
+                        .changeIndex(0);
+                  });
+                  Get.to(LoginScreen(),
+                      duration: Duration(seconds: 1),
+                      transition: Transition.leftToRight);
+                },
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.transparent),
+                  elevation: MaterialStateProperty.all<double>(0),
+                  overlayColor: MaterialStateProperty.all<Color>(
+                      Colors.grey.withOpacity(0.2)),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18.0),
+                      side: BorderSide(color: d_colorGreen),
+                    ),
                   ),
                 ),
-              )
-            : SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 10),
+                  child: Text(
+                    "Se connecter",
+                    style: TextStyle(fontSize: 16, color: d_colorGreen),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      )
+    :
+       SingleChildScrollView(
                 child: Column(
                   children: [
                     Padding(
@@ -238,8 +233,8 @@ class _ProfilState extends State<Profil> {
                                               'Adresse', ac.adresseActeur!),
                                           _buildProfile(
                                               'Localité', ac.localiteActeur!),
-                                          _buildProfile(
-                                              'Pays', ac.niveau3PaysActeur!),
+                                          // _buildProfile(
+                                          //     'Pays', ac.niveau3PaysActeur!),
                                         ],
                                       ),
                                     ),
@@ -287,7 +282,8 @@ class _ProfilState extends State<Profil> {
                                               builder: (context) =>
                                                   const ParametreGenerauxPage()));
                                     },
-                                    child: type.toLowerCase() == 'admin'
+                                    child: 
+                                    type.toLowerCase() == 'admin'
                                         ? Text(
                                             "Parametre Généraux",
                                             style: TextStyle(
@@ -313,9 +309,17 @@ class _ProfilState extends State<Profil> {
                         ),
                       ),
                     ),
-                    type.toLowerCase() == 'producteur' ||
-                            type.toLowerCase() == 'commerçant' ||
-                            type.toLowerCase() == 'commercant'
+                    // type.toLowerCase() == 'producteur' ||
+                    //         type.toLowerCase() == 'commerçant' ||
+                    //         type.toLowerCase() == 'commercant'
+                                              (typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("producteur") ||
+      typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("commerçant") || typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("commercant"))
                         ? Padding(
                             padding: const EdgeInsets.symmetric(
                                 vertical: 15, horizontal: 10),
@@ -430,9 +434,17 @@ class _ProfilState extends State<Profil> {
                             ),
                           )
                         : Container(),
-                    type.toLowerCase() == 'producteur' ||
-                            type.toLowerCase() == 'commerçant' ||
-                            type.toLowerCase() == 'commercant'
+                    // type.toLowerCase() == 'producteur' ||
+                    //         type.toLowerCase() == 'commerçant' ||
+                    //         type.toLowerCase() == 'commercant'
+                             (typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("producteur") ||
+      typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("commerçant") || typeActeurData
+          .map((e) => e.libelle!.toLowerCase())
+          .contains("commercant"))
                         ? Padding(
                             padding: const EdgeInsets.symmetric(
                                 vertical: 15, horizontal: 10),
@@ -555,23 +567,23 @@ class _ProfilState extends State<Profil> {
                           EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                       child: ElevatedButton.icon(
                           onPressed: () async {
-                            final acteurProvider = Provider.of<ActeurProvider>(
-                                context,
-                                listen: false);
+                        final acteurProvider =
+                          Provider.of<ActeurProvider>(context, listen: false);
 
-                            // Déconnexion avec le provider
-                            await acteurProvider.logout();
+                      // Déconnexion avec le provider
+                      await acteurProvider.logout();
+    
 
-                            //                   Navigator.pushReplacement(
-                            // context,
-                            // MaterialPageRoute(builder: (context) => LoginScreen()),
-                            //                        );
-                            Get.off(BottomNavigationPage(),
-                                duration: Duration(
-                                    seconds:
-                                        1), //duration of transitions, default 1 sec
-                                transition: Transition.leftToRight);
-                          },
+                      Get.offAll(BottomNavigationPage(),
+                          duration: Duration(
+                              seconds:
+                                  1), //duration of transitions, default 1 sec
+                          transition: Transition.leftToRight);
+                      Provider.of<BottomNavigationService>(context,
+                              listen: false)
+                          .changeIndex(0);
+
+                    },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             elevation: 10, // Orange color code
@@ -595,7 +607,9 @@ class _ProfilState extends State<Profil> {
                     )
                   ],
                 ),
-              ));
+              );
+  })
+  );
   }
 
   Widget _buildProfile(String title, String value) {

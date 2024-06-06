@@ -61,8 +61,8 @@ class _FormeProduitState extends State<FormeProduit> {
           IconButton(
             onPressed: () {
               setState(() {
-                                                                                _liste = getListe();
-                                                                              });
+                _liste = getListe();
+              });
             },
             icon: const Icon(
               Icons.refresh,
@@ -496,6 +496,20 @@ class _FormeProduitState extends State<FormeProduit> {
       case 'liqudes':
         return Image.asset(
           "assets/images/liquide.jpg",
+          width: 80,
+          height: 80,
+        );
+      case 'sac':
+      case 'sacs':
+        return Image.asset(
+          "assets/images/sac.png",
+          width: 80,
+          height: 80,
+        );
+      case 'poudre':
+      case 'pourdes':
+        return Image.asset(
+          "assets/images/poudre.png",
           width: 80,
           height: 80,
         );
