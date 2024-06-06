@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:image_picker/image_picker.dart';
@@ -48,6 +49,9 @@ class _AddAlerteState extends State<AddAlerte> {
       _progressValue = value;
     });
   }
+
+  String selectedCountry = "";
+  String selectedCountryCode = "";
 
   Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
@@ -296,6 +300,7 @@ class _AddAlerteState extends State<AddAlerte> {
                               ),
                             ),
                           ),
+
                           SizedBox(
                             height: 10,
                           ),
@@ -331,6 +336,49 @@ class _AddAlerteState extends State<AddAlerte> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
+                              ),
+                            ),
+                          ),
+                                                    SizedBox(
+                            height: 10,
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 22,
+                            ),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Text(
+                                "Pays Alerte",
+                                style: TextStyle(
+                                    color: (Colors.black), fontSize: 18),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(Radius.circular(8)),
+                                border: Border.all(
+                                  color: Colors.black26, // Couleur de la bordure
+                                  width: 2, // Largeur de la bordure
+                                ),
+                              ),
+                              child: CountryCodePicker(
+                                backgroundColor: Colors.transparent, // Fond transparent pour le picker
+                                onChanged: (CountryCode countryCode) {
+                                  setState(() {
+                                    selectedCountry = countryCode.name!;
+                                    selectedCountryCode = countryCode.code!;
+                                    print("Pays : $selectedCountry");
+                                  });
+                                },
+                                  initialSelection: selectedCountry, // Set initial selection based on detected country code
+                                showCountryOnly: true,
+                                showOnlyCountryWhenClosed: true,
+                                alignLeft: true,
                               ),
                             ),
                           ),
@@ -482,6 +530,8 @@ class _AddAlerteState extends State<AddAlerte> {
                                           .creerAlertes(
                                               titreAlerte: titre,
                                               descriptionAlerte: description,
+                                              pays: selectedCountry,
+                                              codePays: selectedCountryCode,
                                               videoAlerte: _videoUploaded,
                                               audioAlerte: audiosUploaded,
                                               photoAlerte: photoUploaded)
@@ -536,7 +586,10 @@ class _AddAlerteState extends State<AddAlerte> {
                                       await AlertesService()
                                           .creerAlertes(
                                               titreAlerte: titre,
-                                              descriptionAlerte: description)
+                                              descriptionAlerte: description,
+                                              pays: selectedCountry,
+                                              codePays: selectedCountryCode,
+                                              )
                                           .then((value) => {
                                                 FirebaseApi()
                                                     .sendPushNotificationToTopic(

@@ -356,6 +356,9 @@ class _MesCommandeState extends State<MesCommande> {
                         }
                       },
                       onLongPress: () {
+                        if(acteur.idActeur == commande.acteur?.idActeur){
+                          print("acteur qui a commande");
+                        }
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {

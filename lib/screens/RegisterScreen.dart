@@ -443,6 +443,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 //     ],
 //   ),
 // ),
+
                         IntlPhoneField(
                           initialCountryCode:
                               "ML", // Automatically detect user's country

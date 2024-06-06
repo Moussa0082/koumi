@@ -227,7 +227,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
               Center(child: Image.asset('assets/images/fg-pass.png')),
               // connexion
               const Text(
-                " Mot de passe oublier  ",
+                " Mot de passe oublié  ",
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

@@ -6,11 +6,14 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/DetailAlerte.dart';
 import 'package:koumi_app/constants.dart';
+import 'package:koumi_app/models/Acteur.dart';
 import 'dart:convert';
 import 'dart:async';
 
 import 'package:koumi_app/models/Alertes.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/widgets/carousel_loading.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 
@@ -108,13 +111,15 @@ class _CarrouselState extends State<Carrousel> {
   final CarouselController carouselController = CarouselController();
   int currentIndex = 0;
   List<Alertes> alertesList = [];
+    late Acteur acteur;
    
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchAlertes().then((alerts) {
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    fetchAlertes(acteur.idActeur!).then((alerts) {
       setState(() {
         alertesList = alerts;
         isLoading = false;
@@ -122,12 +127,12 @@ class _CarrouselState extends State<Carrousel> {
     });
   }
 
-  Future<List<Alertes>> fetchAlertes() async {
+  Future<List<Alertes>> fetchAlertes(String idActeur) async {
     const String baseUrl = '$apiOnlineUrl/alertes';
 int page = 0;
-  int size = 3;
+  int size = 2;
   try {
-    final response = await http.get(Uri.parse('$baseUrl/getAllAlertesWithPagination?page=$page&size=$size'));
+    final response = await http.get(Uri.parse('$baseUrl/alertesByPaysForConnectedActor?idActeur=$idActeur&page=$page&size=$size'));
 
     if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
       String contentType = response.headers['content-type'] ?? '';
@@ -149,6 +154,33 @@ int page = 0;
   }
   return [];
 }
+//   Future<List<Alertes>> fetchAlertes() async {
+//     const String baseUrl = '$apiOnlineUrl/alertes';
+// int page = 0;
+//   int size = 3;
+//   try {
+//     final response = await http.get(Uri.parse('$baseUrl/getAllAlertesWithPagination?page=$page&size=$size'));
+
+//     if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+//       String contentType = response.headers['content-type'] ?? '';
+//       if (contentType.contains('application/json')) {
+//         String jsonString = utf8.decode(response.bodyBytes);
+//         Map<String, dynamic> body = jsonDecode(jsonString);
+//         List<dynamic>  alertes = body['content'];
+//         return alertes.map((e) => Alertes.fromMap(e)).toList();
+//       } else {
+//         print('La réponse n\'est pas au format JSON : $contentType');
+//         print('Contenu de la réponse : ${response.body}');
+//       }
+//     } else {
+//       print('Échec du chargement des alertes avec le code d\'état : ${response.statusCode}');
+//       print('Contenu de la réponse : ${response.body}');
+//     }
+//   } catch (e) {
+//     print('Erreur lors de la requête : $e');
+//   }
+//   return [];
+// }
 
  
 
