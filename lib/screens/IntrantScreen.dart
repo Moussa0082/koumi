@@ -44,12 +44,12 @@ class _IntrantScreenState extends State<IntrantScreen> {
   String? catValue;
   late Future _typeList;
   CategorieProduit? selectedType;
- ScrollController scrollableController = ScrollController();
+  ScrollController scrollableController = ScrollController();
   ScrollController scrollableController1 = ScrollController();
 
   int page = 0;
-   bool isLoading = false;
-   int size = 4;
+  bool isLoading = false;
+  int size = 4;
   bool hasMore = true;
     late Future<List<Intrant>> intrantListeFuture;
     late Future<List<Intrant>> intrantListeFuture1;
@@ -58,7 +58,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
     String? monnaie;
 
 
-   Future<String> getMonnaieByActor(String id) async {
+  Future<String> getMonnaieByActor(String id) async {
     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
 
     if (response.statusCode == 200) {
@@ -112,7 +112,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
     debugPrint("no");
 
 }
-   void _scrollListener1() {
+  void _scrollListener1() {
   if ( scrollableController1.position.pixels >=
           scrollableController1.position.maxScrollExtent - 200 &&
       hasMore &&

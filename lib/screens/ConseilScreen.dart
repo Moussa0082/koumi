@@ -9,6 +9,7 @@ import 'package:koumi_app/screens/DetailConseil.dart';
 import 'package:koumi_app/screens/UpdateConseil.dart';
 import 'package:koumi_app/service/ConseilService.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ConseilScreen extends StatefulWidget {
@@ -30,30 +31,31 @@ class _ConseilScreenState extends State<ConseilScreen> {
   late TextEditingController _searchController;
   List<Conseil> conseilList = [];
 
-  // void verify() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   email = prefs.getString('emailActeur');
-  //   if (email != null) {
-  //     // Si l'email de l'acteur est présent, exécute checkLoggedIn
-  //     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-  //     typeActeurData = acteur.typeActeur!;
-  //     type = typeActeurData.map((data) => data.libelle).join(', ');
-  //     setState(() {
-  //       isExist = true;
-  //     });
-  //   } else {
-  //     setState(() {
-  //       isExist = false;
-  //     });
-  //   }
-  // }
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      typeActeurData = acteur.typeActeur!;
+      type = typeActeurData.map((data) => data.libelle).join(', ');
+      setState(() {
+        isExist = true;
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    typeActeurData = acteur.typeActeur!;
-    type = typeActeurData.map((data) => data.libelle).join(', ');
+    // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    // typeActeurData = acteur.typeActeur!;
+    // type = typeActeurData.map((data) => data.libelle).join(', ');
+    verify();
     _searchController = TextEditingController();
   }
 
@@ -84,8 +86,7 @@ class _ConseilScreenState extends State<ConseilScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          actions: 
-          type.toLowerCase() == 'fournisseur' ||
+          actions: type.toLowerCase() == 'fournisseur' ||
                   type.toLowerCase() == 'commerçant' ||
                   type.toLowerCase() == 'transporteur' ||
                   type.toLowerCase() == 'transformeur' ||
@@ -541,9 +542,8 @@ class _ConseilScreenState extends State<ConseilScreen> {
     );
   }
 
-
-   Widget buildShimmerEffect() {
-   return SingleChildScrollView(
+  Widget buildShimmerEffect() {
+    return SingleChildScrollView(
       child: Shimmer.fromColors(
         baseColor: Colors.grey[300]!,
         highlightColor: Colors.grey[100]!,
@@ -618,7 +618,6 @@ class _ConseilScreenState extends State<ConseilScreen> {
       ),
     );
   }
-
 
   Widget _buildEtat(bool isState) {
     return Container(

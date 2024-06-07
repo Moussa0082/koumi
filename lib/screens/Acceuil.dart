@@ -17,6 +17,7 @@ import 'package:koumi_app/screens/Weather.dart';
 import 'package:koumi_app/widgets/AlertAcceuil.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
+import 'package:koumi_app/widgets/Default_Acceuil.dart';
 import 'package:koumi_app/widgets/connection_verify.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -78,6 +79,7 @@ class _AccueilState extends State<Accueil> {
           const SizedBox(
             height: 10,
           ),
+          isExist ?
           SizedBox(
             child: GridView.count(
               shrinkWrap: true,
@@ -88,7 +90,7 @@ class _AccueilState extends State<Accueil> {
               childAspectRatio: 0.9,
               children: _buildCards(),
             ),
-          ),
+          ) : DefautAcceuil(),
           const SizedBox(
             height: 20,
           )
