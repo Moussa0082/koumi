@@ -25,32 +25,28 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
   bool isLoading = false;
   late TextEditingController _searchController;
   ScrollController scrollableController = ScrollController();
-  int size = 4;
+  int size = 6;
   bool hasMore = true;
   late Future<List<Intrant>> intrantListeFuture;
   List<Intrant> intrantListe = [];
   // CategorieProduit? selectedType;
   ScrollController scrollableController1 = ScrollController();
-  String libelle = "Engrais";
+  String libelle = "Semences et plants";
   String? monnaie;
 
   void _scrollListener() {
-    if (scrollableController1.position.pixels >=
-            scrollableController1.position.maxScrollExtent - 200 &&
+    debugPrint("Scroll position: ${scrollableController.position.pixels}");
+    if (scrollableController.position.pixels >=
+            scrollableController.position.maxScrollExtent - 200 &&
         hasMore &&
         !isLoading) {
-      // if (selectedCat != null) {
-      // Incrementez la page et récupérez les stocks par catégorie
-      debugPrint("yes - fetch by category");
       setState(() {
-        // Rafraîchir les données ici
         page++;
       });
 
       fetchIntrantByCategorie().then((value) {
         setState(() {
-          // Rafraîchir les données ici
-          debugPrint("page inc all ${page}");
+          debugPrint("page inc all $page");
         });
       });
     }
@@ -121,8 +117,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
 
   @override
   void dispose() {
-    _searchController
-        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    _searchController.dispose();
     scrollableController.dispose();
     super.dispose();
   }
@@ -203,6 +198,9 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                         // Rafraîchir les données ici
                       });
                       debugPrint("refresh page ${page}");
+                      setState(() {
+                        intrantListeFuture = fetchIntrantByCategorie();
+                      });
                     },
                     child: SingleChildScrollView(
                       controller: scrollableController,
@@ -364,7 +362,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                                                       child: Text(
                                                         monnaie != null
                                                             ? "${intrantListe[index].prixIntrant.toString()} ${monnaie}"
-                                                            : "${intrantListe[index].prixIntrant.toString()} '' ",
+                                                            : "${intrantListe[index].prixIntrant.toString()} 'FCFA' ",
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           color: Colors.black87,

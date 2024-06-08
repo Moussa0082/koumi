@@ -27,7 +27,7 @@ class _ConseilScreenState extends State<ConseilScreen> {
   late Acteur acteur = Acteur();
   String? email = "";
   late List<TypeActeur> typeActeurData = [];
-  late String type;
+  // late String? type;
   late TextEditingController _searchController;
   List<Conseil> conseilList = [];
 
@@ -38,7 +38,7 @@ class _ConseilScreenState extends State<ConseilScreen> {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
       typeActeurData = acteur.typeActeur!;
-      type = typeActeurData.map((data) => data.libelle).join(', ');
+      // type = typeActeurData.map((data) => data.libelle).join(', ');
       setState(() {
         isExist = true;
       });
@@ -86,94 +86,95 @@ class _ConseilScreenState extends State<ConseilScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          actions: type.toLowerCase() == 'fournisseur' ||
-                  type.toLowerCase() == 'commerçant' ||
-                  type.toLowerCase() == 'transporteur' ||
-                  type.toLowerCase() == 'transformeur' ||
-                  type.toLowerCase() == 'commerçant' ||
-                  type.toLowerCase() == 'commercant'
+          actions: !isExist
               ? null
-              : [
-                  PopupMenuButton<String>(
-                    padding: EdgeInsets.zero,
-                    itemBuilder: (context) {
-                      return type.toLowerCase() != 'admin'
-                          ? <PopupMenuEntry<String>>[
-                              PopupMenuItem<String>(
-                                child: ListTile(
-                                  leading: const Icon(
-                                    Icons.add,
-                                    color: d_colorGreen,
-                                  ),
-                                  title: const Text(
-                                    "Ajouter conseil ",
-                                    style: TextStyle(
-                                      color: d_colorGreen,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+              : (typeActeurData
+                      .map((e) => e.libelle!.toLowerCase())
+                      .contains("admin"))
+                  ? [
+                      PopupMenuButton<String>(
+                        padding: EdgeInsets.zero,
+                        itemBuilder: (context) {
+                          return (typeActeurData
+                                  .map((e) => e.libelle!.toLowerCase())
+                                  .contains("admin"))
+                              ? <PopupMenuEntry<String>>[
+                                  PopupMenuItem<String>(
+                                    child: ListTile(
+                                      leading: const Icon(
+                                        Icons.add,
+                                        color: d_colorGreen,
+                                      ),
+                                      title: const Text(
+                                        "Ajouter conseil ",
+                                        style: TextStyle(
+                                          color: d_colorGreen,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      onTap: () async {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    AddConseil()));
+                                      },
                                     ),
                                   ),
-                                  onTap: () async {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                AddConseil()));
-                                  },
-                                ),
-                              ),
-                            ]
-                          : <PopupMenuEntry<String>>[
-                              PopupMenuItem<String>(
-                                child: ListTile(
-                                  leading: const Icon(
-                                    Icons.add,
-                                    color: d_colorGreen,
-                                  ),
-                                  title: const Text(
-                                    "Ajouter conseil ",
-                                    style: TextStyle(
-                                      color: d_colorGreen,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                                  PopupMenuItem<String>(
+                                    child: ListTile(
+                                      leading: const Icon(
+                                        Icons.remove_red_eye,
+                                        color: d_colorGreen,
+                                      ),
+                                      title: const Text(
+                                        "Voir conseil désactiver ",
+                                        style: TextStyle(
+                                          color: d_colorGreen,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      onTap: () async {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ConseilDisable()));
+                                      },
                                     ),
                                   ),
-                                  onTap: () async {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                AddConseil()));
-                                  },
-                                ),
-                              ),
-                              PopupMenuItem<String>(
-                                child: ListTile(
-                                  leading: const Icon(
-                                    Icons.remove_red_eye,
-                                    color: d_colorGreen,
-                                  ),
-                                  title: const Text(
-                                    "Voir conseil désactiver ",
-                                    style: TextStyle(
-                                      color: d_colorGreen,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                                ]
+                              : <PopupMenuEntry<String>>[
+                                  PopupMenuItem<String>(
+                                    child: ListTile(
+                                      leading: const Icon(
+                                        Icons.add,
+                                        color: d_colorGreen,
+                                      ),
+                                      title: const Text(
+                                        "Ajouter conseil ",
+                                        style: TextStyle(
+                                          color: d_colorGreen,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      onTap: () async {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    AddConseil()));
+                                      },
                                     ),
                                   ),
-                                  onTap: () async {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                ConseilDisable()));
-                                  },
-                                ),
-                              ),
-                            ];
-                    },
-                  )
-                ]),
+                                ];
+                        },
+                      )
+                    ]
+                  : null),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -313,9 +314,12 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                                     fontStyle: FontStyle.italic,
                                                   )),
                                               SizedBox(height: 10),
-                                              type.toLowerCase() != 'admin'
-                                                  ? Container()
-                                                  : Container(
+                                             (typeActeurData
+                                                      .map((e) => e.libelle!
+                                                          .toLowerCase())
+                                                      .contains("admin"))
+                                                  ? 
+                                                 Container(
                                                       alignment:
                                                           Alignment.bottomRight,
                                                       padding: const EdgeInsets
@@ -526,7 +530,7 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                                           ),
                                                         ],
                                                       ),
-                                                    )
+                                                    ) : Container()
                                             ]),
                                           ),
                                         ),
