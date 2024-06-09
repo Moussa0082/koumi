@@ -361,7 +361,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                                                       child: Text(
                                                         monnaie != null
                                                             ? "${intrantListe[index].prixIntrant.toString()} ${monnaie}"
-                                                            : "${intrantListe[index].prixIntrant.toString()} 'FCFA' ",
+                                                            : "${intrantListe[index].prixIntrant.toString()} FCFA ",
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           color: Colors.black87,

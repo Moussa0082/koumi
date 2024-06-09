@@ -375,7 +375,7 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
                                                       child: Text(
                                                         monnaie != null
                                                             ? "${filteredSearch[index].prix.toString()} ${monnaie}"
-                                                            : "${filteredSearch[index].prix.toString()} 'FCFA' ",
+                                                            : "${filteredSearch[index].prix.toString()} FCFA ",
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           color: Colors.black87,

@@ -27,11 +27,12 @@ class _ProduitElevageState extends State<ProduitElevage> {
 
   ScrollController scrollableController = ScrollController();
 
-  String libelle = "Animale";
+  List<String> libelles = ["Animale", "Animale", "Elevage", "Elevages"];
+
   String? monnaie;
   int page = 0;
   bool isLoading = false;
-  int size = 6;
+  int size =6 ;
   bool hasMore = true;
   void _scrollListener() {
     if (scrollableController.position.pixels >=
@@ -72,30 +73,35 @@ class _ProduitElevageState extends State<ProduitElevage> {
     }
 
     try {
-      final response = await http.get(Uri.parse(
-          '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
+      List<Stock> tempStockListe = [];
+      for (String libelle in libelles) {
+        final response = await http.get(Uri.parse(
+            '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
 
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
-        final List<dynamic> body = jsonData['content'];
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+          final List<dynamic> body = jsonData['content'];
 
-        if (body.isEmpty) {
-          setState(() {
-            hasMore = false;
-          });
-        } else {
-          setState(() {
+          if (body.isEmpty) {
+            setState(() {
+              hasMore = false;
+            });
+          } else {
             List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
-            stockListe.addAll(newStocks);
-          });
-        }
+            tempStockListe.addAll(newStocks);
+          }
 
-        debugPrint(
-            "response body all stock by categorie with pagination ${page} par défilement soit ${stockListe.length}");
-      } else {
-        print(
-            'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+          debugPrint(
+              "response body all stock by categorie with pagination ${page} par défilement soit ${tempStockListe.length}");
+        } else {
+          print(
+              'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        }
       }
+
+      setState(() {
+        stockListe.addAll(tempStockListe);
+      });
     } catch (e) {
       print(
           'Une erreur s\'est produite lors de la récupération des intrants: $e');
@@ -363,7 +369,7 @@ class _ProduitElevageState extends State<ProduitElevage> {
                                                       child: Text(
                                                         monnaie != null
                                                             ? "${filteredSearch[index].prix.toString()} ${monnaie}"
-                                                            : "${filteredSearch[index].prix.toString()} 'FCFA' ",
+                                                            : "${filteredSearch[index].prix.toString()} FCFA ",
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           color: Colors.black87,

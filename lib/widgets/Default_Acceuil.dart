@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/screens/ComplementAlimentaire.dart';
@@ -14,7 +13,6 @@ import 'package:koumi_app/screens/SemenceAndPlant.dart';
 import 'package:koumi_app/screens/Store.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/Weather.dart';
-import 'package:koumi_app/service/CategorieService.dart';
 
 class DefautAcceuil extends StatefulWidget {
   const DefautAcceuil({super.key});
@@ -57,17 +55,17 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
 
   List<Widget> _buildCards() {
     List<Widget> cards = [
-      _buildAccueilCard("Semence et plant", "semence.png", 13),
-      _buildAccueilCard("Produit phytosanitaire", "physo.png", 12),
+      _buildAccueilCard("Semences et plants", "semence.png", 13),
+      _buildAccueilCard("Produits phytosanitaires", "physo.png", 12),
       _buildAccueilCard("Engrais et apports", "engrais.png", 11),
-      _buildAccueilCard("Fruit et légume", "fruit&legume.png", 10),
-      _buildAccueilCard("Produit agricole", "pro.png", 9),
-      _buildAccueilCard("Complément alimentaire", "compl.png", 5),
-      _buildAccueilCard("Produit d'élévage", "elevage.png", 7),
-      _buildAccueilCard("Magasin", "shop.png", 6),
+      _buildAccueilCard("Fruits et légumes", "fruit&legume.png", 10),
+      _buildAccueilCard("Produits agricoles", "pro.png", 9),
+      _buildAccueilCard("Compléments alimentaires", "compl.png", 5),
+      _buildAccueilCard("Produits d'élévages", "elevage.png", 7),
+      _buildAccueilCard("Magasins", "shop.png", 6),
       _buildAccueilCard("Locations", "loc.png", 4),
-      _buildAccueilCard("Moyen de Transports", "transp.png", 3),
-      _buildAccueilCard("Produit transformé", "transforme.png", 8),
+      _buildAccueilCard("Moyens de Transports", "transp.png", 3),
+      _buildAccueilCard("Produits transformés", "transforme.png", 8),
       _buildAccueilCard("Météo", "met.png", 2),
       _buildAccueilCard("Conseils", "cons.png", 1)
     ];
@@ -135,8 +133,8 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
         },
         borderRadius: BorderRadius.circular(10),
         child: Container(
-          width: 200, // Largeur fixe
-          height: 50, // Hauteur fixe
+          // width: 200, // Largeur fixe
+          // height: 50, // Hauteur fixe
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: Colors.white,
