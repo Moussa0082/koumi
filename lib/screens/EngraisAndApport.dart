@@ -29,7 +29,7 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
   // CategorieProduit? selectedType;
   ScrollController scrollableController1 = ScrollController();
   String libelle = "Engrais et apports";
-  String? monnaie;
+  // String? monnaie;
 
   void _scrollListener() {
     if (scrollableController1.position.pixels >=
@@ -359,8 +359,8 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
                                                           .symmetric(
                                                           horizontal: 15),
                                                       child: Text(
-                                                        monnaie != null
-                                                            ? "${intrantListe[index].prixIntrant.toString()} ${monnaie}"
+                                                        intrantListe[index].monnaie != null
+                                                            ? "${intrantListe[index].prixIntrant.toString()} ${intrantListe[index].monnaie!.libelle}"
                                                             : "${intrantListe[index].prixIntrant.toString()} FCFA ",
                                                         style: TextStyle(
                                                           fontSize: 15,

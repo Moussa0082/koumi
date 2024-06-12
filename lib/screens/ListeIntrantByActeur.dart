@@ -30,8 +30,8 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
   List<Intrant> intrantListe = [];
   late Future futureList;
 
-  List<ParametreGeneraux> paraList = [];
-  late ParametreGeneraux para = ParametreGeneraux();
+  // List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para = ParametreGeneraux();
 
    int page = 0;
    bool isLoading = false;
@@ -40,35 +40,35 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
        ScrollController scrollableController = ScrollController();
 
            bool isLoadingLibelle = true;
-    String? monnaie;
+    // String? monnaie;
 
 
-   Future<String> getMonnaieByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+//    Future<String> getMonnaieByActor(String id) async {
+//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
 
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load monnaie');
-    }
-}
+//     if (response.statusCode == 200) {
+//       print("libelle : ${response.body}");
+//       return response.body;  // Return the body directly since it's a plain string
+//     } else {
+//       throw Exception('Failed to load monnaie');
+//     }
+// }
 
- Future<void> fetchPaysDataByActor() async {
-    try {
-      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+//  Future<void> fetchPaysDataByActor() async {
+//     try {
+//       String monnaies = await getMonnaieByActor(acteur.idActeur!);
 
-      setState(() { 
-        monnaie = monnaies;
-        isLoadingLibelle = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-        });
-      print('Error: $e');
-    }
-  }
+//       setState(() { 
+//         monnaie = monnaies;
+//         isLoadingLibelle = false;
+//       });
+//     } catch (e) {
+//       setState(() {
+//         isLoadingLibelle = false;
+//         });
+//       print('Error: $e');
+//     }
+//   }
 
 
 
@@ -153,12 +153,12 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     futureList = fetchIntrantByActeur(acteur.idActeur!);
     // futureList = getListe(acteur.idActeur!);
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+    // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+    //     .parametreList!;
 
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
-    }
+    // if (paraList.isNotEmpty) {
+    //   para = paraList[0];
+    // }
     WidgetsBinding.instance.addPostFrameCallback((_){
     //write or call your logic
     //code will run when widget rendering complete
@@ -407,7 +407,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         subtitle: Text(
-                                          "${filtereSearch[index].prixIntrant.toString()} ${monnaie}",
+                                          "${filtereSearch[index].prixIntrant.toString()} ${filtereSearch[index].monnaie!.libelle}",
                                           style: TextStyle(
                                             overflow: TextOverflow.ellipsis,
                                             fontSize: 15,

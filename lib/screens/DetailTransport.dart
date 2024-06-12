@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -46,8 +47,11 @@ class _DetailTransportState extends State<DetailTransport> {
   File? photo;
   late TypeVoiture typeVoiture;
   late Map<String, int> prixParDestinations;
-  List<ParametreGeneraux> paraList = [];
-  late ParametreGeneraux para = ParametreGeneraux();
+  String? monnaieValue;
+  late Future _monnaieList;
+  late Monnaie monnaie = Monnaie();
+  // List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para = ParametreGeneraux();
   late ValueNotifier<bool> isDialOpenNotifier;
   TextEditingController _prixController = TextEditingController();
   TextEditingController _nomController = TextEditingController();
@@ -75,36 +79,36 @@ class _DetailTransportState extends State<DetailTransport> {
 
   bool isExist = false;
   String? email = "";
-   bool isLoadingLibelle = true;
-   String? monnaie;
+  bool isLoadingLibelle = true;
+  String? libelleNiveau3Pays;
+  //  String? monnaie;
 
+//    Future<String> getMonnaieByActor(String id) async {
+//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
 
-   Future<String> getMonnaieByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+//     if (response.statusCode == 200) {
+//       print("libelle : ${response.body}");
+//       return response.body;  // Return the body directly since it's a plain string
+//     } else {
+//       throw Exception('Failed to load monnaie');
+//     }
+// }
 
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load monnaie');
-    }
-}
+//  Future<void> fetchPaysDataByActor() async {
+//     try {
+//       String monnaies = await getMonnaieByActor(acteur.idActeur!);
 
- Future<void> fetchPaysDataByActor() async {
-    try {
-      String monnaies = await getMonnaieByActor(acteur.idActeur!);
-
-      setState(() { 
-        monnaie = monnaies;
-        isLoadingLibelle = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-        });
-      print('Error: $e');
-    }
-  }
+//       setState(() {
+//         monnaie = monnaies;
+//         isLoadingLibelle = false;
+//       });
+//     } catch (e) {
+//       setState(() {
+//         isLoadingLibelle = false;
+//         });
+//       print('Error: $e');
+//     }
+//   }
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -152,15 +156,42 @@ class _DetailTransportState extends State<DetailTransport> {
     }
   }
 
-  void verifyParam() {
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+  // void verifyParam() {
+  //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+  //       .parametreList!;
 
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
+  //   if (paraList.isNotEmpty) {
+  //     para = paraList[0];
+  //   } else {
+  //     // Gérer le cas où la liste est null ou vide, par exemple :
+  //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+  //   }
+  // }
+  Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http
+        .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response
+          .body; // Return the body directly since it's a plain string
     } else {
-      // Gérer le cas où la liste est null ou vide, par exemple :
-      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+  }
+
+  Future<void> fetchLibelleNiveau3Pays() async {
+    try {
+      String libelle = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
+      setState(() {
+        libelleNiveau3Pays = libelle;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+      });
+      print('Error: $e');
     }
   }
 
@@ -170,8 +201,8 @@ class _DetailTransportState extends State<DetailTransport> {
     // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
     //     .parametreList!;
     // para = paraList[0];
-    verifyParam();
-    fetchPaysDataByActor();
+    // verifyParam();
+    // fetchPaysDataByActor();
     _niveau3List =
         http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));
 
@@ -194,8 +225,11 @@ class _DetailTransportState extends State<DetailTransport> {
       _destinationControllers.add(destinationController);
       _prixControllers.add(prixController);
     });
-
+      monnaie = vehicules.monnaie!;
+    monnaieValue = vehicules.monnaie!.idMonnaie;
+    _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
     isDialOpenNotifier = ValueNotifier<bool>(false);
+    fetchLibelleNiveau3Pays();
     super.initState();
   }
 
@@ -332,6 +366,7 @@ class _DetailTransportState extends State<DetailTransport> {
               nbKilometrage: nb.toString(),
               typeVoiture: typeVoiture,
               acteur: acteur,
+              monnaie : monnaie
             )
             .then((value) => {
                   setState(() {
@@ -349,6 +384,7 @@ class _DetailTransportState extends State<DetailTransport> {
                       typeVoiture: typeVoiture,
                       acteur: acteur,
                       statutVehicule: vehicules.statutVehicule,
+                      monnaie: monnaie,
                     );
 
                     _isLoading = false;
@@ -370,6 +406,7 @@ class _DetailTransportState extends State<DetailTransport> {
               nbKilometrage: nb.toString(),
               typeVoiture: typeVoiture,
               acteur: acteur,
+              monnaie: monnaie
             )
             .then((value) => {
                   setState(() {
@@ -387,6 +424,7 @@ class _DetailTransportState extends State<DetailTransport> {
                       typeVoiture: typeVoiture,
                       acteur: acteur,
                       statutVehicule: vehicules.statutVehicule,
+                      monnaie:monnaie,
                     );
                     _isLoading = false;
                   }),
@@ -434,7 +472,14 @@ class _DetailTransportState extends State<DetailTransport> {
                       icon:
                           const Icon(Icons.arrow_back_ios, color: d_colorGreen),
                     ),
-              title: Text(
+              title: _isEditing 
+                ?
+              Text(
+                'Modification',
+                style: const TextStyle(
+                    color: d_colorGreen, fontWeight: FontWeight.bold),
+              ):
+              Text(
                 'Transport',
                 style: const TextStyle(
                     color: d_colorGreen, fontWeight: FontWeight.bold),
@@ -501,10 +546,8 @@ class _DetailTransportState extends State<DetailTransport> {
                 _isEditing ? _buildEditing() : _buildData(),
                 !_isEditing ? _buildPanel() : Container(),
                 !_isEditing
-                    ? 
-                    _buildDescription(
+                    ? _buildDescription(
                         'Description : ', vehicules.description!)
-                        
                     : Container(),
               ],
             ),
@@ -598,6 +641,118 @@ class _DetailTransportState extends State<DetailTransport> {
         _buildEditableDetailItem('Description : ', _descriptionController),
         _buildEditableDetailItem('Nombre kilometrage : ', _nbKiloController),
         _buildDestinationPriceFields(),
+        // SizedBox(
+        //   height: 15,
+        // ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                "Monnaie",
+                style: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w500,
+                    fontStyle: FontStyle.italic,
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: 18),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                child: FutureBuilder(
+                  future: _monnaieList,
+                  builder: (_, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return DropdownButtonFormField(
+                        items: [],
+                        onChanged: null,
+                        decoration: InputDecoration(
+                          labelText: 'Chargement...',
+                        ),
+                      );
+                    }
+
+                    if (snapshot.hasData) {
+                      dynamic jsonString = utf8.decode(snapshot.data.bodyBytes);
+                      dynamic responseData = json.decode(jsonString);
+
+                      if (responseData is List) {
+                        List<Monnaie> speList = responseData
+                            .map((e) => Monnaie.fromMap(e))
+                            .toList();
+
+                        if (speList.isEmpty) {
+                          return DropdownButtonFormField(
+                            items: [],
+                            onChanged: null,
+                            decoration: InputDecoration(
+                              labelText: 'Aucun monnaie trouvé',
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 20),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
+                        }
+
+                        return DropdownButtonFormField<String>(
+                          isExpanded: true,
+                          items: speList
+                              .map(
+                                (e) => DropdownMenuItem(
+                                  value: e.idMonnaie,
+                                  child: Text(e.sigle!),
+                                ),
+                              )
+                              .toList(),
+                          value: monnaieValue,
+                          onChanged: (newValue) {
+                            setState(() {
+                              monnaieValue = newValue;
+                              if (newValue != null) {
+                                monnaie = speList.firstWhere(
+                                  (element) => element.idMonnaie == newValue,
+                                );
+                              }
+                            });
+                          },
+                          decoration: InputDecoration(
+                              // labelText: 'Sélectionner la monnaie',
+                              // contentPadding: const EdgeInsets.symmetric(
+                              //     vertical: 10, horizontal: 20),
+                              // border: OutlineInputBorder(
+                              //   borderRadius: BorderRadius.circular(8),
+                              // ),
+                              ),
+                        );
+                      } else {
+                        return DropdownButtonFormField(
+                          items: [],
+                          onChanged: null,
+                          decoration: InputDecoration(
+                            labelText: 'Aucun monnaie trouvé',
+                          ),
+                        );
+                      }
+                    } else {
+                      return DropdownButtonFormField(
+                        items: [],
+                        onChanged: null,
+                        decoration: InputDecoration(
+                          labelText: 'Aucun monnaie trouvé',
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
         SizedBox(
           height: 15,
         ),
@@ -608,7 +763,7 @@ class _DetailTransportState extends State<DetailTransport> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
+               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
@@ -645,7 +800,7 @@ class _DetailTransportState extends State<DetailTransport> {
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Destination',
+                                    labelText: 'Chargement...',
                                     contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10,
                                       horizontal: 20,
@@ -657,11 +812,31 @@ class _DetailTransportState extends State<DetailTransport> {
                                 );
                               }
                               if (snapshot.hasError) {
-                                return Text("${snapshot.error}");
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Chargement...',
+                                    labelStyle: TextStyle(
+                                        overflow: TextOverflow.ellipsis,
+                                        fontSize: 15),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10,
+                                      horizontal: 20,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
                               }
                               if (snapshot.hasData) {
-                                dynamic responseData =
-                                    json.decode(snapshot.data.body);
+                                // dynamic responseData = json
+                                //     .decode(snapshot.data.body);
+                                dynamic jsonString =
+                                    utf8.decode(snapshot.data.bodyBytes);
+                                dynamic responseData = json.decode(jsonString);
+
                                 if (responseData is List) {
                                   final reponse = responseData;
                                   final niveau3List = reponse
@@ -675,6 +850,9 @@ class _DetailTransportState extends State<DetailTransport> {
                                       onChanged: null,
                                       decoration: InputDecoration(
                                         labelText: 'Destination',
+                                        labelStyle: TextStyle(
+                                            overflow: TextOverflow.ellipsis,
+                                            fontSize: 15),
                                         contentPadding:
                                             const EdgeInsets.symmetric(
                                           vertical: 10,
@@ -689,22 +867,26 @@ class _DetailTransportState extends State<DetailTransport> {
                                   }
 
                                   return DropdownButtonFormField<String>(
+                                    isExpanded: true,
                                     items: niveau3List
-                                        .map(
-                                          (e) => DropdownMenuItem(
-                                            value: e.idNiveau3Pays,
-                                            child: Text(e.nomN3),
-                                          ),
-                                        )
+                                        .map((e) => DropdownMenuItem(
+                                              value: e.idNiveau3Pays,
+                                              child: Text(e.nomN3,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      fontSize:
+                                                          14)), // réduire la taille du texte
+                                            ))
                                         .toList(),
-
-                                    value: selectedDestinationsList[
-                                        index], // Utilisez l'index pour accéder à la valeur sélectionnée correspondante dans selectedDestinationsList
+                                      value: selectedDestinationsList[index],
                                     onChanged: (newValue) {
                                       setState(() {
                                         selectedDestinationsList[index] =
-                                            newValue; // Mettre à jour avec l'ID de la destination
-                                        String selectedDestinationName =
+                                            newValue;
+                                         String selectedDestinationName =
                                             niveau3List
                                                 .firstWhere((element) =>
                                                     element.idNiveau3Pays ==
@@ -720,10 +902,13 @@ class _DetailTransportState extends State<DetailTransport> {
                                     },
                                     decoration: InputDecoration(
                                       labelText: 'Destination',
+                                      labelStyle: TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          fontSize: 15),
                                       contentPadding:
                                           const EdgeInsets.symmetric(
-                                        horizontal: 20,
-                                      ),
+                                              horizontal:
+                                                  6), // réduire le padding
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(8),
                                       ),
@@ -735,6 +920,9 @@ class _DetailTransportState extends State<DetailTransport> {
                                     onChanged: null,
                                     decoration: InputDecoration(
                                       labelText: 'Destination',
+                                      labelStyle: TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          fontSize: 15),
                                       contentPadding:
                                           const EdgeInsets.symmetric(
                                         horizontal: 20,
@@ -751,6 +939,9 @@ class _DetailTransportState extends State<DetailTransport> {
                                 onChanged: null,
                                 decoration: InputDecoration(
                                   labelText: 'Destination',
+                                  labelStyle: TextStyle(
+                                      overflow: TextOverflow.ellipsis,
+                                      fontSize: 15),
                                   contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 20,
                                   ),
@@ -781,12 +972,12 @@ class _DetailTransportState extends State<DetailTransport> {
                               ),
                             ),
                           ),
-                        ),
+                        )
                       ],
                     ),
                   ),
                 ),
-              ),
+              )
             ],
           ),
         ),
@@ -914,18 +1105,16 @@ class _DetailTransportState extends State<DetailTransport> {
                   fontSize: 18),
             ),
             Padding(
-                     padding: EdgeInsets.all(8),
-                      child: ReadMoreText(
-                        colorClickableText: Colors.orange,
-                        trimLines: 2,
-                        trimMode: TrimMode.Line,
-                        trimCollapsedText: "Lire plus",
-                        trimExpandedText: "Lire moins",
-                        style: TextStyle(
-                            fontSize: 16, fontStyle: FontStyle.italic),
-                        value
-                      ),
-                    ),
+              padding: EdgeInsets.all(8),
+              child: ReadMoreText(
+                  colorClickableText: Colors.orange,
+                  trimLines: 2,
+                  trimMode: TrimMode.Line,
+                  trimCollapsedText: "Lire plus",
+                  trimExpandedText: "Lire moins",
+                  style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+                  value),
+            ),
           ],
         ),
       ),
@@ -1005,7 +1194,7 @@ class _DetailTransportState extends State<DetailTransport> {
                     int prix =
                         vehicules.prixParDestination.values.elementAt(index);
                     return _buildItem(
-                        destination, "${prix.toString()} ${monnaie}");
+                        destination, "${prix.toString()} ${vehicules.monnaie!.libelle!}");
                   }),
                 ),
               ),

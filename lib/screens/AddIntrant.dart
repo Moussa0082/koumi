@@ -9,6 +9,7 @@ import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Filiere.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
@@ -48,8 +49,9 @@ class _AddIntrantState extends State<AddIntrant> {
   late Filiere filiere = Filiere();
   String? catValue;
   late Future _categorieList;
-  late ParametreGeneraux para = ParametreGeneraux();
-  List<ParametreGeneraux> paraList = [];
+  
+  // late ParametreGeneraux para = ParametreGeneraux();
+  // List<ParametreGeneraux> paraList = [];
   late CategorieProduit categorieProduit = CategorieProduit();
   late Future<List<CategorieProduit>> _liste;
 
@@ -129,29 +131,26 @@ class _AddIntrantState extends State<AddIntrant> {
     });
   }
 
-  void verifyParam() {
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+  // void verifyParam() {
+  //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+  //       .parametreList!;
 
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
-    } else {
-      // Gérer le cas où la liste est null ou vide, par exemple :
-      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
-    }
-  }
+  //   if (paraList.isNotEmpty) {
+  //     para = paraList[0];
+  //   } else {
+  //     // Gérer le cas où la liste est null ou vide, par exemple :
+  //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+  //   }
+  // }
 
   @override
   void initState() {
     super.initState();
-    verifyParam();
+    // verifyParam();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    
-
-    _filiereList = http.get(
-    Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
+    _filiereList = http.get(Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
     _categorieList = http.get(Uri.parse(
-    '$apiOnlineUrl/Categorie/allCategorieByFiliere/${filiere.idFiliere}'));
+        '$apiOnlineUrl/Categorie/allCategorieByFiliere/${filiere.idFiliere}'));
   }
 
   // Future<List<Filiere>> fetchFiliereList() async {

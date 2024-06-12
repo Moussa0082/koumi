@@ -25,10 +25,10 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _Niveau3ListeState extends State<Niveau3Liste> {
-  late ParametreGeneraux para;
+  // late ParametreGeneraux para;
    late Acteur acteur;
   List<Niveau3Pays> niveau3Liste = [];
-  List<ParametreGeneraux> paraList = [];
+  // List<ParametreGeneraux> paraList = [];
   late TextEditingController _searchController;
   late Future<List<Niveau3Pays>> _liste;
   bool isLoadingLibelle = true;
@@ -69,10 +69,10 @@ class _Niveau3ListeState extends State<Niveau3Liste> {
   @override
   void initState() {
     _searchController = TextEditingController();
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+    // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+    //     .parametreList!;
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    para = paraList[0];
+    // para = paraList[0];
     _liste = getSousListe();
     fetchPaysDataByActor();
     super.initState();

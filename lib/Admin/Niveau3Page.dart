@@ -29,36 +29,66 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _Niveau3PageState extends State<Niveau3Page> {
   late TextEditingController _searchController;
-  late ParametreGeneraux para;
+  // late ParametreGeneraux para;
   List<Niveau3Pays> niveau3Liste = [];
   final formkey = GlobalKey<FormState>();
   TextEditingController libelleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  List<ParametreGeneraux> paraList = [];
+  // List<ParametreGeneraux> paraList = [];
   late Niveau2Pays niveau2;
   String? niveau2Value;
-  late Future _niveau2List;
 
   String? niveau1Value;
-  late Future _niveau1List;
   late Niveau1Pays niveau1Pays = Niveau1Pays();
+bool isLoadingLibelle3 = true;
+  late Acteur acteur;
+  String? libelleNiveau3Pays;
+  
+  Future<String> getlibelleNiveau3PaysByActor(String id) async {
+    final response = await http
+        .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
 
-  void verifyParam() {
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
-
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response
+          .body; // Return the body directly since it's a plain string
     } else {
-      // Gérer le cas où la liste est null ou vide, par exemple :
-      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+      throw Exception('Failed to load libelle niveau2Pays');
     }
   }
+
+  Future<void> fetchPaysData1ByActor() async {
+    try {
+      String libelle2 = await getlibelleNiveau3PaysByActor(acteur.idActeur!);
+
+      setState(() {
+        libelleNiveau3Pays = libelle2;
+        isLoadingLibelle3 = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle3 = false;
+      });
+      print('Error: $e');
+    }
+  }
+
+  // void verifyParam() {
+  //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+  //       .parametreList!;
+
+  //   if (paraList.isNotEmpty) {
+  //     para = paraList[0];
+  //   } else {
+  //     // Gérer le cas où la liste est null ou vide, par exemple :
+  //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+  //   }
+  // }
 
   @override
   void initState() {
     _searchController = TextEditingController();
-    verifyParam();
+    // verifyParam();
     // _niveau1List =
     //     http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
 
@@ -95,7 +125,7 @@ class _Niveau3PageState extends State<Niveau3Page> {
             },
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: Text(
-          "Niveau 3 : ${para.libelleNiveau3Pays}",
+          libelleNiveau3Pays!.toUpperCase(),
           style:
               const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
@@ -110,7 +140,7 @@ class _Niveau3PageState extends State<Niveau3Page> {
                     color: Colors.green,
                   ),
                   title: Text(
-                    "Ajouter un ${para.libelleNiveau3Pays}",
+                    "Ajouter un ${libelleNiveau3Pays!}",
                     style: TextStyle(
                         color: Colors.green,
                         fontWeight: FontWeight.bold,
@@ -188,7 +218,7 @@ class _Niveau3PageState extends State<Niveau3Page> {
                           padding: EdgeInsets.all(10),
                           child: Center(
                               child: Text(
-                                  "Aucun ${para.libelleNiveau3Pays} trouvé")),
+                                  "Aucun ${libelleNiveau3Pays} trouvé")),
                         );
                       } else {
                         niveau3Liste = snapshot.data!;
@@ -847,16 +877,16 @@ class AddDialog extends StatefulWidget {
 }
 
 class _AddDialogState extends State<AddDialog> {
-  late ParametreGeneraux para;
   List<Niveau3Pays> niveau3Liste = [];
   final formkey = GlobalKey<FormState>();
   TextEditingController libelleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para;
+  // List<ParametreGeneraux> paraList = [];
   late Niveau2Pays niveau2;
   String? niveau2Value;
   late Future _niveau2List;
- late Acteur acteur;
+  late Acteur acteur;
   String? niveau1Value;
   late Future _niveau1List;
   late Niveau1Pays niveau1Pays = Niveau1Pays();
@@ -1005,7 +1035,7 @@ class _AddDialogState extends State<AddDialog> {
                               onChanged: null,
                               decoration: InputDecoration(
                                 labelText:
-                                    'Aucun ${para.libelleNiveau1Pays} trouvé',
+                                    'Aucun donnée trouvé',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -1041,7 +1071,7 @@ class _AddDialogState extends State<AddDialog> {
                             },
                             decoration: InputDecoration(
                               labelText:
-                                  'Sélectionner un ${para.libelleNiveau1Pays}',
+                                  'Sélectionner une localité',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -1053,7 +1083,7 @@ class _AddDialogState extends State<AddDialog> {
                         items: [],
                         onChanged: null,
                         decoration: InputDecoration(
-                          labelText: 'Aucun ${para.libelleNiveau1Pays} trouvé',
+                          labelText: 'Aucun donnée trouvé',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -1094,7 +1124,7 @@ class _AddDialogState extends State<AddDialog> {
                               onChanged: null,
                               decoration: InputDecoration(
                                 labelText:
-                                    'Aucun ${para.libelleNiveau2Pays} trouvé',
+                                    'Aucun donnée trouvé',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -1126,7 +1156,7 @@ class _AddDialogState extends State<AddDialog> {
                             },
                             decoration: InputDecoration(
                               labelText:
-                                  'Sélectionner un ${para.libelleNiveau2Pays}',
+                                  'Sélectionner une locaité',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -1138,7 +1168,7 @@ class _AddDialogState extends State<AddDialog> {
                         items: [],
                         onChanged: null,
                         decoration: InputDecoration(
-                          labelText: 'Aucun ${para.libelleNiveau2Pays} trouvé',
+                          labelText: 'Aucun donnée trouvé',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),

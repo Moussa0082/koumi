@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -37,6 +38,9 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
   // List<TextEditingController> heureControllers = [];
   // List<TextEditingController> prixControllers = [];
   final formkey = GlobalKey<FormState>();
+  String? monnaieValue;
+  late Future _monnaieList;
+  late Monnaie monnaie = Monnaie();
   String? imageSrc;
   File? photo;
   late Acteur acteur;
@@ -102,6 +106,7 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
    _niveau3List =
         http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
      fetchLibelleNiveau3Pays();
+       _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
     // _typeList =
     //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
     // _niveau3List =
@@ -304,7 +309,7 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
                         padding: const EdgeInsets.all(8.0),
                         child: Align(
                           alignment: Alignment.topLeft,
-                          child: Text("Chargement ................",style: TextStyle(
+                          child: Text("Chargement...",style: TextStyle(
                                   fontSize: 15, fontWeight: FontWeight.bold),)),
                       )
                       :
@@ -474,6 +479,133 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
                       SizedBox(
                         height: 10,
                       ),
+                       Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 22,
+                        ),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            "Chosir la monnaie",
+                            style:
+                                TextStyle(color: (Colors.black), fontSize: 18),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        child: FutureBuilder(
+                          future: _monnaieList,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Chargement...',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+
+                            if (snapshot.hasData) {
+                              dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+
+                              if (responseData is List) {
+                                List<Monnaie> speList = responseData
+                                    .map((e) => Monnaie.fromMap(e))
+                                    .toList();
+
+                                if (speList.isEmpty) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Aucun monnaie trouvé',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return DropdownButtonFormField<String>(
+                                  isExpanded: true,
+                                  items: speList
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idMonnaie,
+                                          child: Text(e.sigle!),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: monnaieValue,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      monnaieValue = newValue;
+                                      if (newValue != null) {
+                                        monnaie = speList.firstWhere(
+                                          (element) =>
+                                              element.idMonnaie == newValue,
+                                        );
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Sélectionner la monnaie',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                // Handle case when response data is not a list
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucun monnaie trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                            } else {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucun monnaie trouvé',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: 22,
@@ -557,7 +689,9 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
                                           etatMateriel: etat,
                                           typeMateriel: type,
                                           photoMateriel: photo,
-                                          acteur: acteur)
+                                          acteur: acteur,
+                                          monnaie: monnaie
+                                          )
                                       .then((value) => {
                                             Provider.of<MaterielService>(
                                                     context,
@@ -569,6 +703,7 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
                                             setState(() {
                                               _isLoading = false;
                                               n3Value = null;
+                                              monnaieValue = null;
                                             }),
                                             Navigator.pop(context),
                                             ScaffoldMessenger.of(context)
@@ -615,7 +750,9 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
                                           localisation: niveau3,
                                           etatMateriel: etat,
                                           typeMateriel: type,
-                                          acteur: acteur)
+                                          acteur: acteur,
+                                           monnaie: monnaie
+                                          )
                                       .then((value) => {
                                             Provider.of<MaterielService>(
                                                     context,
@@ -627,6 +764,7 @@ class _AddMaterielByTypeState extends State<AddMaterielByType> {
                                             setState(() {
                                               _isLoading = false;
                                               n3Value = null;
+                                              monnaieValue = null;
                                             }),
                                             Navigator.pop(context),
                                             ScaffoldMessenger.of(context)

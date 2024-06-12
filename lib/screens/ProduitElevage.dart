@@ -29,7 +29,7 @@ class _ProduitElevageState extends State<ProduitElevage> {
 
   List<String> libelles = ["Animale", "Animale", "Elevage", "Elevages"];
 
-  String? monnaie;
+  // String? monnaie;
   int page = 0;
   bool isLoading = false;
   int size =6 ;
@@ -367,8 +367,8 @@ class _ProduitElevageState extends State<ProduitElevage> {
                                                           .symmetric(
                                                           horizontal: 15),
                                                       child: Text(
-                                                        monnaie != null
-                                                            ? "${filteredSearch[index].prix.toString()} ${monnaie}"
+                                                        filteredSearch[index].monnaie != null
+                                                            ? "${filteredSearch[index].prix.toString()} ${filteredSearch[index].monnaie!.libelle}"
                                                             : "${filteredSearch[index].prix.toString()} FCFA ",
                                                         style: TextStyle(
                                                           fontSize: 15,

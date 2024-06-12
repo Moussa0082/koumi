@@ -35,8 +35,8 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 class _MyProductScreenState extends State<MyProductScreen> {
   late Acteur acteur = Acteur();
   late List<TypeActeur> typeActeurData = [];
-  List<ParametreGeneraux> paraList = [];
-  late ParametreGeneraux para = ParametreGeneraux();
+  // List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para = ParametreGeneraux();
   late String type;
   late TextEditingController _searchController;
   List<Stock> stockListe = [];
@@ -55,36 +55,36 @@ class _MyProductScreenState extends State<MyProductScreen> {
   bool hasMore = true;
 
   bool isLoadingLibelle = true;
-  String? monnaie;
+  // String? monnaie;
 
-  Future<String> getMonnaieByActor(String id) async {
-    final response =
-        await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+  // Future<String> getMonnaieByActor(String id) async {
+  //   final response =
+  //       await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
 
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response
-          .body; // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load monnaie');
-    }
-  }
+  //   if (response.statusCode == 200) {
+  //     print("libelle : ${response.body}");
+  //     return response
+  //         .body; // Return the body directly since it's a plain string
+  //   } else {
+  //     throw Exception('Failed to load monnaie');
+  //   }
+  // }
 
-  Future<void> fetchPaysDataByActor() async {
-    try {
-      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+  // Future<void> fetchPaysDataByActor() async {
+  //   try {
+  //     String monnaies = await getMonnaieByActor(acteur.idActeur!);
 
-      setState(() {
-        monnaie = monnaies;
-        isLoadingLibelle = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-      });
-      print('Error: $e');
-    }
-  }
+  //     setState(() {
+  //       monnaie = monnaies;
+  //       isLoadingLibelle = false;
+  //     });
+  //   } catch (e) {
+  //     setState(() {
+  //       isLoadingLibelle = false;
+  //     });
+  //     print('Error: $e');
+  //   }
+  // }
 
   Future<List<Stock>> fetchStockByActeur(String idActeur,
       {bool refresh = false}) async {
@@ -201,17 +201,17 @@ class _MyProductScreenState extends State<MyProductScreen> {
     return stockListe;
   }
 
-  void verifyParam() {
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+  // void verifyParam() {
+  //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+  //       .parametreList!;
 
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
-    } else {
-      // Gérer le cas où la liste est null ou vide, par exemple :
-      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
-    }
-  }
+  //   if (paraList.isNotEmpty) {
+  //     para = paraList[0];
+  //   } else {
+  //     // Gérer le cas où la liste est null ou vide, par exemple :
+  //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+  //   }
+  // }
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -279,7 +279,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
       scrollableController.addListener(_scrollListener);
     });
     verify();
-    fetchPaysDataByActor();
+    // fetchPaysDataByActor();
     // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // stockListeFuture =  fetchAllStock();
     // typeActeurData = acteur.typeActeur!;
@@ -289,7 +289,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
     _searchController = TextEditingController();
     _catList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
-    verifyParam();
+    // verifyParam();
   }
 
   @override
@@ -690,8 +690,8 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                                                 .symmetric(
                                                                 horizontal: 15),
                                                         child: Text(
-                                                          monnaie != null
-                                                              ? "${filtereSearch[index].prix.toString()} ${monnaie}"
+                                                          filtereSearch[index].monnaie != null
+                                                              ? "${filtereSearch[index].prix.toString()} ${filtereSearch[index].monnaie!.libelle}"
                                                               : "${filtereSearch[index].prix.toString()} FCFA",
                                                           style: TextStyle(
                                                             overflow:

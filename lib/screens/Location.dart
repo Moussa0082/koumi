@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:http/http.dart' as http;
@@ -7,17 +8,14 @@ import 'package:koumi_app/Admin/DetailMateriel.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Materiel.dart';
-import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddMateriel.dart';
 import 'package:koumi_app/screens/ListeMaterielByActeur.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 
 
@@ -45,8 +43,8 @@ class _LocationState extends State<Location> {
   String? typeValue;
   TypeMateriel? selectedType;
   late Future _typeList;
-    List<ParametreGeneraux> paraList = [];
-  late ParametreGeneraux para = ParametreGeneraux();
+  //   List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para = ParametreGeneraux();
 
  ScrollController scrollableController = ScrollController();
   ScrollController scrollableController1 = ScrollController();
@@ -57,35 +55,35 @@ class _LocationState extends State<Location> {
   bool hasMore = true;
 
       bool isLoadingLibelle = true;
-    String? monnaie;
+    // String? monnaie;
 
 
-   Future<String> getMonnaieByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+//    Future<String> getMonnaieByActor(String id) async {
+//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
 
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load monnaie');
-    }
-}
+//     if (response.statusCode == 200) {
+//       print("libelle : ${response.body}");
+//       return response.body;  // Return the body directly since it's a plain string
+//     } else {
+//       throw Exception('Failed to load monnaie');
+//     }
+// }
 
- Future<void> fetchPaysDataByActor() async {
-    try {
-      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+//  Future<void> fetchPaysDataByActor() async {
+//     try {
+//       String monnaies = await getMonnaieByActor(acteur.idActeur!);
 
-      setState(() { 
-        monnaie = monnaies;
-        isLoadingLibelle = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-        });
-      print('Error: $e');
-    }
-  }
+//       setState(() { 
+//         monnaie = monnaies;
+//         isLoadingLibelle = false;
+//       });
+//     } catch (e) {
+//       setState(() {
+//         isLoadingLibelle = false;
+//         });
+//       print('Error: $e');
+//     }
+//   }
 
 
    void _scrollListener() {
@@ -270,13 +268,13 @@ class _LocationState extends State<Location> {
   void initState() {
     super.initState();
     verify();
-      paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+    //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+    //     .parametreList!;
 
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
-    }
-    fetchPaysDataByActor();
+    // if (paraList.isNotEmpty) {
+    //   para = paraList[0];
+    // }
+    // fetchPaysDataByActor();
     _typeList =
         http.get(Uri.parse('$apiOnlineUrl/TypeMateriel/read'));
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
@@ -684,7 +682,7 @@ class _LocationState extends State<Location> {
                                               padding: const EdgeInsets.symmetric(
                                                   horizontal: 15),
                                               child: Text(
-                                                 "${materielListe[index].prixParHeure.toString()} ${monnaie}"
+                                                 "${materielListe[index].prixParHeure.toString()} ${materielListe[index].monnaie!.libelle}"
                                                     ,
                                                 style: TextStyle(
                                                   fontSize: 15,
@@ -879,7 +877,7 @@ class _LocationState extends State<Location> {
                                               padding: const EdgeInsets.symmetric(
                                                   horizontal: 15),
                                               child: Text(
-                                                 "${materielListe[index].prixParHeure.toString()} ${para.monnaie}"
+                                                 "${materielListe[index].prixParHeure.toString()} ${materielListe[index].monnaie!.libelle}"
                                                     ,
                                                 style: TextStyle(
                                                   fontSize: 15,

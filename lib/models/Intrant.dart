@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Forme.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/Superficie.dart';
 
@@ -24,14 +25,15 @@ class Intrant {
   final Forme? forme;
   final Acteur? acteur;
   final CategorieProduit? categorieProduit;
+  final Monnaie? monnaie;
   
   Intrant({
     this.idIntrant,
-     this.nomIntrant,
-     this.quantiteIntrant,
-     this.prixIntrant,
+    this.nomIntrant,
+    this.quantiteIntrant,
+    this.prixIntrant,
     this.codeIntrant,
-     this.descriptionIntrant,
+    this.descriptionIntrant,
     this.photoIntrant,
     this.statutIntrant,
     this.dateExpiration,
@@ -39,10 +41,13 @@ class Intrant {
     this.dateModif,
     this.personneModif,
     this.unite,
-     this.forme,
-     this.acteur,
+    this.forme,
+    this.acteur,
     this.categorieProduit,
+    this.monnaie,
   });
+  
+ 
 
   Intrant copyWith({
     String? idIntrant,
@@ -61,6 +66,7 @@ class Intrant {
     Forme? forme,
     Acteur? acteur,
     CategorieProduit? categorieProduit,
+    Monnaie? monnaie,
   }) {
     return Intrant(
       idIntrant: idIntrant ?? this.idIntrant,
@@ -79,6 +85,7 @@ class Intrant {
       forme: forme ?? this.forme,
       acteur: acteur ?? this.acteur,
       categorieProduit: categorieProduit ?? this.categorieProduit,
+      monnaie: monnaie ?? this.monnaie,
     );
   }
 
@@ -100,17 +107,18 @@ class Intrant {
       'forme': forme?.toMap(),
       'acteur': acteur?.toMap(),
       'categorieProduit': categorieProduit?.toMap(),
+      'monnaie': monnaie?.toMap(),
     };
   }
 
   factory Intrant.fromMap(Map<String, dynamic> map) {
     return Intrant(
       idIntrant: map['idIntrant'] != null ? map['idIntrant'] as String : null,
-      nomIntrant: map['nomIntrant'] as String,
-      quantiteIntrant: map['quantiteIntrant'] as double,
-      prixIntrant: map['prixIntrant'] as int,
+      nomIntrant: map['nomIntrant'] != null ? map['nomIntrant'] as String : null,
+      quantiteIntrant: map['quantiteIntrant'] != null ? map['quantiteIntrant'] as double : null,
+      prixIntrant: map['prixIntrant'] != null ? map['prixIntrant'] as int : null,
       codeIntrant: map['codeIntrant'] != null ? map['codeIntrant'] as String : null,
-      descriptionIntrant: map['descriptionIntrant'] as String,
+      descriptionIntrant: map['descriptionIntrant'] != null ? map['descriptionIntrant'] as String : null,
       photoIntrant: map['photoIntrant'] != null ? map['photoIntrant'] as String : null,
       statutIntrant: map['statutIntrant'] != null ? map['statutIntrant'] as bool : null,
       dateExpiration: map['dateExpiration'] != null ? map['dateExpiration'] as String : null,
@@ -118,9 +126,12 @@ class Intrant {
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
       personneModif: map['personneModif'] != null ? map['personneModif'] as String : null,
       unite: map['unite'] != null ? map['unite'] as String : null,
-      forme: Forme.fromMap(map['forme'] as Map<String,dynamic>),
-      acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
+      forme: map['forme'] != null ? Forme.fromMap(map['forme'] as Map<String,dynamic>) : null,
+      acteur: map['acteur'] != null ? Acteur.fromMap(map['acteur'] as Map<String,dynamic>) : null,
       categorieProduit: map['categorieProduit'] != null ? CategorieProduit.fromMap(map['categorieProduit'] as Map<String,dynamic>) : null,
+       monnaie: map['monnaie'] != null
+          ? Monnaie.fromMap(map['monnaie'] as Map<String, dynamic>)
+          : Monnaie(),
     );
   }
 
@@ -130,7 +141,7 @@ class Intrant {
 
   @override
   String toString() {
-    return 'Intrant(idIntrant: $idIntrant, nomIntrant: $nomIntrant, quantiteIntrant: $quantiteIntrant, prixIntrant: $prixIntrant, codeIntrant: $codeIntrant, descriptionIntrant: $descriptionIntrant, photoIntrant: $photoIntrant, statutIntrant: $statutIntrant, dateExpiration: $dateExpiration, dateAjout: $dateAjout, dateModif: $dateModif, personneModif: $personneModif, unite: $unite, forme: $forme, acteur: $acteur, categorieProduit: $categorieProduit)';
+    return 'Intrant(idIntrant: $idIntrant, nomIntrant: $nomIntrant, quantiteIntrant: $quantiteIntrant, prixIntrant: $prixIntrant, codeIntrant: $codeIntrant, descriptionIntrant: $descriptionIntrant, photoIntrant: $photoIntrant, statutIntrant: $statutIntrant, dateExpiration: $dateExpiration, dateAjout: $dateAjout, dateModif: $dateModif, personneModif: $personneModif, unite: $unite, forme: $forme, acteur: $acteur, categorieProduit: $categorieProduit, monnaie: $monnaie)';
   }
 
   @override
@@ -153,7 +164,8 @@ class Intrant {
       other.unite == unite &&
       other.forme == forme &&
       other.acteur == acteur &&
-      other.categorieProduit == categorieProduit;
+      other.categorieProduit == categorieProduit &&
+      other.monnaie == monnaie;
   }
 
   @override
@@ -173,6 +185,7 @@ class Intrant {
       unite.hashCode ^
       forme.hashCode ^
       acteur.hashCode ^
-      categorieProduit.hashCode;
+      categorieProduit.hashCode ^
+      monnaie.hashCode;
   }
 }

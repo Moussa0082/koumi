@@ -1,24 +1,13 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:koumi_app/constants.dart';
-import 'package:koumi_app/models/Acteur.dart';
-import 'package:koumi_app/models/CategorieProduit.dart';
-import 'package:koumi_app/models/ParametreGeneraux.dart';
-import 'package:koumi_app/models/Stock.dart';
-import 'package:koumi_app/models/TypeActeur.dart';
-import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
-import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
-import 'package:koumi_app/screens/DetailProduits.dart';
-import 'package:koumi_app/service/BottomNavigationService.dart';
-import 'package:koumi_app/service/StockService.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-
-import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:koumi_app/constants.dart';
+import 'package:koumi_app/models/Stock.dart';
+import 'package:koumi_app/screens/DetailProduits.dart';
+import 'package:koumi_app/service/StockService.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProduitTransforme extends StatefulWidget {
@@ -32,14 +21,14 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _ProduitTransformeState extends State<ProduitTransforme> {
- late TextEditingController _searchController;
+  late TextEditingController _searchController;
   List<Stock> stockListe = [];
   late Future<List<Stock>> stockListeFuture;
 
   ScrollController scrollableController = ScrollController();
 
   String libelle = "Produits transformés";
-  String? monnaie;
+  // String? monnaie;
   int page = 0;
   bool isLoading = false;
   int size = 6;
@@ -372,8 +361,10 @@ class _ProduitTransformeState extends State<ProduitTransforme> {
                                                           .symmetric(
                                                           horizontal: 15),
                                                       child: Text(
-                                                        monnaie != null
-                                                            ? "${filteredSearch[index].prix.toString()} ${monnaie}"
+                                                        filteredSearch[index]
+                                                                    .monnaie !=
+                                                                null
+                                                            ? "${filteredSearch[index].prix.toString()} ${filteredSearch[index].monnaie!.libelle}"
                                                             : "${filteredSearch[index].prix.toString()} FCFA ",
                                                         style: TextStyle(
                                                           fontSize: 15,

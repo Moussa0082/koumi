@@ -534,7 +534,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     "Semence",
     "semences et plants"
   ];
-  String? monnaie;
+  // String? monnaie;
 
   void _scrollListener() {
     debugPrint("Scroll position: ${scrollableController.position.pixels}");
@@ -864,8 +864,8 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                                                           .symmetric(
                                                           horizontal: 15),
                                                       child: Text(
-                                                        monnaie != null
-                                                            ? "${intrantListe[index].prixIntrant.toString()} ${monnaie}"
+                                                       intrantListe[index].monnaie != null
+                                                            ? "${intrantListe[index].prixIntrant.toString()} ${intrantListe[index].monnaie!.libelle}"
                                                             : "${intrantListe[index].prixIntrant.toString()} FCFA ",
                                                         style: TextStyle(
                                                           fontSize: 15,

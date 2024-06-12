@@ -25,7 +25,7 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _DefautAcceuilState extends State<DefautAcceuil> {
-  late Future<List<CategorieProduit>> _liste;
+  // late Future<List<CategorieProduit>> _liste;
 
   // Future<List<CategorieProduit>> getCat() async {
   //   return await CategorieService().fetchCategorie();

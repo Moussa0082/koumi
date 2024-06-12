@@ -12,6 +12,7 @@ import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Forme.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -49,10 +50,13 @@ class _NextAddIntratState extends State<NextAddIntrat> {
   TextEditingController _prixController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
   late Speculation speculation;
-  late ParametreGeneraux para = ParametreGeneraux();
-  List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para = ParametreGeneraux();
+  // List<ParametreGeneraux> paraList = [];
   // late CategorieProduit categorieProduit;
   late CategorieProduit categorieProduit = CategorieProduit();
+  String? monnaieValue;
+  late Future _monnaieList;
+  late Monnaie monnaie = Monnaie();
   DateTime selectedDate = DateTime.now();
   bool _isLoading = false;
   final formkey = GlobalKey<FormState>();
@@ -63,36 +67,35 @@ class _NextAddIntratState extends State<NextAddIntrat> {
   late Future _formeList;
   late Forme forme;
 
-      bool isLoadingLibelle = true;
-    String? monnaie;
+  bool isLoadingLibelle = true;
+  // String? monnaie;
 
+//    Future<String> getMonnaieByActor(String id) async {
+//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
 
-   Future<String> getMonnaieByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+//     if (response.statusCode == 200) {
+//       print("libelle : ${response.body}");
+//       return response.body;  // Return the body directly since it's a plain string
+//     } else {
+//       throw Exception('Failed to load monnaie');
+//     }
+// }
 
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load monnaie');
-    }
-}
+//  Future<void> fetchPaysDataByActor() async {
+//     try {
+//       String monnaies = await getMonnaieByActor(acteur.idActeur!);
 
- Future<void> fetchPaysDataByActor() async {
-    try {
-      String monnaies = await getMonnaieByActor(acteur.idActeur!);
-
-      setState(() { 
-        monnaie = monnaies;
-        isLoadingLibelle = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-        });
-      print('Error: $e');
-    }
-  }
+//       setState(() {
+//         monnaie = monnaies;
+//         isLoadingLibelle = false;
+//       });
+//     } catch (e) {
+//       setState(() {
+//         isLoadingLibelle = false;
+//         });
+//       print('Error: $e');
+//     }
+//   }
 
   Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
@@ -170,27 +173,27 @@ class _NextAddIntratState extends State<NextAddIntrat> {
     });
   }
 
-  void verifyParam() {
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+  // void verifyParam() {
+  //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+  //       .parametreList!;
 
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
-    } else {
-      // Gérer le cas où la liste est null ou vide, par exemple :
-      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
-    }
-  }
+  //   if (paraList.isNotEmpty) {
+  //     para = paraList[0];
+  //   } else {
+  //     // Gérer le cas où la liste est null ou vide, par exemple :
+  //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+  //   }
+  // }
 
   @override
   void initState() {
     super.initState();
-    verifyParam();
+    // verifyParam();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // _formeList = fetchList();
-    fetchPaysDataByActor();
-    _formeList = http
-        .get(Uri.parse('$apiOnlineUrl/formeproduit/getAllForme/'));
+    // fetchPaysDataByActor();
+    _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
+    _formeList = http.get(Uri.parse('$apiOnlineUrl/formeproduit/getAllForme/'));
     // Uri.parse('http://10.0.2.2:9000/api-koumi/formeproduit/getAllForme/'));
   }
 
@@ -355,7 +358,129 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: Text(
-                          "Prix (${monnaie}) intrant",
+                          "Chosir la monnaie",
+                          style: TextStyle(color: (Colors.black), fontSize: 18),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      child: FutureBuilder(
+                        future: _monnaieList,
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Chargement...',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+
+                          if (snapshot.hasData) {
+                            dynamic jsonString =
+                                utf8.decode(snapshot.data.bodyBytes);
+                            dynamic responseData = json.decode(jsonString);
+
+                            if (responseData is List) {
+                              List<Monnaie> speList = responseData
+                                  .map((e) => Monnaie.fromMap(e))
+                                  .toList();
+
+                              if (speList.isEmpty) {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucun monnaie trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              return DropdownButtonFormField<String>(
+                                isExpanded: true,
+                                items: speList
+                                    .map(
+                                      (e) => DropdownMenuItem(
+                                        value: e.idMonnaie,
+                                        child: Text(e.sigle!),
+                                      ),
+                                    )
+                                    .toList(),
+                                value: monnaieValue,
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    monnaieValue = newValue;
+                                    if (newValue != null) {
+                                      monnaie = speList.firstWhere(
+                                        (element) =>
+                                            element.idMonnaie == newValue,
+                                      );
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Sélectionner la monnaie',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              // Handle case when response data is not a list
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucun monnaie trouvé',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+                          } else {
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucun monnaie trouvé',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 22,
+                      ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Prix intrant",
                           style: TextStyle(color: (Colors.black), fontSize: 18),
                         ),
                       ),
@@ -497,9 +622,11 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                         photoIntrant: photo,
                                         dateExpiration: date,
                                         forme: forme,
-                                         unite: unite,
+                                        unite: unite,
                                         categorieProduit: categorieProduit,
-                                        acteur: acteur)
+                                        acteur: acteur,
+                                        monnaie: monnaie
+                                        )
                                     .then((value) => {
                                           Provider.of<IntrantService>(context,
                                                   listen: false)
@@ -558,8 +685,10 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                         dateExpiration: date,
                                         categorieProduit: categorieProduit,
                                         forme: forme,
-                                         unite: unite,
-                                        acteur: acteur)
+                                        unite: unite,
+                                        acteur: acteur,
+                                        monnaie: monnaie
+                                        )
                                     .then((value) => {
                                           Provider.of<IntrantService>(context,
                                                   listen: false)

@@ -8,6 +8,7 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Forme.dart';
 import 'package:koumi_app/models/Intrant.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:path/path.dart';
 
@@ -18,7 +19,7 @@ class IntrantService extends ChangeNotifier {
   List<Intrant> intrantList = [];
     int page = 0;
   bool isLoading = false;
-   int size = 4;
+  int size = 4;
   bool hasMore = true;
 
   Future<void> creerIntrant(
@@ -31,7 +32,9 @@ class IntrantService extends ChangeNotifier {
       required Acteur acteur,
       required Forme forme,
       required String unite,
-      required CategorieProduit categorieProduit}) async {
+      required CategorieProduit categorieProduit,
+      required Monnaie monnaie,
+      }) async {
     try {
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
 
@@ -51,7 +54,8 @@ class IntrantService extends ChangeNotifier {
         'unite' : unite,
         'photoIntrant': "",
         'acteur': acteur.toMap(),
-        'forme' : forme.toMap()
+        'forme' : forme.toMap(),
+        'monnaie':monnaie.toMap()
       });
 
       var response = await requete.send();
@@ -80,6 +84,7 @@ class IntrantService extends ChangeNotifier {
     File? photoIntrant,
     required String unite,
     required Acteur acteur,
+    required Monnaie monnaie,
   }) async {
     try {
       var requete =
@@ -100,7 +105,8 @@ class IntrantService extends ChangeNotifier {
         'descriptionIntrant': descriptionIntrant,
         'photoIntrant': "",
         'unite': unite,
-        'acteur': acteur.toMap()
+        'acteur': acteur.toMap(),
+        'monnaie': monnaie.toMap()
       });
 
       var response = await requete.send();

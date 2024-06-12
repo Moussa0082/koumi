@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:io';
 
@@ -9,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Magasin.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/Unite.dart';
@@ -22,49 +22,54 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AddAndUpdateProductEndSreen extends StatefulWidget {
-  
-     bool? isEditable;
-     late Stock? stock;
-     String?  nomProduit, origine, forme,prix , quantite;
-     File? image;
-     
+  bool? isEditable;
+  late Stock? stock;
+  String? nomProduit, origine, forme, prix, quantite;
+  File? image;
+  Monnaie? monnaies;
 
-   AddAndUpdateProductEndSreen({super.key, this.isEditable, this.stock, 
-    this.nomProduit,  this.forme ,  this.origine,  this.prix, 
-    this.quantite,  this.image
-   });
+  AddAndUpdateProductEndSreen(
+      {super.key,
+      this.isEditable,
+      this.stock,
+      this.nomProduit,
+      this.forme,
+      this.origine,
+      this.prix,
+      this.quantite,
+      this.image,
+      this.monnaies});
 
   @override
-  State<AddAndUpdateProductEndSreen> createState() => _AddAndUpdateProductEndSreenState();
+  State<AddAndUpdateProductEndSreen> createState() =>
+      _AddAndUpdateProductEndSreenState();
 }
 
-class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSreen> {
-
-   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-   bool isLoading = false;
-     TextEditingController uniteController = TextEditingController();
-     TextEditingController _descriptionController = TextEditingController();
-     TextEditingController magasinController = TextEditingController();
-     TextEditingController zoneController = TextEditingController();
-     TextEditingController speculationController = TextEditingController();
-     TextEditingController _typeController = TextEditingController();
-      File? photos;
-      String? specValue;
-     Speculation speculation = Speculation();
-    late Future speculationListe;
-      String? uniteValue;
-    Unite unite = Unite(); // Initialisez l'objet unite
-    late Future uniteListe;
-      String? magasinValue;
-     Magasin magasin  = Magasin();
-    late Future magasinListe;
-      String? zoneValue;
-     ZoneProduction zoneProduction = ZoneProduction();
-    late Future zoneListe;
-
-
-       late Acteur acteur = Acteur();
-       String? id = "";
+class _AddAndUpdateProductEndSreenState
+    extends State<AddAndUpdateProductEndSreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool isLoading = false;
+  TextEditingController uniteController = TextEditingController();
+  TextEditingController _descriptionController = TextEditingController();
+  TextEditingController magasinController = TextEditingController();
+  TextEditingController zoneController = TextEditingController();
+  TextEditingController speculationController = TextEditingController();
+  TextEditingController _typeController = TextEditingController();
+  File? photos;
+  String? specValue;
+  Speculation speculation = Speculation();
+  late Future speculationListe;
+  String? uniteValue;
+  Unite unite = Unite(); // Initialisez l'objet unite
+  late Future uniteListe;
+  String? magasinValue;
+  Magasin magasin = Magasin();
+  late Future magasinListe;
+  String? zoneValue;
+  ZoneProduction zoneProduction = ZoneProduction();
+  late Future zoneListe;
+  late Acteur acteur = Acteur();
+  String? id = "";
   String? email = "";
   bool isExist = false;
 
@@ -74,10 +79,10 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-            id = acteur.idActeur;
-    magasinListe =
-        http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByActeur/${id}'));
-        // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
+      id = acteur.idActeur;
+      magasinListe = http
+          .get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByActeur/${id}'));
+      // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
       setState(() {
         isExist = true;
       });
@@ -88,38 +93,32 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
     }
   }
 
-
-  
-
-  void handleButtonPress() async{
+  void handleButtonPress() async {
     setState(() {
       isLoading = true;
     });
-    if(widget.isEditable == false){
+    if (widget.isEditable == false) {
+      await ajouterStock().then((_) {
+        _typeController.clear();
+        _descriptionController.clear();
+        setState(() {
+          isLoading = false;
+        });
+        Navigator.of(context).pop();
+      });
+    } else {
+      await updateProduit().then((_) {
+        _typeController.clear();
+        _descriptionController.clear();
 
-     await ajouterStock().then((_) {
+        Navigator.of(context).pop();
+      });
       _typeController.clear();
       _descriptionController.clear();
-      setState(() {
-        isLoading = false;
-      });
-      Navigator.of(context).pop();
-     });
-    }else{
-  await updateProduit().then((_) {
-    _typeController.clear();
-      _descriptionController.clear();
-      
-      Navigator.of(context).pop();
-     });
-     _typeController.clear();
-     _descriptionController.clear();
     }
-
   }
-    
 
-    // Fonction pour traiter les données du QR code scanné
+  // Fonction pour traiter les données du QR code scanné
   Future<void> processScannedQRCode(Stock scannedData) async {
     // Ici, vous pouvez décoder les données du QR code et effectuer les actions nécessaires
     // Par exemple, naviguer vers la page de détail du produit avec les données du produit
@@ -131,95 +130,117 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
       ),
     );
   }
-   
-    Future<void> ajouterStock() async{
+
+  Future<void> ajouterStock() async {
     try {
-      
-    if(widget.image != null){
-    await StockService().creerStock(nomProduit: widget.nomProduit!,
-     origineProduit: widget.origine!, prix: widget.prix!,
-     formeProduit: widget.forme!, quantiteStock: widget.quantite!, photo: widget.image,
-     typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
-     zoneProduction: zoneProduction, speculation: speculation, unite: unite, 
-      magasin: magasin, acteur: acteur);
-    }else{
-    await StockService().creerStock(nomProduit: widget.nomProduit!,
-         origineProduit: widget.origine!, prix: widget.prix!,
-     formeProduit: widget.forme!, quantiteStock: widget.quantite!, 
-     typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
-     zoneProduction: zoneProduction, speculation: speculation, unite: unite, 
-      magasin: magasin, acteur: acteur);
-   }
+      if (widget.image != null) {
+        await StockService().creerStock(
+            nomProduit: widget.nomProduit!,
+            origineProduit: widget.origine!,
+            prix: widget.prix!,
+            formeProduit: widget.forme!,
+            quantiteStock: widget.quantite!,
+            photo: widget.image,
+            typeProduit: _typeController.text,
+            descriptionStock: _descriptionController.text,
+            zoneProduction: zoneProduction,
+            speculation: speculation,
+            unite: unite,
+            magasin: magasin,
+            acteur: acteur,
+            monnaie: widget.monnaies!);
+      } else {
+        await StockService().creerStock(
+            nomProduit: widget.nomProduit!,
+            origineProduit: widget.origine!,
+            prix: widget.prix!,
+            formeProduit: widget.forme!,
+            quantiteStock: widget.quantite!,
+            typeProduit: _typeController.text,
+            descriptionStock: _descriptionController.text,
+            zoneProduction: zoneProduction,
+            speculation: speculation,
+            unite: unite,
+            magasin: magasin,
+            acteur: acteur,
+            monnaie: widget.monnaies!);
+      }
     } catch (error) {
-        // Handle any exceptions that might occur during the request
-        final String errorMessage = error.toString();
-        debugPrint("no " + errorMessage);
-      } 
-
-   }
-   
-
-   Future<void> updateProduit() async{
-
-    try {
-      
-    if(widget.image != null){
-    await StockService().updateStock(
-      idStock: widget.stock!.idStock!, nomProduit: widget.nomProduit!,
-           origineProduit: widget.origine!, prix: widget.prix!,
-     formeProduit: widget.forme!, quantiteStock: widget.quantite!, photo: widget.image,
-     typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
-     zoneProduction: zoneProduction, speculation: speculation,
-      unite: unite,
-      magasin: magasin, acteur: acteur);
-    }else{
-    await StockService().updateStock(
-      idStock: widget.stock!.idStock!, nomProduit: widget.nomProduit!,
-      origineProduit: widget.origine!, prix: widget.prix!,
-     formeProduit: widget.forme!, quantiteStock: widget.quantite!, 
-     typeProduit: _typeController.text, descriptionStock: _descriptionController.text, 
-      zoneProduction: zoneProduction, speculation: speculation,
-      unite: unite, 
-      magasin: magasin, acteur: acteur);
-   }
-    } catch (error) {
-        // Handle any exceptions that might occur during the request
-        final String errorMessage = error.toString();
-        debugPrint("no update " + errorMessage);
-      } 
-
-
-   } 
-
-     @override
-  void initState() {
-
-    verify();
-    magasinListe =
-        http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByActeur/${id}'));
-    speculationListe =
-        http.get(Uri.parse('$apiOnlineUrl/Speculation/getAllSpeculation'));
-    uniteListe =
-        http.get(Uri.parse('$apiOnlineUrl/Unite/getAllUnite'));
-    zoneListe =
-        http.get(Uri.parse('$apiOnlineUrl/ZoneProduction/getAllZone'));
-
-        
-    debugPrint("nom : ${widget.nomProduit}, bool : ${widget.isEditable} ,image : ${widget.image.toString()} , forme: ${widget.forme}, origine : ${widget.origine}, qte : ${widget.quantite}, prix : ${widget.prix}");
-         
-    super.initState();
-    if(widget.isEditable! == true){
-     _typeController.text = widget.stock!.typeProduit!;
-     _descriptionController.text = widget.stock!.descriptionStock!;
-          debugPrint("id : $id,  forme : ${widget.forme}");
-        magasin = widget.stock!.magasin!;
-        speculation = widget.stock!.speculation!;
-        unite = widget.stock!.unite!;
-        zoneProduction = widget.stock!.zoneProduction!;
-          // debugPrint("spec : ${widget.speculation}, magasin : ${widget.magasin}, zone : ${widget.zoneProduction}   , unite : ${widget.unite}");
+      // Handle any exceptions that might occur during the request
+      final String errorMessage = error.toString();
+      debugPrint("no " + errorMessage);
     }
   }
 
+  Future<void> updateProduit() async {
+    try {
+      if (widget.image != null) {
+        await StockService().updateStock(
+            idStock: widget.stock!.idStock!,
+            nomProduit: widget.nomProduit!,
+            origineProduit: widget.origine!,
+            prix: widget.prix!,
+            formeProduit: widget.forme!,
+            quantiteStock: widget.quantite!,
+            photo: widget.image,
+            typeProduit: _typeController.text,
+            descriptionStock: _descriptionController.text,
+            zoneProduction: zoneProduction,
+            speculation: speculation,
+            unite: unite,
+            magasin: magasin,
+            acteur: acteur,
+            monnaie: widget.monnaies!);
+      } else {
+        await StockService().updateStock(
+            idStock: widget.stock!.idStock!,
+            nomProduit: widget.nomProduit!,
+            origineProduit: widget.origine!,
+            prix: widget.prix!,
+            formeProduit: widget.forme!,
+            quantiteStock: widget.quantite!,
+            typeProduit: _typeController.text,
+            descriptionStock: _descriptionController.text,
+            zoneProduction: zoneProduction,
+            speculation: speculation,
+            unite: unite,
+            magasin: magasin,
+            acteur: acteur,
+            monnaie: widget.monnaies!);
+      }
+    } catch (error) {
+      // Handle any exceptions that might occur during the request
+      final String errorMessage = error.toString();
+      debugPrint("no update " + errorMessage);
+    }
+  }
+
+  @override
+  void initState() {
+    verify();
+    magasinListe = http
+        .get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByActeur/${id}'));
+    speculationListe =
+        http.get(Uri.parse('$apiOnlineUrl/Speculation/getAllSpeculation'));
+    uniteListe = http.get(Uri.parse('$apiOnlineUrl/Unite/getAllUnite'));
+    zoneListe = http.get(Uri.parse('$apiOnlineUrl/ZoneProduction/getAllZone'));
+
+   
+    debugPrint(
+        "nom : ${widget.nomProduit}, bool : ${widget.isEditable} ,image : ${widget.image.toString()} , forme: ${widget.forme}, origine : ${widget.origine}, qte : ${widget.quantite}, prix : ${widget.prix}");
+
+    if (widget.isEditable! == true) {
+      _typeController.text = widget.stock!.typeProduit!;
+      _descriptionController.text = widget.stock!.descriptionStock!;
+      debugPrint("id : $id,  forme : ${widget.forme}");
+      magasin = widget.stock!.magasin!;
+      speculation = widget.stock!.speculation!;
+      unite = widget.stock!.unite!;
+      zoneProduction = widget.stock!.zoneProduction!;
+      // debugPrint("spec : ${widget.speculation}, magasin : ${widget.magasin}, zone : ${widget.zoneProduction}   , unite : ${widget.unite}");
+      super.initState();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -238,9 +259,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
-            widget.isEditable == false
-                ? "Ajouter produit"
-                : "Modifier produit",
+            widget.isEditable == false ? "Ajouter produit" : "Modifier produit",
             style: TextStyle(
                 fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
           ),
@@ -255,7 +274,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                    Padding(
+                        Padding(
                           padding: const EdgeInsets.all(8),
                           child: Align(
                               alignment: Alignment.topLeft,
@@ -265,7 +284,6 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                     fontSize: 15, fontWeight: FontWeight.bold),
                               )),
                         ),
-                       
                         TextFormField(
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -275,7 +293,6 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                           },
                           controller: _typeController,
                           keyboardType: TextInputType.text,
-                      
                           decoration: InputDecoration(
                             hintText: "Type produit",
                             contentPadding: const EdgeInsets.symmetric(
@@ -286,7 +303,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                           ),
                         ),
                         const SizedBox(height: 10),
-                    Padding(
+                        Padding(
                           padding: const EdgeInsets.all(8),
                           child: Align(
                               alignment: Alignment.topLeft,
@@ -296,7 +313,6 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                     fontSize: 15, fontWeight: FontWeight.bold),
                               )),
                         ),
-                       
                         TextFormField(
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -306,7 +322,6 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                           },
                           controller: _descriptionController,
                           keyboardType: TextInputType.text,
-                       
                           decoration: InputDecoration(
                             hintText: "Description produit",
                             contentPadding: const EdgeInsets.symmetric(
@@ -317,8 +332,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                           ),
                         ),
                         const SizedBox(height: 10),
-                    
-                       Padding(
+                        Padding(
                           padding: const EdgeInsets.all(8),
                           child: Align(
                               alignment: Alignment.topLeft,
@@ -328,32 +342,56 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                     fontSize: 15, fontWeight: FontWeight.bold),
                               )),
                         ),
-                      
-                       FutureBuilder(
-                      
-                            future: speculationListe,
-                            builder: (_, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'En cours de chargement',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
+                        FutureBuilder(
+                          future: speculationListe,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'En cours de chargement',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                );
-                              }
-                              if (snapshot.hasError) {
-                            return       DropdownButtonFormField(
+                                ),
+                              );
+                            }
+                            if (snapshot.hasError) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Probleme de connexion',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+                            if (snapshot.hasData) {
+                              dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+                              if (responseData is List) {
+                                final reponse = responseData;
+                                final speculationListe = reponse
+                                    .map((e) => Speculation.fromMap(e))
+                                    .where(
+                                        (con) => con.statutSpeculation == true)
+                                    .toList();
+
+                                if (speculationListe.isEmpty) {
+                                  return DropdownButtonFormField(
                                     items: [],
                                     onChanged: null,
                                     decoration: InputDecoration(
-                                      labelText: 'Probleme de connexion',
+                                      labelText: 'Aucune speculation trouvé',
                                       contentPadding:
                                           const EdgeInsets.symmetric(
                                               vertical: 10, horizontal: 20),
@@ -362,101 +400,79 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                       ),
                                     ),
                                   );
-                              }
-                              if (snapshot.hasData) {
-                                dynamic jsonString =
-                                utf8.decode(snapshot.data.bodyBytes);
-                            dynamic responseData = json.decode(jsonString);
-                                if (responseData is List) {
-                                  final reponse = responseData;
-                                  final speculationListe = reponse
-                                      .map((e) => Speculation.fromMap(e))
-                                      .where((con) => con.statutSpeculation == true)
-                                      .toList();
-                    
-                                  if (speculationListe.isEmpty) {
-                                    return DropdownButtonFormField(
-                                      items: [],
-                                      onChanged: null,
-                                      decoration: InputDecoration(
-                                        labelText: 'Aucune speculation trouvé',
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 10, horizontal: 20),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                  return DropdownButtonFormField<String>(
-                                  isExpanded: true,
-                                    items: speculationListe
-                                        .map(
-                                          (e) => DropdownMenuItem(
-                                            value: e.idSpeculation,
-                                            child: Text(e.nomSpeculation!,
-                                            style:TextStyle(overflow: TextOverflow.ellipsis),
-                                            ),
-                                          ),
-                                        )
-                                        .toList(),
-                                    value: speculation.idSpeculation,
-                                    onChanged: (newValue) {
-                                      setState(() {
-                                        speculation.idSpeculation = newValue;
-                                        if (newValue != null) {
-                                      speculation = speculationListe.firstWhere(
-                         (spec) => spec.idSpeculation == newValue,
-                      );
-                                          print("speculation : ${speculation}");
-                                        }
-                                      });
-                                    },
-                                  
-                                    decoration: InputDecoration(
-                                      
-                                      labelText: widget.isEditable == false ? 'Selectionner une spéculation' : widget.stock!.speculation!.nomSpeculation!,
-                                      contentPadding: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 20),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
-                                } else {
-                                  return DropdownButtonFormField(
-                                    items: [],
-                                    onChanged: null,
-                                    decoration: InputDecoration(
-                                      labelText: 'Aucune spéculation trouvé',
-                                      contentPadding: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 20),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
                                 }
-                              }
-                              return DropdownButtonFormField(
-                                items: [],
-                                onChanged: null,
-                                decoration: InputDecoration(
-                                  labelText: 'Aucune spéculation trouvé',
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                                return DropdownButtonFormField<String>(
+                                  isExpanded: true,
+                                  items: speculationListe
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idSpeculation,
+                                          child: Text(
+                                            e.nomSpeculation!,
+                                            style: TextStyle(
+                                                overflow:
+                                                    TextOverflow.ellipsis),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: speculation.idSpeculation,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      speculation.idSpeculation = newValue;
+                                      if (newValue != null) {
+                                        speculation =
+                                            speculationListe.firstWhere(
+                                          (spec) =>
+                                              spec.idSpeculation == newValue,
+                                        );
+                                        print("speculation : ${speculation}");
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: widget.isEditable == false
+                                        ? 'Selectionner une spéculation'
+                                        : widget.stock!.speculation!
+                                            .nomSpeculation!,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
                                   ),
+                                );
+                              } else {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucune spéculation trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucune spéculation trouvé',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              );
-                            },
-                          ),
-                    
+                              ),
+                            );
+                          },
+                        ),
                         const SizedBox(height: 10),
-                    
-                       Padding(
+                        Padding(
                           padding: const EdgeInsets.all(8),
                           child: Align(
                               alignment: Alignment.topLeft,
@@ -466,31 +482,55 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                     fontSize: 15, fontWeight: FontWeight.bold),
                               )),
                         ),
-                      
-                       FutureBuilder(
-                            future: magasinListe,
-                            builder: (_, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'En cours de chargement ...',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
+                        FutureBuilder(
+                          future: magasinListe,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'En cours de chargement ...',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                );
-                              }
-                              if (snapshot.hasError) {
-                            return  DropdownButtonFormField(
+                                ),
+                              );
+                            }
+                            if (snapshot.hasError) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Probleme de connexion',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+                            if (snapshot.hasData) {
+                              dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+                              if (responseData is List) {
+                                final reponse = responseData;
+                                final magasinListe = reponse
+                                    .map((e) => Magasin.fromMap(e))
+                                    .where((con) => con.statutMagasin == true)
+                                    .toList();
+
+                                if (magasinListe.isEmpty) {
+                                  return DropdownButtonFormField(
                                     items: [],
                                     onChanged: null,
                                     decoration: InputDecoration(
-                                      labelText: 'Probleme de connexion',
+                                      labelText: 'Aucune magasin trouvé',
                                       contentPadding:
                                           const EdgeInsets.symmetric(
                                               vertical: 10, horizontal: 20),
@@ -499,104 +539,79 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                       ),
                                     ),
                                   );
-                              }
-                              if (snapshot.hasData) {
-                                dynamic jsonString =
-                                utf8.decode(snapshot.data.bodyBytes);
-                            dynamic responseData = json.decode(jsonString);
-                                if (responseData is List) {
-                                  final reponse = responseData;
-                                  final magasinListe = reponse
-                                      .map((e) => Magasin.fromMap(e))
-                                      .where((con) => con.statutMagasin == true)
-                                      .toList();
-                    
-                                  if (magasinListe.isEmpty) {
-                                    return DropdownButtonFormField(
-                                      items: [],
-                                      onChanged: null,
-                                      decoration: InputDecoration(
-                                        labelText: 'Aucune magasin trouvé',
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 10, horizontal: 20),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                    
-                                  return DropdownButtonFormField<String>(
-                                    isExpanded: true,
-                                    items: magasinListe
-                                        .map(
-                                          (e) => DropdownMenuItem(
-                                            value: e.idMagasin,
-                                            child: Text(
-                                              e.nomMagasin!,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        )
-                                        .toList(),
-                                    value: magasin.idMagasin,
-                                    onChanged: (newValue) {
-                                      setState(() {
-                                        magasin.idMagasin = newValue;
-                                        if (newValue != null) {
-                                          magasin = magasinListe.firstWhere(
-                    (magasin) => magasin.idMagasin == newValue,
-                  );
-                                          print("magasin : ${magasin.nomMagasin}");
-                                        }
-                                      });
-                                    },
-                                    decoration: InputDecoration(
-                                      labelStyle: TextStyle(
-                                        overflow: TextOverflow.ellipsis
-                                      ),
-                                      labelText: widget.isEditable == false ? 'Selectionner un magasin' : widget.stock!.magasin!.nomMagasin,
-                                      contentPadding: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 20),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
-                                } else {
-                                  return DropdownButtonFormField(
-                                    items: [],
-                                    onChanged: null,
-                                    decoration: InputDecoration(
-                                      labelText: 'Aucune magasin trouvé',
-                                      contentPadding: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 20),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
                                 }
-                              }
-                              return DropdownButtonFormField(
-                                items: [],
-                                onChanged: null,
-                                decoration: InputDecoration(
-                                  labelText: 'Aucune magasin trouvé',
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
+
+                                return DropdownButtonFormField<String>(
+                                  isExpanded: true,
+                                  items: magasinListe
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idMagasin,
+                                          child: Text(
+                                            e.nomMagasin!,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: magasin.idMagasin,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      magasin.idMagasin = newValue;
+                                      if (newValue != null) {
+                                        magasin = magasinListe.firstWhere(
+                                          (magasin) =>
+                                              magasin.idMagasin == newValue,
+                                        );
+                                        print(
+                                            "magasin : ${magasin.nomMagasin}");
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelStyle: TextStyle(
+                                        overflow: TextOverflow.ellipsis),
+                                    labelText: widget.isEditable == false
+                                        ? 'Selectionner un magasin'
+                                        : widget.stock!.magasin!.nomMagasin,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
                                   ),
+                                );
+                              } else {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucune magasin trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucune magasin trouvé',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              );
-                            },
-                          ),
-                    
+                              ),
+                            );
+                          },
+                        ),
                         const SizedBox(height: 10),
-                    
-                       Padding(
+                        Padding(
                           padding: const EdgeInsets.all(8),
                           child: Align(
                               alignment: Alignment.topLeft,
@@ -606,31 +621,55 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                     fontSize: 15, fontWeight: FontWeight.bold),
                               )),
                         ),
-                      
-                       FutureBuilder(
-                            future: uniteListe,
-                            builder: (_, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'En cours de chargement',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
+                        FutureBuilder(
+                          future: uniteListe,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'En cours de chargement',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                );
-                              }
-                              if (snapshot.hasError) {
-                            return  DropdownButtonFormField(
+                                ),
+                              );
+                            }
+                            if (snapshot.hasError) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Probleme de connexion',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+                            if (snapshot.hasData) {
+                              dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+                              if (responseData is List) {
+                                final reponse = responseData;
+                                final uniteListe = reponse
+                                    .map((e) => Unite.fromMap(e))
+                                    .where((con) => con.statutUnite == true)
+                                    .toList();
+
+                                if (uniteListe.isEmpty) {
+                                  return DropdownButtonFormField(
                                     items: [],
                                     onChanged: null,
                                     decoration: InputDecoration(
-                                      labelText: 'Probleme de connexion',
+                                      labelText: 'Aucune unité trouvé',
                                       contentPadding:
                                           const EdgeInsets.symmetric(
                                               vertical: 10, horizontal: 20),
@@ -639,100 +678,77 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                       ),
                                     ),
                                   );
-                              }
-                              if (snapshot.hasData) {
-                                dynamic jsonString =
-                                utf8.decode(snapshot.data.bodyBytes);
-                            dynamic responseData = json.decode(jsonString);
-                                if (responseData is List) {
-                                  final reponse = responseData;
-                                  final uniteListe = reponse
-                                      .map((e) => Unite.fromMap(e))
-                                      .where((con) => con.statutUnite == true)
-                                      .toList();
-                    
-                                  if (uniteListe.isEmpty) {
-                                    return DropdownButtonFormField(
-                                      items: [],
-                                      onChanged: null,
-                                      decoration: InputDecoration(
-                                        labelText: 'Aucune unité trouvé',
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 10, horizontal: 20),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                    
-                                  return DropdownButtonFormField<String>(
-                                   isExpanded: true,
-                                    items: uniteListe
-                                        .map(
-                                          (e) => DropdownMenuItem(
-                                            value: e.idUnite,
-                                            child: Text(e.nomUnite!,
-                                            style:TextStyle(overflow: TextOverflow.ellipsis),
-                                            ),
-                                          ),
-                                        )
-                                        .toList(),
-                                    value: unite.idUnite,
-                                    onChanged: (newValue) {
-                                      setState(() {
-                                        unite.idUnite = newValue;
-                                        if (newValue != null) {
-                                             unite = uniteListe.firstWhere(
-                             (unite) => unite.idUnite == newValue,
-                          );
-                                          print("unité : ${unite.nomUnite}");
-                                        }
-                                      });
-                                    },
-                                    decoration: InputDecoration(
-                                      labelText: widget.isEditable == false ? 'Selectionner une unité' : widget.stock!.unite!.nomUnite ,
-                                      contentPadding: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 20),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
-                                } else {
-                                  return DropdownButtonFormField(
-                                    items: [],
-                                    onChanged: null,
-                                    decoration: InputDecoration(
-                                      labelText: 'Aucune unité trouvé',
-                                      contentPadding: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 20),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
                                 }
-                              }
-                              return DropdownButtonFormField(
-                                items: [],
-                                onChanged: null,
-                                decoration: InputDecoration(
-                                  labelText: 'Aucune unité trouvé',
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
+
+                                return DropdownButtonFormField<String>(
+                                  isExpanded: true,
+                                  items: uniteListe
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idUnite,
+                                          child: Text(
+                                            e.nomUnite!,
+                                            style: TextStyle(
+                                                overflow:
+                                                    TextOverflow.ellipsis),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: unite.idUnite,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      unite.idUnite = newValue;
+                                      if (newValue != null) {
+                                        unite = uniteListe.firstWhere(
+                                          (unite) => unite.idUnite == newValue,
+                                        );
+                                        print("unité : ${unite.nomUnite}");
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: widget.isEditable == false
+                                        ? 'Selectionner une unité'
+                                        : widget.stock!.unite!.nomUnite,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
                                   ),
+                                );
+                              } else {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucune unité trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucune unité trouvé',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              );
-                            },
-                          ),
-                    
+                              ),
+                            );
+                          },
+                        ),
                         const SizedBox(height: 10),
-                    
-                       Padding(
+                        Padding(
                           padding: const EdgeInsets.all(8),
                           child: Align(
                               alignment: Alignment.topLeft,
@@ -742,31 +758,56 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                     fontSize: 15, fontWeight: FontWeight.bold),
                               )),
                         ),
-                      
-                       FutureBuilder(
-                            future: zoneListe,
-                            builder: (_, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'En cours de chargement ...',
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
+                        FutureBuilder(
+                          future: zoneListe,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'En cours de chargement ...',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                );
-                              }
-                              if (snapshot.hasError) {
-                            return  DropdownButtonFormField(
+                                ),
+                              );
+                            }
+                            if (snapshot.hasError) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Probleme de connexion',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+                            if (snapshot.hasData) {
+                              dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+                              if (responseData is List) {
+                                final reponse = responseData;
+                                final zoneListe = reponse
+                                    .map((e) => ZoneProduction.fromMap(e))
+                                    .where((con) => con.statutZone == true)
+                                    .toList();
+
+                                if (zoneListe.isEmpty) {
+                                  return DropdownButtonFormField(
                                     items: [],
                                     onChanged: null,
                                     decoration: InputDecoration(
-                                      labelText: 'Probleme de connexion',
+                                      labelText:
+                                          'Aucune zone de production trouvé',
                                       contentPadding:
                                           const EdgeInsets.symmetric(
                                               vertical: 10, horizontal: 20),
@@ -775,100 +816,80 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                                       ),
                                     ),
                                   );
-                              }
-                              if (snapshot.hasData) {
-                                dynamic jsonString =
-                                utf8.decode(snapshot.data.bodyBytes);
-                            dynamic responseData = json.decode(jsonString);
-                                if (responseData is List) {
-                                  final reponse = responseData;
-                                  final zoneListe = reponse
-                                      .map((e) => ZoneProduction.fromMap(e))
-                                      .where((con) => con.statutZone == true)
-                                      .toList();
-                    
-                                  if (zoneListe.isEmpty) {
-                                    return DropdownButtonFormField(
-                                      items: [],
-                                      onChanged: null,
-                                      decoration: InputDecoration(
-                                        labelText: 'Aucune zone de production trouvé',
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 10, horizontal: 20),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                    
-                                  return DropdownButtonFormField<String>(
-                                isExpanded: true,
-                                    items: zoneListe
-                                        .map(
-                                          (e) => DropdownMenuItem(
-                                            value: e.idZoneProduction,
-                                            child: Text(e.nomZoneProduction!,
-                                            style:TextStyle(overflow: TextOverflow.ellipsis),
-                                            ),
-                                          ),
-                                        )
-                                        .toList(),
-                                    value: zoneProduction.idZoneProduction,
-                                    onChanged: (newValue) {
-                                      setState(() {
-                                        zoneProduction.idZoneProduction = newValue;
-                                        if (newValue != null) {
-                                   zoneProduction = zoneListe.firstWhere(
-                             (zone) => zone.idZoneProduction == newValue,
-                                );
-                                          print("zone de production : ${zoneProduction}");
-                                        }
-                                      });
-                                    },
-                                    decoration: InputDecoration(
-                                     labelText: widget.isEditable == false ? 'Selectionner une zone de production' : widget.stock!.zoneProduction!.nomZoneProduction,
-                                      contentPadding: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 20),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
-                                } else {
-                                  return DropdownButtonFormField(
-                                    items: [],
-                                    onChanged: null,
-                                    decoration: InputDecoration(
-                                      labelText:  'Aucune zone de production trouvé',
-                                      contentPadding: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 20),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
                                 }
-                              }
-                              return DropdownButtonFormField(
-                                items: [],
-                                onChanged: null,
-                                decoration: InputDecoration(
-                                  labelText: 'Aucune zone de production trouvé',
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 20),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
+
+                                return DropdownButtonFormField<String>(
+                                  isExpanded: true,
+                                  items: zoneListe
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idZoneProduction,
+                                          child: Text(
+                                            e.nomZoneProduction!,
+                                            style: TextStyle(
+                                                overflow:
+                                                    TextOverflow.ellipsis),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: zoneProduction.idZoneProduction,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      zoneProduction.idZoneProduction =
+                                          newValue;
+                                      if (newValue != null) {
+                                        zoneProduction = zoneListe.firstWhere(
+                                          (zone) =>
+                                              zone.idZoneProduction == newValue,
+                                        );
+                                        print(
+                                            "zone de production : ${zoneProduction}");
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: widget.isEditable == false
+                                        ? 'Selectionner une zone de production'
+                                        : widget.stock!.zoneProduction!
+                                            .nomZoneProduction,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
                                   ),
+                                );
+                              } else {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText:
+                                        'Aucune zone de production trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucune zone de production trouvé',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              );
-                            },
-                          ),
-                    
-                      
-                  
-                    
+                              ),
+                            );
+                          },
+                        ),
                         const SizedBox(
                           height: 20,
                         ),
@@ -878,8 +899,7 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
                               // Handle button press action here
                               if (_formKey.currentState!.validate()) {
                                 handleButtonPress();
-                                    // debugPrint("zone : ${zoneProduction.nomZoneProduction}, unite : ${unite.nomUnite} , magasin: ${magasin.nomMagasin}, spec : ${speculation.nomSpeculation}");
-
+                                // debugPrint("zone : ${zoneProduction.nomZoneProduction}, unite : ${unite.nomUnite} , magasin: ${magasin.nomMagasin}, spec : ${speculation.nomSpeculation}");
                               }
                             },
                             style: ElevatedButton.styleFrom(
@@ -911,5 +931,4 @@ class _AddAndUpdateProductEndSreenState extends State<AddAndUpdateProductEndSree
       ),
     );
   }
-  
 }

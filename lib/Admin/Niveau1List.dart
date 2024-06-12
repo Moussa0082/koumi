@@ -6,6 +6,10 @@ import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/Niveau1Service.dart';
 import 'package:provider/provider.dart';
+import 'package:koumi_app/constants.dart';
+import 'package:http/http.dart' as http;
+import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 
 class Niveau1List extends StatefulWidget {
   final Pays pays;
@@ -19,8 +23,8 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _Niveau1ListState extends State<Niveau1List> {
-  late ParametreGeneraux para;
-  List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para;
+  // List<ParametreGeneraux> paraList = [];
 
   late TextEditingController _searchController;
   late Pays payss;
@@ -31,12 +35,45 @@ class _Niveau1ListState extends State<Niveau1List> {
     return await Niveau1Service().fetchNiveau1ByPays(widget.pays.idPays!);
   }
 
+  bool isLoadingLibelle = true;
+    String? libelleNiveau1Pays;
+     late Acteur acteur;
+ 
+  Future<String> getlibelleNiveau1PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau1Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau2Pays');
+    }
+ }
+
+    Future<void> fetchPaysDataByActor() async {
+    try {
+      String libelle2 = await getlibelleNiveau1PaysByActor(acteur.idActeur!);
+
+      setState(() { 
+        libelleNiveau1Pays = libelle2;
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
+  
   @override
   void initState() {
     super.initState();
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
-    para = paraList[0];
+    // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+    //     .parametreList!;
+    // para = paraList[0];
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    fetchPaysDataByActor();
     _liste = getSousListe();
     _searchController = TextEditingController();
   }

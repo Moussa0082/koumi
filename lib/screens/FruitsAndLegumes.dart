@@ -28,7 +28,7 @@ class _FruitAndLegumesState extends State<FruitAndLegumes> {
   ScrollController scrollableController = ScrollController();
 
   String libelle = "Végétale";
-  String? monnaie;
+  // String? monnaie;
   int page = 0;
   bool isLoading = false;
   int size = 6;
@@ -361,8 +361,8 @@ class _FruitAndLegumesState extends State<FruitAndLegumes> {
                                                           .symmetric(
                                                           horizontal: 15),
                                                       child: Text(
-                                                        monnaie != null
-                                                            ? "${filteredSearch[index].prix.toString()} ${monnaie}"
+                                                        filteredSearch[index].monnaie != null
+                                                            ? "${filteredSearch[index].prix.toString()} ${filteredSearch[index].monnaie!.libelle}"
                                                             : "${filteredSearch[index].prix.toString()} FCFA ",
                                                         style: TextStyle(
                                                           fontSize: 15,

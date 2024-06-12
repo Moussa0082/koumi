@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:path/path.dart';
@@ -16,7 +17,7 @@ class VehiculeService extends ChangeNotifier {
   List<Vehicule> vehiculeList = [];
     int page = 0;
   bool isLoading = false;
-   int size = 4;
+  int size = 4;
   bool hasMore = true;
 
   Future<void> addVehicule(
@@ -29,7 +30,9 @@ class VehiculeService extends ChangeNotifier {
       required String nbKilometrage,
         File? photoVehicule,
       required TypeVoiture typeVoiture,
-      required Acteur acteur}) async {
+      required Acteur acteur,
+      required Monnaie monnaie
+      }) async {
     try {
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/create'));
 
@@ -50,6 +53,7 @@ class VehiculeService extends ChangeNotifier {
         'capaciteVehicule': capaciteVehicule,
         'typeVoiture':typeVoiture.toMap(),
         'acteur': acteur.toMap(),
+        'monnaie': monnaie.toMap()
       });
 
       var response = await requete.send();
@@ -78,7 +82,9 @@ class VehiculeService extends ChangeNotifier {
       required String nbKilometrage,
       File? photoVehicule,
       required TypeVoiture typeVoiture,
-      required Acteur acteur}) async {
+      required Acteur acteur,
+      required Monnaie monnaie
+      }) async {
     try {
       var requete = http.MultipartRequest(
           'PUT', Uri.parse('$baseUrl/update/$idVehicule'));
@@ -101,6 +107,7 @@ class VehiculeService extends ChangeNotifier {
         'capaciteVehicule': capaciteVehicule,
         'typeVoiture': typeVoiture.toMap(),
         'acteur': acteur.toMap(),
+        'monnaie': monnaie.toMap(),
       });
 
       var response = await requete.send();
@@ -115,7 +122,7 @@ class VehiculeService extends ChangeNotifier {
       }
     } catch (e) {
       throw Exception(
-          'Une erreur s\'est produite lors de l\'ajout de acteur : $e');
+          'Une erreur s\'est produite lors de la modification : $e');
     }
   }
 

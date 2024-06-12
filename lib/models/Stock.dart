@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -7,6 +6,7 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Commande.dart';
 import 'package:koumi_app/models/Forme.dart';
 import 'package:koumi_app/models/Magasin.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/Unite.dart';
 import 'package:koumi_app/models/ZoneProduction.dart';
@@ -32,6 +32,7 @@ class Stock {
    Unite? unite;
    Magasin? magasin;
    Acteur? acteur;
+   Monnaie? monnaie;
 
   Stock({
     this.idStock,
@@ -54,6 +55,7 @@ class Stock {
      this.unite,
      this.magasin,
      this.acteur,
+     this.monnaie
   });
 
   
@@ -82,6 +84,7 @@ class Stock {
       'unite': unite?.toMap(),
       'magasin': magasin?.toMap(),
       'acteur': acteur?.toMap(),
+      'monnaie' : monnaie?.toMap(),
     };
   }
 
@@ -117,6 +120,9 @@ class Stock {
     acteur: map['acteur'] != null
         ? Acteur.fromMap(map['acteur'] as Map<String, dynamic>)
         : Acteur(),
+    monnaie: map['monnaie'] != null
+        ? Monnaie.fromMap(map['monnaie'] as Map<String, dynamic>)
+        : Monnaie(),
   
   );
 }

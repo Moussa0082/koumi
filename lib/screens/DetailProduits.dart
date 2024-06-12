@@ -428,7 +428,7 @@ class _DetailProduitsState extends State<DetailProduits>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '${widget.stock.prix!.toInt()} (${monnaie})', // Convertir en entier
+                            '${widget.stock.prix!.toInt()} (${widget.stock.monnaie!.libelle})', // Convertir en entier
                             style: const TextStyle(
                               overflow: TextOverflow.ellipsis,
                                 fontSize: 20, fontWeight: FontWeight.bold),

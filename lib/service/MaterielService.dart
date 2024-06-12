@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Materiel.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:path/path.dart';
 
@@ -29,6 +30,7 @@ class MaterielService extends ChangeNotifier {
     required String etatMateriel,
     required Acteur acteur,
     required TypeMateriel typeMateriel,
+    required Monnaie monnaie,
   }) async {
     try {
       var requete =
@@ -49,6 +51,7 @@ class MaterielService extends ChangeNotifier {
         'etatMateriel': etatMateriel,
         'acteur': acteur.toMap(),
         'typeMateriel': typeMateriel.toMap(),
+        'monnaie': monnaie.toMap()
       });
 
       var response = await requete.send();
@@ -77,6 +80,7 @@ class MaterielService extends ChangeNotifier {
     required String etatMateriel,
     required Acteur acteur,
       required TypeMateriel typeMateriel,
+      required Monnaie monnaie
   }) async {
     try {
       var requete = http.MultipartRequest(
@@ -98,6 +102,7 @@ class MaterielService extends ChangeNotifier {
         'etatMateriel': etatMateriel,
         'acteur': acteur.toMap(),
         'typeMateriel': typeMateriel.toMap(),
+          'monnaie': monnaie.toMap()
       });
 
       var response = await requete.send();

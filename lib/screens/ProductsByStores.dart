@@ -40,8 +40,8 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
   
   late Acteur acteur = Acteur();
   late List<TypeActeur> typeActeurData = [];
-  List<ParametreGeneraux> paraList = [];
-  late ParametreGeneraux para = ParametreGeneraux();
+  // List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para = ParametreGeneraux();
   late String type;
   late TextEditingController _searchController;
   List<Stock> stockListe = [];
@@ -62,35 +62,35 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
   bool hasMore = true;
 
       bool isLoadingLibelle = true;
-    String? monnaie;
+    // String? monnaie;
 
 
-   Future<String> getMonnaieByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+//    Future<String> getMonnaieByActor(String id) async {
+//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
 
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load monnaie');
-    }
-}
+//     if (response.statusCode == 200) {
+//       print("libelle : ${response.body}");
+//       return response.body;  // Return the body directly since it's a plain string
+//     } else {
+//       throw Exception('Failed to load monnaie');
+//     }
+// }
 
- Future<void> fetchPaysDataByActor() async {
-    try {
-      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+//  Future<void> fetchPaysDataByActor() async {
+//     try {
+//       String monnaies = await getMonnaieByActor(acteur.idActeur!);
 
-      setState(() { 
-        monnaie = monnaies;
-        isLoadingLibelle = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-        });
-      print('Error: $e');
-    }
-  }
+//       setState(() { 
+//         monnaie = monnaies;
+//         isLoadingLibelle = false;
+//       });
+//     } catch (e) {
+//       setState(() {
+//         isLoadingLibelle = false;
+//         });
+//       print('Error: $e');
+//     }
+//   }
 
 
   void verify() async {
@@ -279,17 +279,17 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
 
  
 
-  void verifyParam() {
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+  // void verifyParam() {
+  //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+  //       .parametreList!;
 
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
-    } else {
-      // Gérer le cas où la liste est null ou vide, par exemple :
-      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
-    }
-  }
+  //   if (paraList.isNotEmpty) {
+  //     para = paraList[0];
+  //   } else {
+  //     // Gérer le cas où la liste est null ou vide, par exemple :
+  //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+  //   }
+  // }
 
   @override
   void initState() {
@@ -317,7 +317,7 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
     // updateStockList();
       
     stockListeFuture = stockListeFuture1 = getAllStock();
-    fetchPaysDataByActor();
+    // fetchPaysDataByActor();
   }
 
   @override
@@ -833,8 +833,8 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                                                 padding: const EdgeInsets.symmetric(
                                                     horizontal: 15),
                                                 child: Text(
-                                                  monnaie != null
-                                                      ? "${stockListe[index].prix.toString()} ${monnaie}"
+                                                   stockListe[index].monnaie != null
+                                                      ? "${stockListe[index].prix.toString()} ${ stockListe[index].monnaie!.libelle}"
                                                       : "${stockListe[index].prix.toString()} ",
                                                   style: TextStyle(
                                                     fontSize: 15,
@@ -1087,8 +1087,8 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                                                 padding: const EdgeInsets.symmetric(
                                                     horizontal: 15),
                                                 child: Text(
-                                                  monnaie != null
-                                                      ? "${stockListe[index].prix.toString()} ${monnaie}"
+                                                   stockListe[index].monnaie != null
+                                                      ? "${stockListe[index].prix.toString()} ${ stockListe[index].monnaie!.libelle}"
                                                       : "${stockListe[index].prix.toString()} FCFA",
                                                   style: TextStyle(
                                                     fontSize: 15,

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:http/http.dart' as http;
@@ -7,17 +8,13 @@ import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Intrant.dart';
-import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddIntrant.dart';
 import 'package:koumi_app/screens/DetailIntrant.dart';
 import 'package:koumi_app/screens/ListeIntrantByActeur.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -39,8 +36,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
   late String type;
   late TextEditingController _searchController;
   List<Intrant> intrantListe = [];
-  List<ParametreGeneraux> paraList = [];
-  late ParametreGeneraux para = ParametreGeneraux();
+  // List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para = ParametreGeneraux();
   String? catValue;
   late Future _typeList;
   CategorieProduit? selectedType;
@@ -55,35 +52,35 @@ class _IntrantScreenState extends State<IntrantScreen> {
     late Future<List<Intrant>> intrantListeFuture1;
 
     bool isLoadingLibelle = true;
-    String? monnaie;
+    // String? monnaie;
 
 
-  Future<String> getMonnaieByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+//   Future<String> getMonnaieByActor(String id) async {
+//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
 
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load monnaie');
-    }
-}
+//     if (response.statusCode == 200) {
+//       print("libelle : ${response.body}");
+//       return response.body;  // Return the body directly since it's a plain string
+//     } else {
+//       throw Exception('Failed to load monnaie');
+//     }
+// }
 
- Future<void> fetchPaysDataByActor() async {
-    try {
-      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+//  Future<void> fetchPaysDataByActor() async {
+//     try {
+//       String monnaies = await getMonnaieByActor(acteur.idActeur!);
 
-      setState(() { 
-        monnaie = monnaies;
-        isLoadingLibelle = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-        });
-      print('Error: $e');
-    }
-  }
+//       setState(() { 
+//         monnaie = monnaies;
+//         isLoadingLibelle = false;
+//       });
+//     } catch (e) {
+//       setState(() {
+//         isLoadingLibelle = false;
+//         });
+//       print('Error: $e');
+//     }
+//   }
 
 
 
@@ -271,12 +268,12 @@ class _IntrantScreenState extends State<IntrantScreen> {
   void initState() {
     super.initState();
     verify();
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+    // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+    //     .parametreList!;
 
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
-    }
+    // if (paraList.isNotEmpty) {
+    //   para = paraList[0];
+    // }
     _searchController = TextEditingController();
     _typeList = http
         .get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
@@ -699,9 +696,9 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 15),
                                           child: Text(
-                                            monnaie != null
-                                                ? "${intrantListe[index].prixIntrant.toString()} ${monnaie}"
-                                                : "${intrantListe[index].prixIntrant.toString()} '' ",
+                                            intrantListe[index].monnaie != null
+                                                ? "${intrantListe[index].prixIntrant.toString()} ${ intrantListe[index].monnaie!.libelle}"
+                                                : "${intrantListe[index].prixIntrant.toString()} FCFA ",
                                             style: TextStyle(
                                               fontSize: 15,
                                               color: Colors.black87,
@@ -942,8 +939,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 15),
                                           child: Text(
-                                            para.monnaie != null
-                                                ? "${e.prixIntrant.toString()} ${para.monnaie}"
+                                            e.monnaie != null
+                                                ? "${e.prixIntrant.toString()} ${e.monnaie!.libelle}"
                                                 : "${e.prixIntrant.toString()} FCFA",
                                             style: TextStyle(
                                               fontSize: 15,

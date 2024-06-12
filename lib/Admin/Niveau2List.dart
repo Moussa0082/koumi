@@ -4,9 +4,7 @@ import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/models/Niveau2Pays.dart';
-import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/service/Niveau2Service.dart';
 import 'package:provider/provider.dart';
@@ -23,10 +21,10 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _Niveau2ListState extends State<Niveau2List> {
-  late ParametreGeneraux para;
+  // late ParametreGeneraux para;
+  // List<ParametreGeneraux> paraList = [];
   List<Niveau2Pays> niveauList = [];
   late Future<List<Niveau2Pays>> _liste;
-  List<ParametreGeneraux> paraList = [];
   late TextEditingController _searchController;
   late Acteur acteur;
 
@@ -44,7 +42,7 @@ class _Niveau2ListState extends State<Niveau2List> {
     }
  }
 
-     Future<void> fetchPaysDataByActor() async {
+    Future<void> fetchPaysDataByActor() async {
     try {
       String libelle2 = await getLibelleNiveau2PaysByActor(acteur.idActeur!);
 
@@ -70,11 +68,11 @@ class _Niveau2ListState extends State<Niveau2List> {
   void initState() {
     super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-   fetchPaysDataByActor();
+    fetchPaysDataByActor();
     _searchController = TextEditingController();
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
-    para = paraList[0];
+    // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+    //     .parametreList!;
+    // para = paraList[0];
     _liste = getNiveauListe();
   }
 
