@@ -69,7 +69,7 @@ class CampagneService extends ChangeNotifier {
       return campagneList;
     } else {
       campagneList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête campagne avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }
@@ -83,7 +83,7 @@ class CampagneService extends ChangeNotifier {
       return campagneList;
     } else {
       campagneList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête cp acteur avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }

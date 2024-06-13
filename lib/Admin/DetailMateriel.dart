@@ -9,10 +9,12 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Device.dart';
 import 'package:koumi_app/models/Materiel.dart';
 import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/service/DeviceService.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
@@ -58,12 +60,12 @@ class _DetailMaterielState extends State<DetailMateriel> {
   String niveau3 = '';
   late Materiel materiels;
   bool _isEditing = false;
-
   bool isExist = false;
   String? email = "";
-
+  // late List<Device> devices = [];
+  // late Future<List<Device>> _listeDevice;
   bool isLoadingLibelle = true;
-  // String? monnaie;
+  late Future<Map<String, String>> rates;
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -83,33 +85,44 @@ class _DetailMaterielState extends State<DetailMateriel> {
     }
   }
 
-//      Future<String> getMonnaieByActor(String id) async {
-//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+  Future<List<Device>> getDeviceListe(String id) async {
+    return await DeviceService().fetchDeviceByIdMonnaie(id);
+  }
 
-//     if (response.statusCode == 200) {
-//       print("libelle : ${response.body}");
-//       return response.body;  // Return the body directly since it's a plain string
-//     } else {
-//       throw Exception('Failed to load monnaie');
-//     }
-// }
+  Future<Map<String, String>> fetchConvert(Materiel materiel) async {
+    Monnaie monnaie = materiel.monnaie!;
+    int? amount = materiel.prixParHeure;
+    Map<String, String> result = {};
 
-// Future<void> fetchPaysDataByActor() async {
-//     try {
+    try {
+      List<Device> devices = await getDeviceListe(monnaie.idMonnaie!);
 
-//       // String monnaies = await getMonnaieByActor(acteur.idActeur!);
+      for (var device in devices) {
+        double convertedAmount = amount * device.taux!;
+        String amountSubString = convertedAmount.toStringAsFixed(2);
+        ;
+        print(amountSubString);
+        switch (device.nomDevice!.toLowerCase()) {
+          case 'dollar':
+            result[device.sigle!] = amountSubString;
+            break;
+          case 'euro':
+            result[device.sigle!] = amountSubString;
+            break;
+          case 'yuan':
+            result[device.sigle!] = amountSubString;
+            break;
+          default:
+            print('Aucune devise trouvée pour ${device.nomDevice}');
+        }
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
 
-//       setState(() {
-//         monnaie = monnaies;
-//         isLoadingLibelle = false;
-//       });
-//     } catch (e) {
-//       setState(() {
-//         isLoadingLibelle = false;
-//         });
-//       print('Error: $e');
-//     }
-//   }
+    print("conversion : ${result.toString()}");
+    return result;
+  }
 
   Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
@@ -294,6 +307,8 @@ class _DetailMaterielState extends State<DetailMateriel> {
 
     _niveau3List = http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/read'));
     materiels = widget.materiel;
+    rates = fetchConvert(materiels);
+    print("rates ${rates.toString()}");
     _nomController.text = materiels.nom;
     _descriptionController.text = materiels.description;
     _etatController.text = materiels.etatMateriel;
@@ -484,6 +499,21 @@ class _DetailMaterielState extends State<DetailMateriel> {
         //     "${materiels.prixParHeure.toString()} ${para.monnaie}"):
         _buildItem('Prix par heure : ',
             "${materiels.prixParHeure.toString()} ${materiels.monnaie!.libelle}"),
+        
+        FutureBuilder<Map<String, String>>(
+          future: rates,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else {
+              return Column(
+                children: snapshot.data!.entries.map((entry) {
+                  return _buildItem("Prix en ${entry.key}", "${entry.value}");
+                }).toList(),
+              );
+            }
+          },
+        ),
         _buildItem('Date d\'ajout : ', materiels.dateAjout!),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),

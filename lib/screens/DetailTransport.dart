@@ -9,15 +9,14 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Device.dart';
 import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
-import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/models/Vehicule.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
-import 'package:koumi_app/screens/DetailProduits.dart';
+import 'package:koumi_app/service/DeviceService.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
@@ -76,39 +75,57 @@ class _DetailTransportState extends State<DetailTransport> {
   List<String> selectedDestinations = [];
   Map<String, int> newPrixParDestinations = {};
   List<String?> selectedDestinationsList = [];
+  late Future<Map<String, Map<String, String>>> rates;
 
   bool isExist = false;
   String? email = "";
   bool isLoadingLibelle = true;
   String? libelleNiveau3Pays;
-  //  String? monnaie;
 
-//    Future<String> getMonnaieByActor(String id) async {
-//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+  Future<List<Device>> getDeviceListe(String id) async {
+    try {
+      return await DeviceService().fetchDeviceByIdMonnaie(id);
+    } catch (e) {
+      print('Failed to fetch devices: $e');
+      return [];
+    }
+  }
 
-//     if (response.statusCode == 200) {
-//       print("libelle : ${response.body}");
-//       return response.body;  // Return the body directly since it's a plain string
-//     } else {
-//       throw Exception('Failed to load monnaie');
-//     }
-// }
+ Future<Map<String, Map<String, String>>> fetchConvert(
+      Vehicule vehicule) async {
+    Monnaie monnaie = vehicule.monnaie!;
+    Map<String, Map<String, String>> result = {};
 
-//  Future<void> fetchPaysDataByActor() async {
-//     try {
-//       String monnaies = await getMonnaieByActor(acteur.idActeur!);
+    try {
+      List<Device> devices = await getDeviceListe(monnaie.idMonnaie!);
 
-//       setState(() {
-//         monnaie = monnaies;
-//         isLoadingLibelle = false;
-//       });
-//     } catch (e) {
-//       setState(() {
-//         isLoadingLibelle = false;
-//         });
-//       print('Error: $e');
-//     }
-//   }
+      vehicule.prixParDestination.forEach((destination, prix) {
+        Map<String, String> convertedPrices = {};
+        for (var device in devices) {
+          double convertedAmount = prix * device.taux!;
+          String amountSubString = convertedAmount.toStringAsFixed(2);
+          print(amountSubString);
+
+          switch (device.nomDevice!.toLowerCase()) {
+            case 'dollar':
+            case 'euro':
+            case 'yuan':
+              convertedPrices[device.sigle!] = amountSubString;
+              break;
+            default:
+              print('Aucune devise trouvée pour ${device.nomDevice}');
+          }
+        }
+        result[destination] = convertedPrices;
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
+
+    print("Conversion : ${result.toString()}");
+    return result;
+  }
+
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -208,6 +225,8 @@ class _DetailTransportState extends State<DetailTransport> {
 
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/nivveau3Pays/read'));
     vehicules = widget.vehicule;
+    rates = fetchConvert(vehicules);
+    print("rates ${rates.toString()}");
     typeVoiture = vehicules.typeVoiture;
     prixParDestinations = vehicules.prixParDestination;
     _nomController.text = vehicules.nomVehicule;
@@ -225,7 +244,7 @@ class _DetailTransportState extends State<DetailTransport> {
       _destinationControllers.add(destinationController);
       _prixControllers.add(prixController);
     });
-      monnaie = vehicules.monnaie!;
+    monnaie = vehicules.monnaie!;
     monnaieValue = vehicules.monnaie!.idMonnaie;
     _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
     isDialOpenNotifier = ValueNotifier<bool>(false);
@@ -355,19 +374,18 @@ class _DetailTransportState extends State<DetailTransport> {
       if (photo != null) {
         await VehiculeService()
             .updateVehicule(
-              idVehicule: vehicules.idVehicule,
-              nomVehicule: nom,
-              capaciteVehicule: capacite,
-              prixParDestination: newPrixParDestinations,
-              etatVehicule: etat,
-              photoVehicule: photo,
-              localisation: localite,
-              description: description,
-              nbKilometrage: nb.toString(),
-              typeVoiture: typeVoiture,
-              acteur: acteur,
-              monnaie : monnaie
-            )
+                idVehicule: vehicules.idVehicule,
+                nomVehicule: nom,
+                capaciteVehicule: capacite,
+                prixParDestination: newPrixParDestinations,
+                etatVehicule: etat,
+                photoVehicule: photo,
+                localisation: localite,
+                description: description,
+                nbKilometrage: nb.toString(),
+                typeVoiture: typeVoiture,
+                acteur: acteur,
+                monnaie: monnaie)
             .then((value) => {
                   setState(() {
                     vehicules = Vehicule(
@@ -396,18 +414,17 @@ class _DetailTransportState extends State<DetailTransport> {
       } else {
         await VehiculeService()
             .updateVehicule(
-              idVehicule: vehicules.idVehicule,
-              nomVehicule: nom,
-              capaciteVehicule: capacite,
-              prixParDestination: newPrixParDestinations,
-              etatVehicule: etat,
-              localisation: localite,
-              description: description,
-              nbKilometrage: nb.toString(),
-              typeVoiture: typeVoiture,
-              acteur: acteur,
-              monnaie: monnaie
-            )
+                idVehicule: vehicules.idVehicule,
+                nomVehicule: nom,
+                capaciteVehicule: capacite,
+                prixParDestination: newPrixParDestinations,
+                etatVehicule: etat,
+                localisation: localite,
+                description: description,
+                nbKilometrage: nb.toString(),
+                typeVoiture: typeVoiture,
+                acteur: acteur,
+                monnaie: monnaie)
             .then((value) => {
                   setState(() {
                     vehicules = Vehicule(
@@ -424,7 +441,7 @@ class _DetailTransportState extends State<DetailTransport> {
                       typeVoiture: typeVoiture,
                       acteur: acteur,
                       statutVehicule: vehicules.statutVehicule,
-                      monnaie:monnaie,
+                      monnaie: monnaie,
                     );
                     _isLoading = false;
                   }),
@@ -472,18 +489,17 @@ class _DetailTransportState extends State<DetailTransport> {
                       icon:
                           const Icon(Icons.arrow_back_ios, color: d_colorGreen),
                     ),
-              title: _isEditing 
-                ?
-              Text(
-                'Modification',
-                style: const TextStyle(
-                    color: d_colorGreen, fontWeight: FontWeight.bold),
-              ):
-              Text(
-                'Transport',
-                style: const TextStyle(
-                    color: d_colorGreen, fontWeight: FontWeight.bold),
-              ),
+              title: _isEditing
+                  ? Text(
+                      'Modification',
+                      style: const TextStyle(
+                          color: d_colorGreen, fontWeight: FontWeight.bold),
+                    )
+                  : Text(
+                      'Transport',
+                      style: const TextStyle(
+                          color: d_colorGreen, fontWeight: FontWeight.bold),
+                    ),
               actions: acteur.idActeur == vehicules.acteur.idActeur
                   ? [
                       _isEditing
@@ -763,7 +779,7 @@ class _DetailTransportState extends State<DetailTransport> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
@@ -881,12 +897,12 @@ class _DetailTransportState extends State<DetailTransport> {
                                                           14)), // réduire la taille du texte
                                             ))
                                         .toList(),
-                                      value: selectedDestinationsList[index],
+                                    value: selectedDestinationsList[index],
                                     onChanged: (newValue) {
                                       setState(() {
                                         selectedDestinationsList[index] =
                                             newValue;
-                                         String selectedDestinationName =
+                                        String selectedDestinationName =
                                             niveau3List
                                                 .firstWhere((element) =>
                                                     element.idNiveau3Pays ==
@@ -1193,8 +1209,36 @@ class _DetailTransportState extends State<DetailTransport> {
                         vehicules.prixParDestination.keys.elementAt(index);
                     int prix =
                         vehicules.prixParDestination.values.elementAt(index);
-                    return _buildItem(
-                        destination, "${prix.toString()} ${vehicules.monnaie!.libelle!}");
+                    return Column(
+                      children: [
+                        _buildItem(destination,
+                            "${prix.toString()} ${vehicules.monnaie!.libelle!}"),
+                        FutureBuilder<Map<String, Map<String, String>>>(
+                          future: rates,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            } else {
+                              Map<String, String>? convertedPrices =
+                                  snapshot.data?[destination];
+                              if (convertedPrices != null) {
+                                return Column(
+                                  children:
+                                      convertedPrices.entries.map((entry) {
+                                    return _buildItem("Prix en ${entry.key}",
+                                        "${entry.value}");
+                                  }).toList(),
+                                );
+                              } else {
+                                return Text(
+                                    '');
+                              }
+                            }
+                          },
+                        )
+                      ],
+                    );
                   }),
                 ),
               ),

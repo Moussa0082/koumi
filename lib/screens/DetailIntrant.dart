@@ -1,26 +1,25 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Device.dart';
 import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/Monnaie.dart';
-import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
-import 'package:koumi_app/screens/DetailProduits.dart';
+import 'package:koumi_app/service/DeviceService.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:path/path.dart' as path;
-import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
@@ -62,6 +61,46 @@ class _DetailIntrantState extends State<DetailIntrant> {
   bool isExist = false;
   String? email = "";
   bool isLoadingLibelle = true;
+  late Future<Map<String, String>> rates;
+
+  Future<List<Device>> getDeviceListe(String id) async {
+    return await DeviceService().fetchDeviceByIdMonnaie(id);
+  }
+
+  Future<Map<String, String>> fetchConvert(Intrant intrant) async {
+    Monnaie monnaie = intrant.monnaie!;
+    int? amount = intrant.prixIntrant;
+    Map<String, String> result = {};
+
+    try {
+      List<Device> devices = await getDeviceListe(monnaie.idMonnaie!);
+
+      for (var device in devices) {
+        double convertedAmount = amount! * device.taux!;
+        String amountSubString = convertedAmount.toStringAsFixed(2);
+        print(amountSubString);
+        switch (device.nomDevice!.toLowerCase()) {
+          case 'dollar':
+            result[device.sigle!] = amountSubString;
+            break;
+          case 'euro':
+            result[device.sigle!] = amountSubString;
+            break;
+          case 'yuan':
+            result[device.sigle!] = amountSubString;
+            break;
+          default:
+            print('Aucune devise trouvée pour ${device.nomDevice}');
+        }
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+
+    print("conversion : ${result.toString()}");
+    return result;
+  }
+
   //  String? monnaie;
 
 //    Future<String> getMonnaieByActor(String id) async {
@@ -131,6 +170,8 @@ class _DetailIntrantState extends State<DetailIntrant> {
     // fetchPaysDataByActor();
     // verifyParam();
     intrants = widget.intrant;
+    rates = fetchConvert(intrants);
+    print("rates ${rates.toString()}");
     _nomController.text = intrants.nomIntrant!;
     _descriptionController.text = intrants.descriptionIntrant!;
     _quantiteController.text = intrants.quantiteIntrant.toString();
@@ -797,6 +838,20 @@ class _DetailIntrantState extends State<DetailIntrant> {
             ? _buildItem('Prix ',
                 '${intrants.prixIntrant.toString()} ${intrants.monnaie!.libelle}')
             : _buildItem('Prix ', '${intrants.prixIntrant.toString()} '),
+        FutureBuilder<Map<String, String>>(
+          future: rates,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else {
+              return Column(
+                children: snapshot.data!.entries.map((entry) {
+                  return _buildItem("Prix en ${entry.key}", "${entry.value}");
+                }).toList(),
+              );
+            }
+          },
+        ),
         _buildItem('Unité ', '${intrants.unite}'),
         _buildItem('Forme ', '${intrants.forme!.libelleForme}'),
         _buildItem('Statut ',

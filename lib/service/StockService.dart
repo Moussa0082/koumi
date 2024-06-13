@@ -368,7 +368,7 @@ class StockService extends ChangeNotifier {
         debugPrint("response body stock by categorie and magasin with pagination $page par défilement soit ${stockList.length}");
        return stockList;
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête stock cat mag pag avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {
@@ -433,7 +433,7 @@ class StockService extends ChangeNotifier {
 
         debugPrint("response body all stock by acteur with pagination ${page} par défilement soit ${stockList.length}");
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête stock ac avec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
     } catch (e) {
       print('Une erreur s\'est produite lors de la récupération des stocks: $e');
@@ -471,7 +471,7 @@ class StockService extends ChangeNotifier {
 
         debugPrint("response body all stock by acteur with pagination ${page} par défilement soit ${stockList.length}");
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête  stoc pag ac avec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
     } catch (e) {
       print('Une erreur s\'est produite lors de la récupération des stocks: $e');
@@ -519,7 +519,7 @@ class StockService extends ChangeNotifier {
         debugPrint("response body  stock by magasin with pagination $page par défilement soit ${stockList.length}");
        return stockList;
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête pag avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {

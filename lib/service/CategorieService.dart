@@ -75,7 +75,7 @@ class CategorieService extends ChangeNotifier {
       return categorieList;
     } else {
       
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête categorie avec le code d\'état: ${response.statusCode}');
       return categorieList = [];
     }
   }
@@ -93,7 +93,7 @@ class CategorieService extends ChangeNotifier {
       return categorieList;
     } else {
       categorieList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête cat filiere avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }

@@ -163,7 +163,7 @@ class IntrantService extends ChangeNotifier {
         debugPrint("response body all intrant with pagination $page par défilement soit ${intrantList.length}");
        return intrantList;
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête intrant pag avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {
@@ -213,7 +213,7 @@ class IntrantService extends ChangeNotifier {
         debugPrint("response body intrant by categorie with pagination $page par défilement soit ${intrantList.length}");
        return intrantList;
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête intrant cat avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {
@@ -262,7 +262,7 @@ class IntrantService extends ChangeNotifier {
         debugPrint("response body intrant by acteur with pagination $page par défilement soit ${intrantList.length}");
        return intrantList;
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête intrant act avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {

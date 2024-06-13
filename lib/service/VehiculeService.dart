@@ -139,7 +139,7 @@ class VehiculeService extends ChangeNotifier {
       return vehiculeList;
     } else {
       vehiculeList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête  v type avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }
@@ -180,7 +180,7 @@ class VehiculeService extends ChangeNotifier {
         debugPrint("response body all vehicle with pagination $page par défilement soit ${vehiculeList.length}");
        return vehiculeList;
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête v type pag avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {
@@ -230,7 +230,7 @@ class VehiculeService extends ChangeNotifier {
         debugPrint("response body vehicle by type vehicule with pagination $page par défilement soit ${vehiculeList.length}");
        return vehiculeList;
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête v type pag avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {
@@ -270,7 +270,7 @@ class VehiculeService extends ChangeNotifier {
 
         debugPrint("response body all vehicule by acteur with pagination ${page} par défilement soit ${vehiculeList.length}");
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête v ac avec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
     } catch (e) {
       print('Une erreur s\'est produite lors de la récupération des vehicule: $e');

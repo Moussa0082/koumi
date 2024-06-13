@@ -45,7 +45,7 @@ Future<List<MessageWa>> fetchMessage() async {
       return messageList;
     } else {
       messageList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête mess avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }
@@ -60,7 +60,7 @@ Future<List<MessageWa>> fetchMessageByActeur(String idActeur) async {
       return messageList;
     } else {
       messageList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête mesa acteur avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }

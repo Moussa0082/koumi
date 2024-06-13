@@ -163,7 +163,7 @@ class MaterielService extends ChangeNotifier {
       debugPrint(response.body);
       return materielList;
     } else {
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête mat type avec le code d\'état: ${response.statusCode}');
        return  materielList = [];
     }
   }
@@ -202,7 +202,7 @@ class MaterielService extends ChangeNotifier {
         debugPrint("response body all materiel with pagination $page par défilement soit ${materielList.length}");
        return materielList;
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête mat pag avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {
@@ -251,7 +251,7 @@ class MaterielService extends ChangeNotifier {
         debugPrint("response body materiel by type with pagination $page par défilement soit ${materielList.length}");
        return materielList;
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête mat ty pag avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {
@@ -299,7 +299,7 @@ class MaterielService extends ChangeNotifier {
         debugPrint("response body materiel by acteur with pagination $page par défilement soit ${materielList.length}");
        return materielList;
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête  mat avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {

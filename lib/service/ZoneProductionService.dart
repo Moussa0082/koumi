@@ -112,7 +112,7 @@ class ZoneProductionService extends ChangeNotifier {
       } else {
         zoneList = [];
         print(
-            'Échec de la requête avec le code d\'état: ${response.statusCode}');
+            'Échec de la requête  zone avec le code d\'état: ${response.statusCode}');
         throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
       }
     } catch (e) {
@@ -132,7 +132,7 @@ class ZoneProductionService extends ChangeNotifier {
       } else {
         zoneList = [];
         print(
-            'Échec de la requête avec le code d\'état: ${response.statusCode}');
+            'Échec de la requête zone ac  avec le code d\'état: ${response.statusCode}');
         throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
       }
     } catch (e) {

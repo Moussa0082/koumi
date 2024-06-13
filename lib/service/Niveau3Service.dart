@@ -68,7 +68,7 @@ class Niveau3Service extends ChangeNotifier {
       return niveauList;
     } else {
       niveauList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête n3 avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }

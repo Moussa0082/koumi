@@ -89,7 +89,7 @@ class SuperficieService extends ChangeNotifier {
       return superficieList;
     } else {
       superficieList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête all super avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }
@@ -122,7 +122,7 @@ class SuperficieService extends ChangeNotifier {
       return superficieList;
     } else {
       superficieList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête sup ac  avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }

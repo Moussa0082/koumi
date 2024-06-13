@@ -175,7 +175,7 @@ class ParametreGenerauxService extends ChangeNotifier {
       return parametreList;
     } else {
       parametreList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête para avec le code d\'état: ${response.statusCode}');
        
       // throw Exception("Params vide");
       // throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
@@ -195,7 +195,7 @@ class ParametreGenerauxService extends ChangeNotifier {
       return parametreList;
     } else {
       parametreList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête para id avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }
