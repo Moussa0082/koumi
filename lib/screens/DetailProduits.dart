@@ -1,25 +1,23 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Device.dart';
 import 'package:koumi_app/models/Monnaie.dart';
-import 'package:koumi_app/models/ParametreGeneraux.dart';
+// import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
-import 'package:http/http.dart' as http;
 import 'package:koumi_app/service/DeviceService.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class DetailProduits extends StatefulWidget {
   late Stock stock;
@@ -46,8 +44,8 @@ class _DetailProduitsState extends State<DetailProduits>
 
   bool isExist = false;
   String? email = "";
-  List<ParametreGeneraux> paraList = [];
-  late ParametreGeneraux para = ParametreGeneraux();
+  // List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para = ParametreGeneraux();
 
   bool isLoadingLibelle = true;
   //  String? monnaie;
@@ -407,6 +405,42 @@ class _DetailProduitsState extends State<DetailProduits>
                         ),
                       ],
                     ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Prix",
+                            style: TextStyle(
+                                fontSize: 20, fontStyle: FontStyle.italic)),
+                        Text(
+                          maxLines: 2,
+                          textAlign: TextAlign.right,
+                          '${widget.stock.prix!.toInt()} ${widget.stock.monnaie!.libelle}',
+                          style: TextStyle(
+                            overflow: TextOverflow.ellipsis,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ),
+                    FutureBuilder<Map<String, String>>(
+                      future: rates,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else {
+                          return Column(
+                            children: snapshot.data!.entries.map((entry) {
+                              return _buildItem(
+                                  "Prix en ${entry.key}", "${entry.value}");
+                            }).toList(),
+                          );
+                        }
+                      },
+                    ),
                     Container(
                       height: 40,
                       width: MediaQuery.of(context).size.width,
@@ -460,29 +494,21 @@ class _DetailProduitsState extends State<DetailProduits>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          // Text(
+                          //   '${widget.stock.prix!.toInt()} (${widget.stock.monnaie!.libelle})', // Convertir en entier
+                          //   style: const TextStyle(
+                          //       overflow: TextOverflow.ellipsis,
+                          //       fontSize: 20,
+                          //       fontWeight: FontWeight.bold),
+                          // ),
                           Text(
-                            '${widget.stock.prix!.toInt()} (${widget.stock.monnaie!.libelle})', // Convertir en entier
+                            'Note', // Convertir en entier
                             style: const TextStyle(
                                 overflow: TextOverflow.ellipsis,
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold),
                           ),
-                          FutureBuilder<Map<String, String>>(
-                            future: rates,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              } else {
-                                return Column(
-                                  children: snapshot.data!.entries.map((entry) {
-                                    return _buildItem("Prix en ${entry.key}",
-                                        "${entry.value}");
-                                  }).toList(),
-                                );
-                              }
-                            },
-                          ),
+
                           RatingBar.builder(
                             initialRating: 3,
                             minRating: 0,
@@ -727,7 +753,7 @@ class _DetailProduitsState extends State<DetailProduits>
 
   Widget _buildItem(String title, String value) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

@@ -59,8 +59,8 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
   TextEditingController nomMagasinController = TextEditingController();
   TextEditingController contactMagasinController = TextEditingController();
   TextEditingController localiteMagasinController = TextEditingController();
-  late ParametreGeneraux para;
-  List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para;
+  // List<ParametreGeneraux> paraList = [];
   List<Map<String, dynamic>> regionsData = [];
   bool isLoading = false;
   bool isLoadingLibelle = true;

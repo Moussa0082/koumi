@@ -58,8 +58,8 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
   String? n3Value;
   String niveau3 = '';
   String forme = '';
-  List<ParametreGeneraux> paraList = [];
-  late ParametreGeneraux para = ParametreGeneraux();
+  // List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para = ParametreGeneraux();
   bool isLoadingLibelle = true;
   String? libelleNiveau3Pays;
   String? monnaieValue;

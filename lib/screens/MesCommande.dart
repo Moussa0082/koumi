@@ -29,8 +29,8 @@ class _MesCommandeState extends State<MesCommande> {
 
     late Acteur acteur = Acteur();
   late List<TypeActeur> typeActeurData = [];
-  List<ParametreGeneraux> paraList = [];
-  late ParametreGeneraux para = ParametreGeneraux();
+  // List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para = ParametreGeneraux();
   late String type;
   late TextEditingController _searchController;
   List<Stock>  stockListe = [];
