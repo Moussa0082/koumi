@@ -573,7 +573,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     try {
       for (String libelle in libelles) {
         final response = await http.get(Uri.parse(
-            '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
+            '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=${libelle.toLowerCase()}&page=$page&size=$size'));
 
         if (response.statusCode == 200) {
           final jsonData = jsonDecode(utf8.decode(response.bodyBytes));

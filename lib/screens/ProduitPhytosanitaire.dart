@@ -28,8 +28,66 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
   List<Intrant> intrantListe = [];
   // CategorieProduit? selectedType;
   ScrollController scrollableController1 = ScrollController();
-  String libelle = "Produits phytosanitaires";
+  // String libelle = "Produits phytosanitaires";
   // String? monnaie;
+  List<String> libelles = ["Produits phytosanitaires", "produits phytosanitaires", "produit phytosanitaire", "Produit phytosanitaire"];
+
+
+Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
+    if (isLoading == true) return [];
+
+    setState(() {
+      isLoading = true;
+    });
+
+    if (refresh) {
+      setState(() {
+         intrantListe.clear();
+        page = 0;
+        hasMore = true;
+      });
+    }
+
+    try {
+      List<Intrant> tempStockListe = [];
+      for (String libelle in libelles) {
+        final response = await http.get(Uri.parse(
+            '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=${libelle.toLowerCase()}&page=$page&size=$size'));
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+          final List<dynamic> body = jsonData['content'];
+
+          if (body.isEmpty) {
+            setState(() {
+              hasMore = false;
+            });
+          } else {
+            List<Intrant> newStocks = body.map((e) => Intrant.fromMap(e)).toList();
+            tempStockListe.addAll(newStocks);
+          }
+
+          debugPrint(
+              "response body all stock by categorie with pagination ${page} par défilement soit ${tempStockListe.length}");
+        } else {
+          print(
+              'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        }
+      }
+
+      setState(() {
+        intrantListe.addAll(tempStockListe);
+      });
+    } catch (e) {
+      print(
+          'Une erreur s\'est produite lors de la récupération des intrants: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+    return intrantListe;
+  }
 
   void _scrollListener() {
     if (scrollableController1.position.pixels >=
@@ -54,57 +112,57 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
     debugPrint("no");
   }
 
-  Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
-    if (isLoading == true) return [];
+  // Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
+  //   if (isLoading == true) return [];
 
-    setState(() {
-      isLoading = true;
-    });
+  //   setState(() {
+  //     isLoading = true;
+  //   });
 
-    if (refresh) {
-      setState(() {
-        intrantListe.clear();
-        page = 0;
-        hasMore = true;
-      });
-    }
+  //   if (refresh) {
+  //     setState(() {
+  //       intrantListe.clear();
+  //       page = 0;
+  //       hasMore = true;
+  //     });
+  //   }
 
-    try {
-      final response = await http.get(Uri.parse(
-          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
+  //   try {
+  //     final response = await http.get(Uri.parse(
+  //         '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
 
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
-        final List<dynamic> body = jsonData['content'];
+  //     if (response.statusCode == 200) {
+  //       final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+  //       final List<dynamic> body = jsonData['content'];
 
-        if (body.isEmpty) {
-          setState(() {
-            hasMore = false;
-          });
-        } else {
-          setState(() {
-            List<Intrant> newIntrants =
-                body.map((e) => Intrant.fromMap(e)).toList();
-            intrantListe.addAll(newIntrants);
-          });
-        }
+  //       if (body.isEmpty) {
+  //         setState(() {
+  //           hasMore = false;
+  //         });
+  //       } else {
+  //         setState(() {
+  //           List<Intrant> newIntrants =
+  //               body.map((e) => Intrant.fromMap(e)).toList();
+  //           intrantListe.addAll(newIntrants);
+  //         });
+  //       }
 
-        debugPrint(
-            "response body all intrants by categorie with pagination ${page} par défilement soit ${intrantListe.length}");
-      } else {
-        print(
-            'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
-      }
-    } catch (e) {
-      print(
-          'Une erreur s\'est produite lors de la récupération des intrants: $e');
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
-    return intrantListe;
-  }
+  //       debugPrint(
+  //           "response body all intrants by categorie with pagination ${page} par défilement soit ${intrantListe.length}");
+  //     } else {
+  //       print(
+  //           'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+  //     }
+  //   } catch (e) {
+  //     print(
+  //         'Une erreur s\'est produite lors de la récupération des intrants: $e');
+  //   } finally {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  //   return intrantListe;
+  // }
 
   @override
   void initState() {

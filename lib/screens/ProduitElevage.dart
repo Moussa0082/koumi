@@ -78,7 +78,7 @@ class _ProduitElevageState extends State<ProduitElevage> {
         final response = await http.get(Uri.parse(
             '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
 
-        if (response.statusCode == 200) {
+        if (response.statusCode == 200 || response.statusCode == 201) {
           final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
           final List<dynamic> body = jsonData['content'];
 
@@ -211,7 +211,7 @@ class _ProduitElevageState extends State<ProduitElevage> {
                     child: SingleChildScrollView(
                       controller: scrollableController,
                       child: Consumer<StockService>(
-                          builder: (context, intrantService, child) {
+                          builder: (context, stockService, child) {
                         return FutureBuilder(
                             future: stockListeFuture,
                             builder: (context, snapshot) {
