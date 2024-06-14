@@ -402,43 +402,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                     SliverToBoxAdapter(
                         child: Column(children: [
                       // const SizedBox(height: 10),
-                      // Padding(
-                      //   padding: const EdgeInsets.all(10.0),
-                      //   child: Container(
-                      //     padding: EdgeInsets.symmetric(horizontal: 10),
-                      //     decoration: BoxDecoration(
-                      //       color:
-                      //           Colors.blueGrey[50], // Couleur d'arrière-plan
-                      //       borderRadius: BorderRadius.circular(25),
-                      //     ),
-                      //     child: Row(
-                      //       children: [
-                      //         Icon(Icons.search,
-                      //             color: Colors
-                      //                 .blueGrey[400]), // Couleur de l'icône
-                      //         SizedBox(
-                      //             width:
-                      //                 10), // Espacement entre l'icône et le champ de recherche
-                      //         Expanded(
-                      //           child: TextField(
-                      //             controller: _searchController,
-                      //             onChanged: (value) {
-                      //               setState(() {});
-                      //             },
-                      //             decoration: InputDecoration(
-                      //               hintText: 'Rechercher',
-                      //               border: InputBorder.none,
-                      //               hintStyle: TextStyle(
-                      //                   color: Colors.blueGrey[
-                      //                       400]), // Couleur du texte d'aide
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       ],
-                      //     ),
-                      //   ),
-                      // ),
-                      // const SizedBox(height: 10),
+                     
                       // Padding(
                       //   padding: const EdgeInsets.symmetric(
                       //       vertical: 10, horizontal: 20),
@@ -569,12 +533,12 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: Text('Recherche'),
+                              child: Text('Rechercher'),
                             ),
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: Text('Filtre'),
+                              child: Text('Filtrer'),
                             ),
                           ],
                           isSelected: [isSearchMode, !isSearchMode],
@@ -1423,3 +1387,4 @@ class _IntrantScreenState extends State<IntrantScreen> {
     );
   }
 }
+

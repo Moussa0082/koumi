@@ -10,9 +10,6 @@ const kAnimationDuration = Duration(milliseconds: 200);
 
 const double kBorderRadius = 28;
 
-
-
-// api url 
-      const String apiOnlineUrl = 'https://koumi.ml/api-koumi';
-      // const String apiOnlineUrl = 'http://10.0.2.2:9000/api-koumi';
-
+// api url
+const String apiOnlineUrl = 'https://koumi.ml/api-koumi';
+// const String apiOnlineUrl = 'http://10.0.2.2:9000/api-koumi';
