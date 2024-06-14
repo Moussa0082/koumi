@@ -169,7 +169,7 @@ class _MyAppState extends State<MyApp> {
       ),
       // navigatorKey: navigatorKey,
       routes: {
-        '/BottomNavigationPage': (context) => const BottomNavigationPage(),
+        '/BottomNavigationPage': (context) =>  BottomNavigationPage(),
         // '/notificationPage':(context) =>  NotificationPage(),
       },
       //  home:  ItemScreen(),

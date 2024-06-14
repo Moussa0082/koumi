@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
@@ -23,7 +22,9 @@ import 'package:koumi_app/screens/RegisterNextScreen.dart';
 import 'package:shimmer/shimmer.dart';
 
 class RegisterScreen extends StatefulWidget {
-  RegisterScreen({super.key});
+  String? iso;
+  String? selectedCountry;
+  RegisterScreen({super.key, this.iso, this.selectedCountry});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -37,7 +38,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       PhoneNumber(isoCode: Platform.localeName.split('_').last);
 
   String? typeValue;
-  String selectedCountry = 'Mali';
+  String? selectedCountry;
   // late TypeActeur monTypeActeur;
   // late Future _mesTypeActeur;
   Position? _currentPosition;
@@ -54,109 +55,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController controller = TextEditingController();
   TextEditingController whatsAppController = TextEditingController();
 
-  String initialCountry = 'ML';
+  String? initialCountry;
   String detectedCountryCode = '';
   PhoneNumber number = PhoneNumber();
   // List of items in our dropdown menu
   var items = [
     'Item 2',
   ];
-  void getLocationNew() async {
-    try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        await Geolocator.openLocationSettings();
-        return Future.error('Location services are disabled.');
-      }
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          return Future.error('Location permissions are denied');
-        }
-      }
-
-      if (permission == LocationPermission.deniedForever) {
-        return Future.error('Location permissions are permanently denied.');
-      }
-
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
-
-      Placemark placemark = placemarks.first;
-      setState(() {
-        detectedCountryCode = placemark.isoCountryCode!;
-      });
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
-  var latitude = 'Getting Latitude..'.obs;
-  var longitude = 'Getting Longitude..'.obs;
-  var address = 'Getting Address..'.obs;
-  late StreamSubscription<Position> streamSubscription;
-
-  getLocation() async {
-    bool serviceEnabled;
-
-    LocationPermission permission;
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      await Geolocator.openLocationSettings();
-      return Future.error('Location services are disabled.');
-    }
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    streamSubscription =
-        Geolocator.getPositionStream().listen((Position position) {
-      latitude.value = 'Latitude : ${position.latitude}';
-      longitude.value = 'Longitude : ${position.longitude}';
-      getAddressFromLatLang(position);
-    });
-  }
-
-  Future<void> getAddressFromLatLang(Position position) async {
-    List<Placemark> placemark =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    Placemark place = placemark[0];
-    debugPrint("Address ISO: $detectedC");
-    address.value =
-        'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
-    detectedC = place.isoCountryCode;
-    detectedCountryCode = place.isoCountryCode!;
-
-    debugPrint(
-        "Address:   ${place.locality},${place.country},${place.isoCountryCode}");
-  }
+ 
 
   //    void _detectInitialCountryCode() {
   //   // Obtenir la locale du périphérique
@@ -181,35 +87,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
   }
 
-  // Fonction pour obtenir le pays à partir des coordonnées de latitude et de longitude
-  Future<String?> getCountryFromLatLng(
-      double latitude, double longitude) async {
-    try {
-      List<Placemark> placemarks =
-          await placemarkFromCoordinates(latitude, longitude);
-      if (placemarks.isNotEmpty) {
-        return placemarks[0].country;
-      } else {
-        return null; // Aucun résultat trouvé
-      }
-    } catch (e) {
-      print(
-          "Erreur lors de la récupération du pays à partir des coordonnées: $e");
-      return null;
-    }
-  }
-
-  Future<String?> getCurrentCountryFromLocation() async {
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.low);
-      return getCountryFromLatLng(position.latitude, position.longitude);
-    } catch (e) {
-      print(
-          "Erreur lors de la récupération du pays actuel à partir de la géolocalisation: $e");
-      return null;
-    }
-  }
+ 
 
   TextEditingController nomActeurController = TextEditingController();
 
@@ -231,11 +109,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    selectedCountry = widget.selectedCountry;
     // _mesTypeActeur  =
     // http.get(Uri.parse('https://koumi.ml/api-koumi/typeActeur/read'));
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/typeActeur/read'));
     // getLocation();
-    getLocationNew();
   }
 
   @override
@@ -366,7 +244,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                         IntlPhoneField(
                           initialCountryCode:
-                              "ML", // Automatically detect user's country
+                              widget.iso, // Automatically detect user's country
                           invalidNumberMessage: "Numéro invalide",
                           searchText: "Chercher un pays",
                           decoration: InputDecoration(
@@ -446,7 +324,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                         IntlPhoneField(
                           initialCountryCode:
-                              "ML", // Automatically detect user's country
+                              widget.iso, // Automatically detect user's country
                           controller: whatsAppController,
                           invalidNumberMessage: "Numéro invalide",
                           searchText: "Chercher un pays",
@@ -494,7 +372,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                               whatsAppActeur:
                                                   processedNumberTel,
                                               telephone: processedNumberTel,
-                                              pays: selectedCountry,
+                                              pays: selectedCountry!,
                                             )));
                               }
                             },

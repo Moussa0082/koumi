@@ -180,17 +180,19 @@ class _ActeurListState extends State<ActeurList> {
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                   )),
-                                              subtitle: Text(
-                                                  e.typeActeur!
-                                                      .map((data) =>
-                                                          data.libelle)
-                                                      .join(', '),
-                                                  style: const TextStyle(
-                                                    color: Colors.black87,
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w500,
-                                                    fontStyle: FontStyle.italic,
-                                                  ))),
+                                              // subtitle: Text(
+                                              //     e.typeActeur!
+                                              //         .map((data) =>
+                                              //             data.libelle)
+                                              //         .join(', '),
+                                              //     style: const TextStyle(
+                                              //       color: Colors.black87,
+                                              //       fontSize: 18,
+                                              //       fontWeight: FontWeight.w500,
+                                              //       fontStyle: FontStyle.italic,
+                                              //     )
+                                              //     )
+                                                  ),
                                           Padding(
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: 15),
@@ -199,22 +201,22 @@ class _ActeurListState extends State<ActeurList> {
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                Text("Date d'adhésion :",
-                                                    style: TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 15,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                    )),
-                                                Text(e.dateAjout!,
-                                                    style: TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w800,
-                                                    ))
+                                                // Text("Date d'adhésion :",
+                                                //     style: TextStyle(
+                                                //       color: Colors.black87,
+                                                //       fontSize: 15,
+                                                //       fontWeight:
+                                                //           FontWeight.w500,
+                                                //       fontStyle:
+                                                //           FontStyle.italic,
+                                                //     )),
+                                                // Text(e.dateAjout!,
+                                                //     style: TextStyle(
+                                                //       color: Colors.black87,
+                                                //       fontSize: 16,
+                                                //       fontWeight:
+                                                //           FontWeight.w800,
+                                                //     ))
                                               ],
                                             ),
                                           ),
@@ -227,7 +229,7 @@ class _ActeurListState extends State<ActeurList> {
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                _buildEtat(e.statutActeur!),
+                                                // _buildEtat(e.statutActeur!),
                                                 PopupMenuButton<String>(
                                                   padding: EdgeInsets.zero,
                                                   itemBuilder: (context) =>

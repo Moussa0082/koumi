@@ -21,7 +21,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class Transport extends StatefulWidget {
-  const Transport({super.key});
+  String? detectedCountry;
+   Transport({super.key, this.detectedCountry});
 
   @override
   State<Transport> createState() => _TransportState();
@@ -63,8 +64,8 @@ class _TransportState extends State<Transport> {
           // Rafraîchir les données ici
         page++;
         });
-      debugPrint("yes - fetch all vehicule");
-      fetchVehicule().then((value) {
+      debugPrint("yes - fetch all by pays vehicule");
+      fetchVehicule(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -84,13 +85,13 @@ class _TransportState extends State<Transport> {
       !isLoading && selectedType != null) {
     // if (selectedCat != null) {
       // Incrementez la page et récupérez les stocks par catégorie
-      debugPrint("yes - fetch by type");
+      debugPrint("yes - fetch by type and pays");
       setState(() {
           // Rafraîchir les données ici
       page++;
         });
    
-    fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!).then((value) {
+    fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!, widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -101,7 +102,7 @@ class _TransportState extends State<Transport> {
 
 }
 
-  Future<List<Vehicule>> fetchVehiculeByTypeVoitureWithPagination(String idTypeVoiture,{bool refresh = false }) async {
+  Future<List<Vehicule>> fetchVehiculeByTypeVoitureWithPagination(String idTypeVoiture, String niveau3PaysActeur, {bool refresh = false }) async {
     if (isLoading) return [];
       setState(() {
       isLoading = true;
@@ -116,7 +117,7 @@ class _TransportState extends State<Transport> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getAllVehiculesByTypeVoitureWithPagination?idTypeVoiture=$idTypeVoiture&page=$page&size=$size'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getVehiculesByPaysAndTypeVoitureWithPagination?idTypeVoiture=$idTypeVoiture&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         // debugPrint("url: $response");
@@ -152,7 +153,7 @@ class _TransportState extends State<Transport> {
     return vehiculeListe;
   }
  
-  Future<List<Vehicule>> fetchVehicule({bool refresh = false }) async {
+  Future<List<Vehicule>> fetchVehicule(String niveau3PaysActeur, {bool refresh = false }) async {
     if (isLoading) return [];
          
       setState(() {
@@ -170,7 +171,7 @@ class _TransportState extends State<Transport> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getAllVehiculesWithPagination?page=$page&size=$size'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getVehiculesByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -208,7 +209,7 @@ class _TransportState extends State<Transport> {
     Future<List<Vehicule>> getAllVehicule() async {
      if (selectedType != null) {
       vehiculeListe = await 
-          VehiculeService().fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!);
+          VehiculeService().fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
     }
     
     
@@ -243,7 +244,7 @@ class _TransportState extends State<Transport> {
     // // selectedType == null;
     // type = typeActeurData.map((data) => data.libelle).join(', ');
     verify();
-        vehiculeListeFuture = VehiculeService().fetchVehicule();
+        vehiculeListeFuture = VehiculeService().fetchVehicule(widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
     _searchController = TextEditingController();
     _typeList =
         http.get(Uri.parse('$apiOnlineUrl/TypeVoiture/read'));
@@ -257,7 +258,7 @@ WidgetsBinding.instance.addPostFrameCallback((_){
     //code will run when widget rendering complete
   scrollableController1.addListener(_scrollListener1);
   });
-  vehiculeListeFuture = VehiculeService().fetchVehicule();
+  vehiculeListeFuture = VehiculeService().fetchVehicule(widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
   vehiculeListeFuture1 = getAllVehicule();
 
       super.initState();
@@ -414,11 +415,11 @@ WidgetsBinding.instance.addPostFrameCallback((_){
           selectedType == null ?
           setState(() {
           vehiculeListeFuture =   
-          VehiculeService().fetchVehicule() ;
+          VehiculeService().fetchVehicule(widget.detectedCountry != null ? widget.detectedCountry! : "Mali") ;
           }) :
           setState(() {
             
-         vehiculeListeFuture1 = VehiculeService().fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!);
+         vehiculeListeFuture1 = VehiculeService().fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
           }); 
         },
         child: Container(
@@ -502,7 +503,7 @@ WidgetsBinding.instance.addPostFrameCallback((_){
                             }
                             page = 0;
                   hasMore = true;
-                  fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!,refresh: true);
+                  fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!, widget.detectedCountry != null ? widget.detectedCountry! : "Mali",refresh: true);
                     if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {
         scrollableController1.jumpTo(0.0);
@@ -566,11 +567,11 @@ WidgetsBinding.instance.addPostFrameCallback((_){
           selectedType == null ?
           setState(() {
           vehiculeListeFuture =   
-          VehiculeService().fetchVehicule() ;
+          VehiculeService().fetchVehicule(widget.detectedCountry != null ? widget.detectedCountry! : "Mali") ;
           }) :
           setState(() {
             
-         vehiculeListeFuture1 = VehiculeService().fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!);
+         vehiculeListeFuture1 = VehiculeService().fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
           }); 
         },
               child: selectedType == null ?

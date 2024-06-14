@@ -26,7 +26,8 @@ import 'package:shimmer/shimmer.dart';
 
 class ProductsScreen extends StatefulWidget {
   String? id, nom;
-   ProductsScreen({super.key , this.id, this.nom});
+  String? detectedCountry;
+   ProductsScreen({super.key , this.id, this.nom, this.detectedCountry});
 
   @override
   State<ProductsScreen> createState() => _ProductsScreenState();
@@ -119,7 +120,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Future<List<Stock>> getAllStock() async {
      if (selectedCat != null) {
       stockListe = await 
-          StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!);
+          StockService().fetchStockByCategorie(selectedCat!.idCategorieProduit!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
     }
     
     return stockListe;
@@ -127,7 +128,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   Future<List<Stock>> getAllStocks() async {
       
-      stockListe = await StockService().fetchStock();
+      stockListe = await StockService().fetchStock(widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
       
     return stockListe;
   }
@@ -145,8 +146,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
           // Rafraîchir les données ici
         page++;
         });
-      debugPrint("yes - fetch all stocks");
-      fetchStock().then((value) {
+      debugPrint("yes - fetch all stocks by pays");
+      fetchStock(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -164,13 +165,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
       !isLoading && selectedCat != null) {
     // if (selectedCat != null) {
       // Incrementez la page et récupérez les stocks par catégorie
-      debugPrint("yes - fetch by category");
+      debugPrint("yes - fetch by category and pays");
       setState(() {
           // Rafraîchir les données ici
       page++;
         });
    
-    fetchStockByCategorie().then((value) {
+    fetchStockByCategorie(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -186,7 +187,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
 
 
-  Future<List<Stock>> fetchStock({bool refresh = false}) async {
+  Future<List<Stock>> fetchStock(String niveau3PaysActeur, {bool refresh = false}) async {
     if (isLoading == true) return [];
    
     setState(() {
@@ -203,7 +204,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksWithPagination?page=${page}&size=${size}'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getStocksByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -238,7 +239,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
 
 
-  Future<List<Stock>> fetchStockByCategorie({bool refresh = false}) async {
+  Future<List<Stock>> fetchStockByCategorie(String niveau3PaysActeur, {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -254,7 +255,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByCategorieWithPagination?idCategorie=${selectedCat!.idCategorieProduit}&page=$page&size=$size'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByCategorieAndPaysWithPagination?idCategorie=${selectedCat!.idCategorieProduit}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -271,7 +272,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           });
         }
 
-        debugPrint("response body all stock with pagination ${page} par défilement soit ${stockListe.length}");
+        debugPrint("response body all stock by categorie and pays with pagination ${page} par défilement soit ${stockListe.length}");
       } else {
         print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
@@ -368,7 +369,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           .contains("commercant") ||
         typeActeurData
           .map((e) => e.libelle!.toLowerCase())
-          .contains("commerçant") ||  
+          .contains("commerçant") ||   
       typeActeurData
           .map((e) => e.libelle!.toLowerCase())
           .contains("admin") ||
@@ -562,7 +563,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                        }
                           page = 0;
                 hasMore = true;
-                fetchStockByCategorie(refresh: true);
+                fetchStockByCategorie(widget.detectedCountry != null ? widget.detectedCountry! : "Mali",refresh: true);
                   if (page == 0 && isLoading == true) {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       scrollableController1.jumpTo(0.0);
@@ -628,13 +629,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   // Rafraîchir les données ici
                 });
                   debugPrint("refresh page ${page}");
-                // selectedCat != null ?StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!) : 
                 selectedCat != null ?
                 setState(() {
-                  stockListeFuture1 = StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!);
+                  stockListeFuture1 = StockService().fetchStockByCategorie(selectedCat!.idCategorieProduit!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali" );
                 }) :
                 setState(() {
-                  stockListeFuture = StockService().fetchStock();
+                  stockListeFuture = StockService().fetchStock(widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
                 });
                               },
               child: selectedCat == null ?
@@ -674,10 +674,31 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             ),
                           );
                                           } 
-                                    // if (isLoading== true && hasMore == true) 
-                                    // {
-                                    //   return Center(child: CircularProgressIndicator());
-                                    // }
+                                     if (snapshot.hasError) {
+                          return SingleChildScrollView(
+                            child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Center(
+                                child: Column(
+                                  children: [
+                                    Image.asset('assets/images/notif.jpg'),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      "Une erreur s'est produite veuiller réessayer",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 17,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                                          }
                                           if (!snapshot.hasData) {
                           return SingleChildScrollView(
                             child: Padding(

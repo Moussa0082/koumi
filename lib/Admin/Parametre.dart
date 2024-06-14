@@ -388,7 +388,7 @@ class _ParametreState extends State<Parametre> {
                     getList(
                         "car.png",
                         'Type de véhicule',
-                        const TypeVehicule(),
+                         TypeVehicule(),
                         const Icon(
                           Icons.chevron_right_sharp,
                           size: 30,

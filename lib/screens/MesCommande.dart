@@ -14,6 +14,7 @@ import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/CommandeService.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 
 class MesCommande extends StatefulWidget {
   const MesCommande({super.key});
@@ -38,6 +39,7 @@ class _MesCommandeState extends State<MesCommande> {
    List<Commande> _liste = [];
   String? typeValue;
   bool isExist = false;
+  bool isLoading = true;
   bool isProprietaire = false;
   String? email = "";
 
@@ -69,6 +71,7 @@ class _MesCommandeState extends State<MesCommande> {
         fetchAllCommandes(acteur.idActeur!).then((combinedList) {
           setState(() {
             _liste = combinedList;
+            isLoading = false;
           });
         });
       });
@@ -272,14 +275,14 @@ class _MesCommandeState extends State<MesCommande> {
                   alignment: Alignment.topLeft,
                   child: Text("Liste des commandes :",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold))),
               ),  
-             Padding(
+       Padding(
                padding: const EdgeInsets.all(15.0),
                child: Table(
           border: TableBorder.all(color: Colors.black38),
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           children: [
             // Header row
-            TableRow(
+           TableRow(
               decoration: BoxDecoration(color: Colors.redAccent),
               children: [
                 TableCell(
@@ -321,6 +324,9 @@ class _MesCommandeState extends State<MesCommande> {
               ],
             ),
          
+             if (isLoading)
+              ...List.generate(10, (index) => buildShimmerRow())
+            else  
             // Data rows
             ..._liste.map((commande) =>  TableRow(
               children: [
@@ -425,10 +431,10 @@ class _MesCommandeState extends State<MesCommande> {
                       child: Center(
                         child: Container(
                           width: 80,
-                          color: commande.statutCommande == false ? Colors.red : Colors.green,
+                          color: commande.statutConfirmation == false ? Colors.red : Colors.green,
                           child: Center(
                             child: Text(
-                              commande.statutCommande == false ? "En attende" : "Validée",
+                              commande.statutConfirmation == false ? "En attende" : "Validée",
                               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -444,5 +450,32 @@ class _MesCommandeState extends State<MesCommande> {
              ),
        ));
   }
+
+  TableRow buildShimmerRow() {
+    return TableRow(
+      children: [
+        buildShimmerCell(),
+        buildShimmerCell(),
+        buildShimmerCell(),
+      ],
+    );
+  }
+   TableCell buildShimmerCell() {
+    return TableCell(
+      verticalAlignment: TableCellVerticalAlignment.middle,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Container(
+            height: 20.0,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
   
 }

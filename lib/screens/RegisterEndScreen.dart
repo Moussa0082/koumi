@@ -672,7 +672,15 @@ Future<void> _pickImage(ImageSource source) async {
         content: Text('Veuillez sélectionner au moins une speculation.'),
       )
     );
-            }else{
+            }else if(passwordController.text.toString().trim()  ==  "123456" || confirmPasswordController.text.toString().trim() ==  "123456"){
+             ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Mot de passe faible, veuillez saisir un mot de passe sécurisé.'),
+      )
+    );
+            }
+            
+            else{
 
             _handleButtonPress(context);
             }

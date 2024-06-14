@@ -17,7 +17,8 @@ import 'package:shimmer/shimmer.dart';
 
 class ListeVehiculeByType extends StatefulWidget {
   final TypeVoiture typeVoitures;
-  const ListeVehiculeByType({super.key, required this.typeVoitures});
+  String? detectedCountry;
+   ListeVehiculeByType({super.key, required this.typeVoitures, this.detectedCountry});
 
   @override
   State<ListeVehiculeByType> createState() => _ListeVehiculeByTypeState();
@@ -41,7 +42,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
    bool hasMore = true;
 
   Future<List<Vehicule>> getListe(String id) async {
-    final response = await VehiculeService().fetchVehiculeByTypeVoitureWithPagination(id);
+    final response = await VehiculeService().fetchVehiculeByTypeVoitureWithPagination(id, widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
     return response;
   }
 
@@ -57,7 +58,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
           // Rafraîchir les données ici
         page++;
         });
-      fetchVehiculeByType(typeVoiture.idTypeVoiture!).then((value) {
+      fetchVehiculeByTypeVoitureWithPagination(typeVoiture.idTypeVoiture!, widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
         setState(() {
           // Rafraîchir les données ici
         });
@@ -74,52 +75,56 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
  
  
 
-    Future<List<Vehicule>> fetchVehiculeByType(String idTypeVoiture,{bool refresh = false}) async {
-    // if (_stockService.isLoading == true) return [];
-
-    setState(() {
-      isLoading = true;
-    });
-
-    if (refresh) {
+     Future<List<Vehicule>> fetchVehiculeByTypeVoitureWithPagination(String idTypeVoiture, String niveau3PaysActeur, {bool refresh = false }) async {
+    if (isLoading) return [];
       setState(() {
-        vehiculeListe.clear();
-       page = 0;
-        hasMore = true;
+      isLoading = true;
       });
+      
+    if (refresh) {
+       setState(() {
+        vehiculeListe.clear();
+        page = 0;
+        hasMore = true;
+       });
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getAllVehiculesByTypeVoitureWithPagination?idTypeVoiture=$idTypeVoiture&page=${page}&size=${size}'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getVehiculesByPaysAndTypeVoitureWithPagination?idTypeVoiture=$idTypeVoiture&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
+        // debugPrint("url: $response");
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 
         if (body.isEmpty) {
           setState(() {
-           hasMore = false;
+            hasMore = false;
           });
         } else {
-          setState(() {
-           List<Vehicule> newVehicule = body.map((e) => Vehicule.fromMap(e)).toList();
+           setState(() {
+            List<Vehicule> newVehicule = body.map((e) => Vehicule.fromMap(e)).toList();
           vehiculeListe.addAll(newVehicule);
-          });
+          // page++;
+           });
+          
         }
 
-        debugPrint("response body all vehicule by type with pagination ${page} par défilement soit ${vehiculeListe.length}");
+        debugPrint("response body vehicle by type vehicule with pagination $page par défilement soit ${vehiculeListe.length}");
+       return vehiculeListe;
       } else {
         print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        return [];
       }
     } catch (e) {
       print('Une erreur s\'est produite lors de la récupération des vehicules: $e');
     } finally {
-      setState(() {
-       isLoading = false;
-      });
+         setState(() {
+        isLoading = false;
+         });
     }
     return vehiculeListe;
-  }  
+  }
 
 
 
@@ -266,7 +271,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                    setState(() {
                         page =0;
                        // Rafraîchir les données ici
-                  futureListe = VehiculeService().fetchVehiculeByTypeVoitureWithPagination(typeVoiture.idTypeVoiture!);
+                  futureListe = VehiculeService().fetchVehiculeByTypeVoitureWithPagination(typeVoiture.idTypeVoiture!, widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
                      });
                  },
                  child: SingleChildScrollView(

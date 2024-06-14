@@ -197,7 +197,7 @@ Navigator.pushReplacement(
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => const BottomNavigationPage()),
+                builder: (context) =>  BottomNavigationPage()),
           );
         }
       } else {

@@ -138,39 +138,34 @@ class VehiculeService extends ChangeNotifier {
   }
 
 
-    Future<List<Vehicule>> fetchVehicule({bool refresh = false }) async {
+  Future<List<Vehicule>> fetchVehiculeByTypeVoitureWithPagination(String idTypeVoiture, String niveau3PaysActeur, {bool refresh = false }) async {
     if (isLoading) return [];
-
       isLoading = true;
-
+      
     if (refresh) {
-    
         vehiculeList.clear();
         page = 0;
         hasMore = true;
-     
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getAllVehiculesWithPagination?page=$page&size=$size'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getVehiculesByPaysAndTypeVoitureWithPagination?idTypeVoiture=$idTypeVoiture&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
+        // debugPrint("url: $response");
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 
         if (body.isEmpty) {
-         
             hasMore = false;
-          
         } else {
-          
             List<Vehicule> newVehicule = body.map((e) => Vehicule.fromMap(e)).toList();
           vehiculeList.addAll(newVehicule);
-          // page++;
+          
           
         }
 
-        debugPrint("response body all vehicle with pagination $page par défilement soit ${vehiculeList.length}");
+        debugPrint("response body vehicle by type vehicule and pays with pagination $page par défilement soit ${vehiculeList.length}");
        return vehiculeList;
       } else {
         print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
@@ -179,21 +174,18 @@ class VehiculeService extends ChangeNotifier {
     } catch (e) {
       print('Une erreur s\'est produite lors de la récupération des vehicules: $e');
     } finally {
-     
         isLoading = false;
-      
     }
     return vehiculeList;
   }
-
-
-   Future<List<Vehicule>> fetchVehiculeByTypeVoitureWithPagination(String idTypeVoiture,{bool refresh = false }) async {
+ 
+  Future<List<Vehicule>> fetchVehicule(String niveau3PaysActeur, {bool refresh = false }) async {
     if (isLoading) return [];
-
+         
       isLoading = true;
-    
+
     if (refresh) {
-    
+       
         vehiculeList.clear();
         page = 0;
         hasMore = true;
@@ -201,40 +193,33 @@ class VehiculeService extends ChangeNotifier {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getAllVehiculesByTypeVoitureWithPagination?idTypeVoiture=$idTypeVoiture&page=$page&size=$size'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/vehicule/getVehiculesByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
-        // debugPrint("url: $response");
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 
         if (body.isEmpty) {
-         
             hasMore = false;
-          
         } else {
-          
             List<Vehicule> newVehicule = body.map((e) => Vehicule.fromMap(e)).toList();
           vehiculeList.addAll(newVehicule);
-          // page++;
-          
         }
 
-        debugPrint("response body vehicle by type vehicule with pagination $page par défilement soit ${vehiculeList.length}");
+        debugPrint("response body all vehicle by pays with pagination $page par défilement soit ${vehiculeList.length}");
        return vehiculeList;
       } else {
         print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {
-      print('Une erreur s\'est produite lors de la récupération des vehicule: $e');
+      print('Une erreur s\'est produite lors de la récupération des vehicules: $e');
     } finally {
-     
         isLoading = false;
-      
     }
     return vehiculeList;
   }
+
  
   Future<List<Vehicule>> fetchVehiculeByActeur(String idActeur,{bool refresh = false}) async {
     // if (_stockService.isLoading == true) return [];

@@ -22,7 +22,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class IntrantScreen extends StatefulWidget {
-  const IntrantScreen({super.key});
+  String? detectedCountry;
+   IntrantScreen({super.key, this.detectedCountry});
 
   @override
   State<IntrantScreen> createState() => _IntrantScreenState();
@@ -98,8 +99,9 @@ class _IntrantScreenState extends State<IntrantScreen> {
           // Rafraîchir les données ici
         page++;
         });
-      debugPrint("yes - fetch all intrants");
-      fetchIntrant().then((value) {
+      debugPrint("yes - fetch all by pays intrants");
+      fetchIntrantByPays(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
+      // fetchIntrant().then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -125,7 +127,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
       page++;
         });
    
-    fetchIntrantByCategorie().then((value) {
+    fetchIntrantByCategorie(widget.detectedCountry != null ? widget.detectedCountry! : "Mali", selectedType!.idCategorieProduit!).then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -137,60 +139,58 @@ class _IntrantScreenState extends State<IntrantScreen> {
 }
 
 
+ Future<List<Intrant>> fetchIntrantByPays(String niveau3PaysActeur, {bool refresh = false }) async {
+    if (isLoading) return [];
 
-  Future<List<Intrant>> fetchIntrant({bool refresh = false}) async {
-    if (isLoading == true) return [];
-   
-    setState(() {
-     isLoading = true;
-    });
+      isLoading = true;
 
-      if(mounted)
     if (refresh) {
-      setState(() {
+    
         intrantListe.clear();
-       page = 0;
+        page = 0;
         hasMore = true;
-      });
+     
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/intrant/getAllIntrantsWithPagination?page=${page}&size=${size}'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/intrant/getIntrantsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 
         if (body.isEmpty) {
-          setState(() {
-           hasMore = false;
-          });
+         
+            hasMore = false;
+          
         } else {
-          setState(() {
-          List<Intrant> newIntrants = body.map((e) => Intrant.fromMap(e)).toList();
-          intrantListe.addAll(newIntrants);
-          });
+          
+            List<Intrant> newIntrant = body.map((e) => Intrant.fromMap(e)).toList();
+          intrantListe.addAll(newIntrant);
+          
         }
 
-        debugPrint("response body all intrant with pagination ${page} par défilement soit ${intrantListe.length}");
+        debugPrint("response body all intrant by pays with pagination $page par défilement soit ${intrantListe.length}");
        return intrantListe;
       } else {
         print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {
-      print('Une erreur s\'est produite lors de la récupération des stocks: $e');
+      print('Une erreur s\'est produite lors de la récupération des intrants: $e');
     } finally {
-      setState(() {
-       isLoading = false;
-      });
+     
+        isLoading = false;
+      
     }
     return intrantListe;
   }
 
+  
 
 
-  Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
+
+  Future<List<Intrant>> fetchIntrantByCategorie(String niveau3PaysActeur, String idCategorieProduit, {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -206,7 +206,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/intrant/getAllIntrantsByCategorieWithPagination?idCategorie=${selectedType!.idCategorieProduit}&page=$page&size=$size'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/intrant/getIntrantsByPaysAndCategorieWithPagination?idCategorieProduit=${selectedType!.idCategorieProduit}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -259,7 +259,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
  Future<List<Intrant>> getAllIntrant() async {
        if(selectedType != null){
         
-      intrantListe = await IntrantService().fetchIntrantByCategorieWithPagination(selectedType!.idCategorieProduit!);
+      intrantListe = await IntrantService().fetchIntrantByCategorie(selectedType!.idCategorieProduit!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
        }
       
     return intrantListe;
@@ -290,7 +290,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
     //code will run when widget rendering complete
   scrollableController1.addListener(_scrollListener1);
   });
-   intrantListeFuture = IntrantService().fetchIntrant();
+   intrantListeFuture = IntrantService().fetchIntrantByPays(widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
    intrantListeFuture1 = getAllIntrant();
   
   }
@@ -480,7 +480,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
 
                                page = 0;
                 hasMore = true;
-                fetchIntrantByCategorie(refresh: true);
+                fetchIntrantByCategorie(widget.detectedCountry != null ? widget.detectedCountry! : "Mali", selectedType!.idCategorieProduit!,refresh: true);
                   if (page == 0 && isLoading == true) {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       scrollableController1.jumpTo(0.0);
@@ -546,10 +546,10 @@ class _IntrantScreenState extends State<IntrantScreen> {
                   debugPrint("refresh page ${page}");
                 selectedType == null ?
                 setState(() {
-                  intrantListeFuture = IntrantService().fetchIntrant();
+                  intrantListeFuture = IntrantService().fetchIntrantByPays(widget.detectedCountry!);
                 }) :
                 setState(() {
-                  intrantListeFuture1 = IntrantService().fetchIntrantByCategorieWithPagination(selectedType!.idCategorieProduit!);
+                  intrantListeFuture1 = IntrantService().fetchIntrantByCategorie(selectedType!.idCategorieProduit!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
                 });
                               },
               child: selectedType == null ?

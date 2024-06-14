@@ -29,7 +29,6 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _Niveau3PageState extends State<Niveau3Page> {
   late TextEditingController _searchController;
-  late ParametreGeneraux para;
   List<Niveau3Pays> niveau3Liste = [];
   final formkey = GlobalKey<FormState>();
   TextEditingController libelleController = TextEditingController();
@@ -37,35 +36,87 @@ class _Niveau3PageState extends State<Niveau3Page> {
   List<ParametreGeneraux> paraList = [];
   late Niveau2Pays niveau2;
   String? niveau2Value;
+  late Acteur acteur;
   late Future _niveau2List;
 
   String? niveau1Value;
   late Future _niveau1List;
   late Niveau1Pays niveau1Pays = Niveau1Pays();
 
-  void verifyParam() {
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+  
+    bool isLoadingLibelle = true;
+    String? libelleNiveau1Pays;
+    String? libelleNiveau2Pays;
+    String? libelleNiveau3Pays;
+   
+    
+ 
+    
+  Future<String> getLibelleNiveau1PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau1Pays/$id'));
 
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
     } else {
-      // Gérer le cas où la liste est null ou vide, par exemple :
-      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+      throw Exception('Failed to load libelle niveau1Pays');
+    }
+}
+  Future<String> getLibelleNiveau2PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau2Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau2Pays');
+    }
+}
+  Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+}
+  
+
+     Future<void> fetchPaysDataByActor() async {
+    try {
+      String libelle1 = await getLibelleNiveau1PaysByActor(acteur.idActeur!);
+      String libelle2 = await getLibelleNiveau2PaysByActor(acteur.idActeur!);
+      String libelle3 = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
+     
+      setState(() { 
+        libelleNiveau1Pays = libelle1;
+        libelleNiveau2Pays = libelle2;
+        libelleNiveau3Pays = libelle3;
+       
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
     }
   }
+
+  
 
   @override
   void initState() {
     _searchController = TextEditingController();
-    verifyParam();
     // _niveau1List =
     //     http.get(Uri.parse('https://koumi.ml/api-koumi/niveau1Pays/read'));
-
+   fetchPaysDataByActor();
+   acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // // _niveau2List == null;
     // _niveau2List = http.get(Uri.parse(
     //     'https://koumi.ml/api-koumi/niveau2Pays/listeNiveau2PaysByIdNiveau1Pays/${niveau1Pays.idNiveau1Pays}'));
-
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau2Pays/read'));
     super.initState();
   }
@@ -95,7 +146,7 @@ class _Niveau3PageState extends State<Niveau3Page> {
             },
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: Text(
-          "Niveau 3 : ${para.libelleNiveau3Pays}",
+          "Niveau 3 : ${libelleNiveau3Pays}",
           style:
               const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
@@ -110,7 +161,7 @@ class _Niveau3PageState extends State<Niveau3Page> {
                     color: Colors.green,
                   ),
                   title: Text(
-                    "Ajouter un ${para.libelleNiveau3Pays}",
+                    "Ajouter un ${libelleNiveau3Pays}",
                     style: TextStyle(
                         color: Colors.green,
                         fontWeight: FontWeight.bold,
@@ -188,7 +239,7 @@ class _Niveau3PageState extends State<Niveau3Page> {
                           padding: EdgeInsets.all(10),
                           child: Center(
                               child: Text(
-                                  "Aucun ${para.libelleNiveau3Pays} trouvé")),
+                                  "Aucun ${libelleNiveau3Pays} trouvé")),
                         );
                       } else {
                         niveau3Liste = snapshot.data!;
@@ -847,7 +898,6 @@ class AddDialog extends StatefulWidget {
 }
 
 class _AddDialogState extends State<AddDialog> {
-  late ParametreGeneraux para;
   List<Niveau3Pays> niveau3Liste = [];
   final formkey = GlobalKey<FormState>();
   TextEditingController libelleController = TextEditingController();
@@ -861,6 +911,68 @@ class _AddDialogState extends State<AddDialog> {
   late Future _niveau1List;
   late Niveau1Pays niveau1Pays = Niveau1Pays();
 
+   bool isLoadingLibelle = true;
+    String? libelleNiveau1Pays;
+    String? libelleNiveau2Pays;
+    String? libelleNiveau3Pays;
+   
+    
+ 
+    
+  Future<String> getLibelleNiveau1PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau1Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau1Pays');
+    }
+}
+  Future<String> getLibelleNiveau2PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau2Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau2Pays');
+    }
+}
+  Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response.body;  // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau3Pays');
+    }
+}
+  
+
+     Future<void> fetchPaysDataByActor() async {
+    try {
+      String libelle1 = await getLibelleNiveau1PaysByActor(acteur.idActeur!);
+      String libelle2 = await getLibelleNiveau2PaysByActor(acteur.idActeur!);
+      String libelle3 = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
+     
+      setState(() { 
+        libelleNiveau1Pays = libelle1;
+        libelleNiveau2Pays = libelle2;
+        libelleNiveau3Pays = libelle3;
+       
+        isLoadingLibelle = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle = false;
+        });
+      print('Error: $e');
+    }
+  }
+
+
   // void verifyParam() {
   //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
   //       .parametreList!;
@@ -872,35 +984,8 @@ class _AddDialogState extends State<AddDialog> {
   //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
   //   }
   // }
-  bool isLoadingLibelle = true;
-    String? libelleNiveau3Pays;
+
  
-  Future<String> getLibelleNiveau3PaysByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
-
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load libelle niveau3Pays');
-    }
- }
-
-     Future<void> fetchPaysDataByActor() async {
-    try {
-      String libelle3 = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
-
-      setState(() { 
-        libelleNiveau3Pays = libelle3;
-        isLoadingLibelle = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-        });
-      print('Error: $e');
-    }
-  }
 
   @override
   void initState() {
@@ -1005,7 +1090,7 @@ class _AddDialogState extends State<AddDialog> {
                               onChanged: null,
                               decoration: InputDecoration(
                                 labelText:
-                                    'Aucun ${para.libelleNiveau1Pays} trouvé',
+                                    'Aucun ${libelleNiveau1Pays} trouvé',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -1041,7 +1126,7 @@ class _AddDialogState extends State<AddDialog> {
                             },
                             decoration: InputDecoration(
                               labelText:
-                                  'Sélectionner un ${para.libelleNiveau1Pays}',
+                                  'Sélectionner un ${libelleNiveau1Pays}',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -1053,7 +1138,7 @@ class _AddDialogState extends State<AddDialog> {
                         items: [],
                         onChanged: null,
                         decoration: InputDecoration(
-                          labelText: 'Aucun ${para.libelleNiveau1Pays} trouvé',
+                          labelText: 'Aucun ${libelleNiveau1Pays} trouvé',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -1094,7 +1179,7 @@ class _AddDialogState extends State<AddDialog> {
                               onChanged: null,
                               decoration: InputDecoration(
                                 labelText:
-                                    'Aucun ${para.libelleNiveau2Pays} trouvé',
+                                    'Aucun ${libelleNiveau2Pays} trouvé',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -1126,7 +1211,7 @@ class _AddDialogState extends State<AddDialog> {
                             },
                             decoration: InputDecoration(
                               labelText:
-                                  'Sélectionner un ${para.libelleNiveau2Pays}',
+                                  'Sélectionner un ${libelleNiveau2Pays}',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -1138,7 +1223,7 @@ class _AddDialogState extends State<AddDialog> {
                         items: [],
                         onChanged: null,
                         decoration: InputDecoration(
-                          labelText: 'Aucun ${para.libelleNiveau2Pays} trouvé',
+                          labelText: 'Aucun ${libelleNiveau2Pays} trouvé',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),

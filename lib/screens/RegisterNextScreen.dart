@@ -359,7 +359,7 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                       Padding(
                         padding: const EdgeInsets.only(left: 10.0),
                         child: Text(
-                          "Localisation",
+                          "Localité",
                           style: TextStyle(color: (Colors.black), fontSize: 18),
                         ),
                       ),
