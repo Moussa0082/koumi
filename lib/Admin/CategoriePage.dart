@@ -29,7 +29,7 @@ class _CategoriPageState extends State<CategoriPage> {
   Future<List<CategorieProduit>> getCatListe(String id) async {
     return await CategorieService().fetchCategorieByFiliere(id);
   }
-
+  
   List<CategorieProduit> categorieList = [];
   List<Speculation> speculationList = [];
   late Future<List<CategorieProduit>> _liste;

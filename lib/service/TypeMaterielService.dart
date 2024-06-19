@@ -68,7 +68,7 @@ Future<void> updateTypeVoiture({
       return typeList;
     } else {
       typeList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête type mat avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }

@@ -10,6 +10,7 @@ import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Filiere.dart';
 import 'package:koumi_app/models/Forme.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Stock.dart';
@@ -53,62 +54,60 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
   File? photo;
   String? formeValue;
   late Future _formeList;
-
   late Future _niveau3List;
   String? n3Value;
   String niveau3 = '';
   String forme = '';
-  List<ParametreGeneraux> paraList = [];
-  late ParametreGeneraux para = ParametreGeneraux();
-    bool isLoadingLibelle = true;
-    String? libelleNiveau3Pays;
+  // List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para = ParametreGeneraux();
+  bool isLoadingLibelle = true;
+  String? libelleNiveau3Pays;
+  String? monnaieValue;
+  late Future _monnaieList;
+  late Monnaie monnaie = Monnaie();
+  // String? monnaie;
 
-    String? monnaie;
+//    Future<String> getMonnaieByActor(String id) async {
+//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
 
+//     if (response.statusCode == 200) {
+//       print("monnaie : ${response.body}");
+//       return response.body;  // Return the body directly since it's a plain string
+//     } else {
+//       throw Exception('Failed to load monnaie');
+//     }
+// }
 
-   Future<String> getMonnaieByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+//  Future<void> fetchPaysDataByActor() async {
+//     try {
+//       String monnaies = await getMonnaieByActor(acteur.idActeur!);
 
-    if (response.statusCode == 200) {
-      print("monnaie : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load monnaie');
-    }
-}
+//       setState(() {
+//         monnaie = monnaies;
+//         isLoadingLibelle = false;
+//       });
+//     } catch (e) {
+//       setState(() {
+//         isLoadingLibelle = false;
+//         });
+//       print('Error: $e');
+//     }
+//   }
 
- Future<void> fetchPaysDataByActor() async {
-    try {
-      String monnaies = await getMonnaieByActor(acteur.idActeur!);
-
-      setState(() { 
-        monnaie = monnaies;
-        isLoadingLibelle = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-        });
-      print('Error: $e');
-    }
-  }
-
-
-
- 
-    
   Future<String> getLibelleNiveau3PaysByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+    final response = await http
+        .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
 
     if (response.statusCode == 200) {
       print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
+      return response
+          .body; // Return the body directly since it's a plain string
     } else {
       throw Exception('Failed to load libelle niveau3Pays');
     }
-}
+  }
 
-     Future<void> fetchLibelleNiveau3Pays() async {
+  Future<void> fetchLibelleNiveau3Pays() async {
     try {
       String libelle = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
       setState(() {
@@ -122,7 +121,6 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
       print('Error: $e');
     }
   }
-
 
   Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
@@ -193,26 +191,26 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
     );
   }
 
-  void verifyParam() {
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+  // void verifyParam() {
+  //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+  //       .parametreList!;
 
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
-    } else {
-      // Gérer le cas où la liste est null ou vide, par exemple :
-      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
-    }
-  }
+  //   if (paraList.isNotEmpty) {
+  //     para = paraList[0];
+  //   } else {
+  //     // Gérer le cas où la liste est null ou vide, par exemple :
+  //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+  //   }
+  // }
 
   @override
   void initState() {
+    super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // typeActeurData = acteur.typeActeur!;
     // type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
 
-    super.initState();
     if (widget.isEditable! == true) {
       _nomController.text = widget.stock!.nomProduit!;
       _formController.text = widget.stock!.formeProduit!;
@@ -221,14 +219,16 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
       _quantiteController.text = widget.stock!.quantiteStock!.toString();
       forme = widget.stock!.formeProduit!;
       niveau3 = widget.stock!.origineProduit!;
+      monnaie = widget.stock!.monnaie!;
+      monnaieValue = widget.stock!.monnaie!.idMonnaie;
     }
-    _formeList = http
-        .get(Uri.parse('$apiOnlineUrl/formeproduit/getAllForme/'));
-    _niveau3List =
-        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
-    verifyParam();
+    _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
+    _formeList = http.get(Uri.parse('$apiOnlineUrl/formeproduit/getAllForme/'));
+    _niveau3List = http.get(Uri.parse(
+        '$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
+    // verifyParam();
     fetchLibelleNiveau3Pays();
-    fetchPaysDataByActor();
+    // fetchPaysDataByActor();
   }
 
   @override
@@ -388,10 +388,11 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                               dynamic responseData = json.decode(jsonString);
 
                               if (responseData is List) {
-                                 final reponse = responseData;
+                                final reponse = responseData;
                                 final formeListe = reponse
                                     .map((e) => Forme.fromMap(e))
-                                    .where((element) => element.statutForme == true)
+                                    .where((element) =>
+                                        element.statutForme == true)
                                     .toList();
 
                                 if (formeListe.isEmpty) {
@@ -426,8 +427,9 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                       formeValue = newValue;
                                       if (newValue != null) {
                                         forme = formeListe
-                            .firstWhere((e) => e.idForme == newValue)
-                            .libelleForme!;
+                                            .firstWhere(
+                                                (e) => e.idForme == newValue)
+                                            .libelleForme!;
                                       }
                                       debugPrint("fr : ${forme}");
                                     });
@@ -445,19 +447,18 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                 );
                               } else {
                                 // Handle case when response data is not a list
-                                return  DropdownButtonFormField(
-                                    items: [],
-                                    onChanged: null,
-                                    decoration: InputDecoration(
-                                      labelText: 'Probleme de connexion',
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 20),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Probleme de connexion',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                  );
+                                  ),
+                                );
                               }
                             } else {
                               return DropdownButtonFormField(
@@ -479,28 +480,33 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                       SizedBox(
                         height: 10,
                       ),
-                       isLoadingLibelle ?
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text("Chargement ................",style: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.bold),)),
-                      )
-                      :
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 22,
-                        ),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                           libelleNiveau3Pays != null ? libelleNiveau3Pays!.toUpperCase() : "Origine du produit",
-                            style:
-                                TextStyle(color: (Colors.black), fontSize: 18),
-                          ),
-                        ),
-                      ),
+                      isLoadingLibelle
+                          ? Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    "Chargement...",
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
+                                  )),
+                            )
+                          : Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 22,
+                              ),
+                              child: Align(
+                                alignment: Alignment.topLeft,
+                                child: Text(
+                                  libelleNiveau3Pays != null
+                                      ? libelleNiveau3Pays!.toUpperCase()
+                                      : "Origine du produit",
+                                  style: TextStyle(
+                                      color: (Colors.black), fontSize: 18),
+                                ),
+                              ),
+                            ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 20),
@@ -513,7 +519,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                 items: [],
                                 onChanged: null,
                                 decoration: InputDecoration(
-                                  labelText: 'En cours de chargement ...',
+                                  labelText: 'En cours de chargement...',
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(
@@ -528,7 +534,6 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                   utf8.decode(snapshot.data.bodyBytes);
                               dynamic responseData = json.decode(jsonString);
 
-                             
                               if (responseData is List) {
                                 final reponse = responseData;
                                 final niveau3Liste = reponse
@@ -568,10 +573,11 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                       n3Value = newValue;
                                       if (newValue != null) {
                                         niveau3 = niveau3Liste
-                            .firstWhere((e) => e.idNiveau3Pays == newValue)
-                            .nomN3;
+                                            .firstWhere((e) =>
+                                                e.idNiveau3Pays == newValue)
+                                            .nomN3;
                                       }
-                                        print("niveau 3 origne : ${niveau3}");
+                                      print("niveau 3 origne : ${niveau3}");
                                     });
                                   },
                                   decoration: InputDecoration(
@@ -618,6 +624,133 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                       SizedBox(
                         height: 10,
                       ),
+                       Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 22,
+                        ),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            "Chosir la monnaie",
+                            style:
+                                TextStyle(color: (Colors.black), fontSize: 18),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        child: FutureBuilder(
+                          future: _monnaieList,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Chargement...',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+
+                            if (snapshot.hasData) {
+                              dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+
+                              if (responseData is List) {
+                                List<Monnaie> speList = responseData
+                                    .map((e) => Monnaie.fromMap(e))
+                                    .toList();
+
+                                if (speList.isEmpty) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Aucun monnaie trouvé',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return DropdownButtonFormField<String>(
+                                  isExpanded: true,
+                                  items: speList
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idMonnaie,
+                                          child: Text(e.sigle!),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: monnaieValue,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      monnaieValue = newValue;
+                                      if (newValue != null) {
+                                        monnaie = speList.firstWhere(
+                                          (element) =>
+                                              element.idMonnaie == newValue,
+                                        );
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Sélectionner la monnaie',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                // Handle case when response data is not a list
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucun monnaie trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                            } else {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucun monnaie trouvé',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: 22,
@@ -625,7 +758,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Text(
-                            "Prix du produit en (${monnaie})",
+                            "Prix du produit",
                             style:
                                 TextStyle(color: (Colors.black), fontSize: 18),
                           ),
@@ -701,75 +834,71 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                         height: 10,
                       ),
                       SizedBox(
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: photo != null 
-                            ? GestureDetector(
-                                onTap: _showImageSourceDialog,
-                                child: Image.file(
-
-                                  photo!,
-                                  fit: BoxFit.fitWidth,
-                                  height: 150,
-                                  width: 200,
-                                ),
-                              )
-                            :  widget.isEditable == false ?
-                            // :  widget.stock!.photo == null || widget.stock!.photo!.isEmpty ?
-                             SizedBox(
-                                child: IconButton(
-                                  onPressed: _showImageSourceDialog,
-                                  icon: const Icon(
-                                    Icons.add_a_photo_rounded,
-                                    size: 60,
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: photo != null
+                              ? GestureDetector(
+                                  onTap: _showImageSourceDialog,
+                                  child: Image.file(
+                                    photo!,
+                                    fit: BoxFit.fitWidth,
+                                    height: 150,
+                                    width: 200,
                                   ),
-                                ),
-                              ) 
-                              : Center(
-                          child: widget.stock!.photo != null &&
-                                  !widget.stock!.photo!.isEmpty
-                              ?
-                              
-                          GestureDetector(
-                            onTap: _showImageSourceDialog,
-                            child: CachedNetworkImage(
-                              height: 120,
-                              width: 150,
-                                                    imageUrl:
+                                )
+                              : widget.isEditable == false
+                                  ?
+                                  // :  widget.stock!.photo == null || widget.stock!.photo!.isEmpty ?
+                                  SizedBox(
+                                      child: IconButton(
+                                        onPressed: _showImageSourceDialog,
+                                        icon: const Icon(
+                                          Icons.add_a_photo_rounded,
+                                          size: 60,
+                                        ),
+                                      ),
+                                    )
+                                  : Center(
+                                      child: widget.stock!.photo != null &&
+                                              !widget.stock!.photo!.isEmpty
+                                          ? GestureDetector(
+                                              onTap: _showImageSourceDialog,
+                                              child: CachedNetworkImage(
+                                                height: 120,
+                                                width: 150,
+                                                imageUrl:
                                                     "https://koumi.ml/api-koumi/Stock/${widget.stock!.idStock}/image",
-                                                    fit: BoxFit.cover,
-                                                    placeholder: (context, url) =>
-                                                        const Center(
-                                                            child:
-                                                                CircularProgressIndicator()),
-                                                    errorWidget:
-                                                        (context, url, error) =>
-                                                            Image.asset(
-                                                      'assets/images/default_image.png',
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  ),
-                          )
-
-                             
-                              : SizedBox(
-                                child: IconButton(
-                                  onPressed: _showImageSourceDialog,
-                                  icon: const Icon(
-                                    Icons.add_a_photo_rounded,
-                                    size: 60,
-                                  ),
-                                ),
-                              ) 
-                        )
-                              ,
+                                                fit: BoxFit.cover,
+                                                placeholder: (context, url) =>
+                                                    const Center(
+                                                        child:
+                                                            CircularProgressIndicator()),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        Image.asset(
+                                                  'assets/images/default_image.png',
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            )
+                                          : SizedBox(
+                                              child: IconButton(
+                                                onPressed:
+                                                    _showImageSourceDialog,
+                                                icon: const Icon(
+                                                  Icons.add_a_photo_rounded,
+                                                  size: 60,
+                                                ),
+                                              ),
+                                            )),
+                        ),
                       ),
-                    ),
                       const SizedBox(height: 20),
                       ElevatedButton(
                           onPressed: () async {
                             if (formkey.currentState!.validate()) {
-                              debugPrint("forme: ${forme} , formeValue : ${formeValue}, origin : ${niveau3} , value : ${n3Value}");
+                              debugPrint(
+                                  "forme: ${forme} , formeValue : ${formeValue}, origin : ${niveau3} , value : ${n3Value}");
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -784,18 +913,17 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                             image: photo,
                                             quantite: _quantiteController.text,
                                             stock: widget.stock,
-                                          )))).then((value) => { 
-                                            if(widget.isEditable! == false){
-
-                                            _nomController.clear(),
-                                            _prixController.clear(),
-                                            _quantiteController.clear(),
-                                            setState(() {
-                                              niveau3 == null;
-
-                                            })
-                                            } 
-                                          });
+                                          )))).then((value) => {
+                                    if (widget.isEditable! == false)
+                                      {
+                                        _nomController.clear(),
+                                        _prixController.clear(),
+                                        _quantiteController.clear(),
+                                        setState(() {
+                                          niveau3 == null;
+                                        })
+                                      }
+                                  });
                             }
                           },
                           style: ElevatedButton.styleFrom(

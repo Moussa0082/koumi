@@ -1,25 +1,23 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
-import 'package:koumi_app/models/ParametreGeneraux.dart';
+import 'package:koumi_app/models/Device.dart';
+import 'package:koumi_app/models/Monnaie.dart';
+// import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
-import 'package:koumi_app/service/StockService.dart';
-import 'package:http/http.dart' as http;
+import 'package:koumi_app/service/DeviceService.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-
 
 class DetailProduits extends StatefulWidget {
   late Stock stock;
@@ -42,45 +40,83 @@ class _DetailProduitsState extends State<DetailProduits>
   late List<TypeActeur> typeActeurData = [];
   late String type;
   late ValueNotifier<bool> isDialOpenNotifier;
-    late Stock stock;
+  late Stock stock;
 
   bool isExist = false;
   String? email = "";
-  List<ParametreGeneraux> paraList = [];
-  late ParametreGeneraux para = ParametreGeneraux();
+  // List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para = ParametreGeneraux();
 
   bool isLoadingLibelle = true;
-   String? monnaie;
+  //  String? monnaie;
+  late Future<Map<String, String>> rates;
 
-
-   Future<String> getMonnaieByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
-
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load monnaie');
-    }
-}
-
- Future<void> fetchPaysDataByActor() async {
-    try {
-      String monnaies = await getMonnaieByActor(acteur.idActeur!);
-
-      setState(() { 
-        monnaie = monnaies;
-        isLoadingLibelle = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-        });
-      print('Error: $e');
-    }
+  Future<List<Device>> getDeviceListe(String id) async {
+    return await DeviceService().fetchDeviceByIdMonnaie(id);
   }
 
- void verify() async {
+  Future<Map<String, String>> fetchConvert(Stock stock) async {
+    Monnaie monnaie = stock.monnaie!;
+    int? amount = stock.prix;
+    Map<String, String> result = {};
+
+    try {
+      List<Device> devices = await getDeviceListe(monnaie.idMonnaie!);
+
+      for (var device in devices) {
+        double convertedAmount = amount! * device.taux!;
+        String amountSubString = convertedAmount.toStringAsFixed(2);
+        print(amountSubString);
+        switch (device.nomDevice!.toLowerCase()) {
+          case 'dollar':
+            result[device.sigle!] = amountSubString;
+            break;
+          case 'euro':
+            result[device.sigle!] = amountSubString;
+            break;
+          case 'yuan':
+            result[device.sigle!] = amountSubString;
+            break;
+          default:
+            print('Aucune devise trouvée pour ${device.nomDevice}');
+        }
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+
+    print("conversion : ${result.toString()}");
+    return result;
+  }
+
+//    Future<String> getMonnaieByActor(String id) async {
+//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+//     if (response.statusCode == 200) {
+//       print("libelle : ${response.body}");
+//       return response.body;  // Return the body directly since it's a plain string
+//     } else {
+//       throw Exception('Failed to load monnaie');
+//     }
+// }
+
+//  Future<void> fetchPaysDataByActor() async {
+//     try {
+//       String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+//       setState(() {
+//         monnaie = monnaies;
+//         isLoadingLibelle = false;
+//       });
+//     } catch (e) {
+//       setState(() {
+//         isLoadingLibelle = false;
+//         });
+//       print('Error: $e');
+//     }
+//   }
+
+  void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     email = prefs.getString('emailActeur');
     if (email != null) {
@@ -116,153 +152,149 @@ class _DetailProduitsState extends State<DetailProduits>
     verify();
     // verifyParam();
     stock = widget.stock;
+    rates = fetchConvert(stock);
     setState(() {
       stock = widget.stock;
     });
-    fetchPaysDataByActor();
+    // fetchPaysDataByActor();
     // Initialiser le ValueNotifier
     isDialOpenNotifier = ValueNotifier<bool>(false);
   }
-
-
 
   @override
   Widget build(BuildContext context) {
     const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
     return Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-          centerTitle: true,
-          title: const Text("Détail Produit"),
-          actions:  isExist ?
-      //         (widget.stock.acteur!.idActeur != acteur.idActeur! &&
-      // typeActeurData
-      //     .map((e) => e.libelle!.toLowerCase())
-      //     .contains("admin") ) ?
-           [
-            //  PopupMenuButton<String>(
-            //                                           padding: EdgeInsets.zero,
-            //                                           itemBuilder: (context) =>
-            //                                               <PopupMenuEntry<
-            //                                                   String>>[
-            //                                             PopupMenuItem<String>(
-            //                                                 child: ListTile(
-            //                                               leading: widget.stock.statutSotck ==
-            //                                                       false
-            //                                                   ? Icon(
-            //                                                       Icons.check,
-            //                                                       color: Colors
-            //                                                           .green,
-            //                                                     )
-            //                                                   : Icon(
-            //                                                       Icons
-            //                                                           .disabled_visible,
-            //                                                       color: Colors
-            //                                                               .orange[
-            //                                                           400]),
-            //                                               title: Text(
-            //                                                 widget.stock.statutSotck ==
-            //                                                         false
-            //                                                     ? "Activer"
-            //                                                     : "Desactiver",
-            //                                                 style: TextStyle(
-            //                                                   color: widget.stock.statutSotck ==
-            //                                                           false
-            //                                                       ? Colors.green
-            //                                                       : Colors.red,
-            //                                                   fontWeight:
-            //                                                       FontWeight
-            //                                                           .bold,
-            //                                                 ),
-            //                                               ),
-            //                                               onTap: () async {
-            //                                                 // Changement d'état du magasin ici
-                                                            
-            //                                                             widget.stock.statutSotck ==
-            //                                                         false
-            //                                                     ? await StockService()
-            //                                                         .activerStock(
-            //                                                             widget.stock.idStock!)
-            //                                                         .then(
-            //                                                             (value) =>
-            //                                                                 {
-                                                                             
-            //                                                                   Navigator.of(context).pop(),
-            //                                                                 })
-            //                                                         .catchError(
-            //                                                             (onError) =>
-            //                                                                 {
-            //                                                                   ScaffoldMessenger.of(context).showSnackBar(
-            //                                                                     const SnackBar(
-            //                                                                       content: Row(
-            //                                                                         children: [
-            //                                                                           Text("Une erreur s'est produit"),
-            //                                                                         ],
-            //                                                                       ),
-            //                                                                       duration: Duration(seconds: 5),
-            //                                                                     ),
-            //                                                                   ),
-            //                                                                   Navigator.of(context).pop(),
-            //                                                                 })
-            //                                                     : await StockService()
-            //                                                         .desactiverStock(
-            //                                                             widget.stock.idStock!)
-            //                                                         .then(
-            //                                                             (value) =>
-            //                                                                 {
-                                                                             
-            //                                                                   Navigator.of(context).pop(),
-            //                                                                 });
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+            centerTitle: true,
+            title: const Text("Détail Produit"),
+            actions: isExist
+                ?
+                //         (widget.stock.acteur!.idActeur != acteur.idActeur! &&
+                // typeActeurData
+                //     .map((e) => e.libelle!.toLowerCase())
+                //     .contains("admin") ) ?
+                [
+                    //  PopupMenuButton<String>(
+                    //                                           padding: EdgeInsets.zero,
+                    //                                           itemBuilder: (context) =>
+                    //                                               <PopupMenuEntry<
+                    //                                                   String>>[
+                    //                                             PopupMenuItem<String>(
+                    //                                                 child: ListTile(
+                    //                                               leading: widget.stock.statutSotck ==
+                    //                                                       false
+                    //                                                   ? Icon(
+                    //                                                       Icons.check,
+                    //                                                       color: Colors
+                    //                                                           .green,
+                    //                                                     )
+                    //                                                   : Icon(
+                    //                                                       Icons
+                    //                                                           .disabled_visible,
+                    //                                                       color: Colors
+                    //                                                               .orange[
+                    //                                                           400]),
+                    //                                               title: Text(
+                    //                                                 widget.stock.statutSotck ==
+                    //                                                         false
+                    //                                                     ? "Activer"
+                    //                                                     : "Desactiver",
+                    //                                                 style: TextStyle(
+                    //                                                   color: widget.stock.statutSotck ==
+                    //                                                           false
+                    //                                                       ? Colors.green
+                    //                                                       : Colors.red,
+                    //                                                   fontWeight:
+                    //                                                       FontWeight
+                    //                                                           .bold,
+                    //                                                 ),
+                    //                                               ),
+                    //                                               onTap: () async {
+                    //                                                 // Changement d'état du magasin ici
 
-            //                                                 ScaffoldMessenger
-            //                                                         .of(context)
-            //                                                     .showSnackBar(
-            //                                                   SnackBar(
-            //                                                     content: Row(
-            //                                                       children: [
-            //                                                         Text(widget.stock.statutSotck ==
-            //                                                                 false
-            //                                                             ? "Activer avec succèss "
-            //                                                             : "Desactiver avec succèss"),
-            //                                                       ],
-            //                                                     ),
-            //                                                     duration:
-            //                                                         Duration(
-            //                                                             seconds:
-            //                                                                 2),
-            //                                                   ),
-            //                                                 );
-            //                                               },
-            //                                             )),
-            //                                           ],
-            //                                         ),
-                  acteur.idActeur != widget.stock.acteur!.idActeur
-                      ? SizedBox()
-                      : IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        AddAndUpdateProductScreen(
-                                          isEditable: true,
-                                          stock: widget.stock,
-                                        )));
-                          },
-                          icon: Icon(
-                            Icons.edit,
-                          ),
-                        )
-          ] : null
+                    //                                                             widget.stock.statutSotck ==
+                    //                                                         false
+                    //                                                     ? await StockService()
+                    //                                                         .activerStock(
+                    //                                                             widget.stock.idStock!)
+                    //                                                         .then(
+                    //                                                             (value) =>
+                    //                                                                 {
 
-              
-                        
-                
-        ),
+                    //                                                                   Navigator.of(context).pop(),
+                    //                                                                 })
+                    //                                                         .catchError(
+                    //                                                             (onError) =>
+                    //                                                                 {
+                    //                                                                   ScaffoldMessenger.of(context).showSnackBar(
+                    //                                                                     const SnackBar(
+                    //                                                                       content: Row(
+                    //                                                                         children: [
+                    //                                                                           Text("Une erreur s'est produit"),
+                    //                                                                         ],
+                    //                                                                       ),
+                    //                                                                       duration: Duration(seconds: 5),
+                    //                                                                     ),
+                    //                                                                   ),
+                    //                                                                   Navigator.of(context).pop(),
+                    //                                                                 })
+                    //                                                     : await StockService()
+                    //                                                         .desactiverStock(
+                    //                                                             widget.stock.idStock!)
+                    //                                                         .then(
+                    //                                                             (value) =>
+                    //                                                                 {
+
+                    //                                                                   Navigator.of(context).pop(),
+                    //                                                                 });
+
+                    //                                                 ScaffoldMessenger
+                    //                                                         .of(context)
+                    //                                                     .showSnackBar(
+                    //                                                   SnackBar(
+                    //                                                     content: Row(
+                    //                                                       children: [
+                    //                                                         Text(widget.stock.statutSotck ==
+                    //                                                                 false
+                    //                                                             ? "Activer avec succèss "
+                    //                                                             : "Desactiver avec succèss"),
+                    //                                                       ],
+                    //                                                     ),
+                    //                                                     duration:
+                    //                                                         Duration(
+                    //                                                             seconds:
+                    //                                                                 2),
+                    //                                                   ),
+                    //                                                 );
+                    //                                               },
+                    //                                             )),
+                    //                                           ],
+                    //                                         ),
+                    acteur.idActeur != widget.stock.acteur!.idActeur
+                        ? SizedBox()
+                        : IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          AddAndUpdateProductScreen(
+                                            isEditable: true,
+                                            stock: widget.stock,
+                                          )));
+                            },
+                            icon: Icon(
+                              Icons.edit,
+                            ),
+                          )
+                  ]
+                : null),
         body: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min, // Set mainAxisSize to min
@@ -310,7 +342,7 @@ class _DetailProduitsState extends State<DetailProduits>
                         child: Text(
                           maxLines: 2,
                           widget.stock.nomProduit!.toUpperCase(),
-                            textAlign: TextAlign.right,
+                          textAlign: TextAlign.right,
                           style: const TextStyle(
                               overflow: TextOverflow.ellipsis,
                               fontSize: 20,
@@ -327,7 +359,7 @@ class _DetailProduitsState extends State<DetailProduits>
                               fontSize: 20, fontStyle: FontStyle.italic),
                         ),
                         Text(
-                          textAlign:TextAlign.right,
+                            textAlign: TextAlign.right,
                             widget.stock
                                 .formeProduit!, // Use optional chaining and ??
                             style: TextStyle(
@@ -342,9 +374,8 @@ class _DetailProduitsState extends State<DetailProduits>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text("Quantité : ",
-                        maxLines: 2,
+                            maxLines: 2,
                             style: TextStyle(
-
                                 fontSize: 20, fontStyle: FontStyle.italic)),
                         Text(widget.stock.quantiteStock!.toInt().toString(),
                             style: TextStyle(
@@ -373,6 +404,42 @@ class _DetailProduitsState extends State<DetailProduits>
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Prix",
+                            style: TextStyle(
+                                fontSize: 20, fontStyle: FontStyle.italic)),
+                        Text(
+                          maxLines: 2,
+                          textAlign: TextAlign.right,
+                          '${widget.stock.prix!.toInt()} ${widget.stock.monnaie!.libelle}',
+                          style: TextStyle(
+                            overflow: TextOverflow.ellipsis,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ),
+                    FutureBuilder<Map<String, String>>(
+                      future: rates,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else {
+                          return Column(
+                            children: snapshot.data!.entries.map((entry) {
+                              return _buildItem(
+                                  "Prix en ${entry.key}", "${entry.value}");
+                            }).toList(),
+                          );
+                        }
+                      },
                     ),
                     Container(
                       height: 40,
@@ -427,12 +494,21 @@ class _DetailProduitsState extends State<DetailProduits>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          // Text(
+                          //   '${widget.stock.prix!.toInt()} (${widget.stock.monnaie!.libelle})', // Convertir en entier
+                          //   style: const TextStyle(
+                          //       overflow: TextOverflow.ellipsis,
+                          //       fontSize: 20,
+                          //       fontWeight: FontWeight.bold),
+                          // ),
                           Text(
-                            '${widget.stock.prix!.toInt()} (${monnaie})', // Convertir en entier
+                            'Note', // Convertir en entier
                             style: const TextStyle(
-                              overflow: TextOverflow.ellipsis,
-                                fontSize: 20, fontWeight: FontWeight.bold),
+                                overflow: TextOverflow.ellipsis,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold),
                           ),
+
                           RatingBar.builder(
                             initialRating: 3,
                             minRating: 0,
@@ -482,7 +558,7 @@ class _DetailProduitsState extends State<DetailProduits>
                         Flexible(
                           child: Text(
                             maxLines: 2,
-                             textAlign: TextAlign.right,
+                            textAlign: TextAlign.right,
                             widget.stock.typeProduit!,
                             style: TextStyle(
                               overflow: TextOverflow.ellipsis,
@@ -550,7 +626,7 @@ class _DetailProduitsState extends State<DetailProduits>
                                 ),
                               )
                         : SizedBox(),
-                                          const SizedBox(height: 10),
+                    const SizedBox(height: 10),
                   ],
                 ),
               )
@@ -558,108 +634,106 @@ class _DetailProduitsState extends State<DetailProduits>
           ),
         ),
 
-    //     floatingActionButton: 
-    //     widget.stock.acteur!.idActeur != acteur.idActeur ?
-    // SpeedDial(
-    //   backgroundColor: d_colorGreen,
-    //   foregroundColor: Colors.white,
-    //   overlayColor: Colors.black,
-    //   overlayOpacity: 0.4,
-    //   spacing: 12,
-    //   icon: Icons.phone,
-    //   children: [
-    //     SpeedDialChild(
-    //       child: FaIcon(FontAwesomeIcons.whatsapp),
-    //       label: 'Par WhatsApp',
-    //       labelStyle: TextStyle(
-    //         color: Colors.black,
-    //         fontSize: 15,
-    //         fontWeight: FontWeight.w500,
-    //       ),
-    //       onTap: () {
-    //         final String whatsappNumber = widget.stock.acteur!.whatsAppActeur!;
-    //         _makePhoneWa(whatsappNumber);
-    //       },
-    //     ),
-    //     SpeedDialChild(
-    //       child: Icon(Icons.phone),
-    //       label: 'Par téléphone',
-    //       labelStyle: TextStyle(
-    //         color: Colors.black,
-    //         fontSize: 15,
-    //         fontWeight: FontWeight.w500,
-    //       ),
-    //       onTap: () {
-    //         final String numberPhone = widget.stock.acteur!.telephoneActeur!;
-    //         _makePhoneCall(numberPhone);
-    //       },
-    //     )
-    //   ],
-    //   // État du Speed Dial (ouvert ou fermé)
-    //   openCloseDial: isDialOpenNotifier,
-    //   // Fonction appelée lorsque le bouton principal est pressé
-    //   onPress: () {
-    //     isDialOpenNotifier.value = !isDialOpenNotifier.value;
-    //   },
-    // )
-    // :
-    // Container()
-      floatingActionButton: acteur.idActeur != stock.acteur!.idActeur
-                ? SpeedDial(
-                    // animatedIcon: AnimatedIcons.close_menu,
+        //     floatingActionButton:
+        //     widget.stock.acteur!.idActeur != acteur.idActeur ?
+        // SpeedDial(
+        //   backgroundColor: d_colorGreen,
+        //   foregroundColor: Colors.white,
+        //   overlayColor: Colors.black,
+        //   overlayOpacity: 0.4,
+        //   spacing: 12,
+        //   icon: Icons.phone,
+        //   children: [
+        //     SpeedDialChild(
+        //       child: FaIcon(FontAwesomeIcons.whatsapp),
+        //       label: 'Par WhatsApp',
+        //       labelStyle: TextStyle(
+        //         color: Colors.black,
+        //         fontSize: 15,
+        //         fontWeight: FontWeight.w500,
+        //       ),
+        //       onTap: () {
+        //         final String whatsappNumber = widget.stock.acteur!.whatsAppActeur!;
+        //         _makePhoneWa(whatsappNumber);
+        //       },
+        //     ),
+        //     SpeedDialChild(
+        //       child: Icon(Icons.phone),
+        //       label: 'Par téléphone',
+        //       labelStyle: TextStyle(
+        //         color: Colors.black,
+        //         fontSize: 15,
+        //         fontWeight: FontWeight.w500,
+        //       ),
+        //       onTap: () {
+        //         final String numberPhone = widget.stock.acteur!.telephoneActeur!;
+        //         _makePhoneCall(numberPhone);
+        //       },
+        //     )
+        //   ],
+        //   // État du Speed Dial (ouvert ou fermé)
+        //   openCloseDial: isDialOpenNotifier,
+        //   // Fonction appelée lorsque le bouton principal est pressé
+        //   onPress: () {
+        //     isDialOpenNotifier.value = !isDialOpenNotifier.value;
+        //   },
+        // )
+        // :
+        // Container()
+        floatingActionButton: acteur.idActeur != stock.acteur!.idActeur
+            ? SpeedDial(
+                // animatedIcon: AnimatedIcons.close_menu,
 
-                    backgroundColor: d_colorGreen,
-                    foregroundColor: Colors.white,
-                    overlayColor: Colors.black,
-                    overlayOpacity: 0.7,
-                    spacing: 12,
-                    icon: Icons.phone,
+                backgroundColor: d_colorGreen,
+                foregroundColor: Colors.white,
+                overlayColor: Colors.black,
+                overlayOpacity: 0.7,
+                spacing: 12,
+                icon: Icons.phone,
 
-                    children: [
-                      SpeedDialChild(
-                        child: FaIcon(FontAwesomeIcons.whatsapp),
-                        label: 'Par wathsApp',
-                        labelStyle: TextStyle(
-                          color: Colors.black,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        onTap: () {
-                          final String whatsappNumber =
-                              stock.acteur!.whatsAppActeur!;
-                          _makePhoneWa(whatsappNumber);
-                        },
-                      ),
-                      SpeedDialChild(
-                        child: Icon(Icons.phone),
-                        label: 'Par téléphone ',
-                        labelStyle: TextStyle(
-                          color: Colors.black,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        onTap: () {
-                          final String numberPhone =
-                              stock.acteur!.telephoneActeur!;
-                          _makePhoneCall(numberPhone);
-                        },
-                      )
-                    ],
-                    // État du Speed Dial (ouvert ou fermé)
-                    openCloseDial: isDialOpenNotifier,
-                    // Fonction appelée lorsque le bouton principal est pressé
-                    onPress: () {
-                      isDialOpenNotifier.value = !isDialOpenNotifier
-                          .value; // Inverser la valeur du ValueNotifier
+                children: [
+                  SpeedDialChild(
+                    child: FaIcon(FontAwesomeIcons.whatsapp),
+                    label: 'Par wathsApp',
+                    labelStyle: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    onTap: () {
+                      final String whatsappNumber =
+                          stock.acteur!.whatsAppActeur!;
+                      _makePhoneWa(whatsappNumber);
+                    },
+                  ),
+                  SpeedDialChild(
+                    child: Icon(Icons.phone),
+                    label: 'Par téléphone ',
+                    labelStyle: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    onTap: () {
+                      final String numberPhone = stock.acteur!.telephoneActeur!;
+                      _makePhoneCall(numberPhone);
                     },
                   )
-                : Container() 
-    //// Si l'utilisateur est connecté et que le stock lui appartient, ne pas afficher le bouton de téléphone
-);
+                ],
+                // État du Speed Dial (ouvert ou fermé)
+                openCloseDial: isDialOpenNotifier,
+                // Fonction appelée lorsque le bouton principal est pressé
+                onPress: () {
+                  isDialOpenNotifier.value = !isDialOpenNotifier
+                      .value; // Inverser la valeur du ValueNotifier
+                },
+              )
+            : Container()
+        //// Si l'utilisateur est connecté et que le stock lui appartient, ne pas afficher le bouton de téléphone
+        );
   }
 
-
-   Future<void> _makePhoneWa(String whatsappNumber) async {
+  Future<void> _makePhoneWa(String whatsappNumber) async {
     final Uri launchUri = Uri(
       scheme: 'https',
       host: 'wa.me',
@@ -677,10 +751,42 @@ class _DetailProduitsState extends State<DetailProduits>
     await launchUrl(launchUri);
   }
 
-
+  Widget _buildItem(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w500,
+                  fontStyle: FontStyle.italic,
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 16),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              maxLines: 2,
+              // softWrap: true,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w800,
+                overflow: TextOverflow.ellipsis,
+                fontSize: 16,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
 }
-
-
 
 class DetailScreen extends StatelessWidget {
   @override

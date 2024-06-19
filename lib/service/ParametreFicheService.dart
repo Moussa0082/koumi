@@ -96,7 +96,7 @@ class ParametreFicheService extends ChangeNotifier {
       } else {
         paramList = [];
         print(
-            'Échec de la requête avec le code d\'état: ${response.statusCode}');
+            'Échec de la requête pa fiche avec le code d\'état: ${response.statusCode}');
         throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
       }
     } catch (e) {

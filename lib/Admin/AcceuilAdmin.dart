@@ -1,4 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:koumi_app/Admin/ActeurScreen.dart';
 import 'package:koumi_app/Admin/AlerteScreen.dart';
 import 'package:koumi_app/Admin/CategoriePage.dart';
@@ -6,11 +11,12 @@ import 'package:koumi_app/Admin/FiliereScreen.dart';
 import 'package:koumi_app/Admin/ProfilA.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/CountryProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
-import 'package:koumi_app/screens/Location.dart';
+import 'package:koumi_app/screens/Location.dart' as l;
 import 'package:koumi_app/screens/MesCommande.dart';
 import 'package:koumi_app/screens/MyProduct.dart';
 import 'package:koumi_app/screens/Panier.dart';
@@ -42,6 +48,116 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
   String? email = "";
   bool isExist = false;
 
+    String? detectedC;
+  String? isoCountryCode;
+  String? country;
+  String? detectedCountryCode;
+  String? detectedCountry;
+  CountryProvider? countryProvider;
+  late BuildContext _currentContext;
+
+    void getLocationNew() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        await Geolocator.openLocationSettings();
+        return Future.error('Location services are disabled.');
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return Future.error('Location permissions are denied');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        return Future.error('Location permissions are permanently denied.');
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      Placemark placemark = placemarks.first;
+      setState(() {
+        detectedCountryCode = placemark.isoCountryCode!;
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  var latitude = 'Getting Latitude..'.obs;
+  var longitude = 'Getting Longitude..'.obs;
+  var address = 'Getting Address..'.obs;
+  late StreamSubscription<Position> streamSubscription;
+
+  getLocation() async {
+    bool serviceEnabled;
+
+    LocationPermission permission;
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      await Geolocator.openLocationSettings();
+      return Future.error('Location services are disabled.');
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    streamSubscription =
+        Geolocator.getPositionStream().listen((Position position) {
+      latitude.value = 'Latitude : ${position.latitude}';
+      longitude.value = 'Longitude : ${position.longitude}';
+      getAddressFromLatLang(position);
+    });
+  }  
+  
+  Future<void> getAddressFromLatLang(Position position) async {
+    List<Placemark> placemark =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+    Placemark place = placemark[0];
+    debugPrint("Address ISO: $detectedC");
+    address.value =
+        'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
+        if(mounted)
+        setState(() {
+          
+    detectedC = place.isoCountryCode;
+    detectedCountryCode = place.isoCountryCode!;
+    detectedCountry = place.country!;
+        });
+
+    debugPrint(
+        "Address: admin accueil  ${place.locality},${place.country},${place.isoCountryCode}");
+  }
+
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     email = prefs.getString('emailActeur');
@@ -64,6 +180,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
     super.initState();
     //   WidgetsBinding.instance.addPostFrameCallback((_) {
     verify();
+    getLocation();
     //  Snack.info(message:'Connecté en tant que : ${acteur.nomActeur!.toUpperCase()}') ;
     //   });
   }
@@ -85,10 +202,13 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
       appBar: const CustomAppBar(),
       body: ListView(
         children: [
-          SizedBox(height: 200, child: Carrousel()),
-          const SizedBox(
-            height: 10,
-          ),
+          // SizedBox(height: 200, child: Carrousels()),
+                    SizedBox(height: 180, child: isExist ? Carrousel(): CarrouselOffLine()),
+
+          // SizedBox(height: 100, child: isExist ? Carrousel(): CarrouselOffLine()),
+          // const SizedBox(
+          //   height: 10,
+          // ),
           // SizedBox(height: 100, child: AlertAcceuil()),
           const SizedBox(
             height: 10,
@@ -109,7 +229,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                 _buildAccueilCard("Meteo", "meteo.png", 5),
                 _buildAccueilCard("Transports", "transport.png", 6),
                 _buildAccueilCard("Locations", "location.png", 7),
-
+      
                 _buildAccueilCard("Alertes", "alerte.png", 8),
                 _buildAccueilCard("Produits", "produit.png", 9),
                 _buildAccueilCard("Filières", "filiere.png", 10),
@@ -151,9 +271,8 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProductsScreen(),
+                    builder: (context) => ProductsScreen(detectedCountry: detectedCountry!),
                   ));
-              // builder: (context) =>  ProduitScreen()));
             } else if (index == 8) {
               Navigator.push(
                   context,
@@ -161,10 +280,10 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                       builder: (context) => const AlerteScreen()));
             } else if (index == 7) {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) =>  Location()));
+                  MaterialPageRoute(builder: (context) =>  l.Location(detectedCountry: detectedCountry!)));
             } else if (index == 6) {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) =>  Transport()));
+                  MaterialPageRoute(builder: (context) =>  Transport(detectedCountry: detectedCountry!)));
             } else if (index == 5) {
               Navigator.push(
                   context,
@@ -187,7 +306,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>  IntrantScreen()));
+                      builder: (context) =>  IntrantScreen(detectedCountry: detectedCountry!)));
             }
           },
           borderRadius: BorderRadius.circular(20),

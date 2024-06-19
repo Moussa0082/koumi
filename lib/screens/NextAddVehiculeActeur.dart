@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -49,7 +50,9 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
   List<Widget> destinationPrixFields = [];
   List<TextEditingController> destinationControllers = [];
   List<TextEditingController> prixControllers = [];
-
+  String? monnaieValue;
+  late Future _monnaieList;
+  late Monnaie monnaie = Monnaie();
   late Map<String, int> prixParDestinations;
   final formkey = GlobalKey<FormState>();
   String? imageSrc;
@@ -61,8 +64,8 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
   // List<String>? n3Value = [];
   String niveau3 = '';
   List<String> selectedDestinations = [];
-   bool isLoadingLibelle = true;
-    String? libelleNiveau3Pays;
+  bool isLoadingLibelle = true;
+  String? libelleNiveau3Pays;
 
   // Méthode pour ajouter une nouvelle destination et prix
   // void addDestinationAndPrix() {
@@ -122,17 +125,19 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
   }
 
   Future<String> getLibelleNiveau3PaysByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+    final response = await http
+        .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
 
     if (response.statusCode == 200) {
       print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
+      return response
+          .body; // Return the body directly since it's a plain string
     } else {
       throw Exception('Failed to load libelle niveau3Pays');
     }
-}
+  }
 
-     Future<void> fetchLibelleNiveau3Pays() async {
+  Future<void> fetchLibelleNiveau3Pays() async {
     try {
       String libelle = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
       setState(() {
@@ -147,16 +152,15 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
     }
   }
 
-
-
   @override
   void initState() {
     super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     prixParDestinations = {};
-       _niveau3List =
-        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
-     fetchLibelleNiveau3Pays();
+    _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
+    _niveau3List = http.get(Uri.parse(
+        '$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
+    fetchLibelleNiveau3Pays();
   }
 
   Future<File> saveImagePermanently(String imagePath) async {
@@ -251,7 +255,6 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-             
               Form(
                   key: formkey,
                   child: Column(
@@ -297,6 +300,130 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                         padding: EdgeInsets.symmetric(
                           horizontal: 22,
                         ),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            "Chosir la monnaie",
+                            style:
+                                TextStyle(color: (Colors.black), fontSize: 18),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        child: FutureBuilder(
+                          future: _monnaieList,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Chargement...',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+
+                            if (snapshot.hasData) {
+                              dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+
+                              if (responseData is List) {
+                                List<Monnaie> speList = responseData
+                                    .map((e) => Monnaie.fromMap(e))
+                                    .toList();
+
+                                if (speList.isEmpty) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Aucun monnaie trouvé',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return DropdownButtonFormField<String>(
+                                  isExpanded: true,
+                                  items: speList
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idMonnaie,
+                                          child: Text(e.sigle!),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: monnaieValue,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      monnaieValue = newValue;
+                                      if (newValue != null) {
+                                        monnaie = speList.firstWhere(
+                                          (element) =>
+                                              element.idMonnaie == newValue,
+                                        );
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Sélectionner la monnaie',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                // Handle case when response data is not a list
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucun monnaie trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                            } else {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucun monnaie trouvé',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 22,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -325,28 +452,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Row(
                                     children: [
-                                       isLoadingLibelle ?
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text("Chargement ................",style: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.bold),)),
-                      )
-                      :
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 22,
-                        ),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                           libelleNiveau3Pays != null ? libelleNiveau3Pays!.toUpperCase() : "Localité",
-                            style:
-                                TextStyle(color: (Colors.black), fontSize: 18),
-                          ),
-                        ),
-                      ),
+                                     
                                       Expanded(
                                         child: FutureBuilder(
                                           future: _niveau3List,
@@ -378,7 +484,10 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                                 onChanged: null,
                                                 decoration: InputDecoration(
                                                   labelText: 'Chargement...',
-                                                  labelStyle:  TextStyle(overflow: TextOverflow.ellipsis,fontSize: 15),
+                                                  labelStyle: TextStyle(
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      fontSize: 15),
                                                   contentPadding:
                                                       const EdgeInsets
                                                           .symmetric(
@@ -416,7 +525,10 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                                     onChanged: null,
                                                     decoration: InputDecoration(
                                                       labelText: 'Destination',
-                                                      labelStyle: TextStyle(overflow: TextOverflow.ellipsis,fontSize: 15),
+                                                      labelStyle: TextStyle(
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          fontSize: 15),
                                                       contentPadding:
                                                           const EdgeInsets
                                                               .symmetric(
@@ -433,28 +545,64 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                                   );
                                                 }
 
-                                                return DropdownButtonFormField<String>(
+                                                return DropdownButtonFormField<
+                                                    String>(
                                                   isExpanded: true,
-                                                  items: niveau3List.map((e) => DropdownMenuItem(
-                                                    value: e.idNiveau3Pays,
-                                                    child: Text(e.nomN3, overflow: TextOverflow.ellipsis, style: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 14)), // réduire la taille du texte
-                                                  )).toList(),
-                                                  value: selectedDestinationsList[index],
+                                                  items: niveau3List
+                                                      .map((e) =>
+                                                          DropdownMenuItem(
+                                                            value:
+                                                                e.idNiveau3Pays,
+                                                            child: Text(e.nomN3,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                style: TextStyle(
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                    fontSize:
+                                                                        14)), // réduire la taille du texte
+                                                          ))
+                                                      .toList(),
+                                                  value:
+                                                      selectedDestinationsList[
+                                                          index],
                                                   onChanged: (newValue) {
                                                     setState(() {
-                                                      selectedDestinationsList[index] = newValue;
-                                                      String selectedDestinationName = niveau3List.firstWhere((element) => element.idNiveau3Pays == newValue).nomN3;
-                                                      selectedDestinations.add(selectedDestinationName);
-                                                      print("niveau 3 : $selectedDestinationsList");
-                                                      print("niveau 3 nom  : $selectedDestinations");
+                                                      selectedDestinationsList[
+                                                          index] = newValue;
+                                                      String
+                                                          selectedDestinationName =
+                                                          niveau3List
+                                                              .firstWhere(
+                                                                  (element) =>
+                                                                      element
+                                                                          .idNiveau3Pays ==
+                                                                      newValue)
+                                                              .nomN3;
+                                                      selectedDestinations.add(
+                                                          selectedDestinationName);
+                                                      print(
+                                                          "niveau 3 : $selectedDestinationsList");
+                                                      print(
+                                                          "niveau 3 nom  : $selectedDestinations");
                                                     });
                                                   },
                                                   decoration: InputDecoration(
                                                     labelText: 'Destination',
-                                                    labelStyle: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 15),
-                                                    contentPadding: const EdgeInsets.symmetric(horizontal: 6), // réduire le padding
+                                                    labelStyle: TextStyle(
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        fontSize: 15),
+                                                    contentPadding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal:
+                                                            6), // réduire le padding
                                                     border: OutlineInputBorder(
-                                                      borderRadius: BorderRadius.circular(8),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
                                                     ),
                                                   ),
                                                 );
@@ -464,7 +612,10 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                                   onChanged: null,
                                                   decoration: InputDecoration(
                                                     labelText: 'Destination',
-                                                    labelStyle: TextStyle(overflow: TextOverflow.ellipsis,fontSize: 15),
+                                                    labelStyle: TextStyle(
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        fontSize: 15),
                                                     contentPadding:
                                                         const EdgeInsets
                                                             .symmetric(
@@ -484,7 +635,10 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                               onChanged: null,
                                               decoration: InputDecoration(
                                                 labelText: 'Destination',
-                                                labelStyle: TextStyle(overflow: TextOverflow.ellipsis,fontSize: 15),
+                                                labelStyle: TextStyle(
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    fontSize: 15),
                                                 contentPadding:
                                                     const EdgeInsets.symmetric(
                                                   horizontal: 20,
@@ -507,7 +661,6 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                             FilteringTextInputFormatter
                                                 .digitsOnly,
                                           ],
-                                          
                                           decoration: InputDecoration(
                                             hintText: "Prix",
                                             contentPadding:
@@ -534,29 +687,29 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                         children: destinationPrixFields,
                       ),
                       SizedBox(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 10.0),
-                        child: photo != null
-                            ? GestureDetector(
-                                onTap: _showImageSourceDialog,
-                                child: Image.file(
-                                  photo!,
-                                  fit: BoxFit.fitWidth,
-                                  height: 150,
-                                  width: 300,
-                                ),
-                              )
-                            : SizedBox(
-                                child: IconButton(
-                                  onPressed: _showImageSourceDialog,
-                                  icon: const Icon(
-                                    Icons.add_a_photo_rounded,
-                                    size: 60,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 10.0),
+                          child: photo != null
+                              ? GestureDetector(
+                                  onTap: _showImageSourceDialog,
+                                  child: Image.file(
+                                    photo!,
+                                    fit: BoxFit.fitWidth,
+                                    height: 150,
+                                    width: 300,
+                                  ),
+                                )
+                              : SizedBox(
+                                  child: IconButton(
+                                    onPressed: _showImageSourceDialog,
+                                    icon: const Icon(
+                                      Icons.add_a_photo_rounded,
+                                      size: 60,
+                                    ),
                                   ),
                                 ),
-                              ),
+                        ),
                       ),
-                    ),
                       const SizedBox(height: 20),
                       ElevatedButton(
                           onPressed: () async {
@@ -603,7 +756,8 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                           photoVehicule: photo,
                                           etatVehicule: etat,
                                           typeVoiture: type,
-                                          acteur: acteur)
+                                          acteur: acteur,
+                                          monnaie: monnaie)
                                       .then((value) => {
                                             Provider.of<VehiculeService>(
                                                     context,
@@ -652,7 +806,8 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                           localisation: localite,
                                           etatVehicule: etat,
                                           typeVoiture: type,
-                                          acteur: acteur)
+                                          acteur: acteur,
+                                          monnaie: monnaie)
                                       .then((value) => {
                                             Provider.of<VehiculeService>(
                                                     context,

@@ -164,18 +164,18 @@ class ParametreGenerauxService extends ChangeNotifier {
   Future<List<ParametreGeneraux>> fetchParametre() async {
     final response = await http.get(Uri.parse('$baseUrl/read'));
 
-      Future.delayed(const Duration(seconds: 10), () {
-    print('Hello, after 10 seconds of delay');
-});
+//       Future.delayed(const Duration(seconds: 10), () {
+//     // print('Hello, after 10 seconds of delay');
+// });
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
       parametreList =
           body.map((item) => ParametreGeneraux.fromMap(item)).toList();
-      debugPrint(response.body);
+      // debugPrint(response.body);
       return parametreList;
     } else {
       parametreList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête para avec le code d\'état: ${response.statusCode}');
        
       // throw Exception("Params vide");
       // throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
@@ -191,11 +191,11 @@ class ParametreGenerauxService extends ChangeNotifier {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
       parametreList =
           body.map((item) => ParametreGeneraux.fromMap(item)).toList();
-      debugPrint(response.body);
+      // debugPrint(response.body);
       return parametreList;
     } else {
       parametreList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête para id avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }

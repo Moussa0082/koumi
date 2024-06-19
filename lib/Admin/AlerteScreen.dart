@@ -2,17 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:koumi_app/Admin/AddAlerte.dart';
 import 'package:koumi_app/Admin/AddAlertesOffLine.dart';
 import 'package:koumi_app/Admin/AlerteDisable.dart';
+import 'package:koumi_app/Admin/AlertesOffLine.dart';
 import 'package:koumi_app/Admin/DetailAlerte.dart';
-import 'package:koumi_app/Admin/DetailAlertesOffLine.dart';
 import 'package:koumi_app/Admin/UpdateAlerte.dart';
-import 'package:koumi_app/Admin/UpdateAlertesOffLine.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Alertes.dart';
-import 'package:koumi_app/models/AlertesOffLine.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/AlerteService.dart';
-import 'package:koumi_app/service/AlertesOffLineService.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -32,7 +29,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
   late List<TypeActeur> typeActeurData = [];
   late String type;
   late TextEditingController _searchController;
-  List<AlertesOffLine> alerteList = [];
+  List<Alertes> alerteList = [];
 
   // void verify() async {
   //   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -84,8 +81,8 @@ class _AlerteScreenState extends State<AlerteScreen> {
           actions: typeActeurData
           .map((e) => e.libelle!.toLowerCase())
           .contains("admin")
-              ? null
-              : [
+              ? 
+                [
                   PopupMenuButton<String>(
                     padding: EdgeInsets.zero,
                     itemBuilder: (context) {
@@ -143,6 +140,29 @@ class _AlerteScreenState extends State<AlerteScreen> {
                               color: d_colorGreen,
                             ),
                             title: const Text(
+                              "Alerte PUB ",
+                              style: TextStyle(
+                                color: d_colorGreen,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onTap: () async {
+                              Navigator.of(context).pop();
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => AlertesOffLineScreen()));
+                            },
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.remove_red_eye,
+                              color: d_colorGreen,
+                            ),
+                            title: const Text(
                               "Alerte Désactiver ",
                               style: TextStyle(
                                 color: d_colorGreen,
@@ -162,7 +182,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                       ];
                     },
                   )
-                ]),
+                ] : null),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -202,9 +222,9 @@ class _AlerteScreenState extends State<AlerteScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            Consumer<AlertesOffLineService>(builder: (context, alerteService, child) {
+            Consumer<AlertesService>(builder: (context, alerteService, child) {
               return FutureBuilder(
-                  future: alerteService.fetchAlertesOffLine(),
+                  future: alerteService.fetchAlertes(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return buildShimmerEffect();
@@ -218,13 +238,13 @@ class _AlerteScreenState extends State<AlerteScreen> {
                     } else {
                       alerteList = snapshot.data!;
                       String searchText = "";
-                      List<AlertesOffLine> filtereSearch = alerteList.where((search) {
-                        String libelle = search.titreAlerteOffLine!.toLowerCase();
+                      List<Alertes> filtereSearch = alerteList.where((search) {
+                        String libelle = search.titreAlerte!.toLowerCase();
                         searchText = _searchController.text.toLowerCase();
                         return libelle.contains(searchText);
                       }).toList();
                       return filtereSearch
-                              .where((element) => element.statutAlerteOffLine == true)
+                              .where((element) => element.statutAlerte == true)
                               .isEmpty
                           ? Padding(
                               padding: EdgeInsets.all(10),
@@ -233,7 +253,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                           : Column(
                               children: filtereSearch
                                   .where(
-                                      (element) => element.statutAlerteOffLine == true)
+                                      (element) => element.statutAlerte == true)
                                   .map((e) => Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 10, horizontal: 15),
@@ -243,7 +263,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        DetailAlertesOffLine(
+                                                        DetailAlerte(
                                                             alertes: e)));
                                           },
                                           child: Container(
@@ -273,7 +293,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                     height: 80,
                                                   ),
                                                   title: Text(
-                                                      e.titreAlerteOffLine!
+                                                      e.titreAlerte!
                                                           .toUpperCase(),
                                                       style: const TextStyle(
                                                         color: Colors.black,
@@ -282,7 +302,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                             .ellipsis,
                                                       )),
                                                   subtitle: Text(
-                                                      e.descriptionAlerteOffLine!,
+                                                      e.descriptionAlerte!,
                                                       maxLines: 2,
                                                       style: const TextStyle(
                                                         color: Colors.black87,
@@ -317,7 +337,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                                 .spaceBetween,
                                                         children: [
                                                           _buildEtat(
-                                                              e.statutAlerteOffLine!),
+                                                              e.statutAlerte!),
                                                           PopupMenuButton<
                                                               String>(
                                                             padding:
@@ -328,7 +348,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                               PopupMenuItem<
                                                                   String>(
                                                                 child: ListTile(
-                                                                  leading: e.statutAlerteOffLine ==
+                                                                  leading: e.statutAlerte ==
                                                                           false
                                                                       ? Icon(
                                                                           Icons
@@ -342,13 +362,13 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                                           color:
                                                                               Colors.orange[400]),
                                                                   title: Text(
-                                                                    e.statutAlerteOffLine ==
+                                                                    e.statutAlerte ==
                                                                             false
                                                                         ? "Activer"
                                                                         : "Desactiver",
                                                                     style:
                                                                         TextStyle(
-                                                                      color: e.statutAlerteOffLine ==
+                                                                      color: e.statutAlerte ==
                                                                               false
                                                                           ? Colors
                                                                               .green
@@ -361,11 +381,11 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                                   ),
                                                                   onTap:
                                                                       () async {
-                                                                    e.statutAlerteOffLine ==
+                                                                    e.statutAlerte ==
                                                                             false
                                                                         ? await AlertesService()
                                                                             .activerAlertes(e
-                                                                                .idAlerteOffLine!)
+                                                                                .idAlerte!)
                                                                             .then((value) =>
                                                                                 {
                                                                                   Provider.of<AlertesService>(context, listen: false).applyChange(),
@@ -397,7 +417,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                                                 })
                                                                         : await AlertesService()
                                                                             .desactiverAlertes(e
-                                                                                .idAlerteOffLine!)
+                                                                                .idAlerte!)
                                                                             .then((value) =>
                                                                                 {
                                                                                   Provider.of<AlertesService>(context, listen: false).applyChange(),
@@ -462,7 +482,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                                         context,
                                                                         MaterialPageRoute(
                                                                             builder: (context) =>
-                                                                                UpdateAlertesOffLine(alertes: e)));
+                                                                                UpdateAlerted(alertes: e)));
                                                                   },
                                                                 ),
                                                               ),
@@ -492,7 +512,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                                                       () async {
                                                                     await AlertesService()
                                                                         .deleteAlertes(e
-                                                                            .idAlerteOffLine!)
+                                                                            .idAlerte!)
                                                                         .then((value) =>
                                                                             {
                                                                               Provider.of<AlertesService>(context, listen: false).applyChange(),

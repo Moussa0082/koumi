@@ -67,7 +67,7 @@ class FormeService extends ChangeNotifier {
       return formeList;
     } else {
       formeList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête forme avec le code d\'état: ${response.statusCode}');
       return formeList = [];
     }
   }

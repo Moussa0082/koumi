@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -24,7 +25,7 @@ class NextAddVehicule extends StatefulWidget {
   final String description;
   final String nbKilo;
   final String capacite;
-
+  
   const NextAddVehicule({
     super.key,
     required this.typeVoiture,
@@ -63,8 +64,10 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
   String niveau3 = '';
   List<String> selectedDestinations = [];
   bool isLoadingLibelle = true;
-    String? libelleNiveau3Pays;
-
+  String? libelleNiveau3Pays;
+  String? monnaieValue;
+  late Future _monnaieList;
+  late Monnaie monnaie = Monnaie();
   // Méthode pour ajouter une nouvelle destination et prix
   // void addDestinationAndPrix() {
   //   // Créer un nouveau contrôleur pour chaque champ
@@ -134,7 +137,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
     }
 }
 
-     Future<void> fetchLibelleNiveau3Pays() async {
+  Future<void> fetchLibelleNiveau3Pays() async {
     try {
       String libelle = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
       setState(() {
@@ -155,9 +158,10 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
     super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     prixParDestinations = {};
+    _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
     _niveau3List =
         http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
-     fetchLibelleNiveau3Pays();
+    fetchLibelleNiveau3Pays();
   }
 
   Future<File> saveImagePermanently(String imagePath) async {
@@ -252,8 +256,6 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-             
-             
               Form(
                   key: formkey,
                   child: Column(
@@ -299,6 +301,130 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                         padding: EdgeInsets.symmetric(
                           horizontal: 22,
                         ),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            "Chosir la monnaie",
+                            style:
+                                TextStyle(color: (Colors.black), fontSize: 18),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        child: FutureBuilder(
+                          future: _monnaieList,
+                          builder: (_, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Chargement...',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+
+                            if (snapshot.hasData) {
+                              dynamic jsonString =
+                                  utf8.decode(snapshot.data.bodyBytes);
+                              dynamic responseData = json.decode(jsonString);
+
+                              if (responseData is List) {
+                                List<Monnaie> speList = responseData
+                                    .map((e) => Monnaie.fromMap(e))
+                                    .toList();
+
+                                if (speList.isEmpty) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Aucun monnaie trouvé',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                return DropdownButtonFormField<String>(
+                                  isExpanded: true,
+                                  items: speList
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.idMonnaie,
+                                          child: Text(e.sigle!),
+                                        ),
+                                      )
+                                      .toList(),
+                                  value: monnaieValue,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      monnaieValue = newValue;
+                                      if (newValue != null) {
+                                        monnaie = speList.firstWhere(
+                                          (element) =>
+                                              element.idMonnaie == newValue,
+                                        );
+                                      }
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Sélectionner la monnaie',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                // Handle case when response data is not a list
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucun monnaie trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                            } else {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucun monnaie trouvé',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 22,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -327,12 +453,12 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Row(
                                     children: [
-                                       isLoadingLibelle ?
+                                    isLoadingLibelle ?
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Align(
                           alignment: Alignment.topLeft,
-                          child: Text("Chargement ................",style: TextStyle(
+                          child: Text("Chargement...",style: TextStyle(
                                   fontSize: 15, fontWeight: FontWeight.bold),)),
                       )
                       :
@@ -343,7 +469,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Text(
-                           libelleNiveau3Pays != null ? libelleNiveau3Pays!.toUpperCase() : "Localité",
+                          libelleNiveau3Pays != null ? libelleNiveau3Pays!.toUpperCase() : "Localité",
                             style:
                                 TextStyle(color: (Colors.black), fontSize: 18),
                           ),
@@ -605,7 +731,9 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                           photoVehicule: photo,
                                           etatVehicule: etat,
                                           typeVoiture: type,
-                                          acteur: acteur)
+                                          acteur: acteur,
+                                          monnaie : monnaie
+                                          )
                                       .then((value) => {
                                             Provider.of<VehiculeService>(
                                                     context,
@@ -651,7 +779,9 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                           localisation: localite,
                                           etatVehicule: etat,
                                           typeVoiture: type,
-                                          acteur: acteur)
+                                          acteur: acteur,
+                                          monnaie: monnaie
+                                          )
                                       .then((value) => {
                                             Provider.of<VehiculeService>(
                                                     context,

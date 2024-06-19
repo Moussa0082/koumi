@@ -539,10 +539,10 @@ class _AddAlertesOffLineScreenState extends State<AddAlertesOffLineScreen> {
                                               audioAlerteOffLine: audiosUploaded,
                                               photoAlerteOffLine: photoUploaded)
                                           .then((value) => {
-                                                FirebaseApi()
-                                                    .sendPushNotificationToTopic(
-                                                        'Nouvelle alerte',
-                                                        titre),
+                                                // FirebaseApi()
+                                                //     .sendPushNotificationToTopic(
+                                                //         'Nouvelle alerte pub',
+                                                //         titre),
                                                 _titreController.clear(),
                                                 _descriptionController.clear(),
                                                 _tokenTextController.clear(),
@@ -594,10 +594,10 @@ class _AddAlertesOffLineScreenState extends State<AddAlertesOffLineScreen> {
                                               codePays: selectedCountryCode,
                                               )
                                           .then((value) => {
-                                                FirebaseApi()
-                                                    .sendPushNotificationToTopic(
-                                                        'Nouvelle alerte',
-                                                        titre),
+                                                // FirebaseApi()
+                                                //     .sendPushNotificationToTopic(
+                                                //         'Nouvelle alerte pub',
+                                                //         titre),
                                                 _titreController.clear(),
                                                 _descriptionController.clear(),
                                                 _tokenTextController.clear(),

@@ -155,7 +155,7 @@ class ActeurService extends ChangeNotifier {
         debugPrint('acteur service ${donneesResponse.toString()}');
       } else {
         throw Exception(
-            'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
+            'Échec de la requête acteur avec le code d\'état : ${responsed.statusCode}');
       }
     } catch (e) {
       throw Exception(
@@ -591,7 +591,7 @@ class ActeurService extends ChangeNotifier {
       } else {
         acteurList = [];
         print(
-            'Échec de la requête avec le code d\'état: ${response.statusCode}');
+            'Échec de la requête acteur avec le code d\'état: ${response.statusCode}');
         throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
       }
     } catch (e) {
@@ -613,7 +613,7 @@ class ActeurService extends ChangeNotifier {
       } else {
         acteurList = [];
         print(
-            'Échec de la requête avec le code d\'état: ${response.statusCode}');
+            'Échec de la requête type acteur avec le code d\'état: ${response.statusCode}');
         throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
       }
     } catch (e) {

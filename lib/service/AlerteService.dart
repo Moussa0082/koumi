@@ -138,7 +138,7 @@ class AlertesService extends ChangeNotifier {
       } else {
         alertesList = [];
         print(
-            'Échec de la requête avec le code d\'état: ${response.statusCode}');
+            'Échec de la requête alerte avec le code d\'état: ${response.statusCode}');
         throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
       }
     } catch (e) {

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 
 class Vehicule {
@@ -22,6 +23,7 @@ class Vehicule {
   String? personneModif;
   Acteur acteur;
   TypeVoiture typeVoiture;
+  Monnaie? monnaie;
 
   Vehicule({
     required this.idVehicule,
@@ -40,6 +42,7 @@ class Vehicule {
     this.personneModif,
     required this.acteur,
     required this.typeVoiture,
+    required this.monnaie
   });
 
   Vehicule copyWith({
@@ -59,6 +62,7 @@ class Vehicule {
     String? personneModif,
     Acteur? acteur,
     TypeVoiture? typeVoiture,
+    Monnaie? monnaie
   }) {
     return Vehicule(
       idVehicule: idVehicule ?? this.idVehicule,
@@ -77,6 +81,7 @@ class Vehicule {
       personneModif: personneModif ?? this.personneModif,
       acteur: acteur ?? this.acteur,
       typeVoiture: typeVoiture ?? this.typeVoiture,
+      monnaie: monnaie ?? this.monnaie,
     );
   }
 
@@ -106,6 +111,9 @@ factory Vehicule.fromMap(Map<String, dynamic> map) {
       acteur: Acteur.fromMap(map['acteur'] as Map<String, dynamic>),
       typeVoiture:
           TypeVoiture.fromMap(map['typeVoiture'] as Map<String, dynamic>),
+      monnaie: map['monnaie'] != null
+            ? Monnaie.fromMap(map['monnaie'] as Map<String, dynamic>)
+            : Monnaie()
     );
   }
 
@@ -127,6 +135,7 @@ factory Vehicule.fromMap(Map<String, dynamic> map) {
       'personneModif': personneModif,
       'acteur': acteur.toMap(),
       'typeVoiture': typeVoiture.toMap(),
+      'monnaie' : monnaie!.toMap(),
     };
   }
 

@@ -155,7 +155,7 @@ class MagasinService extends ChangeNotifier{
 
         debugPrint("response body all magasin by acteur with pagination ${page} par défilement soit ${magasin.length}");
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête  mag avec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
     } catch (e) {
       print('Une erreur s\'est produite lors de la récupération des magasins: $e');
@@ -191,7 +191,7 @@ class MagasinService extends ChangeNotifier{
 
         debugPrint("response body all magasin by niveau 1 pays with pagination ${page} par défilement soit ${magasin.length}");
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête  mag niavec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
     } catch (e) {
       print('Une erreur s\'est produite lors de la récupération des magasins: $e');
@@ -228,7 +228,7 @@ class MagasinService extends ChangeNotifier{
 
         debugPrint("response body all magasin  with pagination ${page} par défilement soit ${magasin.length}");
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête mag pagavec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
     } catch (e) {
       print('Une erreur s\'est produite lors de la récupération des magasins: $e');

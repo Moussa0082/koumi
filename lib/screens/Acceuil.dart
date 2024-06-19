@@ -2,14 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart' as geo;
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart' ;
 import 'package:get/get.dart';
 import 'package:koumi_app/admin/AlerteScreen.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/CountryProvider.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
-import 'package:koumi_app/screens/Location.dart';
+import 'package:koumi_app/screens/Location.dart' as l;
 import 'package:koumi_app/screens/MesCommande.dart';
 import 'package:koumi_app/screens/Products.dart';
 import 'package:koumi_app/screens/Store.dart';
@@ -17,6 +19,9 @@ import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/Weather.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
+
+import 'package:koumi_app/widgets/Default_Acceuil.dart';
+import 'package:koumi_app/widgets/connection_verify.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -35,13 +40,14 @@ class _AccueilState extends State<Accueil> {
 
   String? email = "";
   bool isExist = false;
-  String? detectedC = "";
-  String detectedCountryCode = '';
 
-
-   bool isLoading = true;
-
+  String? detectedC;
+  String? isoCountryCode;
+  String? country;
+  String? detectedCountryCode;
   String? detectedCountry;
+  CountryProvider? countryProvider;
+  late BuildContext _currentContext;
 
     void getLocationNew() async {
     try {
@@ -67,12 +73,12 @@ class _AccueilState extends State<Accueil> {
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      List<geo.Placemark> placemarks = await geo.placemarkFromCoordinates(
+      List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
       );
 
-      geo.Placemark placemark = placemarks.first;
+      Placemark placemark = placemarks.first;
       setState(() {
         detectedCountryCode = placemark.isoCountryCode!;
       });
@@ -124,12 +130,12 @@ class _AccueilState extends State<Accueil> {
       longitude.value = 'Longitude : ${position.longitude}';
       getAddressFromLatLang(position);
     });
-  }
-
+  }  
+  
   Future<void> getAddressFromLatLang(Position position) async {
-    List<geo.Placemark> placemark =
-        await geo.placemarkFromCoordinates(position.latitude, position.longitude);
-    geo.Placemark place = placemark[0];
+    List<Placemark> placemark =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+    Placemark place = placemark[0];
     debugPrint("Address ISO: $detectedC");
     address.value =
         'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
@@ -137,13 +143,13 @@ class _AccueilState extends State<Accueil> {
           
     detectedC = place.isoCountryCode;
     detectedCountryCode = place.isoCountryCode!;
-  detectedCountry = place.country;
-
+    detectedCountry = place.country!;
         });
 
     debugPrint(
         "Address:   ${place.locality},${place.country},${place.isoCountryCode}");
   }
+  
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -175,22 +181,31 @@ class _AccueilState extends State<Accueil> {
   }
 
   @override
+  void dispose() {
+    
+    super.dispose();
+  }
+
+ 
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
       appBar: const CustomAppBar(),
       body: ListView(
         children: [
-          SizedBox(height: 180, child:  Carrousels()),
+          // SizedBox(height: 180, child:  Carrousels()),
           
-          // SizedBox(height: 180, child: isExist ? Carrousel(): Carrousels()),
+          SizedBox(height: 180, child: isExist ? Carrousel(): Carrousels()),
           // const SizedBox(
           //   height: 10,
           // ),
-          // isExist ? SizedBox(height: 180, child: Carrousel()) : Carrousels(),
+                    // SizedBox(height: 180, child: isExist ? Carrousel(): CarrouselOffLine()),
           const SizedBox(
             height: 10,
           ),
+          isExist ?
           SizedBox(
             child: GridView.count(
               shrinkWrap: true,
@@ -201,7 +216,7 @@ class _AccueilState extends State<Accueil> {
               childAspectRatio: 0.9,
               children: _buildCards(),
             ),
-          ),
+          ) : DefautAcceuil(),
           const SizedBox(
             height: 20,
           )
@@ -238,7 +253,7 @@ class _AccueilState extends State<Accueil> {
           onTap: () {
             if (index == 9) {
                 Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProductsScreen()));
+                  MaterialPageRoute(builder: (context) => ProductsScreen(detectedCountry: detectedCountry)));
              
             } else if (index == 8) {
               Navigator.push(
@@ -247,10 +262,10 @@ class _AccueilState extends State<Accueil> {
                       builder: (context) => const AlerteScreen()));
             } else if (index == 7) {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) =>  Location()));
+                  MaterialPageRoute(builder: (context) =>  l.Location(detectedCountry: detectedCountry)));
             } else if (index == 6) {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) =>  Transport()));
+                  MaterialPageRoute(builder: (context) =>  Transport(detectedCountry: detectedCountry)));
             } else if (index == 5) {
               Navigator.push(
                   context,

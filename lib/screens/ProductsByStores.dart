@@ -41,8 +41,8 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
   
   late Acteur acteur = Acteur();
   late List<TypeActeur> typeActeurData = [];
-  List<ParametreGeneraux> paraList = [];
-  late ParametreGeneraux para = ParametreGeneraux();
+    bool isSearchMode = true;
+
   late String type;
   late TextEditingController _searchController;
   List<Stock> stockListe = [];
@@ -63,35 +63,35 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
   bool hasMore = true;
 
       bool isLoadingLibelle = true;
-    String? monnaie;
+    // String? monnaie;
 
 
-   Future<String> getMonnaieByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+//    Future<String> getMonnaieByActor(String id) async {
+//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
 
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load monnaie');
-    }
-}
+//     if (response.statusCode == 200) {
+//       print("libelle : ${response.body}");
+//       return response.body;  // Return the body directly since it's a plain string
+//     } else {
+//       throw Exception('Failed to load monnaie');
+//     }
+// }
 
- Future<void> fetchPaysDataByActor() async {
-    try {
-      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+//  Future<void> fetchPaysDataByActor() async {
+//     try {
+//       String monnaies = await getMonnaieByActor(acteur.idActeur!);
 
-      setState(() { 
-        monnaie = monnaies;
-        isLoadingLibelle = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-        });
-      print('Error: $e');
-    }
-  }
+//       setState(() { 
+//         monnaie = monnaies;
+//         isLoadingLibelle = false;
+//       });
+//     } catch (e) {
+//       setState(() {
+//         isLoadingLibelle = false;
+//         });
+//       print('Error: $e');
+//     }
+//   }
 
 
   void verify() async {
@@ -280,17 +280,17 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
 
  
 
-  void verifyParam() {
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+  // void verifyParam() {
+  //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+  //       .parametreList!;
 
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
-    } else {
-      // Gérer le cas où la liste est null ou vide, par exemple :
-      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
-    }
-  }
+  //   if (paraList.isNotEmpty) {
+  //     para = paraList[0];
+  //   } else {
+  //     // Gérer le cas où la liste est null ou vide, par exemple :
+  //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+  //   }
+  // }
 
   @override
   void initState() {
@@ -298,6 +298,10 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
     // typeActeurData = acteur.typeActeur!;
     // // selectedType == null;
     // type = typeActeurData.map((data) => data.libelle).join(', ');
+        widget.detectedCountry != null ?
+   debugPrint("pays fetch product by store page ${widget.detectedCountry!} ")
+     : 
+     debugPrint("null pays non fetch product by store page");
     super.initState();
   //  scrollableController = ScrollController()..addListener(_scrollListener);
   WidgetsBinding.instance.addPostFrameCallback((_){
@@ -318,7 +322,7 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
     // updateStockList();
       
     stockListeFuture = stockListeFuture1 = getAllStock();
-    fetchPaysDataByActor();
+    // fetchPaysDataByActor();
   }
 
   @override
@@ -468,6 +472,59 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                   children:[
       
             const SizedBox(height: 10),
+             Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: ToggleButtons(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text('Rechercher'),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text('Filtrer'),
+                      ),
+                    ],
+                    isSelected: [isSearchMode, !isSearchMode],
+                    onPressed: (index) {
+                      setState(() {
+                        isSearchMode = index == 0;
+                      });
+                    },
+                  ),
+                ),
+             if (isSearchMode)
+              Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.blueGrey[50],
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.search, color: Colors.blueGrey[400]),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              onChanged: (value) {
+                                setState(() {});
+                              },
+                              decoration: InputDecoration(
+                                hintText: 'Rechercher',
+                                border: InputBorder.none,
+                                hintStyle:
+                                    TextStyle(color: Colors.blueGrey[400]),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                if (!isSearchMode)
           
             // const SizedBox(height: 10),
             Padding(
@@ -528,7 +585,6 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                           ),
                         );
                       }
-          
                       return DropdownButtonFormField<String>(
                         isExpanded: true,
                         items: categorieList
@@ -855,8 +911,8 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                                                 padding: const EdgeInsets.symmetric(
                                                     horizontal: 15),
                                                 child: Text(
-                                                  monnaie != null
-                                                      ? "${stockListe[index].prix.toString()} ${monnaie}"
+                                                   stockListe[index].monnaie != null
+                                                      ? "${stockListe[index].prix.toString()} ${ stockListe[index].monnaie!.libelle}"
                                                       : "${stockListe[index].prix.toString()} ",
                                                   style: TextStyle(
                                                     fontSize: 15,
@@ -1109,8 +1165,8 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                                                 padding: const EdgeInsets.symmetric(
                                                     horizontal: 15),
                                                 child: Text(
-                                                  monnaie != null
-                                                      ? "${stockListe[index].prix.toString()} ${monnaie}"
+                                                   stockListe[index].monnaie != null
+                                                      ? "${stockListe[index].prix.toString()} ${ stockListe[index].monnaie!.libelle}"
                                                       : "${stockListe[index].prix.toString()} FCFA",
                                                   style: TextStyle(
                                                     fontSize: 15,

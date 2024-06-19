@@ -30,8 +30,8 @@ class _MesCommandeState extends State<MesCommande> {
 
     late Acteur acteur = Acteur();
   late List<TypeActeur> typeActeurData = [];
-  List<ParametreGeneraux> paraList = [];
-  late ParametreGeneraux para = ParametreGeneraux();
+  // List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para = ParametreGeneraux();
   late String type;
   late TextEditingController _searchController;
   List<Stock>  stockListe = [];
@@ -132,14 +132,14 @@ class _MesCommandeState extends State<MesCommande> {
   //     ),
   //   ),
   // ),
-  IconButton(
-    onPressed: () {
-      // Your onPressed function
-    },
-    icon: Icon(Icons.refresh),
-    color: Colors.black, // Icon color
-    iconSize: 25,
-  ),
+  // IconButton(
+  //   onPressed: () {
+  //     // Your onPressed function
+  //   },
+  //   icon: Icon(Icons.refresh),
+  //   color: Colors.black, // Icon color
+  //   iconSize: 25,
+  // ),
 ],
 
       ),
@@ -431,10 +431,10 @@ class _MesCommandeState extends State<MesCommande> {
                       child: Center(
                         child: Container(
                           width: 80,
-                          color: commande.statutConfirmation == false ? Colors.red : Colors.green,
+                          color: commande.statutCommande == false ? Colors.red : Colors.green,
                           child: Center(
                             child: Text(
-                              commande.statutConfirmation == false ? "En attende" : "Validée",
+                              commande.statutCommande == false ? "En attende" : "Validée",
                               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                             ),
                           ),

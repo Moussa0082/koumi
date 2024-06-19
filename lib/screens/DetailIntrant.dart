@@ -1,24 +1,25 @@
+import 'dart:convert';
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Device.dart';
 import 'package:koumi_app/models/Intrant.dart';
-import 'package:koumi_app/models/ParametreGeneraux.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
-import 'package:koumi_app/screens/DetailProduits.dart';
+import 'package:koumi_app/service/DeviceService.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:path/path.dart' as path;
-import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
@@ -43,6 +44,9 @@ class _DetailIntrantState extends State<DetailIntrant> {
   TextEditingController _prixController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
   TextEditingController _uniteController = TextEditingController();
+  String? monnaieValue;
+  late Future _monnaieList;
+  late Monnaie monnaie = Monnaie();
   bool _isEditing = false;
   bool _isLoading = false;
   late Acteur acteur = Acteur();
@@ -50,42 +54,81 @@ class _DetailIntrantState extends State<DetailIntrant> {
   late String type;
   String? imageSrc;
   File? photo;
-  List<ParametreGeneraux> paraList = [];
-  late ParametreGeneraux para = ParametreGeneraux();
+  // List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para = ParametreGeneraux();
   late ValueNotifier<bool> isDialOpenNotifier;
   late Intrant intrants;
   bool isExist = false;
   String? email = "";
-   bool isLoadingLibelle = true;
-   String? monnaie;
+  bool isLoadingLibelle = true;
+  late Future<Map<String, String>> rates;
 
+  Future<List<Device>> getDeviceListe(String id) async {
+    return await DeviceService().fetchDeviceByIdMonnaie(id);
+  }
 
-   Future<String> getMonnaieByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+  Future<Map<String, String>> fetchConvert(Intrant intrant) async {
+    Monnaie monnaie = intrant.monnaie!;
+    int? amount = intrant.prixIntrant;
+    Map<String, String> result = {};
 
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load monnaie');
-    }
-}
-
- Future<void> fetchPaysDataByActor() async {
     try {
-      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+      List<Device> devices = await getDeviceListe(monnaie.idMonnaie!);
 
-      setState(() { 
-        monnaie = monnaies;
-        isLoadingLibelle = false;
-      });
+      for (var device in devices) {
+        double convertedAmount = amount! * device.taux!;
+        String amountSubString = convertedAmount.toStringAsFixed(2);
+        print(amountSubString);
+        switch (device.nomDevice!.toLowerCase()) {
+          case 'dollar':
+            result[device.sigle!] = amountSubString;
+            break;
+          case 'euro':
+            result[device.sigle!] = amountSubString;
+            break;
+          case 'yuan':
+            result[device.sigle!] = amountSubString;
+            break;
+          default:
+            print('Aucune devise trouvée pour ${device.nomDevice}');
+        }
+      }
     } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-        });
       print('Error: $e');
     }
+
+    print("conversion : ${result.toString()}");
+    return result;
   }
+
+  //  String? monnaie;
+
+//    Future<String> getMonnaieByActor(String id) async {
+//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+
+//     if (response.statusCode == 200) {
+//       print("libelle : ${response.body}");
+//       return response.body;  // Return the body directly since it's a plain string
+//     } else {
+//       throw Exception('Failed to load monnaie');
+//     }
+// }
+
+//  Future<void> fetchPaysDataByActor() async {
+//     try {
+//       String monnaies = await getMonnaieByActor(acteur.idActeur!);
+
+//       setState(() {
+//         monnaie = monnaies;
+//         isLoadingLibelle = false;
+//       });
+//     } catch (e) {
+//       setState(() {
+//         isLoadingLibelle = false;
+//         });
+//       print('Error: $e');
+//     }
+//   }
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -105,17 +148,17 @@ class _DetailIntrantState extends State<DetailIntrant> {
     }
   }
 
-  void verifyParam() {
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+  // void verifyParam() {
+  //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+  //       .parametreList!;
 
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
-    } else {
-      // Gérer le cas où la liste est null ou vide, par exemple :
-      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
-    }
-  }
+  //   if (paraList.isNotEmpty) {
+  //     para = paraList[0];
+  //   } else {
+  //     // Gérer le cas où la liste est null ou vide, par exemple :
+  //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+  //   }
+  // }
 
   @override
   void initState() {
@@ -124,16 +167,21 @@ class _DetailIntrantState extends State<DetailIntrant> {
     // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
     //     .parametreList!;
     // para = paraList[0];
-    fetchPaysDataByActor();
-    verifyParam();
+    // fetchPaysDataByActor();
+    // verifyParam();
     intrants = widget.intrant;
+    rates = fetchConvert(intrants);
+    print("rates ${rates.toString()}");
     _nomController.text = intrants.nomIntrant!;
     _descriptionController.text = intrants.descriptionIntrant!;
     _quantiteController.text = intrants.quantiteIntrant.toString();
     _prixController.text = intrants.prixIntrant.toString();
     _dateController.text = intrants.dateExpiration!;
     _uniteController.text = intrants.unite!;
+    monnaie = intrants.monnaie!;
+    monnaieValue = intrants.monnaie!.idMonnaie;
     isDialOpenNotifier = ValueNotifier<bool>(false);
+    _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
   }
 
   Future<File> saveImagePermanently(String imagePath) async {
@@ -229,12 +277,14 @@ class _DetailIntrantState extends State<DetailIntrant> {
                 dateExpiration: date,
                 photoIntrant: photo,
                 unite: unite,
-                acteur: acteur)
+                acteur: acteur,
+                monnaie: monnaie)
             .then((value) => {
                   Provider.of<IntrantService>(context, listen: false)
                       .applyChange(),
                   setState(() {
                     intrants = Intrant(
+                        idIntrant: intrants.idIntrant,
                         nomIntrant: nom,
                         quantiteIntrant: quantite,
                         prixIntrant: prix,
@@ -245,7 +295,8 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         categorieProduit: intrants.categorieProduit,
                         forme: intrants.forme,
                         unite: unite,
-                        acteur: acteur);
+                        acteur: acteur,
+                        monnaie: monnaie);
                     _isLoading = false;
                   }),
                 })
@@ -275,12 +326,14 @@ class _DetailIntrantState extends State<DetailIntrant> {
                 prixIntrant: prix,
                 dateExpiration: date,
                 unite: unite,
-                acteur: acteur)
+                acteur: acteur,
+                monnaie: monnaie)
             .then((value) => {
                   Provider.of<IntrantService>(context, listen: false)
                       .applyChange(),
                   setState(() {
                     intrants = Intrant(
+                        idIntrant: intrants.idIntrant,
                         nomIntrant: nom,
                         quantiteIntrant: quantite,
                         prixIntrant: prix,
@@ -292,7 +345,8 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         forme: intrants.forme,
                         unite: unite,
                         photoIntrant: intrants.photoIntrant,
-                        acteur: acteur);
+                        acteur: acteur,
+                        monnaie: monnaie);
                     _isLoading = false;
                   }),
                 })
@@ -355,11 +409,17 @@ class _DetailIntrantState extends State<DetailIntrant> {
                         icon: const Icon(Icons.arrow_back_ios,
                             color: d_colorGreen),
                       ),
-                title: Text(
-                  'Détail intrant',
-                  style: const TextStyle(
-                      color: d_colorGreen, fontWeight: FontWeight.bold),
-                ),
+                title: _isEditing
+                    ? Text(
+                        'Modification',
+                        style: const TextStyle(
+                            color: d_colorGreen, fontWeight: FontWeight.bold),
+                      )
+                    : Text(
+                        'Détail intrant',
+                        style: const TextStyle(
+                            color: d_colorGreen, fontWeight: FontWeight.bold),
+                      ),
                 actions: acteur.idActeur == intrants.acteur!.idActeur
                     ? [
                         _isEditing
@@ -397,25 +457,18 @@ class _DetailIntrantState extends State<DetailIntrant> {
                       : Center(
                           child: intrants.photoIntrant != null &&
                                   !intrants.photoIntrant!.isEmpty
-                              ?
-                              
-       CachedNetworkImage(
-                                                  imageUrl:
-                                                  "https://koumi.ml/api-koumi/intrant/${intrants.idIntrant}/image",
-                                                  fit: BoxFit.cover,
-                                                  placeholder: (context, url) =>
-                                                      const Center(
-                                                          child:
-                                                              CircularProgressIndicator()),
-                                                  errorWidget:
-                                                      (context, url, error) =>
-                                                          Image.asset(
-                                                    'assets/images/default_image.png',
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                )
-
-                             
+                              ? CachedNetworkImage(
+                                  imageUrl:
+                                      "https://koumi.ml/api-koumi/intrant/${intrants.idIntrant}/image",
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => const Center(
+                                      child: CircularProgressIndicator()),
+                                  errorWidget: (context, url, error) =>
+                                      Image.asset(
+                                    'assets/images/default_image.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
                               : Image.asset(
                                   "assets/images/default_image.png",
                                   fit: BoxFit.cover,
@@ -579,20 +632,19 @@ class _DetailIntrantState extends State<DetailIntrant> {
         ),
         // _buildDescription(intrants.descriptionIntrant!),
         Padding(
-                     padding: EdgeInsets.all(8),
-                      child: ReadMoreText(
-                        colorClickableText: Colors.orange,
-                        trimLines: 2,
-                        trimMode: TrimMode.Line,
-                        trimCollapsedText: "Lire plus",
-                        trimExpandedText: "Lire moins",
-                        style: TextStyle(
-                            fontSize: 16, fontStyle: FontStyle.italic),
-                        intrants.descriptionIntrant == null
-                            ? "A Henley shirt is a collarless pullover shirt, by a round neckline and a placket about 3 to 5 inches (8 to 13 cm) long and usually having 2–5 buttons."
-                            : intrants.descriptionIntrant!,
-                      ),
-                    ),
+          padding: EdgeInsets.all(8),
+          child: ReadMoreText(
+            colorClickableText: Colors.orange,
+            trimLines: 2,
+            trimMode: TrimMode.Line,
+            trimCollapsedText: "Lire plus",
+            trimExpandedText: "Lire moins",
+            style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+            intrants.descriptionIntrant == null
+                ? "A Henley shirt is a collarless pullover shirt, by a round neckline and a placket about 3 to 5 inches (8 to 13 cm) long and usually having 2–5 buttons."
+                : intrants.descriptionIntrant!,
+          ),
+        ),
 
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -671,6 +723,108 @@ class _DetailIntrantState extends State<DetailIntrant> {
       _buildEditableDetailItem('Date péremption ', _dateController),
       _buildEditableDetailItem('Quantité ', _quantiteController),
       _buildEditableDetailItem('Prix intrant ', _prixController),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              "Monnaie",
+              style: const TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w500,
+                  fontStyle: FontStyle.italic,
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 18),
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              child: FutureBuilder(
+                future: _monnaieList,
+                builder: (_, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return DropdownButtonFormField(
+                      items: [],
+                      onChanged: null,
+                      decoration: InputDecoration(
+                        labelText: 'Chargement...',
+                      ),
+                    );
+                  }
+
+                  if (snapshot.hasData) {
+                    dynamic jsonString = utf8.decode(snapshot.data.bodyBytes);
+                    dynamic responseData = json.decode(jsonString);
+
+                    if (responseData is List) {
+                      List<Monnaie> speList =
+                          responseData.map((e) => Monnaie.fromMap(e)).toList();
+
+                      if (speList.isEmpty) {
+                        return DropdownButtonFormField(
+                          items: [],
+                          onChanged: null,
+                          decoration: InputDecoration(
+                            labelText: 'Aucun monnaie trouvé',
+                          ),
+                        );
+                      }
+
+                      return DropdownButtonFormField<String>(
+                        isExpanded: true,
+                        items: speList
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e.idMonnaie,
+                                child: Text(e.sigle!),
+                              ),
+                            )
+                            .toList(),
+                        value: monnaieValue,
+                        onChanged: (newValue) {
+                          setState(() {
+                            monnaieValue = newValue;
+                            if (newValue != null) {
+                              monnaie = speList.firstWhere(
+                                (element) => element.idMonnaie == newValue,
+                              );
+                            }
+                          });
+                        },
+                        decoration: InputDecoration(
+                            // labelText: 'Sélectionner la monnaie',
+                            // contentPadding: const EdgeInsets.symmetric(
+                            //     vertical: 10, horizontal: 20),
+                            // border: OutlineInputBorder(
+                            //   borderRadius: BorderRadius.circular(8),
+                            // ),
+                            ),
+                      );
+                    } else {
+                      return DropdownButtonFormField(
+                        items: [],
+                        onChanged: null,
+                        decoration: InputDecoration(
+                          labelText: 'Aucun monnaie trouvé',
+                        ),
+                      );
+                    }
+                  } else {
+                    return DropdownButtonFormField(
+                      items: [],
+                      onChanged: null,
+                      decoration: InputDecoration(
+                        labelText: 'Aucun monnaie trouvé',
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     ]);
   }
 
@@ -681,9 +835,23 @@ class _DetailIntrantState extends State<DetailIntrant> {
         _buildItem('Quantité ', intrants.quantiteIntrant.toString()),
         _buildItem('Date péremption ', intrants.dateExpiration!),
         monnaie != null
-            ? _buildItem(
-                'Prix ', '${intrants.prixIntrant.toString()} ${monnaie}')
-            : _buildItem('Prix ', '${intrants.prixIntrant.toString()} ${monnaie}'),
+            ? _buildItem('Prix ',
+                '${intrants.prixIntrant.toString()} ${intrants.monnaie!.libelle}')
+            : _buildItem('Prix ', '${intrants.prixIntrant.toString()} '),
+        FutureBuilder<Map<String, String>>(
+          future: rates,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else {
+              return Column(
+                children: snapshot.data!.entries.map((entry) {
+                  return _buildItem("Prix en ${entry.key}", "${entry.value}");
+                }).toList(),
+              );
+            }
+          },
+        ),
         _buildItem('Unité ', '${intrants.unite}'),
         _buildItem('Forme ', '${intrants.forme!.libelleForme}'),
         _buildItem('Statut ',
@@ -755,36 +923,6 @@ class _DetailIntrantState extends State<DetailIntrant> {
       ),
     );
   }
-  // Widget _buildItem(String title, String value) {
-  //   return Padding(
-  //     padding: const EdgeInsets.all(10.0),
-  //     child: Row(
-  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //       children: [
-  //         Text(
-  //           title,
-  //           style: const TextStyle(
-  //               color: Colors.black87,
-  //               fontWeight: FontWeight.w500,
-  //               fontStyle: FontStyle.italic,
-  //               overflow: TextOverflow.ellipsis,
-  //               fontSize: 18),
-  //         ),
-  //         Text(
-  //           value,
-  //           textAlign: TextAlign.justify,
-  //           softWrap: true,
-  //           style: const TextStyle(
-  //             color: Colors.black,
-  //             fontWeight: FontWeight.w800,
-  //             overflow: TextOverflow.ellipsis,
-  //             fontSize: 16,
-  //           ),
-  //         )
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Widget _buildEditableDetailItem(
       String label, TextEditingController controller) {

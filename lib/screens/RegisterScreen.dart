@@ -12,6 +12,8 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/providers/CountryProvider.dart';
+import 'package:provider/provider.dart';
 import 'package:sim_data_plus/sim_data.dart';
 
 // import 'package:koumi_app/models/TypeActeur.dart';
@@ -54,6 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final TextEditingController controller = TextEditingController();
   TextEditingController whatsAppController = TextEditingController();
+  CountryProvider? countryProvider ;
 
   String? initialCountry;
   String detectedCountryCode = '';
@@ -64,19 +67,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   ];
  
 
-  //    void _detectInitialCountryCode() {
-  //   // Obtenir la locale du périphérique
-  //   String locale = Platform.localeName;
 
-  //   // Extraire le code de pays de la locale
-  //   String countryCode = locale.split('_').last;
-
-  //   // Mettre à jour l'état avec le code de pays détecté
-  //   setState(() {
-  //     detectedCountry = countryCode;
-  //     debugPrint("Iso : $detectedCountry");
-  //   });
-  // }
 
   void getPhoneNumber(String phoneNumber) async {
     PhoneNumber number = await PhoneNumber.getRegionInfoFromPhoneNumber(
@@ -105,11 +96,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String processedNumber = "";
   String processedNumberTel = "";
 
+   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Accédez au fournisseur ici
+    countryProvider = Provider.of<CountryProvider>(context, listen: false);
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    selectedCountry = widget.selectedCountry;
+
+    selectedCountry = countryProvider?.countryCode!;
     // _mesTypeActeur  =
     // http.get(Uri.parse('https://koumi.ml/api-koumi/typeActeur/read'));
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/typeActeur/read'));

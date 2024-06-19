@@ -36,8 +36,12 @@ class _SplashScreenState extends State<SplashScreen> {
   late Acteur acteur;
   late ConnectionVerify connectionVerify;
   String? detectedC;
+  String? isoCountryCode;
+  String? country;
   String? detectedCountryCode;
   String? detectedCountry;
+  CountryProvider? countryProvider;
+  late BuildContext _currentContext;
 
     void getLocationNew() async {
     try {
@@ -118,29 +122,48 @@ class _SplashScreenState extends State<SplashScreen> {
         Geolocator.getPositionStream().listen((Position position) {
       latitude.value = 'Latitude : ${position.latitude}';
       longitude.value = 'Longitude : ${position.longitude}';
-      getAddressFromLatLang(position, context);
+      getAddressFromLatLang(position);
     });
   }
 
- Future<void> getAddressFromLatLang(Position position, BuildContext context) async {
+ @override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+  // Save the context when it changes
+  _currentContext = context;
+}
+
+  Future<void> getAddressFromLatLang(Position position) async {
   List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
   Placemark place = placemarks[0];
   
-  final countryProvider = Provider.of<CountryProvider>(context, listen: false);
+  // var countryProvider = Provider.of<CountryProvider>(_currentContext, listen: false);
+   isoCountryCode = place.isoCountryCode!;
+   country = place.country!;
   
-  if(countryProvider.countryName == null){
+   if(isoCountryCode != null || country != null){
+   debugPrint("iso : $isoCountryCode et country $country");
+   }else{
+       debugPrint("data null");
+   }
 
-  await countryProvider.setCountryInfo(place.isoCountryCode!, place.country!);
-  }
-          setState(() {
-          
+  // Check if the widget is still mounted
+  if (!mounted) return;
+
+  await countryProvider?.setCountryInfo(isoCountryCode!, country!);
+
+  // Check again before calling setState
+  if (!mounted) return;
+  
+  setState(() {
     detectedC = place.isoCountryCode;
     detectedCountryCode = place.isoCountryCode!;
     detectedCountry = place.country!;
-        });
+  });
 
-  debugPrint("Address: ${place.locality}, ${place.country}, ${place.isoCountryCode}");
+  debugPrint("Address: splashScreen ${place.locality}, ${place.country}, ${place.isoCountryCode}");
 }
+
 
   // Future<void> getAddressFromLatLang(Position position) async {
   //   List<Placemark> placemark =
@@ -278,6 +301,12 @@ class _SplashScreenState extends State<SplashScreen> {
     //     ),
     //   );
     // }
+  }
+
+   @override
+  void dispose() {
+  streamSubscription.cancel();
+    super.dispose();
   }
 
   @override

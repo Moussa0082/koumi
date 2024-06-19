@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Materiel.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:path/path.dart';
 
@@ -29,6 +30,7 @@ class MaterielService extends ChangeNotifier {
     required String etatMateriel,
     required Acteur acteur,
     required TypeMateriel typeMateriel,
+    required Monnaie monnaie,
   }) async {
     try {
       var requete =
@@ -49,6 +51,7 @@ class MaterielService extends ChangeNotifier {
         'etatMateriel': etatMateriel,
         'acteur': acteur.toMap(),
         'typeMateriel': typeMateriel.toMap(),
+        'monnaie': monnaie.toMap()
       });
 
       var response = await requete.send();
@@ -77,6 +80,7 @@ class MaterielService extends ChangeNotifier {
     required String etatMateriel,
     required Acteur acteur,
       required TypeMateriel typeMateriel,
+      required Monnaie monnaie
   }) async {
     try {
       var requete = http.MultipartRequest(
@@ -98,6 +102,7 @@ class MaterielService extends ChangeNotifier {
         'etatMateriel': etatMateriel,
         'acteur': acteur.toMap(),
         'typeMateriel': typeMateriel.toMap(),
+          'monnaie': monnaie.toMap()
       });
 
       var response = await requete.send();
@@ -158,7 +163,7 @@ class MaterielService extends ChangeNotifier {
       debugPrint(response.body);
       return materielList;
     } else {
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête mat type avec le code d\'état: ${response.statusCode}');
        return  materielList = [];
     }
   }
@@ -191,7 +196,7 @@ class MaterielService extends ChangeNotifier {
         debugPrint("response body all materiel by pays with pagination ${page} par défilement soit ${materielList.length}");
        return materielList;
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête mat pag avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {
@@ -229,9 +234,10 @@ class MaterielService extends ChangeNotifier {
           materielList.addAll(newMateriels);
         }
 
-        debugPrint("response body all materiel by pays with pagination ${page} par défilement soit ${materielList.length}");
+        debugPrint("response body all materiel by pays and type materiel with pagination ${page} par défilement soit ${materielList.length}");
       } else {
         print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+    return [];
       }
     } catch (e) {
       print('Une erreur s\'est produite lors de la récupération des materiel: $e');
@@ -277,7 +283,7 @@ class MaterielService extends ChangeNotifier {
         debugPrint("response body materiel by acteur with pagination $page par défilement soit ${materielList.length}");
        return materielList;
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête  mat avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {

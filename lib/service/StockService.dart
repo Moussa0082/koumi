@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Magasin.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/Unite.dart';
@@ -19,14 +20,14 @@ class StockService extends ChangeNotifier {
   List<Stock> stockList = [];
   int page = 0;
   bool isLoading = false;
-   int size = 4;
+  int size = 4;
   bool hasMore = true;
 
 
   // List<dynamic> stockList = [];
   // addStock
 
-   Future<void> creerStock({
+  Future<void> creerStock({
     required String nomProduit,
     required String formeProduit,
     required String origineProduit,
@@ -40,6 +41,7 @@ class StockService extends ChangeNotifier {
     required Unite unite,
     required Magasin magasin,
     required Acteur acteur,
+    required Monnaie monnaie,
   }) async {
     try {
       var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/addStock'));
@@ -64,6 +66,7 @@ class StockService extends ChangeNotifier {
         'unite': unite.toMap(),
         'magasin': magasin.toMap(),
         'acteur': acteur.toMap(),
+        'monnaie' : monnaie.toMap()
       });
 
       var response = await requete.send();
@@ -103,6 +106,7 @@ class StockService extends ChangeNotifier {
     required Unite unite,
     required Magasin magasin,
     required Acteur acteur,
+    required Monnaie monnaie
   }) async {
     try {
       var requete = http.MultipartRequest(
@@ -129,6 +133,7 @@ class StockService extends ChangeNotifier {
         'unite': unite.toMap(),
         'magasin': magasin.toMap(),
         'acteur': acteur.toMap(),
+        'monnaie': monnaie.toMap()
       });
 
       var response = await requete.send();
@@ -330,7 +335,7 @@ class StockService extends ChangeNotifier {
         debugPrint("response body all stock by magasin and pays with pagination ${page} par défilement soit ${stockList.length}");
        return stockList;
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête stock cat mag pag avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {
@@ -369,7 +374,7 @@ class StockService extends ChangeNotifier {
           stockList.addAll(newStocks);
         }
 
-        debugPrint("response body all stock by pays with pagination ${page} par défilement soit ${stockList.length}");
+        debugPrint("response body all stock by pays and magasin and categorie with pagination ${page} par défilement soit ${stockList.length}");
       } else {
         print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
@@ -433,7 +438,7 @@ class StockService extends ChangeNotifier {
 
         debugPrint("response body all stock by acteur with pagination ${page} par défilement soit ${stockList.length}");
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête stock ac avec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
     } catch (e) {
       print('Une erreur s\'est produite lors de la récupération des stocks: $e');
@@ -471,7 +476,7 @@ class StockService extends ChangeNotifier {
 
         debugPrint("response body all stock by acteur with pagination ${page} par défilement soit ${stockList.length}");
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête  stoc pag ac avec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
     } catch (e) {
       print('Une erreur s\'est produite lors de la récupération des stocks: $e');
@@ -519,7 +524,7 @@ class StockService extends ChangeNotifier {
         debugPrint("response body  stock by magasin with pagination $page par défilement soit ${stockList.length}");
        return stockList;
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête pag avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {

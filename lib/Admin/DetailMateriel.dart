@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -8,12 +9,12 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Device.dart';
 import 'package:koumi_app/models/Materiel.dart';
-import 'package:koumi_app/models/ParametreGeneraux.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
-import 'package:koumi_app/screens/DetailProduits.dart';
+import 'package:koumi_app/service/DeviceService.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
@@ -40,10 +41,12 @@ class _DetailMaterielState extends State<DetailMateriel> {
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _etatController = TextEditingController();
   TextEditingController _prixController = TextEditingController();
-
+  String? monnaieValue;
+  late Future _monnaieList;
+  late Monnaie monnaie = Monnaie();
   final formkey = GlobalKey<FormState>();
-  List<ParametreGeneraux> paraList = [];
-  late ParametreGeneraux para = ParametreGeneraux();
+  // List<ParametreGeneraux> paraList = [];
+  // late ParametreGeneraux para = ParametreGeneraux();
   late ValueNotifier<bool> isDialOpenNotifier;
   String? imageSrc;
   File? photo;
@@ -57,14 +60,12 @@ class _DetailMaterielState extends State<DetailMateriel> {
   String niveau3 = '';
   late Materiel materiels;
   bool _isEditing = false;
-
   bool isExist = false;
   String? email = "";
-
-  
-    bool isLoadingLibelle = true;
-    String? monnaie;
-
+  // late List<Device> devices = [];
+  // late Future<List<Device>> _listeDevice;
+  bool isLoadingLibelle = true;
+  late Future<Map<String, String>> rates;
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -84,32 +85,43 @@ class _DetailMaterielState extends State<DetailMateriel> {
     }
   }
 
-     Future<String> getMonnaieByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+  Future<List<Device>> getDeviceListe(String id) async {
+    return await DeviceService().fetchDeviceByIdMonnaie(id);
+  }
 
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load monnaie');
-    }
-}
+  Future<Map<String, String>> fetchConvert(Materiel materiel) async {
+    Monnaie monnaie = materiel.monnaie!;
+    int? amount = materiel.prixParHeure;
+    Map<String, String> result = {};
 
-Future<void> fetchPaysDataByActor() async {
     try {
-     
-      String monnaies = await getMonnaieByActor(acteur.idActeur!);
+      List<Device> devices = await getDeviceListe(monnaie.idMonnaie!);
 
-      setState(() { 
-        monnaie = monnaies;
-        isLoadingLibelle = false;
-      });
+      for (var device in devices) {
+        double convertedAmount = amount * device.taux!;
+        String amountSubString = convertedAmount.toStringAsFixed(2);
+        ;
+        print(amountSubString);
+        switch (device.nomDevice!.toLowerCase()) {
+          case 'dollar':
+            result[device.sigle!] = amountSubString;
+            break;
+          case 'euro':
+            result[device.sigle!] = amountSubString;
+            break;
+          case 'yuan':
+            result[device.sigle!] = amountSubString;
+            break;
+          default:
+            print('Aucune devise trouvée pour ${device.nomDevice}');
+        }
+      }
     } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-        });
       print('Error: $e');
     }
+
+    print("conversion : ${result.toString()}");
+    return result;
   }
 
   Future<File> saveImagePermanently(String imagePath) async {
@@ -205,7 +217,8 @@ Future<void> fetchPaysDataByActor() async {
                 etatMateriel: etat,
                 photoMateriel: photo,
                 acteur: acteur,
-                typeMateriel: materiels.typeMateriel)
+                typeMateriel: materiels.typeMateriel,
+                monnaie: monnaie)
             .then((value) => {
                   Provider.of<MaterielService>(context, listen: false)
                       .applyChange(),
@@ -219,11 +232,17 @@ Future<void> fetchPaysDataByActor() async {
                         acteur: acteur,
                         dateAjout: materiels.dateAjout,
                         etatMateriel: etat,
-                        typeMateriel: materiels.typeMateriel);
+                        typeMateriel: materiels.typeMateriel,
+                        monnaie: monnaie);
                     _isLoading = false;
                   })
                 })
-            .catchError((onError) => {print(onError.toString())});
+            .catchError((onError) => {
+                  setState(() {
+                    _isLoading = false;
+                  }),
+                  print(onError.toString())
+                });
       } else {
         await MaterielService()
             .updateMateriel(
@@ -234,7 +253,8 @@ Future<void> fetchPaysDataByActor() async {
                 localisation: localisation,
                 etatMateriel: etat,
                 acteur: acteur,
-                typeMateriel: materiels.typeMateriel)
+                typeMateriel: materiels.typeMateriel,
+                monnaie: monnaie)
             .then((value) => {
                   Provider.of<MaterielService>(context, listen: false)
                       .applyChange(),
@@ -248,11 +268,17 @@ Future<void> fetchPaysDataByActor() async {
                         acteur: acteur,
                         dateAjout: materiels.dateAjout,
                         etatMateriel: etat,
-                        typeMateriel: materiels.typeMateriel);
+                        typeMateriel: materiels.typeMateriel,
+                        monnaie: monnaie);
                     _isLoading = false;
                   })
                 })
-            .catchError((onError) => {print(onError.toString())});
+            .catchError((onError) => {
+                  setState(() {
+                    _isLoading = false;
+                  }),
+                  print(onError.toString())
+                });
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -268,6 +294,9 @@ Future<void> fetchPaysDataByActor() async {
           duration: Duration(seconds: 5),
         ),
       );
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -276,16 +305,20 @@ Future<void> fetchPaysDataByActor() async {
     super.initState();
     verify();
 
-    _niveau3List =
-        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/read'));
+    _niveau3List = http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/read'));
     materiels = widget.materiel;
+    rates = fetchConvert(materiels);
+    print("rates ${rates.toString()}");
     _nomController.text = materiels.nom;
     _descriptionController.text = materiels.description;
     _etatController.text = materiels.etatMateriel;
     _localiteController.text = materiels.localisation;
     _prixController.text = materiels.prixParHeure.toString();
+    monnaie = materiels.monnaie!;
+    monnaieValue = materiels.monnaie!.idMonnaie;
+    _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
     isDialOpenNotifier = ValueNotifier<bool>(false);
-    fetchPaysDataByActor();
+    // fetchPaysDataByActor();
   }
 
   @override
@@ -313,11 +346,17 @@ Future<void> fetchPaysDataByActor() async {
                       icon:
                           const Icon(Icons.arrow_back_ios, color: d_colorGreen),
                     ),
-              title: Text(
-                'Détail matériel',
-                style: const TextStyle(
-                    color: d_colorGreen, fontWeight: FontWeight.bold),
-              ),
+              title: _isEditing
+                  ? Text(
+                      'Modification',
+                      style: const TextStyle(
+                          color: d_colorGreen, fontWeight: FontWeight.bold),
+                    )
+                  : Text(
+                      'Détail matériel',
+                      style: const TextStyle(
+                          color: d_colorGreen, fontWeight: FontWeight.bold),
+                    ),
               actions: acteur.idActeur == materiels.acteur.idActeur
                   ? [
                       _isEditing
@@ -347,33 +386,26 @@ Future<void> fetchPaysDataByActor() async {
               children: [
                 photo != null
                     ? Image.file(
-                    photo!,
-                    width: double.infinity,
-                    height: 200,
-                    fit: BoxFit.cover,
-                                          )
+                        photo!,
+                        width: double.infinity,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      )
                     : materiels.photoMateriel != null &&
                             materiels.photoMateriel!.isNotEmpty
-                        ? 
-                        CachedNetworkImage(
-                   width: double.infinity,
-                    height: 200,
-                    
-                                                  imageUrl:
-                                                      'https://koumi.ml/api-koumi/Materiel/${materiels.idMateriel}/image',
-                                                  fit: BoxFit.cover,
-                                                  placeholder: (context, url) =>
-                                                      const Center(
-                                                          child:
-                                                              CircularProgressIndicator()),
-                                                  errorWidget:
-                                                      (context, url, error) =>
-                                                          Image.asset(
-                                                    'assets/images/default_image.png',
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                )
-                       
+                        ? CachedNetworkImage(
+                            width: double.infinity,
+                            height: 200,
+                            imageUrl:
+                                'https://koumi.ml/api-koumi/Materiel/${materiels.idMateriel}/image',
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator()),
+                            errorWidget: (context, url, error) => Image.asset(
+                              'assets/images/default_image.png',
+                              fit: BoxFit.cover,
+                            ),
+                          )
                         : Image.asset(
                             "assets/images/default_image.png",
                             fit: BoxFit.cover,
@@ -440,6 +472,25 @@ Future<void> fetchPaysDataByActor() async {
   Widget _buildData() {
     return Column(
       children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Container(
+            height: 40,
+            width: MediaQuery.of(context).size.width,
+            decoration: const BoxDecoration(
+              color: Colors.orangeAccent,
+            ),
+            child: Center(
+              child: Text(
+                materiels.nom,
+                style: const TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ),
         _buildItem('Nom du matériel: ', materiels.nom),
         _buildItem('Type matériel: ', materiels.typeMateriel.nom!),
         _buildItem('Localité : ', materiels.localisation),
@@ -447,9 +498,43 @@ Future<void> fetchPaysDataByActor() async {
         // !isExist ? _buildItem('Prix par heure : ',
         //     "${materiels.prixParHeure.toString()} ${para.monnaie}"):
         _buildItem('Prix par heure : ',
-            "${materiels.prixParHeure.toString()} ${monnaie}"),
+            "${materiels.prixParHeure.toString()} ${materiels.monnaie!.libelle}"),
+        
+        FutureBuilder<Map<String, String>>(
+          future: rates,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else {
+              return Column(
+                children: snapshot.data!.entries.map((entry) {
+                  return _buildItem("Prix en ${entry.key}", "${entry.value}");
+                }).toList(),
+              );
+            }
+          },
+        ),
         _buildItem('Date d\'ajout : ', materiels.dateAjout!),
-        _buildDescription('Description : ', materiels.description)
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Container(
+            height: 40,
+            width: MediaQuery.of(context).size.width,
+            decoration: const BoxDecoration(
+              color: Colors.orangeAccent,
+            ),
+            child: Center(
+              child: Text(
+                'Description',
+                style: const TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ),
+        _buildDescription(materiels.description)
       ],
     );
   }
@@ -461,10 +546,258 @@ Future<void> fetchPaysDataByActor() async {
         _buildEditableDetailItem('Localité : ', _localiteController),
         _buildEditableDetailItem('Etat du matériel : ', _etatController),
         _buildEditableDetailItem('Prix par heure : ', _prixController),
-        _buildEditableDetailItem('Description : ', _descriptionController)
+        _buildEditableDetailItem('Description : ', _descriptionController),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                "Monnaie",
+                style: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w500,
+                    fontStyle: FontStyle.italic,
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: 18),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                child: FutureBuilder(
+                  future: _monnaieList,
+                  builder: (_, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return DropdownButtonFormField(
+                        items: [],
+                        onChanged: null,
+                        decoration: InputDecoration(
+                          labelText: 'Chargement...',
+                          // contentPadding: const EdgeInsets.symmetric(
+                          //     vertical: 10, horizontal: 20),
+                          // border: OutlineInputBorder(
+                          //   borderRadius: BorderRadius.circular(8),
+                          // ),
+                        ),
+                      );
+                    }
+
+                    if (snapshot.hasData) {
+                      dynamic jsonString = utf8.decode(snapshot.data.bodyBytes);
+                      dynamic responseData = json.decode(jsonString);
+
+                      if (responseData is List) {
+                        List<Monnaie> speList = responseData
+                            .map((e) => Monnaie.fromMap(e))
+                            .toList();
+
+                        if (speList.isEmpty) {
+                          return DropdownButtonFormField(
+                            items: [],
+                            onChanged: null,
+                            decoration: InputDecoration(
+                              labelText: 'Aucun monnaie trouvé',
+                              // contentPadding: const EdgeInsets.symmetric(
+                              //     vertical: 10, horizontal: 20),
+                              // border: OutlineInputBorder(
+                              //   borderRadius: BorderRadius.circular(8),
+                              // ),
+                            ),
+                          );
+                        }
+
+                        return DropdownButtonFormField<String>(
+                          isExpanded: true,
+                          items: speList
+                              .map(
+                                (e) => DropdownMenuItem(
+                                  value: e.idMonnaie,
+                                  child: Text(e.sigle!),
+                                ),
+                              )
+                              .toList(),
+                          value: monnaieValue,
+                          onChanged: (newValue) {
+                            setState(() {
+                              monnaieValue = newValue;
+                              if (newValue != null) {
+                                monnaie = speList.firstWhere(
+                                  (element) => element.idMonnaie == newValue,
+                                );
+                              }
+                            });
+                          },
+                          decoration: InputDecoration(
+                              // labelText: 'Sélectionner la monnaie',
+                              // contentPadding: const EdgeInsets.symmetric(
+                              //     vertical: 10, horizontal: 20),
+                              // border: OutlineInputBorder(
+                              //   borderRadius: BorderRadius.circular(8),
+                              // ),
+                              ),
+                        );
+                      } else {
+                        return DropdownButtonFormField(
+                          items: [],
+                          onChanged: null,
+                          decoration: InputDecoration(
+                            labelText: 'Aucun monnaie trouvé',
+                          ),
+                        );
+                      }
+                    } else {
+                      return DropdownButtonFormField(
+                        items: [],
+                        onChanged: null,
+                        decoration: InputDecoration(
+                          labelText: 'Aucun monnaie trouvé',
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
+
+  // Widget _buildEditingData() {
+  //   return Column(
+  //     children: [
+  //       _buildEditableDetailItem('Nom du matériel: ', _nomController),
+  //       _buildEditableDetailItem('Localité : ', _localiteController),
+  //       _buildEditableDetailItem('Etat du matériel : ', _etatController),
+  //       _buildEditableDetailItem('Prix par heure : ', _prixController),
+  //       _buildEditableDetailItem('Description : ', _descriptionController),
+  //        //l'erreur est dû a ce row
+  //        Row(
+  //         children: [
+  //           Padding(
+  //             padding: EdgeInsets.symmetric(
+  //               horizontal: 22,
+  //             ),
+  //             child: Align(
+  //               alignment: Alignment.topLeft,
+  //               child: Text(
+  //                 "Chosir la monnaie",
+  //                 style: TextStyle(color: (Colors.black), fontSize: 18),
+  //               ),
+  //             ),
+  //           ),
+  //           Padding(
+  //             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+  //             child: FutureBuilder(
+  //               future: _monnaieList,
+  //               builder: (_, snapshot) {
+  //                 if (snapshot.connectionState == ConnectionState.waiting) {
+  //                   return DropdownButtonFormField(
+  //                     items: [],
+  //                     onChanged: null,
+  //                     decoration: InputDecoration(
+  //                       labelText: 'Chargement...',
+  //                       contentPadding: const EdgeInsets.symmetric(
+  //                           vertical: 10, horizontal: 20),
+  //                       border: OutlineInputBorder(
+  //                         borderRadius: BorderRadius.circular(8),
+  //                       ),
+  //                     ),
+  //                   );
+  //                 }
+
+  //                 if (snapshot.hasData) {
+  //                   dynamic jsonString = utf8.decode(snapshot.data.bodyBytes);
+  //                   dynamic responseData = json.decode(jsonString);
+
+  //                   if (responseData is List) {
+  //                     List<Monnaie> speList =
+  //                         responseData.map((e) => Monnaie.fromMap(e)).toList();
+
+  //                     if (speList.isEmpty) {
+  //                       return DropdownButtonFormField(
+  //                         items: [],
+  //                         onChanged: null,
+  //                         decoration: InputDecoration(
+  //                           labelText: 'Aucun monnaie trouvé',
+  //                           contentPadding: const EdgeInsets.symmetric(
+  //                               vertical: 10, horizontal: 20),
+  //                           border: OutlineInputBorder(
+  //                             borderRadius: BorderRadius.circular(8),
+  //                           ),
+  //                         ),
+  //                       );
+  //                     }
+
+  //                     return DropdownButtonFormField<String>(
+  //                       isExpanded: true,
+  //                       items: speList
+  //                           .map(
+  //                             (e) => DropdownMenuItem(
+  //                               value: e.idMonnaie,
+  //                               child: Text(e.sigle!),
+  //                             ),
+  //                           )
+  //                           .toList(),
+  //                       value: monnaieValue,
+  //                       onChanged: (newValue) {
+  //                         setState(() {
+  //                           monnaieValue = newValue;
+  //                           if (newValue != null) {
+  //                             monnaie = speList.firstWhere(
+  //                               (element) => element.idMonnaie == newValue,
+  //                             );
+  //                           }
+  //                         });
+  //                       },
+  //                       decoration: InputDecoration(
+  //                         labelText: 'Sélectionner la monnaie',
+  //                         contentPadding: const EdgeInsets.symmetric(
+  //                             vertical: 10, horizontal: 20),
+  //                         border: OutlineInputBorder(
+  //                           borderRadius: BorderRadius.circular(8),
+  //                         ),
+  //                       ),
+  //                     );
+  //                   } else {
+  //                     // Handle case when response data is not a list
+  //                     return DropdownButtonFormField(
+  //                       items: [],
+  //                       onChanged: null,
+  //                       decoration: InputDecoration(
+  //                         labelText: 'Aucun monnaie trouvé',
+  //                         contentPadding: const EdgeInsets.symmetric(
+  //                             vertical: 10, horizontal: 20),
+  //                         border: OutlineInputBorder(
+  //                           borderRadius: BorderRadius.circular(8),
+  //                         ),
+  //                       ),
+  //                     );
+  //                   }
+  //                 } else {
+  //                   return DropdownButtonFormField(
+  //                     items: [],
+  //                     onChanged: null,
+  //                     decoration: InputDecoration(
+  //                       labelText: 'Aucun monnaie trouvé',
+  //                       contentPadding: const EdgeInsets.symmetric(
+  //                           vertical: 10, horizontal: 20),
+  //                       border: OutlineInputBorder(
+  //                         borderRadius: BorderRadius.circular(8),
+  //                       ),
+  //                     ),
+  //                   );
+  //                 }
+  //               },
+  //             ),
+  //           )
+  //         ],
+  //       )
+  //     ],
+  //   );
+  // }
 
   Future<void> _makePhoneWa(String whatsappNumber) async {
     final Uri launchUri = Uri(
@@ -525,42 +858,26 @@ Future<void> fetchPaysDataByActor() async {
     );
   }
 
-  Widget _buildDescription(String title, String value) {
+  Widget _buildDescription(String value) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w500,
-                  fontStyle: FontStyle.italic,
-                  overflow: TextOverflow.ellipsis,
-                  fontSize: 18),
-            ),
-             Padding(
-                      padding: EdgeInsets.all(8),
-                      child: ReadMoreText(
-                        colorClickableText: Colors.orange,
-                        trimLines: 2,
-                        trimMode: TrimMode.Line,
-                        trimCollapsedText: "Lire plus",
-                        trimExpandedText: "Lire moins",
-                        style: TextStyle(
-                            fontSize: 16, fontStyle: FontStyle.italic),
-                        value
-                      ),
-                    ),
-          ],
+        child: Padding(
+          padding: EdgeInsets.all(8),
+          child: ReadMoreText(
+              colorClickableText: Colors.orange,
+              trimLines: 2,
+              trimMode: TrimMode.Line,
+              trimCollapsedText: "Lire plus",
+              trimExpandedText: "Lire moins",
+              style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+              value),
         ),
       ),
     );
   }
 
- Widget _buildItem(String title, String value) {
+  Widget _buildItem(String title, String value) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Row(
@@ -595,35 +912,4 @@ Future<void> fetchPaysDataByActor() async {
       ),
     );
   }
-
-  // Widget _buildItem(String title, String value) {
-  //   return Padding(
-  //     padding: const EdgeInsets.all(10.0),
-  //     child: Row(
-  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //       children: [
-  //         Text(
-  //           title,
-  //           style: const TextStyle(
-  //               color: Colors.black87,
-  //               fontWeight: FontWeight.w500,
-  //               fontStyle: FontStyle.italic,
-  //               overflow: TextOverflow.ellipsis,
-  //               fontSize: 18),
-  //         ),
-  //         Text(
-  //           value,
-  //           textAlign: TextAlign.justify,
-  //           softWrap: true,
-  //           style: const TextStyle(
-  //             color: Colors.black,
-  //             fontWeight: FontWeight.w800,
-  //             overflow: TextOverflow.ellipsis,
-  //             fontSize: 16,
-  //           ),
-  //         )
-  //       ],
-  //     ),
-  //   );
-  // }
 }

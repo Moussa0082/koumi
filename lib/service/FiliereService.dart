@@ -69,7 +69,7 @@ class FiliereService extends ChangeNotifier {
       return filiereList;
     } else {
       filiereList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête filiere avec le code d\'état: ${response.statusCode}');
       return  filiereList = [];
       
     }
@@ -86,7 +86,7 @@ class FiliereService extends ChangeNotifier {
       return filiereList;
     } else {
       filiereList = [];
-      print('Échec de la requête avec le code d\'état: ${response.statusCode}');
+      print('Échec de la requête fil ac avec le code d\'état: ${response.statusCode}');
       throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
     }
   }

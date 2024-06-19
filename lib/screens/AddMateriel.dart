@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
@@ -34,6 +35,9 @@ class _AddMaterielState extends State<AddMateriel> {
   TextEditingController _etatController = TextEditingController();
   TextEditingController _prixController = TextEditingController();
   final formkey = GlobalKey<FormState>();
+  String? monnaieValue;
+  late Future _monnaieList;
+  late Monnaie monnaie = Monnaie();
   String? imageSrc;
   File? photo;
   late Acteur acteur;
@@ -45,66 +49,65 @@ class _AddMaterielState extends State<AddMateriel> {
   String? typeValue;
   late TypeMateriel typeMateriel;
   bool isExist = false;
-    String? monnaie;
-  late ParametreGeneraux para = ParametreGeneraux();
-  List<ParametreGeneraux> paraList = [];
-     bool isLoadingLibelle = true;
-    String? libelleNiveau3Pays;
+  // String? monnaie;
+  // late ParametreGeneraux para = ParametreGeneraux();
+  // List<ParametreGeneraux> paraList = [];
+  bool isLoadingLibelle = true;
+  String? libelleNiveau3Pays;
 
-     Future<String> getMonnaieByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+//      Future<String> getMonnaieByActor(String id) async {
+//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
 
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load monnaie');
-    }
-}
+//     if (response.statusCode == 200) {
+//       print("libelle : ${response.body}");
+//       return response.body;  // Return the body directly since it's a plain string
+//     } else {
+//       throw Exception('Failed to load monnaie');
+//     }
+// }
 
-  void verifyParam() {
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+  // void verifyParam() {
+  //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+  //       .parametreList!;
 
-    if (paraList.isNotEmpty) {
-      para = paraList[0];
-    } else {
-      // Gérer le cas où la liste est null ou vide, par exemple :
-      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
-    }
-  }
+  //   if (paraList.isNotEmpty) {
+  //     para = paraList[0];
+  //   } else {
+  //     // Gérer le cas où la liste est null ou vide, par exemple :
+  //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+  //   }
+  // }
 
- 
   Future<String> getLibelleNiveau3PaysByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+    final response = await http
+        .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
 
     if (response.statusCode == 200) {
       print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
+      return response
+          .body; // Return the body directly since it's a plain string
     } else {
       throw Exception('Failed to load libelle niveau3Pays');
     }
- }
-
-     Future<void> fetchPaysDataByActor() async {
-    try {
-      String monnaies = await getMonnaieByActor(acteur.idActeur!);
-
-      setState(() { 
-        monnaie = monnaies;
-        isLoadingLibelle = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-        });
-      print('Error: $e');
-    }
   }
 
-  
+  //    Future<void> fetchPaysDataByActor() async {
+  //   try {
+  //     String monnaies = await getMonnaieByActor(acteur.idActeur!);
 
-     Future<void> fetchLibelleNiveau3Pays() async {
+  //     setState(() {
+  //       monnaie = monnaies;
+  //       isLoadingLibelle = false;
+  //     });
+  //   } catch (e) {
+  //     setState(() {
+  //       isLoadingLibelle = false;
+  //       });
+  //     print('Error: $e');
+  //   }
+  // }
+
+  Future<void> fetchLibelleNiveau3Pays() async {
     try {
       String libelle = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
       setState(() {
@@ -122,16 +125,16 @@ class _AddMaterielState extends State<AddMateriel> {
   @override
   void initState() {
     super.initState();
-    verifyParam();
+    // verifyParam();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    _typeList =
-        http.get(Uri.parse('$apiOnlineUrl/TypeMateriel/read'));
+    fetchLibelleNiveau3Pays();
+    _typeList = http.get(Uri.parse('$apiOnlineUrl/TypeMateriel/read'));
     // _typeList =
     //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
-        _niveau3List =
-        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
-     fetchLibelleNiveau3Pays();
-     fetchPaysDataByActor();
+    _niveau3List = http.get(Uri.parse(
+        '$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
+      _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
+    //  fetchPaysDataByActor();
   }
 
   Future<File> saveImagePermanently(String imagePath) async {
@@ -200,7 +203,7 @@ class _AddMaterielState extends State<AddMateriel> {
           ),
         );
       },
-    ); 
+    );
   }
 
   void _handleButtonPress() async {
@@ -312,28 +315,33 @@ class _AddMaterielState extends State<AddMateriel> {
                         SizedBox(
                           height: 10,
                         ),
-                      isLoadingLibelle ?
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text("Chargement ................",style: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.bold),)),
-                      )
-                      :
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 22,
-                        ),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                           libelleNiveau3Pays != null ? libelleNiveau3Pays!.toUpperCase() : "Localité",
-                            style:
-                                TextStyle(color: (Colors.black), fontSize: 18),
-                          ),
-                        ),
-                      ),
+                        isLoadingLibelle
+                            ? Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Text(
+                                      "Chargement...",
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    )),
+                              )
+                            : Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 22,
+                                ),
+                                child: Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    libelleNiveau3Pays != null
+                                        ? libelleNiveau3Pays!.toUpperCase()
+                                        : "Localité",
+                                    style: TextStyle(
+                                        color: (Colors.black), fontSize: 18),
+                                  ),
+                                ),
+                              ),
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 10, horizontal: 20),
@@ -634,7 +642,137 @@ class _AddMaterielState extends State<AddMateriel> {
                           child: Align(
                             alignment: Alignment.topLeft,
                             child: Text(
-                              "PrixPrix (${monnaie}) par heure",
+                              "Chosir la monnaie",
+                              style: TextStyle(
+                                  color: (Colors.black), fontSize: 18),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          child: FutureBuilder(
+                            future: _monnaieList,
+                            builder: (_, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Chargement...',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              if (snapshot.hasData) {
+                                dynamic jsonString =
+                                    utf8.decode(snapshot.data.bodyBytes);
+                                dynamic responseData = json.decode(jsonString);
+
+                                if (responseData is List) {
+                                  List<Monnaie> speList = responseData
+                                      .map((e) => Monnaie.fromMap(e))
+                                      .toList();
+
+                                  if (speList.isEmpty) {
+                                    return DropdownButtonFormField(
+                                      items: [],
+                                      onChanged: null,
+                                      decoration: InputDecoration(
+                                        labelText: 'Aucun monnaie trouvé',
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 10, horizontal: 20),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  return DropdownButtonFormField<String>(
+                                    isExpanded: true,
+                                    items: speList
+                                        .map(
+                                          (e) => DropdownMenuItem(
+                                            value: e.idMonnaie,
+                                            child: Text(e.sigle!),
+                                          ),
+                                        )
+                                        .toList(),
+                                    value: monnaieValue,
+                                    onChanged: (newValue) {
+                                      setState(() {
+                                        monnaieValue = newValue;
+                                        if (newValue != null) {
+                                          monnaie = speList.firstWhere(
+                                            (element) =>
+                                                element.idMonnaie == newValue,
+                                          );
+                                        }
+                                      });
+                                    },
+                                    decoration: InputDecoration(
+                                      labelText: 'Sélectionner la monnaie',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  // Handle case when response data is not a list
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Aucun monnaie trouvé',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              } else {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucun monnaie trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 22,
+                          ),
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              "Prix par heure",
                               style: TextStyle(
                                   color: (Colors.black), fontSize: 18),
                             ),
@@ -674,8 +812,8 @@ class _AddMaterielState extends State<AddMateriel> {
                                     child: Image.file(
                                       photo!,
                                       fit: BoxFit.fitWidth,
-                                      height: 150,
-                                      width: 300,
+                                      height: 140,
+                                      width: 280,
                                     ),
                                   )
                                 : SizedBox(
@@ -683,7 +821,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                       onPressed: _showImageSourceDialog,
                                       icon: const Icon(
                                         Icons.add_a_photo_rounded,
-                                        size: 60,
+                                        size: 50,
                                       ),
                                     ),
                                   ),
@@ -713,17 +851,21 @@ class _AddMaterielState extends State<AddMateriel> {
                                             etatMateriel: etat,
                                             typeMateriel: typeMateriel,
                                             photoMateriel: photo,
-                                            acteur: acteur)
+                                            acteur: acteur,
+                                            monnaie: monnaie,
+                                            )
                                         .then((value) => {
                                               Provider.of<MaterielService>(
                                                       context,
                                                       listen: false)
                                                   .applyChange(),
-                                                  setState(() {
+                                              setState(() {
                                                 _isLoading = false;
+                                                 n3Value = null;
+                                                monnaieValue = null;
                                               }),
                                               Navigator.pop(context),
-                                                   ScaffoldMessenger.of(context)
+                                              ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 const SnackBar(
                                                   content: Row(
@@ -743,7 +885,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                               )
                                             })
                                         .catchError((onError) => {
-                                           setState(() {
+                                              setState(() {
                                                 _isLoading = false;
                                               }),
                                               ScaffoldMessenger.of(context)
@@ -772,7 +914,6 @@ class _AddMaterielState extends State<AddMateriel> {
                                                 n3Value = null;
                                               }),
                                               Navigator.pop(context),
-                                             
                                             });
                                   } else {
                                     await MaterielService()
@@ -783,17 +924,19 @@ class _AddMaterielState extends State<AddMateriel> {
                                             localisation: niveau3,
                                             etatMateriel: etat,
                                             typeMateriel: typeMateriel,
-                                            acteur: acteur)
+                                            acteur: acteur,
+                                            monnaie: monnaie,
+                                            )
                                         .then((value) => {
                                               Provider.of<MaterielService>(
                                                       context,
                                                       listen: false)
                                                   .applyChange(),
-                                                  setState(() {
+                                              setState(() {
                                                 _isLoading = false;
                                               }),
                                               Navigator.pop(context),
-                                                   ScaffoldMessenger.of(context)
+                                              ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 const SnackBar(
                                                   content: Row(
@@ -813,7 +956,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                               )
                                             })
                                         .catchError((onError) => {
-                                           setState(() {
+                                              setState(() {
                                                 _isLoading = false;
                                               }),
                                               ScaffoldMessenger.of(context)
@@ -842,7 +985,6 @@ class _AddMaterielState extends State<AddMateriel> {
                                                 n3Value = null;
                                               }),
                                               Navigator.pop(context),
-                                              
                                             });
                                   }
                                 } catch (e) {

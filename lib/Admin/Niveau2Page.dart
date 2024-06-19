@@ -31,8 +31,8 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _Niveau2PageState extends State<Niveau2Page> {
-  late ParametreGeneraux para; 
-   late Acteur acteur;
+  // late ParametreGeneraux para;
+  late Acteur acteur;
   List<Niveau2Pays> niveauList = [];
   List<Niveau3Pays> niveau3List = [];
   final formkey = GlobalKey<FormState>();
@@ -54,35 +54,98 @@ class _Niveau2PageState extends State<Niveau2Page> {
   }
 
   bool isLoadingLibelle = true;
-    String? libelleNiveau2Pays;
- 
+  String? libelleNiveau2Pays;
+
   Future<String> getLibelleNiveau2PaysByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau2Pays/$id'));
+    final response = await http
+        .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau2Pays/$id'));
 
     if (response.statusCode == 200) {
       print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
+      return response
+          .body; // Return the body directly since it's a plain string
     } else {
       throw Exception('Failed to load libelle niveau2Pays');
     }
- }
+  }
 
-     Future<void> fetchPaysDataByActor() async {
+  Future<void> fetchPaysDataByActor() async {
     try {
       String libelle2 = await getLibelleNiveau2PaysByActor(acteur.idActeur!);
 
-      setState(() { 
+      setState(() {
         libelleNiveau2Pays = libelle2;
         isLoadingLibelle = false;
       });
     } catch (e) {
       setState(() {
         isLoadingLibelle = false;
-        });
+      });
       print('Error: $e');
     }
   }
 
+  String? libelleNiveau1Pays;
+  bool isLoadingLibelle1 = true;
+  Future<String> getlibelleNiveau1PaysByActor(String id) async {
+    final response = await http
+        .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau1Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response
+          .body; // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau2Pays');
+    }
+  }
+
+  Future<void> fetchPaysData1ByActor() async {
+    try {
+      String libelle2 = await getlibelleNiveau1PaysByActor(acteur.idActeur!);
+
+      setState(() {
+        libelleNiveau1Pays = libelle2;
+        isLoadingLibelle1 = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle1 = false;
+      });
+      print('Error: $e');
+    }
+  }
+String? libelleNiveau3Pays;
+    bool isLoadingLibelle3 = true;
+    
+   Future<String> getlibelleNiveau3PaysByActor(String id) async {
+    final response = await http
+        .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+
+    if (response.statusCode == 200) {
+      print("libelle : ${response.body}");
+      return response
+          .body; // Return the body directly since it's a plain string
+    } else {
+      throw Exception('Failed to load libelle niveau2Pays');
+    }
+  }
+
+  Future<void> fetchPaysData3ByActor() async {
+    try {
+      String libelle2 = await getlibelleNiveau3PaysByActor(acteur.idActeur!);
+
+      setState(() {
+        libelleNiveau3Pays = libelle2;
+        isLoadingLibelle3 = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingLibelle3 = false;
+      });
+      print('Error: $e');
+    }
+  }
 
   @override
   void initState() {
@@ -90,13 +153,12 @@ class _Niveau2PageState extends State<Niveau2Page> {
     _searchController = TextEditingController();
     paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
         .parametreList!;
-              acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    para = paraList[0];
-            acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    // para = paraList[0];
+    //         acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _paysList = http.get(Uri.parse('$apiOnlineUrl/pays/read'));
-    _niveauList =
-        http.get(Uri.parse('$apiOnlineUrl/niveau1Pays/read'));
-        fetchPaysDataByActor();
+    _niveauList = http.get(Uri.parse('$apiOnlineUrl/niveau1Pays/read'));
+    fetchPaysDataByActor();
   }
 
   @override
@@ -203,8 +265,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
                     return Padding(
                       padding: EdgeInsets.all(10),
                       child: Center(
-                          child:
-                              Text("Aucun ${libelleNiveau2Pays} trouvé")),
+                          child: Text("Aucun ${libelleNiveau2Pays} trouvé")),
                     );
                   } else {
                     niveauList = snapshot.data!;
@@ -294,7 +355,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                                                 .spaceBetween,
                                                         children: [
                                                           Text(
-                                                              "Nombres ${para.libelleNiveau3Pays} :",
+                                                              "Nombres ${libelleNiveau3Pays} :",
                                                               style: TextStyle(
                                                                 color: Colors
                                                                     .black87,
@@ -331,7 +392,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                                                 .spaceBetween,
                                                         children: [
                                                           Text(
-                                                              "Nombres ${para.libelleNiveau3Pays} :",
+                                                              "Nombres ${libelleNiveau3Pays} :",
                                                               style: TextStyle(
                                                                 color: Colors
                                                                     .black87,
@@ -389,77 +450,63 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                                                 color: Colors
                                                                         .orange[
                                                                     400]),
-                                                        title:  Text(
-                                                           e.statutN2 == false
+                                                        title: Text(
+                                                          e.statutN2 == false
                                                               ? "Activer"
                                                               : "Desactiver",
                                                           style: TextStyle(
-                                                            color:
-                                                                e.statutN2 ==
-                                                                        false
-                                                                    ? Colors
-                                                                        .green
-                                                                    : Colors.orange[
+                                                            color: e.statutN2 ==
+                                                                    false
+                                                                ? Colors.green
+                                                                : Colors.orange[
                                                                     400],
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                           ),
                                                         ),
                                                         onTap: () async {
-                                                           e.statutN2 ==
-                                                                false
-                                                            ?
-                                                          await Niveau2Service()
-                                                              .activerNiveau2(e
-                                                                  .idNiveau2Pays!)
-                                                              .then((value) => {
-                                                                    Provider.of<Niveau2Service>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                    // setState(
-                                                                    //     () {
-                                                                    //   _liste = Niveau2Service().fetchNiveau2ByNiveau1(widget
-                                                                    //       .niveau1pays
-                                                                    //       .idNiveau1Pays!);
-                                                                    // }),
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
-                                                                    ScaffoldMessenger.of(
-                                                                            context)
-                                                                        .showSnackBar(
-                                                                      const SnackBar(
-                                                                        content:
-                                                                            Row(
-                                                                          children: [
-                                                                            Text("Activer avec succèss "),
-                                                                          ],
-                                                                        ),
-                                                                        duration:
-                                                                            Duration(seconds: 2),
-                                                                      ),
-                                                                    )
-                                                                  })
-                                                              .catchError(
-                                                                  (onError) => {
-                                                                        ScaffoldMessenger.of(context)
-                                                                            .showSnackBar(
-                                                                          const SnackBar(
-                                                                            content:
-                                                                                Row(
-                                                                              children: [
-                                                                                Text("Une erreur s'est produit"),
-                                                                              ],
+                                                          e.statutN2 == false
+                                                              ? await Niveau2Service()
+                                                                  .activerNiveau2(e
+                                                                      .idNiveau2Pays!)
+                                                                  .then(
+                                                                      (value) =>
+                                                                          {
+                                                                            Provider.of<Niveau2Service>(context, listen: false).applyChange(),
+                                                                            // setState(
+                                                                            //     () {
+                                                                            //   _liste = Niveau2Service().fetchNiveau2ByNiveau1(widget
+                                                                            //       .niveau1pays
+                                                                            //       .idNiveau1Pays!);
+                                                                            // }),
+                                                                            Navigator.of(context).pop(),
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              const SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Activer avec succèss "),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: Duration(seconds: 2),
+                                                                              ),
+                                                                            )
+                                                                          })
+                                                                  .catchError(
+                                                                      (onError) =>
+                                                                          {
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              const SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Une erreur s'est produit"),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: Duration(seconds: 5),
+                                                                              ),
                                                                             ),
-                                                                            duration:
-                                                                                Duration(seconds: 5),
-                                                                          ),
-                                                                        ),
-                                                                        Navigator.of(context)
-                                                                            .pop(),
-                                                                      }) : await Niveau2Service()
+                                                                            Navigator.of(context).pop(),
+                                                                          })
+                                                              : await Niveau2Service()
                                                                   .desactiverNiveau2Pays(e
                                                                       .idNiveau2Pays!)
                                                                   .then(
@@ -685,7 +732,6 @@ class _Niveau2PageState extends State<Niveau2Page> {
                           ),
                         ),
                       ),
-                     
                       SizedBox(height: 16),
                       Consumer<Niveau1Service>(
                         builder: (context, niveauService, child) {
@@ -705,9 +751,9 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                   ),
                                 );
                               }
-                              
+
                               if (snapshot.hasData) {
-                                 dynamic jsonString =
+                                dynamic jsonString =
                                     utf8.decode(snapshot.data.bodyBytes);
                                 dynamic reponse = json.decode(jsonString);
 
@@ -724,7 +770,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                       onChanged: null,
                                       decoration: InputDecoration(
                                         labelText:
-                                            'Aucun ${para.libelleNiveau1Pays} trouvé',
+                                            'Aucun ${libelleNiveau1Pays} trouvé',
                                         border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(8),
@@ -760,7 +806,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                     },
                                     decoration: InputDecoration(
                                       labelText:
-                                          'Sélectionner un ${para.libelleNiveau1Pays}',
+                                          'Sélectionner un ${libelleNiveau1Pays}',
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(8),
                                       ),
@@ -773,7 +819,7 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                 onChanged: null,
                                 decoration: InputDecoration(
                                   labelText:
-                                      'Aucun ${para.libelleNiveau1Pays} trouvé',
+                                      'Aucun ${libelleNiveau1Pays} trouvé',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -817,32 +863,32 @@ class _Niveau2PageState extends State<Niveau2Page> {
                                         Provider.of<Niveau2Service>(context,
                                                 listen: false)
                                             .applyChange(),
-                                            Navigator.of(context).pop(),
-                                               ScaffoldMessenger.of(context).showSnackBar(
-                                 SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text("${libelleNiveau2Pays} ajouté avec success"),
-                                    ],
-                                  ),
-                                  duration: Duration(seconds: 5),
-                                ),
-                              ),
+                                        Navigator.of(context).pop(),
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Row(
+                                              children: [
+                                                Text(
+                                                    "${libelleNiveau2Pays} ajouté avec success"),
+                                              ],
+                                            ),
+                                            duration: Duration(seconds: 5),
+                                          ),
+                                        ),
                                         libelleController.clear(),
                                         descriptionController.clear(),
                                         setState(() {
                                           niveau1 == null;
                                         }),
-                                        
                                       });
                             } catch (e) {
                               final String errorMessage = e.toString();
-                                ScaffoldMessenger.of(context).showSnackBar(
+                              ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Row(
                                     children: [
-                                      Text(
-                                          "${libelleNiveau2Pays} existe déjà"),
+                                      Text("${libelleNiveau2Pays} existe déjà"),
                                     ],
                                   ),
                                   duration: Duration(seconds: 5),

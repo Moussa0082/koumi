@@ -132,7 +132,7 @@ class ConseilService extends ChangeNotifier {
       } else {
         conseilList = [];
         print(
-            'Échec de la requête avec le code d\'état: ${response.statusCode}');
+            'Échec de la requête conseil  avec le code d\'état: ${response.statusCode}');
         throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
       }
     } catch (e) {

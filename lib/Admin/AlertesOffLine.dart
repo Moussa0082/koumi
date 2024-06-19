@@ -31,7 +31,14 @@ class _AlertesOffLineScreenState extends State<AlertesOffLineScreen> {
   late List<TypeActeur> typeActeurData = [];
   late String type;
   late TextEditingController _searchController;
+    late Future<List<AlertesOffLine>> _liste;
   List<AlertesOffLine> alerteList = [];
+
+  Future<List<AlertesOffLine>> getAlerteOffLineListe() async {
+    final response = await AlertesOffLineService()
+        .fetchAlertes();
+    return response;
+  }
 
   // void verify() async {
   //   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -51,6 +58,7 @@ class _AlertesOffLineScreenState extends State<AlertesOffLineScreen> {
     typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
     _searchController = TextEditingController();
+    _liste = getAlerteOffLineListe();
   }
 
   @override
@@ -75,7 +83,7 @@ class _AlertesOffLineScreenState extends State<AlertesOffLineScreen> {
               },
               icon: const Icon(Icons.arrow_back_ios)),
           title: const Text(
-            "Alerte ",
+            "Alerte PUB",
             style: TextStyle(
               color: d_colorGreen,
               fontSize: 22,
@@ -180,7 +188,7 @@ class _AlertesOffLineScreenState extends State<AlertesOffLineScreen> {
             const SizedBox(height: 10),
             Consumer<AlertesOffLineService>(builder: (context, alerteService, child) {
               return FutureBuilder(
-                  future: alerteService.fetchAlertesOffLine(),
+                  future: _liste,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return buildShimmerEffect();
@@ -189,7 +197,7 @@ class _AlertesOffLineScreenState extends State<AlertesOffLineScreen> {
                     if (!snapshot.hasData) {
                       return const Padding(
                         padding: EdgeInsets.all(10),
-                        child: Center(child: Text("Aucun conseil trouvé")),
+                        child: Center(child: Text("Aucune alerte trouvé")),
                       );
                     } else {
                       alerteList = snapshot.data!;
@@ -200,7 +208,7 @@ class _AlertesOffLineScreenState extends State<AlertesOffLineScreen> {
                         return libelle.contains(searchText);
                       }).toList();
                       return filtereSearch
-                              .where((element) => element.statutAlerteOffLine == true)
+                              // .where((element) => element.statutAlerteOffLine == true)
                               .isEmpty
                           ? Padding(
                               padding: EdgeInsets.all(10),
@@ -208,8 +216,8 @@ class _AlertesOffLineScreenState extends State<AlertesOffLineScreen> {
                             )
                           : Column(
                               children: filtereSearch
-                                  .where(
-                                      (element) => element.statutAlerteOffLine == true)
+                                  // .where(
+                                      // (element) => element.statutAlerteOffLine == true)
                                   .map((e) => Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 10, horizontal: 15),
@@ -343,6 +351,9 @@ class _AlertesOffLineScreenState extends State<AlertesOffLineScreen> {
                                                                                 .idAlerteOffLine!)
                                                                             .then((value) =>
                                                                                 {
+                                                                                  setState(() {
+                                                                                    _liste = getAlerteOffLineListe();
+                                                                                  }),
                                                                                   Provider.of<AlertesOffLineService>(context, listen: false).applyChange(),
                                                                                   Navigator.of(context).pop(),
                                                                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -375,6 +386,9 @@ class _AlertesOffLineScreenState extends State<AlertesOffLineScreen> {
                                                                                 .idAlerteOffLine!)
                                                                             .then((value) =>
                                                                                 {
+                                                                                  setState(() {
+                                                                                    _liste = getAlerteOffLineListe();
+                                                                                  }),
                                                                                   Provider.of<AlertesOffLineService>(context, listen: false).applyChange(),
                                                                                   Navigator.of(context).pop(),
                                                                                 })
@@ -470,6 +484,9 @@ class _AlertesOffLineScreenState extends State<AlertesOffLineScreen> {
                                                                             .idAlerteOffLine!)
                                                                         .then((value) =>
                                                                             {
+                                                                              setState(() {
+                                                                                    _liste = getAlerteOffLineListe();
+                                                                                  }),
                                                                               Provider.of<AlertesOffLineService>(context, listen: false).applyChange(),
                                                                               Navigator.of(context).pop(),
                                                                             })
