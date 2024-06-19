@@ -8,11 +8,13 @@ import 'package:koumi_app/api/firebase_api.dart';
 import 'package:koumi_app/firebase_options.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CartProvider.dart';
+import 'package:koumi_app/providers/CountryProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/SplashScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/service/AlerteService.dart';
+import 'package:koumi_app/service/AlertesOffLineService.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/CampagneService.dart';
 import 'package:koumi_app/service/CategorieService.dart';
@@ -54,7 +56,7 @@ void main() async {
   
     // WidgetsFlutterBinding.ensureInitialized();
     // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    // await FirebaseApi().initNotification();
+    // await FirebaseApi().initNotification(); 
   // await AwesomeNotifications().initial ize(
   //    'resource://@drawable/launcher_icon',
   //   [
@@ -95,6 +97,7 @@ void main() async {
   //     )
   //   );
   runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (_) => CountryProvider()),
     ChangeNotifierProvider(create: (context) => MagasinService()),
     ChangeNotifierProvider(create: (context) => CommandeService()),
     ChangeNotifierProvider(create: (context) => CartProvider()),
@@ -112,6 +115,7 @@ void main() async {
     ChangeNotifierProvider(create: (context) => TypeMaterielService()),
     ChangeNotifierProvider(create: (context) => SuperficieService()),
     ChangeNotifierProvider(create: (context) => AlertesService()),
+    ChangeNotifierProvider(create: (context) => AlertesOffLineService()),
     ChangeNotifierProvider(create: (context) => IntrantService()),
     ChangeNotifierProvider(create: (context) => TypeVoitureService()),
     ChangeNotifierProvider(create: (context) => CampagneService()),
@@ -170,7 +174,7 @@ class _MyAppState extends State<MyApp> {
       ),
       // navigatorKey: navigatorKey,
       routes: {
-        '/BottomNavigationPage': (context) => const BottomNavigationPage(),
+        '/BottomNavigationPage': (context) =>  BottomNavigationPage(),
         // '/notificationPage':(context) =>  NotificationPage(),
       },
       //  home:  ItemScreen(),

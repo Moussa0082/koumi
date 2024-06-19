@@ -233,7 +233,7 @@ class _PanierState extends State<Panier> {
                   height: 100),
               SizedBox(height: 20),
               Text(
-                "Vous devez vous connecter pour voir faire des commades",
+                "Vous devez vous connecter pour faire des commades",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,

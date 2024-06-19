@@ -14,7 +14,8 @@ import 'package:provider/provider.dart';
 
 class ListeMaterielByType extends StatefulWidget {
   final TypeMateriel? typeMateriel;
-  const ListeMaterielByType({super.key, this.typeMateriel});
+  String? detectedCountry;
+   ListeMaterielByType({super.key, this.typeMateriel, this.detectedCountry});
 
   @override
   State<ListeMaterielByType> createState() => _ListeMaterielByTypeState();
@@ -36,7 +37,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
   bool hasMore = true;
 
   Future<List<Materiel>> getListe(String id) async {
-    final response = await MaterielService().fetchMaterielByTypeWithPagination(id);
+    final response = await MaterielService().fetchMaterielByTypeAndPaysWithPagination(id,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
     return response;
   }
 
@@ -189,7 +190,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
               onRefresh: () async{
                            setState(() {
                              page = 0;
-                             futureListe = MaterielService().fetchMaterielByTypeWithPagination(type.idTypeMateriel!);
+                             futureListe = MaterielService().fetchMaterielByTypeAndPaysWithPagination(type.idTypeMateriel!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
                            });
               },
               child: Consumer<MaterielService>(

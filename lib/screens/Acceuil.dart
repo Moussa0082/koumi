@@ -1,22 +1,25 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart' as geo;
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart' ;
 import 'package:get/get.dart';
 import 'package:koumi_app/admin/AlerteScreen.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/CommandeScreen.dart';
+import 'package:koumi_app/providers/CountryProvider.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
-import 'package:koumi_app/screens/Location.dart';
+import 'package:koumi_app/screens/Location.dart' as l;
 import 'package:koumi_app/screens/MesCommande.dart';
-import 'package:koumi_app/screens/MyProduct.dart';
-import 'package:koumi_app/screens/Product.dart';
 import 'package:koumi_app/screens/Products.dart';
 import 'package:koumi_app/screens/Store.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/Weather.dart';
-import 'package:koumi_app/widgets/AlertAcceuil.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
+
 import 'package:koumi_app/widgets/Default_Acceuil.dart';
 import 'package:koumi_app/widgets/connection_verify.dart';
 import 'package:provider/provider.dart';
@@ -38,6 +41,116 @@ class _AccueilState extends State<Accueil> {
   String? email = "";
   bool isExist = false;
 
+  String? detectedC;
+  String? isoCountryCode;
+  String? country;
+  String? detectedCountryCode;
+  String? detectedCountry;
+  CountryProvider? countryProvider;
+  late BuildContext _currentContext;
+
+    void getLocationNew() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        await Geolocator.openLocationSettings();
+        return Future.error('Location services are disabled.');
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return Future.error('Location permissions are denied');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        return Future.error('Location permissions are permanently denied.');
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      Placemark placemark = placemarks.first;
+      setState(() {
+        detectedCountryCode = placemark.isoCountryCode!;
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  var latitude = 'Getting Latitude..'.obs;
+  var longitude = 'Getting Longitude..'.obs;
+  var address = 'Getting Address..'.obs;
+  late StreamSubscription<Position> streamSubscription;
+
+  getLocation() async {
+    bool serviceEnabled;
+
+    LocationPermission permission;
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      await Geolocator.openLocationSettings();
+      return Future.error('Location services are disabled.');
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    streamSubscription =
+        Geolocator.getPositionStream().listen((Position position) {
+      latitude.value = 'Latitude : ${position.latitude}';
+      longitude.value = 'Longitude : ${position.longitude}';
+      getAddressFromLatLang(position);
+    });
+  }  
+  
+  Future<void> getAddressFromLatLang(Position position) async {
+    List<Placemark> placemark =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+    Placemark place = placemark[0];
+    debugPrint("Address ISO: $detectedC");
+    address.value =
+        'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
+        setState(() {
+          
+    detectedC = place.isoCountryCode;
+    detectedCountryCode = place.isoCountryCode!;
+    detectedCountry = place.country!;
+        });
+
+    debugPrint(
+        "Address:   ${place.locality},${place.country},${place.isoCountryCode}");
+  }
+  
+
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     email = prefs.getString('emailActeur');
@@ -54,14 +167,26 @@ class _AccueilState extends State<Accueil> {
     }
   }
 
+ 
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     verify();
+    getLocation();
     // final acteurProvider = Provider.of<ActeurProvider>(context, listen: false).isLogged;
     // Get.put(ConnectionVerify(), permanent: true);
   }
+
+  @override
+  void dispose() {
+    
+    super.dispose();
+  }
+
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -70,12 +195,13 @@ class _AccueilState extends State<Accueil> {
       appBar: const CustomAppBar(),
       body: ListView(
         children: [
-          SizedBox(height: 180, child:  Carrousel()),
-          // SizedBox(height: 180, child: isExist ? Carrousel(): Carrousels()),
+          // SizedBox(height: 180, child:  Carrousels()),
+          
+          SizedBox(height: 180, child: isExist ? Carrousel(): Carrousels()),
           // const SizedBox(
           //   height: 10,
           // ),
-          // isExist ? SizedBox(height: 100, child: Carrousel()) : Carrousels(),
+                    // SizedBox(height: 180, child: isExist ? Carrousel(): CarrouselOffLine()),
           const SizedBox(
             height: 10,
           ),
@@ -127,7 +253,7 @@ class _AccueilState extends State<Accueil> {
           onTap: () {
             if (index == 9) {
                 Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProductsScreen()));
+                  MaterialPageRoute(builder: (context) => ProductsScreen(detectedCountry: detectedCountry)));
              
             } else if (index == 8) {
               Navigator.push(
@@ -136,10 +262,10 @@ class _AccueilState extends State<Accueil> {
                       builder: (context) => const AlerteScreen()));
             } else if (index == 7) {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Location()));
+                  MaterialPageRoute(builder: (context) =>  l.Location(detectedCountry: detectedCountry)));
             } else if (index == 6) {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Transport()));
+                  MaterialPageRoute(builder: (context) =>  Transport(detectedCountry: detectedCountry)));
             } else if (index == 5) {
               Navigator.push(
                   context,
@@ -162,7 +288,7 @@ class _AccueilState extends State<Accueil> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const IntrantScreen()));
+                      builder: (context) =>  IntrantScreen(detectedCountry: detectedCountry,)));
             }
           },
           borderRadius: BorderRadius.circular(20),
@@ -207,4 +333,6 @@ class _AccueilState extends State<Accueil> {
           )),
     );
   }
+
+   
 }

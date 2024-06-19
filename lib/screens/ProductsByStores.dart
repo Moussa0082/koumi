@@ -24,7 +24,8 @@ import 'package:shimmer/shimmer.dart';
 
 class ProductsByStoresScreen extends StatefulWidget {
   String? id,nom;
-   ProductsByStoresScreen({super.key, this.id, this.nom});
+  String? detectedCountry;
+   ProductsByStoresScreen({super.key, this.id, this.nom, this.detectedCountry});
 
   @override
   State<ProductsByStoresScreen> createState() => _ProductsByStoresScreenState();
@@ -40,8 +41,8 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
   
   late Acteur acteur = Acteur();
   late List<TypeActeur> typeActeurData = [];
-  // List<ParametreGeneraux> paraList = [];
-  // late ParametreGeneraux para = ParametreGeneraux();
+    bool isSearchMode = true;
+
   late String type;
   late TextEditingController _searchController;
   List<Stock> stockListe = [];
@@ -114,10 +115,10 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
   Future<List<Stock>> getAllStock() async {
      if (selectedCat == null && widget.id != null) {
       stockListe = await 
-          StockService().fetchStockByMagasinWithPagination(widget.id!);
+          StockService().fetchStockByMagasin(widget.id!, widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
     }else if(selectedCat != null && widget.id != null)
       stockListe = await 
-          StockService().fetchStockByCategorieAndMagasinWithPagination(selectedCat!.idCategorieProduit!,widget.id!);
+          StockService().fetchStockByCategorieAndMagasin(selectedCat!.idCategorieProduit!,widget.id!, widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
     
     return stockListe;
   }
@@ -136,7 +137,7 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
         page++;
         });
       debugPrint("yes - fetch all stocks by magasin");
-      fetchStockByMagasin().then((value) {
+      fetchStockByMagasin(widget.id!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -160,7 +161,7 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
       page++;
         });
    
-    fetchStockByCategorieAndMagasin().then((value) {
+    fetchStockByCategorieAndMagasin(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -176,7 +177,7 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
 
 
 
-  Future<List<Stock>> fetchStockByMagasin({bool refresh = false}) async {
+  Future<List<Stock>> fetchStockByMagasin(String idMagasin, String niveau3PaysActeur, {bool refresh = false}) async {
     if (isLoading == true) return [];
    
     setState(() {
@@ -193,7 +194,7 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByMagasinWithPagination?page=${page}&size=${size}'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getStocksByPaysAndMagasinWithPagination?idMagasin=$idMagasin&niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -228,7 +229,7 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
 
 
 
-  Future<List<Stock>> fetchStockByCategorieAndMagasin({bool refresh = false}) async {
+  Future<List<Stock>> fetchStockByCategorieAndMagasin(String niveau3PaysActeur,{bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -244,7 +245,7 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByCategorieAndMagasinWithPagination?idCategorie=${selectedCat!.idCategorieProduit}&idMagasin=${widget.id}&page=$page&size=$size'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getStocksByPaysAndMagasinAndCategorieProduitWithPagination?idCategorieProduit=${selectedCat!.idCategorieProduit}&idMagasin=${widget.id}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -297,6 +298,10 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
     // typeActeurData = acteur.typeActeur!;
     // // selectedType == null;
     // type = typeActeurData.map((data) => data.libelle).join(', ');
+        widget.detectedCountry != null ?
+   debugPrint("pays fetch product by store page ${widget.detectedCountry!} ")
+     : 
+     debugPrint("null pays non fetch product by store page");
     super.initState();
   //  scrollableController = ScrollController()..addListener(_scrollListener);
   WidgetsBinding.instance.addPostFrameCallback((_){
@@ -467,6 +472,59 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                   children:[
       
             const SizedBox(height: 10),
+             Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: ToggleButtons(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text('Rechercher'),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text('Filtrer'),
+                      ),
+                    ],
+                    isSelected: [isSearchMode, !isSearchMode],
+                    onPressed: (index) {
+                      setState(() {
+                        isSearchMode = index == 0;
+                      });
+                    },
+                  ),
+                ),
+             if (isSearchMode)
+              Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.blueGrey[50],
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.search, color: Colors.blueGrey[400]),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              onChanged: (value) {
+                                setState(() {});
+                              },
+                              decoration: InputDecoration(
+                                hintText: 'Rechercher',
+                                border: InputBorder.none,
+                                hintStyle:
+                                    TextStyle(color: Colors.blueGrey[400]),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                if (!isSearchMode)
           
             // const SizedBox(height: 10),
             Padding(
@@ -527,7 +585,6 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                           ),
                         );
                       }
-          
                       return DropdownButtonFormField<String>(
                         isExpanded: true,
                         items: categorieList
@@ -550,7 +607,7 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                        }
                           page = 0;
                 hasMore = true;
-                fetchStockByCategorieAndMagasin(refresh: true);
+                fetchStockByCategorieAndMagasin(widget.detectedCountry != null ? widget.detectedCountry! : "Mali",refresh: true);
                   if (page == 0 && isLoading == true) {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       scrollableController1.jumpTo(0.0);
@@ -657,10 +714,31 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                             ),
                           );
                                           } 
-                                    // if (isLoading== true && hasMore == true) 
-                                    // {
-                                    //   return Center(child: CircularProgressIndicator());
-                                    // }
+                                     if (snapshot.hasError) {
+                          return SingleChildScrollView(
+                            child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Center(
+                                child: Column(
+                                  children: [
+                                    Image.asset('assets/images/notif.jpg'),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      "Une erreur s'est produite veuiller réessayer",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 17,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                                          }
                                           if (!snapshot.hasData) {
                           return SingleChildScrollView(
                             child: Padding(

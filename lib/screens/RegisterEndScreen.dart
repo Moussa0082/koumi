@@ -25,6 +25,7 @@ import 'package:koumi_app/screens/RegisterEndScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterEndScreen extends StatefulWidget {
 
@@ -57,13 +58,6 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
 final MultiSelectController _controllerCategorie = MultiSelectController();
 final MultiSelectController _controllerSpeculation = MultiSelectController();
     
-
-
-
-
-
-// Définissez la fonction onOptionSelected pour gérer la sélection des options dans MultiSelectDropDown
-
 
   String password = "";
   String confirmPassword = "";
@@ -177,6 +171,21 @@ Future<void> _pickImage(ImageSource source) async {
      
   }
 
+
+   void _saveUserToPrefs(String nomActeur, String codeActeur) async {
+  final prefs = await SharedPreferences.getInstance();
+  List<String>? acteurs = prefs.getStringList('acteur');
+  
+  // Si c'est la première fois que vous enregistrez des utilisateurs, initialisez la liste
+  if (acteurs == null) {
+    acteurs = [];
+  }
+  
+  // Ajouter les informations de l'utilisateur actuel
+  acteurs.add('$nomActeur|$codeActeur');
+  prefs.setStringList('acteurs', acteurs);
+  }
+
    registerUser(BuildContext context) async {
         final nomActeur = widget.nomActeur;
         final emailActeur = widget.email;
@@ -187,7 +196,6 @@ Future<void> _pickImage(ImageSource source) async {
         final confirmPassword = confirmPasswordController.text;
         
                     if (password != confirmPassword) {
-      
         // Gérez le cas où l'email ou le mot de passe est vide.
          const String errorMessage = "Les mot de passe ne correspondent pas ";
           // Gérez le cas où l'email ou le mot de passe est vide.
@@ -195,7 +203,9 @@ Future<void> _pickImage(ImageSource source) async {
             context:  context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: const Center(child: Text('Erreur', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),)),
+                title: const Center(child: Text('Erreur',
+                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                 )),
                 content:const  Text(errorMessage),
                 actions: <Widget>[
                   TextButton(
@@ -214,11 +224,10 @@ Future<void> _pickImage(ImageSource source) async {
         ActeurService acteurService = ActeurService();
          // Si widget.typeActeur est bien une liste de TypeActeur
       try {
-      
             // String type = typeActeurList.toString();
         if(widget.image1 != null && image2 != null){
       
-      await acteurService.creerActeur(
+    await acteurService.creerActeur(
       logoActeur: widget.image1 as File,
       photoSiegeActeur: image2 as File,
       nomActeur: nomActeur,
@@ -231,8 +240,6 @@ Future<void> _pickImage(ImageSource source) async {
       typeActeur: widget.typeActeur, // Convertir les IDs en chaînes de caractères
       password: password,
       speculations: selectedSpec
-      
-
         ).then((value) => 
                  showDialog(
             context:  context,
@@ -244,11 +251,7 @@ Future<void> _pickImage(ImageSource source) async {
                   TextButton(
                     onPressed: () {
                       Get.back();
-                      // Navigator.of(context).pop();
-      //  Navigator.push(
-      // context,
-      // MaterialPageRoute(builder: (context) => const LoginSuccessScreen()),
-      //   );       
+                         
       Get.offAll(LoginSuccessScreen());           
         },
                     child:const  Text('OK'),
@@ -273,6 +276,7 @@ Future<void> _pickImage(ImageSource source) async {
       speculations: selectedSpec,
       
         ).then((value) => 
+         
          showDialog(
             context:  context,
             builder: (BuildContext context) {
@@ -297,7 +301,6 @@ Future<void> _pickImage(ImageSource source) async {
         );
         
         }
-       
         // print("Demande envoyée avec succès: ${updatedDemande.toString()}");
         debugPrint("yes ");
         // Navigate to the next page if necessary
@@ -318,7 +321,6 @@ Future<void> _pickImage(ImageSource source) async {
       ],
         ),
       );
-        // print("Erreur: $error");
       } 
    }
 
@@ -672,7 +674,15 @@ Future<void> _pickImage(ImageSource source) async {
         content: Text('Veuillez sélectionner au moins une speculation.'),
       )
     );
-            }else{
+            }else if(passwordController.text.toString().trim()  ==  "123456" || confirmPasswordController.text.toString().trim() ==  "123456"){
+             ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Mot de passe faible, veuillez saisir un mot de passe sécurisé.'),
+      )
+    );
+            }
+            
+            else{
 
             _handleButtonPress(context);
             }

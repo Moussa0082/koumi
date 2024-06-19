@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:koumi_app/Admin/AcceuilAdmin.dart';
@@ -42,6 +46,12 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
      ProfilA()
   ];
 
+
+  
+  
+  
+
+
   void _changeActivePageValue(int index) {
     setState(() {
       activePageIndex = index;
@@ -68,6 +78,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
       Provider.of<BottomNavigationService>(context, listen: false)
           .changeIndex(0);
     });
+    
   }
 
   @override

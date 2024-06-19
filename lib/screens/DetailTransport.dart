@@ -173,17 +173,7 @@ class _DetailTransportState extends State<DetailTransport> {
     }
   }
 
-  // void verifyParam() {
-  //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-  //       .parametreList!;
-
-  //   if (paraList.isNotEmpty) {
-  //     para = paraList[0];
-  //   } else {
-  //     // Gérer le cas où la liste est null ou vide, par exemple :
-  //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
-  //   }
-  // }
+ 
   Future<String> getLibelleNiveau3PaysByActor(String id) async {
     final response = await http
         .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
@@ -215,10 +205,7 @@ class _DetailTransportState extends State<DetailTransport> {
   @override
   void initState() {
     verify();
-    // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-    //     .parametreList!;
-    // para = paraList[0];
-    // verifyParam();
+  
     // fetchPaysDataByActor();
     _niveau3List =
         http.get(Uri.parse('https://koumi.ml/api-koumi/nivveau3Pays/read'));

@@ -340,7 +340,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
                         width: 100, height: 100),
                     SizedBox(height: 20),
                     Text(
-                      "Vous devez vous connecter pour vos produits",
+                      "Vous devez vous connecter pour voir vos produits",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,

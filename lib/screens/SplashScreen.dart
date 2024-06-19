@@ -2,10 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/CountryProvider.dart';
+import 'package:koumi_app/providers/PaysProvider.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/RegisterScreen.dart';
 import 'package:koumi_app/widgets/AnimatedBackground.dart';
@@ -22,7 +26,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
  
-  @override
+  @override 
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
@@ -31,11 +35,160 @@ const d_colorPage = Color.fromRGBO(255, 255, 255, 1);
 class _SplashScreenState extends State<SplashScreen> {
   late Acteur acteur;
   late ConnectionVerify connectionVerify;
+  String? detectedC;
+  String? isoCountryCode;
+  String? country;
+  String? detectedCountryCode;
+  String? detectedCountry;
+  CountryProvider? countryProvider;
+  late BuildContext _currentContext;
+
+    void getLocationNew() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        await Geolocator.openLocationSettings();
+        return Future.error('Location services are disabled.');
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return Future.error('Location permissions are denied');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        return Future.error('Location permissions are permanently denied.');
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      Placemark placemark = placemarks.first;
+      setState(() {
+        detectedCountryCode = placemark.isoCountryCode!;
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  var latitude = 'Getting Latitude..'.obs;
+  var longitude = 'Getting Longitude..'.obs;
+  var address = 'Getting Address..'.obs;
+  late StreamSubscription<Position> streamSubscription;
+
+  getLocation() async {
+    bool serviceEnabled;
+
+    LocationPermission permission;
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      await Geolocator.openLocationSettings();
+      return Future.error('Location services are disabled.');
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    streamSubscription =
+        Geolocator.getPositionStream().listen((Position position) {
+      latitude.value = 'Latitude : ${position.latitude}';
+      longitude.value = 'Longitude : ${position.longitude}';
+      getAddressFromLatLang(position);
+    });
+  }
+
+ @override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+  // Save the context when it changes
+  _currentContext = context;
+}
+
+  Future<void> getAddressFromLatLang(Position position) async {
+  List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+  Placemark place = placemarks[0];
+  
+  // var countryProvider = Provider.of<CountryProvider>(_currentContext, listen: false);
+   isoCountryCode = place.isoCountryCode!;
+   country = place.country!;
+  
+   if(isoCountryCode != null || country != null){
+   debugPrint("iso : $isoCountryCode et country $country");
+   }else{
+       debugPrint("data null");
+   }
+
+  // Check if the widget is still mounted
+  if (!mounted) return;
+
+  await countryProvider?.setCountryInfo(isoCountryCode!, country!);
+
+  // Check again before calling setState
+  if (!mounted) return;
+  
+  setState(() {
+    detectedC = place.isoCountryCode;
+    detectedCountryCode = place.isoCountryCode!;
+    detectedCountry = place.country!;
+  });
+
+  debugPrint("Address: splashScreen ${place.locality}, ${place.country}, ${place.isoCountryCode}");
+}
+
+
+  // Future<void> getAddressFromLatLang(Position position) async {
+  //   List<Placemark> placemark =
+  //       await placemarkFromCoordinates(position.latitude, position.longitude);
+  //   Placemark place = placemark[0];
+  //   debugPrint("Address ISO: $detectedC");
+  //   address.value =
+  //       'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
+    //     setState(() {
+          
+    // detectedC = place.isoCountryCode;
+    // detectedCountryCode = place.isoCountryCode!;
+    // detectedCountry = place.country!;
+    //     });
+
+  //   debugPrint(
+  //       "Address:   ${place.locality},${place.country},${place.isoCountryCode}");
+  // }
   
   @override
   void initState() {
     super.initState();
     // clearCart();
+    streamSubscription = const Stream<Position>.empty().listen((_) {});
+    getLocation();
     // Vérifie d'abord si l'email de l'acteur est présent dans SharedPreferences
       // connectionVerify = Get.put(ConnectionVerify(), permanent: true);
     checkEmailInSharedPreferences();
@@ -51,7 +204,7 @@ class _SplashScreenState extends State<SplashScreen> {
       Timer(
         const Duration(seconds: 5),
         () => Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const BottomNavigationPage()),
+          MaterialPageRoute(builder: (_) =>  BottomNavigationPage(iso: detectedC,)),
         ),
       );
       // Si l'email de l'acteur n'est pas présent, redirige directement vers l'écran de connexion
@@ -115,7 +268,7 @@ class _SplashScreenState extends State<SplashScreen> {
       Timer(
         const Duration(seconds: 5),
         () => Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const BottomNavigationPage()),
+          MaterialPageRoute(builder: (_) =>  BottomNavigationPage()),
         ),
       );
     }
@@ -135,7 +288,7 @@ class _SplashScreenState extends State<SplashScreen> {
         Timer(
           const Duration(seconds: 5),
           () => Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const BottomNavigationPage()),
+            MaterialPageRoute(builder: (_) =>  BottomNavigationPage(iso: detectedC,)),
           ),
         );
       }
@@ -149,6 +302,15 @@ class _SplashScreenState extends State<SplashScreen> {
     //     ),
     //   );
     // }
+  }
+
+   @override
+  void dispose() {
+  // streamSubscription.cancel();
+  if (streamSubscription != null) {
+      streamSubscription.cancel();
+    }
+    super.dispose();
   }
 
   @override

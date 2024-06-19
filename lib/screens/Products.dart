@@ -11,6 +11,7 @@ import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/CountryProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/screens/MyProduct.dart';
@@ -21,7 +22,9 @@ import 'package:shimmer/shimmer.dart';
 
 class ProductsScreen extends StatefulWidget {
   String? id, nom;
-  ProductsScreen({super.key, this.id, this.nom});
+  String? detectedCountry;
+   ProductsScreen({super.key , this.id, this.nom, this.detectedCountry});
+
 
   @override
   State<ProductsScreen> createState() => _ProductsScreenState();
@@ -60,6 +63,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   bool hasMore = true;
 
   bool isLoadingLibelle = true;
+  CountryProvider? countryProvider;
   // String? monnaie;
 
 //    Future<String> getMonnaieByActor(String id) async {
@@ -108,16 +112,19 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   Future<List<Stock>> getAllStock() async {
-    if (selectedCat != null) {
-      stockListe = await StockService().fetchStockByCategorieWithPagination(
-          selectedCat!.idCategorieProduit!);
+     if (selectedCat != null) {
+      stockListe = await 
+          StockService().fetchStockByCategorie(selectedCat!.idCategorieProduit!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+
     }
 
     return stockListe;
   }
 
   Future<List<Stock>> getAllStocks() async {
-    stockListe = await StockService().fetchStock();
+      
+      stockListe = await StockService().fetchStock(widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+      
 
     return stockListe;
   }
@@ -132,9 +139,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
       setState(() {
         // Rafraîchir les données ici
         page++;
-      });
-      debugPrint("yes - fetch all stocks");
-      fetchStock().then((value) {
+        });
+      debugPrint("yes - fetch all stocks by pays");
+      fetchStock(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
+
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -152,13 +160,14 @@ class _ProductsScreenState extends State<ProductsScreen> {
         selectedCat != null) {
       // if (selectedCat != null) {
       // Incrementez la page et récupérez les stocks par catégorie
-      debugPrint("yes - fetch by category");
+      debugPrint("yes - fetch by category and pays");
       setState(() {
-        // Rafraîchir les données ici
-        page++;
-      });
+          // Rafraîchir les données ici
+      page++;
+        });
+   
+    fetchStockByCategorie(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
 
-      fetchStockByCategorie().then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -168,7 +177,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     debugPrint("no");
   }
 
-  Future<List<Stock>> fetchStock({bool refresh = false}) async {
+  Future<List<Stock>> fetchStock(String niveau3PaysActeur, {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -184,8 +193,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
 
     try {
-      final response = await http.get(Uri.parse(
-          '$apiOnlineUrl/Stock/getAllStocksWithPagination?page=${page}&size=${size}'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getStocksByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}'));
+
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -221,7 +230,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
     return stockListe;
   }
 
-  Future<List<Stock>> fetchStockByCategorie({bool refresh = false}) async {
+
+  Future<List<Stock>> fetchStockByCategorie(String niveau3PaysActeur, {bool refresh = false}) async {
+
     if (isLoading == true) return [];
 
     setState(() {
@@ -237,8 +248,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
 
     try {
-      final response = await http.get(Uri.parse(
-          '$apiOnlineUrl/Stock/getAllStocksByCategorieWithPagination?idCategorie=${selectedCat!.idCategorieProduit}&page=$page&size=$size'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByCategorieAndPaysWithPagination?idCategorie=${selectedCat!.idCategorieProduit}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
+
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -255,8 +266,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
           });
         }
 
-        debugPrint(
-            "response body all stock with pagination ${page} par défilement soit ${stockListe.length}");
+        debugPrint("response body all stock by categorie and pays with pagination ${page} par défilement soit ${stockListe.length}");
+
       } else {
         print(
             'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
@@ -306,7 +317,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     // fetchPaysDataByActor();
     _searchController = TextEditingController();
     _catList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
-    // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
     // updateStockList();
     stockListeFuture = getAllStocks();
     stockListeFuture1 = getAllStock();
@@ -322,6 +332,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
     scrollableController1.dispose();
     super.dispose();
   }
+
+ 
+
 
   @override
   Widget build(BuildContext context) {
@@ -453,136 +466,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   child: Column(children: [
                 const SizedBox(height: 10),
 
-                // const SizedBox(height: 10),
-                //           Padding(
-                //             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                //             child: FutureBuilder(
-                //               future: _catList,
-                //               builder: (_, snapshot) {
-                //                 if (snapshot.connectionState == ConnectionState.waiting) {
-                //                   return DropdownButtonFormField(
-                //                     items: [],
-                //                     onChanged: null,
-                //                     decoration: InputDecoration(
-                //                       labelText: 'En cours de chargement ...',
-                //                       contentPadding: const EdgeInsets.symmetric(
-                //                           vertical: 10, horizontal: 20),
-                //                       border: OutlineInputBorder(
-                //                         borderRadius: BorderRadius.circular(8),
-                //                       ),
-                //                     ),
-                //                   );
-                //                 }
-                //                 if (snapshot.hasError) {
-                //                   return  DropdownButtonFormField(
-                //                                     items: [],
-                //                                     onChanged: null,
-                //                                     decoration: InputDecoration(
-                //                                       labelText: 'Une erreur s\'est produite veuiller réessayer',
-                //                                       contentPadding:
-                //                                           const EdgeInsets.symmetric(
-                //                                               vertical: 10, horizontal: 20),
-                //                                       border: OutlineInputBorder(
-                //                                         borderRadius: BorderRadius.circular(8),
-                //                                       ),
-                //                                     ),
-                //                                   );
-                //                 }
-                //                 if (snapshot.hasData) {
-                //                   dynamic jsonString = utf8.decode(snapshot.data.bodyBytes);
-                //                   dynamic responseData = json.decode(jsonString);
-                //                   if (responseData is List) {
-                //                     final reponse = responseData;
-                //                     final categorieList = reponse
-                //                         .map((e) => CategorieProduit.fromMap(e))
-                //                         .where((con) => con.statutCategorie == true)
-                //                         .toList();
-
-                //                     if (categorieList.isEmpty) {
-                //                       return DropdownButtonFormField(
-                //                         items: [],
-                //                         onChanged: null,
-                //                         decoration: InputDecoration(
-                //                           labelText: '-- Aucune categorie trouvé --',
-                //                           contentPadding: const EdgeInsets.symmetric(
-                //                               vertical: 10, horizontal: 20),
-                //                           border: OutlineInputBorder(
-                //                             borderRadius: BorderRadius.circular(8),
-                //                           ),
-                //                         ),
-                //                       );
-                //                     }
-
-                //                     return DropdownButtonFormField<String>(
-                //                       isExpanded: true,
-                //                       items: categorieList
-                //                           .map(
-                //                             (e) => DropdownMenuItem(
-                //                               value: e.idCategorieProduit,
-                //                               child: Text(e.libelleCategorie!),
-                //                             ),
-                //                           )
-                //                           .toList(),
-                //                       hint: Text("-- Filtre par categorie --"),
-                //                       value: typeValue,
-                //                       onChanged: (newValue) {
-                //                         setState(() {
-                //                           typeValue = newValue;
-                //                           if (newValue != null) {
-                //                             selectedCat = categorieList.firstWhere(
-                //                               (element) => element.idCategorieProduit == newValue,
-                //                             );
-                //                      }
-                //                         page = 0;
-                //               hasMore = true;
-                //               fetchStockByCategorie(refresh: true);
-                //                 if (page == 0 && isLoading == true) {
-                //   SchedulerBinding.instance.addPostFrameCallback((_) {
-                //     scrollableController1.jumpTo(0.0);
-                //   });
-                // }
-
-                //                         });
-                //                       },
-                //                       decoration: InputDecoration(
-                //                         contentPadding: const EdgeInsets.symmetric(
-                //                             vertical: 10, horizontal: 20),
-                //                         border: OutlineInputBorder(
-                //                           borderRadius: BorderRadius.circular(8),
-                //                         ),
-                //                       ),
-                //                     );
-                //                   } else {
-                //                     return DropdownButtonFormField(
-                //                       items: [],
-                //                       onChanged: null,
-                //                       decoration: InputDecoration(
-                //                         labelText: '-- Aucune categorie trouvé --',
-                //                         contentPadding: const EdgeInsets.symmetric(
-                //                             vertical: 10, horizontal: 20),
-                //                         border: OutlineInputBorder(
-                //                           borderRadius: BorderRadius.circular(8),
-                //                         ),
-                //                       ),
-                //                     );
-                //                   }
-                //                 }
-                //                 return  DropdownButtonFormField(
-                //                                     items: [],
-                //                                     onChanged: null,
-                //                                     decoration: InputDecoration(
-                //                                       labelText: 'Probleme de connexion',
-                //                                       contentPadding:
-                //                                           const EdgeInsets.symmetric(
-                //                                               vertical: 10, horizontal: 20),
-                //                                       border: OutlineInputBorder(
-                //                                         borderRadius: BorderRadius.circular(8),
-                //                                       ),
-                //                                     ),
-                //                                   );
-                //               },
-                //             ),
-                //           ),
+               
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: ToggleButtons(
@@ -688,11 +572,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
               selectedCat != null
                   ? setState(() {
                       stockListeFuture1 = StockService()
-                          .fetchStockByCategorieWithPagination(
-                              selectedCat!.idCategorieProduit!);
+                          .fetchStockByCategorie(
+                              selectedCat!.idCategorieProduit!, widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
                     })
                   : setState(() {
-                      stockListeFuture = StockService().fetchStock();
+                      stockListeFuture = StockService().fetchStock(widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
                     });
             },
             child: selectedCat == null
@@ -1435,10 +1319,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
               (element) => element.idCategorieProduit == newValue,
             );
           }
-
           page = 0;
           hasMore = true;
-          fetchStockByCategorie(refresh: true);
+          fetchStockByCategorie(widget.detectedCountry != null ? widget.detectedCountry! : "Mali",refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {
               scrollableController1.jumpTo(0.0);

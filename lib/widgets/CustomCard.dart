@@ -47,7 +47,7 @@ class _CustomCardState extends State<CustomCard> {
           onTap: () {
             if (index == 6) {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Transport()));
+                  MaterialPageRoute(builder: (context) =>  Transport()));
             } else if (index == 5) {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const WeatherScreen()));
@@ -65,7 +65,7 @@ class _CustomCardState extends State<CustomCard> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const IntrantScreen()));
+                      builder: (context) =>  IntrantScreen()));
             } else if (index == 1) {
               Navigator.push(
                   context,

@@ -27,6 +27,7 @@ class Stock {
    String? dateAjout;
   String? dateModif;
    String? personneModif;
+   String? pays;
    bool? statutSotck;
    Speculation? speculation;
    Unite? unite;
@@ -50,6 +51,7 @@ class Stock {
     this.dateAjout,
     this.dateModif,
     this.personneModif,
+    this.pays,
      this.statutSotck,
      this.speculation,
      this.unite,
@@ -79,6 +81,7 @@ class Stock {
       'dateAjout': dateAjout,
       'dateModif': dateModif,
       'personneModif': personneModif,
+      'pays': pays,
       'statutSotck': statutSotck,
       'speculation': speculation?.toMap(),
       'unite': unite?.toMap(),
@@ -107,6 +110,7 @@ class Stock {
     dateAjout: map['dateAjout'] ,
     dateModif: map['dateModif'] ,
     personneModif: map['personneModif'] ,
+    pays: map['pays'] ,
     statutSotck: map['statutSotck'] as bool? ?? false,
     speculation: map['speculation'] != null
         ? Speculation.fromMap(map['speculation'] as Map<String, dynamic>)

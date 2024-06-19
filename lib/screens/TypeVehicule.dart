@@ -11,7 +11,8 @@ import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:provider/provider.dart';
 
 class TypeVehicule extends StatefulWidget {
-  const TypeVehicule({super.key});
+  String? detectedCountry;
+   TypeVehicule({super.key, this.detectedCountry});
 
   @override
   State<TypeVehicule> createState() => _TypeVehiculeState();
@@ -168,7 +169,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     ListeVehiculeByType(
-                                                        typeVoitures: e)));
+                                                        typeVoitures: e,detectedCountry:widget.detectedCountry, )));
                                       },
                                       child: Container(
                                         width:

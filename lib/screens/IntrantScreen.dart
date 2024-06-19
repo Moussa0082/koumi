@@ -10,6 +10,7 @@ import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/providers/CountryProvider.dart';
 import 'package:koumi_app/screens/AddIntrant.dart';
 import 'package:koumi_app/screens/DetailIntrant.dart';
 import 'package:koumi_app/screens/ListeIntrantByActeur.dart';
@@ -19,7 +20,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class IntrantScreen extends StatefulWidget {
-  const IntrantScreen({super.key});
+  String? detectedCountry;
+   IntrantScreen({super.key, this.detectedCountry});
 
   @override
   State<IntrantScreen> createState() => _IntrantScreenState();
@@ -91,9 +93,11 @@ class _IntrantScreenState extends State<IntrantScreen> {
       setState(() {
         // Rafraîchir les données ici
         page++;
-      });
-      debugPrint("yes - fetch all intrants");
-      fetchIntrant().then((value) {
+        });
+      debugPrint("yes - fetch all by pays intrants");
+      fetchIntrantByPays(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
+      // fetchIntrant().then((value) {
+
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -116,11 +120,12 @@ class _IntrantScreenState extends State<IntrantScreen> {
       // Incrementez la page et récupérez les stocks par catégorie
       debugPrint("yes - fetch by category");
       setState(() {
-        // Rafraîchir les données ici
-        page++;
-      });
+          // Rafraîchir les données ici
+      page++;
+        });
+   
+    fetchIntrantByCategorie(widget.detectedCountry != null ? widget.detectedCountry! : "Mali", selectedType!.idCategorieProduit!).then((value) {
 
-      fetchIntrantByCategorie().then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -128,63 +133,68 @@ class _IntrantScreenState extends State<IntrantScreen> {
       });
     }
     debugPrint("no");
-  }
 
-  Future<List<Intrant>> fetchIntrant({bool refresh = false}) async {
-    if (isLoading == true) return [];
+}
 
-    setState(() {
+
+ Future<List<Intrant>> fetchIntrantByPays(String niveau3PaysActeur, {bool refresh = false }) async {
+    if (isLoading) return [];
+
       isLoading = true;
-    });
 
-    if (mounted) if (refresh) {
-      setState(() {
+    if (refresh) {
+    
+
         intrantListe.clear();
         page = 0;
         hasMore = true;
-      });
+     
     }
 
     try {
-      final response = await http.get(Uri.parse(
-          '$apiOnlineUrl/intrant/getAllIntrantsWithPagination?page=${page}&size=${size}'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/intrant/getIntrantsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
+
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 
         if (body.isEmpty) {
-          setState(() {
+         
             hasMore = false;
-          });
+          
         } else {
-          setState(() {
-            List<Intrant> newIntrants =
-                body.map((e) => Intrant.fromMap(e)).toList();
-            intrantListe.addAll(newIntrants);
-          });
+          
+            List<Intrant> newIntrant = body.map((e) => Intrant.fromMap(e)).toList();
+          intrantListe.addAll(newIntrant);
+          
         }
 
-        debugPrint(
-            "response body all intrant with pagination ${page} par défilement soit ${intrantListe.length}");
-        return intrantListe;
+        debugPrint("response body all intrant by pays with pagination $page par défilement soit ${intrantListe.length}");
+       return intrantListe;
+
       } else {
         print(
             'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {
-      print(
-          'Une erreur s\'est produite lors de la récupération des stocks: $e');
+      print('Une erreur s\'est produite lors de la récupération des intrants: $e');
     } finally {
-      setState(() {
+     
         isLoading = false;
-      });
+      
+
     }
     return intrantListe;
   }
 
-  Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
+  
+
+
+
+  Future<List<Intrant>> fetchIntrantByCategorie(String niveau3PaysActeur, String idCategorieProduit, {bool refresh = false}) async {
+
     if (isLoading == true) return [];
 
     setState(() {
@@ -200,10 +210,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
     }
 
     try {
-      final response = await http.get(Uri.parse(
-        //zero probleme
-          '$apiOnlineUrl/intrant/getIntrantsByPaysAndCategorieWithPagination?idCategorieProduit=${selectedType!.idCategorieProduit}&niveau3PaysActeur=mali&page=$page&size=$size'));
-          // '$apiOnlineUrl/intrant/getAllIntrantsByCategorieWithPagination?idCategorie=${selectedType!.idCategorieProduit}&page=$page&size=$size'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/intrant/getIntrantsByPaysAndCategorieWithPagination?idCategorieProduit=${selectedType!.idCategorieProduit}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
+
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -256,12 +264,12 @@ class _IntrantScreenState extends State<IntrantScreen> {
     }
   }
 
-  Future<List<Intrant>> getAllIntrant() async {
-    if (selectedType != null) {
-      intrantListe = await IntrantService()
-          .fetchIntrantByCategorieWithPagination(
-              selectedType!.idCategorieProduit!);
-    }
+ Future<List<Intrant>> getAllIntrant() async {
+       if(selectedType != null){
+        
+      intrantListe = await IntrantService().fetchIntrantByCategorie(selectedType!.idCategorieProduit!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+       }
+      
 
     return intrantListe;
   }
@@ -270,26 +278,26 @@ class _IntrantScreenState extends State<IntrantScreen> {
   void initState() {
     super.initState();
     verify();
-    // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-    //     .parametreList!;
-
-    // if (paraList.isNotEmpty) {
-    //   para = paraList[0];
-    // }
+  
+    
     _searchController = TextEditingController();
-    _typeList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      //write or call your logic
-      //code will run when widget rendering complete
-      scrollableController.addListener(_scrollListener);
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      //write or call your logic
-      //code will run when widget rendering complete
-      scrollableController1.addListener(_scrollListener1);
-    });
-    intrantListeFuture = IntrantService().fetchIntrant();
-    intrantListeFuture1 = getAllIntrant();
+    _typeList = http
+        .get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
+  WidgetsBinding.instance.addPostFrameCallback((_){
+    //write or call your logic
+    //code will run when widget rendering complete
+  scrollableController.addListener(_scrollListener);
+  });
+  WidgetsBinding.instance.addPostFrameCallback((_){
+    //write or call your logic
+    //code will run when widget rendering complete
+  scrollableController1.addListener(_scrollListener1);
+  });
+   intrantListeFuture = IntrantService().fetchIntrantByPays(widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+   intrantListeFuture1 = getAllIntrant();
+      // final countryProvider = Provider.of<CountryProvider>(context , listen: false);
+
+  debugPrint("pays ${widget.detectedCountry!}");
   }
 
   @override
@@ -303,6 +311,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final countryProvider = Provider.of<CountryProvider>(context , listen: false);
     return Scaffold(
         appBar: AppBar(
             backgroundColor: const Color.fromARGB(255, 255, 255, 255),
@@ -598,7 +607,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                 dynamic jsonString =
                                     utf8.decode(snapshot.data.bodyBytes);
                                 dynamic responseData = json.decode(jsonString);
-
+  //                      
+  // }     
                                 if (responseData is List) {
                                   final reponse = responseData;
                                   final typeList = reponse
@@ -621,6 +631,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             },
                           ),
                         ),
+
                       const SizedBox(height: 10),
                     ])),
                   ];
@@ -636,12 +647,12 @@ class _IntrantScreenState extends State<IntrantScreen> {
                       selectedType == null
                           ? setState(() {
                               intrantListeFuture =
-                                  IntrantService().fetchIntrant();
+                                  IntrantService().fetchIntrantByPays(widget.detectedCountry!);
                             })
                           : setState(() {
                               intrantListeFuture1 = IntrantService()
-                                  .fetchIntrantByCategorieWithPagination(
-                                      selectedType!.idCategorieProduit!);
+                                  .fetchIntrantByCategorie(
+                                      selectedType!.idCategorieProduit!, widget.detectedCountry!);
                             });
                     },
                     child: selectedType == null
@@ -736,18 +747,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                                     },
                                                     child: Card(
                                                       margin: EdgeInsets.all(8),
-                                                      // decoration: BoxDecoration(
-                                                      //   color: Color.fromARGB(250, 250, 250, 250),
-                                                      //   borderRadius: BorderRadius.circular(15),
-                                                      //   boxShadow: [
-                                                      //     BoxShadow(
-                                                      //       color: Colors.grey.withOpacity(0.3),
-                                                      //       offset: Offset(0, 2),
-                                                      //       blurRadius: 8,
-                                                      //       spreadRadius: 2,
-                                                      //     ),
-                                                      //   ],
-                                                      // ),
+                                                      
                                                       child: Column(
                                                         crossAxisAlignment:
                                                             CrossAxisAlignment
@@ -1319,7 +1319,9 @@ class _IntrantScreenState extends State<IntrantScreen> {
 
 
    DropdownButtonFormField<String> buildDropdown(
+
       List<CategorieProduit> typeList) {
+        final countryProvider = Provider.of<CountryProvider>(context, listen: false);
     return DropdownButtonFormField<String>(
       isExpanded: true,
       items: typeList
@@ -1341,7 +1343,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
 
           page = 0;
           hasMore = true;
-          fetchIntrantByCategorie(refresh: true);
+          fetchIntrantByCategorie(selectedType!.idCategorieProduit!, widget.detectedCountry!,refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {
               scrollableController1.jumpTo(0.0);

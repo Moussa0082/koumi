@@ -176,12 +176,11 @@ class IntrantService extends ChangeNotifier {
     return intrantList;
   }
 
-
-   Future<List<Intrant>> fetchIntrantByCategorieWithPagination(String idCategorie,{bool refresh = false }) async {
+   Future<List<Intrant>> fetchIntrantByPays(String niveau3PaysActeur, {bool refresh = false }) async {
     if (isLoading) return [];
 
       isLoading = true;
-    
+
     if (refresh) {
     
         intrantList.clear();
@@ -191,10 +190,9 @@ class IntrantService extends ChangeNotifier {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/intrant/getAllIntrantsByCategorieWithPagination?idCategorie=$idCategorie&page=$page&size=$size'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/intrant/getIntrantsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
-        // debugPrint("url: $response");
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 
@@ -204,13 +202,12 @@ class IntrantService extends ChangeNotifier {
           
         } else {
           
-            List<Intrant> newIntrants = body.map((e) => Intrant.fromMap(e)).toList();
-          intrantList.addAll(newIntrants);
-          // page++;
+            List<Intrant> newIntrant = body.map((e) => Intrant.fromMap(e)).toList();
+          intrantList.addAll(newIntrant);
           
         }
 
-        debugPrint("response body intrant by categorie with pagination $page par défilement soit ${intrantList.length}");
+        debugPrint("response body all intrant by pays with pagination $page par défilement soit ${intrantList.length}");
        return intrantList;
       } else {
         print('Échec de la requête intrant cat avec le code d\'état: ${response.statusCode} |  ${response.body}');
@@ -222,6 +219,48 @@ class IntrantService extends ChangeNotifier {
      
         isLoading = false;
       
+    }
+    return intrantList;
+  }
+
+
+  
+
+
+
+  Future<List<Intrant>> fetchIntrantByCategorie( String idCategorieProduit, String niveau3PaysActeur, {bool refresh = false}) async {
+    if (isLoading == true) return [];
+
+      isLoading = true;
+
+    if (refresh) {
+        intrantList.clear();
+       page = 0;
+        hasMore = true;
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/intrant/getIntrantsByPaysAndCategorieWithPagination?idCategorieProduit=${idCategorieProduit}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+           hasMore = false;
+        } else {
+           List<Intrant> newIntrants = body.map((e) => Intrant.fromMap(e)).toList();
+          intrantList.addAll(newIntrants);
+        }
+
+        debugPrint("response body all intrants by categorie and pays with pagination ${page} par défilement soit ${intrantList.length}");
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des intrants: $e');
+    } finally {
+       isLoading = false;
     }
     return intrantList;
   }
