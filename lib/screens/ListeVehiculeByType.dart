@@ -42,7 +42,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
    bool hasMore = true;
 
   Future<List<Vehicule>> getListe(String id) async {
-    final response = await VehiculeService().fetchVehiculeByTypeVoitureWithPagination(id, widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+    final response = await VehiculeService().fetchVehiculeByTypeVoitureWithPagination(id, widget.detectedCountry!);
     return response;
   }
 
@@ -58,7 +58,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
           // Rafraîchir les données ici
         page++;
         });
-      fetchVehiculeByTypeVoitureWithPagination(typeVoiture.idTypeVoiture!, widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
+      fetchVehiculeByTypeVoitureWithPagination(typeVoiture.idTypeVoiture!, widget.detectedCountry!).then((value) {
         setState(() {
           // Rafraîchir les données ici
         });
@@ -271,7 +271,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                    setState(() {
                         page =0;
                        // Rafraîchir les données ici
-                  futureListe = VehiculeService().fetchVehiculeByTypeVoitureWithPagination(typeVoiture.idTypeVoiture!, widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+                  futureListe = VehiculeService().fetchVehiculeByTypeVoitureWithPagination(typeVoiture.idTypeVoiture!, widget.detectedCountry!);
                      });
                  },
                  child: SingleChildScrollView(

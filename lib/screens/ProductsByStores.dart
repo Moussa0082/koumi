@@ -115,10 +115,10 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
   Future<List<Stock>> getAllStock() async {
      if (selectedCat == null && widget.id != null) {
       stockListe = await 
-          StockService().fetchStockByMagasin(widget.id!, widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+          StockService().fetchStockByMagasin(widget.id!, widget.detectedCountry!);
     }else if(selectedCat != null && widget.id != null)
       stockListe = await 
-          StockService().fetchStockByCategorieAndMagasin(selectedCat!.idCategorieProduit!,widget.id!, widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+          StockService().fetchStockByCategorieAndMagasin(selectedCat!.idCategorieProduit!,widget.id!, widget.detectedCountry!);
     
     return stockListe;
   }
@@ -131,18 +131,13 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
           scrollableController.position.maxScrollExtent - 200 &&
       hasMore &&
       !isLoading && selectedCat== null && widget.id != null){
-      // Incrementez la page et récupérez les stocks généraux
+       if(mounted)
       setState(() {
           // Rafraîchir les données ici
         page++;
         });
       debugPrint("yes - fetch all stocks by magasin");
-      fetchStockByMagasin(widget.id!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
-        setState(() {
-          // Rafraîchir les données ici
-          debugPrint("page inc all ${page}");
-        });
-      });
+      fetchStockByMagasin(widget.id!,widget.detectedCountry!);
  
   }
     debugPrint("no");
@@ -156,17 +151,13 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
     // if (selectedCat != null) {
       // Incrementez la page et récupérez les stocks par catégorie
       debugPrint("yes - fetch by category and magasin");
+      if(mounted)
       setState(() {
           // Rafraîchir les données ici
       page++;
         });
    
-    fetchStockByCategorieAndMagasin(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
-        setState(() {
-          // Rafraîchir les données ici
-          debugPrint("page inc all ${page}");
-        });
-      });
+    fetchStockByCategorieAndMagasin(widget.detectedCountry!);
     } 
     debugPrint("no");
 
@@ -607,7 +598,7 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
                        }
                           page = 0;
                 hasMore = true;
-                fetchStockByCategorieAndMagasin(widget.detectedCountry != null ? widget.detectedCountry! : "Mali",refresh: true);
+                fetchStockByCategorieAndMagasin(widget.detectedCountry!,refresh: true);
                   if (page == 0 && isLoading == true) {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       scrollableController1.jumpTo(0.0);

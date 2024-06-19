@@ -41,13 +41,12 @@ class _AccueilState extends State<Accueil> {
   String? email = "";
   bool isExist = false;
 
-  String? detectedC;
-  String? isoCountryCode;
-  String? country;
-  String? detectedCountryCode;
-  String? detectedCountry;
+  String? detectedC = '';
+  String? isoCountryCode = '';
+  String? country = '';
+  String? detectedCountryCode= '';
+  String? detectedCountry = '';
   CountryProvider? countryProvider;
-  late BuildContext _currentContext;
 
     void getLocationNew() async {
     try {
@@ -139,6 +138,7 @@ class _AccueilState extends State<Accueil> {
     debugPrint("Address ISO: $detectedC");
     address.value =
         'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
+        if(mounted)
         setState(() {
           
     detectedC = place.isoCountryCode;
@@ -197,11 +197,11 @@ class _AccueilState extends State<Accueil> {
         children: [
           // SizedBox(height: 180, child:  Carrousels()),
           
-          SizedBox(height: 180, child: isExist ? Carrousel(): Carrousels()),
+          // SizedBox(height: 180, child: isExist ? Carrousel(): Carrousels()),
           // const SizedBox(
           //   height: 10,
           // ),
-                    // SizedBox(height: 180, child: isExist ? Carrousel(): CarrouselOffLine()),
+                    SizedBox(height: 180, child: isExist ? Carrousel(): CarrouselOffLine()),
           const SizedBox(
             height: 10,
           ),
@@ -253,7 +253,7 @@ class _AccueilState extends State<Accueil> {
           onTap: () {
             if (index == 9) {
                 Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProductsScreen(detectedCountry: detectedCountry)));
+                  MaterialPageRoute(builder: (context) => ProductsScreen(detectedCountry: detectedCountry!)));
              
             } else if (index == 8) {
               Navigator.push(
@@ -262,10 +262,10 @@ class _AccueilState extends State<Accueil> {
                       builder: (context) => const AlerteScreen()));
             } else if (index == 7) {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) =>  l.Location(detectedCountry: detectedCountry)));
+                  MaterialPageRoute(builder: (context) =>  l.Location(detectedCountry: detectedCountry!)));
             } else if (index == 6) {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) =>  Transport(detectedCountry: detectedCountry)));
+                  MaterialPageRoute(builder: (context) =>  Transport(detectedCountry: detectedCountry!)));
             } else if (index == 5) {
               Navigator.push(
                   context,
@@ -288,7 +288,7 @@ class _AccueilState extends State<Accueil> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>  IntrantScreen(detectedCountry: detectedCountry,)));
+                      builder: (context) =>  IntrantScreen(detectedCountry: detectedCountry!,)));
             }
           },
           borderRadius: BorderRadius.circular(20),

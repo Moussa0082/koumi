@@ -48,13 +48,11 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
   String? email = "";
   bool isExist = false;
 
-    String? detectedC;
-  String? isoCountryCode;
-  String? country;
-  String? detectedCountryCode;
-  String? detectedCountry;
-  CountryProvider? countryProvider;
-  late BuildContext _currentContext;
+    String? detectedC = '';
+  String? isoCountryCode = '';
+  String? country ='';
+  String? detectedCountryCode = '';
+  String? detectedCountry ='';
 
     void getLocationNew() async {
     try {
@@ -203,7 +201,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
       body: ListView(
         children: [
           // SizedBox(height: 200, child: Carrousels()),
-                    SizedBox(height: 180, child: isExist ? Carrousel(): CarrouselOffLine()),
+                    SizedBox(height: 180, child: Carrousels()),
 
           // SizedBox(height: 100, child: isExist ? Carrousel(): CarrouselOffLine()),
           // const SizedBox(

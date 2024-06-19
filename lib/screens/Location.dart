@@ -94,13 +94,13 @@ class _LocationState extends State<Location> {
         hasMore &&
         !isLoading &&
         selectedType == null) {
-      // Incrementez la page et récupérez les location généraux
+     if(mounted)
       setState(() {
         // Rafraîchir les données ici
         page++;
         });
       debugPrint("yes - fetch all materiel by pays");
-      fetchMateriel(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
+      fetchMateriel(widget.detectedCountry!).then((value) {
 
         setState(() {
           // Rafraîchir les données ici
@@ -117,20 +117,14 @@ class _LocationState extends State<Location> {
         hasMore &&
         !isLoading &&
         selectedType != null) {
-      // if (selectedCat != null) {
-      // Incrementez la page et récupérez les stocks par catégorie
+         if(mounted)
       debugPrint("yes - fetch by type and pays");
       setState(() {
           // Rafraîchir les données ici
       page++;
         });
    
-    fetchMaterielByType(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
-
-        setState(() {
-          // Rafraîchir les données ici
-        });
-      });
+    fetchMaterielByType("Mali");
     }
     debugPrint("no");
   }
@@ -270,9 +264,9 @@ class _LocationState extends State<Location> {
     Future<List<Materiel>> getAllMateriel() async {
      if (selectedType != null) {
       materielListe = await 
-          MaterielService().fetchMaterielByTypeAndPaysWithPagination(selectedType!.idTypeMateriel!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+          MaterielService().fetchMaterielByTypeAndPaysWithPagination(selectedType!.idTypeMateriel!,widget.detectedCountry!);
     }else{
-     materielListe = await MaterielService().fetchMateriel(widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+     materielListe = await MaterielService().fetchMateriel(widget.detectedCountry!);
 
     }
 
@@ -634,12 +628,12 @@ class _LocationState extends State<Location> {
                       selectedType == null
                           ? setState(() {
                               materielListeFuture = MaterielService()
-                                  .fetchMateriel(widget.detectedCountry != null ? widget.detectedCountry! : "Mali" ,refresh: true);
+                                  .fetchMateriel(widget.detectedCountry! ,refresh: true);
                             })
                           : setState(() {
                               materielListeFuture1 = MaterielService()
                                   .fetchMaterielByTypeAndPaysWithPagination(
-                                      selectedType!.idTypeMateriel!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali",
+                                      selectedType!.idTypeMateriel!,widget.detectedCountry!,
                                       refresh: true);
                             });
                     },
@@ -1261,7 +1255,7 @@ class _LocationState extends State<Location> {
           }
           page = 0;
           hasMore = true;
-          fetchMaterielByType(widget.detectedCountry != null ? widget.detectedCountry! : "Mali" ,refresh: true);
+          fetchMaterielByType(widget.detectedCountry! ,refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {
               scrollableController1.jumpTo(0.0);

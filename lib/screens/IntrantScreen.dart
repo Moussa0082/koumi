@@ -89,23 +89,14 @@ class _IntrantScreenState extends State<IntrantScreen> {
         hasMore &&
         !isLoading &&
         selectedType == null) {
-      // Incrementez la page et récupérez les stocks généraux
+      if(mounted)
       setState(() {
         // Rafraîchir les données ici
         page++;
         });
       debugPrint("yes - fetch all by pays intrants");
-      fetchIntrantByPays(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
-      // fetchIntrant().then((value) {
-
-        setState(() {
-          // Rafraîchir les données ici
-          debugPrint("page inc all ${page}");
-        });
-      });
-      // }
-      // }
-      // else {
+      fetchIntrantByPays("Mali");
+      
     }
     debugPrint("no");
   }
@@ -116,21 +107,15 @@ class _IntrantScreenState extends State<IntrantScreen> {
         hasMore &&
         !isLoading &&
         selectedType != null) {
-      // if (selectedCat != null) {
-      // Incrementez la page et récupérez les stocks par catégorie
+      
       debugPrint("yes - fetch by category");
+      if(mounted)
       setState(() {
           // Rafraîchir les données ici
       page++;
         });
    
-    fetchIntrantByCategorie(widget.detectedCountry != null ? widget.detectedCountry! : "Mali", selectedType!.idCategorieProduit!).then((value) {
-
-        setState(() {
-          // Rafraîchir les données ici
-          debugPrint("page inc all ${page}");
-        });
-      });
+    fetchIntrantByCategorie("Mali", selectedType!.idCategorieProduit!);
     }
     debugPrint("no");
 
@@ -267,7 +252,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
  Future<List<Intrant>> getAllIntrant() async {
        if(selectedType != null){
         
-      intrantListe = await IntrantService().fetchIntrantByCategorie(selectedType!.idCategorieProduit!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+      intrantListe = await IntrantService().fetchIntrantByCategorie(selectedType!.idCategorieProduit!, "Mali");
        }
       
 
@@ -293,7 +278,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
     //code will run when widget rendering complete
   scrollableController1.addListener(_scrollListener1);
   });
-   intrantListeFuture = IntrantService().fetchIntrantByPays(widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+   intrantListeFuture = IntrantService().fetchIntrantByPays("Mali");
    intrantListeFuture1 = getAllIntrant();
       // final countryProvider = Provider.of<CountryProvider>(context , listen: false);
 
@@ -311,7 +296,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final countryProvider = Provider.of<CountryProvider>(context , listen: false);
+
     return Scaffold(
         appBar: AppBar(
             backgroundColor: const Color.fromARGB(255, 255, 255, 255),

@@ -114,7 +114,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Future<List<Stock>> getAllStock() async {
      if (selectedCat != null) {
       stockListe = await 
-          StockService().fetchStockByCategorie(selectedCat!.idCategorieProduit!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+          StockService().fetchStockByCategorie(selectedCat!.idCategorieProduit!,widget.detectedCountry!);
 
     }
 
@@ -123,7 +123,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   Future<List<Stock>> getAllStocks() async {
       
-      stockListe = await StockService().fetchStock(widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+      stockListe = await StockService().fetchStock(widget.detectedCountry!);
       
 
     return stockListe;
@@ -135,19 +135,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
         hasMore &&
         !isLoading &&
         selectedCat == null) {
-      // Incrementez la page et récupérez les stocks généraux
+        if(mounted)
       setState(() {
         // Rafraîchir les données ici
         page++;
         });
       debugPrint("yes - fetch all stocks by pays");
-      fetchStock(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
-
-        setState(() {
-          // Rafraîchir les données ici
-          debugPrint("page inc all ${page}");
-        });
-      });
+      fetchStock(widget.detectedCountry!);
     }
     debugPrint("no");
   }
@@ -161,18 +155,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
       // if (selectedCat != null) {
       // Incrementez la page et récupérez les stocks par catégorie
       debugPrint("yes - fetch by category and pays");
+      if(mounted)
       setState(() {
           // Rafraîchir les données ici
       page++;
         });
    
-    fetchStockByCategorie(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
-
-        setState(() {
-          // Rafraîchir les données ici
-          debugPrint("page inc all ${page}");
-        });
-      });
+    fetchStockByCategorie(widget.detectedCountry!);
     }
     debugPrint("no");
   }
@@ -573,10 +562,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   ? setState(() {
                       stockListeFuture1 = StockService()
                           .fetchStockByCategorie(
-                              selectedCat!.idCategorieProduit!, widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+                              selectedCat!.idCategorieProduit!, widget.detectedCountry!);
                     })
                   : setState(() {
-                      stockListeFuture = StockService().fetchStock(widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+                      stockListeFuture = StockService().fetchStock(widget.detectedCountry!);
                     });
             },
             child: selectedCat == null
@@ -854,7 +843,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         builder: (context, stockService, child) {
                       return FutureBuilder<List<Stock>>(
                           future: stockListeFuture1,
-                          // StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!),
                           // fetchStockByCategorie(selectedCat!.idCategorieProduit!) ,
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
@@ -1321,7 +1309,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           }
           page = 0;
           hasMore = true;
-          fetchStockByCategorie(widget.detectedCountry != null ? widget.detectedCountry! : "Mali",refresh: true);
+          fetchStockByCategorie(widget.detectedCountry!,refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {
               scrollableController1.jumpTo(0.0);

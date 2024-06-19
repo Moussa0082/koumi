@@ -120,29 +120,29 @@ class _AlertesOffLineScreenState extends State<AlertesOffLineScreen> {
                             },
                           ),
                         ),
-                        PopupMenuItem<String>(
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.remove_red_eye,
-                              color: d_colorGreen,
-                            ),
-                            title: const Text(
-                              "Alerte Désactiver ",
-                              style: TextStyle(
-                                color: d_colorGreen,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            onTap: () async {
-                              Navigator.of(context).pop();
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => AlerteDisable()));
-                            },
-                          ),
-                        ),
+                        // PopupMenuItem<String>(
+                        //   child: ListTile(
+                        //     leading: const Icon(
+                        //       Icons.remove_red_eye,
+                        //       color: d_colorGreen,
+                        //     ),
+                        //     title: const Text(
+                        //       "Alerte Désactiver ",
+                        //       style: TextStyle(
+                        //         color: d_colorGreen,
+                        //         fontSize: 18,
+                        //         fontWeight: FontWeight.bold,
+                        //       ),
+                        //     ),
+                        //     onTap: () async {
+                        //       Navigator.of(context).pop();
+                        //       Navigator.push(
+                        //           context,
+                        //           MaterialPageRoute(
+                        //               builder: (context) => AlerteDisable()));
+                        //     },
+                        //   ),
+                        // ),
                       ];
                     },
                   )
@@ -207,7 +207,7 @@ class _AlertesOffLineScreenState extends State<AlertesOffLineScreen> {
                         searchText = _searchController.text.toLowerCase();
                         return libelle.contains(searchText);
                       }).toList();
-                      return filtereSearch
+                      return alerteList
                               // .where((element) => element.statutAlerteOffLine == true)
                               .isEmpty
                           ? Padding(

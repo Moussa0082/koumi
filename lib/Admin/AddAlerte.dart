@@ -536,10 +536,10 @@ class _AddAlerteState extends State<AddAlerte> {
                                               audioAlerte: audiosUploaded,
                                               photoAlerte: photoUploaded)
                                           .then((value) => {
-                                                FirebaseApi()
-                                                    .sendPushNotificationToTopic(
-                                                        'Nouvelle alerte',
-                                                        titre),
+                                                // FirebaseApi()
+                                                //     .sendPushNotificationToTopic(
+                                                //         'Nouvelle alerte',
+                                                //         titre),
                                                 _titreController.clear(),
                                                 _descriptionController.clear(),
                                                 _tokenTextController.clear(),
@@ -591,10 +591,10 @@ class _AddAlerteState extends State<AddAlerte> {
                                               codePays: selectedCountryCode,
                                               )
                                           .then((value) => {
-                                                FirebaseApi()
-                                                    .sendPushNotificationToTopic(
-                                                        'Nouvelle alerte',
-                                                        titre),
+                                                // FirebaseApi()
+                                                //     .sendPushNotificationToTopic(
+                                                //         'Nouvelle alerte',
+                                                //         titre),
                                                 _titreController.clear(),
                                                 _descriptionController.clear(),
                                                 _tokenTextController.clear(),

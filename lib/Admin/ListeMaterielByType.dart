@@ -37,7 +37,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
   bool hasMore = true;
 
   Future<List<Materiel>> getListe(String id) async {
-    final response = await MaterielService().fetchMaterielByTypeAndPaysWithPagination(id,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+    final response = await MaterielService().fetchMaterielByTypeAndPaysWithPagination(id,widget.detectedCountry!);
     return response;
   }
 
@@ -190,7 +190,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
               onRefresh: () async{
                            setState(() {
                              page = 0;
-                             futureListe = MaterielService().fetchMaterielByTypeAndPaysWithPagination(type.idTypeMateriel!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+                             futureListe = MaterielService().fetchMaterielByTypeAndPaysWithPagination(type.idTypeMateriel!,widget.detectedCountry!);
                            });
               },
               child: Consumer<MaterielService>(

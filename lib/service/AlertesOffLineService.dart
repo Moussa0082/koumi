@@ -135,26 +135,28 @@ class AlertesOffLineService extends ChangeNotifier {
   }
 
    
-      Future<List<AlertesOffLine>> fetchAlertes() async {
+
+  Future<List<AlertesOffLine>> fetchAlertes() async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/read'));
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("Fetching data");
+        print("Fetching data alerte offLine");
         List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-        alertesList = body.map((e) => AlertesOffLine.fromMap(e)).toList();
+        print("Response body: $body"); // Imprimez le corps de la réponse pour vérifier son contenu
+
+        List<AlertesOffLine> alertesList = body.map((e) => AlertesOffLine.fromMap(e)).toList();
         debugPrint(alertesList.toString());
         return alertesList;
       } else {
-        alertesList = [];
-        print(
-            'Échec de la requête alerte offline avec le code d\'état: ${response.statusCode}');
+        print('Échec de la requête alerte offline avec le code d\'état: ${response.statusCode}');
         throw Exception(jsonDecode(utf8.decode(response.bodyBytes))["message"]);
       }
     } catch (e) {
       throw Exception(e.toString());
     }
   }
+
 
 
  
