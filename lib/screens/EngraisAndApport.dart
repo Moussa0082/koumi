@@ -11,7 +11,8 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 class EngraisAndApport extends StatefulWidget {
-  const EngraisAndApport({super.key});
+  String? detectedCountry;
+  EngraisAndApport({super.key, this.detectedCountry});
 
   @override
   State<EngraisAndApport> createState() => _EngraisAndApportState();
@@ -29,6 +30,12 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
   // CategorieProduit? selectedType;
   ScrollController scrollableController1 = ScrollController();
   String libelle = "Engrais et apports";
+  // List<String> libelles = [
+  //   "Engrais et apports",
+  //   "engrais et apports",
+  //   "Engrais et apports",
+  //   "Engrais"
+  // ];
   // String? monnaie;
 
   void _scrollListener() {
@@ -44,7 +51,9 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
         page++;
       });
 
-      fetchIntrantByCategorie().then((value) {
+      fetchIntrantByCategorie(
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+          .then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -54,7 +63,8 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
     debugPrint("no");
   }
 
-  Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
+  Future<List<Intrant>> fetchIntrantByCategorie(String pays,
+      {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -70,9 +80,11 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
     }
 
     try {
+      // for (String libelle in libelles) {
       final response = await http.get(Uri.parse(
-          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
-
+          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size'));
+      debugPrint(
+          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
@@ -82,10 +94,14 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
             hasMore = false;
           });
         } else {
+          List<Intrant> newIntrants =
+              body.map((e) => Intrant.fromMap(e)).toList();
+
           setState(() {
-            List<Intrant> newIntrants =
-                body.map((e) => Intrant.fromMap(e)).toList();
-            intrantListe.addAll(newIntrants);
+            // Ajouter uniquement les nouveaux intrants qui ne sont pas déjà dans la liste
+            intrantListe.addAll(newIntrants.where((newIntrant) =>
+                !intrantListe.any((existingIntrant) =>
+                    existingIntrant.idIntrant == newIntrant.idIntrant)));
           });
         }
 
@@ -105,6 +121,57 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
     }
     return intrantListe;
   }
+  // Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
+  //   if (isLoading == true) return [];
+
+  //   setState(() {
+  //     isLoading = true;
+  //   });
+
+  //   if (refresh) {
+  //     setState(() {
+  //       intrantListe.clear();
+  //       page = 0;
+  //       hasMore = true;
+  //     });
+  //   }
+
+  //   try {
+  //     final response = await http.get(Uri.parse(
+  //         '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
+
+  //     if (response.statusCode == 200) {
+  //       final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+  //       final List<dynamic> body = jsonData['content'];
+
+  //       if (body.isEmpty) {
+  //         setState(() {
+  //           hasMore = false;
+  //         });
+  //       } else {
+  //         setState(() {
+  //           List<Intrant> newIntrants =
+  //               body.map((e) => Intrant.fromMap(e)).toList();
+  //           intrantListe.addAll(newIntrants);
+  //         });
+  //       }
+
+  //       debugPrint(
+  //           "response body all intrants by categorie with pagination ${page} par défilement soit ${intrantListe.length}");
+  //     } else {
+  //       print(
+  //           'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+  //     }
+  //   } catch (e) {
+  //     print(
+  //         'Une erreur s\'est produite lors de la récupération des intrants: $e');
+  //   } finally {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  //   return intrantListe;
+  // }
 
   @override
   void initState() {
@@ -113,7 +180,8 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController.addListener(_scrollListener);
     });
-    intrantListeFuture = fetchIntrantByCategorie();
+    intrantListeFuture = fetchIntrantByCategorie(
+        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
   }
 
   @override
@@ -198,6 +266,13 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
                       setState(() {
                         page = 0;
                         // Rafraîchir les données ici
+                      });
+                      debugPrint("refresh page ${page}");
+                      setState(() {
+                        intrantListeFuture = fetchIntrantByCategorie(
+                            widget.detectedCountry != null
+                                ? widget.detectedCountry!
+                                : "Mali");
                       });
                       debugPrint("refresh page ${page}");
                     },
@@ -298,7 +373,8 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
                                                               8.0),
                                                       child: SizedBox(
                                                         height: 85,
-                                                        child: filteredSearch[index]
+                                                        child: filteredSearch[
+                                                                            index]
                                                                         .photoIntrant ==
                                                                     null ||
                                                                 filteredSearch[
@@ -359,7 +435,9 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
                                                           .symmetric(
                                                           horizontal: 15),
                                                       child: Text(
-                                                        intrantListe[index].monnaie != null
+                                                        intrantListe[index]
+                                                                    .monnaie !=
+                                                                null
                                                             ? "${intrantListe[index].prixIntrant.toString()} ${intrantListe[index].monnaie!.libelle}"
                                                             : "${intrantListe[index].prixIntrant.toString()} FCFA ",
                                                         style: TextStyle(

@@ -123,7 +123,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
           // Rafraîchir les données ici
       page++;
         });
-   
+  
     fetchIntrantByCategorie(widget.detectedCountry != null ? widget.detectedCountry! : "Mali", selectedType!.idCategorieProduit!).then((value) {
 
         setState(() {

@@ -22,7 +22,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ComplementAlimentaire extends StatefulWidget {
-  const ComplementAlimentaire({super.key});
+  String? detectedCountry;
+  ComplementAlimentaire({super.key, this.detectedCountry});
 
 
   @override
@@ -35,16 +36,19 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
   late TextEditingController _searchController;
   List<Stock> stockListe = [];
+  List<Stock> stockList = [];
   late Future<List<Stock>> stockListeFuture;
 
   ScrollController scrollableController = ScrollController();
 
   String libelle = "Compléments alimentaires";
+  // List<String> libelles = ["Compléments alimentaires", "complément alimentaire", "compléments alimentaires", "Complements alimentaires"];
   String? monnaie;
   int page = 0;
   bool isLoading = false;
   int size = 6;
   bool hasMore = true;
+
   void _scrollListener() {
     if (scrollableController.position.pixels >=
             scrollableController.position.maxScrollExtent - 200 &&
@@ -58,7 +62,8 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
         page++;
       });
 
-      fetchStock().then((value) {
+      fetchStock(
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -68,7 +73,8 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
     debugPrint("no");
   }
 
-  Future<List<Stock>> fetchStock({bool refresh = false}) async {
+  Future<List<Stock>> fetchStock(String pays,
+      {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -84,31 +90,41 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
     }
 
     try {
-      final response = await http.get(Uri.parse(
-          '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
+      // List<Stock> tempStockListe = [];
+      // for (String libelle in libelles) {
+        final response = await http.get(Uri.parse(
+            '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size'));
 
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
-        final List<dynamic> body = jsonData['content'];
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+          final List<dynamic> body = jsonData['content'];
 
-        if (body.isEmpty) {
-          setState(() {
-            hasMore = false;
-          });
+          if (body.isEmpty) {
+            setState(() {
+              hasMore = false;
+            });
+          } else {
+            List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
+            setState(() {
+              stockListe.addAll(newStocks.where((newStock) => 
+              !stockListe.any((existStock) => 
+              existStock.idStock == newStock.idStock
+              )));
+
+            });
+          }
+
+          debugPrint(
+              "response body all stock by categorie with pagination ${page} par défilement soit ${stockListe.length}");
         } else {
-          setState(() {
-            List<Stock> newStocks =
-                body.map((e) => Stock.fromMap(e)).toList();
-            stockListe.addAll(newStocks);
-          });
+          print(
+              'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
         }
+      
 
-        debugPrint(
-            "response body all stock by categorie with pagination ${page} par défilement soit ${stockListe.length}");
-      } else {
-        print(
-            'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
-      }
+      // setState(() {
+      //   stockListe.addAll(tempStockListe);
+      // });
     } catch (e) {
       print(
           'Une erreur s\'est produite lors de la récupération des intrants: $e');
@@ -119,6 +135,7 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
     }
     return stockListe;
   }
+ 
 
   @override
   void initState() {
@@ -127,7 +144,8 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController.addListener(_scrollListener);
     });
-    stockListeFuture = fetchStock();
+    stockListeFuture = fetchStock(
+        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
   }
 
   @override
@@ -214,6 +232,13 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
                         // Rafraîchir les données ici
                       });
                       debugPrint("refresh page ${page}");
+                      setState(() {
+                        stockListeFuture = fetchStock(
+                            widget.detectedCountry != null
+                                ? widget.detectedCountry!
+                                : "Mali");
+                      });
+                      debugPrint("refresh page ${page}");
                     },
                     child: SingleChildScrollView(
                       controller: scrollableController,
@@ -234,10 +259,10 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
                                       Center(child: Text("Aucun donné trouvé")),
                                 );
                               } else {
-                                stockListe = snapshot.data!;
+                                stockList = snapshot.data!;
                                 String searchText = "";
                                 List<Stock> filteredSearch =
-                                    stockListe.where((cate) {
+                                    stockList.where((cate) {
                                   String nomCat =
                                       cate.nomProduit!.toLowerCase();
                                   searchText =

@@ -11,7 +11,8 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProduitElevage extends StatefulWidget {
-  const ProduitElevage({super.key});
+  String? detectedCountry;
+  ProduitElevage({super.key, this.detectedCountry});
 
   @override
   State<ProduitElevage> createState() => _ProduitElevageState();
@@ -23,17 +24,20 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 class _ProduitElevageState extends State<ProduitElevage> {
   late TextEditingController _searchController;
   List<Stock> stockListe = [];
+  List<Stock> stockList = [];
   late Future<List<Stock>> stockListeFuture;
 
   ScrollController scrollableController = ScrollController();
 
-  List<String> libelles = ["Animale", "Animale", "Elevage", "Elevages"];
+  String libelle = "Animale";
+  // List<String> libelles = ["Animale", "Animale", "Elevage", "Elevages"];
 
   // String? monnaie;
   int page = 0;
   bool isLoading = false;
   int size =6 ;
   bool hasMore = true;
+
   void _scrollListener() {
     if (scrollableController.position.pixels >=
             scrollableController.position.maxScrollExtent - 200 &&
@@ -47,7 +51,8 @@ class _ProduitElevageState extends State<ProduitElevage> {
         page++;
       });
 
-      fetchStock().then((value) {
+      fetchStock(
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -57,7 +62,8 @@ class _ProduitElevageState extends State<ProduitElevage> {
     debugPrint("no");
   }
 
-  Future<List<Stock>> fetchStock({bool refresh = false}) async {
+  Future<List<Stock>> fetchStock(String pays,
+      {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -73,10 +79,10 @@ class _ProduitElevageState extends State<ProduitElevage> {
     }
 
     try {
-      List<Stock> tempStockListe = [];
-      for (String libelle in libelles) {
+      // List<Stock> tempStockListe = [];
+      // for (String libelle in libelles) {
         final response = await http.get(Uri.parse(
-            '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
+            '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size'));
 
         if (response.statusCode == 200 || response.statusCode == 201) {
           final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -88,20 +94,21 @@ class _ProduitElevageState extends State<ProduitElevage> {
             });
           } else {
             List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
-            tempStockListe.addAll(newStocks);
-          }
+          setState(() {
+            stockListe.addAll(newStocks.where((newStock) => !stockListe
+                .any((existStock) => existStock.idStock == newStock.idStock)));
+          });
+        }
 
           debugPrint(
-              "response body all stock by categorie with pagination ${page} par défilement soit ${tempStockListe.length}");
+              "response body all stock by categorie with pagination ${page} par défilement soit ${stockListe.length}");
         } else {
           print(
               'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
         }
-      }
+      // }
 
-      setState(() {
-        stockListe.addAll(tempStockListe);
-      });
+      
     } catch (e) {
       print(
           'Une erreur s\'est produite lors de la récupération des intrants: $e');
@@ -120,7 +127,8 @@ class _ProduitElevageState extends State<ProduitElevage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController.addListener(_scrollListener);
     });
-    stockListeFuture = fetchStock();
+    stockListeFuture = fetchStock(
+        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
   }
 
   @override
@@ -207,6 +215,13 @@ class _ProduitElevageState extends State<ProduitElevage> {
                         // Rafraîchir les données ici
                       });
                       debugPrint("refresh page ${page}");
+                      setState(() {
+                        stockListeFuture = fetchStock(
+                            widget.detectedCountry != null
+                                ? widget.detectedCountry!
+                                : "Mali");
+                      });
+                      debugPrint("refresh page ${page}");
                     },
                     child: SingleChildScrollView(
                       controller: scrollableController,
@@ -227,10 +242,10 @@ class _ProduitElevageState extends State<ProduitElevage> {
                                       Center(child: Text("Aucun donné trouvé")),
                                 );
                               } else {
-                                stockListe = snapshot.data!;
+                                stockList = snapshot.data!;
                                 String searchText = "";
                                 List<Stock> filteredSearch =
-                                    stockListe.where((cate) {
+                                    stockList.where((cate) {
                                   String nomCat =
                                       cate.nomProduit!.toLowerCase();
                                   searchText =

@@ -11,14 +11,16 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProduitPhytosanitaire extends StatefulWidget {
-  const ProduitPhytosanitaire({super.key});
+  String? detectedCountry;
+
+  ProduitPhytosanitaire({super.key, this.detectedCountry});
 
   @override
   State<ProduitPhytosanitaire> createState() => _ProduitPhytosanitaireState();
 }
 
 class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
-    int page = 0;
+  int page = 0;
   bool isLoading = false;
   late TextEditingController _searchController;
   ScrollController scrollableController = ScrollController();
@@ -26,14 +28,21 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
   bool hasMore = true;
   late Future<List<Intrant>> intrantListeFuture;
   List<Intrant> intrantListe = [];
+  List<Intrant> intrantList = [];
   // CategorieProduit? selectedType;
   ScrollController scrollableController1 = ScrollController();
-  // String libelle = "Produits phytosanitaires";
+  
+  String libelle = "Produits phytosanitaires";
   // String? monnaie;
-  List<String> libelles = ["Produits phytosanitaires", "produits phytosanitaires", "produit phytosanitaire", "Produit phytosanitaire"];
+  // List<String> libelles = [
+  //   "Produits phytosanitaires",
+  //   "produits phytosanitaires",
+  //   "produit phytosanitaire",
+  //   "Produit phytosanitaire"
+  // ];
 
-
-Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
+  Future<List<Intrant>> fetchIntrantByCategorie(String pays,
+      {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -42,42 +51,44 @@ Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
 
     if (refresh) {
       setState(() {
-         intrantListe.clear();
+        intrantListe.clear();
         page = 0;
         hasMore = true;
       });
     }
 
     try {
-      List<Intrant> tempStockListe = [];
-      for (String libelle in libelles) {
-        final response = await http.get(Uri.parse(
-            '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=${libelle.toLowerCase()}&page=$page&size=$size'));
+      // for (String libelle in libelles) {
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size'));
+      debugPrint(
+          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
 
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
-          final List<dynamic> body = jsonData['content'];
-
-          if (body.isEmpty) {
-            setState(() {
-              hasMore = false;
-            });
-          } else {
-            List<Intrant> newStocks = body.map((e) => Intrant.fromMap(e)).toList();
-            tempStockListe.addAll(newStocks);
-          }
-
-          debugPrint(
-              "response body all stock by categorie with pagination ${page} par défilement soit ${tempStockListe.length}");
+        if (body.isEmpty) {
+          setState(() {
+            hasMore = false;
+          });
         } else {
-          print(
-              'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
-        }
-      }
+          List<Intrant> newIntrants =
+              body.map((e) => Intrant.fromMap(e)).toList();
 
-      setState(() {
-        intrantListe.addAll(tempStockListe);
-      });
+          setState(() {
+            // Ajouter uniquement les nouveaux intrants qui ne sont pas déjà dans la liste
+            intrantListe.addAll(newIntrants.where((newIntrant) =>
+                !intrantListe.any((existingIntrant) =>
+                    existingIntrant.idIntrant == newIntrant.idIntrant)));
+          });
+        }
+
+        debugPrint(
+            "response body all intrants by categorie with pagination ${page} par défilement soit ${intrantListe.length}");
+      } else {
+        print(
+            'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
     } catch (e) {
       print(
           'Une erreur s\'est produite lors de la récupération des intrants: $e');
@@ -102,7 +113,8 @@ Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
         page++;
       });
 
-      fetchIntrantByCategorie().then((value) {
+      fetchIntrantByCategorie(
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -171,7 +183,9 @@ Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController.addListener(_scrollListener);
     });
-    intrantListeFuture = fetchIntrantByCategorie();
+
+    intrantListeFuture = fetchIntrantByCategorie(
+        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
   }
 
   @override
@@ -258,6 +272,12 @@ Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
                         // Rafraîchir les données ici
                       });
                       debugPrint("refresh page ${page}");
+                      setState(() {
+                        intrantListeFuture = fetchIntrantByCategorie(
+                            widget.detectedCountry != null
+                                ? widget.detectedCountry!
+                                : "Mali");
+                      });
                     },
                     child: SingleChildScrollView(
                       controller: scrollableController,
@@ -281,7 +301,7 @@ Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
                                 intrantListe = snapshot.data!;
                                 String searchText = "";
                                 List<Intrant> filteredSearch =
-                                    intrantListe.where((cate) {
+                                    intrantList.where((cate) {
                                   String nomCat =
                                       cate.nomIntrant!.toLowerCase();
                                   searchText =
@@ -327,9 +347,9 @@ Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
                                           crossAxisSpacing: 10,
                                           childAspectRatio: 0.8,
                                         ),
-                                        itemCount: intrantListe.length + 1,
+                                        itemCount: filteredSearch.length + 1,
                                         itemBuilder: (context, index) {
-                                          if (index < intrantListe.length) {
+                                          if (index < filteredSearch.length) {
                                             return GestureDetector(
                                               onTap: () {
                                                 Navigator.push(
@@ -338,7 +358,7 @@ Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
                                                     builder: (context) =>
                                                         DetailIntrant(
                                                       intrant:
-                                                          intrantListe[index],
+                                                          filteredSearch[index],
                                                     ),
                                                   ),
                                                 );
@@ -356,10 +376,10 @@ Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
                                                               8.0),
                                                       child: SizedBox(
                                                         height: 85,
-                                                        child: intrantListe[index]
+                                                        child: filteredSearch[index]
                                                                         .photoIntrant ==
                                                                     null ||
-                                                                intrantListe[
+                                                                filteredSearch[
                                                                         index]
                                                                     .photoIntrant!
                                                                     .isEmpty
@@ -370,7 +390,7 @@ Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
                                                               )
                                                             : CachedNetworkImage(
                                                                 imageUrl:
-                                                                    "https://koumi.ml/api-koumi/intrant/${intrantListe[index].idIntrant}/image",
+                                                                    "https://koumi.ml/api-koumi/intrant/${filteredSearch[index].idIntrant}/image",
                                                                 fit: BoxFit
                                                                     .cover,
                                                                 placeholder: (context,
@@ -392,7 +412,7 @@ Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
                                                     // SizedBox(height: 8),
                                                     ListTile(
                                                       title: Text(
-                                                        intrantListe[index]
+                                                        filteredSearch[index]
                                                             .nomIntrant!,
                                                         style: TextStyle(
                                                           fontSize: 16,
@@ -405,7 +425,7 @@ Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
                                                             .ellipsis,
                                                       ),
                                                       subtitle: Text(
-                                                        "${intrantListe[index].quantiteIntrant.toString()} ${intrantListe[index].unite}",
+                                                        "${filteredSearch[index].quantiteIntrant.toString()} ${filteredSearch[index].unite}",
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           color: Colors.black87,
@@ -417,10 +437,11 @@ Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
                                                           .symmetric(
                                                           horizontal: 15),
                                                       child: Text(
-                                                        intrantListe[index]
-                                                                    .monnaie != null
-                                                            ? "${intrantListe[index].prixIntrant.toString()} ${intrantListe[index].monnaie!.libelle}"
-                                                            : "${intrantListe[index].prixIntrant.toString()} FCFA ",
+                                                        filteredSearch[index]
+                                                                    .monnaie !=
+                                                                null
+                                                            ? "${filteredSearch[index].prixIntrant.toString()} ${filteredSearch[index].monnaie!.libelle}"
+                                                            : "${filteredSearch[index].prixIntrant.toString()} FCFA ",
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           color: Colors.black87,

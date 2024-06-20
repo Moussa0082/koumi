@@ -507,7 +507,9 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 class SemenceAndPlant extends StatefulWidget {
-  const SemenceAndPlant({super.key});
+  String? detectedCountry;
+
+  SemenceAndPlant({super.key, this.detectedCountry});
 
   @override
   State<SemenceAndPlant> createState() => _SemenceAndPlantState();
@@ -525,16 +527,19 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
   bool hasMore = true;
   late Future<List<Intrant>> intrantListeFuture;
   List<Intrant> intrantListe = [];
+  List<Intrant> intrantList = [];
   // CategorieProduit? selectedType;
   ScrollController scrollableController1 = ScrollController();
-  List<String> libelles = [
-    "Semences et plants",
-    "Semence et plant",
-    "Semences",
-    "Semence",
-    "semences et plants"
-  ];
+  // List<String> libelles = [
+  //   "Semences et plants",
+  //   "Semence et plant",
+  //   "Semences",
+  //   "Semence",
+  //   "semences et plants"
+  // ];
+
   // String? monnaie;
+  String libelle = "Semences et plants";
 
   void _scrollListener() {
     debugPrint("Scroll position: ${scrollableController.position.pixels}");
@@ -546,7 +551,9 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
         page++;
       });
 
-      fetchIntrantByCategorie().then((value) {
+      fetchIntrantByCategorie(
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+          .then((value) {
         setState(() {
           debugPrint("page inc all $page");
         });
@@ -555,7 +562,8 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     debugPrint("no");
   }
 
-  Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
+  Future<List<Intrant>> fetchIntrantByCategorie(String pays,
+      {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -571,10 +579,11 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     }
 
     try {
-      for (String libelle in libelles) {
+      // for (String libelle in libelles) {
         final response = await http.get(Uri.parse(
-            '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=${libelle.toLowerCase()}&page=$page&size=$size'));
-
+            '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size'));
+        debugPrint(
+            '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
         if (response.statusCode == 200) {
           final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
           final List<dynamic> body = jsonData['content'];
@@ -584,10 +593,14 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
               hasMore = false;
             });
           } else {
+            List<Intrant> newIntrants =
+                body.map((e) => Intrant.fromMap(e)).toList();
+
             setState(() {
-              List<Intrant> newIntrants =
-                  body.map((e) => Intrant.fromMap(e)).toList();
-              intrantListe.addAll(newIntrants);
+              // Ajouter uniquement les nouveaux intrants qui ne sont pas déjà dans la liste
+              intrantListe.addAll(newIntrants.where((newIntrant) =>
+                  !intrantListe.any((existingIntrant) =>
+                      existingIntrant.idIntrant == newIntrant.idIntrant)));
             });
           }
 
@@ -597,7 +610,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
           print(
               'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
         }
-      }
+      
     } catch (e) {
       print(
           'Une erreur s\'est produite lors de la récupération des intrants: $e');
@@ -609,6 +622,83 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     return intrantListe;
   }
 
+  // void _scrollListener() {
+  //   debugPrint("Scroll position: ${scrollableController.position.pixels}");
+  //   if (scrollableController.position.pixels >=
+  //           scrollableController.position.maxScrollExtent - 200 &&
+  //       hasMore &&
+  //       !isLoading) {
+  //     setState(() {
+  //       page++;
+  //     });
+
+  //     fetchIntrantByCategorie(
+  //             widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+  //         .then((value) {
+  //       setState(() {
+  //         debugPrint("page inc all $page");
+  //       });
+  //     });
+  //   }
+  //   debugPrint("no");
+  // }
+
+  // Future<List<Intrant>> fetchIntrantByCategorie(String pays,
+  //     {bool refresh = false}) async {
+  //   if (isLoading == true) return [];
+
+  //   setState(() {
+  //     isLoading = true;
+  //   });
+
+  //   if (refresh) {
+  //     setState(() {
+  //       intrantListe.clear();
+  //       page = 0;
+  //       hasMore = true;
+  //     });
+  //   }
+
+  //   try {
+  //     for (String libelle in libelles) {
+  //       final response = await http.get(Uri.parse(
+  //           '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size'));
+  //       debugPrint(
+  //           '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
+  //       if (response.statusCode == 200) {
+  //         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+  //         final List<dynamic> body = jsonData['content'];
+
+  //         if (body.isEmpty) {
+  //           setState(() {
+  //             hasMore = false;
+  //           });
+  //         } else {
+  //           setState(() {
+  //             List<Intrant> newIntrants =
+  //                 body.map((e) => Intrant.fromMap(e)).toList();
+  //             intrantListe.addAll(newIntrants);
+  //           });
+  //         }
+
+  //         debugPrint(
+  //             "response body all intrants by categorie with pagination ${page} par défilement soit ${intrantListe.length}");
+  //       } else {
+  //         print(
+  //             'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+  //       }
+  //     }
+  //   } catch (e) {
+  //     print(
+  //         'Une erreur s\'est produite lors de la récupération des intrants: $e');
+  //   } finally {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  //   return intrantListe;
+  // }
+
   @override
   void initState() {
     super.initState();
@@ -616,7 +706,8 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController.addListener(_scrollListener);
     });
-    intrantListeFuture = fetchIntrantByCategorie();
+    intrantListeFuture = fetchIntrantByCategorie(
+        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
   }
 
   @override
@@ -703,7 +794,10 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                       });
                       debugPrint("refresh page ${page}");
                       setState(() {
-                        intrantListeFuture = fetchIntrantByCategorie();
+                        intrantListeFuture = fetchIntrantByCategorie(
+                            widget.detectedCountry != null
+                                ? widget.detectedCountry!
+                                : "Mali");
                       });
                     },
                     child: SingleChildScrollView(
@@ -725,10 +819,10 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                                       Center(child: Text("Aucun donné trouvé")),
                                 );
                               } else {
-                                intrantListe = snapshot.data!;
+                                intrantList = snapshot.data!;
                                 String searchText = "";
                                 List<Intrant> filteredSearch =
-                                    intrantListe.where((cate) {
+                                    intrantList.where((cate) {
                                   String nomCat =
                                       cate.nomIntrant!.toLowerCase();
                                   searchText =
@@ -774,9 +868,9 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                                           crossAxisSpacing: 10,
                                           childAspectRatio: 0.8,
                                         ),
-                                        itemCount: intrantListe.length + 1,
+                                        itemCount: filteredSearch.length + 1,
                                         itemBuilder: (context, index) {
-                                          if (index < intrantListe.length) {
+                                          if (index < filteredSearch.length) {
                                             return GestureDetector(
                                               onTap: () {
                                                 Navigator.push(
@@ -785,7 +879,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                                                     builder: (context) =>
                                                         DetailIntrant(
                                                       intrant:
-                                                          intrantListe[index],
+                                                          filteredSearch[index],
                                                     ),
                                                   ),
                                                 );
@@ -803,10 +897,10 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                                                               8.0),
                                                       child: SizedBox(
                                                         height: 85,
-                                                        child: intrantListe[index]
+                                                        child: filteredSearch[index]
                                                                         .photoIntrant ==
                                                                     null ||
-                                                                intrantListe[
+                                                                filteredSearch[
                                                                         index]
                                                                     .photoIntrant!
                                                                     .isEmpty
@@ -817,7 +911,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                                                               )
                                                             : CachedNetworkImage(
                                                                 imageUrl:
-                                                                    "https://koumi.ml/api-koumi/intrant/${intrantListe[index].idIntrant}/image",
+                                                                    "https://koumi.ml/api-koumi/intrant/${filteredSearch[index].idIntrant}/image",
                                                                 fit: BoxFit
                                                                     .cover,
                                                                 placeholder: (context,
@@ -839,7 +933,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                                                     // SizedBox(height: 8),
                                                     ListTile(
                                                       title: Text(
-                                                        intrantListe[index]
+                                                        filteredSearch[index]
                                                             .nomIntrant!,
                                                         style: TextStyle(
                                                           fontSize: 16,
@@ -852,7 +946,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                                                             .ellipsis,
                                                       ),
                                                       subtitle: Text(
-                                                        "${intrantListe[index].quantiteIntrant.toString()} ${intrantListe[index].unite}",
+                                                        "${filteredSearch[index].quantiteIntrant.toString()} ${filteredSearch[index].unite}",
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           color: Colors.black87,
@@ -864,9 +958,11 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                                                           .symmetric(
                                                           horizontal: 15),
                                                       child: Text(
-                                                       intrantListe[index].monnaie != null
-                                                            ? "${intrantListe[index].prixIntrant.toString()} ${intrantListe[index].monnaie!.libelle}"
-                                                            : "${intrantListe[index].prixIntrant.toString()} FCFA ",
+                                                        filteredSearch[index]
+                                                                    .monnaie !=
+                                                                null
+                                                            ? "${filteredSearch[index].prixIntrant.toString()} ${filteredSearch[index].monnaie!.libelle}"
+                                                            : "${filteredSearch[index].prixIntrant.toString()} FCFA ",
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           color: Colors.black87,
