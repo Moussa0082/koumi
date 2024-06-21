@@ -347,7 +347,7 @@ class _CarrouselState extends State<Carrousel> {
       onTap: () {
         Get.to(() => DetailAlerte(alertes: alertesList[index]),
             transition: Transition.leftToRightWithFade,
-            duration: Duration(seconds: 2));
+           );
       },
       child: Stack(
         children: [
@@ -729,7 +729,7 @@ class _CarrouselOffLineState extends State<CarrouselOffLine> {
       onTap: () {
         Get.to(() => DetailAlertesOffLine(alertes: alertesList[index]),
             transition: Transition.leftToRightWithFade,
-            duration: Duration(seconds: 2));
+           );
       },
       child: Stack(
         children: [

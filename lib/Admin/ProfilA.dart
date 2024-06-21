@@ -316,9 +316,9 @@ class _ProfilAState extends State<ProfilA> {
     
 
                       Get.offAll(BottomNavigationPage(),
-                          duration: Duration(
-                              seconds:
-                                  1), //duration of transitions, default 1 sec
+                          // duration: Duration(
+                          //     seconds:
+                          //         1), //duration of transitions, default 1 sec
                           transition: Transition.leftToRight);
 
                       Provider.of<BottomNavigationService>(context,

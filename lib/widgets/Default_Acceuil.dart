@@ -1,13 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:koumi_app/models/CategorieProduit.dart';
+import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/providers/CountryProvider.dart';
 import 'package:koumi_app/screens/ComplementAlimentaire.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/EngraisAndApport.dart';
 import 'package:koumi_app/screens/FruitsAndLegumes.dart';
-import 'package:koumi_app/screens/Location.dart';
+import 'package:koumi_app/screens/Location.dart' as l;
+import 'package:koumi_app/screens/MesCommande.dart';
 import 'package:koumi_app/screens/Products.dart';
 import 'package:koumi_app/screens/ProduitElevage.dart';
 import 'package:koumi_app/screens/ProduitPhytosanitaire.dart';
@@ -16,10 +20,10 @@ import 'package:koumi_app/screens/SemenceAndPlant.dart';
 import 'package:koumi_app/screens/Store.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/Weather.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:koumi_app/providers/CountryProvider.dart';
-import 'package:koumi_app/screens/Location.dart' as l;
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../providers/ActeurProvider.dart';
 
 class DefautAcceuil extends StatefulWidget {
   const DefautAcceuil({super.key});
@@ -39,6 +43,26 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
   String? detectedCountry;
   CountryProvider? countryProvider;
   late BuildContext _currentContext;
+  late Acteur acteur = Acteur();
+
+  String? email = "";
+  bool isExist = false;
+
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      setState(() {
+        isExist = true;
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
+  }
 
   void getLocationNew() async {
     try {
@@ -143,7 +167,9 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
   @override
   void initState() {
     super.initState();
-      getLocation();
+    getLocation();
+    verify();
+    _currentContext = context;
     // _liste = getCat();
   }
 
@@ -156,8 +182,7 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
         crossAxisCount: 2,
         mainAxisSpacing: 2,
         crossAxisSpacing: 5,
-        childAspectRatio:
-            2, // Ajustez cette valeur pour contrôler le rapport d'aspect
+        childAspectRatio: 2,
         children: _buildCards(),
       ),
     );
@@ -165,6 +190,7 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
 
   List<Widget> _buildCards() {
     List<Widget> cards = [
+      _buildAccueilCard("Magasins", "shop.png", 6),
       _buildAccueilCard("Semences et plants", "semence.png", 13),
       _buildAccueilCard("Produits phytosanitaires", "physo.png", 12),
       _buildAccueilCard("Engrais et apports", "engrais.png", 11),
@@ -172,42 +198,76 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
       _buildAccueilCard("Produits agricoles", "pro.png", 9),
       _buildAccueilCard("Compléments alimentaires", "compl.png", 5),
       _buildAccueilCard("Produits d'élévages", "elevage.png", 7),
-      _buildAccueilCard("Magasins", "shop.png", 6),
-      _buildAccueilCard("Locations", "loc.png", 4),
+      _buildAccueilCard("Materiels de Locations", "loc.png", 4),
       _buildAccueilCard("Moyens de Transports", "transp.png", 3),
       _buildAccueilCard("Produits transformés", "transforme.png", 8),
       _buildAccueilCard("Météo", "met.png", 2),
       _buildAccueilCard("Conseils", "cons.png", 1)
     ];
 
+    if (isExist) {
+      cards.insert(
+        0,
+        _buildAccueilCard("Commandes", "cm.png", 14),
+      );
+    }
+
     return cards;
   }
+
+  // List<Widget> _buildCards() {
+  //   List<Widget> cards = [
+  //     _buildAccueilCard("Magasins", "shop.png", 6),
+  //     _buildAccueilCard("Commandes", "cm.png", 14),
+  //     _buildAccueilCard("Semences et plants", "semence.png", 13),
+  //     _buildAccueilCard("Produits phytosanitaires", "physo.png", 12),
+  //     _buildAccueilCard("Engrais et apports", "engrais.png", 11),
+  //     _buildAccueilCard("Fruits et légumes", "fruit&legume.png", 10),
+  //     _buildAccueilCard("Produits agricoles", "pro.png", 9),
+  //     _buildAccueilCard("Compléments alimentaires", "compl.png", 5),
+  //     _buildAccueilCard("Produits d'élévages", "elevage.png", 7),
+  //     _buildAccueilCard("Materiels de Locations", "loc.png", 4),
+  //     _buildAccueilCard("Moyens de Transports", "transp.png", 3),
+  //     _buildAccueilCard("Produits transformés", "transforme.png", 8),
+  //     _buildAccueilCard("Météo", "met.png", 2),
+  //     _buildAccueilCard("Conseils", "cons.png", 1)
+  //   ];
+
+  //   return cards;
+  // }
 
   Widget _buildAccueilCard(String titre, String imgLocation, int index) {
     return Padding(
       padding: const EdgeInsets.all(5),
       child: InkWell(
         onTap: () {
-          if (index == 13) {
+          if (index == 14) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const MesCommande()));
+          } else if (index == 13) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>  SemenceAndPlant(detectedCountry: detectedCountry)));
+                    builder: (context) =>
+                        SemenceAndPlant(detectedCountry: detectedCountry)));
           } else if (index == 12) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>  ProduitPhytosanitaire(
+                    builder: (context) => ProduitPhytosanitaire(
                         detectedCountry: detectedCountry)));
           } else if (index == 11) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => EngraisAndApport(detectedCountry: detectedCountry)));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        EngraisAndApport(detectedCountry: detectedCountry)));
           } else if (index == 10) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>  FruitAndLegumes(
-                        detectedCountry: detectedCountry)));
+                    builder: (context) =>
+                        FruitAndLegumes(detectedCountry: detectedCountry)));
           } else if (index == 9) {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ProductsScreen()));
@@ -215,13 +275,14 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>  ProduitTransforme(detectedCountry: detectedCountry)));
+                    builder: (context) =>
+                        ProduitTransforme(detectedCountry: detectedCountry)));
           } else if (index == 7) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>  ProduitElevage(
-                        detectedCountry: detectedCountry)));
+                    builder: (context) =>
+                        ProduitElevage(detectedCountry: detectedCountry)));
           } else if (index == 6) {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const StoreScreen()));
@@ -229,17 +290,23 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>  ComplementAlimentaire(
+                    builder: (context) => ComplementAlimentaire(
                         detectedCountry: detectedCountry)));
           } else if (index == 4) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) =>  l.Location(detectedCountry: detectedCountry)));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        l.Location(detectedCountry: detectedCountry)));
           } else if (index == 3) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) =>  Transport(detectedCountry: detectedCountry)));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        Transport(detectedCountry: detectedCountry)));
           } else if (index == 2) {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) =>  WeatherScreen()));
+                MaterialPageRoute(builder: (context) => WeatherScreen()));
           } else if (index == 1) {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const ConseilScreen()));
@@ -265,8 +332,8 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
                 padding: const EdgeInsets.all(10.0),
                 child: Image.asset(
                   "assets/images/$imgLocation",
-                  width: 50,
-                  height: 50,
+                  width: 45,
+                  height: 45,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -276,6 +343,7 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
                   child: Text(
                     titre,
                     maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 16,
