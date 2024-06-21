@@ -79,11 +79,11 @@ class _AddAndUpdateProductEndSreenState
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
       setState(() {
-      id = acteur.idActeur;
-      zoneListe = http.get(
-          Uri.parse('$apiOnlineUrl/ZoneProduction/getAllZonesByActeurs/${id}'));
-      magasinListe = http
-          .get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByActeur/${id}'));
+        id = acteur.idActeur;
+        zoneListe = http.get(Uri.parse(
+            '$apiOnlineUrl/ZoneProduction/getAllZonesByActeurs/${id}'));
+        magasinListe = http.get(
+            Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByActeur/${id}'));
         isExist = true;
       });
     } else {
@@ -567,8 +567,8 @@ class _AddAndUpdateProductEndSreenState
                                       .toList(),
                                   value: magasin.idMagasin,
                                   onChanged: (newValue) {
+                                    magasin.idMagasin = newValue;
                                     setState(() {
-                                      magasin.idMagasin = newValue;
                                       if (newValue != null) {
                                         magasin = magasinListe.firstWhere(
                                           (magasin) =>
@@ -576,7 +576,7 @@ class _AddAndUpdateProductEndSreenState
                                         );
                                         magasinValue = newValue;
                                         print(
-                                            "magasin : ${magasin.nomMagasin}");
+                                            "magasin : ${magasin.nomMagasin} et ${magasinValue}");
                                       }
                                     });
                                   },
@@ -864,7 +864,7 @@ class _AddAndUpdateProductEndSreenState
                                         );
                                         zoneValue = newValue;
                                         print(
-                                            "zone de production : ${zoneProduction}");
+                                            "zone de production : ${zoneProduction} et ${zoneValue}");
                                       }
                                     });
                                   },
@@ -918,15 +918,22 @@ class _AddAndUpdateProductEndSreenState
                             onPressed: () async {
                               // Handle button press action here
                               if (_formKey.currentState!.validate()) {
-                                if (magasinValue == null && zoneValue == null) {
+                                print('Form is valid');
+                                print('magasinValue: $magasinValue');
+                                print('zoneValue: $zoneValue');
+
+                                if (magasinValue != null && zoneValue != null) {
+                                  handleButtonPress();
+                                } else if (magasinValue == null &&
+                                    zoneValue == null) {
                                   _showMessageDialog();
                                 } else if (magasinValue == null) {
                                   _showMagasinDialog();
                                 } else if (zoneValue == null) {
                                   _showZoneDialog();
-                                } else {
-                                  handleButtonPress();
                                 }
+                              } else {
+                                print('Form is not valid');
                               }
                             },
                             style: ElevatedButton.styleFrom(
