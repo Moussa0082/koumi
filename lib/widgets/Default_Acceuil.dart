@@ -10,6 +10,7 @@ import 'package:koumi_app/screens/ComplementAlimentaire.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/EngraisAndApport.dart';
 import 'package:koumi_app/screens/FruitsAndLegumes.dart';
+import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart' as l;
 import 'package:koumi_app/screens/MesCommande.dart';
 import 'package:koumi_app/screens/Products.dart';
@@ -169,7 +170,7 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
     super.initState();
     getLocation();
     verify();
-    _currentContext = context;
+    // _currentContext = context;
     // _liste = getCat();
   }
 
@@ -191,21 +192,47 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
   List<Widget> _buildCards() {
     List<Widget> cards = [
       _buildAccueilCard("Magasins", "shop.png", 6),
-      _buildAccueilCard("Semences et plants", "semence.png", 13),
-      _buildAccueilCard("Produits phytosanitaires", "physo.png", 12),
-      _buildAccueilCard("Engrais et apports", "engrais.png", 11),
-      _buildAccueilCard("Fruits et légumes", "fruit&legume.png", 10),
       _buildAccueilCard("Produits agricoles", "pro.png", 9),
-      _buildAccueilCard("Compléments alimentaires", "compl.png", 5),
-      _buildAccueilCard("Produits d'élévages", "elevage.png", 7),
-      _buildAccueilCard("Materiels de Locations", "loc.png", 4),
       _buildAccueilCard("Moyens de Transports", "transp.png", 3),
-      _buildAccueilCard("Produits transformés", "transforme.png", 8),
+      _buildAccueilCard("Materiels de Locations", "loc.png", 4),
       _buildAccueilCard("Météo", "met.png", 2),
       _buildAccueilCard("Conseils", "cons.png", 1)
     ];
 
-    if (isExist) {
+    if (!isExist) {
+      cards.insert(
+        2,
+        _buildAccueilCard("Semences et plants", "semence.png", 13),
+      );
+      cards.insert(
+        3,
+        _buildAccueilCard("Produits phytosanitaires", "physo.png", 12),
+      );
+      cards.insert(
+        4,
+        _buildAccueilCard("Engrais et apports", "engrais.png", 11),
+      );
+      cards.insert(
+        5,
+        _buildAccueilCard("Fruits et légumes", "fruit&legume.png", 10),
+      );
+      cards.insert(
+        8,
+        _buildAccueilCard("Compléments alimentaires", "compl.png", 5),
+      );
+      cards.insert(
+        9,
+        _buildAccueilCard("Produits d'élévages", "elevage.png", 7),
+      );
+      cards.insert(
+        12,
+        _buildAccueilCard("Produits transformés", "transforme.png", 8),
+      );
+    } else if (isExist) {
+      cards.insert(
+        2,
+        _buildAccueilCard("Intrants agricoles", "int.png", 15),
+      );
       cards.insert(
         0,
         _buildAccueilCard("Commandes", "cm.png", 14),
@@ -241,7 +268,13 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
       padding: const EdgeInsets.all(5),
       child: InkWell(
         onTap: () {
-          if (index == 14) {
+          if (index == 15) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        IntrantScreen(detectedCountry: detectedCountry!)));
+          } else if (index == 14) {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const MesCommande()));
           } else if (index == 13) {
