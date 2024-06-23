@@ -31,8 +31,9 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
   List<Intrant> intrantList = [];
   // CategorieProduit? selectedType;
   ScrollController scrollableController1 = ScrollController();
-  
+
   String libelle = "Produits phytosanitaires";
+  // String libelle = "Semences et plants";
   // String? monnaie;
   // List<String> libelles = [
   //   "Produits phytosanitaires",
@@ -41,7 +42,29 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
   //   "Produit phytosanitaire"
   // ];
 
-  Future<List<Intrant>> fetchIntrantByCategorie(String pays,
+  void _scrollListener() {
+    debugPrint("Scroll position: ${scrollableController.position.pixels}");
+    if (scrollableController.position.pixels >=
+            scrollableController.position.maxScrollExtent - 200 &&
+        hasMore &&
+        !isLoading) {
+      setState(() {
+        page++;
+      });
+
+      fetchIntrantByCategorie(
+              // widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
+              )
+          .then((value) {
+        setState(() {
+          debugPrint("page inc all $page");
+        });
+      });
+    }
+    debugPrint("no");
+  }
+
+  Future<List<Intrant>> fetchIntrantByCategorie(
       {bool refresh = false}) async {
     if (isLoading == true) return [];
 
@@ -58,12 +81,13 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
     }
 
     try {
-      // for (String libelle in libelles) {
       final response = await http.get(Uri.parse(
-          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size'));
+          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
       debugPrint(
-          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
-      if (response.statusCode == 200) {
+          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&page=$page&size=$size');
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 202) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 
@@ -72,19 +96,15 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
             hasMore = false;
           });
         } else {
-          List<Intrant> newIntrants =
-              body.map((e) => Intrant.fromMap(e)).toList();
-
           setState(() {
-            // Ajouter uniquement les nouveaux intrants qui ne sont pas déjà dans la liste
-            intrantListe.addAll(newIntrants.where((newIntrant) =>
-                !intrantListe.any((existingIntrant) =>
-                    existingIntrant.idIntrant == newIntrant.idIntrant)));
+            List<Intrant> newIntrants =
+                body.map((e) => Intrant.fromMap(e)).toList();
+            intrantListe.addAll(newIntrants);
           });
         }
 
         debugPrint(
-            "response body all intrants by categorie with pagination ${page} par défilement soit ${intrantListe.length}");
+            "response body all intrants by categorie with pagination ${page} par défilement soit ${intrantListe.length} et code ${response.statusCode}");
       } else {
         print(
             'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
@@ -100,82 +120,6 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
     return intrantListe;
   }
 
-  void _scrollListener() {
-    if (scrollableController1.position.pixels >=
-            scrollableController1.position.maxScrollExtent - 200 &&
-        hasMore &&
-        !isLoading) {
-      // if (selectedCat != null) {
-      // Incrementez la page et récupérez les stocks par catégorie
-      debugPrint("yes - fetch by category");
-      setState(() {
-        // Rafraîchir les données ici
-        page++;
-      });
-
-      fetchIntrantByCategorie(
-              widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
-        setState(() {
-          // Rafraîchir les données ici
-          debugPrint("page inc all ${page}");
-        });
-      });
-    }
-    debugPrint("no");
-  }
-
-  // Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
-  //   if (isLoading == true) return [];
-
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-
-  //   if (refresh) {
-  //     setState(() {
-  //       intrantListe.clear();
-  //       page = 0;
-  //       hasMore = true;
-  //     });
-  //   }
-
-  //   try {
-  //     final response = await http.get(Uri.parse(
-  //         '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
-
-  //     if (response.statusCode == 200) {
-  //       final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
-  //       final List<dynamic> body = jsonData['content'];
-
-  //       if (body.isEmpty) {
-  //         setState(() {
-  //           hasMore = false;
-  //         });
-  //       } else {
-  //         setState(() {
-  //           List<Intrant> newIntrants =
-  //               body.map((e) => Intrant.fromMap(e)).toList();
-  //           intrantListe.addAll(newIntrants);
-  //         });
-  //       }
-
-  //       debugPrint(
-  //           "response body all intrants by categorie with pagination ${page} par défilement soit ${intrantListe.length}");
-  //     } else {
-  //       print(
-  //           'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
-  //     }
-  //   } catch (e) {
-  //     print(
-  //         'Une erreur s\'est produite lors de la récupération des intrants: $e');
-  //   } finally {
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //   }
-  //   return intrantListe;
-  // }
-
   @override
   void initState() {
     super.initState();
@@ -183,15 +127,14 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController.addListener(_scrollListener);
     });
-
     intrantListeFuture = fetchIntrantByCategorie(
-        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+        // widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
+        );
   }
 
   @override
   void dispose() {
-    _searchController
-        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    _searchController.dispose();
     scrollableController.dispose();
     super.dispose();
   }
@@ -209,7 +152,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
               },
               icon: const Icon(Icons.arrow_back_ios)),
           title: const Text(
-            "Produits phyto-Sanitaires",
+            "Produits phytosanitaires",
             style: TextStyle(
               color: d_colorGreen,
               fontSize: 22,
@@ -274,9 +217,10 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                       debugPrint("refresh page ${page}");
                       setState(() {
                         intrantListeFuture = fetchIntrantByCategorie(
-                            widget.detectedCountry != null
-                                ? widget.detectedCountry!
-                                : "Mali");
+                            // widget.detectedCountry != null
+                            //     ? widget.detectedCountry!
+                            //     : "Mali"
+                                );
                       });
                     },
                     child: SingleChildScrollView(
@@ -298,7 +242,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                                       Center(child: Text("Aucun donné trouvé")),
                                 );
                               } else {
-                                intrantListe = snapshot.data!;
+                                intrantList = snapshot.data!;
                                 String searchText = "";
                                 List<Intrant> filteredSearch =
                                     intrantList.where((cate) {
@@ -376,7 +320,8 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                                                               8.0),
                                                       child: SizedBox(
                                                         height: 85,
-                                                        child: filteredSearch[index]
+                                                        child: filteredSearch[
+                                                                            index]
                                                                         .photoIntrant ==
                                                                     null ||
                                                                 filteredSearch[

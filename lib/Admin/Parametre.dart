@@ -128,22 +128,22 @@ class _ParametreState extends State<Parametre> {
     }
   }
 
-  void verifyParam() {
-    paramList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+  // void verifyParam() {
+  //   // paramList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+  //   //     .parametreList!;
 
-    if (paramList.isNotEmpty) {
-      params = paramList[0];
-    } else {
-      // Gérer le cas où la liste est null ou vide, par exemple :
-      // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
-    }
-  }
+  //   // if (paramList.isNotEmpty) {
+  //   //   params = paramList[0];
+  //   // } else {
+  //   //   // Gérer le cas où la liste est null ou vide, par exemple :
+  //   //   // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
+  //   // }
+  // }
 
   @override
   void initState() {
     super.initState();
-    verifyParam();
+    // verifyParam();
     fetchPaysDataByActor();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
   }

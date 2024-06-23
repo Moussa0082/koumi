@@ -9,11 +9,9 @@ import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Forme.dart';
 import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/Monnaie.dart';
-import 'package:koumi_app/models/Speculation.dart';
 import 'package:path/path.dart';
 
 class IntrantService extends ChangeNotifier {
-  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/intrant';
   static const String baseUrl = '$apiOnlineUrl/intrant';
 
   List<Intrant> intrantList = [];
@@ -32,6 +30,7 @@ class IntrantService extends ChangeNotifier {
       required Acteur acteur,
       required Forme forme,
       required String unite,
+    
       required CategorieProduit categorieProduit,
       required Monnaie monnaie,
       }) async {
@@ -52,6 +51,7 @@ class IntrantService extends ChangeNotifier {
         'categorieProduit': categorieProduit.toMap(),
         'descriptionIntrant': descriptionIntrant,
         'unite' : unite,
+  
         'photoIntrant': "",
         'acteur': acteur.toMap(),
         'forme' : forme.toMap(),

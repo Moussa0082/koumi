@@ -151,8 +151,8 @@ String? libelleNiveau3Pays;
   void initState() {
     super.initState();
     _searchController = TextEditingController();
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
+    // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+    //     .parametreList!;
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // para = paraList[0];
     //         acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;

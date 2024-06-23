@@ -96,6 +96,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                     ),
                   ),
                   onTap: () async {
+                    Navigator.of(context).pop();
                     _showDialog();
                   },
                 ),
@@ -114,6 +115,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                     ),
                   ),
                   onTap: () async {
+                    Navigator.of(context).pop();
                     _addCategorie();
                   },
                 ),
@@ -311,6 +313,9 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                               ),
                                                             ),
                                                             onTap: () async {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
                                                               e.statutFiliere ==
                                                                       false
                                                                   ? await FiliereService()
@@ -409,6 +414,9 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                               ),
                                                             ),
                                                             onTap: () async {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
                                                               // Ouvrir la boîte de dialogue de modification
                                                               var updatedSousRegion =
                                                                   await showDialog(

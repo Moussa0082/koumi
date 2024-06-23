@@ -39,15 +39,12 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
   // String? monnaie;
 
   void _scrollListener() {
-    if (scrollableController1.position.pixels >=
-            scrollableController1.position.maxScrollExtent - 200 &&
+    debugPrint("Scroll position: ${scrollableController.position.pixels}");
+    if (scrollableController.position.pixels >=
+            scrollableController.position.maxScrollExtent - 200 &&
         hasMore &&
         !isLoading) {
-      // if (selectedCat != null) {
-      // Incrementez la page et récupérez les stocks par catégorie
-      debugPrint("yes - fetch by category");
       setState(() {
-        // Rafraîchir les données ici
         page++;
       });
 
@@ -55,8 +52,7 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
               widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
           .then((value) {
         setState(() {
-          // Rafraîchir les données ici
-          debugPrint("page inc all ${page}");
+          debugPrint("page inc all $page");
         });
       });
     }
@@ -173,7 +169,7 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
   //   return intrantListe;
   // }
 
-  @override
+   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController();
@@ -186,8 +182,7 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
 
   @override
   void dispose() {
-    _searchController
-        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    _searchController.dispose();
     scrollableController.dispose();
     super.dispose();
   }

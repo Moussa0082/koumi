@@ -79,6 +79,7 @@ class _AddCategorieState extends State<AddCategorie> {
           actions: [
             IconButton(
               onPressed: () {
+                // Navigator.of(context).pop();
                 _showDialog();
               },
               icon: const Icon(
@@ -153,7 +154,8 @@ class _AddCategorieState extends State<AddCategorie> {
                           String searchText = "";
                           List<CategorieProduit> filteredCatSearch =
                               categorieList.where((cate) {
-                            String nomCat = cate.libelleCategorie!.toLowerCase();
+                            String nomCat =
+                                cate.libelleCategorie!.toLowerCase();
                             searchText = _searchController.text.toLowerCase();
                             return nomCat.contains(searchText);
                           }).toList();
@@ -185,7 +187,8 @@ class _AddCategorieState extends State<AddCategorie> {
                                             children: [
                                               ListTile(
                                                   leading: _getIconForFiliere(e
-                                                      .filiere!.libelleFiliere!),
+                                                      .filiere!
+                                                      .libelleFiliere!),
                                                   title: Text(
                                                       e.libelleCategorie!
                                                           .toUpperCase(),
@@ -253,20 +256,19 @@ class _AddCategorieState extends State<AddCategorie> {
                                                               String>>[
                                                         PopupMenuItem<String>(
                                                           child: ListTile(
-                                                            leading:  e.statutCategorie ==
-                                                                      false
-                                                                  ? Icon(
-                                                                      Icons
-                                                                          .check,
-                                                                      color: Colors
-                                                                          .green,
-                                                                    )
-                                                                  : Icon(
-                                                                      Icons
-                                                                          .disabled_visible,
-                                                                      color: Colors
-                                                                              .orange[
-                                                                          400]),
+                                                            leading: e.statutCategorie ==
+                                                                    false
+                                                                ? Icon(
+                                                                    Icons.check,
+                                                                    color: Colors
+                                                                        .green,
+                                                                  )
+                                                                : Icon(
+                                                                    Icons
+                                                                        .disabled_visible,
+                                                                    color: Colors
+                                                                            .orange[
+                                                                        400]),
                                                             title: Text(
                                                               e.statutCategorie ==
                                                                       false
@@ -285,72 +287,72 @@ class _AddCategorieState extends State<AddCategorie> {
                                                               ),
                                                             ),
                                                             onTap: () async {
-                                                               e.statutCategorie ==
-                                                                        false
-                                                                    ?
-                                                              await CategorieService()
-                                                                  .activerCategorie(e
-                                                                      .idCategorieProduit!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<CategorieService>(context, listen: false).applyChange(),
-                                                                            setState(() {
-                                                                              _liste = CategorieService().fetchCategorieByFiliere(filiere.idFiliere!);
-                                                                            }),
-                                                                            Navigator.of(context).pop(),
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Activer avec succèss "),
-                                                                                  ],
+                                                              e.statutCategorie ==
+                                                                      false
+                                                                  ? await CategorieService()
+                                                                      .activerCategorie(e
+                                                                          .idCategorieProduit!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Provider.of<CategorieService>(context, listen: false).applyChange(),
+                                                                                setState(() {
+                                                                                  _liste = CategorieService().fetchCategorieByFiliere(filiere.idFiliere!);
+                                                                                }),
+                                                                                Navigator.of(context).pop(),
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Activer avec succèss "),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 2),
+                                                                                  ),
+                                                                                )
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Une erreur s'est produit"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
                                                                                 ),
-                                                                                duration: Duration(seconds: 2),
-                                                                              ),
-                                                                            )
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Une erreur s'est produit"),
-                                                                                  ],
+                                                                                Navigator.of(context).pop(),
+                                                                              })
+                                                                  : await CategorieService()
+                                                                      .desactiverCategorie(e
+                                                                          .idCategorieProduit!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Provider.of<CategorieService>(context, listen: false).applyChange(),
+                                                                                setState(() {
+                                                                                  _liste = CategorieService().fetchCategorieByFiliere(filiere.idFiliere!);
+                                                                                }),
+                                                                                Navigator.of(context).pop(),
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Une erreur s'est produit"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
                                                                                 ),
-                                                                                duration: Duration(seconds: 5),
-                                                                              ),
-                                                                            ),
-                                                                            Navigator.of(context).pop(),
-                                                                          }) :  await CategorieService()
-                                                                  .desactiverCategorie(e
-                                                                      .idCategorieProduit!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<CategorieService>(context, listen: false).applyChange(),
-                                                                            setState(() {
-                                                                              _liste = CategorieService().fetchCategorieByFiliere(filiere.idFiliere!);
-                                                                            }),
-                                                                            Navigator.of(context).pop(),
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Une erreur s'est produit"),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 5),
-                                                                              ),
-                                                                            ),
-                                                                            Navigator.of(context).pop(),
-                                                                          });
+                                                                                Navigator.of(context).pop(),
+                                                                              });
 
                                                               ScaffoldMessenger
                                                                       .of(context)
@@ -389,6 +391,9 @@ class _AddCategorieState extends State<AddCategorie> {
                                                               ),
                                                             ),
                                                             onTap: () async {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
                                                               // Ouvrir la boîte de dialogue de modification
                                                               var updatedSousRegion =
                                                                   await showDialog(
@@ -594,17 +599,19 @@ class _AddCategorieState extends State<AddCategorie> {
                                                     context,
                                                     listen: false)
                                                 .applyChange(),
-                                                Navigator.of(context).pop(),
-                                                   ScaffoldMessenger.of(context).showSnackBar(
-                                 SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text("Categorie ajouté avec success"),
-                                    ],
-                                  ),
-                                  duration: Duration(seconds: 5),
-                                ),
-                              ),
+                                            Navigator.of(context).pop(),
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Row(
+                                                  children: [
+                                                    Text(
+                                                        "Categorie ajouté avec success"),
+                                                  ],
+                                                ),
+                                                duration: Duration(seconds: 5),
+                                              ),
+                                            ),
                                             setState(() {
                                               _liste = CategorieService()
                                                   .fetchCategorieByFiliere(
@@ -612,7 +619,6 @@ class _AddCategorieState extends State<AddCategorie> {
                                             }),
                                             libelleController.clear(),
                                             descriptionController.clear(),
-                                            
                                           });
                                 } catch (e) {
                                   final String errorMessage = e.toString();

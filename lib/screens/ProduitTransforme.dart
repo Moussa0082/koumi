@@ -55,7 +55,8 @@ class _ProduitTransformeState extends State<ProduitTransforme> {
       });
 
       fetchStock(
-              widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
+              // widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
+              ).then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -64,7 +65,7 @@ class _ProduitTransformeState extends State<ProduitTransforme> {
     }
     debugPrint("no");
   }
-   Future<List<Stock>> fetchStock(String pays,
+   Future<List<Stock>> fetchStock(
       {bool refresh = false}) async {
     if (isLoading == true) return [];
 
@@ -84,8 +85,11 @@ class _ProduitTransformeState extends State<ProduitTransforme> {
       // List<Stock> tempStockListe = [];
       // for (String libelle in libelles) {
         final response = await http.get(Uri.parse(
-            '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size'));
+            '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
 
+debugPrint(
+          '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&page=$page&size=$size');
+          // '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
         if (response.statusCode == 200 || response.statusCode == 201) {
           final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
           final List<dynamic> body = jsonData['content'];
@@ -180,7 +184,8 @@ class _ProduitTransformeState extends State<ProduitTransforme> {
       scrollableController.addListener(_scrollListener);
     });
     stockListeFuture = fetchStock(
-        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+        // widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
+        );
   }
 
   @override
@@ -269,9 +274,10 @@ class _ProduitTransformeState extends State<ProduitTransforme> {
                       debugPrint("refresh page ${page}");
                       setState(() {
                         stockListeFuture = fetchStock(
-                            widget.detectedCountry != null
-                                ? widget.detectedCountry!
-                                : "Mali");
+                            // widget.detectedCountry != null
+                            //     ? widget.detectedCountry!
+                            //     : "Mali"
+                                );
                       });
                       debugPrint("refresh page ${page}");
                     },

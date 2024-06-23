@@ -4,25 +4,19 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Filiere.dart';
-import 'package:koumi_app/models/Monnaie.dart';
-import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/NextAddIntrat.dart';
 import 'package:koumi_app/service/CategorieService.dart';
-import 'package:koumi_app/service/FiliereService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class AddIntrant extends StatefulWidget {
-  const AddIntrant({super.key});
+  String? detectedCountry;
+  AddIntrant({super.key, this.detectedCountry});
 
   @override
   State<AddIntrant> createState() => _AddIntrantState();
@@ -49,87 +43,11 @@ class _AddIntrantState extends State<AddIntrant> {
   late Filiere filiere = Filiere();
   String? catValue;
   late Future _categorieList;
-  
+
   // late ParametreGeneraux para = ParametreGeneraux();
   // List<ParametreGeneraux> paraList = [];
   late CategorieProduit categorieProduit = CategorieProduit();
   late Future<List<CategorieProduit>> _liste;
-
-  Future<File> saveImagePermanently(String imagePath) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final name = path.basename(imagePath);
-    final image = File('${directory.path}/$name');
-    return image;
-  }
-
-  Future<void> _pickImage(ImageSource source) async {
-    final image = await getImage(source);
-    if (image != null) {
-      setState(() {
-        photo = image;
-        imageSrc = image.path;
-      });
-    }
-  }
-
-  Future<File?> getImage(ImageSource source) async {
-    final image = await ImagePicker().pickImage(source: source);
-    if (image == null) return null;
-
-    return File(image.path);
-  }
-
-  Future<void> _showImageSourceDialog() async {
-    final BuildContext context = this.context;
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return SizedBox(
-          height: 150,
-          child: AlertDialog(
-            title: const Text('Choisir une source'),
-            content: Wrap(
-              alignment: WrapAlignment.center,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context); // Fermer le dialogue
-                    _pickImage(ImageSource.camera);
-                  },
-                  child: const Column(
-                    children: [
-                      Icon(Icons.camera_alt, size: 40),
-                      Text('Camera'),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 40),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context); // Fermer le dialogue
-                    _pickImage(ImageSource.gallery);
-                  },
-                  child: const Column(
-                    children: [
-                      Icon(Icons.image, size: 40),
-                      Text('Galerie photo'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _handleButtonPress() async {
-    // Afficher l'indicateur de chargement
-    setState(() {
-      _isLoading = true;
-    });
-  }
 
   // void verifyParam() {
   //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
@@ -152,36 +70,6 @@ class _AddIntrantState extends State<AddIntrant> {
     _categorieList = http.get(Uri.parse(
         '$apiOnlineUrl/Categorie/allCategorieByFiliere/${filiere.idFiliere}'));
   }
-
-  // Future<List<Filiere>> fetchFiliereList() async {
-  //   final response = await FiliereService().fetchFiliere();
-  //   return response;
-  // }
-
-  // Future<List<CategorieProduit>> fetchCategorieList() async {
-  //   final response = await CategorieService().fetchCategorie();
-  //   return response;
-  // }
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-//     _fetchData();
-//   }
-
-// //  late List<dynamic> _categorieList;
-// //   late List<dynamic> _filiereList;
-
-//   Future<void> _fetchData() async {
-
-//     setState(() {
-
-//       _filiereList =  http.get(Uri.parse(
-//         'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculationByCategorie/${categorieProduit.idCategorieProduit}'));
-
-//     });
-//   }
 
   @override
   Widget build(BuildContext context) {
@@ -639,6 +527,7 @@ class _AddIntrantState extends State<AddIntrant> {
                                           quantite: quantite,
                                           categorieProduit: categorieProduit,
                                           unite: unit,
+                                         
                                         ))).then((value) => {
                                   _nomController.clear(),
                                   _descriptionController.clear(),

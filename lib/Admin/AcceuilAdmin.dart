@@ -184,15 +184,15 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
 
   @override
   Widget build(BuildContext context) {
-    final parametreProvider =
-        Provider.of<ParametreGenerauxProvider>(context, listen: false);
+    // final parametreProvider =
+    //     Provider.of<ParametreGenerauxProvider>(context, listen: false);
 
-    ParametreGenerauxService().fetchParametre().then((parametreList) {
-      parametreProvider.setParametreList(parametreList);
-    }).catchError((error) {
-      // Gestion des erreurs
-      print('Erreur lors du chargement des données : $error');
-    });
+    // ParametreGenerauxService().fetchParametre().then((parametreList) {
+    //   parametreProvider.setParametreList(parametreList);
+    // }).catchError((error) {
+    //   // Gestion des erreurs
+    //   print('Erreur lors du chargement des données : $error');
+    // });
 
     return Scaffold(
       backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
@@ -230,7 +230,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
       ),
     );
   }
-
+ 
   List<Widget> _buildCards() {
     List<Widget> cards = [
       _buildAccueilCard("Conseils", "cons.png", 2),

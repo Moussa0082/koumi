@@ -228,7 +228,7 @@ class _AlertAcceuilState extends State<AlertAcceuil> {
                                       fit: BoxFit.cover,
                                     ),
                               title: Text(
-                                  alerte != null
+                                  alerte.titreAlerte != null 
                                       ? alerte.titreAlerte!
                                       : "Aucun alerte",
                                   maxLines: 1,
@@ -238,7 +238,9 @@ class _AlertAcceuilState extends State<AlertAcceuil> {
                                     fontSize: 18,
                                     overflow: TextOverflow.ellipsis,
                                   )),
-                              subtitle: Text(alerte.descriptionAlerte!,
+                              subtitle: Text(
+                                 alerte.descriptionAlerte != null ?
+                                alerte.descriptionAlerte! : '',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(

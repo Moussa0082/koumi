@@ -68,9 +68,9 @@ class _UpdateNiveau3State extends State<UpdateNiveau3> {
   @override
   void initState() {
     super.initState();
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
-    para = paraList[0];
+    // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+    //     .parametreList!;
+    // para = paraList[0];
      fetchPaysDataByActor();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     _niveauList =

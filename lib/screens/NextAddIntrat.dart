@@ -603,6 +603,8 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                           final CategorieProduit categorieProduit =
                               widget.categorieProduit;
                           final String unite = widget.unite;
+                          
+
                           final int prix =
                               int.tryParse(_prixController.text) ?? 0;
                           final String date = _dateController.text;
@@ -623,6 +625,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                         dateExpiration: date,
                                         forme: forme,
                                         unite: unite,
+                                       
                                         categorieProduit: categorieProduit,
                                         acteur: acteur,
                                         monnaie: monnaie

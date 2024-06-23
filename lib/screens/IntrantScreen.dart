@@ -54,34 +54,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
   late Future<List<Intrant>> intrantListeFuture1;
 
   bool isLoadingLibelle = true;
-  // String? monnaie;
-
-//   Future<String> getMonnaieByActor(String id) async {
-//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
-
-//     if (response.statusCode == 200) {
-//       print("libelle : ${response.body}");
-//       return response.body;  // Return the body directly since it's a plain string
-//     } else {
-//       throw Exception('Failed to load monnaie');
-//     }
-// }
-
-//  Future<void> fetchPaysDataByActor() async {
-//     try {
-//       String monnaies = await getMonnaieByActor(acteur.idActeur!);
-
-//       setState(() {
-//         monnaie = monnaies;
-//         isLoadingLibelle = false;
-//       });
-//     } catch (e) {
-//       setState(() {
-//         isLoadingLibelle = false;
-//         });
-//       print('Error: $e');
-//     }
-//   }
+ 
 
   void _scrollListener() {
     if (scrollableController.position.pixels >=
@@ -311,7 +284,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final countryProvider = Provider.of<CountryProvider>(context , listen: false);
+    // final countryProvider = Provider.of<CountryProvider>(context , listen: false);
     return Scaffold(
         appBar: AppBar(
             backgroundColor: const Color.fromARGB(255, 255, 255, 255),
@@ -333,11 +306,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
             actions: !isExist
                 ? null
                 :
-                // (type.toLowerCase() == 'admin' ||
-                //             type.toLowerCase() == 'fournisseur' ||
-                //             type.toLowerCase() == 'fournisseurs') ||
-                //         type.toLowerCase() == 'commerçant' ||
-                //         type.toLowerCase() == 'commercant'
+            
                 (typeActeurData
                             .map((e) => e.libelle!.toLowerCase())
                             .contains("fournisseur") ||
@@ -412,131 +381,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                   return <Widget>[
                     SliverToBoxAdapter(
                         child: Column(children: [
-                      // const SizedBox(height: 10),
-                     
-                      // Padding(
-                      //   padding: const EdgeInsets.symmetric(
-                      //       vertical: 10, horizontal: 20),
-                      //   child: FutureBuilder(
-                      //     future: _typeList,
-                      //     builder: (_, snapshot) {
-                      //       if (snapshot.connectionState ==
-                      //           ConnectionState.waiting) {
-                      //         return DropdownButtonFormField(
-                      //           items: [],
-                      //           onChanged: null,
-                      //           decoration: InputDecoration(
-                      //             labelText: 'Chargement...',
-                      //             contentPadding: const EdgeInsets.symmetric(
-                      //                 vertical: 10, horizontal: 20),
-                      //             border: OutlineInputBorder(
-                      //               borderRadius: BorderRadius.circular(8),
-                      //             ),
-                      //           ),
-                      //         );
-                      //       }
-
-                      //       if (snapshot.hasData) {
-                      //         dynamic jsonString =
-                      //             utf8.decode(snapshot.data.bodyBytes);
-                      //         dynamic responseData = json.decode(jsonString);
-
-                      //         // dynamic responseData = json.decode(snapshot.data.body);
-                      //         if (responseData is List) {
-                      //           final reponse = responseData;
-                      //           final typeList = reponse
-                      //               .map((e) => CategorieProduit.fromMap(e))
-                      //               .where((con) => con.statutCategorie == true)
-                      //               .toList();
-
-                      //           if (typeList.isEmpty) {
-                      //             return DropdownButtonFormField(
-                      //               items: [],
-                      //               onChanged: null,
-                      //               decoration: InputDecoration(
-                      //                 labelText: '-- Aucun categorie trouvé --',
-                      //                 contentPadding:
-                      //                     const EdgeInsets.symmetric(
-                      //                         vertical: 10, horizontal: 20),
-                      //                 border: OutlineInputBorder(
-                      //                   borderRadius: BorderRadius.circular(8),
-                      //                 ),
-                      //               ),
-                      //             );
-                      //           }
-
-                      //           return DropdownButtonFormField<String>(
-                      //             isExpanded: true,
-                      //             items: typeList
-                      //                 .map(
-                      //                   (e) => DropdownMenuItem(
-                      //                     value: e.idCategorieProduit,
-                      //                     child: Text(e.libelleCategorie!),
-                      //                   ),
-                      //                 )
-                      //                 .toList(),
-                      //             hint: Text("-- Filtre par categorie --"),
-                      //             value: catValue,
-                      //             onChanged: (newValue) {
-                      //               setState(() {
-                      //                 catValue = newValue;
-                      //                 if (newValue != null) {
-                      //                   selectedType = typeList.firstWhere(
-                      //                     (element) =>
-                      //                         element.idCategorieProduit ==
-                      //                         newValue,
-                      //                   );
-                      //                 }
-
-                      //                 page = 0;
-                      //                 hasMore = true;
-                      //                 fetchIntrantByCategorie(refresh: true);
-                      //                 if (page == 0 && isLoading == true) {
-                      //                   SchedulerBinding.instance
-                      //                       .addPostFrameCallback((_) {
-                      //                     scrollableController1.jumpTo(0.0);
-                      //                   });
-                      //                 }
-                      //               });
-                      //             },
-                      //             decoration: InputDecoration(
-                      //               contentPadding: const EdgeInsets.symmetric(
-                      //                   vertical: 10, horizontal: 20),
-                      //               border: OutlineInputBorder(
-                      //                 borderRadius: BorderRadius.circular(8),
-                      //               ),
-                      //             ),
-                      //           );
-                      //         } else {
-                      //           return DropdownButtonFormField(
-                      //             items: [],
-                      //             onChanged: null,
-                      //             decoration: InputDecoration(
-                      //               labelText: '-- Aucun categorie trouvé --',
-                      //               contentPadding: const EdgeInsets.symmetric(
-                      //                   vertical: 10, horizontal: 20),
-                      //               border: OutlineInputBorder(
-                      //                 borderRadius: BorderRadius.circular(8),
-                      //               ),
-                      //             ),
-                      //           );
-                      //         }
-                      //       }
-                      //       return DropdownButtonFormField(
-                      //         items: [],
-                      //         onChanged: null,
-                      //         decoration: InputDecoration(
-                      //           labelText: '-- Aucun categorie trouvé --',
-                      //           contentPadding: const EdgeInsets.symmetric(
-                      //               vertical: 10, horizontal: 20),
-                      //           border: OutlineInputBorder(
-                      //             borderRadius: BorderRadius.circular(8),
-                      //           ),
-                      //         ),
-                      //       );
-                      //     },
-                      //   ),
-                      // ),
+                    
                       Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: ToggleButtons(
