@@ -32,7 +32,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
   // CategorieProduit? selectedType;
   ScrollController scrollableController1 = ScrollController();
 
-  String libelle = "Produits phytosanitaires";
+  String libelle = "Produits phytosanitaire";
   // String libelle = "Semences et plants";
   // String? monnaie;
   // List<String> libelles = [

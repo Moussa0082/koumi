@@ -21,7 +21,7 @@ import 'package:shimmer/shimmer.dart';
 
 class Location extends StatefulWidget {
   String? detectedCountry;
-   Location({super.key, this.detectedCountry});
+  Location({super.key, this.detectedCountry});
 
   @override
   State<Location> createState() => _LocationState();
@@ -98,10 +98,11 @@ class _LocationState extends State<Location> {
       setState(() {
         // Rafraîchir les données ici
         page++;
-        });
+      });
       debugPrint("yes - fetch all materiel by pays");
-      fetchMateriel(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
-
+      fetchMateriel(
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+          .then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -121,12 +122,13 @@ class _LocationState extends State<Location> {
       // Incrementez la page et récupérez les stocks par catégorie
       debugPrint("yes - fetch by type and pays");
       setState(() {
-          // Rafraîchir les données ici
-      page++;
-        });
-   
-    fetchMaterielByType(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
+        // Rafraîchir les données ici
+        page++;
+      });
 
+      fetchMaterielByType(
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+          .then((value) {
         setState(() {
           // Rafraîchir les données ici
         });
@@ -135,20 +137,15 @@ class _LocationState extends State<Location> {
     debugPrint("no");
   }
 
-
-
-
-
- Future<List<Materiel>> fetchMateriel(String niveau3PaysActeur,{bool refresh = false}) async {
-
+  Future<List<Materiel>> fetchMateriel(String niveau3PaysActeur,
+      {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
       isLoading = true;
     });
 
-    if (mounted) 
-    if (refresh) {
+    if (mounted) if (refresh) {
       setState(() {
         materielListe.clear();
         page = 0;
@@ -157,8 +154,8 @@ class _LocationState extends State<Location> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Materiel/getMaterielsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}'));
-
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/Materiel/getMaterielsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -195,10 +192,8 @@ class _LocationState extends State<Location> {
     return materielListe;
   }
 
-
-
-  Future<List<Materiel>> fetchMaterielByType(String niveau3PaysActeur, {bool refresh = false}) async {
-
+  Future<List<Materiel>> fetchMaterielByType(String niveau3PaysActeur,
+      {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -214,7 +209,8 @@ class _LocationState extends State<Location> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Materiel/getMaterielsByPaysAndTypeMaterielWithPagination?idTypeMateriel=${selectedType!.idTypeMateriel}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/Materiel/getMaterielsByPaysAndTypeMaterielWithPagination?idTypeMateriel=${selectedType!.idTypeMateriel}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -266,29 +262,39 @@ class _LocationState extends State<Location> {
       });
     }
   }
-   
-    Future<List<Materiel>> getAllMateriel() async {
-     if (selectedType != null) {
-      materielListe = await 
-          MaterielService().fetchMaterielByTypeAndPaysWithPagination(selectedType!.idTypeMateriel!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
-    }else{
-     materielListe = await MaterielService().fetchMateriel(widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
 
+  Future<List<Materiel>> getAllMateriel() async {
+    if (selectedType != null) {
+      materielListe = await MaterielService()
+          .fetchMaterielByTypeAndPaysWithPagination(
+              selectedType!.idTypeMateriel!,
+              widget.detectedCountry != null
+                  ? widget.detectedCountry!
+                  : "Mali");
+    } else {
+      materielListe = await MaterielService().fetchMateriel(
+          widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
     }
 
     return materielListe;
   }
 
+  // void refreshList() {
+  //   setState(() {
+  //     materielListeFuture = materielListeFuture1 = getAllMateriel();
+  //   });
+  // }
+
   @override
   void initState() {
     super.initState();
     verify();
-    
+
     // fetchPaysDataByActor();
-        widget.detectedCountry != null ?
-   debugPrint("pays fetch location materiel page ${widget.detectedCountry!} ")
-     : 
-     debugPrint("null pays non fetch location materiel page");
+    widget.detectedCountry != null
+        ? debugPrint(
+            "pays fetch location materiel page ${widget.detectedCountry!} ")
+        : debugPrint("null pays non fetch location materiel page");
     _searchController = TextEditingController();
     _typeList = http.get(Uri.parse('$apiOnlineUrl/TypeMateriel/read'));
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -300,32 +306,28 @@ class _LocationState extends State<Location> {
       scrollableController1.addListener(_scrollListener1);
     });
     materielListeFuture = materielListeFuture1 = getAllMateriel();
+    // refreshList();
   }
 
-
- @override
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Accédez au fournisseur ici
     countryProvider = Provider.of<CountryProvider>(context, listen: false);
   }
 
-
   @override
   void dispose() {
     scrollableController.dispose();
     scrollableController1.dispose();
     _searchController.dispose();
+    // refreshList();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-
-
-
     return Scaffold(
-
         backgroundColor: const Color.fromARGB(255, 250, 250, 250),
         appBar: AppBar(
             centerTitle: true,
@@ -600,8 +602,7 @@ class _LocationState extends State<Location> {
                                   final reponse = responseData;
                                   final typeList = reponse
                                       .map((e) => TypeMateriel.fromMap(e))
-                                      .where(
-                                          (con) => con.statutType == true)
+                                      .where((con) => con.statutType == true)
                                       .toList();
 
                                   if (typeList.isEmpty) {
@@ -634,12 +635,19 @@ class _LocationState extends State<Location> {
                       selectedType == null
                           ? setState(() {
                               materielListeFuture = MaterielService()
-                                  .fetchMateriel(widget.detectedCountry != null ? widget.detectedCountry! : "Mali" ,refresh: true);
+                                  .fetchMateriel(
+                                      widget.detectedCountry != null
+                                          ? widget.detectedCountry!
+                                          : "Mali",
+                                      refresh: true);
                             })
                           : setState(() {
                               materielListeFuture1 = MaterielService()
                                   .fetchMaterielByTypeAndPaysWithPagination(
-                                      selectedType!.idTypeMateriel!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali",
+                                      selectedType!.idTypeMateriel!,
+                                      widget.detectedCountry != null
+                                          ? widget.detectedCountry!
+                                          : "Mali",
                                       refresh: true);
                             });
                     },
@@ -786,7 +794,7 @@ class _LocationState extends State<Location> {
                                                                       )
                                                                     : CachedNetworkImage(
                                                                         imageUrl:
-                                                                            "https://koumi.ml/api-koumi/Materiel/${materielListe[index].idMateriel}/image",
+                                                                            "https://koumi.ml/api-koumi/Materiel/${filteredSearch[index].idMateriel}/image",
                                                                         fit: BoxFit
                                                                             .cover,
                                                                         placeholder:
@@ -1033,7 +1041,7 @@ class _LocationState extends State<Location> {
                                                                           )
                                                                         : CachedNetworkImage(
                                                                             imageUrl:
-                                                                                "https://koumi.ml/api-koumi/Materiel/${materielListe[index].idMateriel}/image",
+                                                                                "https://koumi.ml/api-koumi/Materiel/${filteredSearch[index].idMateriel}/image",
                                                                             fit:
                                                                                 BoxFit.cover,
                                                                             placeholder: (context, url) =>
@@ -1239,8 +1247,7 @@ class _LocationState extends State<Location> {
     );
   }
 
- DropdownButtonFormField<String> buildDropdown(
-      List<TypeMateriel> typeList) {
+  DropdownButtonFormField<String> buildDropdown(List<TypeMateriel> typeList) {
     return DropdownButtonFormField<String>(
       isExpanded: true,
       items: typeList
@@ -1261,7 +1268,9 @@ class _LocationState extends State<Location> {
           }
           page = 0;
           hasMore = true;
-          fetchMaterielByType(widget.detectedCountry != null ? widget.detectedCountry! : "Mali" ,refresh: true);
+          fetchMaterielByType(
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali",
+              refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {
               scrollableController1.jumpTo(0.0);
@@ -1307,5 +1316,5 @@ class _LocationState extends State<Location> {
         ),
       ),
     );
-}
+  }
 }
