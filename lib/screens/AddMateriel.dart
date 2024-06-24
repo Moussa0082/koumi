@@ -16,6 +16,7 @@ import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:pattern_formatter/pattern_formatter.dart';
 
 class AddMateriel extends StatefulWidget {
   const AddMateriel({super.key});
@@ -778,8 +779,8 @@ class _AddMaterielState extends State<AddMateriel> {
                             },
                             controller: _prixController,
                             keyboardType: TextInputType.number,
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly,
+                            inputFormatters: [
+                              ThousandsFormatter(),
                             ],
                             decoration: InputDecoration(
                               hintText: "Prix par heure",
@@ -822,8 +823,11 @@ class _AddMaterielState extends State<AddMateriel> {
                               final String description =
                                   _descriptionController.text;
                               final String etat = _etatController.text;
+                              String formattedMontant =
+                                  _prixController.text.replaceAll(',', '');
                               final int prixParHeures =
-                                  int.tryParse(_prixController.text) ?? 0;
+                                  int.tryParse(formattedMontant) ?? 0;
+                              print("prix formated $prixParHeures");
                               if (formkey.currentState!.validate()) {
                                 try {
                                   setState(() {

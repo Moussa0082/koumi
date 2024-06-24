@@ -197,7 +197,7 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
       _buildAccueilCard("Engrais et apports", "engrais.png", 11),
       _buildAccueilCard("Fruits et légumes", "fruit&legume.png", 10),
       _buildAccueilCard("Compléments alimentaires", "compl.png", 5),
-      _buildAccueilCard("Produits d'élevage", "elevage.png", 7),
+      _buildAccueilCard("Produits d'élevageS", "elevage.png", 7),
       _buildAccueilCard("Produits agricoles", "pro.png", 9),
       _buildAccueilCard("Moyens de transport", "transp.png", 3),
       _buildAccueilCard("Matériels de location", "loc.png", 4),

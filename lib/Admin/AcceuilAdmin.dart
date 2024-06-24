@@ -241,9 +241,9 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
       _buildAccueilCard("Produits agricoles", "pro.png", 9),
       _buildAccueilCard("Materiels de Locations", "loc.png", 7),
       _buildAccueilCard("Moyens de Transports", "transp.png", 6),
-      _buildAccueilCard("Filières", "fil.png", 10),
+      _buildAccueilCard("Filières", "fi.jpg", 10),
       _buildAccueilCard("Météo", "met.png", 5),
-      _buildAccueilCard("Catégorie", "ca.png", 11),
+      _buildAccueilCard("Catégories", "c.jpg", 11),
       _buildAccueilCard("Acteurs", "ac.png", 12),
     ];
 

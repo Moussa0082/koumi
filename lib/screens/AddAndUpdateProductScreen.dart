@@ -19,6 +19,8 @@ import 'package:koumi_app/screens/AddAndUpdateProductEndScreen.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:pattern_formatter/pattern_formatter.dart';
+
 
 class AddAndUpdateProductScreen extends StatefulWidget {
   bool? isEditable;
@@ -897,6 +899,13 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                       const SizedBox(height: 20),
                       ElevatedButton(
                           onPressed: () async {
+
+                            String formattedMontant =
+                                _prixController.text.replaceAll(',', '');
+                            final int prix =
+                                int.tryParse(formattedMontant) ?? 0;
+                            print("prix formated $prix");
+
                             if (formkey.currentState!.validate()) {
                               debugPrint(
                                   "forme: ${forme} , formeValue : ${formeValue}, origin : ${niveau3} , value : ${n3Value}");
@@ -909,8 +918,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                             nomProduit: _nomController.text,
                                             forme: forme,
                                             origine: niveau3,
-                                            prix:
-                                                _prixController.text.toString(),
+                                            prix: prix.toString(),
                                             image: photo,
                                             quantite: _quantiteController.text,
                                             stock: widget.stock,
