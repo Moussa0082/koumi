@@ -394,10 +394,14 @@ class _AddMaterielState extends State<AddMateriel> {
                                       setState(() {
                                         n3Value = newValue;
                                         if (newValue != null) {
-                                          niveau3 = niveau3List
-                                              .map((e) => e.nomN3)
-                                              .first;
-                                          print("niveau 3 : ${niveau3}");
+                                          Niveau3Pays selectedNiveau3 =
+                                              niveau3List.firstWhere(
+                                            (element) =>
+                                                element.idNiveau3Pays ==
+                                                newValue,
+                                          );
+                                          niveau3 = selectedNiveau3.nomN3;
+                                          print("niveau 3 : $niveau3");
                                         }
                                       });
                                     },
@@ -687,7 +691,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                         .map(
                                           (e) => DropdownMenuItem(
                                             value: e.idMonnaie,
-                                            child: Text(e.sigle!),
+                                            child: Text(e.libelle!),
                                           ),
                                         )
                                         .toList(),

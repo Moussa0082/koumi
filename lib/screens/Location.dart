@@ -279,11 +279,11 @@ class _LocationState extends State<Location> {
     return materielListe;
   }
 
-  // void refreshList() {
-  //   setState(() {
-  //     materielListeFuture = materielListeFuture1 = getAllMateriel();
-  //   });
-  // }
+  void refreshList() {
+    setState(() {
+      materielListeFuture = materielListeFuture1 = getAllMateriel();
+    });
+  }
 
   @override
   void initState() {
@@ -306,7 +306,7 @@ class _LocationState extends State<Location> {
       scrollableController1.addListener(_scrollListener1);
     });
     materielListeFuture = materielListeFuture1 = getAllMateriel();
-    // refreshList();
+    refreshList();
   }
 
   @override
@@ -359,11 +359,21 @@ class _LocationState extends State<Location> {
                                 ),
                               ),
                               onTap: () async {
+
                                 Navigator.of(context).pop();
-                                Navigator.push(
+                              
+
+                                final result = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => AddMateriel()));
+                                 if (result == true) {
+                                  refreshList(); // Méthode pour rafraîchir la liste après ajout
+                                }
+                                // Navigator.push(
+                                //     context,
+                                //     MaterialPageRoute(
+                                //         builder: (context) => AddMateriel()));
                               },
                             ),
                           ),

@@ -364,7 +364,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                       .map(
                                         (e) => DropdownMenuItem(
                                           value: e.idMonnaie,
-                                          child: Text(e.sigle!),
+                                          child: Text(e.libelle!),
                                         ),
                                       )
                                       .toList(),

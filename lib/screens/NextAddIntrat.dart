@@ -416,7 +416,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                     .map(
                                       (e) => DropdownMenuItem(
                                         value: e.idMonnaie,
-                                        child: Text(e.sigle!),
+                                        child: Text(e.libelle!),
                                       ),
                                     )
                                     .toList(),

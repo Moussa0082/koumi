@@ -462,10 +462,13 @@ class _AddVehiculeState extends State<AddVehicule> {
                                     setState(() {
                                       n3Value = newValue;
                                       if (newValue != null) {
-                                        niveau3 = niveau3List
-                                            .map((e) => e.nomN3)
-                                            .first;
-                                        print("niveau 3 : ${niveau3}");
+                                        Niveau3Pays selectedNiveau3 =
+                                            niveau3List.firstWhere(
+                                          (element) =>
+                                              element.idNiveau3Pays == newValue,
+                                        );
+                                        niveau3 = selectedNiveau3.nomN3;
+                                        print("niveau 3 : $niveau3");
                                       }
                                     });
                                   },

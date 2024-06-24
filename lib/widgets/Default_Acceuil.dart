@@ -373,8 +373,8 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
                 padding: const EdgeInsets.all(10.0),
                 child: Image.asset(
                   "assets/images/$imgLocation",
-                  width: 45,
-                  height: 45,
+                  width: 40,
+                  height: 40,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -387,7 +387,7 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
