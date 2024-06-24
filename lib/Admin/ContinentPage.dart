@@ -234,7 +234,7 @@ class _ContinentPageState extends State<ContinentPage> {
                                                                   .spaceBetween,
                                                           children: [
                                                             Text(
-                                                                "Nombres de sous région :",
+                                                                "Nombre de sous région :",
                                                                 style:
                                                                     TextStyle(
                                                                   color: Colors

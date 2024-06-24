@@ -397,7 +397,7 @@ class _NotificationPageState extends State<NotificationPage> {
                 children: [
                   SpeedDialChild(
                     child: Icon(Icons.message),
-                    label: 'Envoyé message aux acteurs',
+                    label: 'Envoyer un message aux acteurs',
                     labelStyle: TextStyle(
                       color: Colors.black,
                       fontSize: 15,
@@ -409,7 +409,8 @@ class _NotificationPageState extends State<NotificationPage> {
                   ),
                   SpeedDialChild(
                     child: Icon(Icons.email),
-                    label: 'Envoyé email aux acteurs',
+                    label: 'Envoyer un mail
+aux acteurs',
                     labelStyle: TextStyle(
                       color: Colors.black,
                       fontSize: 15,

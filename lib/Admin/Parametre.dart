@@ -357,7 +357,7 @@ class _ParametreState extends State<Parametre> {
                     ),
                     getList(
                         "unite.png",
-                        'Unite de mesure',
+                        'Unité de mesure',
                         const UnitePage(),
                         const Icon(
                           Icons.chevron_right_sharp,

@@ -284,7 +284,7 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                                   .spaceBetween,
                                                           children: [
                                                             Text(
-                                                                "Nombres pays :",
+                                                                "Nombre pays :",
                                                                 style:
                                                                     TextStyle(
                                                                   color: Colors
@@ -322,7 +322,7 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                                   .spaceBetween,
                                                           children: [
                                                             Text(
-                                                                "Nombres pays :",
+                                                                "Nombre pays :",
                                                                 style:
                                                                     TextStyle(
                                                                   color: Colors
@@ -360,7 +360,7 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                               //         MainAxisAlignment
                                               //             .spaceBetween,
                                               //     children: [
-                                              //       Text("Nombres pays :",
+                                              //       Text("Nombre pays :",
                                               //           style: TextStyle(
                                               //             color: Colors.black87,
                                               //             fontSize: 17,

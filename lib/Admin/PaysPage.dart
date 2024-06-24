@@ -257,7 +257,7 @@ class _PaysPageState extends State<PaysPage> {
                                                                   .spaceBetween,
                                                           children: [
                                                             Text(
-                                                                "Nombres ${para.libelleNiveau1Pays} :",
+                                                                "Nombre ${para.libelleNiveau1Pays} :",
                                                                 style:
                                                                     TextStyle(
                                                                   color: Colors
@@ -296,7 +296,7 @@ class _PaysPageState extends State<PaysPage> {
                                                                   .spaceBetween,
                                                           children: [
                                                             Text(
-                                                                "Nombres ${para.libelleNiveau1Pays} :",
+                                                                "Nombre ${para.libelleNiveau1Pays} :",
                                                                 style:
                                                                     TextStyle(
                                                                   color: Colors
