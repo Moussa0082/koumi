@@ -296,7 +296,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                 },
                 icon: const Icon(Icons.arrow_back_ios)),
             title: const Text(
-              "Intrant agricole ",
+              "Intrants agricoles ",
               style: TextStyle(
                 color: d_colorGreen,
                 fontSize: 22,

@@ -75,7 +75,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
             },
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: const Text(
-          "Filière agricole",
+          "Filières agricoles",
           style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
         actions: [
@@ -89,7 +89,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                     color: Colors.green,
                   ),
                   title: const Text(
-                    "Ajouter filières",
+                    "Ajouter filière",
                     style: TextStyle(
                       color: Colors.green,
                       fontWeight: FontWeight.bold,
@@ -851,7 +851,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                     });
                                   },
                                   decoration: InputDecoration(
-                                    labelText: 'Sélectionner un filiere',
+                                    labelText: 'Sélectionner une filière',
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
