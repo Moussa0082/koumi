@@ -1,5 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
+import 'package:koumi_app/models/Commande.dart';
+import 'package:koumi_app/models/Intrant.dart';
+import 'package:koumi_app/models/Stock.dart';
+
 
 class DetailCommande {
 
@@ -10,6 +14,7 @@ class DetailCommande {
     int? quantiteNonLivree;
     String? nomProduit;
     String? dateAjout;
+    bool? isStock;
     Commande? commande;
     Stock? stock;
     Intrant? intrant;
@@ -21,11 +26,11 @@ class DetailCommande {
     this.quantiteNonLivree,
     this.nomProduit,
     this.dateAjout,
+    this.isStock,
     this.commande,
     this.stock,
     this.intrant,
   });
-
 
   DetailCommande copyWith({
     String? idDetailCommande,
@@ -62,6 +67,7 @@ class DetailCommande {
       'quantiteNonLivree': quantiteNonLivree,
       'nomProduit': nomProduit,
       'dateAjout': dateAjout,
+      'isStock': isStock,
       'commande': commande?.toMap(),
       'stock': stock?.toMap(),
       'intrant': intrant?.toMap(),
@@ -77,6 +83,7 @@ class DetailCommande {
       quantiteNonLivree: map['quantiteNonLivree'] != null ? map['quantiteNonLivree'] as int : null,
       nomProduit: map['nomProduit'] != null ? map['nomProduit'] as String : null,
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
+      isStock: map['isStock'] != null ? map['isStock'] as bool : false,
       commande: map['commande'] != null ? Commande.fromMap(map['commande'] as Map<String,dynamic>) : null,
       stock: map['stock'] != null ? Stock.fromMap(map['stock'] as Map<String,dynamic>) : null,
       intrant: map['intrant'] != null ? Intrant.fromMap(map['intrant'] as Map<String,dynamic>) : null,
@@ -89,7 +96,7 @@ class DetailCommande {
 
   @override
   String toString() {
-    return 'DetailCommande(idDetailCommande: $idDetailCommande, codeProduit: $codeProduit, quantiteDemande: $quantiteDemande, quantiteLivree: $quantiteLivree, quantiteNonLivree: $quantiteNonLivree, nomProduit: $nomProduit, dateAjout: $dateAjout, commande: $commande, stock: $stock, intrant: $intrant)';
+    return 'DetailCommande(idDetailCommande: $idDetailCommande, codeProduit: $codeProduit, quantiteDemande: $quantiteDemande, quantiteLivree: $quantiteLivree, quantiteNonLivree: $quantiteNonLivree, nomProduit: $nomProduit, dateAjout: $dateAjout, isStock : $isStock, commande: $commande, stock: $stock, intrant: $intrant)';
   }
 
   @override
@@ -104,6 +111,7 @@ class DetailCommande {
       other.quantiteNonLivree == quantiteNonLivree &&
       other.nomProduit == nomProduit &&
       other.dateAjout == dateAjout &&
+      other.isStock == isStock &&
       other.commande == commande &&
       other.stock == stock &&
       other.intrant == intrant;
@@ -118,8 +126,11 @@ class DetailCommande {
       quantiteNonLivree.hashCode ^
       nomProduit.hashCode ^
       dateAjout.hashCode ^
+      isStock.hashCode ^
       commande.hashCode ^
       stock.hashCode ^
       intrant.hashCode;
   }
+
+  
 }

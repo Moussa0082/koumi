@@ -843,16 +843,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         builder: (context, stockService, child) {
                       return FutureBuilder<List<Stock>>(
                           future: stockListeFuture1,
-                          // fetchStockByCategorie(selectedCat!.idCategorieProduit!) ,
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
                               return _buildShimmerEffect();
-                              // const Center(
-                              //   child: CircularProgressIndicator(
-                              //     color: Colors.orange,
-                              //   ),
-                              // );
+                              
                             }
                             if (snapshot.hasError == true) {
                               return SingleChildScrollView(
@@ -964,17 +959,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                             itemCount: filteredSearch.length + 1,
                                             //  itemCount: stockListe.length + (!isLoading ? 1 : 0),
                                             itemBuilder: (context, index) {
-                                              //   if (index == stockListe.length) {
-                                              // return
-                                              // _buildShimmerEffect()
-                                              // // Center(
-                                              // //   child: CircularProgressIndicator(
-                                              // //     color: Colors.orange,
-                                              // //   ),
-                                              // // )
-                                              // ;
-                                              //     }
-
+                                              
                                               if (index < filteredSearch.length) {
                                                 return GestureDetector(
                                                     onTap: () {

@@ -64,6 +64,7 @@ class _AddAndUpdateProductEndSreenState
   late Future uniteListe;
   String? magasinValue;
   Magasin magasin = Magasin();
+  Monnaie monnaies = Monnaie();
   late Future magasinListe;
   String? zoneValue;
   ZoneProduction zoneProduction = ZoneProduction();
@@ -227,7 +228,8 @@ class _AddAndUpdateProductEndSreenState
 
    
     debugPrint(
-        "nom : ${widget.nomProduit}, bool : ${widget.isEditable} ,image : ${widget.image.toString()} , forme: ${widget.forme}, origine : ${widget.origine}, qte : ${widget.quantite}, prix : ${widget.prix}");
+        "nom : ${widget.nomProduit},   monnaie : ${widget.monnaies},  bool : ${widget.isEditable} ,image : ${widget.image.toString()} , forme: ${widget.forme}, origine : ${widget.origine}, qte : ${widget.quantite}, prix : ${widget.prix}");
+      monnaies = widget.monnaies!;
 
     if (widget.isEditable! == true) {
       _typeController.text = widget.stock!.typeProduit!;
@@ -237,6 +239,7 @@ class _AddAndUpdateProductEndSreenState
       speculation = widget.stock!.speculation!;
       unite = widget.stock!.unite!;
       zoneProduction = widget.stock!.zoneProduction!;
+      
       // debugPrint("spec : ${widget.speculation}, magasin : ${widget.magasin}, zone : ${widget.zoneProduction}   , unite : ${widget.unite}");
       super.initState();
     }

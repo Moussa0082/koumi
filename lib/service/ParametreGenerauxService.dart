@@ -164,9 +164,6 @@ class ParametreGenerauxService extends ChangeNotifier {
   Future<List<ParametreGeneraux>> fetchParametre() async {
     final response = await http.get(Uri.parse('$baseUrl/read'));
 
-//       Future.delayed(const Duration(seconds: 10), () {
-//     // print('Hello, after 10 seconds of delay');
-// });
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
       parametreList =

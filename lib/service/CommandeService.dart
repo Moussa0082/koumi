@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Commande.dart';
 import 'package:koumi_app/models/CommandeAvecStocks.dart';
+import 'package:koumi_app/models/DetailCommande.Dart';
 import 'package:koumi_app/models/Stock.dart';
 
 
@@ -39,6 +40,43 @@ import 'package:koumi_app/models/Stock.dart';
     return commandeList = [];
   }
 }
+  
+    Future<String> confirmerLivraison(String idDetailCommande, double quantiteLivree) async {
+    final url = Uri.parse('$baseUrl/confirmerLivraison/$idDetailCommande/$quantiteLivree');
+
+    try {
+      final response = await http.put(url);
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body)["message"];
+      } else {
+        throw Exception('Erreur lors de la confirmation de la commande: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Erreur lors de la requête: $e');
+    }
+  }
+
+
+
+   Future<String> getDetailCountByCommandeId(String commandeId) async {
+    final url = Uri.parse('$baseUrl/$commandeId/details/count');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        return response.body;
+      } else {
+        throw Exception('Erreur lors de la récupération du nombre de détails: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Erreur lors de la requête: $e');
+    }
+  }
+
+
+
 
   
   Future<List<Commande>> fetchCommandeByActeurProprietaire(String acteurProprietaire) async {
@@ -62,6 +100,22 @@ import 'package:koumi_app/models/Stock.dart';
     }
         return commandeList = [];
         
+  }
+
+
+ 
+  Future<List<DetailCommande>> fetchDetailsByCommandeId(String commandeId) async {
+    final response = await http.get(Uri.parse('$baseUrl/$commandeId/details'));
+
+    if (response.statusCode == 200) {
+     List<dynamic> body = json.decode(response.body);
+      print(' details fetch avec succes');
+      print(' details fetch avec succes body ${response.body}');
+        List<DetailCommande> details = body.map((dynamic item) => DetailCommande.fromJson(item)).toList();
+        return details;
+    } else {
+      throw Exception('Failed to load details');
+    }
   }
 
 

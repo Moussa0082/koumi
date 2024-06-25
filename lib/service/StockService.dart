@@ -74,10 +74,10 @@ class StockService extends ChangeNotifier {
 
       if (response.statusCode == 200 || responsed.statusCode == 201 || responsed.statusCode == 202) {
         final donneesResponse = json.decode(responsed.body);
-              Get.snackbar("Succès", "Produit ajouté avec succès",duration: Duration(seconds: 3));
+              Get.snackbar("Succès", "Produit ajouté avec succès",duration: Duration(seconds: 5));
         debugPrint('stock service ${donneesResponse.toString()}');
       } else {
-           Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer plus tard",duration: Duration(seconds: 3));
+           Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer plus tard",duration: Duration(seconds: 5));
          
         throw Exception(
             'Échec de la requête avec le code d\'état : ${responsed.statusCode}');

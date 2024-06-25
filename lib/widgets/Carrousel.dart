@@ -118,9 +118,9 @@ class _CarrouselState extends State<Carrousel> {
   late Acteur acteur = Acteur();
   String? email = "";
 
-   String? detectedC ;
-  String? detectedCountryCode;
-  String? detectedCountry;
+   String? detectedC = '';
+  String? detectedCountryCode = '';
+  String? detectedCountry = '';
 
     void getLocationNew() async {
     try {
@@ -212,7 +212,7 @@ class _CarrouselState extends State<Carrousel> {
     debugPrint("Address ISO: $detectedC");
     address.value =
         'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
-   if (!mounted) return;
+   if (mounted)
         setState(() {
     detectedC = place.isoCountryCode;
     detectedCountryCode = place.isoCountryCode!;
@@ -221,7 +221,7 @@ class _CarrouselState extends State<Carrousel> {
   
 
     debugPrint(
-        "Address:   ${place.locality},${place.country},${place.isoCountryCode}");
+        "Address:  carousel online ${place.locality},${place.country},${place.isoCountryCode}");
   }
   
 
@@ -245,13 +245,19 @@ class _CarrouselState extends State<Carrousel> {
 
   bool isLoading = true;
 
+   @override
+  void dispose() {
+  streamSubscription.cancel();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
     // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     verify();
     getLocation();
-    fetchAlertes("Mali").then((alerts) {
+    fetchAlertes(detectedCountry!).then((alerts) {
     // fetchAlertes(detectedCountry != null ? detectedCountry! : "Mali").then((alerts) {
         setState(() {
           alertesList = alerts;
@@ -267,7 +273,7 @@ class _CarrouselState extends State<Carrousel> {
     int size = 2;
     try {
       final response = await http.get(Uri.parse(
-          '$baseUrl/getAlertesByPaysSortedByDate?niveau3PaysActeur=$pays&page=$page&size=$size'));
+          '$baseUrl/getAlertesByPaysAndNotWithPagination?niveau3PaysActeur=$pays&page=$page&size=$size'));
 
       if (response.statusCode == 200 ||
           response.statusCode == 201 ||
@@ -281,46 +287,19 @@ class _CarrouselState extends State<Carrousel> {
         } else {
           print('La réponse n\'est pas au format JSON : $contentType');
           print('Contenu de la réponse : ${response.body}');
-          return [];
+          return  alertesList =[];
         }
       } else {
         print(
-            'Échec du chargement des alertes avec le code d\'état : ${response.statusCode}');
+            'Échec du chargement des alertes on line avec le code d\'état : ${response.statusCode}');
         print('Contenu de la réponse : ${response.body}');
-        return [];
+        return alertesList = [];
       }
     } catch (e) {
       print('Erreur lors de la requête : $e');
     }
-    return [];
+    return  alertesList = [];
   }
-//   Future<List<Alertes>> fetchAlertes() async {
-//     const String baseUrl = '$apiOnlineUrl/alertes';
-// int page = 0;
-//   int size = 3;
-//   try {
-//     final response = await http.get(Uri.parse('$baseUrl/getAllAlertesWithPagination?page=$page&size=$size'));
-
-//     if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
-//       String contentType = response.headers['content-type'] ?? '';
-//       if (contentType.contains('application/json')) {
-//         String jsonString = utf8.decode(response.bodyBytes);
-//         Map<String, dynamic> body = jsonDecode(jsonString);
-//         List<dynamic>  alertes = body['content'];
-//         return alertes.map((e) => Alertes.fromMap(e)).toList();
-//       } else {
-//         print('La réponse n\'est pas au format JSON : $contentType');
-//         print('Contenu de la réponse : ${response.body}');
-//       }
-//     } else {
-//       print('Échec du chargement des alertes avec le code d\'état : ${response.statusCode}');
-//       print('Contenu de la réponse : ${response.body}');
-//     }
-//   } catch (e) {
-//     print('Erreur lors de la requête : $e');
-//   }
-//   return [];
-// }
 
   List<Widget> getImageSliders(
       List<Alertes> alertesList, List<Map<String, String>> imageList) {
@@ -329,7 +308,7 @@ class _CarrouselState extends State<Carrousel> {
           .asMap()
           .entries
           .map((entry) => buildImageSlider(
-              entry.value['image_path'] ?? 'assets/images/default_image.png',
+              entry.value['image_path']!,
               '',
               entry.key, []))
           .toList();
@@ -337,8 +316,8 @@ class _CarrouselState extends State<Carrousel> {
       return alertesList
           .asMap()
           .entries
-          .map((entry) => buildImageSlider(
-              "https://koumi.ml/api-koumi/alertes/${entry.value.idAlerte}/image",
+          .map((entry) => buildImageSlider( entry.value.photoAlerte!.isNotEmpty ?
+              "https://koumi.ml/api-koumi/alertes/${entry.value.idAlerte}/image" : "assets/images/default_image.png" ,
               entry.value.titreAlerte ?? '',
               entry.key,
               alertesList))
@@ -348,6 +327,12 @@ class _CarrouselState extends State<Carrousel> {
 
   Widget buildImageSlider(
       String imagePath, String text, int index, List<Alertes> alertesList) {
+
+   // Check if the list is empty or if the index is out of bounds
+  // if (alertesList.isEmpty || index < 0 || index >= alertesList.length) {
+  //   return Carrousels();
+  // }
+
     return GestureDetector(
       onTap: () {
         Get.to(() => DetailAlerte(alertes: alertesList[index]),
@@ -368,7 +353,7 @@ class _CarrouselState extends State<Carrousel> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(
                   20.0), // Bordure arrondie pour les coins des images
-              child: CachedNetworkImage(
+              child: alertesList[index].photoAlerte!.isNotEmpty ? CachedNetworkImage(
                 imageUrl: imagePath,
                 placeholder: (context, url) =>
                     const Center(child: CircularProgressIndicator()),
@@ -378,7 +363,8 @@ class _CarrouselState extends State<Carrousel> {
                 ),
                 fit: BoxFit.cover,
                 width: double.infinity,
-              ),
+              ) : Image.asset("assets/images/default_image.png", width: double.infinity,
+          )
             ),
           ),
           Positioned(
@@ -512,6 +498,11 @@ class _CarrouselOffLineState extends State<CarrouselOffLine> {
   int currentIndex = 0;
   List<AlertesOffLine> alertesList = [];
     late Acteur acteur;
+    
+List<Map<String, String>> imageListe = [
+  {"image_path": 'assets/images/koumi1.png'},
+  {"image_path": 'assets/images/koumi2.jpg'},
+];
    
   bool isLoading = true;
 
@@ -609,6 +600,7 @@ class _CarrouselOffLineState extends State<CarrouselOffLine> {
     debugPrint("Address ISO: $detectedC");
     address.value =
         'Address carrousel offline avant set state : ${place.locality},${place.country},${place.isoCountryCode} ';
+     if(mounted)
      setState(() {
           
     detectedC = place.isoCountryCode;
@@ -626,7 +618,8 @@ class _CarrouselOffLineState extends State<CarrouselOffLine> {
   void initState() {
     super.initState();
     getLocation();
-    fetchAlertesOffLine("Mali").then((alerts) {
+    print("al off line pays $detectedCountry");
+    fetchAlertesOffLine(detectedCountry!).then((alerts) {
     // fetchAlertesOffLine(detectedCountry != null ? detectedCountry! : "Mali").then((alerts) {
       setState(() {
         alertesList = alerts;
@@ -646,7 +639,7 @@ class _CarrouselOffLineState extends State<CarrouselOffLine> {
    int page = 0;
   int size = 2;
   try {
-    final response = await http.get(Uri.parse('$baseUrl/getAlertesOffLineByPaysSortedByDate?niveau3PaysActeur=$pays&page=$page&size=$size'));
+    final response = await http.get(Uri.parse('$baseUrl/getAlertesOffLineByPaysAndNotWithPagination?niveau3PaysActeur=$pays&page=$page&size=$size'));
 
     if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
       String contentType = response.headers['content-type'] ?? '';
@@ -658,17 +651,17 @@ class _CarrouselOffLineState extends State<CarrouselOffLine> {
       } else {
         print('La réponse n\'est pas au format JSON : $contentType');
         print('Contenu de la réponse : ${response.body}');
-        return [];
+        return  alertesList =[];
       }
     } else {
       print('Échec du chargement des alertes offline avec le code d\'état : ${response.statusCode}');
       print('Contenu de la réponse : ${response.body}');
-      return [];
+      return alertesList = [];
     }
   } catch (e) {
     print('Erreur lors de la requête : $e');
   }
-  return [];
+  return alertesList = [];
 }
 //   Future<List<Alertes>> fetchAlertes() async {
 //     const String baseUrl = '$apiOnlineUrl/alertes';
@@ -699,28 +692,49 @@ class _CarrouselOffLineState extends State<CarrouselOffLine> {
 // }
 
  
+ List<Widget> getImageSliders(List<AlertesOffLine> alertesList, List<Map<String, String>> imageListe) {
+  return alertesList.asMap().entries.map((entry) {
+    String imagePath = entry.value.photoAlerteOffLine!.isNotEmpty ? 
+      "https://koumi.ml/api-koumi/alertesOffLine/${entry.value.idAlerteOffLine}/image" : 'assets/images/default_image.png';
 
-
-List<Widget> getImageSliders(List<AlertesOffLine> alertesList, List<Map<String, String>> imageList) {
-  if (alertesList.isEmpty) {
-    return imageList.asMap().entries.map((entry) => buildImageSlider(
-      entry.value['image_path'] ?? 'assets/images/default_image.png',
-      '',
-      entry.key,
-      []
-    )).toList();
-  } else {
-    return alertesList.asMap().entries.map((entry) => buildImageSlider(
-      "https://koumi.ml/api-koumi/alertesOffLine/${entry.value.idAlerteOffLine}/image",
+    return buildImageSlider(
+      imagePath,
       entry.value.titreAlerteOffLine ?? '',
       entry.key,
-      alertesList
-    )).toList();
-  }
+      alertesList,
+    );
+  }).toList();
 }
 
+
+//    List<Widget> getImageSliders(List<AlertesOffLine> alertesList, List<Map<String, String>> imageList) {
+//   if (alertesList.isEmpty) {
+//     return imageList.asMap().entries.map((entry) => buildImageSlider(
+//       entry.value['image_path'] ?? 'assets/images/default_image.png',
+//       '',
+//       entry.key,
+//       []
+//     )).toList();
+//   } else {
+//     return alertesList.asMap().entries.map((entry) => buildImageSlider( 
+//       entry.value.idAlerteOffLine!
+//       .isNotEmpty || entry.value.idAlerteOffLine != null ?
+//       "https://koumi.ml/api-koumi/alertesOffLine/${entry.value.idAlerteOffLine}/image" : 'assets/images/default_image.png',
+//       entry.value.titreAlerteOffLine ?? '',
+//       entry.key,
+//       alertesList
+//     )).toList();
+//   }
+// }
+
   Widget buildImageSlider(String imagePath, String text, int index, List<AlertesOffLine> alertesList) {
-  return GestureDetector(
+
+    // Check if the list is empty or if the index is out of bounds
+    // if (alertesList.isEmpty || index < 0 || index >= alertesList.length) {
+    //   return Carrousels();
+    // }
+    
+   return GestureDetector(
     onTap: () {
       Get.to(
         () => DetailAlertesOffLine(alertes: alertesList[index]),
@@ -740,17 +754,18 @@ List<Widget> getImageSliders(List<AlertesOffLine> alertesList, List<Map<String, 
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20.0), // Bordure arrondie pour les coins des images
-            child: CachedNetworkImage(
-              imageUrl: imagePath,
-              placeholder: (context, url) =>
-                  const Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) => Image.asset(
-                'assets/images/default_image.png',
+            child:alertesList[index].photoAlerteOffLine!.isNotEmpty ? CachedNetworkImage(
+                imageUrl: imagePath,
+                placeholder: (context, url) =>
+                    const Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) => Image.asset(
+                  'assets/images/default_image.png',
+                  fit: BoxFit.cover,
+                ),
                 fit: BoxFit.cover,
-              ),
-              fit: BoxFit.cover,
-              width: double.infinity,
-            ),
+                width: double.infinity,
+              ) : Image.asset("assets/images/default_image.png", width: double.infinity,
+          ),
           ),
         ),
           Positioned(
@@ -786,7 +801,7 @@ List<Widget> getImageSliders(List<AlertesOffLine> alertesList, List<Map<String, 
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                     ),
                     child: CarouselSlider(
-                      items: getImageSliders(alertesList, imageList),
+                      items: getImageSliders(alertesList, imageListe),
                       carouselController: carouselController,
                       options: CarouselOptions(
                         scrollPhysics: const BouncingScrollPhysics(),
@@ -808,7 +823,7 @@ List<Widget> getImageSliders(List<AlertesOffLine> alertesList, List<Map<String, 
                   right: 0,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: (alertesList.isEmpty ? imageList : alertesList).asMap().entries.map((entry) {
+                    children: (alertesList.isEmpty && isLoading == false ? imageList : alertesList).asMap().entries.map((entry) {
                       return GestureDetector(
                         onTap: () => carouselController.animateToPage(entry.key),
                         child: Container(

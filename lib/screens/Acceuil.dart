@@ -46,7 +46,6 @@ class _AccueilState extends State<Accueil> {
   String? country = '';
   String? detectedCountryCode= '';
   String? detectedCountry = '';
-  CountryProvider? countryProvider;
 
     void getLocationNew() async {
     try {
@@ -147,7 +146,7 @@ class _AccueilState extends State<Accueil> {
         });
 
     debugPrint(
-        "Address:   ${place.locality},${place.country},${place.isoCountryCode}");
+        "Address: data ${detectedCountry}  user accueil ${place.locality},${place.country},${place.isoCountryCode}");
   }
   
 
@@ -172,7 +171,6 @@ class _AccueilState extends State<Accueil> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     verify();
     getLocation();
@@ -180,11 +178,7 @@ class _AccueilState extends State<Accueil> {
     // Get.put(ConnectionVerify(), permanent: true);
   }
 
-  @override
-  void dispose() {
-    
-    super.dispose();
-  }
+ 
 
  
 
@@ -201,7 +195,9 @@ class _AccueilState extends State<Accueil> {
           // const SizedBox(
           //   height: 10,
           // ),
-                    SizedBox(height: 180, child: isExist ? Carrousel(): CarrouselOffLine()),
+                    
+                    SizedBox(height: 180, child: isExist == true ? Carrousel() : CarrouselOffLine()),
+                  
           const SizedBox(
             height: 10,
           ),
@@ -273,7 +269,7 @@ class _AccueilState extends State<Accueil> {
                       builder: (context) => const WeatherScreen()));
             } else if (index == 4) {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const StoreScreen()));
+                  MaterialPageRoute(builder: (context) =>  StoreScreen(detectedCountry: detectedCountry!)));
             } else if (index == 3) {
               Navigator.push(
                   context,
@@ -288,7 +284,7 @@ class _AccueilState extends State<Accueil> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>  IntrantScreen(detectedCountry: detectedCountry!,)));
+                      builder: (context) =>  IntrantScreen(detectedCountry: detectedCountry!)));
             }
           },
           borderRadius: BorderRadius.circular(20),

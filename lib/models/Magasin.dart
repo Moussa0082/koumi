@@ -16,6 +16,7 @@ class Magasin {
     String? dateAjout;
     String? dateModif;
     String? photo;
+    String? pays;
     Acteur? acteur;
     Niveau1Pays? niveau1Pays;
 
@@ -32,6 +33,7 @@ class Magasin {
          this.dateAjout,
          this.dateModif,
          this.photo,
+         this.pays,
          this.acteur,
          this.niveau1Pays,
     });
@@ -49,6 +51,7 @@ class Magasin {
         dateAjout: json["dateAjout"],
         dateModif: json["dateModif"],
         photo: json["photo"],
+        pays: json["pays"],
         acteur: Acteur.fromJson(json["acteur"]),
         niveau1Pays: Niveau1Pays.fromJson(json["niveau1Pays"]),
     );
@@ -66,6 +69,7 @@ class Magasin {
         "dateAjout": dateAjout,
         "dateModif": dateModif,
         "photo": photo,
+        "pays": pays,
         "acteur": acteur?.toJson(),
         "niveau1Pays": niveau1Pays?.toJson(),
     };
@@ -118,6 +122,7 @@ class Magasin {
       'dateAjout': dateAjout,
       'dateModif': dateModif,
       'photo': photo,
+      'pays': pays,
       'acteur': acteur?.toMap(),
       'niveau1Pays': niveau1Pays?.toMap(),
     };
@@ -182,6 +187,7 @@ class Magasin {
       dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
       dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
       photo: map['photo'] != null ? map['photo'] as String : null,
+      pays: map['pays'] != null ? map['pays'] as String : null,
       acteur: map['acteur'] != null ? Acteur.fromMap(map['acteur'] as Map<String,dynamic>) : null,
       niveau1Pays: map['niveau1Pays'] != null ? Niveau1Pays.fromMap(map['niveau1Pays'] as Map<String,dynamic>) : null,
     );

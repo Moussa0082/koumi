@@ -9,10 +9,10 @@ class Pays {
     String? libelleNiveau1Pays;
     String? libelleNiveau2Pays;
     String? libelleNiveau3Pays;
-    String? monnaie;
-    String? tauxDollar;
-    String? tauxYuan;
-    String? tauxEuro;
+    // String? monnaie;
+    // String? tauxDollar;
+    // String? tauxYuan;
+    // String? tauxEuro;
     String? descriptionPays;
     String? whattsAppPays;
     String? personneModif;
@@ -31,10 +31,10 @@ class Pays {
     this.libelleNiveau1Pays,
     this.libelleNiveau2Pays,
     this.libelleNiveau3Pays,
-    this.monnaie,
-    this.tauxDollar,
-    this.tauxYuan,
-    this.tauxEuro,
+    // this.monnaie,
+    // this.tauxDollar,
+    // this.tauxYuan,
+    // this.tauxEuro,
     this.dateModif,
     required this.sousRegion,
   });
@@ -84,10 +84,10 @@ class Pays {
       'libelleNiveau1Pays': libelleNiveau1Pays,
       'libelleNiveau2Pays': libelleNiveau2Pays,
       'libelleNiveau3Pays': libelleNiveau3Pays,
-      'monnaie':monnaie,
-      'tauxDollar':tauxDollar,
-      'tauxYuan':tauxYuan,
-      'tauxEuro':tauxEuro,
+      // 'monnaie':monnaie,
+      // 'tauxDollar':tauxDollar,
+      // 'tauxYuan':tauxYuan,
+      // 'tauxEuro':tauxEuro,
       'dateModif': dateModif,
       'sousRegion': sousRegion?.toMap(),
     };
@@ -105,11 +105,11 @@ class Pays {
       libelleNiveau1Pays: map['libelleNiveau1Pays'] != null ? map['libelleNiveau1Pays'] as String : null,
       libelleNiveau2Pays: map['libelleNiveau2Pays'] != null ? map['libelleNiveau2Pays'] as String : null,
       libelleNiveau3Pays: map['libelleNiveau3Pays'] != null ? map['libelleNiveau3Pays'] as String : null,
-      monnaie: map['monnaie'] != null ? map['monnaie'] as String : null,
-      tauxDollar: map['tauxDollar'] != null ? map['tauxDollar'] as String : null,
-      tauxYuan: map['tauxYuan'] != null ? map['tauxYuan'] as String : null,
-      dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
-      tauxEuro: map['tauxEuro'] != null ? map['tauxEuro'] as String : null,
+      // monnaie: map['monnaie'] != null ? map['monnaie'] as String : null,
+      // tauxDollar: map['tauxDollar'] != null ? map['tauxDollar'] as String : null,
+      // tauxYuan: map['tauxYuan'] != null ? map['tauxYuan'] as String : null,
+      // dateModif: map['dateModif'] != null ? map['dateModif'] as String : null,
+      // tauxEuro: map['tauxEuro'] != null ? map['tauxEuro'] as String : null,
       sousRegion: SousRegion.fromMap(map['sousRegion'] as Map<String,dynamic>),
     );
   }

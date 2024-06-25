@@ -55,7 +55,7 @@ class _CustomCardState extends State<CustomCard> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const StoreScreen()));
+                      builder: (context) =>  StoreScreen()));
             } else if (index == 3) {
               Navigator.push(
                   context,

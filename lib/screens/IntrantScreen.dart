@@ -1,8 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
@@ -21,7 +25,7 @@ import 'package:shimmer/shimmer.dart';
 
 class IntrantScreen extends StatefulWidget {
   String? detectedCountry;
-   IntrantScreen({super.key, this.detectedCountry});
+   IntrantScreen({super.key,  this.detectedCountry});
 
   @override
   State<IntrantScreen> createState() => _IntrantScreenState();
@@ -54,6 +58,129 @@ class _IntrantScreenState extends State<IntrantScreen> {
   late Future<List<Intrant>> intrantListeFuture1;
 
   bool isLoadingLibelle = true;
+
+    String? countryName;
+  String? countryCode;
+
+  String? detectedC = '';
+  String? isoCountryCode = '';
+  String? country = '';
+  String? detectedCountryCode= '';
+  String? detectedCountry = '';
+  CountryProvider? countryProvider;
+
+    void getLocationNew() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        await Geolocator.openLocationSettings();
+        return Future.error('Location services are disabled.');
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return Future.error('Location permissions are denied');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        return Future.error('Location permissions are permanently denied.');
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      Placemark placemark = placemarks.first;
+      setState(() {
+        detectedCountryCode = placemark.isoCountryCode!;
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  var latitude = 'Getting Latitude..'.obs;
+  var longitude = 'Getting Longitude..'.obs;
+  var address = 'Getting Address..'.obs;
+  late StreamSubscription<Position> streamSubscription;
+
+  getLocation() async {
+    bool serviceEnabled;
+
+    LocationPermission permission;
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      await Geolocator.openLocationSettings();
+      return Future.error('Location services are disabled.');
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    streamSubscription =
+        Geolocator.getPositionStream().listen((Position position) {
+      latitude.value = 'Latitude : ${position.latitude}';
+      longitude.value = 'Longitude : ${position.longitude}';
+      getAddressFromLatLang(position);
+    });
+  }  
+  
+  Future<void> getAddressFromLatLang(Position position) async {
+    List<Placemark> placemark =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+    Placemark place = placemark[0];
+    debugPrint("Address ISO: $detectedC");
+    address.value =
+        'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
+        if(mounted)
+        setState(() {
+          
+    detectedC = place.isoCountryCode;
+    detectedCountryCode = place.isoCountryCode!;
+    detectedCountry = place.country!;
+        });
+
+    debugPrint(
+        "Address:   ${place.locality},${place.country},${place.isoCountryCode}");
+  }
+
+   Future<void> _loadCountryData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      countryName = prefs.getString('countryName');
+      countryCode = prefs.getString('countryCode');
+    });
+    
+  }
+
+
   // String? monnaie;
 
 //   Future<String> getMonnaieByActor(String id) async {
@@ -95,7 +222,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
         page++;
         });
       debugPrint("yes - fetch all by pays intrants");
-      fetchIntrantByPays("Mali");
+     isExist ? fetchIntrantByPays(detectedCountry!) : fetchIntrantByPays(acteur.niveau3PaysActeur!);
       
     }
     debugPrint("no");
@@ -115,7 +242,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
       page++;
         });
    
-    fetchIntrantByCategorie("Mali", selectedType!.idCategorieProduit!);
+    isExist ? fetchIntrantByCategorie(detectedCountry!, selectedType!.idCategorieProduit!) : fetchIntrantByCategorie(acteur.niveau3PaysActeur!, selectedType!.idCategorieProduit!);
     }
     debugPrint("no");
 
@@ -125,14 +252,18 @@ class _IntrantScreenState extends State<IntrantScreen> {
  Future<List<Intrant>> fetchIntrantByPays(String niveau3PaysActeur, {bool refresh = false }) async {
     if (isLoading) return [];
 
+          setState(() {
       isLoading = true;
+      });
 
     if (refresh) {
     
-
+   setState(() {
         intrantListe.clear();
         page = 0;
         hasMore = true;
+     
+   });
      
     }
 
@@ -141,17 +272,22 @@ class _IntrantScreenState extends State<IntrantScreen> {
 
 
       if (response.statusCode == 200) {
+       print("pays end point $niveau3PaysActeur");
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 
         if (body.isEmpty) {
-         
+         setState(() {
+           
             hasMore = false;
+         });
           
         } else {
-          
+           setState(() {
+             
             List<Intrant> newIntrant = body.map((e) => Intrant.fromMap(e)).toList();
           intrantListe.addAll(newIntrant);
+           });
           
         }
 
@@ -166,8 +302,10 @@ class _IntrantScreenState extends State<IntrantScreen> {
     } catch (e) {
       print('Une erreur s\'est produite lors de la récupération des intrants: $e');
     } finally {
-     
+     setState(() {
+       
         isLoading = false;
+     });
       
 
     }
@@ -197,8 +335,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
     try {
       final response = await http.get(Uri.parse('$apiOnlineUrl/intrant/getIntrantsByPaysAndCategorieWithPagination?idCategorieProduit=${selectedType!.idCategorieProduit}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
-
       if (response.statusCode == 200) {
+    print("pays end point by cat $niveau3PaysActeur");
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 
@@ -245,6 +383,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
     } else {
       setState(() {
         isExist = false;
+        intrantListeFuture = IntrantService().fetchIntrantByPays(countryName!);
       });
     }
   }
@@ -252,7 +391,9 @@ class _IntrantScreenState extends State<IntrantScreen> {
  Future<List<Intrant>> getAllIntrant() async {
        if(selectedType != null){
         
-      intrantListe = await IntrantService().fetchIntrantByCategorie(selectedType!.idCategorieProduit!, "Mali");
+     isExist ? intrantListe = await IntrantService().fetchIntrantByCategorie(selectedType!.idCategorieProduit!, countryName!):
+     intrantListe = await IntrantService().fetchIntrantByCategorie(selectedType!.idCategorieProduit!, acteur.niveau3PaysActeur!)
+     ;
        }
       
 
@@ -263,8 +404,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
   void initState() {
     super.initState();
     verify();
-  
-    
+  _loadCountryData();
+     getLocation();
     _searchController = TextEditingController();
     _typeList = http
         .get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
@@ -278,11 +419,14 @@ class _IntrantScreenState extends State<IntrantScreen> {
     //code will run when widget rendering complete
   scrollableController1.addListener(_scrollListener1);
   });
-   intrantListeFuture = IntrantService().fetchIntrantByPays("Mali");
+         isExist == true ? intrantListeFuture = IntrantService().fetchIntrantByPays(acteur.niveau3PaysActeur!):
+         intrantListeFuture = IntrantService().fetchIntrantByPays(detectedCountry!)
+         ;
+
    intrantListeFuture1 = getAllIntrant();
       // final countryProvider = Provider.of<CountryProvider>(context , listen: false);
 
-  debugPrint("pays ${widget.detectedCountry!}");
+  // debugPrint("pays ${countryName!}");
   }
 
   @override
@@ -291,6 +435,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
         .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
     scrollableController.dispose();
     scrollableController1.dispose();
+    
     super.dispose();
   }
 
@@ -631,13 +776,18 @@ class _IntrantScreenState extends State<IntrantScreen> {
                       debugPrint("refresh page ${page}");
                       selectedType == null
                           ? setState(() {
-                              intrantListeFuture =
-                                  IntrantService().fetchIntrantByPays(widget.detectedCountry!);
+                             isExist ? intrantListeFuture =
+                                  IntrantService().fetchIntrantByPays(detectedCountry!) :
+                                  intrantListeFuture =
+                                  IntrantService().fetchIntrantByPays(acteur.niveau3PaysActeur!);
                             })
                           : setState(() {
+                             isExist ?
                               intrantListeFuture1 = IntrantService()
                                   .fetchIntrantByCategorie(
-                                      selectedType!.idCategorieProduit!, widget.detectedCountry!);
+                                      selectedType!.idCategorieProduit!, detectedCountry!) : intrantListeFuture1 = IntrantService()
+                                  .fetchIntrantByCategorie(
+                                      selectedType!.idCategorieProduit!, acteur.niveau3PaysActeur!);
                             });
                     },
                     child: selectedType == null
@@ -1328,7 +1478,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
 
           page = 0;
           hasMore = true;
-          fetchIntrantByCategorie(selectedType!.idCategorieProduit!, widget.detectedCountry!,refresh: true);
+       isExist ?  fetchIntrantByCategorie(selectedType!.idCategorieProduit!, detectedCountry!,refresh: true): fetchIntrantByCategorie(selectedType!.idCategorieProduit!, acteur.niveau3PaysActeur!,refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {
               scrollableController1.jumpTo(0.0);

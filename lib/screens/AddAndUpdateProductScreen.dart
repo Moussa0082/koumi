@@ -904,6 +904,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                   MaterialPageRoute(
                                       builder: (context) =>
                                           (AddAndUpdateProductEndSreen(
+                                            monnaies: monnaie,
                                             isEditable: widget.isEditable!,
                                             nomProduit: _nomController.text,
                                             forme: forme,

@@ -799,55 +799,55 @@ class _PaysPageState extends State<PaysPage> {
                         ),
                       ),
                       SizedBox(height: 16),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: monnaieController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Monnaie",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: tauxDollarController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Taux Dollar",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: tauxYuanController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Taux Yuan",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
+                      // TextFormField(
+                      //   validator: (value) {
+                      //     if (value == null || value.isEmpty) {
+                      //       return "Veuillez remplir ce champ";
+                      //     }
+                      //     return null;
+                      //   },
+                      //   controller: monnaieController,
+                      //   maxLines: null,
+                      //   decoration: InputDecoration(
+                      //     labelText: "Monnaie",
+                      //     border: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(8),
+                      //     ),
+                      //   ),
+                      // ),
+                      // SizedBox(height: 16),
+                      // TextFormField(
+                      //   validator: (value) {
+                      //     if (value == null || value.isEmpty) {
+                      //       return "Veuillez remplir ce champ";
+                      //     }
+                      //     return null;
+                      //   },
+                      //   controller: tauxDollarController,
+                      //   maxLines: null,
+                      //   decoration: InputDecoration(
+                      //     labelText: "Taux Dollar",
+                      //     border: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(8),
+                      //     ),
+                      //   ),
+                      // ),
+                      // TextFormField(
+                      //   validator: (value) {
+                      //     if (value == null || value.isEmpty) {
+                      //       return "Veuillez remplir ce champ";
+                      //     }
+                      //     return null;
+                      //   },
+                      //   controller: tauxYuanController,
+                      //   maxLines: null,
+                      //   decoration: InputDecoration(
+                      //     labelText: "Taux Yuan",
+                      //     border: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(8),
+                      //     ),
+                      //   ),
+                      // ),
                       SizedBox(height: 20),
                       ElevatedButton.icon(
                         onPressed: () async {
@@ -862,9 +862,9 @@ class _PaysPageState extends State<PaysPage> {
                                       libelleNiveau1Pays: niveau1PaysController.text,
                                       libelleNiveau2Pays: niveau2PaysController.text,
                                       libelleNiveau3Pays: niveau3PaysController.text,
-                                      monnaie:monnaieController.text,
-                                      tauxDollar: tauxDollarController.text,
-                                      tauxYuan: tauxYuanController.text,
+                                      // monnaie:monnaieController.text,
+                                      // tauxDollar: tauxDollarController.text,
+                                      // tauxYuan: tauxYuanController.text,
                                       sousRegion: sousRegion)
                                   .then((value) => {
                                         Provider.of<PaysService>(context,

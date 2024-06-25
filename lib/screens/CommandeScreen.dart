@@ -337,7 +337,7 @@ class _CommandeScreenState extends State<CommandeScreen> {
                                     onTap: () {
                                       Route _createRoute() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => DetailCommandeScreen(isProprietaire: false,),
+    pageBuilder: (context, animation, secondaryAnimation) => DetailCommandeScreen(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return child;
     },

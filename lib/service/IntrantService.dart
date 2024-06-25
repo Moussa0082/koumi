@@ -228,7 +228,7 @@ class IntrantService extends ChangeNotifier {
 
 
 
-  Future<List<Intrant>> fetchIntrantByCategorie( String idCategorieProduit, String niveau3PaysActeur, {bool refresh = false}) async {
+  Future<List<Intrant>> fetchIntrantByCategorie( String niveau3PaysActeur, String idCategorieProduit,  {bool refresh = false}) async {
     if (isLoading == true) return [];
 
       isLoading = true;

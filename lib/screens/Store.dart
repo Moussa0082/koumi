@@ -23,7 +23,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class StoreScreen extends StatefulWidget {
-  const StoreScreen({super.key});
+  String?  detectedCountry;
+   StoreScreen({super.key, this.detectedCountry});
 
   @override
   State<StoreScreen> createState() => _StoreScreenState();
@@ -56,17 +57,17 @@ class _StoreScreenState extends State<StoreScreen> {
    Future<List<Magasin>> getAllMagasins() async {
       if(selectedNiveau1Pays != null){
 
-      magasinListe = await MagasinService().fetchMagasinByNiveau1PaysWithPagination(selectedNiveau1Pays!.idNiveau1Pays!);
+      magasinListe = await MagasinService().fetchMagasinByNiveau1PaysWithPagination(widget.detectedCountry!,selectedNiveau1Pays!.idNiveau1Pays!);
       }
       else{
 
-      magasinListe = await MagasinService().fetchAllMagasin();
+      magasinListe = await MagasinService().fetchAllMagasin(widget.detectedCountry!);
       }
     
     return magasinListe;
   }
 
- Future<List<Magasin>> fetchMagasin({bool refresh = false}) async {
+ Future<List<Magasin>> fetchMagasin(String niveau3PaysActeur,{bool refresh = false}) async {
     if (isLoading == true) return [];
    
     setState(() {
@@ -83,7 +84,7 @@ class _StoreScreenState extends State<StoreScreen> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinWithPagination?page=${page}&size=${size}'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -195,7 +196,7 @@ class _StoreScreenState extends State<StoreScreen> {
         page++;
         });
       debugPrint("yes - fetch all magasin");
-      fetchMagasin().then((value) {
+      fetchMagasin(widget.detectedCountry!).then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -533,10 +534,10 @@ class _StoreScreenState extends State<StoreScreen> {
                   debugPrint("refresh page ${page}");
                 selectedNiveau1Pays != null ?
                 setState(() {
-                  magasinListeFuture1 = MagasinService().fetchMagasinByNiveau1PaysWithPagination(selectedNiveau1Pays!.idNiveau1Pays!);
+                  magasinListeFuture1 = MagasinService().fetchMagasinByNiveau1PaysWithPagination(widget.detectedCountry!,selectedNiveau1Pays!.idNiveau1Pays!);
                 }) :
                 setState(() {
-                  magasinListeFuture = MagasinService().fetchAllMagasin();
+                  magasinListeFuture = MagasinService().fetchAllMagasin(widget.detectedCountry!);
                 });
                               },
               child: selectedNiveau1Pays == null ?

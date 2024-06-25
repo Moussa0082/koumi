@@ -8,6 +8,7 @@ import 'package:koumi_app/models/Commande.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/screens/DetailCommande.dart';
 import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
@@ -354,6 +355,10 @@ class _MesCommandeState extends State<MesCommande> {
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
                       onTap: (){
+  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => DetailCommandeScreen(idCommande: commande.idCommande,isProprietaire:acteur.idActeur == commande.acteur?.idActeur ? false : true ,)));
                         if(acteur.idActeur == commande.acteur?.idActeur){
                           print("acteur qui a commande");
                         }

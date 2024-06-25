@@ -28,6 +28,7 @@ class MagasinService extends ChangeNotifier{
     required String nomMagasin,
     required String contactMagasin,
     required String localiteMagasin,
+    required String pays,
     File? photo,
     required Acteur acteur,
     required Niveau1Pays niveau1Pays
@@ -53,6 +54,7 @@ class MagasinService extends ChangeNotifier{
      'nomMagasin': nomMagasin,
      'contactMagasin': contactMagasin,
      'localiteMagasin': localiteMagasin,
+     'pays': pays,
      'photo': "",
      'acteur': acteur.toMap(),
      'niveau1Pays': niveau1Pays.toMap()
@@ -164,7 +166,7 @@ class MagasinService extends ChangeNotifier{
     }
     return magasin;
   }
-    Future<List<Magasin>> fetchMagasinByNiveau1PaysWithPagination(String idNiveau1Pays,{bool refresh = false}) async {
+    Future<List<Magasin>> fetchMagasinByNiveau1PaysWithPagination(String niveau3PaysActeur,String idNiveau1Pays,{bool refresh = false}) async {
     // if (_stockService.isLoading == true) return [];
 
       isLoading = true;
@@ -176,7 +178,7 @@ class MagasinService extends ChangeNotifier{
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByNiveau1PaysWithPagination?idNiveau1Pays=$idNiveau1Pays&page=${page}&size=${size}'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByNiveau1PaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&idNiveau1Pays=$idNiveau1Pays&page=${page}&size=${size}'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -201,7 +203,7 @@ class MagasinService extends ChangeNotifier{
     return magasin;
   }
 
-    Future<List<Magasin>> fetchAllMagasin({bool refresh = false}) async {
+    Future<List<Magasin>> fetchAllMagasin(String niveau3PaysActeur, {bool refresh = false}) async {
     // if (_stockService.isLoading == true) return [];
 
       isLoading = true;
@@ -213,7 +215,7 @@ class MagasinService extends ChangeNotifier{
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinWithPagination?page=${page}&size=${size}'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));

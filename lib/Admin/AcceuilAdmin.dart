@@ -201,7 +201,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
       body: ListView(
         children: [
           // SizedBox(height: 200, child: Carrousels()),
-                    SizedBox(height: 180, child: Carrousels()),
+                    SizedBox(height: 180, child: Carrousel()),
 
           // SizedBox(height: 100, child: isExist ? Carrousel(): CarrouselOffLine()),
           // const SizedBox(
@@ -289,7 +289,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                       builder: (context) => const WeatherScreen()));
             } else if (index == 4) {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const StoreScreen()));
+                  MaterialPageRoute(builder: (context) =>  StoreScreen(detectedCountry: detectedCountry!)));
             } else if (index == 3) {
               Navigator.push(
                   context,

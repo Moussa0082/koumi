@@ -124,7 +124,7 @@ class _LocationState extends State<Location> {
       page++;
         });
    
-    fetchMaterielByType("Mali");
+    fetchMaterielByType(widget.detectedCountry.toString().toLowerCase());
     }
     debugPrint("no");
   }
@@ -293,6 +293,11 @@ class _LocationState extends State<Location> {
       //code will run when widget rendering complete
       scrollableController1.addListener(_scrollListener1);
     });
+    if(widget.detectedCountry != null){
+      print("pays location ! ${widget.detectedCountry}");
+    }else{
+      print("pays location null");
+    }
     materielListeFuture = materielListeFuture1 = getAllMateriel();
   }
 

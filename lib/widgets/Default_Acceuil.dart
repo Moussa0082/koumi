@@ -1,10 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/screens/ComplementAlimentaire.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/EngraisAndApport.dart';
 import 'package:koumi_app/screens/FruitsAndLegumes.dart';
-import 'package:koumi_app/screens/Location.dart';
+import 'package:koumi_app/screens/Location.dart' as l;
 import 'package:koumi_app/screens/Products.dart';
 import 'package:koumi_app/screens/ProduitElevage.dart';
 import 'package:koumi_app/screens/ProduitPhytosanitaire.dart';
@@ -30,6 +35,116 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
   // Future<List<CategorieProduit>> getCat() async {
   //   return await CategorieService().fetchCategorie();
   // }
+
+
+   String? detectedC = '';
+  String? isoCountryCode = '';
+  String? country ='';
+  String? detectedCountryCode = '';
+  String? detectedCountry ='';
+
+    void getLocationNew() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        await Geolocator.openLocationSettings();
+        return Future.error('Location services are disabled.');
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return Future.error('Location permissions are denied');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        return Future.error('Location permissions are permanently denied.');
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      Placemark placemark = placemarks.first;
+      setState(() {
+        detectedCountryCode = placemark.isoCountryCode!;
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  var latitude = 'Getting Latitude..'.obs;
+  var longitude = 'Getting Longitude..'.obs;
+  var address = 'Getting Address..'.obs;
+  late StreamSubscription<Position> streamSubscription;
+
+  getLocation() async {
+    bool serviceEnabled;
+
+    LocationPermission permission;
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      await Geolocator.openLocationSettings();
+      return Future.error('Location services are disabled.');
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    streamSubscription =
+        Geolocator.getPositionStream().listen((Position position) {
+      latitude.value = 'Latitude : ${position.latitude}';
+      longitude.value = 'Longitude : ${position.longitude}';
+      getAddressFromLatLang(position);
+    });
+  }  
+  
+  Future<void> getAddressFromLatLang(Position position) async {
+    List<Placemark> placemark =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+    Placemark place = placemark[0];
+    debugPrint("Address ISO: $detectedC");
+    address.value =
+        'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
+        if(mounted)
+        setState(() {
+          
+    detectedC = place.isoCountryCode;
+    detectedCountryCode = place.isoCountryCode!;
+    detectedCountry = place.country!;
+        });
+
+    debugPrint(
+        "Address: default accueil  ${place.locality},${place.country},${place.isoCountryCode}");
+  }
+
 
   @override
   void initState() {
@@ -98,7 +213,7 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
                     builder: (context) => const FruitAndLegumes()));
           } else if (index == 9) {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProductsScreen()));
+                MaterialPageRoute(builder: (context) => ProductsScreen(detectedCountry: detectedCountry!)));
           } else if (index == 8) {
             Navigator.push(
                 context,
@@ -111,7 +226,7 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
                     builder: (context) => const ProduitElevage()));
           } else if (index == 6) {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const StoreScreen()));
+                MaterialPageRoute(builder: (context) =>  StoreScreen(detectedCountry: detectedCountry!)));
           } else if (index == 5) {
             Navigator.push(
                 context,
@@ -119,10 +234,10 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
                     builder: (context) => const ComplementAlimentaire()));
           } else if (index == 4) {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) =>  Location()));
+                MaterialPageRoute(builder: (context) =>  l.Location(detectedCountry: detectedCountry!)));
           } else if (index == 3) {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) =>  Transport()));
+                MaterialPageRoute(builder: (context) =>  Transport(detectedCountry: detectedCountry!)));
           } else if (index == 2) {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) =>  WeatherScreen()));

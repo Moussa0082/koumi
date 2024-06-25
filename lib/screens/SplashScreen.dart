@@ -148,12 +148,15 @@ void didChangeDependencies() {
    }
 
   // Check if the widget is still mounted
-  if (!mounted) return;
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  if (mounted) 
 
-  await countryProvider?.setCountryInfo(isoCountryCode!, country!);
+        prefs.setString('countryCode', country!);
+        prefs.setString('countryName', isoCountryCode!);
+  // await countryProvider?.setCountryInfo(isoCountryCode!, country!);
 
   // Check again before calling setState
-  if (!mounted) return;
+  if (mounted)
   
   setState(() {
     detectedC = place.isoCountryCode;

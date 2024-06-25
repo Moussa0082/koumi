@@ -60,19 +60,13 @@ class _TransportState extends State<Transport> {
         hasMore &&
         !isLoading &&
         selectedType == null) {
-      // Incrementez la page et récupérez les stocks généraux
+        if(mounted)
       setState(() {
         // Rafraîchir les données ici
         page++;
         });
       debugPrint("yes - fetch all by pays vehicule");
-      fetchVehicule(widget.detectedCountry!).then((value) {
-        if(mounted)
-        setState(() {
-          // Rafraîchir les données ici
-          debugPrint("page inc all ${page}");
-        });
-      });
+      fetchVehicule(widget.detectedCountry!);
       // }
       // }
       // else {
@@ -255,7 +249,6 @@ class _TransportState extends State<Transport> {
    debugPrint("pays fetch transport page ${widget.detectedCountry!} ")
      : 
      debugPrint("null pays non fetch transport page");
-        vehiculeListeFuture = VehiculeService().fetchVehicule(widget.detectedCountry!);
     _searchController = TextEditingController();
     _typeList =
         http.get(Uri.parse('$apiOnlineUrl/TypeVoiture/read'));
@@ -269,7 +262,8 @@ WidgetsBinding.instance.addPostFrameCallback((_){
     //code will run when widget rendering complete
   scrollableController1.addListener(_scrollListener1);
   });
-  vehiculeListeFuture = VehiculeService().fetchVehicule(widget.detectedCountry!);
+ isExist == false ? vehiculeListeFuture = VehiculeService().fetchVehicule(widget.detectedCountry!):
+ vehiculeListeFuture = VehiculeService().fetchVehicule(acteur.niveau3PaysActeur!);
   vehiculeListeFuture1 = getAllVehicule();
 
 

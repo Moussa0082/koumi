@@ -202,7 +202,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
         setState(() {
           isLoading = false;
         });
-        Provider.of<MagasinService>(context, listen: false).applyChange();
+        // Provider.of<MagasinService>(context, listen: false).applyChange();
          Navigator.of(context).pop();
       });
     } else {
@@ -228,6 +228,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                 nomMagasin: nomMagasin,
                 contactMagasin: contactMagasin,
                 localiteMagasin: localiteMagasin,
+                pays: acteur.niveau3PaysActeur!,
                 photo: photos,
                 acteur: acteur,
                 niveau1Pays: niveau1Pays)
@@ -261,6 +262,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                 nomMagasin: nomMagasin,
                 contactMagasin: contactMagasin,
                 localiteMagasin: localiteMagasin,
+                pays: acteur.niveau3PaysActeur!,
                 acteur: acteur,
                 niveau1Pays: niveau1Pays)
             .then((value) => {
