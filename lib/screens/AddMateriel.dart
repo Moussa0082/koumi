@@ -2,24 +2,27 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/CategorieProduit.dart';
+import 'package:koumi_app/models/Filiere.dart';
 import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
+import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:pattern_formatter/pattern_formatter.dart';
+import 'package:provider/provider.dart';
 
 class AddMateriel extends StatefulWidget {
-  const AddMateriel({super.key});
+  bool? isEquipement = false;
+  AddMateriel({super.key, this.isEquipement});
 
   @override
   State<AddMateriel> createState() => _AddMaterielState();
@@ -48,34 +51,17 @@ class _AddMaterielState extends State<AddMateriel> {
   String? typeValue;
   late TypeMateriel typeMateriel;
   bool isExist = false;
-  // String? monnaie;
-  // late ParametreGeneraux para = ParametreGeneraux();
-  // List<ParametreGeneraux> paraList = [];
+  String? speValue;
+  String? catValue;
+  String? filiereValue;
+  late Future _speculationList;
+  late Future _categorieList;
+  late Future _filiereList;
+  late Filiere filiere = Filiere();
+  late Speculation speculation = Speculation();
+  late CategorieProduit categorieProduit = CategorieProduit();
   bool isLoadingLibelle = true;
   String? libelleNiveau3Pays;
-
-//      Future<String> getMonnaieByActor(String id) async {
-//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
-
-//     if (response.statusCode == 200) {
-//       print("libelle : ${response.body}");
-//       return response.body;  // Return the body directly since it's a plain string
-//     } else {
-//       throw Exception('Failed to load monnaie');
-//     }
-// }
-
-  // void verifyParam() {
-  //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-  //       .parametreList!;
-
-  //   if (paraList.isNotEmpty) {
-  //     para = paraList[0];
-  //   } else {
-  //     // Gérer le cas où la liste est null ou vide, par exemple :
-  //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
-  //   }
-  // }
 
   Future<String> getLibelleNiveau3PaysByActor(String id) async {
     final response = await http
@@ -89,22 +75,6 @@ class _AddMaterielState extends State<AddMateriel> {
       throw Exception('Failed to load libelle niveau3Pays');
     }
   }
-
-  //    Future<void> fetchPaysDataByActor() async {
-  //   try {
-  //     String monnaies = await getMonnaieByActor(acteur.idActeur!);
-
-  //     setState(() {
-  //       monnaie = monnaies;
-  //       isLoadingLibelle = false;
-  //     });
-  //   } catch (e) {
-  //     setState(() {
-  //       isLoadingLibelle = false;
-  //       });
-  //     print('Error: $e');
-  //   }
-  // }
 
   Future<void> fetchLibelleNiveau3Pays() async {
     try {
@@ -128,10 +98,18 @@ class _AddMaterielState extends State<AddMateriel> {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     fetchLibelleNiveau3Pays();
     _typeList = http.get(Uri.parse('$apiOnlineUrl/TypeMateriel/read'));
-    // _typeList =
-    //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
+
+    _filiereList = http.get(Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
+
+    _categorieList = http.get(Uri.parse(
+        '$apiOnlineUrl/Categorie/allCategorieByFiliere/${filiere.idFiliere}'));
+
+    _speculationList = http.get(Uri.parse(
+        '$apiOnlineUrl/Speculation/getAllSpeculationByCategorie/${categorieProduit.idCategorieProduit}'));
+
     _niveau3List = http.get(Uri.parse(
         '$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
+
     _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
     //  fetchPaysDataByActor();
   }
@@ -239,6 +217,426 @@ class _AddMaterielState extends State<AddMateriel> {
                     key: formkey,
                     child: Column(
                       children: [
+                        if (widget.isEquipement!)
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 22,
+                            ),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Text(
+                                "Chosir une filière",
+                                style: TextStyle(
+                                    color: (Colors.black), fontSize: 18),
+                              ),
+                            ),
+                          ),
+                        if (widget.isEquipement!)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            child: FutureBuilder(
+                              future: _filiereList,
+                              builder: (_, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Chargement...',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                if (snapshot.hasData) {
+                                  dynamic jsonString =
+                                      utf8.decode(snapshot.data.bodyBytes);
+                                  dynamic responseData =
+                                      json.decode(jsonString);
+
+                                  // Vérifier si responseData est une liste
+                                  if (responseData is List) {
+                                    final reponse = responseData;
+                                    final filiereList = reponse
+                                        .map((e) => Filiere.fromMap(e))
+                                        .where(
+                                            (con) => con.statutFiliere == true)
+                                        .toList();
+
+                                    if (filiereList.isEmpty) {
+                                      return DropdownButtonFormField(
+                                        items: [],
+                                        onChanged: null,
+                                        decoration: InputDecoration(
+                                          labelText: 'Aucun filière trouvé',
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  vertical: 10, horizontal: 20),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                      );
+                                    }
+
+                                    return DropdownButtonFormField<String>(
+                                      isExpanded: true,
+                                      items: filiereList
+                                          .map(
+                                            (e) => DropdownMenuItem(
+                                              value: e.idFiliere,
+                                              child: Text(e.libelleFiliere!),
+                                            ),
+                                          )
+                                          .toList(),
+                                      value: filiereValue,
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          catValue = null;
+                                          filiereValue = newValue;
+                                          if (newValue != null) {
+                                            filiere = filiereList.firstWhere(
+                                              (element) =>
+                                                  element.idFiliere == newValue,
+                                            );
+                                            debugPrint("valeur : $newValue");
+                                            _categorieList = http.get(Uri.parse(
+                                                '$apiOnlineUrl/Categorie/allCategorieByFiliere/${newValue}'));
+                                          }
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        labelText: 'Sélectionner un filiere',
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 10, horizontal: 20),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    return DropdownButtonFormField(
+                                      items: [],
+                                      onChanged: null,
+                                      decoration: InputDecoration(
+                                        labelText: 'Aucun filière trouvé',
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 10, horizontal: 20),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                }
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucun filière trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        if (widget.isEquipement!)
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 22,
+                            ),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Text(
+                                "Chosir une categorie",
+                                style: TextStyle(
+                                    color: (Colors.black), fontSize: 18),
+                              ),
+                            ),
+                          ),
+                        if (widget.isEquipement!)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            child: FutureBuilder(
+                              future: _categorieList,
+                              builder: (_, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Chargement...',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                if (snapshot.hasData) {
+                                  dynamic jsonString =
+                                      utf8.decode(snapshot.data.bodyBytes);
+                                  dynamic responseData =
+                                      json.decode(jsonString);
+
+                                  // Vérifier si responseData est une liste
+                                  if (responseData is List) {
+                                    final reponse = responseData;
+                                    final catList = reponse
+                                        .map((e) => CategorieProduit.fromMap(e))
+                                        .where((con) =>
+                                            con.statutCategorie == true)
+                                        .toList();
+
+                                    if (catList.isEmpty) {
+                                      return DropdownButtonFormField(
+                                        items: [],
+                                        onChanged: null,
+                                        decoration: InputDecoration(
+                                          labelText: 'Aucune categorie trouvé',
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  vertical: 10, horizontal: 20),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                      );
+                                    }
+
+                                    return DropdownButtonFormField<String>(
+                                      isExpanded: true,
+                                      items: catList
+                                          .map(
+                                            (e) => DropdownMenuItem(
+                                              value: e.idCategorieProduit,
+                                              child: Text(e.libelleCategorie!),
+                                            ),
+                                          )
+                                          .toList(),
+                                      value: catValue,
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          speValue = null;
+                                          catValue = newValue;
+                                          if (newValue != null) {
+                                            categorieProduit =
+                                                catList.firstWhere(
+                                              (element) =>
+                                                  element.idCategorieProduit ==
+                                                  newValue,
+                                            );
+                                            debugPrint("valeur : $newValue");
+                                            _speculationList = http.get(Uri.parse(
+                                                '$apiOnlineUrl/Speculation/getAllSpeculationByCategorie/${newValue}'));
+                                          }
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        labelText: 'Sélectionner une catégorie',
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 10, horizontal: 20),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    return DropdownButtonFormField(
+                                      items: [],
+                                      onChanged: null,
+                                      decoration: InputDecoration(
+                                        labelText: 'Aucune catégorie trouvé',
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 10, horizontal: 20),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                }
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucune catégorie trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        if (widget.isEquipement!)
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 22,
+                            ),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Text(
+                                "Chosir une speculation",
+                                style: TextStyle(
+                                    color: (Colors.black), fontSize: 18),
+                              ),
+                            ),
+                          ),
+                        if (widget.isEquipement!)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            child: FutureBuilder(
+                                future: _speculationList,
+                                builder: (_, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return DropdownButtonFormField(
+                                      items: [],
+                                      onChanged: null,
+                                      decoration: InputDecoration(
+                                        labelText: 'Chargement...',
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 10, horizontal: 20),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  if (snapshot.hasData) {
+                                    dynamic jsonString =
+                                        utf8.decode(snapshot.data.bodyBytes);
+                                    dynamic responseData =
+                                        json.decode(jsonString);
+
+                                    if (responseData is List) {
+                                      final reponse = responseData;
+                                      final speList = reponse
+                                          .map((e) => Speculation.fromMap(e))
+                                          .where((cat) =>
+                                              cat.statutSpeculation == true)
+                                          .toList();
+
+                                      if (speList.isEmpty) {
+                                        return DropdownButtonFormField(
+                                          items: [],
+                                          onChanged: null,
+                                          decoration: InputDecoration(
+                                            labelText:
+                                                'Aucune speculation trouvé',
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 20),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                        );
+                                      }
+
+                                      return DropdownButtonFormField<String>(
+                                        isExpanded: true,
+                                        items: speList
+                                            .map(
+                                              (e) => DropdownMenuItem(
+                                                value: e.idSpeculation,
+                                                child: Text(e.nomSpeculation!),
+                                              ),
+                                            )
+                                            .toList(),
+                                        value: speValue,
+                                        onChanged: (newValue) {
+                                          setState(() {
+                                            speValue = newValue;
+                                            if (newValue != null) {
+                                              speculation = speList.firstWhere(
+                                                (element) =>
+                                                    element.idSpeculation ==
+                                                    newValue,
+                                              );
+                                            }
+                                          });
+                                        },
+                                        decoration: InputDecoration(
+                                          labelText:
+                                              'Sélectionner une speculation',
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  vertical: 10, horizontal: 20),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      return DropdownButtonFormField(
+                                        items: [],
+                                        onChanged: null,
+                                        decoration: InputDecoration(
+                                          labelText:
+                                              'Aucune speculation trouvé',
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  vertical: 10, horizontal: 20),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  }
+                                  return DropdownButtonFormField(
+                                    items: [],
+                                    onChanged: null,
+                                    decoration: InputDecoration(
+                                      labelText: 'Aucune speculation trouvé',
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                          ),
                         Padding(
                           padding: EdgeInsets.symmetric(
                             horizontal: 22,
@@ -817,207 +1215,412 @@ class _AddMaterielState extends State<AddMateriel> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        ElevatedButton(
-                            onPressed: () async {
-                              final String nom = _nomController.text;
-                              final String description =
-                                  _descriptionController.text;
-                              final String etat = _etatController.text;
-                              String formattedMontant =
-                                  _prixController.text.replaceAll(',', '');
-                              final int prixParHeures =
-                                  int.tryParse(formattedMontant) ?? 0;
-                              print("prix formated $prixParHeures");
-                              if (formkey.currentState!.validate()) {
-                                try {
-                                  setState(() {
-                                    _isLoading = true;
-                                  });
-                                  if (photo != null) {
-                                    await MaterielService()
-                                        .addMateriel(
-                                          prixParHeure: prixParHeures,
-                                          nom: nom,
-                                          description: description,
-                                          localisation: niveau3,
-                                          etatMateriel: etat,
-                                          typeMateriel: typeMateriel,
-                                          photoMateriel: photo,
-                                          acteur: acteur,
-                                          monnaie: monnaie,
-                                        )
-                                        .then((value) => {
-                                              Provider.of<MaterielService>(
-                                                      context,
-                                                      listen: false)
-                                                  .applyChange(),
-                                              setState(() {
-                                                _isLoading = false;
-                                                n3Value = null;
-                                                monnaieValue = null;
-                                              }),
-                                              Navigator.pop(context),
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                const SnackBar(
-                                                  content: Row(
-                                                    children: [
-                                                      Text(
-                                                        "Matériel ajouté avec succèss",
-                                                        style: TextStyle(
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis),
-                                                      ),
-                                                    ],
+                        if (widget.isEquipement!)
+                          ElevatedButton(
+                              onPressed: () async {
+                                final String nom = _nomController.text;
+                                final String description =
+                                    _descriptionController.text;
+                                final String etat = _etatController.text;
+                                String formattedMontant =
+                                    _prixController.text.replaceAll(',', '');
+                                final int prixParHeures =
+                                    int.tryParse(formattedMontant) ?? 0;
+                                print("prix formated $prixParHeures");
+                                Speculation? sp = speculation;
+                                if (formkey.currentState!.validate()) {
+                                  try {
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+                                    if (photo != null) {
+                                      await MaterielService()
+                                          .addMateriel(
+                                              prixParHeure: prixParHeures,
+                                              nom: nom,
+                                              description: description,
+                                              localisation: niveau3,
+                                              etatMateriel: etat,
+                                              typeMateriel: typeMateriel,
+                                              photoMateriel: photo,
+                                              acteur: acteur,
+                                              monnaie: monnaie,
+                                              speculation: sp)
+                                          .then((value) => {
+                                                Provider.of<MaterielService>(
+                                                        context,
+                                                        listen: false)
+                                                    .applyChange(),
+                                                setState(() {
+                                                  _isLoading = false;
+                                                  n3Value = null;
+                                                  monnaieValue = null;
+                                                }),
+                                                Navigator.pop(context),
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Row(
+                                                      children: [
+                                                        Text(
+                                                          "Matériel ajouté avec succèss",
+                                                          style: TextStyle(
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    duration:
+                                                        Duration(seconds: 5),
                                                   ),
-                                                  duration:
-                                                      Duration(seconds: 5),
-                                                ),
-                                              )
-                                            })
-                                        .catchError((onError) => {
-                                              setState(() {
-                                                _isLoading = false;
-                                              }),
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                const SnackBar(
-                                                  content: Row(
-                                                    children: [
-                                                      Text(
-                                                        "Une erreur s'est produite",
-                                                        style: TextStyle(
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis),
-                                                      ),
-                                                    ],
+                                                )
+                                              })
+                                          .catchError((onError) => {
+                                                setState(() {
+                                                  _isLoading = false;
+                                                }),
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Row(
+                                                      children: [
+                                                        Text(
+                                                          "Une erreur s'est produite",
+                                                          style: TextStyle(
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    duration:
+                                                        Duration(seconds: 5),
                                                   ),
-                                                  duration:
-                                                      Duration(seconds: 5),
                                                 ),
-                                              ),
-                                              _etatController.clear(),
-                                              _nomController.clear(),
-                                              _descriptionController.clear(),
-                                              setState(() {
-                                                _isLoading = false;
-                                                n3Value = null;
-                                              }),
-                                              Navigator.pop(context),
-                                            });
-                                  } else {
-                                    await MaterielService()
-                                        .addMateriel(
-                                          prixParHeure: prixParHeures,
-                                          nom: nom,
-                                          description: description,
-                                          localisation: niveau3,
-                                          etatMateriel: etat,
-                                          typeMateriel: typeMateriel,
-                                          acteur: acteur,
-                                          monnaie: monnaie,
-                                        )
-                                        .then((value) => {
-                                              Provider.of<MaterielService>(
-                                                      context,
-                                                      listen: false)
-                                                  .applyChange(),
-                                              setState(() {
-                                                _isLoading = false;
-                                              }),
-                                              Navigator.pop(context),
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                const SnackBar(
-                                                  content: Row(
-                                                    children: [
-                                                      Text(
-                                                        "Matériel ajouté avec succèss",
-                                                        style: TextStyle(
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis),
-                                                      ),
-                                                    ],
+                                                _etatController.clear(),
+                                                _nomController.clear(),
+                                                _descriptionController.clear(),
+                                                setState(() {
+                                                  _isLoading = false;
+                                                  n3Value = null;
+                                                }),
+                                                Navigator.pop(context),
+                                              });
+                                    } else {
+                                      await MaterielService()
+                                          .addMateriel(
+                                              prixParHeure: prixParHeures,
+                                              nom: nom,
+                                              description: description,
+                                              localisation: niveau3,
+                                              etatMateriel: etat,
+                                              typeMateriel: typeMateriel,
+                                              acteur: acteur,
+                                              monnaie: monnaie,
+                                              speculation: sp)
+                                          .then((value) => {
+                                                Provider.of<MaterielService>(
+                                                        context,
+                                                        listen: false)
+                                                    .applyChange(),
+                                                setState(() {
+                                                  _isLoading = false;
+                                                }),
+                                                Navigator.pop(context),
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Row(
+                                                      children: [
+                                                        Text(
+                                                          "Matériel ajouté avec succèss",
+                                                          style: TextStyle(
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    duration:
+                                                        Duration(seconds: 5),
                                                   ),
-                                                  duration:
-                                                      Duration(seconds: 5),
-                                                ),
-                                              )
-                                            })
-                                        .catchError((onError) => {
-                                              setState(() {
-                                                _isLoading = false;
-                                              }),
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                const SnackBar(
-                                                  content: Row(
-                                                    children: [
-                                                      Text(
-                                                        "Une erreur s'est produite",
-                                                        style: TextStyle(
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis),
-                                                      ),
-                                                    ],
+                                                )
+                                              })
+                                          .catchError((onError) => {
+                                                setState(() {
+                                                  _isLoading = false;
+                                                }),
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Row(
+                                                      children: [
+                                                        Text(
+                                                          "Une erreur s'est produite",
+                                                          style: TextStyle(
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    duration:
+                                                        Duration(seconds: 5),
                                                   ),
-                                                  duration:
-                                                      Duration(seconds: 5),
                                                 ),
-                                              ),
-                                              _etatController.clear(),
-                                              _nomController.clear(),
-                                              _descriptionController.clear(),
-                                              setState(() {
-                                                _isLoading = false;
-                                                n3Value = null;
-                                              }),
-                                              Navigator.pop(context),
-                                            });
-                                  }
-                                } catch (e) {
-                                  print("Error: " + e.toString());
-                                  setState(() {
-                                    _isLoading = false;
-                                  });
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Row(
-                                        children: [
-                                          Text(
-                                            "Une erreur est survenu lors de l'ajout",
-                                            style: TextStyle(
-                                                overflow:
-                                                    TextOverflow.ellipsis),
-                                          ),
-                                        ],
+                                                _etatController.clear(),
+                                                _nomController.clear(),
+                                                _descriptionController.clear(),
+                                                setState(() {
+                                                  _isLoading = false;
+                                                  n3Value = null;
+                                                }),
+                                                Navigator.pop(context),
+                                              });
+                                    }
+                                  } catch (e) {
+                                    print("Error: " + e.toString());
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Row(
+                                          children: [
+                                            Text(
+                                              "Une erreur est survenu lors de l'ajout",
+                                              style: TextStyle(
+                                                  overflow:
+                                                      TextOverflow.ellipsis),
+                                            ),
+                                          ],
+                                        ),
+                                        duration: Duration(seconds: 5),
                                       ),
-                                      duration: Duration(seconds: 5),
-                                    ),
-                                  );
+                                    );
+                                  }
                                 }
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  Colors.orange, // Orange color code
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Colors.orange, // Orange color code
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                minimumSize: const Size(290, 45),
                               ),
-                              minimumSize: const Size(290, 45),
-                            ),
-                            child: Text(
-                              "Ajouter",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                              child: Text(
+                                "Ajouter",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )),
+                        if (!widget.isEquipement!)
+                          ElevatedButton(
+                              onPressed: () async {
+                                final String nom = _nomController.text;
+                                final String description =
+                                    _descriptionController.text;
+                                final String etat = _etatController.text;
+                                String formattedMontant =
+                                    _prixController.text.replaceAll(',', '');
+                                final int prixParHeures =
+                                    int.tryParse(formattedMontant) ?? 0;
+                                print("prix formated $prixParHeures");
+                                Speculation? sp = speculation;
+                                if (formkey.currentState!.validate()) {
+                                  try {
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+                                    if (photo != null) {
+                                      await MaterielService()
+                                          .addMateriel(
+                                            prixParHeure: prixParHeures,
+                                            nom: nom,
+                                            description: description,
+                                            localisation: niveau3,
+                                            etatMateriel: etat,
+                                            typeMateriel: typeMateriel,
+                                            photoMateriel: photo,
+                                            acteur: acteur,
+                                            monnaie: monnaie,
+                                          )
+                                          .then((value) => {
+                                                Provider.of<MaterielService>(
+                                                        context,
+                                                        listen: false)
+                                                    .applyChange(),
+                                                setState(() {
+                                                  _isLoading = false;
+                                                  n3Value = null;
+                                                  monnaieValue = null;
+                                                }),
+                                                Navigator.pop(context),
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Row(
+                                                      children: [
+                                                        Text(
+                                                          "Matériel ajouté avec succèss",
+                                                          style: TextStyle(
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    duration:
+                                                        Duration(seconds: 5),
+                                                  ),
+                                                )
+                                              })
+                                          .catchError((onError) => {
+                                                setState(() {
+                                                  _isLoading = false;
+                                                }),
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Row(
+                                                      children: [
+                                                        Text(
+                                                          "Une erreur s'est produite",
+                                                          style: TextStyle(
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    duration:
+                                                        Duration(seconds: 5),
+                                                  ),
+                                                ),
+                                                _etatController.clear(),
+                                                _nomController.clear(),
+                                                _descriptionController.clear(),
+                                                setState(() {
+                                                  _isLoading = false;
+                                                  n3Value = null;
+                                                }),
+                                                Navigator.pop(context),
+                                              });
+                                    } else {
+                                      await MaterielService()
+                                          .addMateriel(
+                                            prixParHeure: prixParHeures,
+                                            nom: nom,
+                                            description: description,
+                                            localisation: niveau3,
+                                            etatMateriel: etat,
+                                            typeMateriel: typeMateriel,
+                                            acteur: acteur,
+                                            monnaie: monnaie,
+                                          )
+                                          .then((value) => {
+                                                Provider.of<MaterielService>(
+                                                        context,
+                                                        listen: false)
+                                                    .applyChange(),
+                                                setState(() {
+                                                  _isLoading = false;
+                                                }),
+                                                Navigator.pop(context),
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Row(
+                                                      children: [
+                                                        Text(
+                                                          "Matériel ajouté avec succèss",
+                                                          style: TextStyle(
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    duration:
+                                                        Duration(seconds: 5),
+                                                  ),
+                                                )
+                                              })
+                                          .catchError((onError) => {
+                                                setState(() {
+                                                  _isLoading = false;
+                                                }),
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Row(
+                                                      children: [
+                                                        Text(
+                                                          "Une erreur s'est produite",
+                                                          style: TextStyle(
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    duration:
+                                                        Duration(seconds: 5),
+                                                  ),
+                                                ),
+                                                _etatController.clear(),
+                                                _nomController.clear(),
+                                                _descriptionController.clear(),
+                                                setState(() {
+                                                  _isLoading = false;
+                                                  n3Value = null;
+                                                }),
+                                                Navigator.pop(context),
+                                              });
+                                    }
+                                  } catch (e) {
+                                    print("Error: " + e.toString());
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Row(
+                                          children: [
+                                            Text(
+                                              "Une erreur est survenu lors de l'ajout",
+                                              style: TextStyle(
+                                                  overflow:
+                                                      TextOverflow.ellipsis),
+                                            ),
+                                          ],
+                                        ),
+                                        duration: Duration(seconds: 5),
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Colors.orange, // Orange color code
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                minimumSize: const Size(290, 45),
                               ),
-                            ))
+                              child: Text(
+                                "Ajouter",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ))
                       ],
                     ))
               ],

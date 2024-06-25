@@ -23,7 +23,7 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
   bool isLoading = false;
   late TextEditingController _searchController;
   ScrollController scrollableController = ScrollController();
-  int size = 6;
+  int size = 8;
   bool hasMore = true;
   late Future<List<Intrant>> intrantListeFuture;
   List<Intrant> intrantListe = [];
@@ -49,7 +49,7 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
       });
 
       fetchIntrantByCategorie(
-              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+             )
           .then((value) {
         setState(() {
           debugPrint("page inc all $page");
@@ -59,7 +59,7 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
     debugPrint("no");
   }
 
-  Future<List<Intrant>> fetchIntrantByCategorie(String pays,
+  Future<List<Intrant>> fetchIntrantByCategorie(
       {bool refresh = false}) async {
     if (isLoading == true) return [];
 
@@ -78,9 +78,9 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
     try {
       // for (String libelle in libelles) {
       final response = await http.get(Uri.parse(
-          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size'));
+          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
       debugPrint(
-          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
+          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&page=$page&size=$size');
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
@@ -176,8 +176,7 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController.addListener(_scrollListener);
     });
-    intrantListeFuture = fetchIntrantByCategorie(
-        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+    intrantListeFuture = fetchIntrantByCategorie();
   }
 
   @override
@@ -264,10 +263,7 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
                       });
                       debugPrint("refresh page ${page}");
                       setState(() {
-                        intrantListeFuture = fetchIntrantByCategorie(
-                            widget.detectedCountry != null
-                                ? widget.detectedCountry!
-                                : "Mali");
+                        intrantListeFuture = fetchIntrantByCategorie();
                       });
                       debugPrint("refresh page ${page}");
                     },

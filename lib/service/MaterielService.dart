@@ -7,6 +7,7 @@ import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Materiel.dart';
 import 'package:koumi_app/models/Monnaie.dart';
+import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:path/path.dart';
 
@@ -17,7 +18,7 @@ class MaterielService extends ChangeNotifier {
   List<Materiel> materielList = [];
   int page = 0;
   bool isLoading = false;
-   int size = 4;
+  int size = 8;
   bool hasMore = true;
 
 
@@ -31,6 +32,7 @@ class MaterielService extends ChangeNotifier {
     required Acteur acteur,
     required TypeMateriel typeMateriel,
     required Monnaie monnaie,
+    Speculation? speculation,
   }) async {
     try {
       var requete =
@@ -51,7 +53,8 @@ class MaterielService extends ChangeNotifier {
         'etatMateriel': etatMateriel,
         'acteur': acteur.toMap(),
         'typeMateriel': typeMateriel.toMap(),
-        'monnaie': monnaie.toMap()
+        'monnaie': monnaie.toMap(),
+        if (speculation != null) 'speculation': speculation.toMap(),
       });
 
       var response = await requete.send();
@@ -207,7 +210,60 @@ class MaterielService extends ChangeNotifier {
     return materielList;
   }
 
+  Future<List<Materiel>> fetchMateriele(
+      String pays, String libelleFiliere,{bool refresh = false}) async {
+    if (isLoading == true) return [];
 
+    // setState(() {
+    // });
+      isLoading = true;
+
+    if (refresh) {
+      // setState(() {
+      // });
+        materielList.clear();
+        page = 0;
+        hasMore = true;
+    }
+
+    try {
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/Materiel/getMaterielsByFiliereWithPagination?libelleFiliere=$libelleFiliere&pays=$pays&page=${page}&size=${size}'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+          // setState(() {
+          // });
+            hasMore = false;
+        } else {
+          // setState(() {
+          // });
+            List<Materiel> newMateriels =
+                body.map((e) => Materiel.fromMap(e)).toList();
+            materielList.addAll(newMateriels);
+        }
+
+        debugPrint(
+            "response body all materiel with pagination ${page} par défilement soit ${materielList.length}");
+        return materielList;
+      } else {
+        print(
+            'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      print(
+          'Une erreur s\'est produite lors de la récupération des materiels: $e');
+    } finally {
+      // setState(() {
+      // });
+        isLoading = false;
+    }
+    return materielList;
+  }
 
   Future<List<Materiel>> fetchMaterielByTypeAndPaysWithPagination(String idTypeMateriel, String niveau3PaysActeur, {bool refresh = false}) async {
     if (isLoading == true) return [];
@@ -222,6 +278,43 @@ class MaterielService extends ChangeNotifier {
 
     try {
       final response = await http.get(Uri.parse('$apiOnlineUrl/Materiel/getMaterielsByPaysAndTypeMaterielWithPagination?idTypeMateriel=${idTypeMateriel}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+           hasMore = false;
+        } else {
+           List<Materiel> newMateriels = body.map((e) => Materiel.fromMap(e)).toList();
+          materielList.addAll(newMateriels);
+        }
+
+        debugPrint("response body all materiel by pays and type materiel with pagination ${page} par défilement soit ${materielList.length}");
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+    return [];
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des materiel: $e');
+    } finally {
+       isLoading = false;
+    }
+    return materielList;
+  }
+  Future<List<Materiel>> fetchMaterielByTypeAndFiliere(String idTypeMateriel,String libelleFiliere, String pays, {bool refresh = false}) async {
+    if (isLoading == true) return [];
+
+      isLoading = true;
+
+    if (refresh) {
+        materielList.clear();
+       page = 0;
+        hasMore = true;
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Materiel/getMaterielsByIdTypeAndFiliere?idTypeMateriel=${idTypeMateriel}&libelleFiliere=$libelleFiliere&pays=$pays&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));

@@ -34,7 +34,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
 
   int page = 0;
   bool isLoading = false;
-  int size = 4;
+  int size = 8;
   bool hasMore = true;
 
   Future<List<Materiel>> getListe(String id) async {

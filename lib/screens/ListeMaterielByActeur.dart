@@ -36,7 +36,7 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
   bool _isNotActive = false;
      int page = 0;
    bool isLoading = false;
-   int size = 4;
+   int size = 8;
    bool hasMore = true;
        ScrollController scrollableController = ScrollController();
        late TextEditingController _searchController;

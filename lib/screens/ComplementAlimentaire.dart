@@ -46,7 +46,7 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
   String? monnaie;
   int page = 0;
   bool isLoading = false;
-  int size = 6;
+  int size = 8;
   bool hasMore = true;
 
   void _scrollListener() {

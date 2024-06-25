@@ -11,7 +11,6 @@ import 'package:koumi_app/models/Materiel.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/CountryProvider.dart';
 import 'package:koumi_app/screens/AddMateriel.dart';
 import 'package:koumi_app/screens/ListeMaterielByActeur.dart';
 import 'package:koumi_app/service/MaterielService.dart';
@@ -19,89 +18,55 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
-class Location extends StatefulWidget {
+class MaterielAndEquipement extends StatefulWidget {
   String? detectedCountry;
-  Location({super.key, this.detectedCountry});
+  MaterielAndEquipement({super.key, this.detectedCountry});
 
   @override
-  State<Location> createState() => _LocationState();
+  State<MaterielAndEquipement> createState() => _MaterielAndEquipementState();
 }
 
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
-class _LocationState extends State<Location> {
-  // late TypeMateriel type = TypeMateriel();
+class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
+  ScrollController scrollableController = ScrollController();
+  ScrollController scrollableController1 = ScrollController();
+  late TextEditingController _searchController;
+  late Future<List<Materiel>> materielListeFuture;
+  late Future<List<Materiel>> materielListeFuture1;
   List<Materiel> materielListe = [];
   late Acteur acteur;
   late List<TypeActeur> typeActeurData = [];
   late String type;
-  late Future<List<Materiel>> materielListeFuture;
-  late Future<List<Materiel>> materielListeFuture1;
-  late TextEditingController _searchController;
-
-  bool isExist = false;
-  String? email = "";
   String? typeValue;
   TypeMateriel? selectedType;
   late Future _typeList;
   bool isSearchMode = true;
-  CountryProvider? countryProvider;
-  //   List<ParametreGeneraux> paraList = [];
-  // late ParametreGeneraux para = ParametreGeneraux();
-
-  ScrollController scrollableController = ScrollController();
-  ScrollController scrollableController1 = ScrollController();
-
+  bool isExist = false;
+  String? email = "";
   int page = 0;
   bool isLoading = false;
   int size = 8;
   bool hasMore = true;
-
+  String libelleFiliere = "Équipements et matériels";
   bool isLoadingLibelle = true;
-  // String? monnaie;
-
-//    Future<String> getMonnaieByActor(String id) async {
-//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
-
-//     if (response.statusCode == 200) {
-//       print("libelle : ${response.body}");
-//       return response.body;  // Return the body directly since it's a plain string
-//     } else {
-//       throw Exception('Failed to load monnaie');
-//     }
-// }
-
-//  Future<void> fetchPaysDataByActor() async {
-//     try {
-//       String monnaies = await getMonnaieByActor(acteur.idActeur!);
-
-//       setState(() {
-//         monnaie = monnaies;
-//         isLoadingLibelle = false;
-//       });
-//     } catch (e) {
-//       setState(() {
-//         isLoadingLibelle = false;
-//         });
-//       print('Error: $e');
-//     }
-//   }
 
   void _scrollListener() {
     if (scrollableController.position.pixels >=
             scrollableController.position.maxScrollExtent - 200 &&
         hasMore &&
-        !isLoading &&
-        selectedType == null) {
+        !isLoading) {
       // Incrementez la page et récupérez les location généraux
       setState(() {
         // Rafraîchir les données ici
         page++;
       });
       debugPrint("yes - fetch all materiel by pays");
+
       fetchMateriel(
-              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali",
+              refresh: true)
           .then((value) {
         setState(() {
           // Rafraîchir les données ici
@@ -137,7 +102,7 @@ class _LocationState extends State<Location> {
     debugPrint("no");
   }
 
-  Future<List<Materiel>> fetchMateriel(String niveau3PaysActeur,
+  Future<List<Materiel>> fetchMateriel(String pays,
       {bool refresh = false}) async {
     if (isLoading == true) return [];
 
@@ -155,7 +120,7 @@ class _LocationState extends State<Location> {
 
     try {
       final response = await http.get(Uri.parse(
-          '$apiOnlineUrl/Materiel/getMaterielsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}'));
+          '$apiOnlineUrl/Materiel/getMaterielsByFiliereWithPagination?libelleFiliere=$libelleFiliere&pays=$pays&page=${page}&size=${size}'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -192,7 +157,7 @@ class _LocationState extends State<Location> {
     return materielListe;
   }
 
-  Future<List<Materiel>> fetchMaterielByType(String niveau3PaysActeur,
+  Future<List<Materiel>> fetchMaterielByType(String pays,
       {bool refresh = false}) async {
     if (isLoading == true) return [];
 
@@ -210,7 +175,7 @@ class _LocationState extends State<Location> {
 
     try {
       final response = await http.get(Uri.parse(
-          '$apiOnlineUrl/Materiel/getMaterielsByPaysAndTypeMaterielWithPagination?idTypeMateriel=${selectedType!.idTypeMateriel}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
+          '$apiOnlineUrl/Materiel/getMaterielsByIdTypeAndFiliere?idTypeMateriel=${selectedType!.idTypeMateriel}&libelleFiliere=$libelleFiliere&pays=$pays&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -266,37 +231,25 @@ class _LocationState extends State<Location> {
   Future<List<Materiel>> getAllMateriel() async {
     if (selectedType != null) {
       materielListe = await MaterielService()
-          .fetchMaterielByTypeAndPaysWithPagination(
+          .fetchMaterielByTypeAndFiliere(
               selectedType!.idTypeMateriel!,
+               libelleFiliere,
               widget.detectedCountry != null
                   ? widget.detectedCountry!
                   : "Mali");
     } else {
-      materielListe = await MaterielService().fetchMateriel(
-          widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+      materielListe = await MaterielService().fetchMateriele(
+          widget.detectedCountry != null ? widget.detectedCountry! : "Mali",
+          libelleFiliere,
+          refresh: true);
     }
 
     return materielListe;
   }
 
-  // void refreshList() {
-  //   setState(() {
-  //     materielListeFuture = materielListeFuture1 = getAllMateriel();
-  //   });
-  // }
-
   @override
   void initState() {
-    super.initState();
-    verify();
-
-    // fetchPaysDataByActor();
-    widget.detectedCountry != null
-        ? debugPrint(
-            "pays fetch location materiel page ${widget.detectedCountry!} ")
-        : debugPrint("null pays non fetch location materiel page");
     _searchController = TextEditingController();
-    _typeList = http.get(Uri.parse('$apiOnlineUrl/TypeMateriel/read'));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       //code will run when widget rendering complete
       scrollableController.addListener(_scrollListener);
@@ -305,18 +258,15 @@ class _LocationState extends State<Location> {
       //code will run when widget rendering complete
       scrollableController1.addListener(_scrollListener1);
     });
+    _typeList = http.get(Uri.parse('$apiOnlineUrl/TypeMateriel/read'));
+    verify();
     materielListeFuture = materielListeFuture1 = getAllMateriel();
-    // refreshList();
+    super.initState();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Accédez au fournisseur ici
-    countryProvider = Provider.of<CountryProvider>(context, listen: false);
-  }
 
-  @override
+  
+ @override
   void dispose() {
     scrollableController.dispose();
     scrollableController1.dispose();
@@ -333,7 +283,7 @@ class _LocationState extends State<Location> {
             centerTitle: true,
             toolbarHeight: 100,
             title: Text(
-              "Location Matériel",
+              "Matériels et Équipements",
               style: const TextStyle(
                   color: d_colorGreen, fontWeight: FontWeight.bold),
             ),
@@ -365,7 +315,9 @@ class _LocationState extends State<Location> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => AddMateriel(isEquipement: false,)));
+                                        builder: (context) => AddMateriel(
+                                              isEquipement: true,
+                                            )));
                                 //  if (result == true) {
                                 //   refreshList(); // Méthode pour rafraîchir la liste après ajout
                                 // }
@@ -528,16 +480,18 @@ class _LocationState extends State<Location> {
                       selectedType == null
                           ? setState(() {
                               materielListeFuture = MaterielService()
-                                  .fetchMateriel(
+                                  .fetchMateriele(
                                       widget.detectedCountry != null
                                           ? widget.detectedCountry!
                                           : "Mali",
+                                          libelleFiliere,
                                       refresh: true);
                             })
                           : setState(() {
                               materielListeFuture1 = MaterielService()
-                                  .fetchMaterielByTypeAndPaysWithPagination(
+                                  .fetchMaterielByTypeAndFiliere(
                                       selectedType!.idTypeMateriel!,
+                                      libelleFiliere,
                                       widget.detectedCountry != null
                                           ? widget.detectedCountry!
                                           : "Mali",
@@ -587,7 +541,7 @@ class _LocationState extends State<Location> {
                                         materielListe = snapshot.data!;
                                         String searchText = "";
                                         List<Materiel> filteredSearch =
-                                            materielListe.where((cate)  {
+                                            materielListe.where((cate) {
                                           String nomCat =
                                               cate.nom.toLowerCase();
                                           searchText = _searchController.text
@@ -1014,7 +968,6 @@ class _LocationState extends State<Location> {
                           )))));
   }
 
-
   Widget _buildShimmerEffect() {
     return Center(
       child: GridView.builder(
@@ -1083,7 +1036,6 @@ class _LocationState extends State<Location> {
     );
   }
 
- 
   DropdownButtonFormField<String> buildDropdown(List<TypeMateriel> typeList) {
     return DropdownButtonFormField<String>(
       isExpanded: true,

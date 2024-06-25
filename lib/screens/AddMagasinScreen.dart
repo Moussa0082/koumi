@@ -616,7 +616,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Aucun  region trouvé',
+                                    labelText: 'Aucune région trouvée',
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 20),
                                     border: OutlineInputBorder(

@@ -59,7 +59,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   int page = 0;
   bool isLoading = false;
-  int size = 4;
+  int size = 8;
   bool hasMore = true;
 
   bool isLoadingLibelle = true;

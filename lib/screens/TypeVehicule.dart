@@ -253,7 +253,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                                                                 .spaceBetween,
                                                         children: [
                                                           Text(
-                                                              "Nombres de véhicule",
+                                                              "Nombre de véhicule",
                                                               style: TextStyle(
                                                                 color: Colors
                                                                     .black87,

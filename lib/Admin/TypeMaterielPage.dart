@@ -349,7 +349,7 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
                                                                   .spaceBetween,
                                                           children: [
                                                             Text(
-                                                                "Nombres de matériel",
+                                                                "Nombre de matériel",
                                                                 style:
                                                                     TextStyle(
                                                                   color: Colors
@@ -388,7 +388,7 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
                                                                   .spaceBetween,
                                                           children: [
                                                             Text(
-                                                                "Nombres de matériel",
+                                                                "Nombre de matériel",
                                                                 style:
                                                                     TextStyle(
                                                                   color: Colors

@@ -442,7 +442,7 @@ class _UnitePageState extends State<UnitePage> {
               children: [
                 ListTile(
                   title: Text(
-                    "Ajouter une unite ",
+                    "Ajouter une unité ",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,

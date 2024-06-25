@@ -47,7 +47,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
 
    int page = 0;
    bool isLoading = false;
-   int size = 4;
+   int size = 8;
    bool hasMore = true;
 
     void _scrollListener() {

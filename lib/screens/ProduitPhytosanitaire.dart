@@ -24,7 +24,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
   bool isLoading = false;
   late TextEditingController _searchController;
   ScrollController scrollableController = ScrollController();
-  int size = 6;
+  int size = 8;
   bool hasMore = true;
   late Future<List<Intrant>> intrantListeFuture;
   List<Intrant> intrantListe = [];
@@ -53,7 +53,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
       });
 
       fetchIntrantByCategorie(
-              // widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
               )
           .then((value) {
         setState(() {
@@ -64,7 +64,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
     debugPrint("no");
   }
 
-  Future<List<Intrant>> fetchIntrantByCategorie(
+  Future<List<Intrant>> fetchIntrantByCategorie(String pays,
       {bool refresh = false}) async {
     if (isLoading == true) return [];
 
@@ -82,9 +82,9 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
 
     try {
       final response = await http.get(Uri.parse(
-          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
+          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size'));
       debugPrint(
-          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&page=$page&size=$size');
+          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
       if (response.statusCode == 200 ||
           response.statusCode == 201 ||
           response.statusCode == 202) {
@@ -128,7 +128,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
       scrollableController.addListener(_scrollListener);
     });
     intrantListeFuture = fetchIntrantByCategorie(
-        // widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
+        widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
         );
   }
 
@@ -217,9 +217,9 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                       debugPrint("refresh page ${page}");
                       setState(() {
                         intrantListeFuture = fetchIntrantByCategorie(
-                            // widget.detectedCountry != null
-                            //     ? widget.detectedCountry!
-                            //     : "Mali"
+                            widget.detectedCountry != null
+                                ? widget.detectedCountry!
+                                : "Mali"
                                 );
                       });
                     },

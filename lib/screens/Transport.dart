@@ -46,7 +46,7 @@ class _TransportState extends State<Transport> {
   int page = 0;
   bool isLoading = false;
   bool isSearchMode = true;
-  int size = 4;
+  int size = 8;
   bool hasMore = true;
   ScrollController scrollableController = ScrollController();
   ScrollController scrollableController1 = ScrollController();

@@ -84,7 +84,7 @@ class _CategoriPageState extends State<CategoriPage> {
             },
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: const Text(
-          "Catégorie produit",
+          "Catégories de produits",
           style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
         ),
         actions: [
@@ -194,7 +194,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                Text('Aucune catégorie trouvé ',
+                                Text('Aucune catégorie touvée ',
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 17,
@@ -369,7 +369,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                                                     .spaceBetween,
                                                             children: [
                                                               Text(
-                                                                  "Nombres de spéculation:",
+                                                                  "Nombre de spéculation:",
                                                                   style:
                                                                       TextStyle(
                                                                     color: Colors
@@ -813,7 +813,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                     items: [],
                                     onChanged: null,
                                     decoration: InputDecoration(
-                                      labelText: 'Aucun filière trouvé',
+                                      labelText: 'Aucune filière trouvée',
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(8),
                                       ),
@@ -844,7 +844,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                     });
                                   },
                                   decoration: InputDecoration(
-                                    labelText: 'Sélectionner un filiere',
+                                    labelText: 'Sélectionnez une filière',
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
@@ -855,7 +855,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                   items: [],
                                   onChanged: null,
                                   decoration: InputDecoration(
-                                    labelText: 'Aucun filière trouvé',
+                                    labelText: 'Aucune filière trouvée',
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
@@ -867,7 +867,7 @@ class _CategoriPageState extends State<CategoriPage> {
                               items: [],
                               onChanged: null,
                               decoration: InputDecoration(
-                                labelText: 'Aucun filière trouvé',
+                                labelText: 'Aucune filière trouvée',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -917,7 +917,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                             content: Row(
                                               children: [
                                                 Text(
-                                                    "Catégorie ajouté avec success"),
+                                                    "Catégorie ajouté avec succès"),
                                               ],
                                             ),
                                             duration: Duration(seconds: 3),
@@ -940,7 +940,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                 const SnackBar(
                                   content: Row(
                                     children: [
-                                      Text("Cette categorie existe déjà"),
+                                      Text("Cette catégorie existe déjà"),
                                     ],
                                   ),
                                   duration: Duration(seconds: 5),

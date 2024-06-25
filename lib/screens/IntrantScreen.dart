@@ -48,7 +48,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
   bool isSearchMode = true;
   int page = 0;
   bool isLoading = false;
-  int size = 4;
+  int size = 8;
   bool hasMore = true;
   late Future<List<Intrant>> intrantListeFuture;
   late Future<List<Intrant>> intrantListeFuture1;
@@ -296,7 +296,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                 },
                 icon: const Icon(Icons.arrow_back_ios)),
             title: const Text(
-              "Intrant agricole ",
+              "Intrants agricoles ",
               style: TextStyle(
                 color: d_colorGreen,
                 fontSize: 22,

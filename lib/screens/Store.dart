@@ -50,7 +50,7 @@ class _StoreScreenState extends State<StoreScreen> {
 
   int page = 0;
    bool isLoading = false;
-   int size = 4;
+   int size = 8;
   bool hasMore = true;
 
    Future<List<Magasin>> getAllMagasins() async {
@@ -277,7 +277,7 @@ class _StoreScreenState extends State<StoreScreen> {
                 },
                 icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
             title: Text(
-              'Tous les boutiques',
+              'Toutes les boutiques',
               style: const TextStyle(
                   color: d_colorGreen, fontWeight: FontWeight.bold),
             ),

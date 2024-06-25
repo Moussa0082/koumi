@@ -257,7 +257,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
           .map((e) => e.libelle!.toLowerCase())
           .contains("admin")
               ? Text(
-                  "Parametre Généraux",
+                  "Paramètre généraux",
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,

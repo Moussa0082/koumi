@@ -29,13 +29,13 @@ class _ProduitElevageState extends State<ProduitElevage> {
 
   ScrollController scrollableController = ScrollController();
 
-  String libelle = "Animale";
+  String libelle = "Animaux";
   // List<String> libelles = ["Animale", "Animale", "Elevage", "Elevages"];
 
   // String? monnaie;
   int page = 0;
   bool isLoading = false;
-  int size =6 ;
+  int size = 8;
   bool hasMore = true;
 
   void _scrollListener() {
@@ -53,7 +53,8 @@ class _ProduitElevageState extends State<ProduitElevage> {
 
       fetchStock(
               // widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
-              ).then((value) {
+              )
+          .then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -63,8 +64,7 @@ class _ProduitElevageState extends State<ProduitElevage> {
     debugPrint("no");
   }
 
-  Future<List<Stock>> fetchStock(
-      {bool refresh = false}) async {
+  Future<List<Stock>> fetchStock({bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -82,36 +82,34 @@ class _ProduitElevageState extends State<ProduitElevage> {
     try {
       // List<Stock> tempStockListe = [];
       // for (String libelle in libelles) {
-        final response = await http.get(Uri.parse(
-            '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
-debugPrint(
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
+      debugPrint(
           '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&page=$page&size=$size');
-          // '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
-          final List<dynamic> body = jsonData['content'];
+      // '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
 
-          if (body.isEmpty) {
-            setState(() {
-              hasMore = false;
-            });
-          } else {
-            List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
+        if (body.isEmpty) {
+          setState(() {
+            hasMore = false;
+          });
+        } else {
+          List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
           setState(() {
             stockListe.addAll(newStocks.where((newStock) => !stockListe
                 .any((existStock) => existStock.idStock == newStock.idStock)));
           });
         }
 
-          debugPrint(
-              "response body all stock by categorie with pagination ${page} par défilement soit ${stockListe.length}");
-        } else {
-          print(
-              'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
-        }
+        debugPrint(
+            "response body all stock by categorie with pagination ${page} par défilement soit ${stockListe.length}");
+      } else {
+        print(
+            'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
       // }
-
-      
     } catch (e) {
       print(
           'Une erreur s\'est produite lors de la récupération des intrants: $e');
@@ -224,7 +222,7 @@ debugPrint(
                             // widget.detectedCountry != null
                             //     ? widget.detectedCountry!
                             //     : "Mali"
-                                );
+                            );
                       });
                       debugPrint("refresh page ${page}");
                     },
@@ -387,7 +385,9 @@ debugPrint(
                                                           .symmetric(
                                                           horizontal: 15),
                                                       child: Text(
-                                                        filteredSearch[index].monnaie != null
+                                                        filteredSearch[index]
+                                                                    .monnaie !=
+                                                                null
                                                             ? "${filteredSearch[index].prix.toString()} ${filteredSearch[index].monnaie!.libelle}"
                                                             : "${filteredSearch[index].prix.toString()} FCFA ",
                                                         style: TextStyle(

@@ -12,6 +12,7 @@ import 'package:koumi_app/screens/EngraisAndApport.dart';
 import 'package:koumi_app/screens/FruitsAndLegumes.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart' as l;
+import 'package:koumi_app/screens/MatereilAndEquipement.dart';
 import 'package:koumi_app/screens/MesCommande.dart';
 import 'package:koumi_app/screens/Products.dart';
 import 'package:koumi_app/screens/ProduitElevage.dart';
@@ -197,7 +198,8 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
       _buildAccueilCard("Engrais et apports", "engrais.png", 11),
       _buildAccueilCard("Fruits et légumes", "fruit&legume.png", 10),
       _buildAccueilCard("Compléments alimentaires", "compl.png", 5),
-      _buildAccueilCard("Produits d'élevageS", "elevage.png", 7),
+      _buildAccueilCard("Produits d'élevages", "elevage.png", 7),
+      _buildAccueilCard("Matériels et équipements", "equi.png", 16),
       _buildAccueilCard("Produits agricoles", "pro.png", 9),
       _buildAccueilCard("Moyens de transport", "transp.png", 3),
       _buildAccueilCard("Matériels de location", "loc.png", 4),
@@ -276,7 +278,12 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
       padding: const EdgeInsets.all(5),
       child: InkWell(
         onTap: () {
-          if (index == 15) {
+          if (index == 16) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => MaterielAndEquipement()));
+          } else if (index == 15) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -355,8 +362,6 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
         },
         borderRadius: BorderRadius.circular(10),
         child: Container(
-          // width: 200, // Largeur fixe
-          // height: 50, // Hauteur fixe
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: Colors.white,
@@ -373,9 +378,9 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
                 padding: const EdgeInsets.all(10.0),
                 child: Image.asset(
                   "assets/images/$imgLocation",
-                  width: 40,
-                  height: 40,
-                  fit: BoxFit.cover,
+                  width: 35,
+                  height: 35,
+                  fit: BoxFit.contain,
                 ),
               ),
               Expanded(
@@ -387,7 +392,7 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontSize: 15,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

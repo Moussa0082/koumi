@@ -12,7 +12,6 @@ import 'package:koumi_app/Admin/ProfilA.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CountryProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart' as l;
@@ -23,7 +22,6 @@ import 'package:koumi_app/screens/Products.dart';
 import 'package:koumi_app/screens/Store.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/Weather.dart';
-import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:koumi_app/widgets/AlertAcceuil.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
@@ -230,7 +228,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
       ),
     );
   }
- 
+
   List<Widget> _buildCards() {
     List<Widget> cards = [
       _buildAccueilCard("Conseils", "cons.png", 2),
@@ -319,9 +317,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
             }
           },
           borderRadius: BorderRadius.circular(10),
-          child: Container(
-            // width: 200, // Largeur fixe
-            // height: 50, // Hauteur fixe
+          child:  Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               color: Colors.white,
@@ -338,9 +334,9 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                   padding: const EdgeInsets.all(10.0),
                   child: Image.asset(
                     "assets/images/$imgLocation",
-                    width: 45,
-                    height: 45,
-                    fit: BoxFit.fitHeight
+                    width: 35,
+                    height: 35,
+                    fit: BoxFit.contain,
                   ),
                 ),
                 Expanded(
@@ -349,6 +345,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                     child: Text(
                       titre,
                       maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 16,
@@ -359,7 +356,8 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                 ),
               ],
             ),
-          )),
+          )
+          ),
     );
   }
 
