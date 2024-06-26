@@ -112,9 +112,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
           toolbarHeight: 100,
           leading: IconButton(
               onPressed: () {
-                Navigator.of(context).pop();
-                Provider.of<VehiculeService>(context, listen: false)
-                    .applyChange();
+                Navigator.pop(context, true);
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
@@ -156,9 +154,11 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                           controller: _nomController,
                           decoration: InputDecoration(
                             hintText: "nom",
-                            contentPadding: const EdgeInsets.symmetric(
+                             contentPadding: const EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 20),
-                            border: OutlineInputBorder(
+                
+                   border:
+             OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
@@ -206,7 +206,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                         height: 10,
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(
+                         padding: EdgeInsets.symmetric(
                           horizontal: 22,
                         ),
                         child: Align(

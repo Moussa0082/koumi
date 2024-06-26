@@ -1251,12 +1251,12 @@ class _AddMaterielState extends State<AddMateriel> {
                                                         context,
                                                         listen: false)
                                                     .applyChange(),
+                                                Navigator.pop(context, true),
                                                 setState(() {
                                                   _isLoading = false;
                                                   n3Value = null;
                                                   monnaieValue = null;
                                                 }),
-                                                Navigator.pop(context),
                                                 ScaffoldMessenger.of(context)
                                                     .showSnackBar(
                                                   const SnackBar(
@@ -1305,7 +1305,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                                   _isLoading = false;
                                                   n3Value = null;
                                                 }),
-                                                Navigator.pop(context),
+                                                Navigator.pop(context, true)
                                               });
                                     } else {
                                       await MaterielService()
@@ -1327,7 +1327,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                                 setState(() {
                                                   _isLoading = false;
                                                 }),
-                                                Navigator.pop(context),
+                                                Navigator.pop(context, true),
                                                 ScaffoldMessenger.of(context)
                                                     .showSnackBar(
                                                   const SnackBar(
@@ -1376,7 +1376,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                                   _isLoading = false;
                                                   n3Value = null;
                                                 }),
-                                                Navigator.pop(context),
+                                                Navigator.pop(context, true)
                                               });
                                     }
                                   } catch (e) {
@@ -1459,7 +1459,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                                   n3Value = null;
                                                   monnaieValue = null;
                                                 }),
-                                                Navigator.pop(context),
+                                               Navigator.pop(context, true),
                                                 ScaffoldMessenger.of(context)
                                                     .showSnackBar(
                                                   const SnackBar(
@@ -1508,7 +1508,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                                   _isLoading = false;
                                                   n3Value = null;
                                                 }),
-                                                Navigator.pop(context),
+                                                Navigator.pop(context, true)
                                               });
                                     } else {
                                       await MaterielService()
@@ -1530,7 +1530,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                                 setState(() {
                                                   _isLoading = false;
                                                 }),
-                                                Navigator.pop(context),
+                                                Navigator.pop(context, true),
                                                 ScaffoldMessenger.of(context)
                                                     .showSnackBar(
                                                   const SnackBar(
@@ -1579,7 +1579,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                                   _isLoading = false;
                                                   n3Value = null;
                                                 }),
-                                                Navigator.pop(context),
+                                                Navigator.pop(context, true)
                                               });
                                     }
                                   } catch (e) {

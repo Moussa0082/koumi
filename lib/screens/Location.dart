@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -279,11 +280,11 @@ class _LocationState extends State<Location> {
     return materielListe;
   }
 
-  // void refreshList() {
-  //   setState(() {
-  //     materielListeFuture = materielListeFuture1 = getAllMateriel();
-  //   });
-  // }
+  void refreshList() {
+    setState(() {
+      materielListeFuture = materielListeFuture1 = getAllMateriel();
+    });
+  }
 
   @override
   void initState() {
@@ -314,6 +315,34 @@ class _LocationState extends State<Location> {
     super.didChangeDependencies();
     // Accédez au fournisseur ici
     countryProvider = Provider.of<CountryProvider>(context, listen: false);
+  }
+
+  Future<void> _getResultFromNextScreen1(BuildContext context) async {
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AddMateriel(isEquipement: false)));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        materielListeFuture = materielListeFuture1 = getAllMateriel();
+      });
+    }
+  }
+
+  Future<void> _getResultFromNextScreen2(BuildContext context) async {
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ListeMaterielByActeur()));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        materielListeFuture = materielListeFuture1 = getAllMateriel();
+      });
+    }
   }
 
   @override
@@ -360,19 +389,14 @@ class _LocationState extends State<Location> {
                               ),
                               onTap: () async {
                                 Navigator.of(context).pop();
-
-                                // final result = await
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => AddMateriel(isEquipement: false,)));
-                                //  if (result == true) {
-                                //   refreshList(); // Méthode pour rafraîchir la liste après ajout
-                                // }
-                                // // Navigator.push(
-                                //     context,
-                                //     MaterialPageRoute(
-                                //         builder: (context) => AddMateriel()));
+                                // final result = await Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (context) =>
+                                //         AddMateriel(isEquipement: false),
+                                //   ),
+                                // );
+                                _getResultFromNextScreen1(context);
                               },
                             ),
                           ),
@@ -392,11 +416,8 @@ class _LocationState extends State<Location> {
                               ),
                               onTap: () async {
                                 Navigator.of(context).pop();
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            ListeMaterielByActeur()));
+                                _getResultFromNextScreen2(context);
+                            
                               },
                             ),
                           )
@@ -587,7 +608,7 @@ class _LocationState extends State<Location> {
                                         materielListe = snapshot.data!;
                                         String searchText = "";
                                         List<Materiel> filteredSearch =
-                                            materielListe.where((cate)  {
+                                            materielListe.where((cate) {
                                           String nomCat =
                                               cate.nom.toLowerCase();
                                           searchText = _searchController.text
@@ -1014,7 +1035,6 @@ class _LocationState extends State<Location> {
                           )))));
   }
 
-
   Widget _buildShimmerEffect() {
     return Center(
       child: GridView.builder(
@@ -1083,7 +1103,6 @@ class _LocationState extends State<Location> {
     );
   }
 
- 
   DropdownButtonFormField<String> buildDropdown(List<TypeMateriel> typeList) {
     return DropdownButtonFormField<String>(
       isExpanded: true,

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,7 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
   String? email = "";
   int page = 0;
   bool isLoading = false;
-  int size = 8;
+  int size = 2;
   bool hasMore = true;
   String libelleFiliere = "Équipements et matériels";
   bool isLoadingLibelle = true;
@@ -230,13 +231,10 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
 
   Future<List<Materiel>> getAllMateriel() async {
     if (selectedType != null) {
-      materielListe = await MaterielService()
-          .fetchMaterielByTypeAndFiliere(
-              selectedType!.idTypeMateriel!,
-               libelleFiliere,
-              widget.detectedCountry != null
-                  ? widget.detectedCountry!
-                  : "Mali");
+      materielListe = await MaterielService().fetchMaterielByTypeAndFiliere(
+          selectedType!.idTypeMateriel!,
+          libelleFiliere,
+          widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
     } else {
       materielListe = await MaterielService().fetchMateriele(
           widget.detectedCountry != null ? widget.detectedCountry! : "Mali",
@@ -264,15 +262,41 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
     super.initState();
   }
 
-
-  
- @override
+  @override
   void dispose() {
     scrollableController.dispose();
     scrollableController1.dispose();
     _searchController.dispose();
     // refreshList();
     super.dispose();
+  }
+
+  Future<void> _getResultFromNextScreen1(BuildContext context) async {
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AddMateriel(
+                  isEquipement: true,
+                )));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        materielListeFuture = materielListeFuture1 = getAllMateriel();
+      });
+    }
+  }
+
+  Future<void> _getResultFromNextScreen2(BuildContext context) async {
+    final result = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => ListeMaterielByActeur()));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        materielListeFuture = materielListeFuture1 = getAllMateriel();
+      });
+    }
   }
 
   @override
@@ -310,21 +334,7 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
                               ),
                               onTap: () async {
                                 Navigator.of(context).pop();
-
-                                // final result = await
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => AddMateriel(
-                                              isEquipement: true,
-                                            )));
-                                //  if (result == true) {
-                                //   refreshList(); // Méthode pour rafraîchir la liste après ajout
-                                // }
-                                // // Navigator.push(
-                                //     context,
-                                //     MaterialPageRoute(
-                                //         builder: (context) => AddMateriel()));
+                                _getResultFromNextScreen1(context);
                               },
                             ),
                           ),
@@ -344,11 +354,7 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
                               ),
                               onTap: () async {
                                 Navigator.of(context).pop();
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            ListeMaterielByActeur()));
+                                _getResultFromNextScreen2(context);
                               },
                             ),
                           )
@@ -484,7 +490,7 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
                                       widget.detectedCountry != null
                                           ? widget.detectedCountry!
                                           : "Mali",
-                                          libelleFiliere,
+                                      libelleFiliere,
                                       refresh: true);
                             })
                           : setState(() {

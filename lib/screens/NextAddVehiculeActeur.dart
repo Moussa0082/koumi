@@ -68,37 +68,6 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
   bool isLoadingLibelle = true;
   String? libelleNiveau3Pays;
 
-  // Méthode pour ajouter une nouvelle destination et prix
-  // void addDestinationAndPrix() {
-  //   // Créer un nouveau contrôleur pour chaque champ
-  //   TextEditingController newDestinationController = TextEditingController();
-  //   TextEditingController newPrixController = TextEditingController();
-
-  //   setState(() {
-  //     // Ajouter les nouveaux contrôleurs aux listes
-  //     destinationControllers.add(newDestinationController);
-  //     prixControllers.add(newPrixController);
-  //   });
-  // }
-
-// Méthode pour ajouter une nouvelle destination et prix
-  // void addDestinationAndPrix() {
-  //   // Créer un nouveau contrôleur pour chaque champ
-  //   TextEditingController newDestinationController = TextEditingController();
-  //   TextEditingController newPrixController = TextEditingController();
-
-  //   setState(() {
-  //     // Ajouter les nouveaux contrôleurs aux listes
-  //     destinationControllers.add(newDestinationController);
-
-  //     prixControllers.add(newPrixController);
-
-  //     // Ajouter une chaîne vide à la liste des destinations sélectionnées
-  //     selectedDestinations.add('');
-  //     n3Value = '';
-  //   });
-  // }
-
 // Déclarer une liste pour stocker les valeurs sélectionnées pour chaque liste de destinations
   List<String?> selectedDestinationsList = [];
 
@@ -244,7 +213,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
           toolbarHeight: 100,
           leading: IconButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.pop(context, true);
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
@@ -768,10 +737,8 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                             setState(() {
                                               _isLoading = false;
                                             }),
-                                            Navigator.pop(context),
-                                            // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => VehiculeActeur())),
-
-                                            // Get.off(VehiculeActeur()),
+                                            Navigator.pop(context, true),
+                                           
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
@@ -820,12 +787,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                               _isLoading = false;
                                               // typeVoiture == null;
                                             }),
-                                            Navigator.pop(context),
-                                            // Navigator.pushReplacement(
-                                            //   context,
-                                            //   MaterialPageRoute(
-                                            //       builder: (context) =>
-                                            //           VehiculeActeur())),
+                                            Navigator.pop(context, true),
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(

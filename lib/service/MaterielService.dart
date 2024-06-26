@@ -18,7 +18,7 @@ class MaterielService extends ChangeNotifier {
   List<Materiel> materielList = [];
   int page = 0;
   bool isLoading = false;
-  int size = 8;
+  int size = 4;
   bool hasMore = true;
 
 

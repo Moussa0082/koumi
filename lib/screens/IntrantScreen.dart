@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,7 @@ import 'package:shimmer/shimmer.dart';
 
 class IntrantScreen extends StatefulWidget {
   String? detectedCountry;
-   IntrantScreen({super.key, this.detectedCountry});
+  IntrantScreen({super.key, this.detectedCountry});
 
   @override
   State<IntrantScreen> createState() => _IntrantScreenState();
@@ -54,7 +55,6 @@ class _IntrantScreenState extends State<IntrantScreen> {
   late Future<List<Intrant>> intrantListeFuture1;
 
   bool isLoadingLibelle = true;
- 
 
   void _scrollListener() {
     if (scrollableController.position.pixels >=
@@ -66,10 +66,12 @@ class _IntrantScreenState extends State<IntrantScreen> {
       setState(() {
         // Rafraîchir les données ici
         page++;
-        });
+      });
       debugPrint("yes - fetch all by pays intrants");
-      fetchIntrantByPays(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
-      // fetchIntrant().then((value) {
+      fetchIntrantByPays(
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+          .then((value) {
+        // fetchIntrant().then((value) {
 
         setState(() {
           // Rafraîchir les données ici
@@ -93,12 +95,14 @@ class _IntrantScreenState extends State<IntrantScreen> {
       // Incrementez la page et récupérez les stocks par catégorie
       debugPrint("yes - fetch by category");
       setState(() {
-          // Rafraîchir les données ici
-      page++;
-        });
-  
-    fetchIntrantByCategorie(widget.detectedCountry != null ? widget.detectedCountry! : "Mali", selectedType!.idCategorieProduit!).then((value) {
+        // Rafraîchir les données ici
+        page++;
+      });
 
+      fetchIntrantByCategorie(
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali",
+              selectedType!.idCategorieProduit!)
+          .then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -106,68 +110,56 @@ class _IntrantScreenState extends State<IntrantScreen> {
       });
     }
     debugPrint("no");
+  }
 
-}
-
-
- Future<List<Intrant>> fetchIntrantByPays(String niveau3PaysActeur, {bool refresh = false }) async {
+  Future<List<Intrant>> fetchIntrantByPays(String niveau3PaysActeur,
+      {bool refresh = false}) async {
     if (isLoading) return [];
 
-      isLoading = true;
+    isLoading = true;
 
     if (refresh) {
-    
-
-        intrantListe.clear();
-        page = 0;
-        hasMore = true;
-     
+      intrantListe.clear();
+      page = 0;
+      hasMore = true;
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/intrant/getIntrantsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
-
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/intrant/getIntrantsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 
         if (body.isEmpty) {
-         
-            hasMore = false;
-          
+          hasMore = false;
         } else {
-          
-            List<Intrant> newIntrant = body.map((e) => Intrant.fromMap(e)).toList();
+          List<Intrant> newIntrant =
+              body.map((e) => Intrant.fromMap(e)).toList();
           intrantListe.addAll(newIntrant);
-          
         }
 
-        debugPrint("response body all intrant by pays with pagination $page par défilement soit ${intrantListe.length}");
-       return intrantListe;
-
+        debugPrint(
+            "response body all intrant by pays with pagination $page par défilement soit ${intrantListe.length}");
+        return intrantListe;
       } else {
         print(
             'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {
-      print('Une erreur s\'est produite lors de la récupération des intrants: $e');
+      print(
+          'Une erreur s\'est produite lors de la récupération des intrants: $e');
     } finally {
-     
-        isLoading = false;
-      
-
+      isLoading = false;
     }
     return intrantListe;
   }
 
-  
-
-
-
-  Future<List<Intrant>> fetchIntrantByCategorie(String niveau3PaysActeur, String idCategorieProduit, {bool refresh = false}) async {
-
+  Future<List<Intrant>> fetchIntrantByCategorie(
+      String niveau3PaysActeur, String idCategorieProduit,
+      {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -183,8 +175,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/intrant/getIntrantsByPaysAndCategorieWithPagination?idCategorieProduit=${selectedType!.idCategorieProduit}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
-
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/intrant/getIntrantsByPaysAndCategorieWithPagination?idCategorieProduit=${selectedType!.idCategorieProduit}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -237,12 +229,12 @@ class _IntrantScreenState extends State<IntrantScreen> {
     }
   }
 
- Future<List<Intrant>> getAllIntrant() async {
-       if(selectedType != null){
-        
-      intrantListe = await IntrantService().fetchIntrantByCategorie(selectedType!.idCategorieProduit!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
-       }
-      
+  Future<List<Intrant>> getAllIntrant() async {
+    if (selectedType != null) {
+      intrantListe = await IntrantService().fetchIntrantByCategorie(
+          selectedType!.idCategorieProduit!,
+          widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+    }
 
     return intrantListe;
   }
@@ -251,26 +243,51 @@ class _IntrantScreenState extends State<IntrantScreen> {
   void initState() {
     super.initState();
     verify();
-  
-    
-    _searchController = TextEditingController();
-    _typeList = http
-        .get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
-  WidgetsBinding.instance.addPostFrameCallback((_){
-    //write or call your logic
-    //code will run when widget rendering complete
-  scrollableController.addListener(_scrollListener);
-  });
-  WidgetsBinding.instance.addPostFrameCallback((_){
-    //write or call your logic
-    //code will run when widget rendering complete
-  scrollableController1.addListener(_scrollListener1);
-  });
-   intrantListeFuture = IntrantService().fetchIntrantByPays(widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
-   intrantListeFuture1 = getAllIntrant();
-      // final countryProvider = Provider.of<CountryProvider>(context , listen: false);
 
-  debugPrint("pays ${widget.detectedCountry!}");
+    _searchController = TextEditingController();
+    _typeList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      //write or call your logic
+      //code will run when widget rendering complete
+      scrollableController.addListener(_scrollListener);
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      //write or call your logic
+      //code will run when widget rendering complete
+      scrollableController1.addListener(_scrollListener1);
+    });
+    intrantListeFuture = IntrantService().fetchIntrantByPays(
+        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+    intrantListeFuture1 = getAllIntrant();
+    // final countryProvider = Provider.of<CountryProvider>(context , listen: false);
+
+    debugPrint("pays ${widget.detectedCountry!}");
+  }
+
+  Future<void> _getResultFromNextScreen1(BuildContext context) async {
+    final result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => AddIntrant()));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        intrantListeFuture = IntrantService().fetchIntrantByPays(
+            widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+      });
+    }
+  }
+
+  Future<void> _getResultFromNextScreen2(BuildContext context) async {
+    final result = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => ListeIntrantByActeur()));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        intrantListeFuture = IntrantService().fetchIntrantByPays(
+            widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+      });
+    }
   }
 
   @override
@@ -305,9 +322,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
             ),
             actions: !isExist
                 ? null
-                :
-            
-                (typeActeurData
+                : (typeActeurData
                             .map((e) => e.libelle!.toLowerCase())
                             .contains("fournisseur") ||
                         typeActeurData
@@ -337,11 +352,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                   ),
                                   onTap: () async {
                                     Navigator.of(context).pop();
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                AddIntrant()));
+                                     _getResultFromNextScreen1(context);
                                   },
                                 ),
                               ),
@@ -361,11 +372,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                   ),
                                   onTap: () async {
                                     Navigator.of(context).pop();
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                ListeIntrantByActeur()));
+                                    _getResultFromNextScreen2(context);
                                   },
                                 ),
                               )
@@ -381,7 +388,6 @@ class _IntrantScreenState extends State<IntrantScreen> {
                   return <Widget>[
                     SliverToBoxAdapter(
                         child: Column(children: [
-                    
                       Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: ToggleButtons(
@@ -452,8 +458,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                 dynamic jsonString =
                                     utf8.decode(snapshot.data.bodyBytes);
                                 dynamic responseData = json.decode(jsonString);
-  //                      
-  // }     
+                                //
+                                // }
                                 if (responseData is List) {
                                   final reponse = responseData;
                                   final typeList = reponse
@@ -476,7 +482,6 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             },
                           ),
                         ),
-
                       const SizedBox(height: 10),
                     ])),
                   ];
@@ -491,13 +496,14 @@ class _IntrantScreenState extends State<IntrantScreen> {
                       debugPrint("refresh page ${page}");
                       selectedType == null
                           ? setState(() {
-                              intrantListeFuture =
-                                  IntrantService().fetchIntrantByPays(widget.detectedCountry!);
+                              intrantListeFuture = IntrantService()
+                                  .fetchIntrantByPays(widget.detectedCountry!);
                             })
                           : setState(() {
                               intrantListeFuture1 = IntrantService()
                                   .fetchIntrantByCategorie(
-                                      selectedType!.idCategorieProduit!, widget.detectedCountry!);
+                                      selectedType!.idCategorieProduit!,
+                                      widget.detectedCountry!);
                             });
                     },
                     child: selectedType == null
@@ -570,10 +576,9 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                                 crossAxisSpacing: 10,
                                                 childAspectRatio: 0.8,
                                               ),
-                                              itemCount: filteredSearch.length +
-                                                  1,
+                                              itemCount:
+                                                  filteredSearch.length + 1,
                                               itemBuilder: (context, index) {
-                                              
                                                 if (index <
                                                     filteredSearch.length) {
                                                   return GestureDetector(
@@ -592,7 +597,6 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                                     },
                                                     child: Card(
                                                       margin: EdgeInsets.all(8),
-                                                      
                                                       child: Column(
                                                         crossAxisAlignment:
                                                             CrossAxisAlignment
@@ -795,7 +799,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                       );
                                     } else {
                                       intrantListe = snapshot.data!;
-   String searchText = "";
+                                      String searchText = "";
                                       List<Intrant> filteredSearch =
                                           intrantListe.where((cate) {
                                         String nomCat =
@@ -1162,11 +1166,10 @@ class _IntrantScreenState extends State<IntrantScreen> {
     );
   }
 
-
-   DropdownButtonFormField<String> buildDropdown(
-
+  DropdownButtonFormField<String> buildDropdown(
       List<CategorieProduit> typeList) {
-        final countryProvider = Provider.of<CountryProvider>(context, listen: false);
+    final countryProvider =
+        Provider.of<CountryProvider>(context, listen: false);
     return DropdownButtonFormField<String>(
       isExpanded: true,
       items: typeList
@@ -1188,7 +1191,9 @@ class _IntrantScreenState extends State<IntrantScreen> {
 
           page = 0;
           hasMore = true;
-          fetchIntrantByCategorie(selectedType!.idCategorieProduit!, widget.detectedCountry!,refresh: true);
+          fetchIntrantByCategorie(
+              selectedType!.idCategorieProduit!, widget.detectedCountry!,
+              refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {
               scrollableController1.jumpTo(0.0);
@@ -1236,4 +1241,3 @@ class _IntrantScreenState extends State<IntrantScreen> {
     );
   }
 }
-

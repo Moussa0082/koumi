@@ -45,8 +45,6 @@ class _DetailMaterielState extends State<DetailMateriel> {
   late Future _monnaieList;
   late Monnaie monnaie = Monnaie();
   final formkey = GlobalKey<FormState>();
-  // List<ParametreGeneraux> paraList = [];
-  // late ParametreGeneraux para = ParametreGeneraux();
   late ValueNotifier<bool> isDialOpenNotifier;
   String? imageSrc;
   File? photo;
@@ -62,8 +60,6 @@ class _DetailMaterielState extends State<DetailMateriel> {
   bool _isEditing = false;
   bool isExist = false;
   String? email = "";
-  // late List<Device> devices = [];
-  // late Future<List<Device>> _listeDevice;
   bool isLoadingLibelle = true;
   late Future<Map<String, String>> rates;
 
@@ -235,7 +231,20 @@ class _DetailMaterielState extends State<DetailMateriel> {
                         typeMateriel: materiels.typeMateriel,
                         monnaie: monnaie);
                     _isLoading = false;
-                  })
+                  }),
+                   ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Row(
+                        children: [
+                          Text(
+                            "Modifier avec succéss",
+                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                          ),
+                        ],
+                      ),
+                      duration: Duration(seconds: 2),
+                    ),
+                  )
                 })
             .catchError((onError) => {
                   setState(() {
@@ -271,7 +280,20 @@ class _DetailMaterielState extends State<DetailMateriel> {
                         typeMateriel: materiels.typeMateriel,
                         monnaie: monnaie);
                     _isLoading = false;
-                  })
+                  }),
+                  ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Text(
+                "Modifier avec succéss",
+                style: TextStyle(overflow: TextOverflow.ellipsis),
+              ),
+            ],
+          ),
+          duration: Duration(seconds: 2),
+        ),
+      )
                 })
             .catchError((onError) => {
                   setState(() {
@@ -499,7 +521,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
         //     "${materiels.prixParHeure.toString()} ${para.monnaie}"):
         _buildItem('Prix par heure : ',
             "${materiels.prixParHeure.toString()} ${materiels.monnaie!.libelle}"),
-        
+
         FutureBuilder<Map<String, String>>(
           future: rates,
           builder: (context, snapshot) {

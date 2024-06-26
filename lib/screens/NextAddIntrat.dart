@@ -641,7 +641,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                           setState(() {
                                             _isLoading = false;
                                           }),
-                                          Navigator.pop(context),
+                                          Navigator.pop(context, true),
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
                                             const SnackBar(
@@ -703,7 +703,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                           setState(() {
                                             _isLoading = false;
                                           }),
-                                          Navigator.pop(context),
+                                         Navigator.pop(context, true),
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
                                             const SnackBar(

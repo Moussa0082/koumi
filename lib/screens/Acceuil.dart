@@ -2,29 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart' ;
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:koumi_app/admin/AlerteScreen.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CountryProvider.dart';
-import 'package:koumi_app/screens/ConseilScreen.dart';
-import 'package:koumi_app/screens/IntrantScreen.dart';
-import 'package:koumi_app/screens/Location.dart' as l;
-import 'package:koumi_app/screens/MesCommande.dart';
-import 'package:koumi_app/screens/Products.dart';
-import 'package:koumi_app/screens/Store.dart';
-import 'package:koumi_app/screens/Transport.dart';
-import 'package:koumi_app/screens/Weather.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
-
 import 'package:koumi_app/widgets/Default_Acceuil.dart';
-import 'package:koumi_app/widgets/connection_verify.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../widgets/AlertAcceuil.dart';
 
 class Accueil extends StatefulWidget {
   const Accueil({super.key});
@@ -50,7 +37,7 @@ class _AccueilState extends State<Accueil> {
   CountryProvider? countryProvider;
   late BuildContext _currentContext;
 
-    void getLocationNew() async {
+  void getLocationNew() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
@@ -131,8 +118,8 @@ class _AccueilState extends State<Accueil> {
       longitude.value = 'Longitude : ${position.longitude}';
       getAddressFromLatLang(position);
     });
-  }  
-  
+  }
+
   Future<void> getAddressFromLatLang(Position position) async {
     List<Placemark> placemark =
         await placemarkFromCoordinates(position.latitude, position.longitude);
@@ -140,17 +127,15 @@ class _AccueilState extends State<Accueil> {
     debugPrint("Address ISO: $detectedC");
     address.value =
         'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
-        setState(() {
-          
-    detectedC = place.isoCountryCode;
-    detectedCountryCode = place.isoCountryCode!;
-    detectedCountry = place.country!;
-        });
+    setState(() {
+      detectedC = place.isoCountryCode;
+      detectedCountryCode = place.isoCountryCode!;
+      detectedCountry = place.country!;
+    });
 
     debugPrint(
         "Address:   ${place.locality},${place.country},${place.isoCountryCode}");
   }
-  
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -168,9 +153,6 @@ class _AccueilState extends State<Accueil> {
     }
   }
 
- 
-
-
   @override
   void initState() {
     // TODO: implement initState
@@ -184,11 +166,8 @@ class _AccueilState extends State<Accueil> {
 
   @override
   void dispose() {
-    
     super.dispose();
   }
-
- 
 
   @override
   Widget build(BuildContext context) {
@@ -197,21 +176,21 @@ class _AccueilState extends State<Accueil> {
       appBar: const CustomAppBar(),
       body: ListView(
         children: [
-          SizedBox(height: 180, child:  Carrousels()),
-          
+          SizedBox(height: 180, child: Carrousels()),
+
           // SizedBox(height: 180, child: isExist ? Carrousel(): Carrousels()),
           // const SizedBox(
           //   height: 10,
           // ),
-                    // SizedBox(height: 180, child: isExist ? Carrousel(): CarrouselOffLine()),
-         const SizedBox(
-            height: 10,
-          ),
-          isExist ?
-          SizedBox(height: 100, child: AlertAcceuil()): Container(),
+          // SizedBox(height: 180, child: isExist ? Carrousel(): CarrouselOffLine()),
           const SizedBox(
             height: 10,
           ),
+          // isExist ?
+          // SizedBox(height: 100, child: AlertAcceuil()): Container(),
+          // const SizedBox(
+          //   height: 10,
+          // ),
           DefautAcceuil(),
           // isExist ?
           // SizedBox(
@@ -262,7 +241,7 @@ class _AccueilState extends State<Accueil> {
   //           if (index == 9) {
   //               Navigator.push(context,
   //                 MaterialPageRoute(builder: (context) => ProductsScreen(detectedCountry: detectedCountry)));
-             
+
   //           } else if (index == 8) {
   //             Navigator.push(
   //                 context,
@@ -344,6 +323,4 @@ class _AccueilState extends State<Accueil> {
   //         ),
   //   );
   // }
-
-   
 }
