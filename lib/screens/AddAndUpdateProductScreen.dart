@@ -57,42 +57,12 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
   String? n3Value;
   String niveau3 = '';
   String forme = '';
-  // List<ParametreGeneraux> paraList = [];
-  // late ParametreGeneraux para = ParametreGeneraux();
   bool isLoadingLibelle = true;
   String? libelleNiveau3Pays;
   String? monnaieValue;
   late Future _monnaieList;
   late Monnaie monnaie = Monnaie();
-  // String? monnaie;
-
-//    Future<String> getMonnaieByActor(String id) async {
-//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
-
-//     if (response.statusCode == 200) {
-//       print("monnaie : ${response.body}");
-//       return response.body;  // Return the body directly since it's a plain string
-//     } else {
-//       throw Exception('Failed to load monnaie');
-//     }
-// }
-
-//  Future<void> fetchPaysDataByActor() async {
-//     try {
-//       String monnaies = await getMonnaieByActor(acteur.idActeur!);
-
-//       setState(() {
-//         monnaie = monnaies;
-//         isLoadingLibelle = false;
-//       });
-//     } catch (e) {
-//       setState(() {
-//         isLoadingLibelle = false;
-//         });
-//       print('Error: $e');
-//     }
-//   }
-
+  
   Future<String> getLibelleNiveau3PaysByActor(String id) async {
     final response = await http
         .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
@@ -190,18 +160,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
     );
   }
 
-  // void verifyParam() {
-  //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-  //       .parametreList!;
-
-  //   if (paraList.isNotEmpty) {
-  //     para = paraList[0];
-  //   } else {
-  //     // Gérer le cas où la liste est null ou vide, par exemple :
-  //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
-  //   }
-  // }
-
+ 
   @override
   void initState() {
     super.initState();
@@ -239,7 +198,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
         toolbarHeight: 100,
         leading: IconButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.pop(context, true);
             },
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: Text(
@@ -250,57 +209,10 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
       ),
       body: SingleChildScrollView(
         child: Column(children: [
-          // const SizedBox(height: 10),
-          // Padding(
-          //   padding: const EdgeInsets.all(10.0),
-          //   child: Container(
-          //     padding: EdgeInsets.symmetric(horizontal: 10),
-          //     decoration: BoxDecoration(
-          //       color: Colors.blueGrey[50], // Couleur d'arrière-plan
-          //       borderRadius: BorderRadius.circular(25),
-          //     ),
-          //     child: Row(
-          //       children: [
-          //         Icon(Icons.search,
-          //             color: Colors.blueGrey[400]), // Couleur de l'icône
-          //         SizedBox(
-          //             width:
-          //                 10), // Espacement entre l'icône et le champ de recherche
-          //         Expanded(
-          //           child: TextField(
-          //             controller: _searchController,
-          //             onChanged: (value) {
-          //               setState(() {});
-          //             },
-          //             decoration: InputDecoration(
-          //               hintText: 'Rechercher',
-          //               border: InputBorder.none,
-          //               hintStyle: TextStyle(
-          //                   color: Colors
-          //                       .blueGrey[400]), // Couleur du texte d'aide
-          //             ),
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
-          // const SizedBox(height: 10),
+          
           Column(
             children: [
-              // SizedBox(
-              //   // height: 150,
-              //   child: Padding(
-              //       padding: const EdgeInsets.only(left: 10.0),
-              //       child: photo != null
-              //           ? Image.file(
-              //               photo!,
-              //               fit: BoxFit.fitWidth,
-              //               height: 100,
-              //               width: 150,
-              //             )
-              //           : Container()),
-              // ),
+            
               SizedBox(
                 height: 30,
               ),
