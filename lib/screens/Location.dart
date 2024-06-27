@@ -354,7 +354,13 @@ class _LocationState extends State<Location> {
                   color: d_colorGreen, fontWeight: FontWeight.bold),
             ),
             actions: !isExist
-                ? null
+                ? [
+                    IconButton(
+                        onPressed: () {
+                          materielListeFuture = getAllMateriel();
+                        },
+                        icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                  ]
                 : [
                     IconButton(
                         onPressed: () {

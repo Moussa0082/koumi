@@ -309,10 +309,19 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
             title: Text(
               "Matériels et Équipements",
               style: const TextStyle(
-                  color: d_colorGreen, fontWeight: FontWeight.bold,  fontSize: 18,),
+                color: d_colorGreen,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
             actions: !isExist
-                ? null
+                ? [
+                    IconButton(
+                        onPressed: () {
+                          materielListeFuture = getAllMateriel();
+                        },
+                        icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                  ]
                 : [
                     IconButton(
                         onPressed: () {

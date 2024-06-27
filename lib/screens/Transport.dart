@@ -339,10 +339,21 @@ class _TransportState extends State<Transport> {
             title: Text(
               'Transport',
               style: const TextStyle(
-                  color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 18),
+                  color: d_colorGreen,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18),
             ),
             actions: !isExist
-                ? null
+                ? [
+                    IconButton(
+                        onPressed: () {
+                          vehiculeListeFuture = VehiculeService().fetchVehicule(
+                              widget.detectedCountry != null
+                                  ? widget.detectedCountry!
+                                  : "Mali");
+                        },
+                        icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                  ]
                 : [
                     IconButton(
                         onPressed: () {

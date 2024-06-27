@@ -22,7 +22,6 @@ import 'package:koumi_app/screens/Products.dart';
 import 'package:koumi_app/screens/Store.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/Weather.dart';
-import 'package:koumi_app/widgets/AlertAcceuil.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
 import 'package:provider/provider.dart';
@@ -202,10 +201,10 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
           //     height: 180, child: isExist ? Carrousel() : CarrouselOffLine()),
 
           // SizedBox(height: 100, child: isExist ? Carrousel(): CarrouselOffLine()),
-          const SizedBox(
-            height: 10,
-          ),
-          SizedBox(height: 100, child: AlertAcceuil()),
+          // const SizedBox(
+          //   height: 10,
+          // ),
+          // SizedBox(height: 100, child: AlertAcceuil()),
           const SizedBox(
             height: 10,
           ),
@@ -317,7 +316,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
             }
           },
           borderRadius: BorderRadius.circular(10),
-          child:  Container(
+          child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               color: Colors.white,
@@ -356,8 +355,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                 ),
               ],
             ),
-          )
-          ),
+          )),
     );
   }
 
