@@ -206,7 +206,7 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
             "Compléments alimentaires",
             style: TextStyle(
               color: d_colorGreen,
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),

@@ -189,7 +189,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
           title: Text(
             typeVoiture.nom!.toUpperCase(),
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 18),
+                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
           ),
           actions: [
             IconButton(

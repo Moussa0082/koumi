@@ -207,7 +207,8 @@ class _AddMaterielState extends State<AddMateriel> {
             title: Text(
               "Ajout matériel",
               style: const TextStyle(
-                  color: d_colorGreen, fontWeight: FontWeight.bold),
+                  color: d_colorGreen, fontWeight: FontWeight.bold,
+                  fontSize: 20),
             ),
           ),
           body: SingleChildScrollView(

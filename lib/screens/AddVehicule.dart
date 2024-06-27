@@ -111,7 +111,7 @@ class _AddVehiculeState extends State<AddVehicule> {
           title: Text(
             'Ajout de véhicule',
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
+                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
           ),
         ),
         body: SingleChildScrollView(

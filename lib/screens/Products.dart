@@ -327,7 +327,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           title: Text(
             'Tous les Produits',
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 18),
+                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
           ),
           actions: !isExist
               ? null

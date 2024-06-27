@@ -63,7 +63,7 @@ class _CampagnePageState extends State<CampagnePage> {
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: const Text(
           "Campagne agricole",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize:18),
+          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize:20),
         ),
         actions: [
           IconButton(

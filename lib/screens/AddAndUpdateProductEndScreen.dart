@@ -265,7 +265,7 @@ class _AddAndUpdateProductEndSreenState
           title: Text(
             widget.isEditable == false ? "Ajouter produit" : "Modifier produit",
             style: TextStyle(
-                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green),
           ),
         ),
         body: SingleChildScrollView(

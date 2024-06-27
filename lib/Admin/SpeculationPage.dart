@@ -73,7 +73,7 @@ Future<List<Speculation>> getCatListe() async {
                 style: TextStyle(
                     color: d_colorGreen,
                     fontWeight: FontWeight.w600,
-                    fontSize: 18,
+                    fontSize: 20,
                     overflow: TextOverflow.ellipsis),
               ),
             ],

@@ -85,7 +85,7 @@ class _CategoriPageState extends State<CategoriPage> {
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: const Text(
           "Catégories de produits",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         actions: [
           PopupMenuButton<String>(

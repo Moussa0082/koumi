@@ -74,7 +74,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
             "Alerte ",
             style: TextStyle(
               color: d_colorGreen,
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),

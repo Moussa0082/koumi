@@ -73,7 +73,7 @@ class _AddCategorieState extends State<AddCategorie> {
             Text(
               filiere.libelleFiliere!.toUpperCase(),
               style:
-                  TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+                  TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 20),
             )
           ]),
           actions: [

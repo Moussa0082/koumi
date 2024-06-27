@@ -139,7 +139,7 @@ class _AddSuperficieState extends State<AddSuperficie> {
           title: Text(
             'Ajout de superficie ',
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
+                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
           ),
         ),
         body: SingleChildScrollView(

@@ -128,6 +128,7 @@ class _UpdateZoneState extends State<UpdateZone> {
           style: TextStyle(
               color: d_colorGreen,
               fontWeight: FontWeight.bold,
+              fontSize: 20,
               overflow: TextOverflow.ellipsis),
         ),
       ),

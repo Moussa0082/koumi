@@ -88,7 +88,8 @@ class _AddIntrantState extends State<AddIntrant> {
             title: Text(
               'Ajout d\'intrant ',
               style: const TextStyle(
-                  color: d_colorGreen, fontWeight: FontWeight.bold),
+                  color: d_colorGreen, fontWeight: FontWeight.bold,
+                  fontSize: 20),
             ),
           ),
           body: SingleChildScrollView(

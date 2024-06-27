@@ -446,7 +446,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                 ? "Ajouter magasin"
                 : "Modifier magasin",
             style: TextStyle(
-                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green),
           ),
         ),
         body: SingleChildScrollView(

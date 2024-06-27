@@ -316,7 +316,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
               "Intrants agricoles ",
               style: TextStyle(
                 color: d_colorGreen,
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),

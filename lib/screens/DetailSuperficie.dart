@@ -35,7 +35,7 @@ class _DetailSuperficieState extends State<DetailSuperficie> {
         title: Text(
           'Détail',
           style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
       body: SingleChildScrollView(

@@ -151,7 +151,7 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
             "Mes Matériels",
             style: const TextStyle(
                 color: d_colorGreen, fontWeight: FontWeight.bold,
-                  fontSize: 18),
+                  fontSize: 20),
           ),
            actions: [
               IconButton(

@@ -198,7 +198,7 @@ class _EngraisAndApportState extends State<EngraisAndApport> {
             "Engrais et apports ",
             style: TextStyle(
               color: d_colorGreen,
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),

@@ -203,7 +203,7 @@ class _FruitAndLegumesState extends State<FruitAndLegumes> {
             "Fruits & légumes",
             style: TextStyle(
               color: d_colorGreen,
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),

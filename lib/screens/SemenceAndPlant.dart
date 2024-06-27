@@ -204,7 +204,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
             "Semences et plants ",
             style: TextStyle(
               color: d_colorGreen,
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),

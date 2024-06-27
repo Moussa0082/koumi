@@ -180,7 +180,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
               'Etape 2 ',
               style: const TextStyle(
                   color: d_colorGreen, fontWeight: FontWeight.bold,
-                  fontSize: 18),
+                  fontSize: 20),
             ),
           ),
           body: SingleChildScrollView(

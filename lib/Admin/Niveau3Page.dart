@@ -149,7 +149,7 @@ class _Niveau3PageState extends State<Niveau3Page> {
         title: Text(
           "Niveau 3",
           style: const TextStyle(
-              color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 19),
+              color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         actions: [
           PopupMenuButton<String>(

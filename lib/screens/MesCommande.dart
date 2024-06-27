@@ -119,7 +119,7 @@ class _MesCommandeState extends State<MesCommande> {
             style: const TextStyle(
               color: d_colorGreen,
               fontWeight: FontWeight.bold,
-              fontSize: 18,
+              fontSize: 20,
             ),
           ),
       actions: [

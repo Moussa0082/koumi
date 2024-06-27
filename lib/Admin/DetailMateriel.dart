@@ -368,12 +368,14 @@ class _DetailMaterielState extends State<DetailMateriel> {
                   ? Text(
                       'Modification',
                       style: const TextStyle(
-                          color: d_colorGreen, fontWeight: FontWeight.bold),
+                          color: d_colorGreen, fontWeight: FontWeight.bold,
+                          fontSize: 20),
                     )
                   : Text(
                       'Détail matériel',
                       style: const TextStyle(
-                          color: d_colorGreen, fontWeight: FontWeight.bold),
+                          color: d_colorGreen, fontWeight: FontWeight.bold,
+                          fontSize: 20),
                     ),
               actions: acteur.idActeur == materiels.acteur.idActeur
                   ? [

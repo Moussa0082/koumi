@@ -279,7 +279,7 @@ class _StoreScreenState extends State<StoreScreen> {
             title: Text(
               'Toutes les boutiques',
               style: const TextStyle(
-                  color: d_colorGreen, fontWeight: FontWeight.bold),
+                  color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
             ),
             actions: !isExist
                 ? null

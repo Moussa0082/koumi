@@ -137,7 +137,7 @@ bool isLoadingLibelle2 = true;
           title: Text(
            "Niveau 1 ",
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 18),
+                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
           ),
           actions: [
             PopupMenuButton<String>(

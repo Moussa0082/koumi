@@ -258,7 +258,7 @@ class _AddAlertesOffLineScreenState extends State<AddAlertesOffLineScreen> {
                   "Ajout d'alerte pour les personnes non connectés",
                   style: TextStyle(
                     color: d_colorGreen,
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 )),

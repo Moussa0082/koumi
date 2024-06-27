@@ -480,12 +480,14 @@ class _DetailTransportState extends State<DetailTransport> {
                   ? Text(
                       'Modification',
                       style: const TextStyle(
-                          color: d_colorGreen, fontWeight: FontWeight.bold),
+                          color: d_colorGreen, fontWeight: FontWeight.bold,
+                          fontSize: 20),
                     )
                   : Text(
                       'Transport',
                       style: const TextStyle(
-                          color: d_colorGreen, fontWeight: FontWeight.bold),
+                          color: d_colorGreen, fontWeight: FontWeight.bold,
+                          fontSize: 20),
                     ),
               actions: acteur.idActeur == vehicules.acteur.idActeur
                   ? [

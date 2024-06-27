@@ -351,7 +351,8 @@ class _LocationState extends State<Location> {
             title: Text(
               "Location Matériel",
               style: const TextStyle(
-                  color: d_colorGreen, fontWeight: FontWeight.bold),
+                  color: d_colorGreen, fontWeight: FontWeight.bold,
+                  fontSize: 20),
             ),
             actions: !isExist
                 ? [

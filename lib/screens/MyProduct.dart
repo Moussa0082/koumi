@@ -267,7 +267,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
         title: Text(
           'Mes Produits',
           style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold ,fontSize:18),
+              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold ,fontSize:20),
         ),
         // actions: !isExist ? null :  [
         //    IconButton(

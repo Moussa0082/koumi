@@ -100,7 +100,7 @@ class _Niveau3ListeState extends State<Niveau3Liste> {
         title: Text(
           widget.niveau2pays.nomN2.toUpperCase(),
           style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 18),
+              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
       body: SingleChildScrollView(

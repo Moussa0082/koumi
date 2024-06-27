@@ -183,7 +183,7 @@ String? libelleNiveau3Pays;
         title: Text(
           "Niveau 2",
           style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 18),
+              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 20),
         ),
         actions: [
           PopupMenuButton<String>(

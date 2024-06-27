@@ -12,13 +12,21 @@ import 'package:koumi_app/Admin/ProfilA.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CountryProvider.dart';
+import 'package:koumi_app/screens/ComplementAlimentaire.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
+import 'package:koumi_app/screens/EngraisAndApport.dart';
+import 'package:koumi_app/screens/FruitsAndLegumes.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart' as l;
+import 'package:koumi_app/screens/MatereilAndEquipement.dart';
 import 'package:koumi_app/screens/MesCommande.dart';
 import 'package:koumi_app/screens/MyProduct.dart';
 import 'package:koumi_app/screens/Panier.dart';
 import 'package:koumi_app/screens/Products.dart';
+import 'package:koumi_app/screens/ProduitElevage.dart';
+import 'package:koumi_app/screens/ProduitPhytosanitaire.dart';
+import 'package:koumi_app/screens/ProduitTransforme.dart';
+import 'package:koumi_app/screens/SemenceAndPlant.dart';
 import 'package:koumi_app/screens/Store.dart';
 import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/Weather.dart';
@@ -232,6 +240,14 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
     List<Widget> cards = [
       _buildAccueilCard("Conseils", "cons.png", 2),
       _buildAccueilCard("Alertes", "alt.png", 8),
+      // _buildAccueilCard("Semences et plants", "semence.png", 14),
+      // _buildAccueilCard("Produits phytosanitaires", "physo.png", 15),
+      // _buildAccueilCard("Engrais et apports", "engrais.png", 17),
+      // _buildAccueilCard("Fruits et légumes", "fruit&legume.png", 16),
+      // _buildAccueilCard("Compléments alimentaires", "compl.png", 18),
+      // _buildAccueilCard("Produits d'élevages", "elevage.png", 19),
+      // _buildAccueilCard("Matériels et équipements", "equi.png", 13),
+      // _buildAccueilCard("Produits transformés", "transforme.png", 20),
       _buildAccueilCard("Commandes", "cm.png", 3),
       _buildAccueilCard("Magasins", "shop.png", 4),
       _buildAccueilCard("Intrants agricoles", "int.png", 1),
@@ -252,7 +268,54 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
       child: InkWell(
           onTap: () {
-            if (index == 12) {
+            if (index == 20) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ProduitTransforme(detectedCountry: detectedCountry)));
+            } else if (index == 19) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ProduitElevage(detectedCountry: detectedCountry)));
+            } else if (index == 18) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ComplementAlimentaire(
+                          detectedCountry: detectedCountry)));
+            } else if (index == 17) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          EngraisAndApport(detectedCountry: detectedCountry)));
+            } else if (index == 16) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          FruitAndLegumes(detectedCountry: detectedCountry)));
+            } else if (index == 15) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProduitPhytosanitaire(
+                          detectedCountry: detectedCountry)));
+            } else if (index == 14) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          SemenceAndPlant(detectedCountry: detectedCountry)));
+            } else if (index == 13) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MaterielAndEquipement()));
+            } else if (index == 12) {
               Navigator.push(
                   context,
                   MaterialPageRoute(

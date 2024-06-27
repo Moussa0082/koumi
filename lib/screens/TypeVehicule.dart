@@ -61,7 +61,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
           title: Text(
             'Type de véhicule',
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold,fontSize:19),
+                color: d_colorGreen, fontWeight: FontWeight.bold,fontSize:20),
           ),
           actions: [
             PopupMenuButton<String>(

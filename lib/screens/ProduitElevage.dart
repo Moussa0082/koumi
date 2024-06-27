@@ -275,7 +275,7 @@ class _ProduitElevageState extends State<ProduitElevage> {
             "Produits d'élévages",
             style: TextStyle(
               color: d_colorGreen,
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),

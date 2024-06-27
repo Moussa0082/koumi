@@ -161,7 +161,7 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
           title: Text(
             'Materiel',
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold,fontSize:19),
+                color: d_colorGreen, fontWeight: FontWeight.bold,fontSize:20),
           ),
           actions: [
            

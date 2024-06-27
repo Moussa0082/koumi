@@ -163,7 +163,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
           title: Text(
             type.nom!.toUpperCase(),
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 18),
+                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
           ),
           actions: [
             IconButton(

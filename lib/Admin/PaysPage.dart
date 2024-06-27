@@ -1,19 +1,13 @@
-import 'dart:convert';
-
 import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:koumi_app/Admin/Addpays.dart';
 import 'package:koumi_app/Admin/Niveau1List.dart';
 import 'package:koumi_app/Admin/UpdatesPays.dart';
-import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Pays.dart';
-import 'package:koumi_app/models/SousRegion.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/Niveau1Service.dart';
 import 'package:koumi_app/service/PaysService.dart';
-import 'package:koumi_app/service/SousRegionService.dart';
 import 'package:provider/provider.dart';
 
 class PaysPage extends StatefulWidget {
@@ -28,24 +22,12 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _PaysPageState extends State<PaysPage> {
-  final formkey = GlobalKey<FormState>();
-  TextEditingController libelleController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-  TextEditingController niveau1PaysController = TextEditingController();
-  TextEditingController niveau2PaysController = TextEditingController();
-  TextEditingController niveau3PaysController = TextEditingController();
-  TextEditingController monnaieController = TextEditingController();
-  TextEditingController tauxDollarController = TextEditingController();
-  TextEditingController tauxYuanController = TextEditingController();
-  late SousRegion sousRegion;
   List<Pays> paysList = [];
   late Future<List<Pays>> _liste;
   late ParametreGeneraux para;
   List<Niveau1Pays> niveauList = [];
   List<ParametreGeneraux> paraList = [];
-  bool isLoading = false;
-  String? sousValue;
-  late Future _sousRegionList;
+
   late TextEditingController _searchController;
 
   @override
@@ -54,8 +36,7 @@ class _PaysPageState extends State<PaysPage> {
     // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
     //     .parametreList!;
     // para = paraList[0];
-    _sousRegionList =
-        http.get(Uri.parse('$apiOnlineUrl/sousRegion/read'));
+
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/sousRegion/read'));
     _searchController = TextEditingController();
   }
@@ -81,7 +62,8 @@ class _PaysPageState extends State<PaysPage> {
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: const Text(
           "Pays",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 18),
+          style: TextStyle(
+              color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         actions: [
           PopupMenuButton<String>(
@@ -101,9 +83,9 @@ class _PaysPageState extends State<PaysPage> {
                         overflow: TextOverflow.ellipsis),
                   ),
                   onTap: () async {
-                     if(mounted)
-                     Navigator.of(context).pop();
-                    _showDialog();
+                    if (mounted) Navigator.of(context).pop();
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Addpays()));
                   },
                 ),
               ),
@@ -376,10 +358,13 @@ class _PaysPageState extends State<PaysPage> {
                                                                         400],
                                                                 fontWeight:
                                                                     FontWeight
-                                                                        .bold,
+                                                                        .bold, 
                                                               ),
                                                             ),
                                                             onTap: () async {
+                                                              // Navigator.of(
+                                                              //         context)
+                                                              //     .pop();
                                                               e.statutPays ==
                                                                       false
                                                                   ? await PaysService()
@@ -390,7 +375,7 @@ class _PaysPageState extends State<PaysPage> {
                                                                               {
                                                                                 Provider.of<PaysService>(context, listen: false).applyChange(),
                                                                                 setState(() {
-                                                                                  _liste = PaysService().fetchPaysBySousRegion(sousRegion.idSousRegion!);
+                                                                                  // _liste = PaysService().fetchPaysBySousRegion(sousRegion.idSousRegion!);
                                                                                 }),
                                                                                 Navigator.of(context).pop(),
                                                                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -484,35 +469,15 @@ class _PaysPageState extends State<PaysPage> {
                                                               ),
                                                             ),
                                                             onTap: () async {
-                                                              // Ouvrir la boîte de dialogue de modification
-                                                              var updatedSousRegion =
-                                                                  await showDialog(
-                                                                context:
-                                                                    context,
-                                                                builder: (BuildContext
-                                                                        context) =>
-                                                                    AlertDialog(
-                                                                        backgroundColor:
-                                                                            Colors
-                                                                                .white,
-                                                                        shape:
-                                                                            RoundedRectangleBorder(
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(16),
-                                                                        ),
-                                                                        content:
-                                                                            UpdatesPays(pays: e)),
-                                                              );
-
-                                                              // Si les détails sont modifiés, appliquer les changements
-                                                              if (updatedSousRegion !=
-                                                                  null) {
-                                                                Provider.of<PaysService>(
-                                                                        context,
-                                                                        listen:
-                                                                            false)
-                                                                    .applyChange();
-                                                              }
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                              Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                      builder: (context) =>
+                                                                          UpdatesPays(
+                                                                              pays: e)));
                                                             },
                                                           ),
                                                         ),
@@ -575,365 +540,6 @@ class _PaysPageState extends State<PaysPage> {
               },
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  void _showDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ListTile(
-                  title: Text(
-                    "Ajouter un pays",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 18,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  trailing: IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: Icon(
-                      Icons.close,
-                      color: Colors.red,
-                      size: 24,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                Form(
-                  key: formkey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: libelleController,
-                        decoration: InputDecoration(
-                          labelText: "Nom du pays",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      Consumer<SousRegionService>(
-                        builder: (context, conService, child) {
-                          return FutureBuilder(
-                            future: _sousRegionList,
-                            builder: (_, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Chargement...',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                              }
-
-                              if (snapshot.hasData) {
-                                // final reponse = json.decode(snapshot.data.body);
-                                dynamic jsonString =
-                                    utf8.decode(snapshot.data.bodyBytes);
-                                dynamic reponse = json.decode(jsonString);
-                                if (reponse is List) {
-                                  final regionList = reponse
-                                      .map((e) => SousRegion.fromMap(e))
-                                      .where(
-                                          (con) => con.statutSousRegion == true)
-                                      .toList();
-
-                                  if (regionList.isEmpty) {
-                                    return DropdownButtonFormField(
-                                      items: [],
-                                      onChanged: null,
-                                      decoration: InputDecoration(
-                                        labelText: 'Aucun sous region trouvé',
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                    );
-                                  }
-
-                                  return DropdownButtonFormField<String>(
-                                    isExpanded: true,
-                                    items: regionList
-                                        .map(
-                                          (e) => DropdownMenuItem(
-                                            value: e.idSousRegion,
-                                            child: Text(e.nomSousRegion),
-                                          ),
-                                        )
-                                        .toList(),
-                                    value: sousValue,
-                                    onChanged: (newValue) {
-                                      setState(() {
-                                        sousValue = newValue;
-                                        if (newValue != null) {
-                                          sousRegion = regionList.firstWhere(
-                                              (element) =>
-                                                  element.idSousRegion ==
-                                                  newValue);
-                                          debugPrint(
-                                              "con select ${sousRegion.idSousRegion.toString()}");
-                                          // typeSelected = true;
-                                        }
-                                      });
-                                    },
-                                    decoration: InputDecoration(
-                                      labelText: 'Sélectionner un sous region',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
-                                }
-                              }
-                              return DropdownButtonFormField(
-                                items: [],
-                                onChanged: null,
-                                decoration: InputDecoration(
-                                  labelText: 'Aucun sous region trouvé',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: descriptionController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Description",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: niveau1PaysController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Libelle niveau 1 pays",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: niveau2PaysController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Libelle niveau 2 pays",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: niveau3PaysController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Libelle niveau 3 pays",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: monnaieController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Monnaie",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: tauxDollarController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Taux Dollar",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: tauxYuanController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Taux Yuan",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final String libelle = libelleController.text;
-                          final String description = descriptionController.text;
-                          if (formkey.currentState!.validate()) {
-                            try {
-                              await PaysService()
-                                  .addPays(
-                                      nomPays: libelle,
-                                      descriptionPays: description,
-                                      libelleNiveau1Pays: niveau1PaysController.text,
-                                      libelleNiveau2Pays: niveau2PaysController.text,
-                                      libelleNiveau3Pays: niveau3PaysController.text,
-                                      monnaie:monnaieController.text,
-                                      tauxDollar: tauxDollarController.text,
-                                      tauxYuan: tauxYuanController.text,
-                                      sousRegion: sousRegion)
-                                  .then((value) => {
-                                        Provider.of<PaysService>(context,
-                                                listen: false)
-                                            .applyChange(),
-                                        Navigator.of(context).pop(),
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Row(
-                                              children: [
-                                                Text(
-                                                    "Pays ajouté avec success"),
-                                              ],
-                                            ),
-                                            duration: Duration(seconds: 5),
-                                          ),
-                                        ),
-                                        libelleController.clear(),
-                                        descriptionController.clear(),
-                                        niveau1PaysController.clear(),
-                                        niveau2PaysController.clear(),
-                                        niveau3PaysController.clear(),
-                                        setState(() {
-                                          sousRegion == null;
-                                        }),
-                                      });
-                            } catch (e) {
-                              final String errorMessage = e.toString();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text("Ce pays existe déjà"),
-                                    ],
-                                  ),
-                                  duration: Duration(seconds: 5),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green, // Orange color code
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          minimumSize: const Size(290, 45),
-                        ),
-                        icon: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Ajouter",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );

@@ -174,7 +174,8 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
             title: Text(
               'Mes véhicules',
               style: const TextStyle(
-                  color: d_colorGreen, fontWeight: FontWeight.bold),
+                  color: d_colorGreen, fontWeight: FontWeight.bold,
+                  fontSize: 20),
             ),
             actions: [
               PopupMenuButton<String>(

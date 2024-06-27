@@ -55,7 +55,7 @@ class _UnitePageState extends State<UnitePage> {
         title: const Text(
           "Unité de mesure",
           style: TextStyle(
-              color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 18),
+              color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         actions: [
           PopupMenuButton<String>(

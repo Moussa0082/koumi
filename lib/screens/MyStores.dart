@@ -198,7 +198,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
           title: Text(
             'Mes boutiques',
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold ,fontSize:18),
+                color: d_colorGreen, fontWeight: FontWeight.bold ,fontSize:20),
           ),
           // actions:  [
           //   IconButton(

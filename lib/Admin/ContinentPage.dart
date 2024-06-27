@@ -52,7 +52,7 @@ class _ContinentPageState extends State<ContinentPage> {
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: const Text(
             "Continent",
-            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
           ),
           actions: [
             PopupMenuButton<String>(

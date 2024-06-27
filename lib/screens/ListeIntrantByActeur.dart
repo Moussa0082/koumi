@@ -150,7 +150,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
           "Mes intrants",
           style: TextStyle(
             color: d_colorGreen,
-            fontSize: 18,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),

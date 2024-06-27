@@ -341,7 +341,7 @@ class _TransportState extends State<Transport> {
               style: const TextStyle(
                   color: d_colorGreen,
                   fontWeight: FontWeight.bold,
-                  fontSize: 18),
+                  fontSize: 20),
             ),
             actions: !isExist
                 ? [

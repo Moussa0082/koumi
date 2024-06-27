@@ -204,7 +204,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
         title: Text(
           widget.isEditable! ? 'Modifier de produit' : 'Ajout de produit',
           style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
       body: SingleChildScrollView(

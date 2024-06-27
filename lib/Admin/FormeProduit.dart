@@ -56,7 +56,7 @@ class _FormeProduitState extends State<FormeProduit> {
         title: const Text(
           "Forme produit",
           style: TextStyle(
-              color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 19),
+              color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         actions: [
           IconButton(

@@ -255,7 +255,7 @@ class _AddAlerteState extends State<AddAlerte> {
                   "Ajout Alerte ",
                   style: TextStyle(
                     color: d_colorGreen,
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 )),
