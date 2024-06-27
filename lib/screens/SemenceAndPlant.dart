@@ -1,13 +1,19 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
+import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Intrant.dart';
+import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/AddIntrant.dart';
 import 'package:koumi_app/screens/DetailIntrant.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class SemenceAndPlant extends StatefulWidget {
@@ -27,7 +33,13 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
   bool isLoading = false;
   late TextEditingController _searchController;
   ScrollController scrollableController = ScrollController();
-  int size = 6;
+  int size = sized;
+
+  bool isExist = false;
+  late Acteur acteur = Acteur();
+  String? email = "";
+  late List<TypeActeur> typeActeurData = [];
+  late String type;
   bool hasMore = true;
   late Future<List<Intrant>> intrantListeFuture;
   List<Intrant> intrantListe = [];
@@ -125,82 +137,23 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     return intrantListe;
   }
 
-  // void _scrollListener() {
-  //   debugPrint("Scroll position: ${scrollableController.position.pixels}");
-  //   if (scrollableController.position.pixels >=
-  //           scrollableController.position.maxScrollExtent - 200 &&
-  //       hasMore &&
-  //       !isLoading) {
-  //     setState(() {
-  //       page++;
-  //     });
-
-  //     fetchIntrantByCategorie(
-  //             widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
-  //         .then((value) {
-  //       setState(() {
-  //         debugPrint("page inc all $page");
-  //       });
-  //     });
-  //   }
-  //   debugPrint("no");
-  // }
-
-  // Future<List<Intrant>> fetchIntrantByCategorie(String pays,
-  //     {bool refresh = false}) async {
-  //   if (isLoading == true) return [];
-
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-
-  //   if (refresh) {
-  //     setState(() {
-  //       intrantListe.clear();
-  //       page = 0;
-  //       hasMore = true;
-  //     });
-  //   }
-
-  //   try {
-  //     for (String libelle in libelles) {
-  //       final response = await http.get(Uri.parse(
-  //           '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size'));
-  //       debugPrint(
-  //           '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
-  //       if (response.statusCode == 200) {
-  //         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
-  //         final List<dynamic> body = jsonData['content'];
-
-  //         if (body.isEmpty) {
-  //           setState(() {
-  //             hasMore = false;
-  //           });
-  //         } else {
-  //           setState(() {
-  //             List<Intrant> newIntrants =
-  //                 body.map((e) => Intrant.fromMap(e)).toList();
-  //             intrantListe.addAll(newIntrants);
-  //           });
-  //         }
-
-  //         debugPrint(
-  //             "response body all intrants by categorie with pagination ${page} par défilement soit ${intrantListe.length}");
-  //       } else {
-  //         print(
-  //             'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
-  //       }
-  //     }
-  //   } catch (e) {
-  //     print(
-  //         'Une erreur s\'est produite lors de la récupération des intrants: $e');
-  //   } finally {
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //   }
-  //   return intrantListe;
-  // }
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      typeActeurData = acteur.typeActeur!;
+      type = typeActeurData.map((data) => data.libelle).join(', ');
+      setState(() {
+        isExist = true;
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -209,9 +162,24 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController.addListener(_scrollListener);
     });
+    verify();
     intrantListeFuture = fetchIntrantByCategorie(
         widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
   }
+
+ Future<void> _getResultFromNextScreen1(BuildContext context) async {
+    final result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => AddIntrant()));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        intrantListeFuture = IntrantService().fetchIntrantByPays(
+            widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+      });
+    }
+  }
+  
 
   @override
   void dispose() {
@@ -236,11 +204,99 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
             "Semences et plants ",
             style: TextStyle(
               color: d_colorGreen,
-              fontSize: 22,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
-        ),
+         actions: !isExist
+                ? [
+                    IconButton(
+                        onPressed: () {
+                         intrantListeFuture = fetchIntrantByCategorie(
+                              widget.detectedCountry != null
+                                  ? widget.detectedCountry!
+                                  : "Mali");
+                        },
+                        icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                  ]
+                : (typeActeurData
+                            .map((e) => e.libelle!.toLowerCase())
+                            .contains("fournisseur") ||
+                        typeActeurData
+                            .map((e) => e.libelle!.toLowerCase())
+                            .contains("admin") ||
+                        typeActeurData
+                            .map((e) => e.libelle!.toLowerCase())
+                            .contains("fournisseurs"))
+                    ? [
+                        IconButton(
+                            onPressed: () {
+                              intrantListeFuture = fetchIntrantByCategorie(
+                                  widget.detectedCountry != null
+                                      ? widget.detectedCountry!
+                                      : "Mali");
+                            },
+                            icon:
+                                const Icon(Icons.refresh, color: d_colorGreen)),
+                        PopupMenuButton<String>(
+                          padding: EdgeInsets.zero,
+                          itemBuilder: (context) {
+                            return <PopupMenuEntry<String>>[
+                              PopupMenuItem<String>(
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.add,
+                                    color: d_colorGreen,
+                                  ),
+                                  title: const Text(
+                                    "Ajouter intrant ",
+                                    style: TextStyle(
+                                      color: d_colorGreen,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.of(context).pop();
+                                    _getResultFromNextScreen1(context);
+                                  },
+                                ),
+                              ),
+                              // PopupMenuItem<String>(
+                              //   child: ListTile(
+                              //     leading: const Icon(
+                              //       Icons.remove_red_eye,
+                              //       color: d_colorGreen,
+                              //     ),
+                              //     title: const Text(
+                              //       "Mes intrants ",
+                              //       style: TextStyle(
+                              //         color: d_colorGreen,
+                              //         fontSize: 18,
+                              //         fontWeight: FontWeight.bold,
+                              //       ),
+                              //     ),
+                              //     onTap: () async {
+                              //       Navigator.of(context).pop();
+                              //       _getResultFromNextScreen2(context);
+                              //     },
+                              //   ),
+                              // )
+                            ];
+                          },
+                        )
+                      ]
+                    : [
+                        IconButton(
+                            onPressed: () {
+                              intrantListeFuture = fetchIntrantByCategorie(
+                                  widget.detectedCountry != null
+                                      ? widget.detectedCountry!
+                                      : "Mali");
+                            },
+                            icon:
+                                const Icon(Icons.refresh, color: d_colorGreen)),
+                      ]),
         body: Container(
             child: NestedScrollView(
                 headerSliverBuilder:

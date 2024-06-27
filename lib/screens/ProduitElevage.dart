@@ -1,14 +1,21 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Stock.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/service/StockService.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
+
+import '../models/Acteur.dart';
+import '../models/TypeActeur.dart';
 
 class ProduitElevage extends StatefulWidget {
   String? detectedCountry;
@@ -35,8 +42,32 @@ class _ProduitElevageState extends State<ProduitElevage> {
   // String? monnaie;
   int page = 0;
   bool isLoading = false;
-  int size = 8;
+  int size = sized;
   bool hasMore = true;
+  bool isExist = false;
+  String? email = "";
+  late String type;
+  late Acteur acteur = Acteur();
+  late List<TypeActeur> typeActeurData = [];
+
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      typeActeurData = acteur.typeActeur!;
+      type = typeActeurData.map((data) => data.libelle).join(', ');
+      setState(() {
+        isExist = true;
+        // stockListeFuture = fetchAllStock();
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
+  }
 
   void _scrollListener() {
     if (scrollableController.position.pixels >=
@@ -52,8 +83,8 @@ class _ProduitElevageState extends State<ProduitElevage> {
       });
 
       fetchStock(
-              widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
-              ).then((value) {
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+          .then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -63,7 +94,7 @@ class _ProduitElevageState extends State<ProduitElevage> {
     debugPrint("no");
   }
 
-   Future<List<Stock>> fetchStock(String pays, {bool refresh = false}) async {
+  Future<List<Stock>> fetchStock(String pays, {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -131,6 +162,7 @@ class _ProduitElevageState extends State<ProduitElevage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController.addListener(_scrollListener);
     });
+    verify();
     stockListeFuture = fetchStock(
         widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
   }
@@ -141,6 +173,23 @@ class _ProduitElevageState extends State<ProduitElevage> {
         .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
     scrollableController.dispose();
     super.dispose();
+  }
+
+  Future<void> _getResultFromNextScreen1(BuildContext context) async {
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AddAndUpdateProductScreen(
+                  isEditable: false,
+                )));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        stockListeFuture = fetchStock(
+            widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+      });
+    }
   }
 
   @override
@@ -155,11 +204,78 @@ class _ProduitElevageState extends State<ProduitElevage> {
                 Navigator.of(context).pop();
               },
               icon: const Icon(Icons.arrow_back_ios)),
+          actions: !isExist
+              ? [
+                  IconButton(
+                      onPressed: () {
+                        stockListeFuture = fetchStock(
+                            widget.detectedCountry != null
+                                ? widget.detectedCountry!
+                                : "Mali");
+                      },
+                      icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                ]
+              : [
+                  IconButton(
+                      onPressed: () {
+                        stockListeFuture = fetchStock(
+                            widget.detectedCountry != null
+                                ? widget.detectedCountry!
+                                : "Mali");
+                      },
+                      icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                  (typeActeurData
+                              .map((e) => e.libelle!.toLowerCase())
+                              .contains("commercant") ||
+                          typeActeurData
+                              .map((e) => e.libelle!.toLowerCase())
+                              .contains("commerçant") ||
+                          typeActeurData
+                              .map((e) => e.libelle!.toLowerCase())
+                              .contains("admin") ||
+                          typeActeurData
+                              .map((e) => e.libelle!.toLowerCase())
+                              .contains("producteur"))
+                      ? PopupMenuButton<String>(
+                          padding: EdgeInsets.zero,
+                          itemBuilder: (context) {
+                            return <PopupMenuEntry<String>>[
+                              PopupMenuItem<String>(
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.add,
+                                    color: Colors.green,
+                                  ),
+                                  title: const Text(
+                                    "Ajouter produit",
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.of(context).pop();
+                                    _getResultFromNextScreen1(context);
+                                  },
+                                ),
+                              ),
+                            ];
+                          },
+                        )
+                      : IconButton(
+                          onPressed: () {
+                            stockListeFuture = fetchStock(
+                                widget.detectedCountry != null
+                                    ? widget.detectedCountry!
+                                    : "Mali");
+                          },
+                          icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                ],
           title: const Text(
             "Produits d'élévages",
             style: TextStyle(
               color: d_colorGreen,
-              fontSize: 22,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),

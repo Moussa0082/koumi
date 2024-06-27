@@ -50,7 +50,7 @@ class _StoreScreenState extends State<StoreScreen> {
 
   int page = 0;
    bool isLoading = false;
-   int size = 8;
+   int size = sized;
   bool hasMore = true;
 
    Future<List<Magasin>> getAllMagasins() async {

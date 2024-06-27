@@ -56,7 +56,7 @@ class _PageTransporteurState extends State<PageTransporteur> {
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: Text(
           "Listes des transporteurs",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 18),
         ),
       ),
       body: SingleChildScrollView(

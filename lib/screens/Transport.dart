@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:http/http.dart' as http;
@@ -13,12 +15,9 @@ import 'package:koumi_app/providers/CountryProvider.dart';
 import 'package:koumi_app/screens/AddVehicule.dart';
 import 'package:koumi_app/screens/DetailTransport.dart';
 import 'package:koumi_app/screens/PageTransporteur.dart';
-import 'package:koumi_app/screens/TypeVehicule.dart';
 import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -47,7 +46,7 @@ class _TransportState extends State<Transport> {
   int page = 0;
   bool isLoading = false;
   bool isSearchMode = true;
-  int size = 8;
+  int size = sized;
   bool hasMore = true;
   ScrollController scrollableController = ScrollController();
   ScrollController scrollableController1 = ScrollController();
@@ -340,11 +339,19 @@ class _TransportState extends State<Transport> {
             title: Text(
               'Transport',
               style: const TextStyle(
-                  color: d_colorGreen, fontWeight: FontWeight.bold),
+                  color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 18),
             ),
             actions: !isExist
                 ? null
                 : [
+                    IconButton(
+                        onPressed: () {
+                          vehiculeListeFuture = VehiculeService().fetchVehicule(
+                              widget.detectedCountry != null
+                                  ? widget.detectedCountry!
+                                  : "Mali");
+                        },
+                        icon: const Icon(Icons.refresh, color: d_colorGreen)),
                     (typeActeurData
                                 .map((e) => e.libelle!.toLowerCase())
                                 .contains("transporteur") ||
@@ -439,6 +446,7 @@ class _TransportState extends State<Transport> {
                                       ),
                                     ),
                                     onTap: () async {
+                                      Navigator.of(context).pop();
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
@@ -783,7 +791,6 @@ class _TransportState extends State<Transport> {
                                           itemCount: filtereSearch.length + 1,
                                           itemBuilder: (context, index) {
                                             if (index < filtereSearch.length) {
-                                              
                                               return GestureDetector(
                                                 onTap: () {
                                                   Navigator.push(
@@ -797,7 +804,6 @@ class _TransportState extends State<Transport> {
                                                 },
                                                 child: Card(
                                                   margin: EdgeInsets.all(8),
-                                                  
                                                   child: Column(
                                                     crossAxisAlignment:
                                                         CrossAxisAlignment

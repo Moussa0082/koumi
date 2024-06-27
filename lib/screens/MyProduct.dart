@@ -51,7 +51,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
 
   int page = 0;
   bool isLoading = false;
-  int size = 8;
+  int size = sized;
   bool hasMore = true;
 
   bool isLoadingLibelle = true;
@@ -267,7 +267,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
         title: Text(
           'Mes Produits',
           style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold ,fontSize:18),
         ),
         // actions: !isExist ? null :  [
         //    IconButton(

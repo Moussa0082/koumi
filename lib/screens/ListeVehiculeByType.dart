@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -11,8 +14,6 @@ import 'package:koumi_app/screens/AddVehiculeTransport.dart';
 import 'package:koumi_app/screens/DetailTransport.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ListeVehiculeByType extends StatefulWidget {
@@ -39,7 +40,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
   ScrollController scrollableController = ScrollController();
   int page = 0;
   bool isLoading = false;
-  int size = 8;
+  int size = sized;
   bool hasMore = true;
 
   Future<List<Vehicule>> getListe(String id) async {
@@ -93,6 +94,9 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
     try {
       final response = await http.get(Uri.parse(
           '$apiOnlineUrl/vehicule/getVehiculesByPaysAndTypeVoitureWithPagination?idTypeVoiture=$idTypeVoiture&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
+
+     debugPrint(
+          '$apiOnlineUrl/vehicule/getVehiculesByPaysAndTypeVoitureWithPagination?idTypeVoiture=$idTypeVoiture&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size');
 
       if (response.statusCode == 200) {
         // debugPrint("url: $response");
@@ -154,9 +158,11 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
     super.dispose();
   }
 
- Future<void> _getResultFromNextScreen1(BuildContext context) async {
+  Future<void> _getResultFromNextScreen1(BuildContext context) async {
     final result = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => AddVehiculeTransport(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AddVehiculeTransport(
                   typeVoitures: typeVoiture,
                 )));
     log(result.toString());
@@ -183,9 +189,19 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
           title: Text(
             typeVoiture.nom!.toUpperCase(),
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
+                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 18),
           ),
           actions: [
+            IconButton(
+                onPressed: () {
+                  futureListe = VehiculeService()
+                      .fetchVehiculeByTypeVoitureWithPagination(
+                          typeVoiture.idTypeVoiture!,
+                          widget.detectedCountry != null
+                              ? widget.detectedCountry!
+                              : "Mali");
+                },
+                icon: const Icon(Icons.refresh, color: d_colorGreen)),
             PopupMenuButton<String>(
               padding: EdgeInsets.zero,
               itemBuilder: (context) => <PopupMenuEntry<String>>[
@@ -199,12 +215,13 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                       "Ajouter un vehicule",
                       style: TextStyle(
                         color: Colors.green,
+                          fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     onTap: () async {
                       Navigator.of(context).pop();
-                     _getResultFromNextScreen1(context);
+                      _getResultFromNextScreen1(context);
                     },
                   ),
                 ),
@@ -331,10 +348,7 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                             itemCount: filtereSearch.length + 1,
                             itemBuilder: (context, index) {
                               if (index < filtereSearch.length) {
-                                var e = filtereSearch
-                                    .where((element) =>
-                                        element.statutVehicule == true)
-                                    .elementAt(index);
+                                var e = filtereSearch.elementAt(index);
                                 return GestureDetector(
                                   onTap: () {
                                     Navigator.push(

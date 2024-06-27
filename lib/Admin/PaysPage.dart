@@ -81,7 +81,7 @@ class _PaysPageState extends State<PaysPage> {
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: const Text(
           "Pays",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 18),
         ),
         actions: [
           PopupMenuButton<String>(
@@ -102,6 +102,7 @@ class _PaysPageState extends State<PaysPage> {
                   ),
                   onTap: () async {
                      if(mounted)
+                     Navigator.of(context).pop();
                     _showDialog();
                   },
                 ),
@@ -257,7 +258,7 @@ class _PaysPageState extends State<PaysPage> {
                                                                   .spaceBetween,
                                                           children: [
                                                             Text(
-                                                                "Nombre ${para.libelleNiveau1Pays} :",
+                                                                "Nombre de niveau 1 :",
                                                                 style:
                                                                     TextStyle(
                                                                   color: Colors
@@ -296,7 +297,7 @@ class _PaysPageState extends State<PaysPage> {
                                                                   .spaceBetween,
                                                           children: [
                                                             Text(
-                                                                "Nombre ${para.libelleNiveau1Pays} :",
+                                                                "Nombre de niveau 1 :",
                                                                 style:
                                                                     TextStyle(
                                                                   color: Colors

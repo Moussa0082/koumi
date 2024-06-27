@@ -78,7 +78,7 @@ class _NotificationPageState extends State<NotificationPage> {
               icon: Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
             "Notifications",
-            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 18),
           ),
           actions: [
             PopupMenuButton<String>(

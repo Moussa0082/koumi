@@ -49,7 +49,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
   bool isSearchMode = true;
   int page = 0;
   bool isLoading = false;
-  int size = 8;
+  int size = sized;
   bool hasMore = true;
   late Future<List<Intrant>> intrantListeFuture;
   late Future<List<Intrant>> intrantListeFuture1;
@@ -316,12 +316,21 @@ class _IntrantScreenState extends State<IntrantScreen> {
               "Intrants agricoles ",
               style: TextStyle(
                 color: d_colorGreen,
-                fontSize: 22,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             actions: !isExist
-                ? null
+                ? [
+                    IconButton(
+                        onPressed: () {
+                          intrantListeFuture = IntrantService()
+                              .fetchIntrantByPays(widget.detectedCountry != null
+                                  ? widget.detectedCountry!
+                                  : "Mali");
+                        },
+                        icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                  ]
                 : (typeActeurData
                             .map((e) => e.libelle!.toLowerCase())
                             .contains("fournisseur") ||
@@ -332,6 +341,16 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             .map((e) => e.libelle!.toLowerCase())
                             .contains("fournisseurs"))
                     ? [
+                        IconButton(
+                            onPressed: () {
+                              intrantListeFuture = IntrantService()
+                                  .fetchIntrantByPays(
+                                      widget.detectedCountry != null
+                                          ? widget.detectedCountry!
+                                          : "Mali");
+                            },
+                            icon:
+                                const Icon(Icons.refresh, color: d_colorGreen)),
                         PopupMenuButton<String>(
                           padding: EdgeInsets.zero,
                           itemBuilder: (context) {
@@ -352,7 +371,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                   ),
                                   onTap: () async {
                                     Navigator.of(context).pop();
-                                     _getResultFromNextScreen1(context);
+                                    _getResultFromNextScreen1(context);
                                   },
                                 ),
                               ),
@@ -380,7 +399,18 @@ class _IntrantScreenState extends State<IntrantScreen> {
                           },
                         )
                       ]
-                    : null),
+                    : [
+                        IconButton(
+                            onPressed: () {
+                              intrantListeFuture = IntrantService()
+                                  .fetchIntrantByPays(
+                                      widget.detectedCountry != null
+                                          ? widget.detectedCountry!
+                                          : "Mali");
+                            },
+                            icon:
+                                const Icon(Icons.refresh, color: d_colorGreen)),
+                      ]),
         body: Container(
             child: NestedScrollView(
                 headerSliverBuilder:

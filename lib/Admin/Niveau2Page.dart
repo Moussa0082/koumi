@@ -181,9 +181,9 @@ String? libelleNiveau3Pays;
             },
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: Text(
-          "Niveau 2 : ${libelleNiveau2Pays}",
+          "Niveau 2",
           style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 18),
         ),
         actions: [
           PopupMenuButton<String>(
@@ -196,13 +196,14 @@ String? libelleNiveau3Pays;
                     color: Colors.green,
                   ),
                   title: Text(
-                    "Ajouter un ${libelleNiveau2Pays}",
+                    "Ajouter un niveau 2",
                     style: TextStyle(
                         color: Colors.green,
                         fontWeight: FontWeight.bold,
                         overflow: TextOverflow.ellipsis),
                   ),
                   onTap: () async {
+                    Navigator.of(context).pop();
                     _showDialog();
                   },
                 ),
@@ -265,7 +266,7 @@ String? libelleNiveau3Pays;
                     return Padding(
                       padding: EdgeInsets.all(10),
                       child: Center(
-                          child: Text("Aucun ${libelleNiveau2Pays} trouvé")),
+                          child: Text("Aucun niveau 2 trouvé")),
                     );
                   } else {
                     niveauList = snapshot.data!;
@@ -692,7 +693,7 @@ String? libelleNiveau3Pays;
               children: [
                 ListTile(
                   title: Text(
-                    "Ajouter un(e) ${libelleNiveau2Pays}",
+                    "Ajouter un niveau 2",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -726,7 +727,7 @@ String? libelleNiveau3Pays;
                         },
                         controller: libelleController,
                         decoration: InputDecoration(
-                          labelText: "Nom du ${libelleNiveau2Pays}",
+                          labelText: "Nom du niveau 2",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -870,7 +871,7 @@ String? libelleNiveau3Pays;
                                             content: Row(
                                               children: [
                                                 Text(
-                                                    "${libelleNiveau2Pays} ajouté avec success"),
+                                                    "niveau 2 ajouté avec success"),
                                               ],
                                             ),
                                             duration: Duration(seconds: 5),
@@ -888,7 +889,7 @@ String? libelleNiveau3Pays;
                                 SnackBar(
                                   content: Row(
                                     children: [
-                                      Text("${libelleNiveau2Pays} existe déjà"),
+                                      Text("niveau 2 existe déjà"),
                                     ],
                                   ),
                                   duration: Duration(seconds: 5),

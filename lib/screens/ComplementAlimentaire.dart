@@ -1,30 +1,24 @@
 import 'dart:convert';
+import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
-import 'package:koumi_app/models/CategorieProduit.dart';
-import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
-import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/StockService.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ComplementAlimentaire extends StatefulWidget {
   String? detectedCountry;
   ComplementAlimentaire({super.key, this.detectedCountry});
-
 
   @override
   State<ComplementAlimentaire> createState() => _ComplementAlimentaireState();
@@ -46,8 +40,32 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
   String? monnaie;
   int page = 0;
   bool isLoading = false;
-  int size = 8;
+  int size = sized;
   bool hasMore = true;
+  bool isExist = false;
+  String? email = "";
+  late String type;
+  late Acteur acteur = Acteur();
+  late List<TypeActeur> typeActeurData = [];
+
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      typeActeurData = acteur.typeActeur!;
+      type = typeActeurData.map((data) => data.libelle).join(', ');
+      setState(() {
+        isExist = true;
+        // stockListeFuture = fetchAllStock();
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
+  }
 
   void _scrollListener() {
     if (scrollableController.position.pixels >=
@@ -63,8 +81,8 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
       });
 
       fetchStock(
-              widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
-              ).then((value) {
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+          .then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -74,8 +92,7 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
     debugPrint("no");
   }
 
-  Future<List<Stock>> fetchStock(String pays,
-      {bool refresh = false}) async {
+  Future<List<Stock>> fetchStock(String pays, {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -93,38 +110,34 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
     try {
       // List<Stock> tempStockListe = [];
       // for (String libelle in libelles) {
-        final response = await http.get(Uri.parse(
-            '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size'));
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size'));
 
-debugPrint(
+      debugPrint(
           '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
-          // '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
-          final List<dynamic> body = jsonData['content'];
+      // '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
 
-          if (body.isEmpty) {
-            setState(() {
-              hasMore = false;
-            });
-          } else {
-            List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
-            setState(() {
-              stockListe.addAll(newStocks.where((newStock) => 
-              !stockListe.any((existStock) => 
-              existStock.idStock == newStock.idStock
-              )));
-
-            });
-          }
-
-          debugPrint(
-              "response body all stock by categorie with pagination ${page} par défilement soit ${stockListe.length}");
+        if (body.isEmpty) {
+          setState(() {
+            hasMore = false;
+          });
         } else {
-          print(
-              'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+          List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
+          setState(() {
+            stockListe.addAll(newStocks.where((newStock) => !stockListe
+                .any((existStock) => existStock.idStock == newStock.idStock)));
+          });
         }
-      
+
+        debugPrint(
+            "response body all stock by categorie with pagination ${page} par défilement soit ${stockListe.length}");
+      } else {
+        print(
+            'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
 
       // setState(() {
       //   stockListe.addAll(tempStockListe);
@@ -139,7 +152,6 @@ debugPrint(
     }
     return stockListe;
   }
- 
 
   @override
   void initState() {
@@ -149,8 +161,25 @@ debugPrint(
       scrollableController.addListener(_scrollListener);
     });
     stockListeFuture = fetchStock(
-        widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
-        );
+        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+    verify();
+  }
+
+  Future<void> _getResultFromNextScreen1(BuildContext context) async {
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AddAndUpdateProductScreen(
+                  isEditable: false,
+                )));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        stockListeFuture = fetchStock(
+            widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+      });
+    }
   }
 
   @override
@@ -177,10 +206,77 @@ debugPrint(
             "Compléments alimentaires",
             style: TextStyle(
               color: d_colorGreen,
-              fontSize: 22,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
+          actions: !isExist
+              ? [
+                  IconButton(
+                      onPressed: () {
+                        stockListeFuture = fetchStock(
+                            widget.detectedCountry != null
+                                ? widget.detectedCountry!
+                                : "Mali");
+                      },
+                      icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                ]
+              : [
+                  IconButton(
+                      onPressed: () {
+                        stockListeFuture = fetchStock(
+                            widget.detectedCountry != null
+                                ? widget.detectedCountry!
+                                : "Mali");
+                      },
+                      icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                  (typeActeurData
+                              .map((e) => e.libelle!.toLowerCase())
+                              .contains("commercant") ||
+                          typeActeurData
+                              .map((e) => e.libelle!.toLowerCase())
+                              .contains("commerçant") ||
+                          typeActeurData
+                              .map((e) => e.libelle!.toLowerCase())
+                              .contains("admin") ||
+                          typeActeurData
+                              .map((e) => e.libelle!.toLowerCase())
+                              .contains("producteur"))
+                      ? PopupMenuButton<String>(
+                          padding: EdgeInsets.zero,
+                          itemBuilder: (context) {
+                            return <PopupMenuEntry<String>>[
+                              PopupMenuItem<String>(
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.add,
+                                    color: Colors.green,
+                                  ),
+                                  title: const Text(
+                                    "Ajouter produit",
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.of(context).pop();
+                                    _getResultFromNextScreen1(context);
+                                  },
+                                ),
+                              ),
+                            ];
+                          },
+                        )
+                      : IconButton(
+                          onPressed: () {
+                            stockListeFuture = fetchStock(
+                                widget.detectedCountry != null
+                                    ? widget.detectedCountry!
+                                    : "Mali");
+                          },
+                          icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                ],
         ),
         body: Container(
             child: NestedScrollView(
@@ -241,8 +337,7 @@ debugPrint(
                         stockListeFuture = fetchStock(
                             widget.detectedCountry != null
                                 ? widget.detectedCountry!
-                                : "Mali"
-                                );
+                                : "Mali");
                       });
                       debugPrint("refresh page ${page}");
                     },
@@ -343,7 +438,8 @@ debugPrint(
                                                               8.0),
                                                       child: SizedBox(
                                                         height: 85,
-                                                        child: filteredSearch[index]
+                                                        child: filteredSearch[
+                                                                            index]
                                                                         .photo ==
                                                                     null ||
                                                                 filteredSearch[

@@ -55,7 +55,8 @@ class _FormeProduitState extends State<FormeProduit> {
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: const Text(
           "Forme produit",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 19),
         ),
         actions: [
           IconButton(
@@ -70,15 +71,29 @@ class _FormeProduitState extends State<FormeProduit> {
               size: 28,
             ),
           ),
-          IconButton(
-            onPressed: () {
-              _addForme();
-            },
-            icon: const Icon(
-              Icons.add,
-              color: d_colorGreen,
-              size: 28,
-            ),
+          PopupMenuButton<String>(
+            padding: EdgeInsets.zero,
+            itemBuilder: (context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                child: ListTile(
+                  leading: Icon(
+                    Icons.add,
+                    color:  d_colorGreen,
+                  ),
+                  title: Text(
+                    "Ajouter une forme",
+                    style: TextStyle(
+                      color:  d_colorGreen,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    _addForme();
+                  },
+                ),
+              ),
+            ],
           )
         ],
       ),

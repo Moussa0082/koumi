@@ -34,7 +34,7 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
   bool _isNotActive = false;
   int page = 0;
   bool isLoading = false;
-  int size = 8;
+  int size = sized;
   bool hasMore = true;
   ScrollController scrollableController = ScrollController();
   late TextEditingController _searchController;
@@ -150,8 +150,17 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
           title: Text(
             "Mes Matériels",
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
+                color: d_colorGreen, fontWeight: FontWeight.bold,
+                  fontSize: 18),
           ),
+           actions: [
+              IconButton(
+                  onPressed: () {
+                    futureListe = MaterielService()
+                        .fetchMaterielByActeurWithPagination(acteur.idActeur!);
+                  },
+                  icon: const Icon(Icons.refresh, color: d_colorGreen)),
+            ]
         ),
         body: Container(
             child: NestedScrollView(

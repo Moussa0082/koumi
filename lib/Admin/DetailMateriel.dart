@@ -191,7 +191,6 @@ class _DetailMaterielState extends State<DetailMateriel> {
 
   Future<void> updateMethode() async {
     setState(() {
-      // Afficher l'indicateur de chargement pendant l'opération
       _isLoading = true;
     });
 
@@ -232,7 +231,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
                         monnaie: monnaie);
                     _isLoading = false;
                   }),
-                   ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Row(
                         children: [
@@ -282,18 +281,18 @@ class _DetailMaterielState extends State<DetailMateriel> {
                     _isLoading = false;
                   }),
                   ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
-            children: [
-              Text(
-                "Modifier avec succéss",
-                style: TextStyle(overflow: TextOverflow.ellipsis),
-              ),
-            ],
-          ),
-          duration: Duration(seconds: 2),
-        ),
-      )
+                    const SnackBar(
+                      content: Row(
+                        children: [
+                          Text(
+                            "Modifier avec succéss",
+                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                          ),
+                        ],
+                      ),
+                      duration: Duration(seconds: 2),
+                    ),
+                  )
                 })
             .catchError((onError) => {
                   setState(() {
@@ -326,7 +325,6 @@ class _DetailMaterielState extends State<DetailMateriel> {
   void initState() {
     super.initState();
     verify();
-
     _niveau3List = http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/read'));
     materiels = widget.materiel;
     rates = fetchConvert(materiels);
@@ -340,7 +338,6 @@ class _DetailMaterielState extends State<DetailMateriel> {
     monnaieValue = materiels.monnaie!.idMonnaie;
     _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
     isDialOpenNotifier = ValueNotifier<bool>(false);
-    // fetchPaysDataByActor();
   }
 
   @override
@@ -363,11 +360,10 @@ class _DetailMaterielState extends State<DetailMateriel> {
                     )
                   : IconButton(
                       onPressed: () {
-                        Navigator.of(context).pop();
+                      Navigator.pop(context, true);
                       },
-                      icon:
-                          const Icon(Icons.arrow_back_ios, color: d_colorGreen),
-                    ),
+                      icon: const Icon(Icons.arrow_back_ios,
+                          color: d_colorGreen)),
               title: _isEditing
                   ? Text(
                       'Modification',

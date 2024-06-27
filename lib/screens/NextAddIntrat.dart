@@ -179,7 +179,8 @@ class _NextAddIntratState extends State<NextAddIntrat> {
             title: Text(
               'Etape 2 ',
               style: const TextStyle(
-                  color: d_colorGreen, fontWeight: FontWeight.bold),
+                  color: d_colorGreen, fontWeight: FontWeight.bold,
+                  fontSize: 18),
             ),
           ),
           body: SingleChildScrollView(

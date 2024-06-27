@@ -52,19 +52,39 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                 icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
             title: const Text(
               "Type acteur",
-              style:
-                  TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: d_colorGreen,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18),
             ),
             actions: [
-              IconButton(
-                  onPressed: () {
-                    _showDialog();
-                  },
-                  icon: const Icon(
-                    Icons.add,
-                    color: d_colorGreen,
-                    size: 30,
-                  ))
+              PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                itemBuilder: (context) {
+                  return <PopupMenuEntry<String>>[
+                    PopupMenuItem<String>(
+                      child: ListTile(
+                        leading: const Icon(
+                          Icons.add,
+                          color: Colors.green,
+                        ),
+                        title: const Text(
+                          "Type acteur ",
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onTap: () async {
+                          Navigator.of(context).pop();
+                          _showDialog();
+                        },
+                      ),
+                    ),
+                  ];
+                },
+              )
             ]),
         body: SingleChildScrollView(
           child: Column(
@@ -377,8 +397,8 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                                                                           color:
                                                                               Colors.orange[400],
                                                                         ),
-                                                              title:  Text(
-                                                               e.statutTypeActeur ==
+                                                              title: Text(
+                                                                e.statutTypeActeur ==
                                                                         false
                                                                     ? "Activer"
                                                                     : "Desactiver",
@@ -396,14 +416,12 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                                                                 ),
                                                               ),
                                                               onTap: () async {
-                                                                 e.statutTypeActeur ==
-                                                                          false
-                                                                      ?
-                                                                await TypeActeurService()
-                                                                    .activerTypeActeur(e
-                                                                        .idTypeActeur!)
-                                                                    .then(
-                                                                        (value) =>
+                                                                e.statutTypeActeur ==
+                                                                        false
+                                                                    ? await TypeActeurService()
+                                                                        .activerTypeActeur(e
+                                                                            .idTypeActeur!)
+                                                                        .then((value) =>
                                                                             {
                                                                               Provider.of<TypeActeurService>(context, listen: false).applyChange(),
                                                                               Navigator.of(context).pop(),
@@ -418,21 +436,22 @@ class _TypeActeurPageState extends State<TypeActeurPage> {
                                                                                 ),
                                                                               )
                                                                             })
-                                                                    .catchError(
-                                                                        (onError) =>
-                                                                            {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                SnackBar(
-                                                                                  content: Row(
-                                                                                    children: [
-                                                                                      Text("Une erreur s'est produit : $onError"),
-                                                                                    ],
+                                                                        .catchError(
+                                                                            (onError) =>
+                                                                                {
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    SnackBar(
+                                                                                      content: Row(
+                                                                                        children: [
+                                                                                          Text("Une erreur s'est produit : $onError"),
+                                                                                        ],
+                                                                                      ),
+                                                                                      duration: const Duration(seconds: 5),
+                                                                                    ),
                                                                                   ),
-                                                                                  duration: const Duration(seconds: 5),
-                                                                                ),
-                                                                              ),
-                                                                              Navigator.of(context).pop(),
-                                                                            }) : await TypeActeurService()
+                                                                                  Navigator.of(context).pop(),
+                                                                                })
+                                                                    : await TypeActeurService()
                                                                         .desactiverTypeActeur(e
                                                                             .idTypeActeur!)
                                                                         .then((value) =>

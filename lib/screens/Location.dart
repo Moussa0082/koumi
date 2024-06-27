@@ -56,38 +56,10 @@ class _LocationState extends State<Location> {
 
   int page = 0;
   bool isLoading = false;
-  int size = 8;
+  int size = sized;
   bool hasMore = true;
 
   bool isLoadingLibelle = true;
-  // String? monnaie;
-
-//    Future<String> getMonnaieByActor(String id) async {
-//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
-
-//     if (response.statusCode == 200) {
-//       print("libelle : ${response.body}");
-//       return response.body;  // Return the body directly since it's a plain string
-//     } else {
-//       throw Exception('Failed to load monnaie');
-//     }
-// }
-
-//  Future<void> fetchPaysDataByActor() async {
-//     try {
-//       String monnaies = await getMonnaieByActor(acteur.idActeur!);
-
-//       setState(() {
-//         monnaie = monnaies;
-//         isLoadingLibelle = false;
-//       });
-//     } catch (e) {
-//       setState(() {
-//         isLoadingLibelle = false;
-//         });
-//       print('Error: $e');
-//     }
-//   }
 
   void _scrollListener() {
     if (scrollableController.position.pixels >=
@@ -326,21 +298,36 @@ class _LocationState extends State<Location> {
     if (result == true) {
       print("Rafraichissement en cours");
       setState(() {
-        materielListeFuture = materielListeFuture1 = getAllMateriel();
+        materielListeFuture = getAllMateriel();
       });
     }
   }
 
   Future<void> _getResultFromNextScreen2(BuildContext context) async {
-    final result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ListeMaterielByActeur()));
+    final result = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => ListeMaterielByActeur()));
     log(result.toString());
     if (result == true) {
       print("Rafraichissement en cours");
       setState(() {
-        materielListeFuture = materielListeFuture1 = getAllMateriel();
+        materielListeFuture = getAllMateriel();
+      });
+    }
+  }
+
+  Future<void> _getResultFromNextScreen3(
+      BuildContext context, Materiel materiel) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DetailMateriel(materiel: materiel),
+      ),
+    );
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        materielListeFuture = getAllMateriel();
       });
     }
   }
@@ -369,6 +356,11 @@ class _LocationState extends State<Location> {
             actions: !isExist
                 ? null
                 : [
+                    IconButton(
+                        onPressed: () {
+                          materielListeFuture = getAllMateriel();
+                        },
+                        icon: const Icon(Icons.refresh, color: d_colorGreen)),
                     PopupMenuButton<String>(
                       padding: EdgeInsets.zero,
                       itemBuilder: (context) {
@@ -417,7 +409,6 @@ class _LocationState extends State<Location> {
                               onTap: () async {
                                 Navigator.of(context).pop();
                                 _getResultFromNextScreen2(context);
-                            
                               },
                             ),
                           )
@@ -667,6 +658,10 @@ class _LocationState extends State<Location> {
                                                                     DetailMateriel(
                                                                         materiel:
                                                                             filteredSearch[index])));
+                                                        // _getResultFromNextScreen3(
+                                                        //     context,
+                                                        //     filteredSearch[
+                                                        //         index]);
                                                       },
                                                       child: Card(
                                                         child: Column(
@@ -834,9 +829,6 @@ class _LocationState extends State<Location> {
                                           ),
                                         );
                                       } else {
-                                        // dynamic jsonString =
-                                        //     utf8.decode(snapshot.data!.bodyBytes);
-                                        // dynamic responseData = json.decode(jsonString);
                                         materielListe = snapshot.data!;
                                         String searchText = "";
                                         List<Materiel> filteredSearch =
@@ -898,7 +890,7 @@ class _LocationState extends State<Location> {
                                                           filteredSearch
                                                               .length) {
                                                         return GestureDetector(
-                                                          onTap: () {
+                                                          onTap: () async {
                                                             Navigator.push(
                                                                 context,
                                                                 MaterialPageRoute(
@@ -906,6 +898,7 @@ class _LocationState extends State<Location> {
                                                                         DetailMateriel(
                                                                             materiel:
                                                                                 filteredSearch[index])));
+                                                            // _getResultFromNextScreen3(context, filteredSearch[index]);
                                                           },
                                                           child: Card(
                                                             child: Column(

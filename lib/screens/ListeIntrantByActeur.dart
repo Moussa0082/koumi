@@ -33,7 +33,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
 
   int page = 0;
   bool isLoading = false;
-  int size = 8;
+  int size = sized;
   bool hasMore = true;
   ScrollController scrollableController = ScrollController();
 
@@ -150,7 +150,7 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
           "Mes intrants",
           style: TextStyle(
             color: d_colorGreen,
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),

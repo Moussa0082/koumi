@@ -72,6 +72,7 @@ class _ContinentPageState extends State<ContinentPage> {
                           overflow: TextOverflow.ellipsis),
                     ),
                     onTap: () async {
+                      Navigator.of(context).pop();
                       _showDialog();
                     },
                   ),
@@ -325,64 +326,73 @@ class _ContinentPageState extends State<ContinentPage> {
                                                         PopupMenuItem<String>(
                                                           child: ListTile(
                                                             leading: e.statutContinent ==
-                                                                  false
-                                                              ? Icon(
-                                                                  Icons.check,
-                                                                  color: Colors
-                                                                      .green,
-                                                                )
-                                                              : Icon(
-                                                                  Icons
-                                                                      .disabled_visible,
-                                                                  color: Colors
-                                                                          .orange[
-                                                                      400]),
-                                                            title:  Text(
-                                                              e.statutContinent == false ? "Activer" : "Desactiver",
-                                                                 style: TextStyle(
-                                                                   color: e.statutContinent == false ? Colors.green : Colors.orange[
-                                                                      400],
+                                                                    false
+                                                                ? Icon(
+                                                                    Icons.check,
+                                                                    color: Colors
+                                                                        .green,
+                                                                  )
+                                                                : Icon(
+                                                                    Icons
+                                                                        .disabled_visible,
+                                                                    color: Colors
+                                                                            .orange[
+                                                                        400]),
+                                                            title: Text(
+                                                              e.statutContinent ==
+                                                                      false
+                                                                  ? "Activer"
+                                                                  : "Desactiver",
+                                                              style: TextStyle(
+                                                                color: e.statutContinent ==
+                                                                        false
+                                                                    ? Colors
+                                                                        .green
+                                                                    : Colors.orange[
+                                                                        400],
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
                                                               ),
                                                             ),
                                                             onTap: () async {
-                                                              e.statutContinent == false ?
-                                                              await ContinentService()
-                                                                  .activerContinent(e
-                                                                      .idContinent!)
-                                                                  .then(
-                                                                      (value) =>
-                                                                          {
-                                                                            Provider.of<ContinentService>(context, listen: false).applyChange(),
-                                                                            Navigator.of(context).pop(),
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Activer avec succèss "),
-                                                                                  ],
+                                                              e.statutContinent ==
+                                                                      false
+                                                                  ? await ContinentService()
+                                                                      .activerContinent(e
+                                                                          .idContinent!)
+                                                                      .then(
+                                                                          (value) =>
+                                                                              {
+                                                                                Provider.of<ContinentService>(context, listen: false).applyChange(),
+                                                                                Navigator.of(context).pop(),
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Activer avec succèss "),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 2),
+                                                                                  ),
+                                                                                )
+                                                                              })
+                                                                      .catchError(
+                                                                          (onError) =>
+                                                                              {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  const SnackBar(
+                                                                                    content: Row(
+                                                                                      children: [
+                                                                                        Text("Une erreur s'est produit"),
+                                                                                      ],
+                                                                                    ),
+                                                                                    duration: Duration(seconds: 5),
+                                                                                  ),
                                                                                 ),
-                                                                                duration: Duration(seconds: 2),
-                                                                              ),
-                                                                            )
-                                                                          })
-                                                                  .catchError(
-                                                                      (onError) =>
-                                                                          {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Row(
-                                                                                  children: [
-                                                                                    Text("Une erreur s'est produit"),
-                                                                                  ],
-                                                                                ),
-                                                                                duration: Duration(seconds: 5),
-                                                                              ),
-                                                                            ),
-                                                                            Navigator.of(context).pop(),
-                                                                          }) : await ContinentService()
+                                                                                Navigator.of(context).pop(),
+                                                                              })
+                                                                  : await ContinentService()
                                                                       .desactiverContinent(e
                                                                           .idContinent!)
                                                                       .then(
@@ -647,8 +657,7 @@ class _ContinentPageState extends State<ContinentPage> {
                                 SnackBar(
                                   content: Row(
                                     children: [
-                                      Text(
-                                          "Une erreur s'est produit"),
+                                      Text("Une erreur s'est produit"),
                                     ],
                                   ),
                                   duration: const Duration(seconds: 5),

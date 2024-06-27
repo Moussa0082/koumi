@@ -161,9 +161,10 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
           title: Text(
             'Materiel',
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
+                color: d_colorGreen, fontWeight: FontWeight.bold,fontSize:19),
           ),
           actions: [
+           
             PopupMenuButton<String>(
               padding: EdgeInsets.zero,
               itemBuilder: (context) {
@@ -183,6 +184,7 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
                         ),
                       ),
                       onTap: () async {
+                        Navigator.of(context).pop();
                         _showDialog();
                       },
                     ),

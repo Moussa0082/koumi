@@ -44,7 +44,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
 
   int page = 0;
   bool isLoading = false;
-  int size = 8;
+  int size = sized;
   bool hasMore = true;
 
   void _scrollListener() {
@@ -191,6 +191,7 @@ class _VehiculeActeurState extends State<VehiculeActeur> {
                         style: TextStyle(
                           color: Colors.green,
                           fontWeight: FontWeight.bold,
+                          fontSize: 18
                         ),
                       ),
                       onTap: () async {

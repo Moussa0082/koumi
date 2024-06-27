@@ -48,7 +48,7 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
   String? email = "";
   int page = 0;
   bool isLoading = false;
-  int size = 2;
+  int size = sized;
   bool hasMore = true;
   String libelleFiliere = "Équipements et matériels";
   bool isLoadingLibelle = true;
@@ -309,11 +309,16 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
             title: Text(
               "Matériels et Équipements",
               style: const TextStyle(
-                  color: d_colorGreen, fontWeight: FontWeight.bold),
+                  color: d_colorGreen, fontWeight: FontWeight.bold,  fontSize: 18,),
             ),
             actions: !isExist
                 ? null
                 : [
+                    IconButton(
+                        onPressed: () {
+                          materielListeFuture = getAllMateriel();
+                        },
+                        icon: const Icon(Icons.refresh, color: d_colorGreen)),
                     PopupMenuButton<String>(
                       padding: EdgeInsets.zero,
                       itemBuilder: (context) {

@@ -1,20 +1,20 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/CodePays.dart';
 import 'package:koumi_app/Admin/Niveau2List.dart';
 import 'package:koumi_app/Admin/UpdateNiveau1.dart';
+import 'package:koumi_app/constants.dart';
+import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
 import 'package:koumi_app/models/Niveau2Pays.dart';
 import 'package:koumi_app/models/Pays.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/Niveau1Service.dart';
 import 'package:koumi_app/service/Niveau2Service.dart';
 import 'package:koumi_app/service/PaysService.dart';
 import 'package:provider/provider.dart';
-import 'package:koumi_app/constants.dart';
-import 'package:http/http.dart' as http;
-import 'package:koumi_app/models/Acteur.dart';
-import 'package:koumi_app/providers/ActeurProvider.dart';
 
 class Niveau1Page extends StatefulWidget {
   const Niveau1Page({super.key});
@@ -108,7 +108,7 @@ bool isLoadingLibelle2 = true;
     // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
     //     .parametreList!;
     // para = paraList[0];
-    // _paysList = http.get(Uri.parse('$apiOnlineUrl/pays/read'));
+    _paysList = http.get(Uri.parse('$apiOnlineUrl/pays/read'));
     // _paysList = http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/pays/read'));
     _searchController = TextEditingController();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
@@ -135,9 +135,9 @@ bool isLoadingLibelle2 = true;
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
-            libelleNiveau1Pays!.toUpperCase(),
+           "Niveau 1 ",
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
+                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 18),
           ),
           actions: [
             PopupMenuButton<String>(
@@ -150,13 +150,14 @@ bool isLoadingLibelle2 = true;
                       color: Colors.green,
                     ),
                     title:  Text(
-                      "Ajouter un ${libelleNiveau1Pays} ",
+                      "Ajouter un niveau 1 ",
                       style: TextStyle(
                           color: Colors.green,
                           fontWeight: FontWeight.bold,
                           overflow: TextOverflow.ellipsis),
                     ),
                     onTap: () async {
+                      Navigator.of(context).pop();
                       _showDialog();
                     },
                   ),

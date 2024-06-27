@@ -1,13 +1,19 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
+import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Intrant.dart';
+import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/AddIntrant.dart';
 import 'package:koumi_app/screens/DetailIntrant.dart';
 import 'package:koumi_app/service/IntrantService.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProduitPhytosanitaire extends StatefulWidget {
@@ -18,13 +24,19 @@ class ProduitPhytosanitaire extends StatefulWidget {
   @override
   State<ProduitPhytosanitaire> createState() => _ProduitPhytosanitaireState();
 }
-
+const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
+const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
   int page = 0;
   bool isLoading = false;
   late TextEditingController _searchController;
   ScrollController scrollableController = ScrollController();
-  int size = 8;
+  int size = sized;
+  bool isExist = false;
+  late Acteur acteur = Acteur();
+  String? email = "";
+  late List<TypeActeur> typeActeurData = [];
+  late String type;
   bool hasMore = true;
   late Future<List<Intrant>> intrantListeFuture;
   List<Intrant> intrantListe = [];
@@ -53,8 +65,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
       });
 
       fetchIntrantByCategorie(
-              widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
-              )
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
           .then((value) {
         setState(() {
           debugPrint("page inc all $page");
@@ -96,10 +107,14 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
             hasMore = false;
           });
         } else {
+          List<Intrant> newIntrants =
+              body.map((e) => Intrant.fromMap(e)).toList();
+
           setState(() {
-            List<Intrant> newIntrants =
-                body.map((e) => Intrant.fromMap(e)).toList();
-            intrantListe.addAll(newIntrants);
+            // Ajouter uniquement les nouveaux intrants qui ne sont pas déjà dans la liste
+            intrantListe.addAll(newIntrants.where((newIntrant) =>
+                !intrantListe.any((existingIntrant) =>
+                    existingIntrant.idIntrant == newIntrant.idIntrant)));
           });
         }
 
@@ -120,6 +135,24 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
     return intrantListe;
   }
 
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      typeActeurData = acteur.typeActeur!;
+      type = typeActeurData.map((data) => data.libelle).join(', ');
+      setState(() {
+        isExist = true;
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -128,10 +161,23 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
       scrollableController.addListener(_scrollListener);
     });
     intrantListeFuture = fetchIntrantByCategorie(
-        widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
-        );
+        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+    verify();
   }
 
+  Future<void> _getResultFromNextScreen1(BuildContext context) async {
+    final result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => AddIntrant()));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        intrantListeFuture = IntrantService().fetchIntrantByPays(
+            widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+      });
+    }
+  }
+  
   @override
   void dispose() {
     _searchController.dispose();
@@ -143,23 +189,113 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-          centerTitle: true,
-          toolbarHeight: 100,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.arrow_back_ios)),
-          title: const Text(
-            "Produits phytosanitaires",
-            style: TextStyle(
-              color: d_colorGreen,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
+            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+            centerTitle: true,
+            toolbarHeight: 100,
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.arrow_back_ios)),
+            title: const Text(
+              "Produits phytosanitaires",
+              style: TextStyle(
+                color: d_colorGreen,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-        ),
+              actions: !isExist
+                ? [
+                    IconButton(
+                        onPressed: () {
+                           intrantListeFuture = fetchIntrantByCategorie(
+                              widget.detectedCountry != null
+                                  ? widget.detectedCountry!
+                                  : "Mali");
+                        },
+                        icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                  ]
+                : (typeActeurData
+                            .map((e) => e.libelle!.toLowerCase())
+                            .contains("fournisseur") ||
+                        typeActeurData
+                            .map((e) => e.libelle!.toLowerCase())
+                            .contains("admin") ||
+                        typeActeurData
+                            .map((e) => e.libelle!.toLowerCase())
+                            .contains("fournisseurs"))
+                    ? [
+                        IconButton(
+                            onPressed: () {
+                              intrantListeFuture = fetchIntrantByCategorie(
+                                  widget.detectedCountry != null
+                                      ? widget.detectedCountry!
+                                      : "Mali");
+                            },
+                            icon:
+                                const Icon(Icons.refresh, color: d_colorGreen)),
+                        PopupMenuButton<String>(
+                          padding: EdgeInsets.zero,
+                          itemBuilder: (context) {
+                            return <PopupMenuEntry<String>>[
+                              PopupMenuItem<String>(
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.add,
+                                    color: d_colorGreen,
+                                  ),
+                                  title: const Text(
+                                    "Ajouter intrant ",
+                                    style: TextStyle(
+                                      color: d_colorGreen,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.of(context).pop();
+                                    _getResultFromNextScreen1(context);
+                                  },
+                                ),
+                              ),
+                              // PopupMenuItem<String>(
+                              //   child: ListTile(
+                              //     leading: const Icon(
+                              //       Icons.remove_red_eye,
+                              //       color: d_colorGreen,
+                              //     ),
+                              //     title: const Text(
+                              //       "Mes intrants ",
+                              //       style: TextStyle(
+                              //         color: d_colorGreen,
+                              //         fontSize: 18,
+                              //         fontWeight: FontWeight.bold,
+                              //       ),
+                              //     ),
+                              //     onTap: () async {
+                              //       Navigator.of(context).pop();
+                              //       _getResultFromNextScreen2(context);
+                              //     },
+                              //   ),
+                              // )
+                            ];
+                          },
+                        )
+                      ]
+                    : [
+                        IconButton(
+                            onPressed: () {
+                              intrantListeFuture = fetchIntrantByCategorie(
+                                  widget.detectedCountry != null
+                                      ? widget.detectedCountry!
+                                      : "Mali");
+                            },
+                            icon:
+                                const Icon(Icons.refresh, color: d_colorGreen)),
+                      ]
+                      ),
+           
         body: Container(
             child: NestedScrollView(
                 headerSliverBuilder:
@@ -219,8 +355,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                         intrantListeFuture = fetchIntrantByCategorie(
                             widget.detectedCountry != null
                                 ? widget.detectedCountry!
-                                : "Mali"
-                                );
+                                : "Mali");
                       });
                     },
                     child: SingleChildScrollView(

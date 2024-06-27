@@ -17,7 +17,7 @@ class IntrantService extends ChangeNotifier {
   List<Intrant> intrantList = [];
     int page = 0;
   bool isLoading = false;
-  int size = 4;
+  int size = sized;
   bool hasMore = true;
 
   Future<void> creerIntrant(

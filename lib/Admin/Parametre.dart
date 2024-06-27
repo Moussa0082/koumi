@@ -35,9 +35,7 @@ class _ParametreState extends State<Parametre> {
     String? libelleNiveau1Pays;
     String? libelleNiveau2Pays;
     String? libelleNiveau3Pays;
-    String? monnaie;
-    String? tauxDollar;
-    String? tauxYuan;
+  
     
  
     
@@ -71,53 +69,50 @@ class _ParametreState extends State<Parametre> {
       throw Exception('Failed to load libelle niveau3Pays');
     }
 }
-  Future<String> getMonnaieByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
+//   Future<String> getMonnaieByActor(String id) async {
+//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
 
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load monnaie');
-    }
-}
+//     if (response.statusCode == 200) {
+//       print("libelle : ${response.body}");
+//       return response.body;  // Return the body directly since it's a plain string
+//     } else {
+//       throw Exception('Failed to load monnaie');
+//     }
+// }
 
-  Future<String> getTauxDollarByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/tauxDollar/$id'));
+//   Future<String> getTauxDollarByActor(String id) async {
+//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/tauxDollar/$id'));
 
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load tauxDollar');
-    }
-}
-  Future<String> getTauxYuanByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/tauxYuan/$id'));
+//     if (response.statusCode == 200) {
+//       print("libelle : ${response.body}");
+//       return response.body;  // Return the body directly since it's a plain string
+//     } else {
+//       throw Exception('Failed to load tauxDollar');
+//     }
+// }
+//   Future<String> getTauxYuanByActor(String id) async {
+//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/tauxYuan/$id'));
 
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load tauxYUAN');
-    }
-}
+//     if (response.statusCode == 200) {
+//       print("libelle : ${response.body}");
+//       return response.body;  // Return the body directly since it's a plain string
+//     } else {
+//       throw Exception('Failed to load tauxYUAN');
+//     }
+// }
 
      Future<void> fetchPaysDataByActor() async {
     try {
       String libelle1 = await getLibelleNiveau1PaysByActor(acteur.idActeur!);
       String libelle2 = await getLibelleNiveau2PaysByActor(acteur.idActeur!);
       String libelle3 = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
-      String monnaies = await getMonnaieByActor(acteur.idActeur!);
-      String tauxDollar = await getTauxDollarByActor(acteur.idActeur!);
-      String tauxYuan = await getTauxYuanByActor(acteur.idActeur!);
+      // String monnaies = await getMonnaieByActor(acteur.idActeur!);
+      // String tauxDollar = await getTauxDollarByActor(acteur.idActeur!);
+      // String tauxYuan = await getTauxYuanByActor(acteur.idActeur!);
       setState(() { 
         libelleNiveau1Pays = libelle1;
         libelleNiveau2Pays = libelle2;
         libelleNiveau3Pays = libelle3;
-        tauxYuan = tauxYuan;
-        tauxDollar = tauxDollar;
-        monnaie = monnaies;
         isLoadingLibelle = false;
       });
     } catch (e) {
@@ -128,17 +123,6 @@ class _ParametreState extends State<Parametre> {
     }
   }
 
-  // void verifyParam() {
-  //   // paramList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-  //   //     .parametreList!;
-
-  //   // if (paramList.isNotEmpty) {
-  //   //   params = paramList[0];
-  //   // } else {
-  //   //   // Gérer le cas où la liste est null ou vide, par exemple :
-  //   //   // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
-  //   // }
-  // }
 
   @override
   void initState() {
@@ -163,7 +147,7 @@ class _ParametreState extends State<Parametre> {
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: const Text(
           "Paramètre Système",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 18),
         ),
       ),
       body: SingleChildScrollView(

@@ -73,7 +73,7 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
           children: [
             ListTile(
               title: Text(
-                "Ajouter un(e) ${para.libelleNiveau2Pays}",
+                "Modification",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -107,7 +107,7 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                     },
                     controller: libelleController,
                     decoration: InputDecoration(
-                      labelText: "Nom du ${para.libelleNiveau2Pays}",
+                      labelText: "Nom ",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -202,9 +202,7 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                                   ),
                                 );
                       }
-                      if (snapshot.hasError) {
-                        return Text("${snapshot.error}");
-                      }
+                      
                       if (snapshot.hasData) {
                         final reponse = json.decode((snapshot.data.body)) as List;
                         final niveauList = reponse
@@ -244,7 +242,7 @@ class _UpdatesNiveau2State extends State<UpdatesNiveau2> {
                           },
                           decoration: InputDecoration(
                             labelText:
-                                'Sélectionner un ${para.libelleNiveau2Pays}',
+                                'Sélectionner un niveau 1',
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),

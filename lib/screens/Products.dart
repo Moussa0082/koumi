@@ -60,7 +60,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   int page = 0;
   bool isLoading = false;
-  int size = 8;
+  int size = sized;
   bool hasMore = true;
 
   bool isLoadingLibelle = true;
@@ -327,11 +327,16 @@ class _ProductsScreenState extends State<ProductsScreen> {
           title: Text(
             'Tous les Produits',
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
+                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 18),
           ),
           actions: !isExist
               ? null
               : [
+                 IconButton(
+                      onPressed: () {
+                        stockListeFuture = getAllStocks();
+                      },
+                      icon: const Icon(Icons.refresh, color: d_colorGreen)),
                   (typeActeurData
                               .map((e) => e.libelle!.toLowerCase())
                               .contains("commercant") ||

@@ -61,7 +61,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
           title: Text(
             'Type de véhicule',
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
+                color: d_colorGreen, fontWeight: FontWeight.bold,fontSize:19),
           ),
           actions: [
             PopupMenuButton<String>(
@@ -83,6 +83,7 @@ class _TypeVehiculeState extends State<TypeVehicule> {
                         ),
                       ),
                       onTap: () async {
+                        Navigator.of(context).pop();
                         _showDialog();
                       },
                     ),

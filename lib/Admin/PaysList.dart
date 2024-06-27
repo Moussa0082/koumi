@@ -55,7 +55,7 @@ class _PaysListState extends State<PaysList> {
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: Text(
           region.nomSousRegion.toUpperCase(),
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 18),
         ),
         actions: [
           IconButton(

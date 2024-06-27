@@ -107,7 +107,7 @@ class _CommandeScreenState extends State<CommandeScreen> {
         title: Text(
           "Mes Commandes",
           style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 18),
         ),
         actions: !isExist ? null : [
           IconButton(
