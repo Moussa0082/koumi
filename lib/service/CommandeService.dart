@@ -16,6 +16,7 @@ import 'package:koumi_app/models/Stock.dart';
       final String baseUrl = '$apiOnlineUrl/commande'; // Replace with your API URL
     // final String baseUrl = 'http://10.0.2.2:9000/api-koumi/commande'; // Replace with your API URL
             List<Commande> commandeList = [];
+            List<DetailCommande> detailCommandeList = [];
 
 
    Future<List<Commande>> fetchCommandeByActeur(String idActeur) async {
@@ -41,21 +42,130 @@ import 'package:koumi_app/models/Stock.dart';
   }
 }
   
-    Future<String> confirmerLivraison(String idDetailCommande, double quantiteLivree) async {
-    final url = Uri.parse('$baseUrl/confirmerLivraison/$idDetailCommande/$quantiteLivree');
+  //   Future<String> confirmerLivraison(String idDetailCommande, double quantiteLivree) async {
+  //   final url = Uri.parse('$baseUrl/confirmerLivraison/$idDetailCommande/$quantiteLivree');
 
-    try {
-      final response = await http.put(url);
+  //   try {
+  //     final response = await http.put(url);
 
-      if (response.statusCode == 200) {
-        return json.decode(response.body)["message"];
-      } else {
-        throw Exception('Erreur lors de la confirmation de la commande: ${response.body}');
+  //     if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202 ) {
+  //       return json.decode(response.body)["message"];
+  //     } else {
+  //       print('Erreur lors de la confirmation de la commande: ${response.body}');
+  //        return "Erreur else la quantité livrée ne doit pas être supérieur à la quantité demandée";
+  //     }
+  //   } catch (e) {
+  //      debugPrint('Erreur lors de la requête: $e');
+  //      return "Erreur catch la quantité livrée ne doit pas être supérieur à la quantité demandée";
+  //   }
+  // }
+Future<String> confirmerLivraison(String idDetailCommande, double quantiteLivree) async {
+  final url = Uri.parse('$baseUrl/confirmerLivraison/$idDetailCommande/$quantiteLivree');
+
+  try {
+    final response = await http.put(url);
+
+    // Imprimer la réponse brute
+
+    if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+    print('Response body: ${response.body}');
+      // Vérifier si la réponse est du JSON valide
+      var jsonResponse;
+      try {
+        // jsonResponse = json.decode(response.body);
+         jsonResponse = json.decode(utf8.decode(response.bodyBytes));
+               } catch (e) {
+        throw FormatException("Réponse JSON non valide");
       }
-    } catch (e) {
-      throw Exception('Erreur lors de la requête: $e');
+
+      return jsonResponse["message"];
+    } else {
+      print('Erreur lors de la confirmation de la commande: ${response.body}');
+      return "Erreur lors de la confirmation de la commande";
     }
+  } catch (e) {
+    debugPrint('Erreur lors de la requête: $e');
+    return "Erreur lors de la requête de confirmation";
   }
+}
+
+//  Future<String> confirmerLivraison(String idDetailCommande, double quantiteLivree) async {
+//   final url = Uri.parse('$baseUrl/confirmerLivraison/$idDetailCommande/$quantiteLivree');
+
+//   try {
+//     final response = await http.put(url);
+//     print('Response body: ${response.body}');
+
+//     if (response.statusCode == 200) {
+//       final responseBody = json.decode(response.body);
+//       if (responseBody is Map<String, dynamic> && responseBody.containsKey('message')) {
+//         return responseBody["message"];
+//       } else {
+//         // throw FormatException('Unexpected response format');
+//               return "Unexpected response format";
+
+//       }
+//     } else {
+//       print('Erreur lors de la confirmation de la commande: ${response.body}');
+//       return "Erreur: La quantité livrée ne doit pas être supérieure à la quantité demandée";
+//     }
+//   } catch (e) {
+//     print('Erreur lors de la requête: $e');
+//     return "Erreur: La quantité livrée ne doit pas être supérieure à la quantité demandée";
+//   }
+// }
+
+  //   Future<String> annulerLivraisonParProduit(String idDetailCommande, {String? description}) async {
+  //   final url = Uri.parse('$baseUrl/annulerLivraison/$idDetailCommande/$description');
+
+  //   try {
+  //     final response = await http.put(url);
+
+  //     if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202 ) {
+  //       return json.decode(response.body)["message"];
+  //     } else {
+  //       print('Erreur lors de l\'annulation de la commande: ${response.body}');
+  //        return "Erreur lors de l'annulation de la commande";
+  //     }
+  //   } catch (e) {
+  //      debugPrint('Erreur lors de la requête: $e');
+  //      return "Erreur lors de l'annulation de la commande";
+  //   }
+  // }
+ Future<String> annulerLivraisonParProduit(String idDetailCommande, {String? description}) async {
+  final url = Uri.parse('$baseUrl/annulerLivraison/$idDetailCommande');
+
+  try {
+    final response = await http.put(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'description': description}),
+    );
+
+    // Imprimer la réponse brute
+
+    if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+    print('Response body: ${response.body}');
+      // Vérifier si la réponse est du JSON valide
+      var jsonResponse;
+      try {
+        // jsonResponse = json.decode(response.body);
+         jsonResponse = json.decode(utf8.decode(response.bodyBytes));
+
+      } catch (e) {
+        throw FormatException("Réponse JSON non valide");
+      }
+
+      return jsonResponse["message"];
+    } else {
+      print('Erreur lors de l\'annulation de la commande: ${response.body}');
+      return "Erreur lors de l'annulation de la commande";
+    }
+  } catch (e) {
+    debugPrint('Erreur lors de la requête: $e');
+    return "Erreur lors de la requête d'annulation";
+  }
+}
 
 
 
@@ -99,6 +209,30 @@ import 'package:koumi_app/models/Stock.dart';
       print('Error catch fetching commande for acteur proprietaire $acteurProprietaire: $e');
     }
         return commandeList = [];
+        
+  }
+
+
+    Future<List<DetailCommande>> fetchDetailsCommande(String commandeId) async {
+    try {
+      final response = await http.get(Uri.parse(
+          '$baseUrl/$commandeId/details'));
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+
+     print("succes detail commande fetch ");
+               List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+        detailCommandeList = body
+        // .where((commande) => commande['statutCommande'] == true)
+        .map((e) => DetailCommande.fromMap(e)).toList();
+        return detailCommandeList;
+      } else {
+        debugPrint("erreur lors de la recuperation des details  commande ");
+       return detailCommandeList = [];
+      }
+    } catch (e) {
+      print('Error catch fetching des details commande : $e');
+    }
+        return detailCommandeList = [];
         
   }
 

@@ -16,6 +16,7 @@ import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:pattern_formatter/pattern_formatter.dart';
 
 class NextAddVehiculeActeur extends StatefulWidget {
   final TypeVoiture typeVoiture;
@@ -363,7 +364,7 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                       .map(
                                         (e) => DropdownMenuItem(
                                           value: e.idMonnaie,
-                                          child: Text(e.sigle!),
+                                          child: Text(e.libelle!),
                                         ),
                                       )
                                       .toList(),
@@ -657,9 +658,8 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                         child: TextFormField(
                                           controller: prixControllers[index],
                                           keyboardType: TextInputType.number,
-                                          inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter
-                                                .digitsOnly,
+                                          inputFormatters: [
+                                            ThousandsFormatter(),
                                           ],
                                           decoration: InputDecoration(
                                             hintText: "Prix",
@@ -727,9 +727,10 @@ class _NextAddVehiculeActeurState extends State<NextAddVehiculeActeur> {
                                   i < selectedDestinationsList.length;
                                   i++) {
                                 String destination = selectedDestinations[i];
-                                int prix =
-                                    int.tryParse(prixControllers[i].text) ?? 0;
-
+                                String formattedMontant =
+                                    prixControllers[i].text.replaceAll(',', '');
+                                int prix = int.tryParse(formattedMontant) ?? 0;
+                                print("prix : $prix");
                                 // Ajouter la destination et le prix à la nouvelle map
                                 if (destination.isNotEmpty && prix > 0) {
                                   prixParDestinations

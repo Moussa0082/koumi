@@ -241,7 +241,7 @@ Future<void> _pickImage(ImageSource source) async {
       password: password,
       speculations: selectedSpec
         ).then((value) => 
-                 showDialog(
+              showDialog(
             context:  context,
             builder: (BuildContext context) {
               return AlertDialog(
@@ -251,8 +251,7 @@ Future<void> _pickImage(ImageSource source) async {
                   TextButton(
                     onPressed: () {
                       Get.back();
-                         
-      Get.offAll(LoginSuccessScreen());           
+      Get.offAll(LoginSuccessScreen());
         },
                     child:const  Text('OK'),
                   ),
@@ -261,7 +260,6 @@ Future<void> _pickImage(ImageSource source) async {
             },
           )
         );
- 
         }else{
       await acteurService.creerActeur(
       nomActeur: nomActeur,

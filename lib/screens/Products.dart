@@ -741,7 +741,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                                                 )
                                                               : CachedNetworkImage(
                                                                   imageUrl:
-                                                                      "https://koumi.ml/api-koumi/Stock/${stockListe[index].idStock}/image",
+                                                                      "https://koumi.ml/api-koumi/Stock/${filteredSearch[index].idStock}/image",
                                                                   fit: BoxFit
                                                                       .cover,
                                                                   placeholder: (context,
@@ -1002,7 +1002,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                                                     )
                                                                   : CachedNetworkImage(
                                                                       imageUrl:
-                                                                          "https://koumi.ml/api-koumi/Stock/${stockListe[index].idStock}/image",
+                                                                          "https://koumi.ml/api-koumi/Stock/${filteredSearch[index].idStock}/image",
                                                                       fit: BoxFit
                                                                           .cover,
                                                                       placeholder: (context,

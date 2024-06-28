@@ -71,6 +71,7 @@ class _ZoneState extends State<Zone> {
                     ),
                   ),
                   onTap: () async {
+                    Navigator.of(context).pop();
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) => AddZone()));
                   },
@@ -165,43 +166,42 @@ class _ZoneState extends State<Zone> {
                                       height: 305,
                                       child: Column(children: [
                                         ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: zone.photoZone == null ||
-                                                  zone.photoZone!.isEmpty
-                                              ? Image.asset(
-                                                  "assets/images/zoneProd.jpg",
-                                                  fit: BoxFit.fitWidth,
-                                                  height: 150,
-                                                  width: double.infinity,
-                                                )
-                                              : 
-                                              CachedNetworkImage(
-                   width: double.infinity,
-                    height: 150,
-                    
-                                                  imageUrl:
-                                                      "https://koumi.ml/api-koumi/ZoneProduction/${zone.idZoneProduction}/image",
-                                                  fit: BoxFit.cover,
-                                                  placeholder: (context, url) =>
-                                                      const Center(
-                                                          child:
-                                                              CircularProgressIndicator()),
-                                                  errorWidget:
-                                                      (context, url, error) =>
-                                                          Image.asset(
-                                                    'assets/images/default_image.png',
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            child: zone.photoZone == null ||
+                                                    zone.photoZone!.isEmpty
+                                                ? Image.asset(
+                                                    "assets/images/zoneProd.jpg",
+                                                    fit: BoxFit.fitWidth,
+                                                    height: 150,
+                                                    width: double.infinity,
+                                                  )
+                                                : CachedNetworkImage(
+                                                    width: double.infinity,
+                                                    height: 150,
+                                                    imageUrl:
+                                                        "https://koumi.ml/api-koumi/ZoneProduction/${zone.idZoneProduction}/image",
                                                     fit: BoxFit.cover,
-                                                  ),
-                                                )
-                                             
-                                              // : Image.network(
-                                              //     "http://10.0.2.2/${zone.photoZone!}",
-                                              //     fit: BoxFit.fitWidth,
-                                              //     height: 150,
-                                              //     width: double.infinity,
-                                              //   ),
-                                        ),
+                                                    placeholder: (context,
+                                                            url) =>
+                                                        const Center(
+                                                            child:
+                                                                CircularProgressIndicator()),
+                                                    errorWidget:
+                                                        (context, url, error) =>
+                                                            Image.asset(
+                                                      'assets/images/default_image.png',
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  )
+
+                                            // : Image.network(
+                                            //     "http://10.0.2.2/${zone.photoZone!}",
+                                            //     fit: BoxFit.fitWidth,
+                                            //     height: 150,
+                                            //     width: double.infinity,
+                                            //   ),
+                                            ),
                                         const SizedBox(
                                           height: 10,
                                         ),
@@ -273,7 +273,8 @@ class _ZoneState extends State<Zone> {
                                                       <PopupMenuEntry<String>>[
                                                     PopupMenuItem<String>(
                                                       child: ListTile(
-                                                        leading:   zone.statutZone ==
+                                                        leading:
+                                                            zone.statutZone ==
                                                                     false
                                                                 ? Icon(
                                                                     Icons.check,
@@ -287,11 +288,10 @@ class _ZoneState extends State<Zone> {
                                                                             .orange[
                                                                         400],
                                                                   ),
-                                                        title:  Text(
-                                                           zone.statutZone ==
-                                                                    false
-                                                                ?
-                                                          "Activer"
+                                                        title: Text(
+                                                          zone.statutZone ==
+                                                                  false
+                                                              ? "Activer"
                                                               : "Desactiver",
                                                           style: TextStyle(
                                                             color: zone.statutZone ==
@@ -305,53 +305,42 @@ class _ZoneState extends State<Zone> {
                                                         ),
                                                         onTap: () async {
                                                           zone.statutZone ==
-                                                                    false
-                                                                ?
-                                                          await ZoneProductionService()
-                                                              .activerZone(zone
-                                                                  .idZoneProduction!)
-                                                              .then((value) => {
-                                                                    Provider.of<ZoneProductionService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
-                                                                    ScaffoldMessenger.of(
-                                                                            context)
-                                                                        .showSnackBar(
-                                                                      const SnackBar(
-                                                                        content:
-                                                                            Row(
-                                                                          children: [
-                                                                            Text("Activer avec succèss "),
-                                                                          ],
-                                                                        ),
-                                                                        duration:
-                                                                            Duration(seconds: 2),
-                                                                      ),
-                                                                    )
-                                                                  })
-                                                              .catchError(
-                                                                  (onError) => {
-                                                                        ScaffoldMessenger.of(context)
-                                                                            .showSnackBar(
-                                                                          SnackBar(
-                                                                            content:
-                                                                                Row(
-                                                                              children: [
-                                                                                Text("Une erreur s'est produit : $onError"),
-                                                                              ],
+                                                                  false
+                                                              ? await ZoneProductionService()
+                                                                  .activerZone(zone
+                                                                      .idZoneProduction!)
+                                                                  .then(
+                                                                      (value) =>
+                                                                          {
+                                                                            Provider.of<ZoneProductionService>(context, listen: false).applyChange(),
+                                                                            Navigator.of(context).pop(),
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              const SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Activer avec succèss "),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: Duration(seconds: 2),
+                                                                              ),
+                                                                            )
+                                                                          })
+                                                                  .catchError(
+                                                                      (onError) =>
+                                                                          {
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Une erreur s'est produit : $onError"),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: const Duration(seconds: 5),
+                                                                              ),
                                                                             ),
-                                                                            duration:
-                                                                                const Duration(seconds: 5),
-                                                                          ),
-                                                                        ),
-                                                                        Navigator.of(context)
-                                                                            .pop(),
-                                                                      }) :   await ZoneProductionService()
+                                                                            Navigator.of(context).pop(),
+                                                                          })
+                                                              : await ZoneProductionService()
                                                                   .desactiverZone(zone
                                                                       .idZoneProduction!)
                                                                   .then(

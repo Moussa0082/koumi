@@ -13,6 +13,7 @@ import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/CommandeService.dart';
+import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
@@ -38,6 +39,7 @@ class _MesCommandeState extends State<MesCommande> {
   List<Stock>  stockListe = [];
   CategorieProduit? selectedCat;
    List<Commande> _liste = [];
+    List<Commande> _filteredListe = [];
   String? typeValue;
   bool isExist = false;
   bool isLoading = true;
@@ -45,6 +47,55 @@ class _MesCommandeState extends State<MesCommande> {
   String? email = "";
 
 
+
+  //   void _filterCommandes(String search) {
+  //   setState(() {
+  //     _filteredListe = _liste.where((commande) {
+  //       final codeLower = commande.codeCommande!.toLowerCase();
+  //       final dateLower = commande.dateCommande!.toLowerCase();
+  //       final statutLower = commande.statutConfirmation == false ? 'en attente' : 'validée';
+
+  //       final searchLower = search.toLowerCase();
+
+  //       return codeLower.contains(searchLower) ||
+  //           dateLower.contains(searchLower) ||
+  //           statutLower.contains(searchLower);
+  //     }).toList();
+  //   });
+  // }
+
+  void _filterCommandes(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredListe = _liste;
+      } else {
+        _filteredListe = _liste.where((commande) {
+          final codeCommande = commande.codeCommande?.toLowerCase() ?? '';
+          final dateCommande = commande.dateCommande?.toLowerCase() ?? '';
+          final statutCommande = commande.statutCommande?.toString().toLowerCase() ?? '';
+
+          // Inverser le format de la date pour les comparaisons
+          String inverseDateFormat(String date) {
+            if (date.contains('-')) {
+              final parts = date.split('-');
+              if (parts.length == 3) {
+                return '${parts[2]}-${parts[1]}-${parts[0]}';
+              }
+            }
+            return date;
+          }
+
+          final invertedDateCommande = inverseDateFormat(dateCommande);
+
+          final searchQuery = query.toLowerCase();
+          return codeCommande.contains(searchQuery) ||
+              dateCommande.contains(searchQuery) ||
+              invertedDateCommande.contains(searchQuery) ||
+              statutCommande.contains(searchQuery);
+        }).toList();
+      }
+    });
+  }
 
      void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -72,6 +123,7 @@ class _MesCommandeState extends State<MesCommande> {
         fetchAllCommandes(acteur.idActeur!).then((combinedList) {
           setState(() {
             _liste = combinedList;
+            _filteredListe = combinedList;
             isLoading = false;
           });
         });
@@ -223,7 +275,8 @@ class _MesCommandeState extends State<MesCommande> {
         onRefresh: () async{
        setState(() {
             fetchAllCommandes(acteur.idActeur!).then((value) => {
-          _liste = value
+          // _liste = value,
+          _filteredListe = value
         });
        });
         },
@@ -247,9 +300,10 @@ class _MesCommandeState extends State<MesCommande> {
                       Expanded(
                         child: TextField(
                           controller: _searchController,
-                          onChanged: (value) {
-                            setState(() {});
-                          },
+                         onChanged: (value) {
+                  _filterCommandes(value);
+                },
+                          
                           decoration: InputDecoration(
                             hintText: 'Rechercher',
                             border: InputBorder.none,
@@ -261,8 +315,9 @@ class _MesCommandeState extends State<MesCommande> {
                       IconButton(
                         icon: Icon(Icons.clear),
                         onPressed: () {
-                          _searchController.clear();
-                          setState(() {});
+ _searchController.clear();
+                _filterCommandes('');
+                                          setState(() {});
                         },
                       ),
                     ],
@@ -283,6 +338,7 @@ class _MesCommandeState extends State<MesCommande> {
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           children: [
             // Header row
+            
            TableRow(
               decoration: BoxDecoration(color: Colors.redAccent),
               children: [
@@ -329,8 +385,10 @@ class _MesCommandeState extends State<MesCommande> {
               ...List.generate(10, (index) => buildShimmerRow())
             else  
             // Data rows
-            ..._liste.map((commande) =>  TableRow(
+            
+            ..._filteredListe.map((commande) =>  TableRow(
               children: [
+                       
                 TableCell(
                   verticalAlignment: TableCellVerticalAlignment.middle,
                   child: Padding(
@@ -369,7 +427,7 @@ class _MesCommandeState extends State<MesCommande> {
                       onLongPress: () {
                         if(acteur.idActeur == commande.acteur?.idActeur){
                           print("acteur qui a commande");
-                        }
+                        
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
@@ -400,7 +458,8 @@ class _MesCommandeState extends State<MesCommande> {
                                                                         .applyChange(),
                                                                     setState(() {
             fetchAllCommandes(acteur.idActeur!).then((value) => {
-          _liste = value
+          // _liste = value,
+          _filteredListe = value
             });
           }),
                                                                     Navigator.of(
@@ -432,14 +491,19 @@ class _MesCommandeState extends State<MesCommande> {
                             );
                           },
                         );
+                      }
+                        else{
+                          print("je suis propriétaire");
+                          Snack.error(titre: "Alerte", message: "Vos produits ont été commandé donc uniquement l'acheteur peut annuler la commande");
+                        } 
                       },
                       child: Center(
                         child: Container(
                           width: 80,
-                          color: commande.statutCommande == false ? Colors.red : Colors.green,
+                          color: commande.statutConfirmation == false ? Colors.red : Colors.green,
                           child: Center(
                             child: Text(
-                              commande.statutCommande == false ? "En attende" : "Validée",
+                              commande.statutConfirmation == false ? "En attende" : "Validée",
                               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                             ),
                           ),

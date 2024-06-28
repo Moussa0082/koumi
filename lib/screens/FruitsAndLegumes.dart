@@ -11,7 +11,8 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 class FruitAndLegumes extends StatefulWidget {
-  const FruitAndLegumes({super.key});
+  String? detectedCountry;
+  FruitAndLegumes({super.key,this.detectedCountry});
 
   @override
   State<FruitAndLegumes> createState() => _FruitAndLegumesState();
@@ -23,11 +24,14 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 class _FruitAndLegumesState extends State<FruitAndLegumes> {
   late TextEditingController _searchController;
   List<Stock> stockListe = [];
+  List<Stock> stockList = [];
   late Future<List<Stock>> stockListeFuture;
 
   ScrollController scrollableController = ScrollController();
 
   String libelle = "Végétale";
+  // List<String> libelles = ["Végétale", "Vegetale", "vegetale", "végétale","Végétales"];
+
   // String? monnaie;
   int page = 0;
   bool isLoading = false;
@@ -46,7 +50,10 @@ class _FruitAndLegumesState extends State<FruitAndLegumes> {
         page++;
       });
 
-      fetchStock().then((value) {
+      fetchStock(
+              // widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
+              ).then((value) {
+          
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -56,7 +63,8 @@ class _FruitAndLegumesState extends State<FruitAndLegumes> {
     debugPrint("no");
   }
 
-  Future<List<Stock>> fetchStock({bool refresh = false}) async {
+  Future<List<Stock>> fetchStock(
+      {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -72,30 +80,38 @@ class _FruitAndLegumesState extends State<FruitAndLegumes> {
     }
 
     try {
-      final response = await http.get(Uri.parse(
-          '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
+      // List<Stock> tempStockListe = [];
+      // for (String libelle in libelles) {
+        final response = await http.get(Uri.parse(
+            '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
+            // '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?pays=$pays&libelle=$libelle&page=$page&size=$size'));
+        debugPrint( '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&page=$page&size=$size');
+        // debugPrint( '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+          final List<dynamic> body = jsonData['content'];
 
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
-        final List<dynamic> body = jsonData['content'];
-
-        if (body.isEmpty) {
-          setState(() {
-            hasMore = false;
-          });
-        } else {
-          setState(() {
+          if (body.isEmpty) {
+            setState(() {
+              hasMore = false;
+            });
+          } else {
             List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
-            stockListe.addAll(newStocks);
+          setState(() {
+            stockListe.addAll(newStocks.where((newStock) => !stockListe
+                .any((existStock) => existStock.idStock == newStock.idStock)));
           });
         }
 
-        debugPrint(
-            "response body all stock by categorie with pagination ${page} par défilement soit ${stockListe.length}");
-      } else {
-        print(
-            'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
-      }
+          debugPrint(
+              "response body all stock by categorie with pagination ${page} par défilement soit ${stockListe.length}");
+        } else {
+          print(
+              'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        }
+      
+
+     
     } catch (e) {
       print(
           'Une erreur s\'est produite lors de la récupération des intrants: $e');
@@ -114,7 +130,9 @@ class _FruitAndLegumesState extends State<FruitAndLegumes> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController.addListener(_scrollListener);
     });
-    stockListeFuture = fetchStock();
+    stockListeFuture = fetchStock(
+        // widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
+        );
   }
 
   @override
@@ -201,6 +219,14 @@ class _FruitAndLegumesState extends State<FruitAndLegumes> {
                         // Rafraîchir les données ici
                       });
                       debugPrint("refresh page ${page}");
+                      setState(() {
+                        stockListeFuture = fetchStock(
+                            // widget.detectedCountry != null
+                            //     ? widget.detectedCountry!
+                            //     : "Mali"
+                                );
+                      });
+                      debugPrint("refresh page ${page}");
                     },
                     child: SingleChildScrollView(
                       controller: scrollableController,
@@ -221,10 +247,10 @@ class _FruitAndLegumesState extends State<FruitAndLegumes> {
                                       Center(child: Text("Aucun donné trouvé")),
                                 );
                               } else {
-                                stockListe = snapshot.data!;
+                                stockList = snapshot.data!;
                                 String searchText = "";
                                 List<Stock> filteredSearch =
-                                    stockListe.where((cate) {
+                                    stockList.where((cate) {
                                   String nomCat =
                                       cate.nomProduit!.toLowerCase();
                                   searchText =

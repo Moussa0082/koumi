@@ -65,7 +65,7 @@ class _LoginSuccessScreenState extends State<LoginSuccessScreen> {
                 
                ),
              ),
-           ),  
+           ),
         const SizedBox(height: 20,),
              Text("Votre compte a été créé avec succès. L'administrateur vous enverra un message de validation  dans les 24 heures. Si vous ne recevez pas de message dans ce délai, veuillez contacter le +223 51554851", 
              textAlign: TextAlign.justify,

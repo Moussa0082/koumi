@@ -26,7 +26,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
  
-  @override
+  @override 
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
@@ -190,6 +190,7 @@ void didChangeDependencies() {
   void initState() {
     super.initState();
     // clearCart();
+    streamSubscription = const Stream<Position>.empty().listen((_) {});
     getLocation();
     // Vérifie d'abord si l'email de l'acteur est présent dans SharedPreferences
       // connectionVerify = Get.put(ConnectionVerify(), permanent: true);
@@ -308,7 +309,10 @@ void didChangeDependencies() {
 
    @override
   void dispose() {
-  streamSubscription.cancel();
+  // streamSubscription.cancel();
+  if (streamSubscription != null) {
+      streamSubscription.cancel();
+    }
     super.dispose();
   }
 

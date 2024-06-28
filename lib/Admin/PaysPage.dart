@@ -51,9 +51,9 @@ class _PaysPageState extends State<PaysPage> {
   @override
   void initState() {
     super.initState();
-    paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-        .parametreList!;
-    para = paraList[0];
+    // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
+    //     .parametreList!;
+    // para = paraList[0];
     _sousRegionList =
         http.get(Uri.parse('$apiOnlineUrl/sousRegion/read'));
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/sousRegion/read'));

@@ -29,7 +29,7 @@ class _CategoriPageState extends State<CategoriPage> {
   Future<List<CategorieProduit>> getCatListe(String id) async {
     return await CategorieService().fetchCategorieByFiliere(id);
   }
-  
+
   List<CategorieProduit> categorieList = [];
   List<Speculation> speculationList = [];
   late Future<List<CategorieProduit>> _liste;
@@ -54,13 +54,12 @@ class _CategoriPageState extends State<CategoriPage> {
     super.initState();
 
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    _filiereList = http
-        .get(Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
+    _filiereList = http.get(Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
     // .get( Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
 
     // _categorieList = http.get( Uri.parse('http://10.0.2.2:9000/api-koumi/Categorie/allCategorie'));
-    _categorieList = http
-        .get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
+    _categorieList =
+        http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
     _liste = getCat();
     _searchController = TextEditingController();
   }
@@ -106,6 +105,7 @@ class _CategoriPageState extends State<CategoriPage> {
                     ),
                   ),
                   onTap: () async {
+                    Navigator.of(context).pop();
                     _showDialogSpeculation();
                   },
                 ),
@@ -214,9 +214,7 @@ class _CategoriPageState extends State<CategoriPage> {
                           return nomCat.contains(searchText);
                         }).toList();
                         return Column(
-                            children: filteredCatSearch
-                          
-                                    .isEmpty
+                            children: filteredCatSearch.isEmpty
                                 ? [
                                     Padding(
                                       padding: EdgeInsets.all(10),
@@ -283,6 +281,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                                       title: Text(
                                                           e.libelleCategorie!
                                                               .toUpperCase(),
+                                                          maxLines: 1,
                                                           style:
                                                               const TextStyle(
                                                             color: Colors.black,
@@ -313,8 +312,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                                         MainAxisAlignment
                                                             .spaceBetween,
                                                     children: [
-                                                      Text(
-                                                          "Filière appartenant:",
+                                                      Text("Filière : ",
                                                           style: TextStyle(
                                                             color:
                                                                 Colors.black87,
@@ -325,15 +323,18 @@ class _CategoriPageState extends State<CategoriPage> {
                                                                 .italic,
                                                           )),
                                                       Text(
-                                                          e.filiere!
-                                                              .libelleFiliere!,
-                                                          style: TextStyle(
-                                                            color:
-                                                                Colors.black87,
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                          ))
+                                                        e.filiere!
+                                                            .libelleFiliere!,
+                                                        style: TextStyle(
+                                                          color: Colors.black87,
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      )
                                                     ],
                                                   ),
                                                 ),
@@ -675,10 +676,7 @@ class _CategoriPageState extends State<CategoriPage> {
                                                                             {
                                                                               Provider.of<CategorieService>(context, listen: false).applyChange(),
                                                                               setState(() {
-                                                                                _categorieList = http
-                                                                                    .
-
-                                                                                    get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
+                                                                                _categorieList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
                                                                               }),
                                                                               Navigator.of(context).pop(),
                                                                             })

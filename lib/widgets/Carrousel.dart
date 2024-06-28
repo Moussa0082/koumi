@@ -871,4 +871,3 @@ Widget buildShimmerImageSlider() {
 }
 
 }
-

@@ -21,7 +21,7 @@ import 'package:shimmer/shimmer.dart';
 
 class Location extends StatefulWidget {
   String? detectedCountry;
-   Location({super.key, this.detectedCountry});
+  Location({super.key, this.detectedCountry});
 
   @override
   State<Location> createState() => _LocationState();
@@ -98,9 +98,10 @@ class _LocationState extends State<Location> {
       setState(() {
         // Rafraîchir les données ici
         page++;
-        });
+      });
       debugPrint("yes - fetch all materiel by pays");
       fetchMateriel(widget.detectedCountry!).then((value) {
+
 
         setState(() {
           // Rafraîchir les données ici
@@ -125,24 +126,20 @@ class _LocationState extends State<Location> {
         });
    
     fetchMaterielByType(widget.detectedCountry.toString().toLowerCase());
+
     }
     debugPrint("no");
   }
 
-
-
-
-
- Future<List<Materiel>> fetchMateriel(String niveau3PaysActeur,{bool refresh = false}) async {
-
+  Future<List<Materiel>> fetchMateriel(String niveau3PaysActeur,
+      {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
       isLoading = true;
     });
 
-    if (mounted) 
-    if (refresh) {
+    if (mounted) if (refresh) {
       setState(() {
         materielListe.clear();
         page = 0;
@@ -151,8 +148,8 @@ class _LocationState extends State<Location> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Materiel/getMaterielsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}'));
-
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/Materiel/getMaterielsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -189,10 +186,8 @@ class _LocationState extends State<Location> {
     return materielListe;
   }
 
-
-
-  Future<List<Materiel>> fetchMaterielByType(String niveau3PaysActeur, {bool refresh = false}) async {
-
+  Future<List<Materiel>> fetchMaterielByType(String niveau3PaysActeur,
+      {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -208,7 +203,8 @@ class _LocationState extends State<Location> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Materiel/getMaterielsByPaysAndTypeMaterielWithPagination?idTypeMateriel=${selectedType!.idTypeMateriel}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/Materiel/getMaterielsByPaysAndTypeMaterielWithPagination?idTypeMateriel=${selectedType!.idTypeMateriel}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -260,6 +256,7 @@ class _LocationState extends State<Location> {
       });
     }
   }
+
    
     Future<List<Materiel>> getAllMateriel() async {
      if (selectedType != null) {
@@ -267,22 +264,41 @@ class _LocationState extends State<Location> {
           MaterielService().fetchMaterielByTypeAndPaysWithPagination(selectedType!.idTypeMateriel!,widget.detectedCountry!);
     }else{
      materielListe = await MaterielService().fetchMateriel(widget.detectedCountry!);
-
     }
-
     return materielListe;
+    }
+  // Future<List<Materiel>> getAllMateriel() async {
+  //   if (selectedType != null) {
+  //     materielListe = await MaterielService()
+  //         .fetchMaterielByTypeAndPaysWithPagination(
+  //             selectedType!.idTypeMateriel!,
+  //             widget.detectedCountry != null
+  //                 ? widget.detectedCountry!
+  //                 : "Mali");
+  //   } else {
+  //     materielListe = await MaterielService().fetchMateriel(
+  //         widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+  //   }
+
+  //   return materielListe;
+  // }
+
+  void refreshList() {
+    setState(() {
+      materielListeFuture = materielListeFuture1 = getAllMateriel();
+    });
   }
 
   @override
   void initState() {
     super.initState();
     verify();
-    
+
     // fetchPaysDataByActor();
-        widget.detectedCountry != null ?
-   debugPrint("pays fetch location materiel page ${widget.detectedCountry!} ")
-     : 
-     debugPrint("null pays non fetch location materiel page");
+    widget.detectedCountry != null
+        ? debugPrint(
+            "pays fetch location materiel page ${widget.detectedCountry!} ")
+        : debugPrint("null pays non fetch location materiel page");
     _searchController = TextEditingController();
     _typeList = http.get(Uri.parse('$apiOnlineUrl/TypeMateriel/read'));
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -299,32 +315,28 @@ class _LocationState extends State<Location> {
       print("pays location null");
     }
     materielListeFuture = materielListeFuture1 = getAllMateriel();
+    refreshList();
   }
 
-
- @override
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Accédez au fournisseur ici
     countryProvider = Provider.of<CountryProvider>(context, listen: false);
   }
 
-
   @override
   void dispose() {
     scrollableController.dispose();
     scrollableController1.dispose();
     _searchController.dispose();
+    // refreshList();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-
-
-
     return Scaffold(
-
         backgroundColor: const Color.fromARGB(255, 250, 250, 250),
         appBar: AppBar(
             centerTitle: true,
@@ -356,11 +368,21 @@ class _LocationState extends State<Location> {
                                 ),
                               ),
                               onTap: () async {
+
                                 Navigator.of(context).pop();
-                                Navigator.push(
+                              
+
+                                final result = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => AddMateriel()));
+                                 if (result == true) {
+                                  refreshList(); // Méthode pour rafraîchir la liste après ajout
+                                }
+                                // Navigator.push(
+                                //     context,
+                                //     MaterialPageRoute(
+                                //         builder: (context) => AddMateriel()));
                               },
                             ),
                           ),
@@ -400,130 +422,6 @@ class _LocationState extends State<Location> {
                     SliverToBoxAdapter(
                         child: Column(children: [
                       const SizedBox(height: 10),
-                      // Padding(
-                      //   padding: const EdgeInsets.symmetric(
-                      //       vertical: 10, horizontal: 20),
-                      //   child: FutureBuilder(
-                      //     future: _typeList,
-                      //     builder: (_, snapshot) {
-                      //       if (snapshot.connectionState ==
-                      //           ConnectionState.waiting) {
-                      //         return DropdownButtonFormField(
-                      //           items: [],
-                      //           onChanged: null,
-                      //           decoration: InputDecoration(
-                      //             labelText: 'Chargement...',
-                      //             contentPadding: const EdgeInsets.symmetric(
-                      //                 vertical: 10, horizontal: 20),
-                      //             border: OutlineInputBorder(
-                      //               borderRadius: BorderRadius.circular(8),
-                      //             ),
-                      //           ),
-                      //         );
-                      //       }
-
-                      //       if (snapshot.hasData) {
-                      //         dynamic jsonString =
-                      //             utf8.decode(snapshot.data.bodyBytes);
-                      //         dynamic responseData = json.decode(jsonString);
-                      //         if (responseData is List) {
-                      //           final reponse = responseData;
-                      //           final typeList = reponse
-                      //               .map((e) => TypeMateriel.fromMap(e))
-                      //               .where((con) => con.statutType == true)
-                      //               .toList();
-
-                      //           if (typeList.isEmpty) {
-                      //             return DropdownButtonFormField(
-                      //               items: [],
-                      //               onChanged: null,
-                      //               decoration: InputDecoration(
-                      //                 labelText:
-                      //                     '-- Aucun type de matériel trouvé --',
-                      //                 contentPadding:
-                      //                     const EdgeInsets.symmetric(
-                      //                         vertical: 10, horizontal: 20),
-                      //                 border: OutlineInputBorder(
-                      //                   borderRadius: BorderRadius.circular(8),
-                      //                 ),
-                      //               ),
-                      //             );
-                      //           }
-
-                      //           return DropdownButtonFormField<String>(
-                      //             isExpanded: true,
-                      //             items: typeList
-                      //                 .map(
-                      //                   (e) => DropdownMenuItem(
-                      //                     value: e.idTypeMateriel,
-                      //                     child: Text(e.nom!),
-                      //                   ),
-                      //                 )
-                      //                 .toList(),
-                      //             hint:
-                      //                 Text("-- Filtre par type de matériel --"),
-                      //             value: typeValue,
-                      //             onChanged: (newValue) {
-                      //               setState(() {
-                      //                 typeValue = newValue;
-                      //                 if (newValue != null) {
-                      //                   selectedType = typeList.firstWhere(
-                      //                     (element) =>
-                      //                         element.idTypeMateriel ==
-                      //                         newValue,
-                      //                   );
-                      //                 }
-                      //                 page = 0;
-                      //                 hasMore = true;
-                      //                 fetchMaterielByType(refresh: true);
-                      //                 if (page == 0 && isLoading == true) {
-                      //                   SchedulerBinding.instance
-                      //                       .addPostFrameCallback((_) {
-                      //                     scrollableController1.jumpTo(0.0);
-                      //                   });
-                      //                 }
-                      //               });
-                      //             },
-                      //             decoration: InputDecoration(
-                      //               contentPadding: const EdgeInsets.symmetric(
-                      //                   vertical: 10, horizontal: 20),
-                      //               border: OutlineInputBorder(
-                      //                 borderRadius: BorderRadius.circular(8),
-                      //               ),
-                      //             ),
-                      //           );
-                      //         } else {
-                      //           return DropdownButtonFormField(
-                      //             items: [],
-                      //             onChanged: null,
-                      //             decoration: InputDecoration(
-                      //               labelText:
-                      //                   '-- Aucun type de matériel trouvé --',
-                      //               contentPadding: const EdgeInsets.symmetric(
-                      //                   vertical: 10, horizontal: 20),
-                      //               border: OutlineInputBorder(
-                      //                 borderRadius: BorderRadius.circular(8),
-                      //               ),
-                      //             ),
-                      //           );
-                      //         }
-                      //       }
-                      //       return DropdownButtonFormField(
-                      //         items: [],
-                      //         onChanged: null,
-                      //         decoration: InputDecoration(
-                      //           labelText:
-                      //               '-- Aucun type de matériel trouvé --',
-                      //           contentPadding: const EdgeInsets.symmetric(
-                      //               vertical: 10, horizontal: 20),
-                      //           border: OutlineInputBorder(
-                      //             borderRadius: BorderRadius.circular(8),
-                      //           ),
-                      //         ),
-                      //       );
-                      //     },
-                      //   ),
-                      // ),
                       Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: ToggleButtons(
@@ -599,8 +497,7 @@ class _LocationState extends State<Location> {
                                   final reponse = responseData;
                                   final typeList = reponse
                                       .map((e) => TypeMateriel.fromMap(e))
-                                      .where(
-                                          (con) => con.statutType == true)
+                                      .where((con) => con.statutType == true)
                                       .toList();
 
                                   if (typeList.isEmpty) {
@@ -634,11 +531,13 @@ class _LocationState extends State<Location> {
                           ? setState(() {
                               materielListeFuture = MaterielService()
                                   .fetchMateriel(widget.detectedCountry! ,refresh: true);
+
                             })
                           : setState(() {
                               materielListeFuture1 = MaterielService()
                                   .fetchMaterielByTypeAndPaysWithPagination(
                                       selectedType!.idTypeMateriel!,widget.detectedCountry!,
+
                                       refresh: true);
                             });
                     },
@@ -785,7 +684,7 @@ class _LocationState extends State<Location> {
                                                                       )
                                                                     : CachedNetworkImage(
                                                                         imageUrl:
-                                                                            "https://koumi.ml/api-koumi/Materiel/${materielListe[index].idMateriel}/image",
+                                                                            "https://koumi.ml/api-koumi/Materiel/${filteredSearch[index].idMateriel}/image",
                                                                         fit: BoxFit
                                                                             .cover,
                                                                         placeholder:
@@ -1032,7 +931,7 @@ class _LocationState extends State<Location> {
                                                                           )
                                                                         : CachedNetworkImage(
                                                                             imageUrl:
-                                                                                "https://koumi.ml/api-koumi/Materiel/${materielListe[index].idMateriel}/image",
+                                                                                "https://koumi.ml/api-koumi/Materiel/${filteredSearch[index].idMateriel}/image",
                                                                             fit:
                                                                                 BoxFit.cover,
                                                                             placeholder: (context, url) =>
@@ -1238,8 +1137,7 @@ class _LocationState extends State<Location> {
     );
   }
 
- DropdownButtonFormField<String> buildDropdown(
-      List<TypeMateriel> typeList) {
+  DropdownButtonFormField<String> buildDropdown(List<TypeMateriel> typeList) {
     return DropdownButtonFormField<String>(
       isExpanded: true,
       items: typeList
@@ -1306,5 +1204,5 @@ class _LocationState extends State<Location> {
         ),
       ),
     );
-}
+  }
 }

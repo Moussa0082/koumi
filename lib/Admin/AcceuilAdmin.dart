@@ -13,14 +13,12 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CountryProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
-import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/ConseilScreen.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart' as l;
 import 'package:koumi_app/screens/MesCommande.dart';
 import 'package:koumi_app/screens/MyProduct.dart';
 import 'package:koumi_app/screens/Panier.dart';
-import 'package:koumi_app/screens/Product.dart';
 import 'package:koumi_app/screens/Products.dart';
 import 'package:koumi_app/screens/Store.dart';
 import 'package:koumi_app/screens/Transport.dart';
@@ -48,13 +46,15 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
   String? email = "";
   bool isExist = false;
 
+
     String? detectedC = '';
   String? isoCountryCode = '';
   String? country ='';
   String? detectedCountryCode = '';
   String? detectedCountry ='';
 
-    void getLocationNew() async {
+
+  void getLocationNew() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
@@ -135,8 +135,8 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
       longitude.value = 'Longitude : ${position.longitude}';
       getAddressFromLatLang(position);
     });
-  }  
-  
+  }
+
   Future<void> getAddressFromLatLang(Position position) async {
     List<Placemark> placemark =
         await placemarkFromCoordinates(position.latitude, position.longitude);
@@ -144,13 +144,12 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
     debugPrint("Address ISO: $detectedC");
     address.value =
         'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
-        if(mounted)
-        setState(() {
-          
-    detectedC = place.isoCountryCode;
-    detectedCountryCode = place.isoCountryCode!;
-    detectedCountry = place.country!;
-        });
+    if (mounted)
+      setState(() {
+        detectedC = place.isoCountryCode;
+        detectedCountryCode = place.isoCountryCode!;
+        detectedCountry = place.country!;
+      });
 
     debugPrint(
         "Address: admin accueil  ${place.locality},${place.country},${place.isoCountryCode}");
@@ -185,15 +184,15 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
 
   @override
   Widget build(BuildContext context) {
-    final parametreProvider =
-        Provider.of<ParametreGenerauxProvider>(context, listen: false);
+    // final parametreProvider =
+    //     Provider.of<ParametreGenerauxProvider>(context, listen: false);
 
-    ParametreGenerauxService().fetchParametre().then((parametreList) {
-      parametreProvider.setParametreList(parametreList);
-    }).catchError((error) {
-      // Gestion des erreurs
-      print('Erreur lors du chargement des données : $error');
-    });
+    // ParametreGenerauxService().fetchParametre().then((parametreList) {
+    //   parametreProvider.setParametreList(parametreList);
+    // }).catchError((error) {
+    //   // Gestion des erreurs
+    //   print('Erreur lors du chargement des données : $error');
+    // });
 
     return Scaffold(
       backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
@@ -203,11 +202,12 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
           // SizedBox(height: 200, child: Carrousels()),
                     SizedBox(height: 180, child: Carrousel()),
 
+
           // SizedBox(height: 100, child: isExist ? Carrousel(): CarrouselOffLine()),
-          // const SizedBox(
-          //   height: 10,
-          // ),
-          // SizedBox(height: 100, child: AlertAcceuil()),
+          const SizedBox(
+            height: 10,
+          ),
+          SizedBox(height: 100, child: AlertAcceuil()),
           const SizedBox(
             height: 10,
           ),
@@ -215,26 +215,12 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
             child: GridView.count(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 3,
+              crossAxisCount: 2,
               mainAxisSpacing: 2,
               crossAxisSpacing: 5,
-              childAspectRatio: 0.9,
-              children: [
-                _buildAccueilCard("Intrants", "intrant.png", 1),
-                _buildAccueilCard("Conseils", "conseil.png", 2),
-                _buildAccueilCard("Commandes", "commande.png", 3),
-                _buildAccueilCard("Magasin", "magasin.png", 4),
-                _buildAccueilCard("Meteo", "meteo.png", 5),
-                _buildAccueilCard("Transports", "transport.png", 6),
-                _buildAccueilCard("Locations", "location.png", 7),
-      
-                _buildAccueilCard("Alertes", "alerte.png", 8),
-                _buildAccueilCard("Produits", "produit.png", 9),
-                _buildAccueilCard("Filières", "filiere.png", 10),
-                _buildAccueilCard("Catégorie", "cat.png", 11),
-                _buildAccueilCard("Acteurs", "acteur.png", 12),
-                // _buildAccueilCard("Statistique", "statistique_logo.png", 4)
-              ],
+              childAspectRatio:
+                  2, // Ajustez cette valeur pour contrôler le rapport d'aspect
+              children: _buildCards(),
             ),
           ),
           const SizedBox(
@@ -243,6 +229,25 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
         ],
       ),
     );
+  }
+ 
+  List<Widget> _buildCards() {
+    List<Widget> cards = [
+      _buildAccueilCard("Conseils", "cons.png", 2),
+      _buildAccueilCard("Alertes", "alt.png", 8),
+      _buildAccueilCard("Commandes", "cm.png", 3),
+      _buildAccueilCard("Magasins", "shop.png", 4),
+      _buildAccueilCard("Intrants agricoles", "int.png", 1),
+      _buildAccueilCard("Produits agricoles", "pro.png", 9),
+      _buildAccueilCard("Materiels de Locations", "loc.png", 7),
+      _buildAccueilCard("Moyens de Transports", "transp.png", 6),
+      _buildAccueilCard("Filières", "fi.jpg", 10),
+      _buildAccueilCard("Météo", "met.png", 5),
+      _buildAccueilCard("Catégories", "c.jpg", 11),
+      _buildAccueilCard("Acteurs", "ac.png", 12),
+    ];
+
+    return cards;
   }
 
   Widget _buildAccueilCard(String titre, String imgLocation, int index) {
@@ -269,7 +274,8 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProductsScreen(detectedCountry: detectedCountry!),
+                    builder: (context) =>
+                        ProductsScreen(detectedCountry: detectedCountry!),
                   ));
             } else if (index == 8) {
               Navigator.push(
@@ -277,11 +283,17 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                   MaterialPageRoute(
                       builder: (context) => const AlerteScreen()));
             } else if (index == 7) {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) =>  l.Location(detectedCountry: detectedCountry!)));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          l.Location(detectedCountry: detectedCountry!)));
             } else if (index == 6) {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) =>  Transport(detectedCountry: detectedCountry!)));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          Transport(detectedCountry: detectedCountry!)));
             } else if (index == 5) {
               Navigator.push(
                   context,
@@ -291,10 +303,8 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) =>  StoreScreen(detectedCountry: detectedCountry!)));
             } else if (index == 3) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const MesCommande()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const MesCommande()));
             } else if (index == 2) {
               Navigator.push(
                   context,
@@ -304,47 +314,50 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>  IntrantScreen(detectedCountry: detectedCountry!)));
+                      builder: (context) =>
+                          IntrantScreen(detectedCountry: detectedCountry!)));
             }
           },
-          borderRadius: BorderRadius.circular(20),
-          child: Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              // height: 155,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.white,
-                boxShadow: const [
-                  BoxShadow(
-                    blurRadius: 5.0,
-                    color: Color.fromRGBO(0, 0, 0, 0.25), // Opacité de 10%
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            // width: 200, // Largeur fixe
+            // height: 50, // Hauteur fixe
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.white,
+              boxShadow: const [
+                BoxShadow(
+                  blurRadius: 5.0,
+                  color: Color.fromRGBO(0, 0, 0, 0.25), // Opacité de 10%
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Image.asset(
+                    "assets/images/$imgLocation",
+                    width: 45,
+                    height: 45,
+                    fit: BoxFit.fitHeight
                   ),
-                ],
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.28,
-                    child: Image.asset(
-                      "assets/images/$imgLocation",
-                      fit: BoxFit
-                          .cover, // You can adjust the BoxFit based on your needs
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text(
+                      titre,
+                      maxLines: 2,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    titre,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      overflow: TextOverflow.ellipsis,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           )),
     );
@@ -357,7 +370,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
       child: PageView(
         children: [
           const AcceuilAdmin(),
-           MyProductScreen(),
+          MyProductScreen(),
           Panier(),
           const ProfilA()
         ],

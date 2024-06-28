@@ -1,23 +1,25 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
-import 'package:koumi_app/models/Commande.dart';
-import 'package:koumi_app/models/Intrant.dart';
-import 'package:koumi_app/models/Stock.dart';
 
+import 'package:koumi_app/models/Commande.dart';
+import 'package:koumi_app/models/Stock.dart';
+import 'package:koumi_app/models/Intrant.dart';
 
 class DetailCommande {
+  String? idDetailCommande;
+  String? codeProduit;
+  double? quantiteDemande;
+  double? quantiteLivree;
+  double? quantiteNonLivree;
+  String? nomProduit;
+  String? description;
+  String? dateAjout;
+  bool? isStock;
+  bool? isDelivered;
+  Commande? commande;
+  Stock? stock;
+  Intrant? intrant;
 
- String? idDetailCommande;
-    String? codeProduit;
-    int? quantiteDemande;
-    int? quantiteLivree;
-    int? quantiteNonLivree;
-    String? nomProduit;
-    String? dateAjout;
-    bool? isStock;
-    Commande? commande;
-    Stock? stock;
-    Intrant? intrant;
   DetailCommande({
     this.idDetailCommande,
     this.codeProduit,
@@ -25,8 +27,10 @@ class DetailCommande {
     this.quantiteLivree,
     this.quantiteNonLivree,
     this.nomProduit,
+    this.description,
     this.dateAjout,
     this.isStock,
+    this.isDelivered,
     this.commande,
     this.stock,
     this.intrant,
@@ -35,11 +39,14 @@ class DetailCommande {
   DetailCommande copyWith({
     String? idDetailCommande,
     String? codeProduit,
-    int? quantiteDemande,
-    int? quantiteLivree,
-    int? quantiteNonLivree,
+    double? quantiteDemande,
+    double? quantiteLivree,
+    double? quantiteNonLivree,
     String? nomProduit,
+    String? description,
     String? dateAjout,
+    bool? isStock,
+    bool? isDelivered,
     Commande? commande,
     Stock? stock,
     Intrant? intrant,
@@ -51,7 +58,10 @@ class DetailCommande {
       quantiteLivree: quantiteLivree ?? this.quantiteLivree,
       quantiteNonLivree: quantiteNonLivree ?? this.quantiteNonLivree,
       nomProduit: nomProduit ?? this.nomProduit,
+      description: description ?? this.description,
       dateAjout: dateAjout ?? this.dateAjout,
+      isStock: isStock ?? this.isStock,
+      isDelivered: isDelivered ?? this.isDelivered,
       commande: commande ?? this.commande,
       stock: stock ?? this.stock,
       intrant: intrant ?? this.intrant,
@@ -66,8 +76,10 @@ class DetailCommande {
       'quantiteLivree': quantiteLivree,
       'quantiteNonLivree': quantiteNonLivree,
       'nomProduit': nomProduit,
+      'description': description,
       'dateAjout': dateAjout,
       'isStock': isStock,
+      'isDelivered': isDelivered,
       'commande': commande?.toMap(),
       'stock': stock?.toMap(),
       'intrant': intrant?.toMap(),
@@ -76,17 +88,19 @@ class DetailCommande {
 
   factory DetailCommande.fromMap(Map<String, dynamic> map) {
     return DetailCommande(
-      idDetailCommande: map['idDetailCommande'] != null ? map['idDetailCommande'] as String : null,
-      codeProduit: map['codeProduit'] != null ? map['codeProduit'] as String : null,
-      quantiteDemande: map['quantiteDemande'] != null ? map['quantiteDemande'] as int : null,
-      quantiteLivree: map['quantiteLivree'] != null ? map['quantiteLivree'] as int : null,
-      quantiteNonLivree: map['quantiteNonLivree'] != null ? map['quantiteNonLivree'] as int : null,
-      nomProduit: map['nomProduit'] != null ? map['nomProduit'] as String : null,
-      dateAjout: map['dateAjout'] != null ? map['dateAjout'] as String : null,
-      isStock: map['isStock'] != null ? map['isStock'] as bool : false,
-      commande: map['commande'] != null ? Commande.fromMap(map['commande'] as Map<String,dynamic>) : null,
-      stock: map['stock'] != null ? Stock.fromMap(map['stock'] as Map<String,dynamic>) : null,
-      intrant: map['intrant'] != null ? Intrant.fromMap(map['intrant'] as Map<String,dynamic>) : null,
+      idDetailCommande: map['idDetailCommande'] as String?,
+      codeProduit: map['codeProduit'] as String?,
+      quantiteDemande: map['quantiteDemande'] as double?,
+      quantiteLivree: map['quantiteLivree'] as double?,
+      quantiteNonLivree: map['quantiteNonLivree'] as double?,
+      nomProduit: map['nomProduit'] as String?,
+      description: map['description'] as String?,
+      dateAjout: map['dateAjout'] as String?,
+      isStock: map['isStock'] as bool?,
+      isDelivered: map['isDelivered'] as bool?,
+      commande: map['commande'] != null ? Commande.fromMap(map['commande'] as Map<String, dynamic>) : null,
+      stock: map['stock'] != null ? Stock.fromMap(map['stock'] as Map<String, dynamic>) : null,
+      intrant: map['intrant'] != null ? Intrant.fromMap(map['intrant'] as Map<String, dynamic>) : null,
     );
   }
 
@@ -96,13 +110,13 @@ class DetailCommande {
 
   @override
   String toString() {
-    return 'DetailCommande(idDetailCommande: $idDetailCommande, codeProduit: $codeProduit, quantiteDemande: $quantiteDemande, quantiteLivree: $quantiteLivree, quantiteNonLivree: $quantiteNonLivree, nomProduit: $nomProduit, dateAjout: $dateAjout, isStock : $isStock, commande: $commande, stock: $stock, intrant: $intrant)';
+    return 'DetailCommande(idDetailCommande: $idDetailCommande, codeProduit: $codeProduit, quantiteDemande: $quantiteDemande, quantiteLivree: $quantiteLivree, quantiteNonLivree: $quantiteNonLivree, nomProduit: $nomProduit, description : $description, dateAjout: $dateAjout, isStock: $isStock, isDelivered: $isDelivered , commande: $commande, stock: $stock, intrant: $intrant)';
   }
 
   @override
   bool operator ==(covariant DetailCommande other) {
     if (identical(this, other)) return true;
-  
+
     return 
       other.idDetailCommande == idDetailCommande &&
       other.codeProduit == codeProduit &&
@@ -110,8 +124,10 @@ class DetailCommande {
       other.quantiteLivree == quantiteLivree &&
       other.quantiteNonLivree == quantiteNonLivree &&
       other.nomProduit == nomProduit &&
+      other.description == description &&
       other.dateAjout == dateAjout &&
       other.isStock == isStock &&
+      other.isDelivered == isDelivered &&
       other.commande == commande &&
       other.stock == stock &&
       other.intrant == intrant;
@@ -125,12 +141,12 @@ class DetailCommande {
       quantiteLivree.hashCode ^
       quantiteNonLivree.hashCode ^
       nomProduit.hashCode ^
+      description.hashCode ^
       dateAjout.hashCode ^
       isStock.hashCode ^
+      isDelivered.hashCode ^
       commande.hashCode ^
       stock.hashCode ^
       intrant.hashCode;
   }
-
-  
 }

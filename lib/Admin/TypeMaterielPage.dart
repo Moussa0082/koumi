@@ -33,7 +33,7 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
   String? detectedCountryCode;
   String? detectedCountry;
 
-    void getLocationNew() async {
+  void getLocationNew() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
@@ -123,12 +123,11 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
     debugPrint("Address ISO: $detectedC");
     address.value =
         'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
-        setState(() {
-          
-    detectedC = place.isoCountryCode;
-    detectedCountryCode = place.isoCountryCode!;
-    detectedCountry = place.country!;
-        });
+    setState(() {
+      detectedC = place.isoCountryCode;
+      detectedCountryCode = place.isoCountryCode!;
+      detectedCountry = place.country!;
+    });
 
     debugPrint(
         "Address:   ${place.locality},${place.country},${place.isoCountryCode}");
@@ -226,6 +225,13 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
                         ),
                       ),
                     ),
+                    IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() {});
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -266,7 +272,8 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
                                     child: GestureDetector(
                                       onTap: () {
                                         Get.to(ListeMaterielByType(
-                                          typeMateriel: e,detectedCountry: detectedCountryCode,
+                                          typeMateriel: e,
+                                          detectedCountry: detectedCountryCode,
                                         ));
                                       },
                                       child: Container(
@@ -431,16 +438,23 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
                                                             String>>[
                                                       PopupMenuItem<String>(
                                                         child: ListTile(
-                                                          leading:   e.statutType == false
-                                                                          ? Icon(
-                                                                              Icons.check,
-                                                                              color: Colors.green,
-                                                                            )
-                                                                          : Icon(
-                                                                              Icons.disabled_visible,
-                                                                              color: Colors.orange[400],
-                                                                            ),
-                                                          title:  Text(
+                                                          leading:
+                                                              e.statutType ==
+                                                                      false
+                                                                  ? Icon(
+                                                                      Icons
+                                                                          .check,
+                                                                      color: Colors
+                                                                          .green,
+                                                                    )
+                                                                  : Icon(
+                                                                      Icons
+                                                                          .disabled_visible,
+                                                                      color: Colors
+                                                                              .orange[
+                                                                          400],
+                                                                    ),
+                                                          title: Text(
                                                             e.statutType ==
                                                                     false
                                                                 ? "Activer"
@@ -457,47 +471,43 @@ class _TypeMaterielPageState extends State<TypeMaterielPage> {
                                                             ),
                                                           ),
                                                           onTap: () async {
-                                                              e.statutType ==
+                                                            e.statutType ==
                                                                     false
-                                                                ?
-                                                            await TypeMaterielService()
-                                                                .activerType(e
-                                                                    .idTypeMateriel!)
-                                                                .then(
-                                                                    (value) => {
-                                                                          Provider.of<TypeMaterielService>(context, listen: false)
-                                                                              .applyChange(),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Activer avec succèss "),
-                                                                                ],
+                                                                ? await TypeMaterielService()
+                                                                    .activerType(e
+                                                                        .idTypeMateriel!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<TypeMaterielService>(context, listen: false).applyChange(),
+                                                                              Navigator.of(context).pop(),
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Activer avec succèss "),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 2),
+                                                                                ),
+                                                                              )
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: const Duration(seconds: 5),
+                                                                                ),
                                                                               ),
-                                                                              duration: Duration(seconds: 2),
-                                                                            ),
-                                                                          )
-                                                                        })
-                                                                .catchError(
-                                                                    (onError) =>
-                                                                        {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Une erreur s'est produit"),
-                                                                                ],
-                                                                              ),
-                                                                              duration: const Duration(seconds: 5),
-                                                                            ),
-                                                                          ),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        }) : await TypeMaterielService()
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                : await TypeMaterielService()
                                                                     .desactiverType(e
                                                                         .idTypeMateriel!)
                                                                     .then(

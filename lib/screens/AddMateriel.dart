@@ -9,15 +9,14 @@ import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
-import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:pattern_formatter/pattern_formatter.dart';
 
 class AddMateriel extends StatefulWidget {
   const AddMateriel({super.key});
@@ -133,7 +132,7 @@ class _AddMaterielState extends State<AddMateriel> {
     //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeMateriel/read'));
     _niveau3List = http.get(Uri.parse(
         '$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
-      _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
+    _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
     //  fetchPaysDataByActor();
   }
 
@@ -315,33 +314,19 @@ class _AddMaterielState extends State<AddMateriel> {
                         SizedBox(
                           height: 10,
                         ),
-                        isLoadingLibelle
-                            ? Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Text(
-                                      "Chargement...",
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold),
-                                    )),
-                              )
-                            : Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 22,
-                                ),
-                                child: Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    libelleNiveau3Pays != null
-                                        ? libelleNiveau3Pays!.toUpperCase()
-                                        : "Localité",
-                                    style: TextStyle(
-                                        color: (Colors.black), fontSize: 18),
-                                  ),
-                                ),
-                              ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 22,
+                          ),
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              "Localité",
+                              style: TextStyle(
+                                  color: (Colors.black), fontSize: 18),
+                            ),
+                          ),
+                        ),
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 10, horizontal: 20),
@@ -410,10 +395,14 @@ class _AddMaterielState extends State<AddMateriel> {
                                       setState(() {
                                         n3Value = newValue;
                                         if (newValue != null) {
-                                          niveau3 = niveau3List
-                                              .map((e) => e.nomN3)
-                                              .first;
-                                          print("niveau 3 : ${niveau3}");
+                                          Niveau3Pays selectedNiveau3 =
+                                              niveau3List.firstWhere(
+                                            (element) =>
+                                                element.idNiveau3Pays ==
+                                                newValue,
+                                          );
+                                          niveau3 = selectedNiveau3.nomN3;
+                                          print("niveau 3 : $niveau3");
                                         }
                                       });
                                     },
@@ -703,7 +692,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                         .map(
                                           (e) => DropdownMenuItem(
                                             value: e.idMonnaie,
-                                            child: Text(e.sigle!),
+                                            child: Text(e.libelle!),
                                           ),
                                         )
                                         .toList(),
@@ -790,8 +779,8 @@ class _AddMaterielState extends State<AddMateriel> {
                             },
                             controller: _prixController,
                             keyboardType: TextInputType.number,
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly,
+                            inputFormatters: [
+                              ThousandsFormatter(),
                             ],
                             decoration: InputDecoration(
                               hintText: "Prix par heure",
@@ -834,8 +823,11 @@ class _AddMaterielState extends State<AddMateriel> {
                               final String description =
                                   _descriptionController.text;
                               final String etat = _etatController.text;
+                              String formattedMontant =
+                                  _prixController.text.replaceAll(',', '');
                               final int prixParHeures =
-                                  int.tryParse(_prixController.text) ?? 0;
+                                  int.tryParse(formattedMontant) ?? 0;
+                              print("prix formated $prixParHeures");
                               if (formkey.currentState!.validate()) {
                                 try {
                                   setState(() {
@@ -844,16 +836,16 @@ class _AddMaterielState extends State<AddMateriel> {
                                   if (photo != null) {
                                     await MaterielService()
                                         .addMateriel(
-                                            prixParHeure: prixParHeures,
-                                            nom: nom,
-                                            description: description,
-                                            localisation: niveau3,
-                                            etatMateriel: etat,
-                                            typeMateriel: typeMateriel,
-                                            photoMateriel: photo,
-                                            acteur: acteur,
-                                            monnaie: monnaie,
-                                            )
+                                          prixParHeure: prixParHeures,
+                                          nom: nom,
+                                          description: description,
+                                          localisation: niveau3,
+                                          etatMateriel: etat,
+                                          typeMateriel: typeMateriel,
+                                          photoMateriel: photo,
+                                          acteur: acteur,
+                                          monnaie: monnaie,
+                                        )
                                         .then((value) => {
                                               Provider.of<MaterielService>(
                                                       context,
@@ -861,7 +853,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                                   .applyChange(),
                                               setState(() {
                                                 _isLoading = false;
-                                                 n3Value = null;
+                                                n3Value = null;
                                                 monnaieValue = null;
                                               }),
                                               Navigator.pop(context),
@@ -918,15 +910,15 @@ class _AddMaterielState extends State<AddMateriel> {
                                   } else {
                                     await MaterielService()
                                         .addMateriel(
-                                            prixParHeure: prixParHeures,
-                                            nom: nom,
-                                            description: description,
-                                            localisation: niveau3,
-                                            etatMateriel: etat,
-                                            typeMateriel: typeMateriel,
-                                            acteur: acteur,
-                                            monnaie: monnaie,
-                                            )
+                                          prixParHeure: prixParHeures,
+                                          nom: nom,
+                                          description: description,
+                                          localisation: niveau3,
+                                          etatMateriel: etat,
+                                          typeMateriel: typeMateriel,
+                                          acteur: acteur,
+                                          monnaie: monnaie,
+                                        )
                                         .then((value) => {
                                               Provider.of<MaterielService>(
                                                       context,

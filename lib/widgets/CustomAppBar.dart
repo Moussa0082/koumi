@@ -132,6 +132,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                           ),
                     title: Text(
                       ac.nomActeur!.toUpperCase(),
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                           color: d_colorGreen,
                           fontSize: 18,
@@ -139,10 +140,11 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     ),
                     subtitle: Text(
                       type,
-                      
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                           color: d_colorOr,
-                          fontSize: 18,
+                          fontSize: 17,
                           fontWeight: FontWeight.w400),
                     ),
                     trailing: badges.Badge(

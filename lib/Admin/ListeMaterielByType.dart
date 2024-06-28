@@ -15,7 +15,7 @@ import 'package:provider/provider.dart';
 class ListeMaterielByType extends StatefulWidget {
   final TypeMateriel? typeMateriel;
   String? detectedCountry;
-   ListeMaterielByType({super.key, this.typeMateriel, this.detectedCountry});
+  ListeMaterielByType({super.key, this.typeMateriel, this.detectedCountry});
 
   @override
   State<ListeMaterielByType> createState() => _ListeMaterielByTypeState();
@@ -28,20 +28,22 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
   late TypeMateriel type = TypeMateriel();
   List<Materiel> materielListe = [];
   late Future<List<Materiel>> futureListe;
+  late TextEditingController _searchController;
   bool isExist = false;
-   ScrollController scrollableController = ScrollController();
+  ScrollController scrollableController = ScrollController();
 
   int page = 0;
-   bool isLoading = false;
-   int size = 4;
+  bool isLoading = false;
+  int size = 4;
   bool hasMore = true;
 
   Future<List<Materiel>> getListe(String id) async {
     final response = await MaterielService().fetchMaterielByTypeAndPaysWithPagination(id,widget.detectedCountry!);
+
     return response;
   }
 
-   Future<List<Materiel>> fetchMaterielByType({bool refresh = false}) async {
+  Future<List<Materiel>> fetchMaterielByType({bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -51,13 +53,14 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
     if (refresh) {
       setState(() {
         materielListe.clear();
-       page = 0;
+        page = 0;
         hasMore = true;
       });
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Materiel/getAllMaterielsByTypeMaterielWithPagination?idTypeMateriel=${type.idTypeMateriel}&page=$page&size=$size'));
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/Materiel/getAllMaterielsByTypeMaterielWithPagination?idTypeMateriel=${type.idTypeMateriel}&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -65,41 +68,43 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
 
         if (body.isEmpty) {
           setState(() {
-           hasMore = false;
+            hasMore = false;
           });
         } else {
           setState(() {
-           List<Materiel> newMateriels = body.map((e) => Materiel.fromMap(e)).toList();
-          materielListe.addAll(newMateriels);
+            List<Materiel> newMateriels =
+                body.map((e) => Materiel.fromMap(e)).toList();
+            materielListe.addAll(newMateriels);
           });
         }
 
-        debugPrint("response body all materiel with pagination ${page} par défilement soit ${materielListe.length}");
+        debugPrint(
+            "response body all materiel with pagination ${page} par défilement soit ${materielListe.length}");
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print(
+            'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
     } catch (e) {
-      print('Une erreur s\'est produite lors de la récupération des materiel: $e');
+      print(
+          'Une erreur s\'est produite lors de la récupération des materiel: $e');
     } finally {
       setState(() {
-       isLoading = false;
+        isLoading = false;
       });
     }
     return materielListe;
   }
 
-
-   void _scrollListener() {
-  
-    if( scrollableController.position.pixels >=
-          scrollableController.position.maxScrollExtent - 200 &&
-      hasMore &&
-      !isLoading){
+  void _scrollListener() {
+    if (scrollableController.position.pixels >=
+            scrollableController.position.maxScrollExtent - 200 &&
+        hasMore &&
+        !isLoading) {
       // Incrementez la page et récupérez les materiaux généraux
       setState(() {
-          // Rafraîchir les données ici
+        // Rafraîchir les données ici
         page++;
-        });
+      });
       debugPrint("yes - fetch  materiel by type");
       fetchMaterielByType().then((value) {
         setState(() {
@@ -107,13 +112,12 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
           debugPrint("page inc all ${page}");
         });
       });
-    // }
-  // } 
-  // else {
-  }
+      // }
+      // }
+      // else {
+    }
     debugPrint("no");
-
-}
+  }
 
   void verifyTypeMateriel() {
     if (widget.typeMateriel != null) {
@@ -132,13 +136,21 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
   @override
   void initState() {
     verifyTypeMateriel();
+    _searchController = TextEditingController();
     // futureListe = getListe(type.idTypeMateriel!);
-     WidgetsBinding.instance.addPostFrameCallback((_){
-    //write or call your logic
-    //code will run when widget rendering complete
-  scrollableController.addListener(_scrollListener);
-  });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      //write or call your logic
+      //code will run when widget rendering complete
+      scrollableController.addListener(_scrollListener);
+    });
     super.initState();
+  }
+
+   @override
+  void dispose() {
+    _searchController
+        .dispose();
+    super.dispose();
   }
 
   @override
@@ -174,7 +186,8 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                       ),
                       onTap: () async {
                         Navigator.of(context).pop();
-                        Get.to(AddMaterielByType(typeMateriel: type), transition: Transition.leftToRightWithFade);
+                        Get.to(AddMaterielByType(typeMateriel: type),
+                            transition: Transition.leftToRightWithFade);
                       },
                     ),
                   ),
@@ -186,76 +199,129 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
         controller: scrollableController,
         child: Column(
           children: [
+              const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.search,
+                        color: Colors.blueGrey[400],
+                        size:
+                            28), // Utiliser une icône de recherche plus grande
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Rechercher',
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(color: Colors.blueGrey[400]),
+                        ),
+                      ),
+                    ),
+                    // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
+                    IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() {});
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
             RefreshIndicator(
+
               onRefresh: () async{
                            setState(() {
                              page = 0;
                              futureListe = MaterielService().fetchMaterielByTypeAndPaysWithPagination(type.idTypeMateriel!,widget.detectedCountry!);
                            });
+
               },
               child: Consumer<MaterielService>(
                 builder: (context, materielService, child) {
                   return FutureBuilder(
                       future: futureListe,
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return const Center(
                             child: CircularProgressIndicator(
                               color: Colors.orange,
                             ),
                           );
                         }
-              
+
                         if (!snapshot.hasData) {
-                                            return  SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(10),
-            child: Center(
-              child: Column(
-                children: [
-                  Image.asset('assets/images/notif.jpg'),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    'Aucun materiel trouvé' ,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 17,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
+                          return SingleChildScrollView(
+                            child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Center(
+                                child: Column(
+                                  children: [
+                                    Image.asset('assets/images/notif.jpg'),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      'Aucun materiel trouvé',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 17,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
                         } else {
                           materielListe = snapshot.data!;
-                          return materielListe.isEmpty
+                            String searchText = "";
+                          List<Materiel> filtereSearch =
+                              materielListe.where((search) {
+                            String libelle = search.nom.toLowerCase();
+                            searchText = _searchController.text.toLowerCase();
+                            return libelle.contains(searchText);
+                          }).toList();
+                          return filtereSearch.isEmpty
                               ? SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(10),
-            child: Center(
-              child: Column(
-                children: [
-                  Image.asset('assets/images/notif.jpg'),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    'Aucun materiel trouvé' ,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 17,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        )
+                                  child: Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: Center(
+                                      child: Column(
+                                        children: [
+                                          Image.asset(
+                                              'assets/images/notif.jpg'),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Text(
+                                            'Aucun materiel trouvé',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 17,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                )
                               : GridView.builder(
                                   shrinkWrap: true,
                                   physics: NeverScrollableScrollPhysics(),
@@ -266,9 +332,9 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                     crossAxisSpacing: 10,
                                     childAspectRatio: 0.8,
                                   ),
-                                  itemCount: materielListe.length,
+                                  itemCount: filtereSearch.length,
                                   itemBuilder: (context, index) {
-                                    var e = materielListe.elementAt(index);
+                                    var e = filtereSearch.elementAt(index);
                                     return GestureDetector(
                                         onTap: () {
                                           Navigator.push(
@@ -280,7 +346,6 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                         },
                                         child: Card(
                                             margin: EdgeInsets.all(8),
-                                           
                                             child: Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.stretch,
@@ -290,37 +355,39 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                         BorderRadius.circular(
                                                             8.0),
                                                     child: SizedBox(
-                                                      height: 85,
-                                                      child: e.photoMateriel ==
-                                                              null ||
-                                                              e.photoMateriel!
-                                                                  .isEmpty
-                                                          ? Image.asset(
-                                                              "assets/images/default_image.png",
-                                                              fit: BoxFit.cover,
-                                                              height: 72,
-                                                            )
-                                                          : 
-                                                          CachedNetworkImage(
-                     width: double.infinity,
-                      height: 200,
-                      
-                                                    imageUrl:
-                                                        "https://koumi.ml/api-koumi/Materiel/${e.idMateriel}/image",
-                                                    fit: BoxFit.cover,
-                                                    placeholder: (context, url) =>
-                                                        const Center(
-                                                            child:
-                                                                CircularProgressIndicator()),
-                                                    errorWidget:
-                                                        (context, url, error) =>
-                                                            Image.asset(
-                                                      'assets/images/default_image.png',
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  )
-                                                          
-                                                    ),
+                                                        height: 85,
+                                                        child: e.photoMateriel ==
+                                                                    null ||
+                                                                e.photoMateriel!
+                                                                    .isEmpty
+                                                            ? Image.asset(
+                                                                "assets/images/default_image.png",
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                                height: 72,
+                                                              )
+                                                            : CachedNetworkImage(
+                                                                width: double
+                                                                    .infinity,
+                                                                height: 200,
+                                                                imageUrl:
+                                                                    "https://koumi.ml/api-koumi/Materiel/${e.idMateriel}/image",
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                                placeholder: (context,
+                                                                        url) =>
+                                                                    const Center(
+                                                                        child:
+                                                                            CircularProgressIndicator()),
+                                                                errorWidget: (context,
+                                                                        url,
+                                                                        error) =>
+                                                                    Image.asset(
+                                                                  'assets/images/default_image.png',
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                ),
+                                                              )),
                                                   ),
                                                   SizedBox(height: 2),
                                                   ListTile(
@@ -333,19 +400,20 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                         color: Colors.black87,
                                                       ),
                                                       maxLines: 1,
-                                                      overflow: TextOverflow.ellipsis,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     ),
                                                     subtitle: Text(
                                                       e.localisation,
                                                       style: TextStyle(
-                                                        overflow: TextOverflow.ellipsis,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
                                                         fontSize: 15,
                                                         color: Colors.black87,
                                                       ),
                                                     ),
                                                   ),
-                                                  
-                                                   !isExist
+                                                  !isExist
                                                       ? Container()
                                                       : Container(
                                                           alignment: Alignment
@@ -353,7 +421,8 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                           padding:
                                                               const EdgeInsets
                                                                   .symmetric(
-                                                                  horizontal: 10),
+                                                                  horizontal:
+                                                                      10),
                                                           child: Row(
                                                             mainAxisAlignment:
                                                                 MainAxisAlignment
@@ -366,9 +435,10 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                                 padding:
                                                                     EdgeInsets
                                                                         .zero,
-                                                                itemBuilder: (context) =>
-                                                                    <PopupMenuEntry<
-                                                                        String>>[
+                                                                itemBuilder:
+                                                                    (context) =>
+                                                                        <PopupMenuEntry<
+                                                                            String>>[
                                                                   PopupMenuItem<
                                                                       String>(
                                                                     child:
@@ -377,23 +447,20 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                                               false
                                                                           ? Icon(
                                                                               Icons.check,
-                                                                              color:
-                                                                                  Colors.green,
+                                                                              color: Colors.green,
                                                                             )
                                                                           : Icon(
-                                                                              Icons
-                                                                                  .disabled_visible,
-                                                                              color:
-                                                                                  Colors.orange[400]),
-                                                                      title: Text(
+                                                                              Icons.disabled_visible,
+                                                                              color: Colors.orange[400]),
+                                                                      title:
+                                                                          Text(
                                                                         e.statut ==
                                                                                 false
                                                                             ? "Activer"
                                                                             : "Desactiver",
                                                                         style:
                                                                             TextStyle(
-                                                                          color: e.statut ==
-                                                                                  false
+                                                                          color: e.statut == false
                                                                               ? Colors.green
                                                                               : Colors.orange[400],
                                                                           fontWeight:
@@ -458,9 +525,8 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                                                       ),
                                                                                       Navigator.of(context).pop(),
                                                                                     });
-              
-                                                                        ScaffoldMessenger.of(
-                                                                                context)
+
+                                                                        ScaffoldMessenger.of(context)
                                                                             .showSnackBar(
                                                                           const SnackBar(
                                                                             content:
@@ -492,8 +558,8 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                                         "Supprimer",
                                                                         style:
                                                                             TextStyle(
-                                                                          color: Colors
-                                                                              .red,
+                                                                          color:
+                                                                              Colors.red,
                                                                           fontWeight:
                                                                               FontWeight.bold,
                                                                         ),

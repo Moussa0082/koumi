@@ -23,6 +23,7 @@ import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:pattern_formatter/pattern_formatter.dart';
 
 class NextAddIntrat extends StatefulWidget {
   final String nom;
@@ -416,7 +417,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                     .map(
                                       (e) => DropdownMenuItem(
                                         value: e.idMonnaie,
-                                        child: Text(e.sigle!),
+                                        child: Text(e.libelle!),
                                       ),
                                     )
                                     .toList(),
@@ -497,8 +498,8 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                         },
                         controller: _prixController,
                         keyboardType: TextInputType.number,
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.digitsOnly,
+                        inputFormatters: [
+                          ThousandsFormatter(),
                         ],
                         decoration: InputDecoration(
                           hintText: "Prix intrant",
@@ -603,8 +604,12 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                           final CategorieProduit categorieProduit =
                               widget.categorieProduit;
                           final String unite = widget.unite;
+                           String formattedMontant =
+                              _prixController.text.replaceAll(',', '');
+
                           final int prix =
-                              int.tryParse(_prixController.text) ?? 0;
+                               int.tryParse(formattedMontant) ?? 0;
+                          print("prix formated $prix");
                           final String date = _dateController.text;
 
                           if (formkey.currentState!.validate()) {
@@ -623,6 +628,7 @@ class _NextAddIntratState extends State<NextAddIntrat> {
                                         dateExpiration: date,
                                         forme: forme,
                                         unite: unite,
+                                       
                                         categorieProduit: categorieProduit,
                                         acteur: acteur,
                                         monnaie: monnaie

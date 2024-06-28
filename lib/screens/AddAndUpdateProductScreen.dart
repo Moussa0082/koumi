@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
@@ -12,16 +12,15 @@ import 'package:koumi_app/models/Filiere.dart';
 import 'package:koumi_app/models/Forme.dart';
 import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
-import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductEndScreen.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
-import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:pattern_formatter/pattern_formatter.dart';
+
 
 class AddAndUpdateProductScreen extends StatefulWidget {
   bool? isEditable;
@@ -328,7 +327,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                         child: TextFormField(
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return "Veuillez remplir les champs";
+                              return "Veuillez remplir le champs";
                             }
                             return null;
                           },
@@ -413,6 +412,12 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
 
                                 return DropdownButtonFormField<String>(
                                   isExpanded: true,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Veuillez sélectionner une forme";
+                                    }
+                                    return null;
+                                  },
                                   items: formeListe
                                       .map(
                                         (e) => DropdownMenuItem(
@@ -480,33 +485,19 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                       SizedBox(
                         height: 10,
                       ),
-                      isLoadingLibelle
-                          ? Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    "Chargement...",
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold),
-                                  )),
-                            )
-                          : Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 22,
-                              ),
-                              child: Align(
-                                alignment: Alignment.topLeft,
-                                child: Text(
-                                  libelleNiveau3Pays != null
-                                      ? libelleNiveau3Pays!.toUpperCase()
-                                      : "Origine du produit",
-                                  style: TextStyle(
-                                      color: (Colors.black), fontSize: 18),
-                                ),
-                              ),
-                            ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 22,
+                        ),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            "Origine du produit",
+                            style:
+                                TextStyle(color: (Colors.black), fontSize: 18),
+                          ),
+                        ),
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 20),
@@ -559,6 +550,12 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
 
                                 return DropdownButtonFormField<String>(
                                   isExpanded: true,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Veuillez sélectionner la localité";
+                                    }
+                                    return null;
+                                  },
                                   items: niveau3Liste
                                       .map(
                                         (e) => DropdownMenuItem(
@@ -624,7 +621,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                       SizedBox(
                         height: 10,
                       ),
-                       Padding(
+                      Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: 22,
                         ),
@@ -687,11 +684,17 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
 
                                 return DropdownButtonFormField<String>(
                                   isExpanded: true,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Veuillez sélectionner une monnaie";
+                                    }
+                                    return null;
+                                  },
                                   items: speList
                                       .map(
                                         (e) => DropdownMenuItem(
                                           value: e.idMonnaie,
-                                          child: Text(e.sigle!),
+                                          child: Text(e.libelle!),
                                         ),
                                       )
                                       .toList(),
@@ -780,7 +783,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                             FilteringTextInputFormatter.digitsOnly,
                           ],
                           decoration: InputDecoration(
-                            hintText: "Prix du produit en (${monnaie})",
+                            hintText: "Prix du produit",
                             contentPadding: const EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 20),
                             border: OutlineInputBorder(
@@ -811,7 +814,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                         child: TextFormField(
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return "Veuillez saisir la quantite du produit";
+                              return "Veuillez saisir la quantité du produit";
                             }
                             return null;
                           },
@@ -896,6 +899,13 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                       const SizedBox(height: 20),
                       ElevatedButton(
                           onPressed: () async {
+
+                            String formattedMontant =
+                                _prixController.text.replaceAll(',', '');
+                            final int prix =
+                                int.tryParse(formattedMontant) ?? 0;
+                            print("prix formated $prix");
+
                             if (formkey.currentState!.validate()) {
                               debugPrint(
                                   "forme: ${forme} , formeValue : ${formeValue}, origin : ${niveau3} , value : ${n3Value}");
@@ -909,19 +919,21 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                             nomProduit: _nomController.text,
                                             forme: forme,
                                             origine: niveau3,
-                                            prix:
-                                                _prixController.text.toString(),
+                                            prix: prix.toString(),
                                             image: photo,
                                             quantite: _quantiteController.text,
                                             stock: widget.stock,
                                           )))).then((value) => {
+                                   
                                     if (widget.isEditable! == false)
                                       {
                                         _nomController.clear(),
                                         _prixController.clear(),
                                         _quantiteController.clear(),
                                         setState(() {
-                                          niveau3 == null;
+                                          n3Value = null;
+                                          monnaieValue = null;
+                                          formeValue = null;
                                         })
                                       }
                                   });

@@ -11,14 +11,16 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProduitPhytosanitaire extends StatefulWidget {
-  const ProduitPhytosanitaire({super.key});
+  String? detectedCountry;
+
+  ProduitPhytosanitaire({super.key, this.detectedCountry});
 
   @override
   State<ProduitPhytosanitaire> createState() => _ProduitPhytosanitaireState();
 }
 
 class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
-    int page = 0;
+  int page = 0;
   bool isLoading = false;
   late TextEditingController _searchController;
   ScrollController scrollableController = ScrollController();
@@ -26,35 +28,44 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
   bool hasMore = true;
   late Future<List<Intrant>> intrantListeFuture;
   List<Intrant> intrantListe = [];
+  List<Intrant> intrantList = [];
   // CategorieProduit? selectedType;
   ScrollController scrollableController1 = ScrollController();
-  String libelle = "Produits phytosanitaires";
+
+  String libelle = "Produits phytosanitaire";
+  // String libelle = "Semences et plants";
   // String? monnaie;
+  // List<String> libelles = [
+  //   "Produits phytosanitaires",
+  //   "produits phytosanitaires",
+  //   "produit phytosanitaire",
+  //   "Produit phytosanitaire"
+  // ];
 
   void _scrollListener() {
-    if (scrollableController1.position.pixels >=
-            scrollableController1.position.maxScrollExtent - 200 &&
+    debugPrint("Scroll position: ${scrollableController.position.pixels}");
+    if (scrollableController.position.pixels >=
+            scrollableController.position.maxScrollExtent - 200 &&
         hasMore &&
         !isLoading) {
-      // if (selectedCat != null) {
-      // Incrementez la page et récupérez les stocks par catégorie
-      debugPrint("yes - fetch by category");
       setState(() {
-        // Rafraîchir les données ici
         page++;
       });
 
-      fetchIntrantByCategorie().then((value) {
+      fetchIntrantByCategorie(
+              // widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
+              )
+          .then((value) {
         setState(() {
-          // Rafraîchir les données ici
-          debugPrint("page inc all ${page}");
+          debugPrint("page inc all $page");
         });
       });
     }
     debugPrint("no");
   }
 
-  Future<List<Intrant>> fetchIntrantByCategorie({bool refresh = false}) async {
+  Future<List<Intrant>> fetchIntrantByCategorie(
+      {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -72,8 +83,11 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
     try {
       final response = await http.get(Uri.parse(
           '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
-
-      if (response.statusCode == 200) {
+      debugPrint(
+          '$apiOnlineUrl/intrant/listeIntrantByLibelleCategorie?libelle=$libelle&page=$page&size=$size');
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 202) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 
@@ -90,7 +104,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
         }
 
         debugPrint(
-            "response body all intrants by categorie with pagination ${page} par défilement soit ${intrantListe.length}");
+            "response body all intrants by categorie with pagination ${page} par défilement soit ${intrantListe.length} et code ${response.statusCode}");
       } else {
         print(
             'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
@@ -113,13 +127,14 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController.addListener(_scrollListener);
     });
-    intrantListeFuture = fetchIntrantByCategorie();
+    intrantListeFuture = fetchIntrantByCategorie(
+        // widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
+        );
   }
 
   @override
   void dispose() {
-    _searchController
-        .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
+    _searchController.dispose();
     scrollableController.dispose();
     super.dispose();
   }
@@ -137,7 +152,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
               },
               icon: const Icon(Icons.arrow_back_ios)),
           title: const Text(
-            "Produits phyto-Sanitaires",
+            "Produits phytosanitaires",
             style: TextStyle(
               color: d_colorGreen,
               fontSize: 22,
@@ -200,6 +215,13 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                         // Rafraîchir les données ici
                       });
                       debugPrint("refresh page ${page}");
+                      setState(() {
+                        intrantListeFuture = fetchIntrantByCategorie(
+                            // widget.detectedCountry != null
+                            //     ? widget.detectedCountry!
+                            //     : "Mali"
+                                );
+                      });
                     },
                     child: SingleChildScrollView(
                       controller: scrollableController,
@@ -220,10 +242,10 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                                       Center(child: Text("Aucun donné trouvé")),
                                 );
                               } else {
-                                intrantListe = snapshot.data!;
+                                intrantList = snapshot.data!;
                                 String searchText = "";
                                 List<Intrant> filteredSearch =
-                                    intrantListe.where((cate) {
+                                    intrantList.where((cate) {
                                   String nomCat =
                                       cate.nomIntrant!.toLowerCase();
                                   searchText =
@@ -269,9 +291,9 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                                           crossAxisSpacing: 10,
                                           childAspectRatio: 0.8,
                                         ),
-                                        itemCount: intrantListe.length + 1,
+                                        itemCount: filteredSearch.length + 1,
                                         itemBuilder: (context, index) {
-                                          if (index < intrantListe.length) {
+                                          if (index < filteredSearch.length) {
                                             return GestureDetector(
                                               onTap: () {
                                                 Navigator.push(
@@ -280,7 +302,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                                                     builder: (context) =>
                                                         DetailIntrant(
                                                       intrant:
-                                                          intrantListe[index],
+                                                          filteredSearch[index],
                                                     ),
                                                   ),
                                                 );
@@ -298,10 +320,11 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                                                               8.0),
                                                       child: SizedBox(
                                                         height: 85,
-                                                        child: intrantListe[index]
+                                                        child: filteredSearch[
+                                                                            index]
                                                                         .photoIntrant ==
                                                                     null ||
-                                                                intrantListe[
+                                                                filteredSearch[
                                                                         index]
                                                                     .photoIntrant!
                                                                     .isEmpty
@@ -312,7 +335,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                                                               )
                                                             : CachedNetworkImage(
                                                                 imageUrl:
-                                                                    "https://koumi.ml/api-koumi/intrant/${intrantListe[index].idIntrant}/image",
+                                                                    "https://koumi.ml/api-koumi/intrant/${filteredSearch[index].idIntrant}/image",
                                                                 fit: BoxFit
                                                                     .cover,
                                                                 placeholder: (context,
@@ -334,7 +357,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                                                     // SizedBox(height: 8),
                                                     ListTile(
                                                       title: Text(
-                                                        intrantListe[index]
+                                                        filteredSearch[index]
                                                             .nomIntrant!,
                                                         style: TextStyle(
                                                           fontSize: 16,
@@ -347,7 +370,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                                                             .ellipsis,
                                                       ),
                                                       subtitle: Text(
-                                                        "${intrantListe[index].quantiteIntrant.toString()} ${intrantListe[index].unite}",
+                                                        "${filteredSearch[index].quantiteIntrant.toString()} ${filteredSearch[index].unite}",
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           color: Colors.black87,
@@ -359,10 +382,11 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                                                           .symmetric(
                                                           horizontal: 15),
                                                       child: Text(
-                                                        intrantListe[index]
-                                                                    .monnaie != null
-                                                            ? "${intrantListe[index].prixIntrant.toString()} ${intrantListe[index].monnaie!.libelle}"
-                                                            : "${intrantListe[index].prixIntrant.toString()} FCFA ",
+                                                        filteredSearch[index]
+                                                                    .monnaie !=
+                                                                null
+                                                            ? "${filteredSearch[index].prixIntrant.toString()} ${filteredSearch[index].monnaie!.libelle}"
+                                                            : "${filteredSearch[index].prixIntrant.toString()} FCFA ",
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           color: Colors.black87,

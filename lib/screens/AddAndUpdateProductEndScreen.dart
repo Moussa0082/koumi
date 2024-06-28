@@ -2,9 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/Admin/Zone.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Magasin.dart';
@@ -14,10 +13,10 @@ import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/Unite.dart';
 import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/AddMagasinScreen.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/service/StockService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
-import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -63,8 +62,8 @@ class _AddAndUpdateProductEndSreenState
   Unite unite = Unite(); // Initialisez l'objet unite
   late Future uniteListe;
   String? magasinValue;
-  Magasin magasin = Magasin();
   Monnaie monnaies = Monnaie();
+  late Magasin magasin = Magasin();
   late Future magasinListe;
   String? zoneValue;
   ZoneProduction zoneProduction = ZoneProduction();
@@ -80,11 +79,12 @@ class _AddAndUpdateProductEndSreenState
     if (email != null) {
       // Si l'email de l'acteur est présent, exécute checkLoggedIn
       acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-      id = acteur.idActeur;
-      magasinListe = http
-          .get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByActeur/${id}'));
-      // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/Magasin/getAllMagasinByActeur/${id}'));
       setState(() {
+        id = acteur.idActeur;
+        zoneListe = http.get(Uri.parse(
+            '$apiOnlineUrl/ZoneProduction/getAllZonesByActeurs/${id}'));
+        magasinListe = http.get(
+            Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByActeur/${id}'));
         isExist = true;
       });
     } else {
@@ -95,6 +95,10 @@ class _AddAndUpdateProductEndSreenState
   }
 
   void handleButtonPress() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
     setState(() {
       isLoading = true;
     });
@@ -224,9 +228,9 @@ class _AddAndUpdateProductEndSreenState
     speculationListe =
         http.get(Uri.parse('$apiOnlineUrl/Speculation/getAllSpeculation'));
     uniteListe = http.get(Uri.parse('$apiOnlineUrl/Unite/getAllUnite'));
-    zoneListe = http.get(Uri.parse('$apiOnlineUrl/ZoneProduction/getAllZone'));
+    zoneListe = http.get(
+        Uri.parse('$apiOnlineUrl/ZoneProduction/getAllZonesByActeurs/${id}'));
 
-   
     debugPrint(
         "nom : ${widget.nomProduit},   monnaie : ${widget.monnaies},  bool : ${widget.isEditable} ,image : ${widget.image.toString()} , forme: ${widget.forme}, origine : ${widget.origine}, qte : ${widget.quantite}, prix : ${widget.prix}");
       monnaies = widget.monnaies!;
@@ -239,7 +243,6 @@ class _AddAndUpdateProductEndSreenState
       speculation = widget.stock!.speculation!;
       unite = widget.stock!.unite!;
       zoneProduction = widget.stock!.zoneProduction!;
-      
       // debugPrint("spec : ${widget.speculation}, magasin : ${widget.magasin}, zone : ${widget.zoneProduction}   , unite : ${widget.unite}");
       super.initState();
     }
@@ -394,7 +397,7 @@ class _AddAndUpdateProductEndSreenState
                                     items: [],
                                     onChanged: null,
                                     decoration: InputDecoration(
-                                      labelText: 'Aucune speculation trouvé',
+                                      labelText: 'Aucune spéculation trouvé',
                                       contentPadding:
                                           const EdgeInsets.symmetric(
                                               vertical: 10, horizontal: 20),
@@ -406,6 +409,12 @@ class _AddAndUpdateProductEndSreenState
                                 }
                                 return DropdownButtonFormField<String>(
                                   isExpanded: true,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Veuillez sélectionner une spéculation";
+                                    }
+                                    return null;
+                                  },
                                   items: speculationListe
                                       .map(
                                         (e) => DropdownMenuItem(
@@ -546,6 +555,7 @@ class _AddAndUpdateProductEndSreenState
 
                                 return DropdownButtonFormField<String>(
                                   isExpanded: true,
+                                  validator: _validateMagasin,
                                   items: magasinListe
                                       .map(
                                         (e) => DropdownMenuItem(
@@ -559,15 +569,16 @@ class _AddAndUpdateProductEndSreenState
                                       .toList(),
                                   value: magasin.idMagasin,
                                   onChanged: (newValue) {
+                                    magasin.idMagasin = newValue;
                                     setState(() {
-                                      magasin.idMagasin = newValue;
                                       if (newValue != null) {
                                         magasin = magasinListe.firstWhere(
                                           (magasin) =>
                                               magasin.idMagasin == newValue,
                                         );
+                                        magasinValue = newValue;
                                         print(
-                                            "magasin : ${magasin.nomMagasin}");
+                                            "magasin : ${magasin.nomMagasin} et ${magasinValue}");
                                       }
                                     });
                                   },
@@ -685,6 +696,12 @@ class _AddAndUpdateProductEndSreenState
 
                                 return DropdownButtonFormField<String>(
                                   isExpanded: true,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Veuillez sélectionner une unité";
+                                    }
+                                    return null;
+                                  },
                                   items: uniteListe
                                       .map(
                                         (e) => DropdownMenuItem(
@@ -823,6 +840,7 @@ class _AddAndUpdateProductEndSreenState
 
                                 return DropdownButtonFormField<String>(
                                   isExpanded: true,
+                                  validator: _validateZone,
                                   items: zoneListe
                                       .map(
                                         (e) => DropdownMenuItem(
@@ -846,8 +864,9 @@ class _AddAndUpdateProductEndSreenState
                                           (zone) =>
                                               zone.idZoneProduction == newValue,
                                         );
+                                        zoneValue = newValue;
                                         print(
-                                            "zone de production : ${zoneProduction}");
+                                            "zone de production : ${zoneProduction} et ${zoneValue}");
                                       }
                                     });
                                   },
@@ -901,8 +920,22 @@ class _AddAndUpdateProductEndSreenState
                             onPressed: () async {
                               // Handle button press action here
                               if (_formKey.currentState!.validate()) {
-                                handleButtonPress();
-                                // debugPrint("zone : ${zoneProduction.nomZoneProduction}, unite : ${unite.nomUnite} , magasin: ${magasin.nomMagasin}, spec : ${speculation.nomSpeculation}");
+                                print('Form is valid');
+                                print('magasinValue: $magasinValue');
+                                print('zoneValue: $zoneValue');
+
+                                if (magasinValue != null && zoneValue != null) {
+                                  handleButtonPress();
+                                } else if (magasinValue == null &&
+                                    zoneValue == null) {
+                                  _showMessageDialog();
+                                } else if (magasinValue == null) {
+                                  _showMagasinDialog();
+                                } else if (zoneValue == null) {
+                                  _showZoneDialog();
+                                }
+                              } else {
+                                print('Form is not valid');
                               }
                             },
                             style: ElevatedButton.styleFrom(
@@ -932,6 +965,107 @@ class _AddAndUpdateProductEndSreenState
           ),
         ),
       ),
+    );
+  }
+
+  String? _validateMagasin(String? value) {
+    if (value == null || value.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showMagasinDialog());
+      return 'Veuillez sélectionner un magasin';
+    }
+    return null;
+  }
+
+  void _showMagasinDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Center(child: Text('Aucun magasin sélectionner')),
+          content: const Text("Veuillez au préalable créer un magasin"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Get.back();
+                Navigator.of(context).pop();
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddMagasinScreen(
+                        isEditable: false,
+                      ),
+                    ));
+              },
+              child: const Text('Créer un magasin'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Annuler'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showMessageDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title:
+              const Center(child: Text('Aucun magasin et zone  sélectionner')),
+          content: const Text(
+              "Veuillez au préalable créer un magasin et une zone de production(Profil)"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Ok'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  String? _validateZone(String? value) {
+    if (value == null || value.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showMagasinDialog());
+      return 'Veuillez sélectionner une zone de production';
+    }
+    return null;
+  }
+
+  void _showZoneDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Center(child: Text('Aucun zone sélectionner')),
+          content: const Text("Veuillez au préalable ajouter une zone"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Get.back();
+                Navigator.of(context).pop();
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => Zone()));
+              },
+              child: const Text('Ajouter une zone'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Annuler'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

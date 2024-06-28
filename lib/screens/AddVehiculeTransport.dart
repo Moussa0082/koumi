@@ -9,7 +9,6 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/ListeVehiculeByType.dart';
 import 'package:koumi_app/screens/NextAddVehicule.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
@@ -50,28 +49,29 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
   final formkey = GlobalKey<FormState>();
 
   bool isLoadingLibelle = true;
-    String? libelleNiveau3Pays;
+  String? libelleNiveau3Pays;
 
   void _handleButtonPress() async {
     // Afficher l'indicateur de chargement
     setState(() {
       _isLoading = true;
     });
+  }
 
-   }
-
-    Future<String> getLibelleNiveau3PaysByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+  Future<String> getLibelleNiveau3PaysByActor(String id) async {
+    final response = await http
+        .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
 
     if (response.statusCode == 200) {
       print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
+      return response
+          .body; // Return the body directly since it's a plain string
     } else {
       throw Exception('Failed to load libelle niveau3Pays');
     }
   }
 
-    Future<void> fetchLibelleNiveau3Pays() async {
+  Future<void> fetchLibelleNiveau3Pays() async {
     try {
       String libelle = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
       setState(() {
@@ -86,18 +86,15 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
     }
   }
 
-
-
   @override
   void initState() {
     super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     type = widget.typeVoitures!;
-    _typeList =
-        http.get(Uri.parse('$apiOnlineUrl/TypeVoiture/read'));
-    _niveau3List =
-        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
-     fetchLibelleNiveau3Pays();
+    _typeList = http.get(Uri.parse('$apiOnlineUrl/TypeVoiture/read'));
+    _niveau3List = http.get(Uri.parse(
+        '$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
+    fetchLibelleNiveau3Pays();
     // _typeList =
     //     http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/TypeVoiture/read'));
     // _niveau3List =
@@ -118,7 +115,6 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                 Navigator.of(context).pop();
                 Provider.of<VehiculeService>(context, listen: false)
                     .applyChange();
-                
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
@@ -247,19 +243,9 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                           ),
                         ),
                       ),
-
                       SizedBox(
                         height: 10,
                       ),
-                       isLoadingLibelle ?
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text("Chargement ................",style: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.bold),)),
-                      )
-                      :
                       Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: 22,
@@ -267,7 +253,7 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: Text(
-                           libelleNiveau3Pays != null ? libelleNiveau3Pays!.toUpperCase() : "Localité",
+                            "Localité",
                             style:
                                 TextStyle(color: (Colors.black), fontSize: 18),
                           ),
@@ -294,11 +280,11 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                                 ),
                               );
                             }
-                           
+
                             if (snapshot.hasData) {
                               // dynamic responseData =
                               //     json.decode(snapshot.data.body);
-                               dynamic jsonString =
+                              dynamic jsonString =
                                   utf8.decode(snapshot.data.bodyBytes);
                               dynamic responseData = json.decode(jsonString);
 
@@ -340,10 +326,13 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                                     setState(() {
                                       n3Value = newValue;
                                       if (newValue != null) {
-                                        niveau3 = niveau3List
-                                            .map((e) => e.nomN3)
-                                            .first;
-                                        print("niveau 3 : ${niveau3}");
+                                        Niveau3Pays selectedNiveau3 =
+                                            niveau3List.firstWhere(
+                                          (element) =>
+                                              element.idNiveau3Pays == newValue,
+                                        );
+                                        niveau3 = selectedNiveau3.nomN3;
+                                        print("niveau 3 : $niveau3");
                                       }
                                     });
                                   },
@@ -386,28 +375,6 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                           },
                         ),
                       ),
-                      // Padding(
-                      //   padding: const EdgeInsets.symmetric(
-                      //       vertical: 10, horizontal: 20),
-                      //   child: TextFormField(
-                      //     validator: (value) {
-                      //       if (value == null || value.isEmpty) {
-                      //         return "Veuillez remplir les champs";
-                      //       }
-                      //       return null;
-                      //     },
-                      //     controller: _localiteController,
-                      //     maxLines: null,
-                      //     decoration: InputDecoration(
-                      //       hintText: "Ex : Bamako, segou",
-                      //       contentPadding: const EdgeInsets.symmetric(
-                      //           vertical: 10, horizontal: 20),
-                      //       border: OutlineInputBorder(
-                      //         borderRadius: BorderRadius.circular(8),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
                       SizedBox(
                         height: 10,
                       ),

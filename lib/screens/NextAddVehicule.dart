@@ -17,6 +17,7 @@ import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:pattern_formatter/pattern_formatter.dart';
 
 class NextAddVehicule extends StatefulWidget {
   final TypeVoiture typeVoiture;
@@ -25,7 +26,7 @@ class NextAddVehicule extends StatefulWidget {
   final String description;
   final String nbKilo;
   final String capacite;
-  
+
   const NextAddVehicule({
     super.key,
     required this.typeVoiture,
@@ -124,18 +125,19 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
       _isLoading = true;
     });
   }
-  
 
   Future<String> getLibelleNiveau3PaysByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
+    final response = await http
+        .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
 
     if (response.statusCode == 200) {
       print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
+      return response
+          .body; // Return the body directly since it's a plain string
     } else {
       throw Exception('Failed to load libelle niveau3Pays');
     }
-}
+  }
 
   Future<void> fetchLibelleNiveau3Pays() async {
     try {
@@ -152,15 +154,14 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
     }
   }
 
-
   @override
   void initState() {
     super.initState();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     prixParDestinations = {};
     _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
-    _niveau3List =
-        http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
+    _niveau3List = http.get(Uri.parse(
+        '$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${acteur.niveau3PaysActeur}'));
     fetchLibelleNiveau3Pays();
   }
 
@@ -364,7 +365,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                       .map(
                                         (e) => DropdownMenuItem(
                                           value: e.idMonnaie,
-                                          child: Text(e.sigle!),
+                                          child: Text(e.libelle!),
                                         ),
                                       )
                                       .toList(),
@@ -453,28 +454,37 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Row(
                                     children: [
-                                    isLoadingLibelle ?
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text("Chargement...",style: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.bold),)),
-                      )
-                      :
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 22,
-                        ),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                          libelleNiveau3Pays != null ? libelleNiveau3Pays!.toUpperCase() : "Localité",
-                            style:
-                                TextStyle(color: (Colors.black), fontSize: 18),
-                          ),
-                        ),
-                      ),
+                                      isLoadingLibelle
+                                          ? Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Align(
+                                                  alignment: Alignment.topLeft,
+                                                  child: Text(
+                                                    "Chargement...",
+                                                    style: TextStyle(
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  )),
+                                            )
+                                          : Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 22,
+                                              ),
+                                              child: Align(
+                                                alignment: Alignment.topLeft,
+                                                child: Text(
+                                                  libelleNiveau3Pays != null
+                                                      ? libelleNiveau3Pays!
+                                                          .toUpperCase()
+                                                      : "Localité",
+                                                  style: TextStyle(
+                                                      color: (Colors.black),
+                                                      fontSize: 18),
+                                                ),
+                                              ),
+                                            ),
                                       Expanded(
                                         child: FutureBuilder(
                                           future: _niveau3List,
@@ -545,11 +555,18 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                                         (e) => DropdownMenuItem(
                                                           value:
                                                               e.idNiveau3Pays,
-                                                          child: Text(e.nomN3,style: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 15),),
+                                                          child: Text(
+                                                            e.nomN3,
+                                                            style: TextStyle(
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                fontSize: 15),
+                                                          ),
                                                         ),
                                                       )
                                                       .toList(),
-                                                      isExpanded: true,
+                                                  isExpanded: true,
 
                                                   value: selectedDestinationsList[
                                                       index], // Utilisez l'index pour accéder à la valeur sélectionnée correspondante dans selectedDestinationsList
@@ -632,9 +649,8 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                         child: TextFormField(
                                           controller: prixControllers[index],
                                           keyboardType: TextInputType.number,
-                                          inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter
-                                                .digitsOnly,
+                                          inputFormatters: [
+                                            ThousandsFormatter(),
                                           ],
                                           decoration: InputDecoration(
                                             hintText: "Prix",
@@ -662,29 +678,29 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                         children: destinationPrixFields,
                       ),
                       SizedBox(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 10.0),
-                        child: photo != null
-                            ? GestureDetector(
-                                onTap: _showImageSourceDialog,
-                                child: Image.file(
-                                  photo!,
-                                  fit: BoxFit.fitWidth,
-                                  height: 150,
-                                  width: 300,
-                                ),
-                              )
-                            : SizedBox(
-                                child: IconButton(
-                                  onPressed: _showImageSourceDialog,
-                                  icon: const Icon(
-                                    Icons.add_a_photo_rounded,
-                                    size: 60,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 10.0),
+                          child: photo != null
+                              ? GestureDetector(
+                                  onTap: _showImageSourceDialog,
+                                  child: Image.file(
+                                    photo!,
+                                    fit: BoxFit.fitWidth,
+                                    height: 150,
+                                    width: 300,
+                                  ),
+                                )
+                              : SizedBox(
+                                  child: IconButton(
+                                    onPressed: _showImageSourceDialog,
+                                    icon: const Icon(
+                                      Icons.add_a_photo_rounded,
+                                      size: 60,
+                                    ),
                                   ),
                                 ),
-                              ),
+                        ),
                       ),
-                    ),
                       const SizedBox(height: 20),
                       ElevatedButton(
                           onPressed: () async {
@@ -702,9 +718,10 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                   i < selectedDestinationsList.length;
                                   i++) {
                                 String destination = selectedDestinations[i];
-                                int prix =
-                                    int.tryParse(prixControllers[i].text) ?? 0;
-
+                                String formattedMontant =
+                                    prixControllers[i].text.replaceAll(',', '');
+                                int prix = int.tryParse(formattedMontant) ?? 0;
+                                print("prix : $prix");
                                 // Ajouter la destination et le prix à la nouvelle map
                                 if (destination.isNotEmpty && prix > 0) {
                                   prixParDestinations
@@ -732,8 +749,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                           etatVehicule: etat,
                                           typeVoiture: type,
                                           acteur: acteur,
-                                          monnaie : monnaie
-                                          )
+                                          monnaie: monnaie)
                                       .then((value) => {
                                             Provider.of<VehiculeService>(
                                                     context,
@@ -780,8 +796,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                           etatVehicule: etat,
                                           typeVoiture: type,
                                           acteur: acteur,
-                                          monnaie: monnaie
-                                          )
+                                          monnaie: monnaie)
                                       .then((value) => {
                                             Provider.of<VehiculeService>(
                                                     context,

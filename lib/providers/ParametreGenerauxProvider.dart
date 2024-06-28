@@ -4,10 +4,10 @@ import 'package:koumi_app/models/ParametreGeneraux.dart';
 class ParametreGenerauxProvider extends ChangeNotifier {
   List<ParametreGeneraux> _parametreList = [];
 
-  List<ParametreGeneraux>? get parametreList => _parametreList;
-  void setParametreList(List<ParametreGeneraux> newList) {
-    _parametreList = newList;
-    print("provider : ${_parametreList.toString()}");
-    notifyListeners();
-  }
+  // List<ParametreGeneraux>? get parametreList => _parametreList;
+  // void setParametreList(List<ParametreGeneraux> newList) {
+  //   _parametreList = newList;
+  //   print("provider : ${_parametreList.toString()}");
+  //   notifyListeners();
+  // }
 }
