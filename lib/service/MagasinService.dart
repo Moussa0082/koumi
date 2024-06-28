@@ -21,7 +21,7 @@ class MagasinService extends ChangeNotifier{
     List<Magasin> magasin = [];
     int page = 0;
    bool isLoading = false;
-   int size = 4;
+   int size = sized;
    bool hasMore = true;
  
   Future<void> creerMagasin({

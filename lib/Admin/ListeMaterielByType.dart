@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:koumi_app/Admin/AddMaterielByType.dart';
 import 'package:http/http.dart' as http;
+import 'package:koumi_app/Admin/AddMaterielByType.dart';
 import 'package:koumi_app/Admin/DetailMateriel.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Materiel.dart';
@@ -34,7 +34,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
 
   int page = 0;
   bool isLoading = false;
-  int size = 4;
+  int size = sized;
   bool hasMore = true;
 
   Future<List<Materiel>> getListe(String id) async {
@@ -146,10 +146,9 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
     super.initState();
   }
 
-   @override
+  @override
   void dispose() {
-    _searchController
-        .dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -163,9 +162,14 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
           title: Text(
             type.nom!.toUpperCase(),
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
+                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
           ),
           actions: [
+            IconButton(
+                onPressed: () {
+                  verifyTypeMateriel();
+                },
+                icon: const Icon(Icons.refresh, color: d_colorGreen)),
             PopupMenuButton<String>(
               padding: EdgeInsets.zero,
               itemBuilder: (context) {
@@ -199,7 +203,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
         controller: scrollableController,
         child: Column(
           children: [
-              const SizedBox(height: 10),
+            const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Container(
@@ -290,7 +294,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                           );
                         } else {
                           materielListe = snapshot.data!;
-                            String searchText = "";
+                          String searchText = "";
                           List<Materiel> filtereSearch =
                               materielListe.where((search) {
                             String libelle = search.nom.toLowerCase();
@@ -334,7 +338,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                   ),
                                   itemCount: filtereSearch.length,
                                   itemBuilder: (context, index) {
-                                    var e = filtereSearch.elementAt(index);
+                                    // var e = filtereSearch.elementAt(index);
                                     return GestureDetector(
                                         onTap: () {
                                           Navigator.push(
@@ -342,7 +346,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       DetailMateriel(
-                                                          materiel: e)));
+                                                          materiel: filtereSearch[index])));
                                         },
                                         child: Card(
                                             margin: EdgeInsets.all(8),
@@ -356,9 +360,11 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                             8.0),
                                                     child: SizedBox(
                                                         height: 85,
-                                                        child: e.photoMateriel ==
+                                                        child: filtereSearch[index].photoMateriel ==
                                                                     null ||
-                                                                e.photoMateriel!
+                                                                filtereSearch[
+                                                                        index]
+                                                                    .photoMateriel!
                                                                     .isEmpty
                                                             ? Image.asset(
                                                                 "assets/images/default_image.png",
@@ -371,7 +377,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                                     .infinity,
                                                                 height: 200,
                                                                 imageUrl:
-                                                                    "https://koumi.ml/api-koumi/Materiel/${e.idMateriel}/image",
+                                                                    "https://koumi.ml/api-koumi/Materiel/${filtereSearch[index].idMateriel}/image",
                                                                 fit: BoxFit
                                                                     .cover,
                                                                 placeholder: (context,
@@ -392,7 +398,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                   SizedBox(height: 2),
                                                   ListTile(
                                                     title: Text(
-                                                      e.nom,
+                                                      filtereSearch[index].nom,
                                                       style: TextStyle(
                                                         fontSize: 16,
                                                         fontWeight:
@@ -404,7 +410,8 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                           TextOverflow.ellipsis,
                                                     ),
                                                     subtitle: Text(
-                                                      e.localisation,
+                                                      filtereSearch[index]
+                                                          .localisation,
                                                       style: TextStyle(
                                                         overflow: TextOverflow
                                                             .ellipsis,
@@ -429,7 +436,9 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                                     .spaceBetween,
                                                             children: [
                                                               _buildEtat(
-                                                                  e.statut!),
+                                                                  filtereSearch[
+                                                                          index]
+                                                                      .statut!),
                                                               PopupMenuButton<
                                                                   String>(
                                                                 padding:
@@ -443,7 +452,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                                       String>(
                                                                     child:
                                                                         ListTile(
-                                                                      leading: e.statut ==
+                                                                      leading: filtereSearch[index].statut ==
                                                                               false
                                                                           ? Icon(
                                                                               Icons.check,
@@ -454,13 +463,13 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                                               color: Colors.orange[400]),
                                                                       title:
                                                                           Text(
-                                                                        e.statut ==
+                                                                        filtereSearch[index].statut ==
                                                                                 false
                                                                             ? "Activer"
                                                                             : "Desactiver",
                                                                         style:
                                                                             TextStyle(
-                                                                          color: e.statut == false
+                                                                          color: filtereSearch[index].statut == false
                                                                               ? Colors.green
                                                                               : Colors.orange[400],
                                                                           fontWeight:
@@ -469,10 +478,10 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                                       ),
                                                                       onTap:
                                                                           () async {
-                                                                        e.statut ==
+                                                                        filtereSearch[index].statut ==
                                                                                 false
                                                                             ? await MaterielService()
-                                                                                .activerMateriel(e.idMateriel!)
+                                                                                .activerMateriel(filtereSearch[index].idMateriel!)
                                                                                 .then((value) => {
                                                                                       Provider.of<MaterielService>(context, listen: false).applyChange(),
                                                                                       setState(() {
@@ -504,7 +513,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                                                       Navigator.of(context).pop(),
                                                                                     })
                                                                             : await MaterielService()
-                                                                                .desactiverMateriel(e.idMateriel!)
+                                                                                .desactiverMateriel(filtereSearch[index].idMateriel!)
                                                                                 .then((value) => {
                                                                                       Provider.of<MaterielService>(context, listen: false).applyChange(),
                                                                                       setState(() {
@@ -567,7 +576,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                                       onTap:
                                                                           () async {
                                                                         await MaterielService()
-                                                                            .deleteMateriel(e
+                                                                            .deleteMateriel(filtereSearch[index]
                                                                                 .idMateriel!)
                                                                             .then((value) =>
                                                                                 {

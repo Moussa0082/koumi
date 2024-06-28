@@ -79,7 +79,7 @@ class _ProfilState extends State<Profil> {
           //     icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: const Text(
             "Mon Profil",
-            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 20),
           ),
         ),
         body: 

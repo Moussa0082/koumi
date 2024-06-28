@@ -67,32 +67,46 @@ Future<List<Speculation>> getCatListe() async {
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Column(
             children: [
-              // Text(
-              //   "Spéculation",
-              //   style:
-              //       TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
-              // ),
-              // SizedBox(height: 10),
+              
               Text(
                 cat.libelleCategorie!.toUpperCase(),
                 style: TextStyle(
                     color: d_colorGreen,
                     fontWeight: FontWeight.w600,
+                    fontSize: 20,
                     overflow: TextOverflow.ellipsis),
               ),
             ],
           ),
           actions: [
-            IconButton(
-              onPressed: () {
-                _showDialog();
-              },
-              icon: const Icon(
-                Icons.add,
-                color: d_colorGreen,
-                size: 25,
-              ),
-            )
+                PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                itemBuilder: (context) {
+                  return <PopupMenuEntry<String>>[
+                    PopupMenuItem<String>(
+                      child: ListTile(
+                        leading: const Icon(
+                          Icons.add,
+                          color: Colors.green,
+                        ),
+                        title: const Text(
+                          "Ajouter une spéculation ",
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onTap: () async {
+                          Navigator.of(context).pop();
+                          _showDialog();
+                        },
+                      ),
+                    ),
+                  ];
+                },
+              )
+           
           ],
         ),
         body: SingleChildScrollView(

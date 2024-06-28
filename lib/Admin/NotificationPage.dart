@@ -78,7 +78,7 @@ class _NotificationPageState extends State<NotificationPage> {
               icon: Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
             "Notifications",
-            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 20),
           ),
           actions: [
             PopupMenuButton<String>(
@@ -397,7 +397,7 @@ class _NotificationPageState extends State<NotificationPage> {
                 children: [
                   SpeedDialChild(
                     child: Icon(Icons.message),
-                    label: 'Envoyé message aux acteurs',
+                    label: 'Envoyer un message aux acteurs',
                     labelStyle: TextStyle(
                       color: Colors.black,
                       fontSize: 15,
@@ -409,7 +409,7 @@ class _NotificationPageState extends State<NotificationPage> {
                   ),
                   SpeedDialChild(
                     child: Icon(Icons.email),
-                    label: 'Envoyé email aux acteurs',
+                    label: 'Envoyer un mail aux acteurs',
                     labelStyle: TextStyle(
                       color: Colors.black,
                       fontSize: 15,

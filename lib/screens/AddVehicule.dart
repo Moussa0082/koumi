@@ -105,18 +105,13 @@ class _AddVehiculeState extends State<AddVehicule> {
           toolbarHeight: 100,
           leading: IconButton(
               onPressed: () {
-                Provider.of<VehiculeService>(context, listen: false)
-                    .applyChange();
-                Navigator.of(context).pop();
-
-                // Navigator.pushReplacement(context,
-                //     MaterialPageRoute(builder: (context) => Transport()));
+                Navigator.pop(context, true);
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
             'Ajout de véhicule',
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
+                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
           ),
         ),
         body: SingleChildScrollView(

@@ -109,14 +109,14 @@ class _AddAndUpdateProductEndSreenState
         setState(() {
           isLoading = false;
         });
-        Navigator.of(context).pop();
+        Navigator.pop(context, true);
       });
     } else {
       await updateProduit().then((_) {
         _typeController.clear();
         _descriptionController.clear();
 
-        Navigator.of(context).pop();
+        Navigator.pop(context, true);
       });
       _typeController.clear();
       _descriptionController.clear();
@@ -261,13 +261,13 @@ class _AddAndUpdateProductEndSreenState
           toolbarHeight: 100,
           leading: IconButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.pop(context, true);
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
             widget.isEditable == false ? "Ajouter produit" : "Modifier produit",
             style: TextStyle(
-                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green),
           ),
         ),
         body: SingleChildScrollView(

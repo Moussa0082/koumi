@@ -1,8 +1,8 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Monnaie.dart';
+import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 
 class Materiel {
@@ -22,7 +22,7 @@ class Materiel {
   final String etatMateriel;
   TypeMateriel typeMateriel;
   Monnaie? monnaie;
-  
+  Speculation? speculation;
   Materiel({
     this.idMateriel,
     this.codeMateriel,
@@ -40,12 +40,8 @@ class Materiel {
     required this.etatMateriel,
     required this.typeMateriel,
     required this.monnaie,
+    this.speculation,
   });
-
- 
- 
-
-  
 
   Materiel copyWith({
     String? idMateriel,
@@ -63,7 +59,8 @@ class Materiel {
     Acteur? acteur,
     String? etatMateriel,
     TypeMateriel? typeMateriel,
-    Monnaie? monnaie
+    Monnaie? monnaie,
+    Speculation? speculation
   }) {
     return Materiel(
       idMateriel: idMateriel ?? this.idMateriel,
@@ -82,6 +79,7 @@ class Materiel {
       etatMateriel: etatMateriel ?? this.etatMateriel,
       typeMateriel: typeMateriel ?? this.typeMateriel,
       monnaie: monnaie ?? this.monnaie,
+      speculation: speculation ?? this.speculation,
     );
   }
 
@@ -103,6 +101,7 @@ class Materiel {
       'etatMateriel': etatMateriel,
       'typeMateriel': typeMateriel.toMap(),
       'monnaie' : monnaie!.toMap(),
+      'speculation': speculation?.toMap(),
     };
   }
 
@@ -123,9 +122,12 @@ class Materiel {
       acteur: Acteur.fromMap(map['acteur'] as Map<String,dynamic>),
       etatMateriel: map['etatMateriel'] as String,
       typeMateriel: TypeMateriel.fromMap(map['typeMateriel'] as Map<String,dynamic>),
-       monnaie: map['monnaie'] != null
+      monnaie: map['monnaie'] != null
             ? Monnaie.fromMap(map['monnaie'] as Map<String, dynamic>)
-            : Monnaie()
+            : Monnaie(),
+      speculation: map['speculation'] != null
+          ? Speculation.fromMap(map['speculation'] as Map<String, dynamic>)
+          : Speculation(),
     );
   }
 

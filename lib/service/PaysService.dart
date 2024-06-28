@@ -20,9 +20,9 @@ class PaysService extends ChangeNotifier {
     required String libelleNiveau1Pays,
     required String libelleNiveau2Pays,
     required String libelleNiveau3Pays,
-    // required String monnaie,
-    // required String tauxDollar,
-    // required String tauxYuan,
+
+    required String monnaie,
+    required String whattsAppPays,
     required SousRegion sousRegion,
   }) async {
     var addPays = jsonEncode({
@@ -32,9 +32,8 @@ class PaysService extends ChangeNotifier {
       'libelleNiveau1Pays': libelleNiveau1Pays,
       'libelleNiveau2Pays': libelleNiveau2Pays,
       'libelleNiveau3Pays': libelleNiveau3Pays,
-      // 'monnaie': monnaie,
-      // 'tauxDollar': tauxDollar,
-      // 'tauxYuan': tauxYuan,
+      'monnaie': monnaie,
+      'whattsAppPays': whattsAppPays,
       'sousRegion': sousRegion.toMap()
     });
 
@@ -55,9 +54,8 @@ class PaysService extends ChangeNotifier {
     required String libelleNiveau1Pays,
     required String libelleNiveau2Pays,
     required String libelleNiveau3Pays,
-    // required String monnaie,
-    // required String tauxDollar,
-    // required String tauxYuan,
+    required String monnaie,
+    required String whattsAppPays,
     required SousRegion sousRegion,
   }) async {
     var addPays = jsonEncode({
@@ -67,9 +65,8 @@ class PaysService extends ChangeNotifier {
       'libelleNiveau1Pays': libelleNiveau1Pays,
       'libelleNiveau2Pays': libelleNiveau2Pays,
       'libelleNiveau3Pays': libelleNiveau3Pays,
-      // 'monnaie': monnaie,
-      // 'tauxDollar': tauxDollar,
-      // 'tauxYuan': tauxYuan,
+      'monnaie': monnaie,
+      'whattsAppPays': whattsAppPays,
       'sousRegion': sousRegion.toMap()
     });
 

@@ -4,7 +4,7 @@ import 'package:koumi_app/constants.dart';
 class RemoteServices {
   static var client = http.Client();
   int page = 1;
-  int size = 10;
+  int size = sized;
    var baseURL = '$apiOnlineUrl/Stock/getAllStocksWithPagination';
   // static var baseURL = 'https://grocery-app-sc6n.onrender.com';
 

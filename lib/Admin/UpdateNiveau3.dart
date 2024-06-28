@@ -261,7 +261,7 @@ class _UpdateNiveau3State extends State<UpdateNiveau3> {
             });
           },
           decoration: InputDecoration(
-            labelText: 'Sélectionner un ${para.libelleNiveau2Pays}',
+            labelText: 'Sélectionner un niveau 2',
             labelStyle: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 15),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),

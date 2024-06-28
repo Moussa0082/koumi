@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +53,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
   bool isSearchMode = true;
   int page = 0;
   bool isLoading = false;
-  int size = 4;
+  int size = sized;
   bool hasMore = true;
   late Future<List<Intrant>> intrantListeFuture;
   late Future<List<Intrant>> intrantListeFuture1;
@@ -221,7 +222,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
       setState(() {
         // Rafraîchir les données ici
         page++;
-        });
+      });
       debugPrint("yes - fetch all by pays intrants");
      isExist ? fetchIntrantByPays(detectedCountry!) : fetchIntrantByPays(acteur.niveau3PaysActeur!);
       
@@ -247,11 +248,10 @@ class _IntrantScreenState extends State<IntrantScreen> {
 
     }
     debugPrint("no");
+  }
 
-}
-
-
- Future<List<Intrant>> fetchIntrantByPays(String niveau3PaysActeur, {bool refresh = false }) async {
+  Future<List<Intrant>> fetchIntrantByPays(String niveau3PaysActeur,
+      {bool refresh = false}) async {
     if (isLoading) return [];
 
           setState(() {
@@ -270,8 +270,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/intrant/getIntrantsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
-
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/intrant/getIntrantsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
        print("pays end point $niveau3PaysActeur");
@@ -293,16 +293,17 @@ class _IntrantScreenState extends State<IntrantScreen> {
           
         }
 
-        debugPrint("response body all intrant by pays with pagination $page par défilement soit ${intrantListe.length}");
-       return intrantListe;
-
+        debugPrint(
+            "response body all intrant by pays with pagination $page par défilement soit ${intrantListe.length}");
+        return intrantListe;
       } else {
         print(
             'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
         return [];
       }
     } catch (e) {
-      print('Une erreur s\'est produite lors de la récupération des intrants: $e');
+      print(
+          'Une erreur s\'est produite lors de la récupération des intrants: $e');
     } finally {
      setState(() {
        
@@ -314,12 +315,9 @@ class _IntrantScreenState extends State<IntrantScreen> {
     return intrantListe;
   }
 
-  
-
-
-
-  Future<List<Intrant>> fetchIntrantByCategorie(String niveau3PaysActeur, String idCategorieProduit, {bool refresh = false}) async {
-
+  Future<List<Intrant>> fetchIntrantByCategorie(
+      String niveau3PaysActeur, String idCategorieProduit,
+      {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -429,6 +427,51 @@ class _IntrantScreenState extends State<IntrantScreen> {
       // final countryProvider = Provider.of<CountryProvider>(context , listen: false);
 
   // debugPrint("pays ${countryName!}");
+
+    _searchController = TextEditingController();
+    _typeList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      //write or call your logic
+      //code will run when widget rendering complete
+      scrollableController.addListener(_scrollListener);
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      //write or call your logic
+      //code will run when widget rendering complete
+      scrollableController1.addListener(_scrollListener1);
+    });
+    intrantListeFuture = IntrantService().fetchIntrantByPays(
+        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+    intrantListeFuture1 = getAllIntrant();
+    // final countryProvider = Provider.of<CountryProvider>(context , listen: false);
+
+    debugPrint("pays ${widget.detectedCountry!}");
+  }
+
+  Future<void> _getResultFromNextScreen1(BuildContext context) async {
+    final result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => AddIntrant()));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        intrantListeFuture = IntrantService().fetchIntrantByPays(
+            widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+      });
+    }
+  }
+
+  Future<void> _getResultFromNextScreen2(BuildContext context) async {
+    final result = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => ListeIntrantByActeur()));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        intrantListeFuture = IntrantService().fetchIntrantByPays(
+            widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+      });
+    }
   }
 
   @override
@@ -455,18 +498,25 @@ class _IntrantScreenState extends State<IntrantScreen> {
                 },
                 icon: const Icon(Icons.arrow_back_ios)),
             title: const Text(
-              "Intrant agricole ",
+              "Intrants agricoles ",
               style: TextStyle(
                 color: d_colorGreen,
-                fontSize: 22,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
             actions: !isExist
-                ? null
-                :
-            
-                (typeActeurData
+                ? [
+                    IconButton(
+                        onPressed: () {
+                          intrantListeFuture = IntrantService()
+                              .fetchIntrantByPays(widget.detectedCountry != null
+                                  ? widget.detectedCountry!
+                                  : "Mali");
+                        },
+                        icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                  ]
+                : (typeActeurData
                             .map((e) => e.libelle!.toLowerCase())
                             .contains("fournisseur") ||
                         typeActeurData
@@ -476,6 +526,16 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             .map((e) => e.libelle!.toLowerCase())
                             .contains("fournisseurs"))
                     ? [
+                        IconButton(
+                            onPressed: () {
+                              intrantListeFuture = IntrantService()
+                                  .fetchIntrantByPays(
+                                      widget.detectedCountry != null
+                                          ? widget.detectedCountry!
+                                          : "Mali");
+                            },
+                            icon:
+                                const Icon(Icons.refresh, color: d_colorGreen)),
                         PopupMenuButton<String>(
                           padding: EdgeInsets.zero,
                           itemBuilder: (context) {
@@ -496,11 +556,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                   ),
                                   onTap: () async {
                                     Navigator.of(context).pop();
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                AddIntrant()));
+                                    _getResultFromNextScreen1(context);
                                   },
                                 ),
                               ),
@@ -520,11 +576,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                   ),
                                   onTap: () async {
                                     Navigator.of(context).pop();
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                ListeIntrantByActeur()));
+                                    _getResultFromNextScreen2(context);
                                   },
                                 ),
                               )
@@ -532,7 +584,18 @@ class _IntrantScreenState extends State<IntrantScreen> {
                           },
                         )
                       ]
-                    : null),
+                    : [
+                        IconButton(
+                            onPressed: () {
+                              intrantListeFuture = IntrantService()
+                                  .fetchIntrantByPays(
+                                      widget.detectedCountry != null
+                                          ? widget.detectedCountry!
+                                          : "Mali");
+                            },
+                            icon:
+                                const Icon(Icons.refresh, color: d_colorGreen)),
+                      ]),
         body: Container(
             child: NestedScrollView(
                 headerSliverBuilder:
@@ -540,7 +603,6 @@ class _IntrantScreenState extends State<IntrantScreen> {
                   return <Widget>[
                     SliverToBoxAdapter(
                         child: Column(children: [
-                    
                       Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: ToggleButtons(
@@ -611,8 +673,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                 dynamic jsonString =
                                     utf8.decode(snapshot.data.bodyBytes);
                                 dynamic responseData = json.decode(jsonString);
-  //                      
-  // }     
+                                //
+                                // }
                                 if (responseData is List) {
                                   final reponse = responseData;
                                   final typeList = reponse
@@ -635,7 +697,6 @@ class _IntrantScreenState extends State<IntrantScreen> {
                             },
                           ),
                         ),
-
                       const SizedBox(height: 10),
                     ])),
                   ];
@@ -734,10 +795,9 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                                 crossAxisSpacing: 10,
                                                 childAspectRatio: 0.8,
                                               ),
-                                              itemCount: filteredSearch.length +
-                                                  1,
+                                              itemCount:
+                                                  filteredSearch.length + 1,
                                               itemBuilder: (context, index) {
-                                              
                                                 if (index <
                                                     filteredSearch.length) {
                                                   return GestureDetector(
@@ -756,7 +816,6 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                                     },
                                                     child: Card(
                                                       margin: EdgeInsets.all(8),
-                                                      
                                                       child: Column(
                                                         crossAxisAlignment:
                                                             CrossAxisAlignment
@@ -959,7 +1018,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                       );
                                     } else {
                                       intrantListe = snapshot.data!;
-   String searchText = "";
+                                      String searchText = "";
                                       List<Intrant> filteredSearch =
                                           intrantListe.where((cate) {
                                         String nomCat =
@@ -1326,11 +1385,10 @@ class _IntrantScreenState extends State<IntrantScreen> {
     );
   }
 
-
-   DropdownButtonFormField<String> buildDropdown(
-
+  DropdownButtonFormField<String> buildDropdown(
       List<CategorieProduit> typeList) {
-        final countryProvider = Provider.of<CountryProvider>(context, listen: false);
+    final countryProvider =
+        Provider.of<CountryProvider>(context, listen: false);
     return DropdownButtonFormField<String>(
       isExpanded: true,
       items: typeList
@@ -1400,4 +1458,3 @@ class _IntrantScreenState extends State<IntrantScreen> {
     );
   }
 }
-

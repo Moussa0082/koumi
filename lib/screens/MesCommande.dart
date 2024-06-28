@@ -165,7 +165,16 @@ class _MesCommandeState extends State<MesCommande> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Mes commandes"),
+        centerTitle: true,
+          toolbarHeight: 100,
+          title: Text(
+            "Mes commandes",
+            style: const TextStyle(
+              color: d_colorGreen,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
       actions: [
   // Container(
   //   width: 30,

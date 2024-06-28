@@ -259,7 +259,7 @@ class _UpdateConseilState extends State<UpdateConseil> {
               "Modification ",
               style: TextStyle(
                 color: d_colorGreen,
-                fontSize: 22,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             )),

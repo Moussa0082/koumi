@@ -209,6 +209,7 @@ class _AddZoneState extends State<AddZone> {
               style: TextStyle(
                   color: d_colorGreen,
                   fontWeight: FontWeight.bold,
+                  fontSize: 20,
                   overflow: TextOverflow.ellipsis),
             ),
           ),

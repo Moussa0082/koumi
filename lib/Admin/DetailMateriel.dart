@@ -45,8 +45,6 @@ class _DetailMaterielState extends State<DetailMateriel> {
   late Future _monnaieList;
   late Monnaie monnaie = Monnaie();
   final formkey = GlobalKey<FormState>();
-  // List<ParametreGeneraux> paraList = [];
-  // late ParametreGeneraux para = ParametreGeneraux();
   late ValueNotifier<bool> isDialOpenNotifier;
   String? imageSrc;
   File? photo;
@@ -62,8 +60,6 @@ class _DetailMaterielState extends State<DetailMateriel> {
   bool _isEditing = false;
   bool isExist = false;
   String? email = "";
-  // late List<Device> devices = [];
-  // late Future<List<Device>> _listeDevice;
   bool isLoadingLibelle = true;
   late Future<Map<String, String>> rates;
 
@@ -195,7 +191,6 @@ class _DetailMaterielState extends State<DetailMateriel> {
 
   Future<void> updateMethode() async {
     setState(() {
-      // Afficher l'indicateur de chargement pendant l'opération
       _isLoading = true;
     });
 
@@ -235,7 +230,20 @@ class _DetailMaterielState extends State<DetailMateriel> {
                         typeMateriel: materiels.typeMateriel,
                         monnaie: monnaie);
                     _isLoading = false;
-                  })
+                  }),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Row(
+                        children: [
+                          Text(
+                            "Modifier avec succéss",
+                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                          ),
+                        ],
+                      ),
+                      duration: Duration(seconds: 2),
+                    ),
+                  )
                 })
             .catchError((onError) => {
                   setState(() {
@@ -271,7 +279,20 @@ class _DetailMaterielState extends State<DetailMateriel> {
                         typeMateriel: materiels.typeMateriel,
                         monnaie: monnaie);
                     _isLoading = false;
-                  })
+                  }),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Row(
+                        children: [
+                          Text(
+                            "Modifier avec succéss",
+                            style: TextStyle(overflow: TextOverflow.ellipsis),
+                          ),
+                        ],
+                      ),
+                      duration: Duration(seconds: 2),
+                    ),
+                  )
                 })
             .catchError((onError) => {
                   setState(() {
@@ -304,7 +325,6 @@ class _DetailMaterielState extends State<DetailMateriel> {
   void initState() {
     super.initState();
     verify();
-
     _niveau3List = http.get(Uri.parse('$apiOnlineUrl/nivveau3Pays/read'));
     materiels = widget.materiel;
     rates = fetchConvert(materiels);
@@ -318,7 +338,6 @@ class _DetailMaterielState extends State<DetailMateriel> {
     monnaieValue = materiels.monnaie!.idMonnaie;
     _monnaieList = http.get(Uri.parse('$apiOnlineUrl/Monnaie/getAllMonnaie'));
     isDialOpenNotifier = ValueNotifier<bool>(false);
-    // fetchPaysDataByActor();
   }
 
   @override
@@ -341,21 +360,22 @@ class _DetailMaterielState extends State<DetailMateriel> {
                     )
                   : IconButton(
                       onPressed: () {
-                        Navigator.of(context).pop();
+                      Navigator.pop(context, true);
                       },
-                      icon:
-                          const Icon(Icons.arrow_back_ios, color: d_colorGreen),
-                    ),
+                      icon: const Icon(Icons.arrow_back_ios,
+                          color: d_colorGreen)),
               title: _isEditing
                   ? Text(
                       'Modification',
                       style: const TextStyle(
-                          color: d_colorGreen, fontWeight: FontWeight.bold),
+                          color: d_colorGreen, fontWeight: FontWeight.bold,
+                          fontSize: 20),
                     )
                   : Text(
                       'Détail matériel',
                       style: const TextStyle(
-                          color: d_colorGreen, fontWeight: FontWeight.bold),
+                          color: d_colorGreen, fontWeight: FontWeight.bold,
+                          fontSize: 20),
                     ),
               actions: acteur.idActeur == materiels.acteur.idActeur
                   ? [
@@ -499,7 +519,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
         //     "${materiels.prixParHeure.toString()} ${para.monnaie}"):
         _buildItem('Prix par heure : ',
             "${materiels.prixParHeure.toString()} ${materiels.monnaie!.libelle}"),
-        
+
         FutureBuilder<Map<String, String>>(
           future: rates,
           builder: (context, snapshot) {

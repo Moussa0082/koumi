@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
@@ -151,6 +152,22 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
     super.dispose();
   }
 
+  Future<void> _getResultFromNextScreen1(BuildContext context) async {
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AddVehiculeTransport(
+                  typeVoitures: typeVoiture,
+                )));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        futureListe = getListe(typeVoiture.idTypeVoiture!);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -197,13 +214,8 @@ class _ListeVehiculeByTypeState extends State<ListeVehiculeByType> {
                       ),
                     ),
                     onTap: () async {
-                      Navigator.of(context).pop();
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AddVehiculeTransport(
-                                    typeVoitures: typeVoiture,
-                                  )));
+                        Navigator.of(context).pop();
+                      _getResultFromNextScreen1(context);
                     },
                   ),
                 ),

@@ -124,7 +124,7 @@ class _DetailAlertesOffLineState extends State<DetailAlertesOffLine> {
         title: Text(
           'Détail alerte',
           style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
       body: SingleChildScrollView(

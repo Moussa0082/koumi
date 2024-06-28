@@ -86,7 +86,7 @@ class _AlertesOffLineScreenState extends State<AlertesOffLineScreen> {
             "Alerte PUB",
             style: TextStyle(
               color: d_colorGreen,
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),

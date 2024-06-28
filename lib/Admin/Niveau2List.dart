@@ -98,7 +98,7 @@ class _Niveau2ListState extends State<Niveau2List> {
         title: Text(
           widget.niveau1pays.nomN1!.toUpperCase(),
           style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
       body: SingleChildScrollView(

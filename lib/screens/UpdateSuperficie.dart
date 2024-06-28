@@ -166,7 +166,7 @@ class _UpdateSuperficieState extends State<UpdateSuperficie> {
           title: Text(
             'Modification  ',
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
+                color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 20),
           ),
         ),
         body: SingleChildScrollView(

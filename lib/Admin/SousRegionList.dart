@@ -58,7 +58,7 @@ class _SousRegionListState extends State<SousRegionList> {
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
             continents.nomContinent.toUpperCase(),
-            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 20),
           ),
         ),
         body: SingleChildScrollView(

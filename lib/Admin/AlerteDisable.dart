@@ -60,7 +60,7 @@ class _AlerteDisableState extends State<AlerteDisable> {
           "Alerte Désactiver",
           style: TextStyle(
             color: d_colorGreen,
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),

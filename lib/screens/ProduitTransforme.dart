@@ -1,18 +1,24 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
+import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Stock.dart';
+import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/AddAndUpdateProductScreen.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/service/StockService.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProduitTransforme extends StatefulWidget {
   String? detectedCountry;
-  ProduitTransforme({super.key,this.detectedCountry});
+  ProduitTransforme({super.key, this.detectedCountry});
 
   @override
   State<ProduitTransforme> createState() => _ProduitTransformeState();
@@ -30,16 +36,14 @@ class _ProduitTransformeState extends State<ProduitTransforme> {
   ScrollController scrollableController = ScrollController();
 
   String libelle = "Produits transformés";
-  //  List<String> libelles = [
-  //   "Produits transformés",
-  //   "Produit transformé",
-  //   "produits transformés",
-  //   "produit transformé"
-  // ];
-  // String? monnaie;
+  bool isExist = false;
+  String? email = "";
+  late String type;
+  late Acteur acteur = Acteur();
+  late List<TypeActeur> typeActeurData = [];
   int page = 0;
   bool isLoading = false;
-  int size = 6;
+  int size = sized;
   bool hasMore = true;
   void _scrollListener() {
     if (scrollableController.position.pixels >=
@@ -55,8 +59,8 @@ class _ProduitTransformeState extends State<ProduitTransforme> {
       });
 
       fetchStock(
-              // widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
-              ).then((value) {
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+          .then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -65,8 +69,8 @@ class _ProduitTransformeState extends State<ProduitTransforme> {
     }
     debugPrint("no");
   }
-   Future<List<Stock>> fetchStock(
-      {bool refresh = false}) async {
+
+  Future<List<Stock>> fetchStock(String pays, {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -84,36 +88,34 @@ class _ProduitTransformeState extends State<ProduitTransforme> {
     try {
       // List<Stock> tempStockListe = [];
       // for (String libelle in libelles) {
-        final response = await http.get(Uri.parse(
-            '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size'));
 
-debugPrint(
-          '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&page=$page&size=$size');
-          // '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
-          final List<dynamic> body = jsonData['content'];
+      debugPrint(
+          '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
+      // '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&pays=$pays&page=$page&size=$size');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
 
-          if (body.isEmpty) {
-            setState(() {
-              hasMore = false;
-            });
-          } else {
-             List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
+        if (body.isEmpty) {
+          setState(() {
+            hasMore = false;
+          });
+        } else {
+          List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
           setState(() {
             stockListe.addAll(newStocks.where((newStock) => !stockListe
                 .any((existStock) => existStock.idStock == newStock.idStock)));
           });
         }
-          debugPrint(
-              "response body all stock by categorie with pagination ${page} par défilement soit ${stockListe.length}");
-        } else {
-          print(
-              'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
-        }
+        debugPrint(
+            "response body all stock by categorie with pagination ${page} par défilement soit ${stockListe.length}");
+      } else {
+        print(
+            'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
       // }
-
-    
     } catch (e) {
       print(
           'Une erreur s\'est produite lors de la récupération des intrants: $e');
@@ -125,56 +127,24 @@ debugPrint(
     return stockListe;
   }
 
-  // Future<List<Stock>> fetchStock({bool refresh = false}) async {
-  //   if (isLoading == true) return [];
-
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-
-  //   if (refresh) {
-  //     setState(() {
-  //       stockListe.clear();
-  //       page = 0;
-  //       hasMore = true;
-  //     });
-  //   }
-
-  //   try {
-  //     final response = await http.get(Uri.parse(
-  //         '$apiOnlineUrl/Stock/listeStockByLibelleCategorie?libelle=$libelle&page=$page&size=$size'));
-
-  //     if (response.statusCode == 200) {
-  //       final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
-  //       final List<dynamic> body = jsonData['content'];
-
-  //       if (body.isEmpty) {
-  //         setState(() {
-  //           hasMore = false;
-  //         });
-  //       } else {
-  //         setState(() {
-  //           List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
-  //           stockListe.addAll(newStocks);
-  //         });
-  //       }
-
-  //       debugPrint(
-  //           "response body all stock by categorie with pagination ${page} par défilement soit ${stockListe.length}");
-  //     } else {
-  //       print(
-  //           'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
-  //     }
-  //   } catch (e) {
-  //     print(
-  //         'Une erreur s\'est produite lors de la récupération des intrants: $e');
-  //   } finally {
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //   }
-  //   return stockListe;
-  // }
+  void verify() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('emailActeur');
+    if (email != null) {
+      // Si l'email de l'acteur est présent, exécute checkLoggedIn
+      acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+      typeActeurData = acteur.typeActeur!;
+      type = typeActeurData.map((data) => data.libelle).join(', ');
+      setState(() {
+        isExist = true;
+        // stockListeFuture = fetchAllStock();
+      });
+    } else {
+      setState(() {
+        isExist = false;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -184,8 +154,8 @@ debugPrint(
       scrollableController.addListener(_scrollListener);
     });
     stockListeFuture = fetchStock(
-        // widget.detectedCountry != null ? widget.detectedCountry! : "Mali"
-        );
+        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+    verify();
   }
 
   @override
@@ -194,6 +164,23 @@ debugPrint(
         .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
     scrollableController.dispose();
     super.dispose();
+  }
+
+  Future<void> _getResultFromNextScreen1(BuildContext context) async {
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AddAndUpdateProductScreen(
+                  isEditable: false,
+                )));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        stockListeFuture = fetchStock(
+            widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+      });
+    }
   }
 
   @override
@@ -212,10 +199,77 @@ debugPrint(
             "Produits transformés",
             style: TextStyle(
               color: d_colorGreen,
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
+          actions: !isExist
+              ? [
+                  IconButton(
+                      onPressed: () {
+                        stockListeFuture = fetchStock(
+                            widget.detectedCountry != null
+                                ? widget.detectedCountry!
+                                : "Mali");
+                      },
+                      icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                ]
+              : [
+                  IconButton(
+                      onPressed: () {
+                        stockListeFuture = fetchStock(
+                            widget.detectedCountry != null
+                                ? widget.detectedCountry!
+                                : "Mali");
+                      },
+                      icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                  (typeActeurData
+                              .map((e) => e.libelle!.toLowerCase())
+                              .contains("commercant") ||
+                          typeActeurData
+                              .map((e) => e.libelle!.toLowerCase())
+                              .contains("commerçant") ||
+                          typeActeurData
+                              .map((e) => e.libelle!.toLowerCase())
+                              .contains("admin") ||
+                          typeActeurData
+                              .map((e) => e.libelle!.toLowerCase())
+                              .contains("producteur"))
+                      ? PopupMenuButton<String>(
+                          padding: EdgeInsets.zero,
+                          itemBuilder: (context) {
+                            return <PopupMenuEntry<String>>[
+                              PopupMenuItem<String>(
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.add,
+                                    color: Colors.green,
+                                  ),
+                                  title: const Text(
+                                    "Ajouter produit",
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.of(context).pop();
+                                    _getResultFromNextScreen1(context);
+                                  },
+                                ),
+                              ),
+                            ];
+                          },
+                        )
+                      : IconButton(
+                          onPressed: () {
+                            stockListeFuture = fetchStock(
+                                widget.detectedCountry != null
+                                    ? widget.detectedCountry!
+                                    : "Mali");
+                          },
+                          icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                ],
         ),
         body: Container(
             child: NestedScrollView(
@@ -267,17 +321,16 @@ debugPrint(
                 },
                 body: RefreshIndicator(
                     onRefresh: () async {
-                        setState(() {
+                      setState(() {
                         page = 0;
                         // Rafraîchir les données ici
                       });
                       debugPrint("refresh page ${page}");
                       setState(() {
                         stockListeFuture = fetchStock(
-                            // widget.detectedCountry != null
-                            //     ? widget.detectedCountry!
-                            //     : "Mali"
-                                );
+                            widget.detectedCountry != null
+                                ? widget.detectedCountry!
+                                : "Mali");
                       });
                       debugPrint("refresh page ${page}");
                     },

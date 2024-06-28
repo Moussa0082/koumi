@@ -251,7 +251,7 @@ class _AddConseilState extends State<AddConseil> {
               "Ajout conseil ",
               style: TextStyle(
                 color: d_colorGreen,
-                fontSize: 22,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             )),

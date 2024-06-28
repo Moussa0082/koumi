@@ -67,7 +67,7 @@ class _DetailParametreState extends State<DetailParametre> {
         title: Text(
           'Détails paramètre',
           style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         actions: [
           _isEditing

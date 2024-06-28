@@ -29,7 +29,7 @@ class _NotificationDetailState extends State<NotificationDetail> {
         ),
         title: Text(
           "Détails",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
       body: Padding(

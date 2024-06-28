@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -11,7 +10,6 @@ import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/service/ParametreGenerauxService.dart';
 import 'package:path/path.dart' as path;
-import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -38,9 +36,9 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
   TextEditingController emailStructureController = TextEditingController();
   TextEditingController telephoneStructureController = TextEditingController();
   TextEditingController whattsAppStructureController = TextEditingController();
-  TextEditingController libelleNiveau1PaysController = TextEditingController();
-  TextEditingController libelleNiveau2PaysController = TextEditingController();
-  TextEditingController libelleNiveau3PaysController = TextEditingController();
+  // TextEditingController libelleNiveau1PaysController = TextEditingController();
+  // TextEditingController libelleNiveau2PaysController = TextEditingController();
+  // TextEditingController libelleNiveau3PaysController = TextEditingController();
   TextEditingController localiteStructureController = TextEditingController();
   bool isEditing = false;
   late ParametreGeneraux param;
@@ -50,107 +48,9 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
   late List<TypeActeur> typeActeurData = [];
   late String type;
 
-
-
   late ParametreGenerauxProvider parProvider;
 
-
-    bool isLoadingLibelle = true;
-    String? libelleNiveau1Pays;
-    String? libelleNiveau2Pays;
-    String? libelleNiveau3Pays;
-    String? monnaie;
-    String? tauxDollar;
-    String? tauxYuan;
-    
- 
-    
-  Future<String> getLibelleNiveau1PaysByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau1Pays/$id'));
-
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load libelle niveau1Pays');
-    }
-}
-  Future<String> getLibelleNiveau2PaysByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau2Pays/$id'));
-
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load libelle niveau2Pays');
-    }
-}
-  Future<String> getLibelleNiveau3PaysByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
-
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load libelle niveau3Pays');
-    }
-}
-  Future<String> getMonnaieByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
-
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load monnaie');
-    }
-}
-
-  Future<String> getTauxDollarByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/tauxDollar/$id'));
-
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load tauxDollar');
-    }
-}
-  Future<String> getTauxYuanByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/tauxYuan/$id'));
-
-    if (response.statusCode == 200) {
-      print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
-    } else {
-      throw Exception('Failed to load tauxYUAN');
-    }
-}
-
-     Future<void> fetchPaysDataByActor() async {
-    try {
-      String libelle1 = await getLibelleNiveau1PaysByActor(acteur.idActeur!);
-      String libelle2 = await getLibelleNiveau2PaysByActor(acteur.idActeur!);
-      String libelle3 = await getLibelleNiveau3PaysByActor(acteur.idActeur!);
-      String monnaies = await getMonnaieByActor(acteur.idActeur!);
-      String tauxDollars = await getTauxDollarByActor(acteur.idActeur!);
-      String tauxYuans = await getTauxYuanByActor(acteur.idActeur!);
-      setState(() { 
-        libelleNiveau1Pays = libelle1;
-        libelleNiveau2Pays = libelle2;
-        libelleNiveau3Pays = libelle3;
-        tauxYuan = tauxYuans;
-        tauxDollar = tauxDollars;
-        monnaie = monnaies;
-        isLoadingLibelle = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingLibelle = false;
-        });
-      print('Error: $e');
-    }
-  }
+  bool isLoadingLibelle = true;
 
   Future<File> saveImagePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
@@ -235,7 +135,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     typeActeurData = acteur.typeActeur!;
     type = typeActeurData.map((data) => data.libelle).join(', ');
-    fetchPaysDataByActor();
+    // fetchPaysDataByActor();
   }
 
   @override
@@ -254,10 +154,10 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                   icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen),
                 ),
           title: typeActeurData
-          .map((e) => e.libelle!.toLowerCase())
-          .contains("admin")
+                  .map((e) => e.libelle!.toLowerCase())
+                  .contains("admin")
               ? Text(
-                  "Parametre Généraux",
+                  "Paramètre généraux",
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -271,8 +171,8 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                       fontWeight: FontWeight.bold),
                 ),
           actions: typeActeurData
-          .map((e) => e.libelle!.toLowerCase())
-          .contains("admin")
+                  .map((e) => e.libelle!.toLowerCase())
+                  .contains("admin")
               ? [
                   isEditing
                       ? IconButton(
@@ -298,17 +198,17 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                         emailStructure: param.emailStructure!,
                                         telephoneStructure:
                                             param.telephoneStructure!,
-                                        monnaie: monnaie!,
-                                        tauxDollar: tauxDollar!,
-                                        tauxYuan: tauxYuan!,
+                                        // monnaie: monnaie!,
+                                        // tauxDollar: tauxDollar!,
+                                        // tauxYuan: tauxYuan!,
                                         whattsAppStructure:
                                             param.whattsAppStructure!,
-                                        libelleNiveau1Pays:
-                                            libelleNiveau1Pays!,
-                                        libelleNiveau2Pays:
-                                            libelleNiveau2Pays!,
-                                        libelleNiveau3Pays:
-                                            libelleNiveau3Pays!,
+                                        // libelleNiveau1Pays:
+                                        //     libelleNiveau1Pays!,
+                                        // libelleNiveau2Pays:
+                                        //     libelleNiveau2Pays!,
+                                        // libelleNiveau3Pays:
+                                        //     libelleNiveau3Pays!,
                                         localiteStructure:
                                             param.localiteStructure!)
                                     .then((value) => {
@@ -330,9 +230,9 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                         sigleSysteme: param.sigleSysteme!,
                                         nomSysteme: param.nomSysteme!,
                                         logoSysteme: photo,
-                                        monnaie: monnaie!,
-                                        tauxDollar: tauxDollar!,
-                                        tauxYuan: tauxYuan!,
+                                        // monnaie: monnaie!,
+                                        // tauxDollar: tauxDollar!,
+                                        // tauxYuan: tauxYuan!,
                                         descriptionSysteme:
                                             param.descriptionSysteme!,
                                         sloganSysteme: param.sloganSysteme!,
@@ -343,12 +243,12 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                             param.telephoneStructure!,
                                         whattsAppStructure:
                                             param.whattsAppStructure!,
-                                        libelleNiveau1Pays:
-                                            libelleNiveau1Pays!,
-                                        libelleNiveau2Pays:
-                                            libelleNiveau2Pays!,
-                                        libelleNiveau3Pays:
-                                            libelleNiveau3Pays!,
+                                        // libelleNiveau1Pays:
+                                        //     libelleNiveau1Pays!,
+                                        // libelleNiveau2Pays:
+                                        //     libelleNiveau2Pays!,
+                                        // libelleNiveau3Pays:
+                                        //     libelleNiveau3Pays!,
                                         localiteStructure:
                                             param.localiteStructure!)
                                     .then((value) => {
@@ -384,8 +284,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                   future: paramService.fetchParametre(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return 
-                         buildShimmerEffect();
+                      return buildShimmerEffect();
                     }
                     if (snapshot.hasError) {
                       return const Padding(
@@ -439,7 +338,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                 child: Image.asset(
                                                   "assets/images/logo.png",
                                                   scale: 1,
-                                                  fit: BoxFit.fill,
+                                                  fit: BoxFit.contain,
                                                 ),
                                               )
                                             : SizedBox(
@@ -448,11 +347,10 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                 child: Column(
                                                   children: [
                                                     Flexible(
-                                                      child:
-                                                       Image.network(
+                                                      child: Image.network(
                                                         "https://koumi.ml/api-koumi/parametreGeneraux/${param.idParametreGeneraux!}/image",
                                                         scale: 1,
-                                                        fit: BoxFit.fill,
+                                                        fit: BoxFit.contain,
                                                         errorBuilder:
                                                             (BuildContext
                                                                     context,
@@ -463,7 +361,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                           return Image.asset(
                                                             'assets/images/default_image.png',
                                                             scale: 1,
-                                                            fit: BoxFit.fill,
+                                                            fit: BoxFit.contain,
                                                           );
                                                         },
                                                       ),
@@ -493,20 +391,18 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                 child: Image.asset(
                                                   "assets/images/logo.png",
                                                   scale: 1,
-                                                  fit: BoxFit.fill,
+                                                  fit: BoxFit.contain,
                                                 ),
                                               )
                                             : SizedBox(
                                                 width: 110,
                                                 height: 150,
-                                                child: 
-                                                CachedNetworkImage(
-                   width: double.infinity,
-                    height: 200,
-                    
+                                                child: CachedNetworkImage(
+                                                  width: double.infinity,
+                                                  height: 150,
                                                   imageUrl:
                                                       "https://koumi.ml/api-koumi/parametreGeneraux/${param.idParametreGeneraux!}/image",
-                                                  fit: BoxFit.cover,
+                                                  fit: BoxFit.fitWidth,
                                                   placeholder: (context, url) =>
                                                       const Center(
                                                           child:
@@ -515,11 +411,9 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                                       (context, url, error) =>
                                                           Image.asset(
                                                     'assets/images/default_image.png',
-                                                    fit: BoxFit.cover,
+                                                    fit: BoxFit.contain,
                                                   ),
-                                                )
-                                                
-                                              ),
+                                                )),
                                     title: isEditing
                                         ? TextFormField(
                                             initialValue: param.nomSysteme,
@@ -704,7 +598,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                 horizontal:
                                     MediaQuery.of(context).size.width * 0.05),
                             child: Container(
-                              height: isEditing ? 560 : 400,
+                              height: isEditing ? 340 : 250,
                               width: MediaQuery.of(context).size.width * 0.9,
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -889,294 +783,10 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
                                       ],
                                     ),
                                   ),
-                                  const Padding(
-                                    padding: EdgeInsets.all(5.0),
-                                    child: Divider(
-                                      height: 1,
-                                      color: d_colorGreen,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Expanded(
-                                          child: Text("Niveau 1",
-                                              style: TextStyle(
-                                                color: Colors.black87,
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.w500,
-                                                fontStyle: FontStyle.italic,
-                                              )),
-                                        ),
-                                        isEditing
-                                            ? Expanded(
-                                                child: TextFormField(
-                                                  initialValue:
-                                                      libelleNiveau1Pays,
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      libelleNiveau1Pays =
-                                                          value;
-                                                    });
-                                                  },
-                                                  // controller:
-                                                  //     libelleNiveau1PaysController
-                                                ),
-                                              )
-                                            : Text(libelleNiveau1Pays != null ? libelleNiveau1Pays! : "",
-                                                style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w800,
-                                                ))
-                                      ],
-                                    ),
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.all(5.0),
-                                    child: Divider(
-                                      height: 1,
-                                      color: d_colorGreen,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Expanded(
-                                          child: Text("Niveau 2",
-                                              style: TextStyle(
-                                                color: Colors.black87,
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.w500,
-                                                fontStyle: FontStyle.italic,
-                                              )),
-                                        ),
-                                        isEditing
-                                            ? Expanded(
-                                                child: TextFormField(
-                                                  initialValue:
-                                                      libelleNiveau2Pays,
-                                                  onChanged: (value) {
-                                                    libelleNiveau2Pays =
-                                                        value;
-                                                  },
-                                                  // controller:
-                                                  //     libelleNiveau2PaysController
-                                                ),
-                                              )
-                                            : Text(libelleNiveau2Pays != null ? libelleNiveau2Pays! : "",
-                                                style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w800,
-                                                ))
-                                      ],
-                                    ),
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.all(5.0),
-                                    child: Divider(
-                                      height: 1,
-                                      color: d_colorGreen,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Expanded(
-                                          child: Text("Niveau 3",
-                                              style: TextStyle(
-                                                color: Colors.black87,
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.w500,
-                                                fontStyle: FontStyle.italic,
-                                              )),
-                                        ),
-                                        isEditing
-                                            ? Expanded(
-                                                child: TextFormField(
-                                                  initialValue:
-                                                      libelleNiveau1Pays,
-                                                  onChanged: (value) {
-                                                    libelleNiveau3Pays =
-                                                        value;
-                                                  },
-                                                  // controller:
-                                                  //     libelleNiveau3PaysController
-                                                ),
-                                              )
-                                            : Text(libelleNiveau3Pays != null ? libelleNiveau3Pays! : "",
-                                                style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w800,
-                                                ))
-                                      ],
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),
                           ),
-                          Padding(
-                              padding: EdgeInsets.symmetric(
-                                  vertical:
-                                      MediaQuery.of(context).size.height * 0.01,
-                                  horizontal:
-                                      MediaQuery.of(context).size.width * 0.05),
-                              child: Container(
-                                // height: isEditing ? 150 : 110,
-                                width: MediaQuery.of(context).size.width * 0.9,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(15),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.2),
-                                      offset: const Offset(0, 2),
-                                      blurRadius: 5,
-                                      spreadRadius: 2,
-                                    ),
-                                  ],
-                                ),
-                                child: Column(children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Expanded(
-                                          child: Text("Monnaie",
-                                              style: TextStyle(
-                                                color: Colors.black87,
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.w500,
-                                                fontStyle: FontStyle.italic,
-                                              )),
-                                        ),
-                                        isEditing
-                                            ? Expanded(
-                                                child: TextFormField(
-                                                  initialValue: monnaie,
-                                                  onChanged: (value) {
-                                                    monnaie = value;
-                                                  },
-                                                  // controller:
-                                                  //     nomStructureController
-                                                ),
-                                              )
-                                            : Text(monnaie != null ? monnaie! : "",
-                                                style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w800,
-                                                ))
-                                      ],
-                                    ),
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.all(10.0),
-                                    child: Divider(
-                                      height: 2,
-                                      color: d_colorGreen,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Expanded(
-                                          child: Text("Taux en Dollars USA",
-                                              style: TextStyle(
-                                                color: Colors.black87,
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.w500,
-                                                fontStyle: FontStyle.italic,
-                                              )),
-                                        ),
-                                        isEditing
-                                            ? Expanded(
-                                                child: TextFormField(
-                                                  initialValue:
-                                                      tauxDollar,
-                                                  onChanged: (value) {
-                                                    tauxDollar = value;
-                                                  },
-                                                  // controller:
-                                                  //     sigleStructureController,
-                                                ),
-                                              )
-                                            : Text(
-                                                tauxDollar != null
-                                                    ? tauxDollar!
-                                                    : '',
-                                                style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w800,
-                                                ))
-                                      ],
-                                    ),
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.all(10.0),
-                                    child: Divider(
-                                      height: 2,
-                                      color: d_colorGreen,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Expanded(
-                                          child: Text("Taux en Yuan",
-                                              style: TextStyle(
-                                                color: Colors.black87,
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.w500,
-                                                fontStyle: FontStyle.italic,
-                                              )),
-                                        ),
-                                        isEditing
-                                            ? Expanded(
-                                                child: TextFormField(
-                                                  initialValue: tauxYuan,
-                                                  onChanged: (value) {
-                                                    tauxYuan = value;
-                                                  },
-                                                  // controller:
-                                                  //     sigleStructureController,
-                                                ),
-                                              )
-                                            : Text(
-                                                tauxYuan != null
-                                                    ? tauxYuan!
-                                                    : '',
-                                                style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w800,
-                                                ))
-                                      ],
-                                    ),
-                                  )
-                                ]),
-                              )),
                         ],
                       );
                     }
@@ -1191,7 +801,7 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
   }
 
   Widget buildShimmerEffect() {
-     return Column(
+    return Column(
       children: [
         Padding(
           padding: EdgeInsets.symmetric(
@@ -1398,8 +1008,6 @@ class _ParametreGenerauxPageState extends State<ParametreGenerauxPage> {
       ],
     );
   }
-
-
 
   Widget _buildProfil(String title, String value) {
     return Padding(

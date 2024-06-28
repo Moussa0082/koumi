@@ -42,7 +42,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
 
       int page = 0;
    bool isLoading = false;
-   int size = 4;
+   int size = 50;
    bool hasMore = true;
        ScrollController scrollableController = ScrollController();
 
@@ -198,7 +198,7 @@ class _MyStoresScreenState extends State<MyStoresScreen> {
           title: Text(
             'Mes boutiques',
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
+                color: d_colorGreen, fontWeight: FontWeight.bold ,fontSize:20),
           ),
           // actions:  [
           //   IconButton(

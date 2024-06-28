@@ -119,7 +119,7 @@ class _DetailConseilState extends State<DetailConseil> {
         title: Text(
           'Détail conseil',
           style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
       body: SingleChildScrollView(

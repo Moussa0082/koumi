@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-
+import 'dart:developer';
+ 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -59,39 +60,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   int page = 0;
   bool isLoading = false;
-  int size = 4;
+  int size = sized;
   bool hasMore = true;
 
   bool isLoadingLibelle = true;
   CountryProvider? countryProvider;
-  // String? monnaie;
-
-//    Future<String> getMonnaieByActor(String id) async {
-//     final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/monnaie/$id'));
-
-//     if (response.statusCode == 200) {
-//       print("libelle : ${response.body}");
-//       return response.body;  // Return the body directly since it's a plain string
-//     } else {
-//       throw Exception('Failed to load monnaie');
-//     }
-// }
-
-//  Future<void> fetchPaysDataByActor() async {
-//     try {
-//       String monnaies = await getMonnaieByActor(acteur.idActeur!);
-
-//       setState(() {
-//         monnaie = monnaies;
-//         isLoadingLibelle = false;
-//       });
-//     } catch (e) {
-//       setState(() {
-//         isLoadingLibelle = false;
-//         });
-//       print('Error: $e');
-//     }
-//   }
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -219,7 +192,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     return stockListe;
   }
 
-
   Future<List<Stock>> fetchStockByCategorie(String niveau3PaysActeur, {bool refresh = false}) async {
 
     if (isLoading == true) return [];
@@ -272,38 +244,18 @@ class _ProductsScreenState extends State<ProductsScreen> {
     return stockListe;
   }
 
-  // void verifyParam() {
-  //   paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
-  //       .parametreList!;
-
-  //   if (paraList.isNotEmpty) {
-  //     para = paraList[0];
-  //   } else {
-  //     // Gérer le cas où la liste est null ou vide, par exemple :
-  //     // Afficher un message d'erreur, initialiser 'para' à une valeur par défaut, etc.
-  //   }
-  // }
-
   @override
   void initState() {
-    // acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
-    // typeActeurData = acteur.typeActeur!;
-    // // selectedType == null;
-    // type = typeActeurData.map((data) => data.libelle).join(', ');
     super.initState();
-    //  scrollableController = ScrollController()..addListener(_scrollListener);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      //write or call your logic
-      //code will run when widget rendering complete
+    
       scrollableController.addListener(_scrollListener);
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      //write or call your logic
-      //code will run when widget rendering complete
+
       scrollableController1.addListener(_scrollListener1);
     });
     verify();
-    // fetchPaysDataByActor();
     _searchController = TextEditingController();
     _catList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
     // updateStockList();
@@ -323,7 +275,31 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
  
+ Future<void> _getResultFromNextScreen1(BuildContext context) async {
+    final result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => AddAndUpdateProductScreen(
+                  isEditable: false,
+                )));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        stockListeFuture = getAllStocks();
+      });
+    }
+  }
 
+  Future<void> _getResultFromNextScreen2(BuildContext context) async {
+    final result = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => MyProductScreen()));
+    log(result.toString());
+    if (result == true) {
+      print("Rafraichissement en cours");
+      setState(() {
+        stockListeFuture = getAllStocks();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -332,19 +308,24 @@ class _ProductsScreenState extends State<ProductsScreen> {
           backgroundColor: const Color.fromARGB(255, 250, 250, 250),
           centerTitle: true,
           toolbarHeight: 100,
-          // leading: IconButton(
-          //     onPressed: () {
-          //       Navigator.of(context).pop();
-          //     },
-          //     icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
             'Tous les Produits',
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
+                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
           ),
           actions: !isExist
               ? null
               : [
+                 IconButton(
+                      onPressed: () {
+                        stockListeFuture = getAllStocks();
+                      },
+                      icon: const Icon(Icons.refresh, color: d_colorGreen)),
                   (typeActeurData
                               .map((e) => e.libelle!.toLowerCase())
                               .contains("commercant") ||
@@ -376,15 +357,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                   ),
                                   onTap: () async {
                                     Navigator.of(context).pop();
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            AddAndUpdateProductScreen(
-                                          isEditable: false,
-                                        ),
-                                      ),
-                                    );
+                                    _getResultFromNextScreen1(context);
                                   },
                                 ),
                               ),
@@ -403,12 +376,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                   ),
                                   onTap: () async {
                                     Navigator.of(context).pop();
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => MyProductScreen(),
-                                      ),
-                                    );
+                                    _getResultFromNextScreen2(context);
                                   },
                                 ),
                               ),

@@ -2,29 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart' ;
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:koumi_app/admin/AlerteScreen.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/providers/CountryProvider.dart';
-import 'package:koumi_app/screens/ConseilScreen.dart';
-import 'package:koumi_app/screens/IntrantScreen.dart';
-import 'package:koumi_app/screens/Location.dart' as l;
-import 'package:koumi_app/screens/MesCommande.dart';
-import 'package:koumi_app/screens/Products.dart';
-import 'package:koumi_app/screens/Store.dart';
-import 'package:koumi_app/screens/Transport.dart';
-import 'package:koumi_app/screens/Weather.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
-
 import 'package:koumi_app/widgets/Default_Acceuil.dart';
-import 'package:koumi_app/widgets/connection_verify.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../widgets/AlertAcceuil.dart';
 
 class Accueil extends StatefulWidget {
   const Accueil({super.key});
@@ -42,13 +29,15 @@ class _AccueilState extends State<Accueil> {
   String? email = "";
   bool isExist = false;
 
-  String? detectedC = '';
-  String? isoCountryCode = '';
-  String? country = '';
-  String? detectedCountryCode= '';
-  String? detectedCountry = '';
+  String? detectedC;
+  String? isoCountryCode;
+  String? country;
+  String? detectedCountryCode;
+  String? detectedCountry;
+  CountryProvider? countryProvider;
+  late BuildContext _currentContext;
 
-    void getLocationNew() async {
+  void getLocationNew() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
@@ -129,8 +118,8 @@ class _AccueilState extends State<Accueil> {
       longitude.value = 'Longitude : ${position.longitude}';
       getAddressFromLatLang(position);
     });
-  }  
-  
+  }
+
   Future<void> getAddressFromLatLang(Position position) async {
     List<Placemark> placemark =
         await placemarkFromCoordinates(position.latitude, position.longitude);
@@ -138,18 +127,15 @@ class _AccueilState extends State<Accueil> {
     debugPrint("Address ISO: $detectedC");
     address.value =
         'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
-        if(mounted)
-        setState(() {
-          
-    detectedC = place.isoCountryCode;
-    detectedCountryCode = place.isoCountryCode!;
-    detectedCountry = place.country!;
-        });
+    setState(() {
+      detectedC = place.isoCountryCode;
+      detectedCountryCode = place.isoCountryCode!;
+      detectedCountry = place.country!;
+    });
 
     debugPrint(
-        "Address: data ${detectedCountry}  user accueil ${place.locality},${place.country},${place.isoCountryCode}");
+        "Address:   ${place.locality},${place.country},${place.isoCountryCode}");
   }
-  
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -167,11 +153,9 @@ class _AccueilState extends State<Accueil> {
     }
   }
 
- 
-
-
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
     verify();
     getLocation();
@@ -180,9 +164,10 @@ class _AccueilState extends State<Accueil> {
     // Get.put(ConnectionVerify(), permanent: true);
   }
 
- 
-
- 
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -191,23 +176,21 @@ class _AccueilState extends State<Accueil> {
       appBar: const CustomAppBar(),
       body: ListView(
         children: [
-          // SizedBox(height: 180, child:  Carrousels()),
-          
+          SizedBox(height: 180, child: Carrousels()),
+
           // SizedBox(height: 180, child: isExist ? Carrousel(): Carrousels()),
           // const SizedBox(
           //   height: 10,
           // ),
-                    
-                    SizedBox(height: 180, child: isExist == true ? Carrousel() : CarrouselOffLine()),
-                  
-
-                    // SizedBox(height: 180, child: isExist ? Carrousel(): CarrouselOffLine()),
-         
-          // isExist ?
-          // SizedBox(height: 100, child: AlertAcceuil()): Container(),
+          // SizedBox(height: 180, child: isExist ? Carrousel(): CarrouselOffLine()),
           const SizedBox(
             height: 10,
           ),
+          // isExist ?
+          // SizedBox(height: 100, child: AlertAcceuil()): Container(),
+          // const SizedBox(
+          //   height: 10,
+          // ),
           DefautAcceuil(),
           // isExist ?
           // SizedBox(
@@ -250,93 +233,6 @@ class _AccueilState extends State<Accueil> {
   //   return cards;
   // }
 
-  Widget _buildAccueilCard(String titre, String imgLocation, int index) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-      child: InkWell(
-          onTap: () {
-            if (index == 9) {
-                Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProductsScreen(detectedCountry: detectedCountry!)));
-             
-            } else if (index == 8) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const AlerteScreen()));
-            } else if (index == 7) {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) =>  l.Location(detectedCountry: detectedCountry!)));
-            } else if (index == 6) {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) =>  Transport(detectedCountry: detectedCountry!)));
-            } else if (index == 5) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const WeatherScreen()));
-            } else if (index == 4) {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) =>  StoreScreen(detectedCountry: detectedCountry!)));
-            } else if (index == 3) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const MesCommande()));
-            } else if (index == 2) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ConseilScreen()));
-            } else if (index == 1) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>  IntrantScreen(detectedCountry: detectedCountry!)));
-            }
-          },
-          borderRadius: BorderRadius.circular(20),
-          child: Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              // height: 155,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.white,
-                boxShadow: const [
-                  BoxShadow(
-                    blurRadius: 5.0,
-                    color: Color.fromRGBO(0, 0, 0, 0.25), // Opacité de 10%
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.28,
-                    child: Image.asset(
-                      "assets/images/$imgLocation",
-                      fit: BoxFit
-                          .cover, // You can adjust the BoxFit based on your needs
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    titre,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      overflow: TextOverflow.ellipsis,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          )),
-    );
-  }
   // Widget _buildAccueilCard(String titre, String imgLocation, int index) {
   //   return Padding(
   //     padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
@@ -345,7 +241,7 @@ class _AccueilState extends State<Accueil> {
   //           if (index == 9) {
   //               Navigator.push(context,
   //                 MaterialPageRoute(builder: (context) => ProductsScreen(detectedCountry: detectedCountry)));
-             
+
   //           } else if (index == 8) {
   //             Navigator.push(
   //                 context,
@@ -427,6 +323,4 @@ class _AccueilState extends State<Accueil> {
   //         ),
   //   );
   // }
-
-   
 }

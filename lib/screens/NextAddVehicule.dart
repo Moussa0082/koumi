@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/constants.dart';
@@ -11,13 +10,12 @@ import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/ListeVehiculeByType.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:pattern_formatter/pattern_formatter.dart';
+import 'package:provider/provider.dart';
 
 class NextAddVehicule extends StatefulWidget {
   final TypeVoiture typeVoiture;
@@ -69,38 +67,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
   String? monnaieValue;
   late Future _monnaieList;
   late Monnaie monnaie = Monnaie();
-  // Méthode pour ajouter une nouvelle destination et prix
-  // void addDestinationAndPrix() {
-  //   // Créer un nouveau contrôleur pour chaque champ
-  //   TextEditingController newDestinationController = TextEditingController();
-  //   TextEditingController newPrixController = TextEditingController();
 
-  //   setState(() {
-  //     // Ajouter les nouveaux contrôleurs aux listes
-  //     destinationControllers.add(newDestinationController);
-  //     prixControllers.add(newPrixController);
-  //   });
-  // }
-
-// Méthode pour ajouter une nouvelle destination et prix
-  // void addDestinationAndPrix() {
-  //   // Créer un nouveau contrôleur pour chaque champ
-  //   TextEditingController newDestinationController = TextEditingController();
-  //   TextEditingController newPrixController = TextEditingController();
-
-  //   setState(() {
-  //     // Ajouter les nouveaux contrôleurs aux listes
-  //     destinationControllers.add(newDestinationController);
-
-  //     prixControllers.add(newPrixController);
-
-  //     // Ajouter une chaîne vide à la liste des destinations sélectionnées
-  //     selectedDestinations.add('');
-  //     n3Value = '';
-  //   });
-  // }
-
-// Déclarer une liste pour stocker les valeurs sélectionnées pour chaque liste de destinations
   List<String?> selectedDestinationsList = [];
 
   // Méthode pour ajouter une nouvelle destination et prix
@@ -245,13 +212,13 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
           toolbarHeight: 100,
           leading: IconButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.pop(context, true);
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
             'Etape 2',
             style: const TextStyle(
-                color: d_colorGreen, fontWeight: FontWeight.bold),
+                color: d_colorGreen, fontWeight: FontWeight.bold,fontSize:20),
           ),
         ),
         body: SingleChildScrollView(
@@ -454,37 +421,6 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Row(
                                     children: [
-                                      isLoadingLibelle
-                                          ? Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Align(
-                                                  alignment: Alignment.topLeft,
-                                                  child: Text(
-                                                    "Chargement...",
-                                                    style: TextStyle(
-                                                        fontSize: 15,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  )),
-                                            )
-                                          : Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 22,
-                                              ),
-                                              child: Align(
-                                                alignment: Alignment.topLeft,
-                                                child: Text(
-                                                  libelleNiveau3Pays != null
-                                                      ? libelleNiveau3Pays!
-                                                          .toUpperCase()
-                                                      : "Localité",
-                                                  style: TextStyle(
-                                                      color: (Colors.black),
-                                                      fontSize: 18),
-                                                ),
-                                              ),
-                                            ),
                                       Expanded(
                                         child: FutureBuilder(
                                           future: _niveau3List,
@@ -510,12 +446,14 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                                 ),
                                               );
                                             }
-                                            if (snapshot.hasError) {
-                                              return Text("${snapshot.error}");
-                                            }
+                                          
                                             if (snapshot.hasData) {
-                                              dynamic responseData = json
-                                                  .decode(snapshot.data.body);
+
+                                             dynamic jsonString = utf8.decode(
+                                                  snapshot.data.bodyBytes);
+                                              dynamic responseData =
+                                                  json.decode(jsonString);
+
                                               if (responseData is List) {
                                                 final reponse = responseData;
                                                 final niveau3List = reponse
@@ -759,7 +697,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                             setState(() {
                                               _isLoading = false;
                                             }),
-                                            Navigator.pop(context),
+                                            Navigator.pop(context, true),
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
@@ -811,7 +749,7 @@ class _NextAddVehiculeState extends State<NextAddVehicule> {
                                               _isLoading = false;
                                               // typeVoiture == null;
                                             }),
-                                            Navigator.pop(context),
+                                            Navigator.pop(context, true),
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(

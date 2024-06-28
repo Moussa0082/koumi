@@ -73,7 +73,7 @@ class _SousRegionPageState extends State<SousRegionPage> {
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: const Text(
             "Sous regions",
-            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 20),
           ),
           actions: [
             PopupMenuButton<String>(
@@ -93,6 +93,7 @@ class _SousRegionPageState extends State<SousRegionPage> {
                           overflow: TextOverflow.ellipsis),
                     ),
                     onTap: () async {
+                        Navigator.of(context).pop();
                       _showDialog();
                     },
                   ),
@@ -284,7 +285,7 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                                   .spaceBetween,
                                                           children: [
                                                             Text(
-                                                                "Nombres pays :",
+                                                                "Nombre pays :",
                                                                 style:
                                                                     TextStyle(
                                                                   color: Colors
@@ -322,7 +323,7 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                                                   .spaceBetween,
                                                           children: [
                                                             Text(
-                                                                "Nombres pays :",
+                                                                "Nombre pays :",
                                                                 style:
                                                                     TextStyle(
                                                                   color: Colors
@@ -360,7 +361,7 @@ class _SousRegionPageState extends State<SousRegionPage> {
                                               //         MainAxisAlignment
                                               //             .spaceBetween,
                                               //     children: [
-                                              //       Text("Nombres pays :",
+                                              //       Text("Nombre pays :",
                                               //           style: TextStyle(
                                               //             color: Colors.black87,
                                               //             fontSize: 17,

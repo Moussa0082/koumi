@@ -28,7 +28,7 @@ class _SurfaceState extends State<Surface> {
         title: Text(
           "Surface cultiver",
           style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 20),
         ),
       ),
       body: SingleChildScrollView(

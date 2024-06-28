@@ -112,7 +112,7 @@ class _ActeurScreenState extends State<ActeurScreen> {
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Text(
             "Listes des acteurs",
-            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+            style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize:20),
           ),
         ),
         body: SingleChildScrollView(

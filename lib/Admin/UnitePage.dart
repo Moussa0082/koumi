@@ -54,18 +54,36 @@ class _UnitePageState extends State<UnitePage> {
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: const Text(
           "Unité de mesure",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              _showDialog();
+          PopupMenuButton<String>(
+            padding: EdgeInsets.zero,
+            itemBuilder: (context) {
+              return <PopupMenuEntry<String>>[
+                PopupMenuItem<String>(
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.add,
+                      color: Colors.green,
+                    ),
+                    title: const Text(
+                      "Unité de mesure",
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onTap: () async {
+                      Navigator.of(context).pop();
+                      _showDialog();
+                    },
+                  ),
+                ),
+              ];
             },
-            icon: const Icon(
-              Icons.add,
-              color: d_colorGreen,
-              size: 25,
-            ),
           )
         ],
       ),
@@ -168,15 +186,16 @@ class _UnitePageState extends State<UnitePage> {
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                     )),
-                                                subtitle: Text(e.description!.trim(),
-                                                    style: const TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 17,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                    ))),
+                                                subtitle:
+                                                    Text(e.description!.trim(),
+                                                        style: const TextStyle(
+                                                          color: Colors.black87,
+                                                          fontSize: 17,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          fontStyle:
+                                                              FontStyle.italic,
+                                                        ))),
                                             Container(
                                               alignment: Alignment.bottomRight,
                                               padding:
@@ -195,7 +214,8 @@ class _UnitePageState extends State<UnitePage> {
                                                             String>>[
                                                       PopupMenuItem<String>(
                                                         child: ListTile(
-                                                          leading:  e.statutUnite ==
+                                                          leading:
+                                                              e.statutUnite ==
                                                                       false
                                                                   ? Icon(
                                                                       Icons
@@ -210,7 +230,7 @@ class _UnitePageState extends State<UnitePage> {
                                                                               .orange[
                                                                           400],
                                                                     ),
-                                                          title:  Text(
+                                                          title: Text(
                                                             e.statutUnite ==
                                                                     false
                                                                 ? "Activer"
@@ -228,46 +248,42 @@ class _UnitePageState extends State<UnitePage> {
                                                           ),
                                                           onTap: () async {
                                                             e.statutUnite ==
-                                                                      false
-                                                                  ?
-                                                            await UniteService()
-                                                                .activerUnite(
-                                                                    e.idUnite!)
-                                                                .then(
-                                                                    (value) => {
-                                                                          Provider.of<UniteService>(context, listen: false)
-                                                                              .applyChange(),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            const SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Activer avec succèss "),
-                                                                                ],
+                                                                    false
+                                                                ? await UniteService()
+                                                                    .activerUnite(e
+                                                                        .idUnite!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                              Provider.of<UniteService>(context, listen: false).applyChange(),
+                                                                              Navigator.of(context).pop(),
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Activer avec succèss "),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 2),
+                                                                                ),
+                                                                              )
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit : $onError"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: const Duration(seconds: 5),
+                                                                                ),
                                                                               ),
-                                                                              duration: Duration(seconds: 2),
-                                                                            ),
-                                                                          )
-                                                                        })
-                                                                .catchError(
-                                                                    (onError) =>
-                                                                        {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            SnackBar(
-                                                                              content: Row(
-                                                                                children: [
-                                                                                  Text("Une erreur s'est produit : $onError"),
-                                                                                ],
-                                                                              ),
-                                                                              duration: const Duration(seconds: 5),
-                                                                            ),
-                                                                          ),
-                                                                          Navigator.of(context)
-                                                                              .pop(),
-                                                                        }) : await UniteService()
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                : await UniteService()
                                                                     .desactiverUnite(e
                                                                         .idUnite!)
                                                                     .then(
@@ -347,7 +363,6 @@ class _UnitePageState extends State<UnitePage> {
                                                             Navigator.of(
                                                                     context)
                                                                 .pop();
-                                                           
                                                           },
                                                         ),
                                                       ),
@@ -442,7 +457,7 @@ class _UnitePageState extends State<UnitePage> {
               children: [
                 ListTile(
                   title: Text(
-                    "Ajouter une unite ",
+                    "Ajouter une unité ",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,

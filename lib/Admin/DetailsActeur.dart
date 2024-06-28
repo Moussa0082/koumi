@@ -37,7 +37,7 @@ class _DetailsActeurState extends State<DetailsActeur> {
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: Text(
           "Détails",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
       body: SingleChildScrollView(

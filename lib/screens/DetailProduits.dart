@@ -172,7 +172,7 @@ class _DetailProduitsState extends State<DetailProduits>
                 },
                 icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
             centerTitle: true,
-            title: const Text("Détail Produit"),
+            title: const Text("Détail Produit",style:TextStyle(fontSize: 20)),
             actions: isExist
                 ?
                 //         (widget.stock.acteur!.idActeur != acteur.idActeur! &&

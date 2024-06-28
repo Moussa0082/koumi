@@ -97,17 +97,17 @@ class ParametreGenerauxService extends ChangeNotifier {
     required String nomSysteme,
     required String descriptionSysteme,
     required String sloganSysteme,
-    required String monnaie,
-    required String tauxDollar,
-    required String tauxYuan,
+    // required String monnaie,
+    // required String tauxDollar,
+    // required String tauxYuan,
     File? logoSysteme,
     required String adresseStructure,
     required String emailStructure,
     required String telephoneStructure,
     required String whattsAppStructure,
-    required String libelleNiveau1Pays,
-    required String libelleNiveau2Pays,
-    required String libelleNiveau3Pays,
+    // required String libelleNiveau1Pays,
+    // required String libelleNiveau2Pays,
+    // required String libelleNiveau3Pays,
     required String localiteStructure,
   }) async {
     try {
@@ -134,14 +134,10 @@ class ParametreGenerauxService extends ChangeNotifier {
         'logoSysteme': "",
         'adresseStructure': adresseStructure,
         'emailStructure': emailStructure,
-        'tauxDollar': tauxDollar,
-        'tauxYuan' : tauxYuan,
-        'monnaie' : monnaie,
+       
         'telephoneStructure': telephoneStructure,
         'whattsAppStructure': whattsAppStructure,
-        'libelleNiveau1Pays': libelleNiveau1Pays,
-        'libelleNiveau2Pays': libelleNiveau2Pays,
-        'libelleNiveau3Pays': libelleNiveau3Pays,
+       
         'localiteStructure': localiteStructure,
       });
 

@@ -82,13 +82,14 @@ class _AddIntrantState extends State<AddIntrant> {
             toolbarHeight: 100,
             leading: IconButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.pop(context, true);
                 },
                 icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
             title: Text(
               'Ajout d\'intrant ',
               style: const TextStyle(
-                  color: d_colorGreen, fontWeight: FontWeight.bold),
+                  color: d_colorGreen, fontWeight: FontWeight.bold,
+                  fontSize: 20),
             ),
           ),
           body: SingleChildScrollView(
@@ -527,7 +528,6 @@ class _AddIntrantState extends State<AddIntrant> {
                                           quantite: quantite,
                                           categorieProduit: categorieProduit,
                                           unite: unit,
-                                         
                                         ))).then((value) => {
                                   _nomController.clear(),
                                   _descriptionController.clear(),

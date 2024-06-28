@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Campagne.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -23,6 +24,7 @@ class _CampagnePageState extends State<CampagnePage> {
   TextEditingController descriptionController = TextEditingController();
   late TextEditingController _searchController;
   late Acteur acteur;
+  // double? si = fontSized;
 
   late Future<List<Campagne>> _liste;
 
@@ -61,7 +63,7 @@ class _CampagnePageState extends State<CampagnePage> {
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: const Text(
           "Campagne agricole",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
+          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize:20),
         ),
         actions: [
           IconButton(

@@ -61,7 +61,7 @@ class _ConseilDisableState extends State<ConseilDisable> {
           "Conseil désactiver",
           style: TextStyle(
             color: d_colorGreen,
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),

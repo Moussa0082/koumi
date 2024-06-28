@@ -59,7 +59,7 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
 
   int page = 0;
    bool isLoading = false;
-   int size = 4;
+   int size = sized;
   bool hasMore = true;
 
       bool isLoadingLibelle = true;
@@ -340,7 +340,7 @@ class _ProductsByStoresScreenState extends State<ProductsByStoresScreen> {
           title: Text( overflow:TextOverflow.ellipsis,
             'Produits du magasin ${widget.nom!}' ,
             style: const TextStyle(overflow:TextOverflow.ellipsis,
-                color: d_colorGreen, fontWeight: FontWeight.bold),
+                color: d_colorGreen, fontWeight: FontWeight.bold,fontSize:20),
           ),
           actions: !isExist
               ? null

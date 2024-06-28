@@ -265,7 +265,7 @@ class _UpdateAlertedState extends State<UpdateAlerted> {
                   "Modification",
                   style: TextStyle(
                     color: d_colorGreen,
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 )),
