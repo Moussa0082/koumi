@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
- 
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -24,8 +24,7 @@ import 'package:shimmer/shimmer.dart';
 class ProductsScreen extends StatefulWidget {
   String? id, nom;
   String? detectedCountry;
-   ProductsScreen({super.key , this.id, this.nom, this.detectedCountry});
-
+  ProductsScreen({super.key, this.id, this.nom, this.detectedCountry});
 
   @override
   State<ProductsScreen> createState() => _ProductsScreenState();
@@ -85,19 +84,18 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   Future<List<Stock>> getAllStock() async {
-     if (selectedCat != null) {
-      stockListe = await 
-          StockService().fetchStockByCategorie(selectedCat!.idCategorieProduit!,widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
-
+    if (selectedCat != null) {
+      stockListe = await StockService().fetchStockByCategorie(
+          selectedCat!.idCategorieProduit!,
+          widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
     }
 
     return stockListe;
   }
 
   Future<List<Stock>> getAllStocks() async {
-      
-      stockListe = await StockService().fetchStock(widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
-      
+    stockListe = await StockService().fetchStock(
+        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
 
     return stockListe;
   }
@@ -112,10 +110,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
       setState(() {
         // Rafraîchir les données ici
         page++;
-        });
+      });
       debugPrint("yes - fetch all stocks by pays");
-      fetchStock(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
-
+      fetchStock(
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+          .then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -135,12 +134,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
       // Incrementez la page et récupérez les stocks par catégorie
       debugPrint("yes - fetch by category and pays");
       setState(() {
-          // Rafraîchir les données ici
-      page++;
-        });
-   
-    fetchStockByCategorie(widget.detectedCountry != null ? widget.detectedCountry! : "Mali").then((value) {
+        // Rafraîchir les données ici
+        page++;
+      });
 
+      fetchStockByCategorie(
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+          .then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -150,7 +150,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
     debugPrint("no");
   }
 
-  Future<List<Stock>> fetchStock(String niveau3PaysActeur, {bool refresh = false}) async {
+  Future<List<Stock>> fetchStock(String niveau3PaysActeur,
+      {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -166,8 +167,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getStocksByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}'));
-
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/Stock/getStocksByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}'));
+      debugPrint(
+          '$apiOnlineUrl/Stock/getStocksByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}');
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -203,8 +206,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
     return stockListe;
   }
 
-  Future<List<Stock>> fetchStockByCategorie(String niveau3PaysActeur, {bool refresh = false}) async {
-
+  Future<List<Stock>> fetchStockByCategorie(String niveau3PaysActeur,
+      {bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -220,8 +223,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByCategorieAndPaysWithPagination?idCategorie=${selectedCat!.idCategorieProduit}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
-
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/Stock/getAllStocksByCategorieAndPaysWithPagination?idCategorie=${selectedCat!.idCategorieProduit}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -238,8 +241,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
           });
         }
 
-        debugPrint("response body all stock by categorie and pays with pagination ${page} par défilement soit ${stockListe.length}");
-
+        debugPrint(
+            "response body all stock by categorie and pays with pagination ${page} par défilement soit ${stockListe.length}");
       } else {
         print(
             'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
@@ -259,11 +262,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-    
       scrollableController.addListener(_scrollListener);
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-
       scrollableController1.addListener(_scrollListener1);
     });
     verify();
@@ -285,10 +286,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
     super.dispose();
   }
 
- 
- Future<void> _getResultFromNextScreen1(BuildContext context) async {
+  Future<void> _getResultFromNextScreen1(BuildContext context) async {
     final result = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => AddAndUpdateProductScreen(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AddAndUpdateProductScreen(
                   isEditable: false,
                 )));
     log(result.toString());
@@ -301,8 +303,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   Future<void> _getResultFromNextScreen2(BuildContext context) async {
-    final result = await Navigator.push(context,
-        MaterialPageRoute(builder: (context) => MyProductScreen()));
+    final result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => MyProductScreen()));
     log(result.toString());
     if (result == true) {
       print("Rafraichissement en cours");
@@ -332,7 +334,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           actions: !isExist
               ? null
               : [
-                 IconButton(
+                  IconButton(
                       onPressed: () {
                         stockListeFuture = getAllStocks();
                       },
@@ -433,8 +435,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
               SliverToBoxAdapter(
                   child: Column(children: [
                 const SizedBox(height: 10),
-
-               
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: ToggleButtons(
@@ -539,12 +539,17 @@ class _ProductsScreenState extends State<ProductsScreen> {
               // selectedCat != null ?StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!) :
               selectedCat != null
                   ? setState(() {
-                      stockListeFuture1 = StockService()
-                          .fetchStockByCategorie(
-                              selectedCat!.idCategorieProduit!, widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+                      stockListeFuture1 = StockService().fetchStockByCategorie(
+                          selectedCat!.idCategorieProduit!,
+                          widget.detectedCountry != null
+                              ? widget.detectedCountry!
+                              : "Mali");
                     })
                   : setState(() {
-                      stockListeFuture = StockService().fetchStock(widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+                      stockListeFuture = StockService().fetchStock(
+                          widget.detectedCountry != null
+                              ? widget.detectedCountry!
+                              : "Mali");
                     });
             },
             child: selectedCat == null
@@ -687,8 +692,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                                     MaterialPageRoute(
                                                       builder: (context) =>
                                                           DetailProduits(
-                                                        stock:
-                                                            filteredSearch[index],
+                                                        stock: filteredSearch[
+                                                            index],
                                                       ),
                                                     ),
                                                   );
@@ -706,7 +711,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                                                 .circular(8.0),
                                                         child: Container(
                                                           height: 85,
-                                                          child: filteredSearch[index]
+                                                          child: filteredSearch[
+                                                                              index]
                                                                           .photo ==
                                                                       null ||
                                                                   filteredSearch[
@@ -941,7 +947,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                               crossAxisSpacing: 10,
                                               childAspectRatio: 0.8,
                                             ),
-                                            itemCount: filteredSearch.length + 1,
+                                            itemCount:
+                                                filteredSearch.length + 1,
                                             //  itemCount: stockListe.length + (!isLoading ? 1 : 0),
                                             itemBuilder: (context, index) {
                                               //   if (index == stockListe.length) {
@@ -955,7 +962,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                               // ;
                                               //     }
 
-                                              if (index < filteredSearch.length) {
+                                              if (index <
+                                                  filteredSearch.length) {
                                                 return GestureDetector(
                                                     onTap: () {
                                                       Navigator.push(
@@ -963,8 +971,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                                         MaterialPageRoute(
                                                           builder: (context) =>
                                                               DetailProduits(
-                                                            stock: filteredSearch[
-                                                                index],
+                                                            stock:
+                                                                filteredSearch[
+                                                                    index],
                                                           ),
                                                         ),
                                                       );
@@ -1019,7 +1028,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                                           // SizedBox(height: 8),
                                                           ListTile(
                                                             title: Text(
-                                                              filteredSearch[index]
+                                                              filteredSearch[
+                                                                      index]
                                                                   .nomProduit!,
                                                               style: TextStyle(
                                                                 fontSize: 16,
@@ -1266,8 +1276,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
-
-                                   DropdownButtonFormField<String> buildDropdown(
+  DropdownButtonFormField<String> buildDropdown(
       List<CategorieProduit> typeList) {
     return DropdownButtonFormField<String>(
       isExpanded: true,
@@ -1289,7 +1298,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
           }
           page = 0;
           hasMore = true;
-          fetchStockByCategorie(widget.detectedCountry != null ? widget.detectedCountry! : "Mali",refresh: true);
+          fetchStockByCategorie(
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali",
+              refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {
               scrollableController1.jumpTo(0.0);

@@ -8,7 +8,7 @@ class Snack{
   }
 
   static error({ required String titre,required String message}){
-    Get.snackbar(titre, message,  duration: Duration(seconds: 5),icon:Image.asset("assets/images/logo.png")  );
+    Get.snackbar(titre, message,  duration: Duration(seconds: 8),icon:Image.asset("assets/images/logo.png")  );
   }
 
   static info({required String message}){

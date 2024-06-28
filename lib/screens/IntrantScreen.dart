@@ -127,7 +127,8 @@ class _IntrantScreenState extends State<IntrantScreen> {
     try {
       final response = await http.get(Uri.parse(
           '$apiOnlineUrl/intrant/getIntrantsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
-
+      debugPrint(
+          '$apiOnlineUrl/intrant/getIntrantsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size');
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];

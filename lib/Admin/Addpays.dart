@@ -90,6 +90,7 @@ class _AddpaysState extends State<Addpays> {
                       },
                       controller: libelleController,
                       decoration: InputDecoration(
+                        labelText: "Nom",
                         contentPadding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 20),
                         border: OutlineInputBorder(
@@ -431,82 +432,87 @@ class _AddpaysState extends State<Addpays> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
-                  ElevatedButton.icon(
-                    onPressed: () async {
-                      final String libelle = libelleController.text;
-                      final String description = descriptionController.text;
-                      if (formkey.currentState!.validate()) {
-                        try {
-                          await PaysService()
-                              .addPays(
-                                  nomPays: libelle,
-                                  descriptionPays: description,
-                                  libelleNiveau1Pays:
-                                      niveau1PaysController.text,
-                                  libelleNiveau2Pays:
-                                      niveau2PaysController.text,
-                                  libelleNiveau3Pays:
-                                      niveau3PaysController.text,
-                                  monnaie: monnaieController.text,
-                                  whattsAppPays: wathsappPaysController.text,
-                                  sousRegion: sousRegion)
-                              .then((value) => {
-                                    Provider.of<PaysService>(context,
-                                            listen: false)
-                                        .applyChange(),
-                                    Navigator.of(context).pop(),
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Row(
-                                          children: [
-                                            Text("Pays ajouté avec success"),
-                                          ],
+                  SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        final String libelle = libelleController.text;
+                        final String description = descriptionController.text;
+                        if (formkey.currentState!.validate()) {
+                          try {
+                            await PaysService()
+                                .addPays(
+                                    nomPays: libelle,
+                                    descriptionPays: description,
+                                    libelleNiveau1Pays:
+                                        niveau1PaysController.text,
+                                    libelleNiveau2Pays:
+                                        niveau2PaysController.text,
+                                    libelleNiveau3Pays:
+                                        niveau3PaysController.text,
+                                    monnaie: monnaieController.text,
+                                    whattsAppPays: wathsappPaysController.text,
+                                    sousRegion: sousRegion)
+                                .then((value) => {
+                                      Provider.of<PaysService>(context,
+                                              listen: false)
+                                          .applyChange(),
+                                      Navigator.of(context).pop(),
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Row(
+                                            children: [
+                                              Text("Pays ajouté avec success"),
+                                            ],
+                                          ),
+                                          duration: Duration(seconds: 5),
                                         ),
-                                        duration: Duration(seconds: 5),
                                       ),
-                                    ),
-                                    libelleController.clear(),
-                                    descriptionController.clear(),
-                                    niveau1PaysController.clear(),
-                                    niveau2PaysController.clear(),
-                                    niveau3PaysController.clear(),
-                                    setState(() {
-                                      sousRegion == null;
-                                    }),
-                                  });
-                        } catch (e) {
-                          final String errorMessage = e.toString();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Row(
-                                children: [
-                                  Text("Ce pays existe déjà"),
-                                ],
+                                      libelleController.clear(),
+                                      descriptionController.clear(),
+                                      niveau1PaysController.clear(),
+                                      niveau2PaysController.clear(),
+                                      niveau3PaysController.clear(),
+                                      setState(() {
+                                        sousRegion == null;
+                                      }),
+                                    });
+                          } catch (e) {
+                            final String errorMessage = e.toString();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Row(
+                                  children: [
+                                    Text("Ce pays existe déjà"),
+                                  ],
+                                ),
+                                duration: Duration(seconds: 5),
                               ),
-                              duration: Duration(seconds: 5),
-                            ),
-                          );
+                            );
+                          }
                         }
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange, // Orange color code
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange, // Orange color code
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        minimumSize: const Size(290, 45),
                       ),
-                      minimumSize: const Size(290, 45),
-                    ),
-                    icon: const Icon(
-                      Icons.add,
-                      color: Colors.white,
-                    ),
-                    label: const Text(
-                      "Ajouter",
-                      style: TextStyle(
-                        fontSize: 20,
+                      icon: const Icon(
+                        Icons.add,
                         color: Colors.white,
-                        fontWeight: FontWeight.w700,
+                      ),
+                      label: const Text(
+                        "Ajouter",
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   )

@@ -428,82 +428,85 @@ class _UpdatesPaysState extends State<UpdatesPays> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 16),
-                  SizedBox(height: 20),
-                  ElevatedButton.icon(
-                    onPressed: () async {
-                      final String libelle = libelleController.text;
-                      final String description = descriptionController.text;
-                      if (formkey.currentState!.validate()) {
-                        try {
-                          await PaysService()
-                              .updatePays(
-                                  idPays: payss.idPays!,
-                                  nomPays: libelle,
-                                  descriptionPays: description,
-                                  libelleNiveau1Pays:
-                                      niveau1PaysController.text,
-                                  libelleNiveau2Pays:
-                                      niveau2PaysController.text,
-                                  libelleNiveau3Pays:
-                                      niveau3PaysController.text,
-                                  monnaie: monnaieController.text,
-                                  whattsAppPays: numController.text,
-                                  sousRegion: sousRegion)
-                              .then((value) => {
-                                    Provider.of<PaysService>(context,
-                                            listen: false)
-                                        .applyChange(),
-                                    Provider.of<PaysService>(context,
-                                            listen: false)
-                                        .applyChange(),
-                                    numController.clear(),
-                                    libelleController.clear(),
-                                    niveau1PaysController.clear(),
-                                    niveau2PaysController.clear(),
-                                    niveau3PaysController.clear(),
-                                    descriptionController.clear(),
-                                    setState(() {
-                                      sousRegion == null;
-                                    }),
-                                    Navigator.of(context).pop()
-                                  });
-                        } catch (e) {
-                          final String errorMessage = e.toString();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Row(
-                                children: [
-                                  Text("Une erreur s'est produit"),
-                                ],
+                  SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        final String libelle = libelleController.text;
+                        final String description = descriptionController.text;
+                        if (formkey.currentState!.validate()) {
+                          try {
+                            await PaysService()
+                                .updatePays(
+                                    idPays: payss.idPays!,
+                                    nomPays: libelle,
+                                    descriptionPays: description,
+                                    libelleNiveau1Pays:
+                                        niveau1PaysController.text,
+                                    libelleNiveau2Pays:
+                                        niveau2PaysController.text,
+                                    libelleNiveau3Pays:
+                                        niveau3PaysController.text,
+                                    monnaie: monnaieController.text,
+                                    whattsAppPays: numController.text,
+                                    sousRegion: sousRegion)
+                                .then((value) => {
+                                      Provider.of<PaysService>(context,
+                                              listen: false)
+                                          .applyChange(),
+                                      Provider.of<PaysService>(context,
+                                              listen: false)
+                                          .applyChange(),
+                                      numController.clear(),
+                                      libelleController.clear(),
+                                      niveau1PaysController.clear(),
+                                      niveau2PaysController.clear(),
+                                      niveau3PaysController.clear(),
+                                      descriptionController.clear(),
+                                      setState(() {
+                                        sousRegion == null;
+                                      }),
+                                      Navigator.of(context).pop()
+                                    });
+                          } catch (e) {
+                            final String errorMessage = e.toString();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Row(
+                                  children: [
+                                    Text("Une erreur s'est produit"),
+                                  ],
+                                ),
+                                duration: Duration(seconds: 5),
                               ),
-                              duration: Duration(seconds: 5),
-                            ),
-                          );
+                            );
+                          }
+                          debugPrint("sous region $sousRegion");
+                          debugPrint("l1 ${niveau1PaysController.text}");
+                          debugPrint("l2 ${niveau2PaysController.text}");
+                          debugPrint("l3 ${niveau3PaysController.text}");
                         }
-                        debugPrint("sous region $sousRegion");
-                        debugPrint("l1 ${niveau1PaysController.text}");
-                        debugPrint("l2 ${niveau2PaysController.text}");
-                        debugPrint("l3 ${niveau3PaysController.text}");
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange, // Orange color code
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange, // Orange color code
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        minimumSize: const Size(290, 45),
                       ),
-                      minimumSize: const Size(290, 45),
-                    ),
-                    icon: const Icon(
-                      Icons.edit,
-                      color: Colors.white,
-                    ),
-                    label: const Text(
-                      "Modufuer",
-                      style: TextStyle(
-                        fontSize: 20,
+                      icon: const Icon(
+                        Icons.edit,
                         color: Colors.white,
-                        fontWeight: FontWeight.w700,
+                      ),
+                      label: const Text(
+                        "Modifier",
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   )
