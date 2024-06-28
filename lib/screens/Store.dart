@@ -466,7 +466,7 @@ class _StoreScreenState extends State<StoreScreen> {
                               (element) => element.idNiveau1Pays == newValue,
                             );
                           }
-                                                page = 0;
+                page = 0;
                 hasMore = true;
                 fetchMagasinByNiveau1PaysWithPagination(widget.detectedCountry!, selectedNiveau1Pays!.idNiveau1Pays!,refresh: true);
                   if (page == 0 && isLoading == true) {
