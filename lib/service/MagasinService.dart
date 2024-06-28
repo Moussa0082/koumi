@@ -204,7 +204,6 @@ class MagasinService extends ChangeNotifier{
   }
 
     Future<List<Magasin>> fetchAllMagasin(String niveau3PaysActeur, {bool refresh = false}) async {
-    // if (_stockService.isLoading == true) return [];
 
       isLoading = true;
 

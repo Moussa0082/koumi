@@ -119,23 +119,22 @@ class _StoreScreenState extends State<StoreScreen> {
 
 
 
-  Future<List<Magasin>> fetchMagasinByCategorie({bool refresh = false}) async {
-    if (isLoading == true) return [];
-
-    setState(() {
+    Future<List<Magasin>> fetchMagasinByNiveau1PaysWithPagination(String niveau3PaysActeur,String idNiveau1Pays,{bool refresh = false}) async {
+  setState(() {
+    
       isLoading = true;
-    });
+  });
 
     if (refresh) {
-      setState(() {
+       setState(() {
         magasinListe.clear();
        page = 0;
         hasMore = true;
-      });
+       });
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByNiveau1PaysWithPagination?idNiveau1Pays=${selectedNiveau1Pays!.idNiveau1Pays}&page=$page&size=$size'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByNiveau1PaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&idNiveau1Pays=$idNiveau1Pays&page=${page}&size=${size}'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -147,14 +146,14 @@ class _StoreScreenState extends State<StoreScreen> {
           });
         } else {
           setState(() {
-           List<Magasin> newMagasins = body.map((e) => Magasin.fromMap(e)).toList();
-          magasinListe.addAll(newMagasins);
+           List<Magasin> newMagasin = body.map((e) => Magasin.fromMap(e)).toList();
+          magasinListe.addAll(newMagasin);
           });
         }
 
-        debugPrint("response body all magasins  by niveau 1 pays with pagination ${page} par défilement soit ${magasinListe.length}");
+        debugPrint("response body all magasin by niveau 1 pays with pagination ${page} par défilement soit ${magasinListe.length}");
       } else {
-        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        print('Échec de la requête  mag niavec le code d\'état: ${response.statusCode} |  ${response.body}');
       }
     } catch (e) {
       print('Une erreur s\'est produite lors de la récupération des magasins: $e');
@@ -165,6 +164,7 @@ class _StoreScreenState extends State<StoreScreen> {
     }
     return magasinListe;
   }
+
 
 
   void verify() async {
@@ -218,7 +218,7 @@ class _StoreScreenState extends State<StoreScreen> {
       page++;
         });
    
-    fetchMagasinByCategorie().then((value) {
+    fetchMagasinByNiveau1PaysWithPagination(widget.detectedCountry!, selectedNiveau1Pays!.idNiveau1Pays!).then((value) {
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -468,7 +468,7 @@ class _StoreScreenState extends State<StoreScreen> {
                           }
                                                 page = 0;
                 hasMore = true;
-                fetchMagasinByCategorie(refresh: true);
+                fetchMagasinByNiveau1PaysWithPagination(widget.detectedCountry!, selectedNiveau1Pays!.idNiveau1Pays!,refresh: true);
                   if (page == 0 && isLoading == true) {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       scrollableController1.jumpTo(0.0);

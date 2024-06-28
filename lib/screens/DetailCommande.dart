@@ -318,7 +318,6 @@ Widget build(BuildContext context) {
                height: 40,
                  child: Center(
                    child:Lottie.asset("assets/anim.json"),
-                  
                  ),
                )
                                           ],
