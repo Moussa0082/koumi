@@ -46,7 +46,6 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
   String? detectedCountryCode;
   String? detectedCountry;
   CountryProvider? countryProvider;
-  late BuildContext _currentContext;
   late Acteur acteur = Acteur();
 
   String? email = "";

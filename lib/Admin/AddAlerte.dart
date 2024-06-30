@@ -15,7 +15,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class AddAlerte extends StatefulWidget {
-  const AddAlerte({super.key});
+  String? detectedCountryCode;
+  String? detectedCountry;
+   AddAlerte({super.key, this.detectedCountryCode, this.detectedCountry});
 
   @override
   State<AddAlerte> createState() => _AddAlerteState();
@@ -197,6 +199,8 @@ class _AddAlerteState extends State<AddAlerte> {
     super.initState();
     initRecoder();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    selectedCountryCode = widget.detectedCountryCode!;
+    selectedCountry = widget.detectedCountry!;
   }
 
   @override

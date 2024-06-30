@@ -14,7 +14,9 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 class AlerteScreen extends StatefulWidget {
-  const AlerteScreen({super.key});
+   String? detectedCountry;
+   String? detectedCountryCode;
+   AlerteScreen({super.key, this.detectedCountry, this.detectedCountryCode});
 
   @override
   State<AlerteScreen> createState() => _AlerteScreenState();
@@ -106,7 +108,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => AddAlerte()));
+                                      builder: (context) => AddAlerte(detectedCountry: widget.detectedCountry!, detectedCountryCode: widget.detectedCountryCode!)));
                             },
                           ),
                         ),

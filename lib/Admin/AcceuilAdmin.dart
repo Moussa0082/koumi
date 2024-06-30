@@ -341,7 +341,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const AlerteScreen()));
+                      builder: (context) =>  AlerteScreen(detectedCountry: detectedCountry!, detectedCountryCode: detectedCountryCode!,)));
             } else if (index == 7) {
               Navigator.push(
                   context,
