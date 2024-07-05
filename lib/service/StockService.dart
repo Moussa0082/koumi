@@ -74,10 +74,10 @@ class StockService extends ChangeNotifier {
 
       if (response.statusCode == 200 || responsed.statusCode == 201 || responsed.statusCode == 202) {
         final donneesResponse = json.decode(responsed.body);
-              Get.snackbar("Succès", "Produit ajouté avec succès",duration: Duration(seconds: 3));
+              Get.snackbar("Succès", "Produit ajouté avec succès",duration: Duration(seconds: 5));
         debugPrint('stock service ${donneesResponse.toString()}');
       } else {
-           Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer plus tard",duration: Duration(seconds: 3));
+           Get.snackbar("Erreur", "Une erreur s'est produite veuiller réessayer plus tard",duration: Duration(seconds: 5));
          
         throw Exception(
             'Échec de la requête avec le code d\'état : ${responsed.statusCode}');
@@ -220,7 +220,8 @@ class StockService extends ChangeNotifier {
            hasMore = false;
         } else {
           List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
-          stockList.addAll(newStocks);
+          stockList.addAll(newStocks.where((newStock) => !stockList
+              .any((existStock) => existStock.idStock == newStock.idStock)));
         }
 
         debugPrint("response body all stock with pagination ${page} par défilement soit ${stockList.length}");
@@ -263,7 +264,49 @@ class StockService extends ChangeNotifier {
         
         } else {
            List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
-          stockList.addAll(newStocks);
+          stockList.addAll(newStocks.where((newStock) => !stockList
+              .any((existStock) => existStock.idStock == newStock.idStock)));
+        }
+
+        debugPrint("response body all stock by categorie and pays with pagination ${page} par défilement soit ${stockList.length}");
+      } else {
+        print('Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
+    } catch (e) {
+      print('Une erreur s\'est produite lors de la récupération des stocks: $e');
+    } finally {
+      
+       isLoading = false;
+    }
+    return stockList;
+  }
+
+  Future<List<Stock>> fetchStockByCategorieAndFiliere(String idCategorie,String libelleFiliere, String niveau3PaysActeur, {bool refresh = false}) async {
+    if (isLoading == true) return [];
+
+      isLoading = true;
+
+    if (refresh) {
+        stockList.clear();
+       page = 0;
+        hasMore = true;
+    }
+
+    try {
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getAllStocksByCategorieAndFiliere?idCategorie=${idCategorie}&libelleFiliere=$libelleFiliere&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+          
+           hasMore = false;
+        
+        } else {
+           List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
+          stockList.addAll(newStocks.where((newStock) => !stockList
+              .any((existStock) => existStock.idStock == newStock.idStock)));
         }
 
         debugPrint("response body all stock by categorie and pays with pagination ${page} par défilement soit ${stockList.length}");
@@ -307,7 +350,7 @@ class StockService extends ChangeNotifier {
   }
 
   
-  Future<List<Stock>> fetchStockByMagasin(String idMagasin, String niveau3PaysActeur, {bool refresh = false}) async {
+  Future<List<Stock>> fetchStockByMagasin(String idMagasin, {bool refresh = false}) async {
     if (isLoading == true) return [];
    
      isLoading = true;
@@ -319,7 +362,7 @@ class StockService extends ChangeNotifier {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getStocksByPaysAndMagasinWithPagination?idMagasin=$idMagasin&niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getStocksByPaysAndMagasinWithPagination?idMagasin=$idMagasin&page=${page}&size=${size}'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -329,7 +372,8 @@ class StockService extends ChangeNotifier {
            hasMore = false;
         } else {
           List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
-          stockList.addAll(newStocks);
+         stockList.addAll(newStocks.where((newStock) => !stockList
+              .any((existStock) => existStock.idStock == newStock.idStock)));
         }
 
         debugPrint("response body all stock by magasin and pays with pagination ${page} par défilement soit ${stockList.length}");
@@ -348,7 +392,7 @@ class StockService extends ChangeNotifier {
 
 
 
-  Future<List<Stock>> fetchStockByCategorieAndMagasin(String idCategorieProduit, String idMagasin ,String niveau3PaysActeur,{bool refresh = false}) async {
+  Future<List<Stock>> fetchStockByCategorieAndMagasin(String idCategorieProduit, String idMagasin,{bool refresh = false}) async {
     if (isLoading == true) return [];
 
       isLoading = true;
@@ -360,7 +404,7 @@ class StockService extends ChangeNotifier {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getStocksByPaysAndMagasinAndCategorieProduitWithPagination?idCategorieProduit=${idCategorieProduit}&idMagasin=${idMagasin}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Stock/getStocksByPaysAndMagasinAndCategorieProduitWithPagination?idCategorieProduit=${idCategorieProduit}&idMagasin=${idMagasin}&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -371,7 +415,8 @@ class StockService extends ChangeNotifier {
      
         } else {
            List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
-          stockList.addAll(newStocks);
+         stockList.addAll(newStocks.where((newStock) => !stockList
+              .any((existStock) => existStock.idStock == newStock.idStock)));
         }
 
         debugPrint("response body all stock by pays and magasin and categorie with pagination ${page} par défilement soit ${stockList.length}");
@@ -432,8 +477,9 @@ class StockService extends ChangeNotifier {
         if (body.isEmpty) {
            hasMore = false;
         } else {
-           List<Stock> newIntrant = body.map((e) => Stock.fromMap(e)).toList();
-          stockList.addAll(newIntrant);
+           List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
+          stockList.addAll(newStocks.where((newStock) => !stockList
+              .any((existStock) => existStock.idStock == newStock.idStock)));
         }
 
         debugPrint("response body all stock by acteur with pagination ${page} par défilement soit ${stockList.length}");
@@ -471,7 +517,8 @@ class StockService extends ChangeNotifier {
            hasMore = false;
         } else {
            List<Stock> newStock = body.map((e) => Stock.fromMap(e)).toList();
-          stockList.addAll(newStock);
+           stockList.addAll(newStock.where((newStock) => !stockList
+              .any((existStock) => existStock.idStock == newStock.idStock)));
         }
 
         debugPrint("response body all stock by acteur with pagination ${page} par défilement soit ${stockList.length}");
@@ -516,8 +563,8 @@ class StockService extends ChangeNotifier {
         } else {
           
             List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
-          stockList.addAll(newStocks);
-          // page++;
+           stockList.addAll(newStocks.where((newStock) => !stockList
+              .any((existStock) => existStock.idStock == newStock.idStock)));
           
         }
 

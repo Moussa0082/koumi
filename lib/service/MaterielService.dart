@@ -193,7 +193,8 @@ class MaterielService extends ChangeNotifier {
            hasMore = false;
         } else {
           List<Materiel> newMateriels =  body.map((e) => Materiel.fromMap(e)).toList();
-          materielList.addAll(newMateriels);
+          materielList.addAll(newMateriels.where((newMat) => !newMateriels
+              .any((element) => element.idMateriel == newMat.idMateriel)));
         }
 
         debugPrint("response body all materiel by pays with pagination ${page} par défilement soit ${materielList.length}");
@@ -242,8 +243,9 @@ class MaterielService extends ChangeNotifier {
           // setState(() {
           // });
             List<Materiel> newMateriels =
-                body.map((e) => Materiel.fromMap(e)).toList();
-            materielList.addAll(newMateriels);
+              body.map((e) => Materiel.fromMap(e)).toList();
+          materielList.addAll(newMateriels.where((newMat) => !newMateriels
+              .any((element) => element.idMateriel == newMat.idMateriel)));
         }
 
         debugPrint(
@@ -265,7 +267,7 @@ class MaterielService extends ChangeNotifier {
     return materielList;
   }
 
-  Future<List<Materiel>> fetchMaterielByTypeAndPaysWithPagination(String idTypeMateriel, String niveau3PaysActeur, {bool refresh = false}) async {
+  Future<List<Materiel>> fetchMaterielByTypeAndPaysWithPagination(String idTypeMateriel, {bool refresh = false}) async {
     if (isLoading == true) return [];
 
       isLoading = true;
@@ -277,7 +279,7 @@ class MaterielService extends ChangeNotifier {
     }
 
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Materiel/getAllMaterielsByTypeMaterielWithPagination?idTypeMateriel=${idTypeMateriel}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
+      final response = await http.get(Uri.parse('$apiOnlineUrl/Materiel/getAllMaterielsByTypeMaterielWithPagination?idTypeMateriel=${idTypeMateriel}&page=$page&size=$size'));
       // final response = await http.get(Uri.parse('$apiOnlineUrl/Materiel/getMaterielsByPaysAndTypeMaterielWithPagination?idTypeMateriel=${idTypeMateriel}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
 
       if (response.statusCode == 200) {
@@ -287,8 +289,10 @@ class MaterielService extends ChangeNotifier {
         if (body.isEmpty) {
            hasMore = false;
         } else {
-           List<Materiel> newMateriels = body.map((e) => Materiel.fromMap(e)).toList();
-          materielList.addAll(newMateriels);
+          List<Materiel> newMateriels =
+              body.map((e) => Materiel.fromMap(e)).toList();
+          materielList.addAll(newMateriels.where((newMat) => !newMateriels
+              .any((element) => element.idMateriel == newMat.idMateriel)));
         }
 
         debugPrint("response body all materiel by pays and type materiel with pagination ${page} par défilement soit ${materielList.length}");
@@ -324,8 +328,10 @@ class MaterielService extends ChangeNotifier {
         if (body.isEmpty) {
            hasMore = false;
         } else {
-           List<Materiel> newMateriels = body.map((e) => Materiel.fromMap(e)).toList();
-          materielList.addAll(newMateriels);
+           List<Materiel> newMateriels =
+              body.map((e) => Materiel.fromMap(e)).toList();
+          materielList.addAll(newMateriels.where((newMat) => !newMateriels
+              .any((element) => element.idMateriel == newMat.idMateriel)));
         }
 
         debugPrint("response body all materiel by pays and type materiel with pagination ${page} par défilement soit ${materielList.length}");
@@ -369,8 +375,10 @@ class MaterielService extends ChangeNotifier {
           
         } else {
           
-            List<Materiel> newMateriels = body.map((e) => Materiel.fromMap(e)).toList();
-          materielList.addAll(newMateriels);
+            List<Materiel> newMateriels =
+              body.map((e) => Materiel.fromMap(e)).toList();
+          materielList.addAll(newMateriels.where((newMat) => !newMateriels
+              .any((element) => element.idMateriel == newMat.idMateriel)));
           
         }
 

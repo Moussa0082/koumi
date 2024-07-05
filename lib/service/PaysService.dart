@@ -20,6 +20,7 @@ class PaysService extends ChangeNotifier {
     required String libelleNiveau1Pays,
     required String libelleNiveau2Pays,
     required String libelleNiveau3Pays,
+
     required String monnaie,
     required String whattsAppPays,
     required SousRegion sousRegion,

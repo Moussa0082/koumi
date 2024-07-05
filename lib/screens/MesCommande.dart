@@ -1,17 +1,16 @@
-
- import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Commande.dart';
-import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
-import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
+import 'package:koumi_app/screens/DetailCommande.dart';
+import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/CommandeService.dart';
+import 'package:koumi_app/widgets/SnackBar.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
@@ -27,25 +26,72 @@ const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _MesCommandeState extends State<MesCommande> {
-
-    late Acteur acteur = Acteur();
+  late Acteur acteur = Acteur();
   late List<TypeActeur> typeActeurData = [];
-  // List<ParametreGeneraux> paraList = [];
-  // late ParametreGeneraux para = ParametreGeneraux();
+
   late String type;
   late TextEditingController _searchController;
-  List<Stock>  stockListe = [];
+  List<Stock> stockListe = [];
   CategorieProduit? selectedCat;
-   List<Commande> _liste = [];
+  List<Commande> _liste = [];
+  List<Commande> _filteredListe = [];
   String? typeValue;
   bool isExist = false;
   bool isLoading = true;
   bool isProprietaire = false;
   String? email = "";
 
+  //   void _filterCommandes(String search) {
+  //   setState(() {
+  //     _filteredListe = _liste.where((commande) {
+  //       final codeLower = commande.codeCommande!.toLowerCase();
+  //       final dateLower = commande.dateCommande!.toLowerCase();
+  //       final statutLower = commande.statutConfirmation == false ? 'en attente' : 'validée';
 
+  //       final searchLower = search.toLowerCase();
 
-     void verify() async {
+  //       return codeLower.contains(searchLower) ||
+  //           dateLower.contains(searchLower) ||
+  //           statutLower.contains(searchLower);
+  //     }).toList();
+  //   });
+  // }
+
+  void _filterCommandes(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredListe = _liste;
+      } else {
+        _filteredListe = _liste.where((commande) {
+          final codeCommande = commande.codeCommande?.toLowerCase() ?? '';
+          final dateCommande = commande.dateCommande?.toLowerCase() ?? '';
+          final statutCommande =
+              commande.statutCommande?.toString().toLowerCase() ?? '';
+
+          // Inverser le format de la date pour les comparaisons
+          String inverseDateFormat(String date) {
+            if (date.contains('-')) {
+              final parts = date.split('-');
+              if (parts.length == 3) {
+                return '${parts[2]}-${parts[1]}-${parts[0]}';
+              }
+            }
+            return date;
+          }
+
+          final invertedDateCommande = inverseDateFormat(dateCommande);
+
+          final searchQuery = query.toLowerCase();
+          return codeCommande.contains(searchQuery) ||
+              dateCommande.contains(searchQuery) ||
+              invertedDateCommande.contains(searchQuery) ||
+              statutCommande.contains(searchQuery);
+        }).toList();
+      }
+    });
+  }
+
+  void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     email = prefs.getString('emailActeur');
     if (email != null) {
@@ -56,7 +102,7 @@ class _MesCommandeState extends State<MesCommande> {
       setState(() {
         isExist = true;
         //     if (_liste.any((commande) => commande.acteur?.idActeur == acteur.idActeur)) {
-          
+
         // getAllCommandeByActeur(acteur.idActeur!).then((value) => {
         //   _liste = value
         // });
@@ -71,6 +117,7 @@ class _MesCommandeState extends State<MesCommande> {
         fetchAllCommandes(acteur.idActeur!).then((combinedList) {
           setState(() {
             _liste = combinedList;
+            _filteredListe = combinedList;
             isLoading = false;
           });
         });
@@ -82,24 +129,26 @@ class _MesCommandeState extends State<MesCommande> {
     }
   }
 
-   Future<List<Commande>> fetchAllCommandes(String idActeur) async {
+  Future<List<Commande>> fetchAllCommandes(String idActeur) async {
     final commandesActeur = await getAllCommandeByActeur(idActeur);
-    final commandesProprietaire = await fetchCommandeByActeurProprietaire(idActeur);
+    final commandesProprietaire =
+        await fetchCommandeByActeurProprietaire(idActeur);
     return [...commandesActeur, ...commandesProprietaire];
   }
 
-
- Future<List<Commande>> getAllCommandeByActeur(String idActeur) async {
+  Future<List<Commande>> getAllCommandeByActeur(String idActeur) async {
     final response = await CommandeService().fetchCommandeByActeur(idActeur);
     return response;
   }
- Future<List<Commande>> fetchCommandeByActeurProprietaire(String acteurProprietaire)async {
-    final response = await CommandeService().fetchCommandeByActeurProprietaire(acteurProprietaire);
+
+  Future<List<Commande>> fetchCommandeByActeurProprietaire(
+      String acteurProprietaire) async {
+    final response = await CommandeService()
+        .fetchCommandeByActeurProprietaire(acteurProprietaire);
     return response;
   }
 
- 
-   @override
+  @override
   void initState() {
     // TODO: implement initState
     super.initState();
@@ -107,12 +156,11 @@ class _MesCommandeState extends State<MesCommande> {
     verify();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
+        appBar: AppBar(
+          centerTitle: true,
           toolbarHeight: 100,
           title: Text(
             "Mes commandes",
@@ -122,38 +170,49 @@ class _MesCommandeState extends State<MesCommande> {
               fontSize: 20,
             ),
           ),
-      actions: [
-  // Container(
-  //   width: 30,
-  //   height: 30,
-  //   decoration: BoxDecoration(
-  //     color: Colors.green, // Background color of the circle
-  //     shape: BoxShape.circle, // Shape of the container
-  //   ),
-  //   child: Center(
-  //     child: IconButton(
-  //       onPressed: () {
-  //         // Your onPressed function
-  //       },
-  //       icon: Icon(Icons.add),
-  //       color: Colors.white, // Icon color
-  //       iconSize: 16, // Adjust the icon size as needed
-  //     ),
-  //   ),
-  // ),
-  // IconButton(
-  //   onPressed: () {
-  //     // Your onPressed function
-  //   },
-  //   icon: Icon(Icons.refresh),
-  //   color: Colors.black, // Icon color
-  //   iconSize: 25,
-  // ),
-],
-
-      ),
-      body:
-       !isExist
+          actions: [
+            IconButton(
+                onPressed: () {
+                  setState(() {
+                    fetchAllCommandes(acteur.idActeur!).then((combinedList) {
+          setState(() {
+            _liste = combinedList;
+            _filteredListe = combinedList;
+            isLoading = false;
+          });
+        });
+                  });
+                },
+                icon: Icon(Icons.refresh)),
+            // Container(
+            //   width: 30,
+            //   height: 30,
+            //   decoration: BoxDecoration(
+            //     color: Colors.green, // Background color of the circle
+            //     shape: BoxShape.circle, // Shape of the container
+            //   ),
+            //   child: Center(
+            //     child: IconButton(
+            //       onPressed: () {
+            //         // Your onPressed function
+            //       },
+            //       icon: Icon(Icons.add),
+            //       color: Colors.white, // Icon color
+            //       iconSize: 16, // Adjust the icon size as needed
+            //     ),
+            //   ),
+            // ),
+            // IconButton(
+            //   onPressed: () {
+            //     // Your onPressed function
+            //   },
+            //   icon: Icon(Icons.refresh),
+            //   color: Colors.black, // Icon color
+            //   iconSize: 25,
+            // ),
+          ],
+        ),
+        body: !isExist
             ? Center(
                 child: Container(
                   padding: EdgeInsets.all(
@@ -226,238 +285,362 @@ class _MesCommandeState extends State<MesCommande> {
                   ),
                 ),
               )
-            :
-       RefreshIndicator(
-        onRefresh: () async{
-       setState(() {
-            fetchAllCommandes(acteur.idActeur!).then((value) => {
-          _liste = value
-        });
-       });
-        },
-         child: SingleChildScrollView(
-          child: Column(
-            children: [
-               Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.blueGrey[50], // Couleur d'arrière-plan
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.search,
-                          color: Colors.blueGrey[400],
-                          size: 28), // Utiliser une icône de recherche plus grande
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: TextField(
-                          controller: _searchController,
-                          onChanged: (value) {
-                            setState(() {});
-                          },
-                          decoration: InputDecoration(
-                            hintText: 'Rechercher',
-                            border: InputBorder.none,
-                            hintStyle: TextStyle(color: Colors.blueGrey[400]),
-                          ),
+            : RefreshIndicator(
+                onRefresh: () async {
+                  setState(() {
+                    fetchAllCommandes(acteur.idActeur!).then((value) => {
+                          // _liste = value,
+                          _filteredListe = value
+                        });
+                  });
+                },
+                child: SingleChildScrollView(
+                    child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                          borderRadius: BorderRadius.circular(25),
                         ),
-                      ),
-                      // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
-                      IconButton(
-                        icon: Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() {});
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),    
-              const SizedBox(height: 5,),
-              Padding(
-                padding: const EdgeInsets.only(left:20.0),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text("Liste des commandes :",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold))),
-              ),  
-       Padding(
-               padding: const EdgeInsets.all(15.0),
-               child: Table(
-          border: TableBorder.all(color: Colors.black38),
-          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-          children: [
-            // Header row
-           TableRow(
-              decoration: BoxDecoration(color: Colors.redAccent),
-              children: [
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Center(
-                      child: Text(
-                        "Code",
-                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ),
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Center(
-                      child: Text(
-                        "Date",
-                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ),
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Center(
-                      child: Text(
-                        "Statut",
-                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-         
-             if (isLoading)
-              ...List.generate(10, (index) => buildShimmerRow())
-            else  
-            // Data rows
-            ..._liste.map((commande) =>  TableRow(
-              children: [
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Center(
-                      child: Text(commande.codeCommande!, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                ),
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Center(
-                      child: Text(commande.dateCommande!, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                ),
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: GestureDetector(
-                      onTap: (){
-                        if(acteur.idActeur == commande.acteur?.idActeur){
-                          print("acteur qui a commande");
-                        }
-                        else {
-                          print("acteur proprietaire");
-                        }
-                      },
-                      onLongPress: () {
-                        if(acteur.idActeur == commande.acteur?.idActeur){
-                          print("acteur qui a commande");
-                        }
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Annuler la commande'),
-                              content: const Text('Êtes-vous sûr de vouloir annuler la commande ?'),
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text('Non'),
+                        child: Row(
+                          children: [
+                            Icon(Icons.search,
+                                color: Colors.blueGrey[400],
+                                size:
+                                    28), // Utiliser une icône de recherche plus grande
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: TextField(
+                                controller: _searchController,
+                                onChanged: (value) {
+                                  _filterCommandes(value);
+                                },
+                                decoration: InputDecoration(
+                                  hintText: 'Rechercher',
+                                  border: InputBorder.none,
+                                  hintStyle:
+                                      TextStyle(color: Colors.blueGrey[400]),
                                 ),
-                                TextButton(
-                                  onPressed: () async{
-                                    Navigator.pop(context);
-                                    // Call the callback function for cancellation
-                                    
-                                               commande.statutCommande! ==
-                                                              true
-                                                          ? await CommandeService()
-                                                              .disableCommane(
-                                                                  commande.idCommande!)
-                                                              .then((value) => {
-                                                                    // Mettre à jour la liste des magasins après le changement d'état
-                                                                    Provider.of<CommandeService>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .applyChange(),
-                                                                    setState(() {
-            fetchAllCommandes(acteur.idActeur!).then((value) => {
-          _liste = value
-            });
-          }),
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
-                                                                  })
-                                                              .catchError(
-                                                                  (onError) => {
-                                                                        ScaffoldMessenger.of(context)
-                                                                            .showSnackBar(
-                                                                          const SnackBar(
-                                                                            content:
-                                                                                Row(
-                                                                              children: [
-                                                                                Text("Une erreur s'est produit"),
-                                                                              ],
-                                                                            ),
-                                                                            duration:
-                                                                                Duration(seconds: 5),
-                                                                          ),
-                                                                        ),
-                                                                        Navigator.of(context)
-                                                                            .pop(),
-                                                                      }): null;
-                                  },
-                                  child: const Text('Oui'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      child: Center(
-                        child: Container(
-                          width: 80,
-                          color: commande.statutCommande == false ? Colors.red : Colors.green,
-                          child: Center(
-                            child: Text(
-                              commande.statutCommande == false ? "En attende" : "Validée",
-                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                              ),
                             ),
-                          ),
+                            // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
+                            IconButton(
+                              icon: Icon(Icons.clear),
+                              onPressed: () {
+                                _searchController.clear();
+                                _filterCommandes('');
+                                setState(() {});
+                              },
+                            ),
+                          ],
                         ),
                       ),
-                    ),))
-            ],
-          ),)
-               
-             ],)
-             )
-             ],)
-             ),
-       ));
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0),
+                      child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text("Liste des commandes :",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold))),
+                    ),
+                    Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Table(
+                          border: TableBorder.all(color: Colors.black38),
+                          defaultVerticalAlignment:
+                              TableCellVerticalAlignment.middle,
+                          children: [
+                            // Header row
+
+                            TableRow(
+                              decoration:
+                                  BoxDecoration(color: Colors.redAccent),
+                              children: [
+                                TableCell(
+                                  verticalAlignment:
+                                      TableCellVerticalAlignment.middle,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Center(
+                                      child: Text(
+                                        "Code",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                TableCell(
+                                  verticalAlignment:
+                                      TableCellVerticalAlignment.middle,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Center(
+                                      child: Text(
+                                        "Date",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                TableCell(
+                                  verticalAlignment:
+                                      TableCellVerticalAlignment.middle,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Center(
+                                      child: Text(
+                                        "Statut",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                // TableCell(
+                                //   verticalAlignment:
+                                //       TableCellVerticalAlignment.middle,
+                                //   child: Padding(
+                                //     padding: const EdgeInsets.all(8.0),
+                                //     child: Center(
+                                //       child: Text(
+                                //         "Action",
+                                //         style: TextStyle(
+                                //             color: Colors.white,
+                                //             fontSize: 14,
+                                //             fontWeight: FontWeight.bold),
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
+                              ],
+                            ),
+
+                            if (isLoading)
+                              ...List.generate(10, (index) => buildShimmerRow())
+                            else
+                              // Data rows
+
+                              ..._filteredListe.map(
+                                (commande) => TableRow(
+                                  children: [
+                                    TableCell(
+                                      verticalAlignment:
+                                          TableCellVerticalAlignment.middle,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        DetailCommandeScreen(
+                                                          idCommande: commande
+                                                              .idCommande,
+                                                          isProprietaire: acteur
+                                                                      .idActeur ==
+                                                                  commande
+                                                                      .acteur
+                                                                      ?.idActeur
+                                                              ? false
+                                                              : true,
+                                                        )));
+                                            if (acteur.idActeur ==
+                                                commande.acteur?.idActeur) {
+                                              print("acteur qui a commande");
+                                            } else {
+                                              print("acteur proprietaire");
+                                            }
+                                          },
+                                          child: Center(
+                                            child: Text(commande.codeCommande!,
+                                                style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold)),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      verticalAlignment:
+                                          TableCellVerticalAlignment.middle,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        DetailCommandeScreen(
+                                                          idCommande: commande
+                                                              .idCommande,
+                                                          isProprietaire: acteur
+                                                                      .idActeur ==
+                                                                  commande
+                                                                      .acteur
+                                                                      ?.idActeur
+                                                              ? false
+                                                              : true,
+                                                        )));
+                                            if (acteur.idActeur ==
+                                                commande.acteur?.idActeur) {
+                                              print("acteur qui a commande");
+                                            } else {
+                                              print("acteur proprietaire");
+                                            }
+                                          },
+                                          child: Center(
+                                            child: Text(commande.dateCommande!,
+                                                style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold)),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    TableCell(
+                                        verticalAlignment:
+                                            TableCellVerticalAlignment.middle,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: GestureDetector(
+                                            child: Center(
+                                              child: Container(
+                                                width: 80,
+                                                color:
+                                                    commande.statutConfirmation ==
+                                                            false
+                                                        ? Colors.red
+                                                        : Colors.green,
+                                                child: Center(
+                                                  child: Text(
+                                                    commande.statutConfirmation ==
+                                                            false
+                                                        ? "En attende"
+                                                        : "Valider",
+                                                    style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            onTap: () {
+                                              if (acteur.idActeur ==
+                                                  commande.acteur?.idActeur) {
+                                                print("acteur qui a commande");
+
+                                                showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return AlertDialog(
+                                                      title: const Text(
+                                                          'Annuler la commande'),
+                                                      content: const Text(
+                                                          'Êtes-vous sûr de vouloir annuler la commande ?'),
+                                                      actions: <Widget>[
+                                                        TextButton(
+                                                          onPressed: () =>
+                                                              Navigator.pop(
+                                                                  context),
+                                                          child:
+                                                              const Text('Non'),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () async {
+                                                            Navigator.pop(
+                                                                context);
+                                                            // Call the callback function for cancellation
+
+                                                            commande.statutConfirmation! ==
+                                                                    true
+                                                                ? await CommandeService()
+                                                                    .disableCommane(
+                                                                        commande
+                                                                            .idCommande!)
+                                                                    .then(
+                                                                        (value) =>
+                                                                            {
+                                                                               ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Désactié avec succèss"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 5),
+                                                                                ),
+                                                                              ),
+                                                                              // Mettre à jour la liste des magasins après le changement d'état
+                                                                              Provider.of<CommandeService>(context, listen: false).applyChange(),
+                                                                              setState(() {
+                                                                                fetchAllCommandes(acteur.idActeur!).then((value) => {
+                                                                                      // _liste = value,
+                                                                                      _filteredListe = value
+                                                                                    });
+                                                                              }),
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                    .catchError(
+                                                                        (onError) =>
+                                                                            {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                const SnackBar(
+                                                                                  content: Row(
+                                                                                    children: [
+                                                                                      Text("Une erreur s'est produit"),
+                                                                                    ],
+                                                                                  ),
+                                                                                  duration: Duration(seconds: 5),
+                                                                                ),
+                                                                              ),
+                                                                              Navigator.of(context).pop(),
+                                                                            })
+                                                                : null;
+                                                          },
+                                                          child:
+                                                              const Text('Oui'),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  },
+                                                );
+                                              } else {
+                                                print("je suis propriétaire");
+                                                Snack.error(
+                                                    titre: "Alerte",
+                                                    message:
+                                                        "Vos produits ont été commandé donc uniquement l'acheteur peut annuler la commande");
+                                              }
+                                            },
+                                          ),
+                                        ))
+                                  ],
+                                ),
+                              )
+                          ],
+                        ))
+                  ],
+                )),
+              ));
   }
 
   TableRow buildShimmerRow() {
@@ -469,7 +652,8 @@ class _MesCommandeState extends State<MesCommande> {
       ],
     );
   }
-   TableCell buildShimmerCell() {
+
+  TableCell buildShimmerCell() {
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.middle,
       child: Padding(
@@ -485,6 +669,4 @@ class _MesCommandeState extends State<MesCommande> {
       ),
     );
   }
-
-  
 }

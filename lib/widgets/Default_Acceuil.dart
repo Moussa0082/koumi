@@ -149,21 +149,52 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
     });
   }
 
-  Future<void> getAddressFromLatLang(Position position) async {
-    List<Placemark> placemark =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    Placemark place = placemark[0];
-    debugPrint("Address ISO: $detectedC");
-    address.value =
-        'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
-    setState(() {
-      detectedC = place.isoCountryCode;
-      detectedCountryCode = place.isoCountryCode!;
-      detectedCountry = place.country!;
-    });
+  // Future<void> getAddressFromLatLang(Position position) async {
+  //   List<Placemark> placemark =
+  //       await placemarkFromCoordinates(position.latitude, position.longitude);
+  //   Placemark place = placemark[0];
+  //   debugPrint("Address ISO: $detectedC");
+  //   address.value =
+  //       'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
+  //       if(mounted)
+  //   setState(() {
+  //     detectedC = place.isoCountryCode;
+  //     detectedCountryCode = place.isoCountryCode!;
+  //     detectedCountry = place.country!;
+  //   });
 
-    debugPrint(
-        "Address:   ${place.locality},${place.country},${place.isoCountryCode}");
+  //   debugPrint(
+  //       "Address:   ${place.locality},${place.country},${place.isoCountryCode}");
+  // }
+
+  Future<void> getAddressFromLatLang(Position position) async {
+    try {
+      List<Placemark> placemark =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+      if (placemark.isNotEmpty) {
+        Placemark place = placemark[0];
+        debugPrint("Address ISO: $detectedC");
+        address.value =
+            'Address : ${place.locality}, ${place.country}, ${place.isoCountryCode}';
+
+        if (mounted) {
+          setState(() {
+            detectedC = place.isoCountryCode;
+            detectedCountryCode = place.isoCountryCode!;
+            detectedCountry = place.country!;
+          });
+        }
+
+        debugPrint(
+            "Address: ${place.locality}, ${place.country}, ${place.isoCountryCode}");
+      } else {
+        debugPrint(
+            "Aucun emplacement trouvé dans defaut accueil pour les coordonnées fournies.");
+      }
+    } catch (e) {
+      debugPrint(
+          "Une erreur est survenue lors de la récupération de l'adresse : $e");
+    }
   }
 
   @override
@@ -192,29 +223,29 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
 
   List<Widget> _buildCards() {
     List<Widget> cards = [
-      _buildAccueilCard("Magasins", "shop.png", 6),
       _buildAccueilCard("Semences et plants", "semence.png", 13),
       _buildAccueilCard("Produits phytosanitaires", "physo.png", 12),
       _buildAccueilCard("Engrais et apports", "engrais.png", 11),
       _buildAccueilCard("Fruits et légumes", "fruit&legume.png", 10),
       _buildAccueilCard("Compléments alimentaires", "compl.png", 5),
+      _buildAccueilCard("Produits transformés", "transforme.png", 8),
       _buildAccueilCard("Produits d'élevages", "elevage.png", 7),
-      _buildAccueilCard("Produits agricoles", "pro.png", 9),
+      _buildAccueilCard("Produits agricoles", "pro1.png", 9),
       _buildAccueilCard("Matériels et équipements", "equi.png", 16),
+      _buildAccueilCard("Magasins", "shop1.png", 6),
       _buildAccueilCard("Moyens de transport", "transp.png", 3),
       _buildAccueilCard("Matériels de location", "loc.png", 4),
-      _buildAccueilCard("Produits transformés", "transforme.png", 8),
-      _buildAccueilCard("Météo", "met.png", 2),
-      _buildAccueilCard("Conseils", "cons.png", 1)
+      _buildAccueilCard("Météo", "met1.png", 2),
+      _buildAccueilCard("Conseils", "cons1.png", 1)
     ];
 
     if (isExist) {
       cards.insert(
         8,
-        _buildAccueilCard("Intrants agricoles", "int.png", 15),
+        _buildAccueilCard("Intrants agricoles", "int1.png", 15),
       );
       cards.insert(
-        0,
+        11,
         _buildAccueilCard("Commandes", "cm.png", 14),
       );
     }
@@ -317,8 +348,11 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
                     builder: (context) =>
                         FruitAndLegumes(detectedCountry: detectedCountry)));
           } else if (index == 9) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProductsScreen()));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        ProductsScreen(detectedCountry: detectedCountry!)));
           } else if (index == 8) {
             Navigator.push(
                 context,
@@ -332,8 +366,11 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
                     builder: (context) =>
                         ProduitElevage(detectedCountry: detectedCountry)));
           } else if (index == 6) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const StoreScreen()));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        StoreScreen(detectedCountry: detectedCountry!)));
           } else if (index == 5) {
             Navigator.push(
                 context,
@@ -345,7 +382,13 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        l.Location(detectedCountry: detectedCountry)));
+                        l.Location(detectedCountry: detectedCountry!)));
+          } else if (index == 3) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        Transport(detectedCountry: detectedCountry!)));
           } else if (index == 3) {
             Navigator.push(
                 context,
@@ -375,24 +418,24 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
           child: Row(
             children: [
               Padding(
-                padding: const EdgeInsets.all(10.0),
+                padding: const EdgeInsets.all(5.0),
                 child: Image.asset(
                   "assets/images/$imgLocation",
-                  width: 35,
-                  height: 35,
+                  width: 36,
+                  height: 36,
                   fit: BoxFit.contain,
                 ),
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(5.0),
                   child: Text(
                     titre,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

@@ -484,9 +484,9 @@ class _AddConseilState extends State<AddConseil> {
                                         audioConseil: audiosUploaded,
                                         acteur: acteur)
                                     .then((value) => {
-                                          FirebaseApi()
-                                              .sendPushNotificationToTopic(
-                                                  'Nouveau conseil', titre),
+                                          // FirebaseApi()
+                                          //     .sendPushNotificationToTopic(
+                                          //         'Nouveau conseil', titre),
                                           _titreController.clear(),
                                           _descriptionController.clear(),
                                           _tokenTextController.clear(),
@@ -532,9 +532,9 @@ class _AddConseilState extends State<AddConseil> {
                                         descriptionConseil: description,
                                         acteur: acteur)
                                     .then((value) => {
-                                          FirebaseApi()
-                                              .sendPushNotificationToTopic(
-                                                  'Nouveau conseil', titre),
+                                          // FirebaseApi()
+                                          //     .sendPushNotificationToTopic(
+                                          //         'Nouveau conseil', titre),
                                           _titreController.clear(),
                                           _descriptionController.clear(),
                                           _tokenTextController.clear(),

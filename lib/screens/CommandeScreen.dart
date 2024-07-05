@@ -109,11 +109,11 @@ class _CommandeScreenState extends State<CommandeScreen> {
           style:
               const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 20),
         ),
-        actions: !isExist ? null : [
+        actions: [
           IconButton(
                 onPressed: () {
                   setState(() {
-        isExist = true;
+       
           _liste = getAllCommandeByActeur(acteur.idActeur!);
       });
                 },
@@ -337,7 +337,7 @@ class _CommandeScreenState extends State<CommandeScreen> {
                                     onTap: () {
                                       Route _createRoute() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => DetailCommandeScreen(isProprietaire: false,),
+    pageBuilder: (context, animation, secondaryAnimation) => DetailCommandeScreen(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return child;
     },

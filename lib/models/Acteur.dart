@@ -1,6 +1,4 @@
-import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:koumi_app/models/Pays.dart';
 
 import 'package:koumi_app/models/Speculation.dart';

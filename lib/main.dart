@@ -44,6 +44,7 @@ import 'package:koumi_app/service/UniteService.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
 import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
+import 'package:koumi_app/widgets/DetectorPays.dart';
 import 'package:koumi_app/widgets/connection_verify.dart';
 import 'package:koumi_app/widgets/notification_controller.dart';
 import 'package:koumi_app/controller/dependency_injection.dart';
@@ -54,9 +55,6 @@ import 'package:provider/provider.dart';
 
 void main() async {
   
-    // WidgetsFlutterBinding.ensureInitialized();
-    // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    // await FirebaseApi().initNotification(); 
   // await AwesomeNotifications().initial ize(
   //    'resource://@drawable/launcher_icon',
   //   [
@@ -98,6 +96,7 @@ void main() async {
   //   );
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => CountryProvider()),
+    ChangeNotifierProvider(create: (_) => DetectorPays()),
     ChangeNotifierProvider(create: (context) => MagasinService()),
     ChangeNotifierProvider(create: (context) => CommandeService()),
     ChangeNotifierProvider(create: (context) => CartProvider()),

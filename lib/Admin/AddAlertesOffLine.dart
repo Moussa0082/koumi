@@ -255,7 +255,7 @@ class _AddAlertesOffLineScreenState extends State<AddAlertesOffLineScreen> {
                     },
                     icon: const Icon(Icons.arrow_back_ios)),
                 title: const Text(
-                  "Ajout d'alerte pour les personnes non connectés",
+                  "Ajout d'alerte",
                   style: TextStyle(
                     color: d_colorGreen,
                     fontSize: 20,

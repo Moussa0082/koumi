@@ -7,11 +7,9 @@ import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
-import 'package:koumi_app/models/ParametreGeneraux.dart';
 import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/providers/ParametreGenerauxProvider.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/StockService.dart';
@@ -55,7 +53,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
   bool hasMore = true;
 
   bool isLoadingLibelle = true;
-  
+
   Future<List<Stock>> fetchStockByActeur(String idActeur,
       {bool refresh = false}) async {
     // if (_stockService.isLoading == true) return [];
@@ -171,7 +169,6 @@ class _MyProductScreenState extends State<MyProductScreen> {
     return stockListe;
   }
 
-
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     email = prefs.getString('emailActeur');
@@ -238,10 +235,9 @@ class _MyProductScreenState extends State<MyProductScreen> {
       scrollableController.addListener(_scrollListener);
     });
     verify();
-  
+
     _searchController = TextEditingController();
     _catList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
-   
   }
 
   @override
@@ -259,15 +255,11 @@ class _MyProductScreenState extends State<MyProductScreen> {
         backgroundColor: const Color.fromARGB(255, 250, 250, 250),
         centerTitle: true,
         toolbarHeight: 100,
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context, true);
-            },
-            icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
+
         title: Text(
           'Mes Produits',
-          style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold ,fontSize:20),
+          style: const TextStyle(
+              color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         // actions: !isExist ? null :  [
         //    IconButton(
@@ -642,7 +634,9 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                                                 .symmetric(
                                                                 horizontal: 15),
                                                         child: Text(
-                                                          filtereSearch[index].monnaie != null
+                                                          filtereSearch[index]
+                                                                      .monnaie !=
+                                                                  null
                                                               ? "${filtereSearch[index].prix.toString()} ${filtereSearch[index].monnaie!.libelle}"
                                                               : "${filtereSearch[index].prix.toString()} FCFA",
                                                           style: TextStyle(

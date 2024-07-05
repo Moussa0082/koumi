@@ -66,44 +66,55 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Widget build(BuildContext context) {
     return !isExist
         ? Padding(
-            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 25),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 25),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  "Koumi",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 21,
-                    fontWeight:
-                        FontWeight.bold, // Ajout d'un style de police en gras
-                    color: Colors.black, // Ajout d'une couleur de texte
-                  ),
+                Image.asset(
+                  'assets/images/logo.png',
+                  height: 48,
+                  scale: 1,
                 ),
-                IconButton(
+                ElevatedButton.icon(
                   onPressed: () {
                     Future.microtask(() {
                       Provider.of<BottomNavigationService>(context,
                               listen: false)
                           .changeIndex(0);
                     });
-                    Get.to(PinLoginScreen(),
-                        duration: Duration(
-                            seconds:
-                                1), //duration of transitions, default 1 sec
-                        transition: Transition.leftToRight);
+                    Get.to(
+                      PinLoginScreen(),
+                      duration: Duration(seconds: 1),
+                      transition: Transition.leftToRight,
+                    );
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.blue,
+                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
                   icon: Icon(
                     Icons.login,
-                    color: d_colorGreen, // Ajout d'une couleur à l'icône
-                    size: 30, // Ajout d'une taille à l'icône
+                    color: const Color.fromARGB(255, 3, 100, 179),
+                  ),
+                  label: Text(
+                    "Se connecter",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.w800,
+                      color: const Color.fromARGB(255, 3, 100, 179),
+                    ),
                   ),
                 ),
               ],
             ),
           )
         : Padding(
-            padding: const EdgeInsets.symmetric(vertical: 15),
+            padding: const EdgeInsets.symmetric(vertical: 12),
             child: Padding(
               padding: const EdgeInsets.all(5.0),
               child: Consumer<ActeurProvider>(

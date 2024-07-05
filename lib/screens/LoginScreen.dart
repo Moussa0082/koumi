@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -43,8 +42,6 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _currentAddress;
   Position? _currentPosition;
 
-
-  
   // TextEditingController Controller = TextEditingController();
 
   //  login methode start
@@ -169,8 +166,8 @@ class _LoginScreenState extends State<LoginScreen> {
           //   MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
           // );
           Get.off(BottomNavBarAdmin(),
-                      duration: Duration(seconds: 1),
-                      transition: Transition.leftToRight);
+              duration: Duration(seconds: 1),
+              transition: Transition.leftToRight);
         } else {
           // Navigator.pushReplacement(
           //   context,
@@ -178,8 +175,8 @@ class _LoginScreenState extends State<LoginScreen> {
           //       builder: (context) => const BottomNavigationPage()),
           // );
           Get.off(BottomNavigationPage(),
-                      duration: Duration(seconds: 1),
-                      transition: Transition.leftToRight);
+              duration: Duration(seconds: 1),
+              transition: Transition.leftToRight);
         }
       } else {
         // Traitement en cas d'échec
@@ -258,38 +255,37 @@ class _LoginScreenState extends State<LoginScreen> {
   //     });
   //   }
   // }
-   void _handleButtonPress() async {
-  // Vérifier si le widget est toujours monté avant de continuer
-  if (!mounted) return;
+  void _handleButtonPress() async {
+    // Vérifier si le widget est toujours monté avant de continuer
+    if (!mounted) return;
 
-  // Afficher l'indicateur de chargement
-  setState(() {
-    _isLoading = true;
-  });
+    // Afficher l'indicateur de chargement
+    setState(() {
+      _isLoading = true;
+    });
 
-  if (isActive) {
-    await loginUser().then((_) {
-      // Vérifier à nouveau si le widget est toujours monté
-      if (!mounted) return;
-      
-      // Cacher l'indicateur de chargement lorsque votre fonction est terminée
-      setState(() {
-        _isLoading = false;
+    if (isActive) {
+      await loginUser().then((_) {
+        // Vérifier à nouveau si le widget est toujours monté
+        if (!mounted) return;
+
+        // Cacher l'indicateur de chargement lorsque votre fonction est terminée
+        setState(() {
+          _isLoading = false;
+        });
       });
-    });
-  } else {
-    await loginUserWithoutSavedData().then((_) {
-      // Vérifier à nouveau si le widget est toujours monté
-      if (!mounted) return;
-      
-      // Cacher l'indicateur de chargement lorsque votre fonction est terminée
-      setState(() {
-        _isLoading = false;
+    } else {
+      await loginUserWithoutSavedData().then((_) {
+        // Vérifier à nouveau si le widget est toujours monté
+        if (!mounted) return;
+
+        // Cacher l'indicateur de chargement lorsque votre fonction est terminée
+        setState(() {
+          _isLoading = false;
+        });
       });
-    });
+    }
   }
-}
-
 
   Future<void> loginUserWithoutSavedData() async {
     final String emailActeur = emailController.text;
@@ -383,8 +379,8 @@ class _LoginScreenState extends State<LoginScreen> {
           //   MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
           // );
           Get.off(BottomNavBarAdmin(),
-                      duration: Duration(seconds: 1),
-                      transition: Transition.leftToRight);
+              duration: Duration(seconds: 1),
+              transition: Transition.leftToRight);
         } else {
           // Navigator.pushReplacement(
           //   context,
@@ -392,8 +388,8 @@ class _LoginScreenState extends State<LoginScreen> {
           //       builder: (context) => const BottomNavigationPage()),
           // );
           Get.off(BottomNavigationPage(),
-                      duration: Duration(seconds: 1),
-                      transition: Transition.leftToRight);
+              duration: Duration(seconds: 1),
+              transition: Transition.leftToRight);
         }
       } else {
         // Traitement en cas d'échec
@@ -517,14 +513,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       TextFormField(
                         controller: emailController,
-                         decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
                           hintText: "Entrez votre adresse email",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
+                        ),
                         keyboardType: TextInputType.text,
                         validator: (val) {
                           if (val == null || val.isEmpty) {
@@ -551,12 +547,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       // debut  mot de pass
                       TextFormField(
                         controller: passwordController,
-                         decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                           hintText: "Entrez votre mot de passe",
                           suffixIcon: IconButton(
                             onPressed: () {
@@ -573,8 +569,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Colors.grey,
                             ),
                           ),
-                          ),
-                        keyboardType: TextInputType.text,
+                        ),
+                        keyboardType: TextInputType.number,
                         obscureText: _obscureText,
                         validator: (val) {
                           if (val == null || val.isEmpty) {
@@ -633,8 +629,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               //   ),
                               // );
                               Get.to(ForgetPassScreen(),
-                      duration: Duration(seconds: 1),
-                      transition: Transition.leftToRight);
+                                  duration: Duration(seconds: 1),
+                                  transition: Transition.leftToRight);
                             },
                             child: const Text(
                               "Mot de passe oublié ",
@@ -705,15 +701,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  // Navigator.push(
-                                  //     context,
-                                  //     MaterialPageRoute(
-                                  //         builder: (context) =>
-                                  //             RegisterScreen()));
-                                  
-                                Get.to(RegisterScreen(),
-                      duration: Duration(seconds: 1),
-                      transition: Transition.leftToRight);
+                                  Get.to(RegisterScreen(),
+                                      duration: Duration(seconds: 1),
+                                      transition: Transition.leftToRight);
                                 },
                                 child: const Text(
                                   "S'inscrire",

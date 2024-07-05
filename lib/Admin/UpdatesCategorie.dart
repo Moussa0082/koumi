@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Filiere.dart';
@@ -24,6 +28,8 @@ class _UpdatesCategorieState extends State<UpdatesCategorie> {
   late CategorieProduit cat;
   late Acteur acteur;
   late Filiere filiere;
+  late Future _filiereList;
+  late String? filiereValue;
 
   @override
   void initState() {
@@ -33,6 +39,8 @@ class _UpdatesCategorieState extends State<UpdatesCategorie> {
     libelleController.text = cat.libelleCategorie!;
     descriptionController.text = cat.descriptionCategorie!;
     filiere = cat.filiere!;
+    filiereValue = cat.filiere!.idFiliere;
+    _filiereList = http.get(Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
   }
 
   @override
@@ -86,6 +94,103 @@ class _UpdatesCategorieState extends State<UpdatesCategorie> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  FutureBuilder(
+                    future: _filiereList,
+                    builder: (_, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return DropdownButtonFormField(
+                          items: [],
+                          onChanged: null,
+                          decoration: InputDecoration(
+                            labelText: 'Chargement...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        );
+                      }
+
+                      if (snapshot.hasData) {
+                        dynamic jsonString =
+                            utf8.decode(snapshot.data.bodyBytes);
+                        dynamic responseData = json.decode(jsonString);
+
+                        if (responseData is List) {
+                          final reponse = responseData;
+                          final filiereList = reponse
+                              .map((e) => Filiere.fromMap(e))
+                              .where((con) => con.statutFiliere == true)
+                              .toList();
+
+                          if (filiereList.isEmpty) {
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Aucune filière trouvée',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          }
+
+                          return DropdownButtonFormField<String>(
+                            isExpanded: true,
+                            items: filiereList
+                                .map(
+                                  (e) => DropdownMenuItem(
+                                    value: e.idFiliere,
+                                    child: Text(e.libelleFiliere!),
+                                  ),
+                                )
+                                .toList(),
+                            value: filiereValue,
+                            onChanged: (newValue) {
+                              setState(() {
+                                filiereValue = newValue;
+                                if (newValue != null) {
+                                  filiere = filiereList.firstWhere(
+                                    (element) => element.idFiliere == newValue,
+                                  );
+                                }
+                              });
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'Sélectionnez une filière',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
+                        } else {
+                          return DropdownButtonFormField(
+                            items: [],
+                            onChanged: null,
+                            decoration: InputDecoration(
+                              labelText: 'Aucune filière trouvée',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                      return DropdownButtonFormField(
+                        items: [],
+                        onChanged: null,
+                        decoration: InputDecoration(
+                          labelText: 'Aucune filière trouvée',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(
                     height: 10,

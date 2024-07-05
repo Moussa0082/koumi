@@ -29,6 +29,7 @@ class _SpeculationPageState extends State<SpeculationPage> {
   List<Speculation> speculationList = [];
   List<Stock> stockList = [];
   late Future<List<Speculation>> _liste;
+  late Future<List<Stock>> _listeStock;
   late TextEditingController _searchController;
 
   
@@ -44,6 +45,10 @@ class _SpeculationPageState extends State<SpeculationPage> {
 
 Future<List<Speculation>> getCatListe() async {
     return await SpeculationService().fetchSpeculationByCategorie(widget.categorieProduit.idCategorieProduit!);
+  }
+
+Future<List<Stock>> getCatListeStock(String id) async {
+    return await StockService().fetchStockBySpeculation(id);
   }
 
   @override
@@ -227,133 +232,131 @@ Future<List<Speculation>> getCatListe() async {
                                                     fontStyle:
                                                         FontStyle.italic,
                                                   ))),
-                                          FutureBuilder(
-                                              future: StockService()
-                                                  .fetchStockBySpeculation(
-                                                      e.idSpeculation!),
-                                              builder: (context, snapshot) {
-                                                if (snapshot
-                                                        .connectionState ==
-                                                    ConnectionState
-                                                        .waiting) {
-                                                  return Padding(
-                                                    padding:
-                                                        const EdgeInsets
-                                                            .all(8.0),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                            "Nombres de produit",
-                                                            style:
-                                                                TextStyle(
-                                                              color: Colors
-                                                                  .black87,
-                                                              fontSize: 17,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              fontStyle:
-                                                                  FontStyle
-                                                                      .italic,
-                                                            )),
-                                                        Text("0",
-                                                            style:
-                                                                TextStyle(
-                                                              color: Colors
-                                                                  .black87,
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w800,
-                                                            ))
-                                                      ],
-                                                    ),
-                                                  );
-                                                }
+                                          // FutureBuilder(
+                                          //     future: getCatListeStock(e.idSpeculation!),
+                                          //     builder: (context, snapshot) {
+                                          //       if (snapshot
+                                          //               .connectionState ==
+                                          //           ConnectionState
+                                          //               .waiting) {
+                                          //         return Padding(
+                                          //           padding:
+                                          //               const EdgeInsets
+                                          //                   .all(8.0),
+                                          //           child: Row(
+                                          //             mainAxisAlignment:
+                                          //                 MainAxisAlignment
+                                          //                     .spaceBetween,
+                                          //             children: [
+                                          //               Text(
+                                          //                   "Nombres de produit",
+                                          //                   style:
+                                          //                       TextStyle(
+                                          //                     color: Colors
+                                          //                         .black87,
+                                          //                     fontSize: 17,
+                                          //                     fontWeight:
+                                          //                         FontWeight
+                                          //                             .w500,
+                                          //                     fontStyle:
+                                          //                         FontStyle
+                                          //                             .italic,
+                                          //                   )),
+                                          //               Text("0",
+                                          //                   style:
+                                          //                       TextStyle(
+                                          //                     color: Colors
+                                          //                         .black87,
+                                          //                     fontSize: 18,
+                                          //                     fontWeight:
+                                          //                         FontWeight
+                                          //                             .w800,
+                                          //                   ))
+                                          //             ],
+                                          //           ),
+                                          //         );
+                                          //       }
               
-                                                if (!snapshot.hasData) {
-                                                  return Padding(
-                                                    padding: EdgeInsets
-                                                        .symmetric(
-                                                            horizontal: 15),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                            "Nombres de produit:",
-                                                            style:
-                                                                TextStyle(
-                                                              color: Colors
-                                                                  .black87,
-                                                              fontSize: 17,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              fontStyle:
-                                                                  FontStyle
-                                                                      .italic,
-                                                            )),
-                                                        Text("0",
-                                                            style:
-                                                                TextStyle(
-                                                              color: Colors
-                                                                  .black87,
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w800,
-                                                            ))
-                                                      ],
-                                                    ),
-                                                  );
-                                                } else {
-                                                  stockList =
-                                                      snapshot.data!;
-                                                  return Padding(
-                                                    padding: EdgeInsets
-                                                        .symmetric(
-                                                            horizontal: 15),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                            "Nombres de produit",
-                                                            style:
-                                                                TextStyle(
-                                                              color: Colors
-                                                                  .black87,
-                                                              fontSize: 17,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              fontStyle:
-                                                                  FontStyle
-                                                                      .italic,
-                                                            )),
-                                                        Text(
-                                                            stockList.length
-                                                                .toString(),
-                                                            style:
-                                                                TextStyle(
-                                                              color: Colors
-                                                                  .black87,
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w800,
-                                                            ))
-                                                      ],
-                                                    ),
-                                                  );
-                                                }
-                                              }),
+                                          //       if (!snapshot.hasData) {
+                                          //         return Padding(
+                                          //           padding: EdgeInsets
+                                          //               .symmetric(
+                                          //                   horizontal: 15),
+                                          //           child: Row(
+                                          //             mainAxisAlignment:
+                                          //                 MainAxisAlignment
+                                          //                     .spaceBetween,
+                                          //             children: [
+                                          //               Text(
+                                          //                   "Nombres de produit:",
+                                          //                   style:
+                                          //                       TextStyle(
+                                          //                     color: Colors
+                                          //                         .black87,
+                                          //                     fontSize: 17,
+                                          //                     fontWeight:
+                                          //                         FontWeight
+                                          //                             .w500,
+                                          //                     fontStyle:
+                                          //                         FontStyle
+                                          //                             .italic,
+                                          //                   )),
+                                          //               Text("0",
+                                          //                   style:
+                                          //                       TextStyle(
+                                          //                     color: Colors
+                                          //                         .black87,
+                                          //                     fontSize: 18,
+                                          //                     fontWeight:
+                                          //                         FontWeight
+                                          //                             .w800,
+                                          //                   ))
+                                          //             ],
+                                          //           ),
+                                          //         );
+                                          //       } else {
+                                          //         stockList =
+                                          //             snapshot.data!;
+                                          //         return Padding(
+                                          //           padding: EdgeInsets
+                                          //               .symmetric(
+                                          //                   horizontal: 15),
+                                          //           child: Row(
+                                          //             mainAxisAlignment:
+                                          //                 MainAxisAlignment
+                                          //                     .spaceBetween,
+                                          //             children: [
+                                          //               Text(
+                                          //                   "Nombres de produit",
+                                          //                   style:
+                                          //                       TextStyle(
+                                          //                     color: Colors
+                                          //                         .black87,
+                                          //                     fontSize: 17,
+                                          //                     fontWeight:
+                                          //                         FontWeight
+                                          //                             .w500,
+                                          //                     fontStyle:
+                                          //                         FontStyle
+                                          //                             .italic,
+                                          //                   )),
+                                          //               Text(
+                                          //                   stockList.length
+                                          //                       .toString(),
+                                          //                   style:
+                                          //                       TextStyle(
+                                          //                     color: Colors
+                                          //                         .black87,
+                                          //                     fontSize: 18,
+                                          //                     fontWeight:
+                                          //                         FontWeight
+                                          //                             .w800,
+                                          //                   ))
+                                          //             ],
+                                          //           ),
+                                          //         );
+                                          //       }
+                                          //     }),
                                           Container(
                                             alignment:
                                                 Alignment.bottomRight,

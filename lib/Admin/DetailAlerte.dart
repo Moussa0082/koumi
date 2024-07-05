@@ -3,7 +3,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Alertes.dart';
-import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/widgets/PlayerWidget.dart';
 import 'package:readmore/readmore.dart';
 import 'package:video_player/video_player.dart';
@@ -117,8 +116,8 @@ class _DetailAlerteState extends State<DetailAlerte> {
         ),
         title: Text(
           'Détail alerte',
-          style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
+          style: const TextStyle(
+              color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
       body: SingleChildScrollView(
@@ -126,28 +125,21 @@ class _DetailAlerteState extends State<DetailAlerte> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             alerte.photoAlerte != null && !alerte.photoAlerte!.isEmpty
-                ? 
-                CachedNetworkImage(
-                   width: double.infinity,
+                ? CachedNetworkImage(
+                    width: double.infinity,
                     height: 200,
-                    
-                                                  imageUrl:
-                                                      'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/image',
-                                                  fit: BoxFit.cover,
-                                                  placeholder: (context, url) =>
-                                                      const Center(
-                                                          child:
-                                                              CircularProgressIndicator()),
-                                                  errorWidget:
-                                                      (context, url, error) =>
-                                                          Image.asset(
-                                                    'assets/images/default_image.png',
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                )
-                
+                    imageUrl:
+                        'https://koumi.ml/api-koumi/alertes/${alerte.idAlerte}/image',
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) => Image.asset(
+                      'assets/images/alert_default.jpg',
+                      fit: BoxFit.cover,
+                    ),
+                  )
                 : Image.asset(
-                    "assets/images/default_image.png",
+                    "assets/images/alert_default.jpg",
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: 200,
@@ -264,19 +256,17 @@ class _DetailAlerteState extends State<DetailAlerte> {
             ),
           ),
         ),
-         Padding(
-                      padding: EdgeInsets.all(8),
-                      child: ReadMoreText(
-                        colorClickableText: Colors.orange,
-                        trimLines: 2,
-                        trimMode: TrimMode.Line,
-                        trimCollapsedText: "Lire plus",
-                        trimExpandedText: "Lire moins",
-                        style: TextStyle(
-                            fontSize: 18, fontStyle: FontStyle.italic),
-                        alerte.descriptionAlerte!
-                      ),
-                    ),
+        Padding(
+          padding: EdgeInsets.all(8),
+          child: ReadMoreText(
+              colorClickableText: Colors.orange,
+              trimLines: 2,
+              trimMode: TrimMode.Line,
+              trimCollapsedText: "Lire plus",
+              trimExpandedText: "Lire moins",
+              style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
+              alerte.descriptionAlerte!),
+        ),
       ],
     );
   }

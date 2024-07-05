@@ -10,6 +10,7 @@ import 'package:koumi_app/providers/CountryProvider.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
 import 'package:koumi_app/widgets/Default_Acceuil.dart';
+import 'package:koumi_app/widgets/DetectorPays.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -121,21 +122,38 @@ class _AccueilState extends State<Accueil> {
   }
 
   Future<void> getAddressFromLatLang(Position position) async {
-    List<Placemark> placemark =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    Placemark place = placemark[0];
-    debugPrint("Address ISO: $detectedC");
-    address.value =
-        'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
-    setState(() {
-      detectedC = place.isoCountryCode;
-      detectedCountryCode = place.isoCountryCode!;
-      detectedCountry = place.country!;
-    });
+    final detectorPays = Provider.of<DetectorPays>(context, listen: false);
+    try {
+      List<Placemark> placemark =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+      if (placemark.isNotEmpty) {
+        Placemark place = placemark[0];
+        debugPrint("Address ISO: $detectedC");
+        address.value =
+            'Address : ${place.locality}, ${place.country}, ${place.isoCountryCode}';
 
-    debugPrint(
-        "Address:   ${place.locality},${place.country},${place.isoCountryCode}");
+        if (mounted) {
+          setState(() {
+            detectedC = place.isoCountryCode;
+            detectedCountryCode = place.isoCountryCode!;
+            detectedCountry = place.country!;
+            detectorPays.setDetectedCountryAndCode(
+                detectedCountry, detectedCountryCode);
+          });
+        }
+
+        debugPrint(
+            "Address: ${place.locality}, ${place.country}, ${place.isoCountryCode}");
+      } else {
+        debugPrint(
+            "Aucun emplacement trouvé dans admin accueil pour les coordonnées fournies.");
+      }
+    } catch (e) {
+      debugPrint(
+          "Une erreur est survenue lors de la récupération de l'adresse : $e");
+    }
   }
+
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -166,6 +184,7 @@ class _AccueilState extends State<Accueil> {
 
   @override
   void dispose() {
+    streamSubscription?.cancel();
     super.dispose();
   }
 
@@ -176,9 +195,9 @@ class _AccueilState extends State<Accueil> {
       appBar: const CustomAppBar(),
       body: ListView(
         children: [
-          SizedBox(height: 180, child: Carrousels()),
+          //  SizedBox(height: 180, child: Carrousels()),
 
-          // SizedBox(height: 180, child: isExist ? Carrousel(): Carrousels()),
+          SizedBox(height: 180, child: Carrousel()),
           // const SizedBox(
           //   height: 10,
           // ),

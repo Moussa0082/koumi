@@ -1,3 +1,6 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
+
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Forme.dart';
@@ -81,6 +84,7 @@ class Intrant {
       dateAjout: dateAjout ?? this.dateAjout,
       dateModif: dateModif ?? this.dateModif,
       personneModif: personneModif ?? this.personneModif,
+      unite: unite ?? this.unite,
       pays: pays ?? this.pays,
       forme: forme ?? this.forme,
       acteur: acteur ?? this.acteur,
@@ -131,11 +135,65 @@ class Intrant {
       forme: map['forme'] != null ? Forme.fromMap(map['forme'] as Map<String,dynamic>) : null,
       acteur: map['acteur'] != null ? Acteur.fromMap(map['acteur'] as Map<String,dynamic>) : null,
       categorieProduit: map['categorieProduit'] != null ? CategorieProduit.fromMap(map['categorieProduit'] as Map<String,dynamic>) : null,
-      monnaie: map['monnaie'] != null
-          ? Monnaie.fromMap(map['monnaie'] as Map<String, dynamic>)
-          : Monnaie(),
+      monnaie: map['monnaie'] != null ? Monnaie.fromMap(map['monnaie'] as Map<String,dynamic>) : null,
     );
   }
 
 
+
+  String toJson() => json.encode(toMap());
+
+  factory Intrant.fromJson(String source) => Intrant.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() {
+    return 'Intrant(idIntrant: $idIntrant, nomIntrant: $nomIntrant, quantiteIntrant: $quantiteIntrant, prixIntrant: $prixIntrant, codeIntrant: $codeIntrant, descriptionIntrant: $descriptionIntrant, photoIntrant: $photoIntrant, statutIntrant: $statutIntrant, dateExpiration: $dateExpiration, dateAjout: $dateAjout, dateModif: $dateModif, personneModif: $personneModif, unite: $unite, pays: $pays, forme: $forme, acteur: $acteur, categorieProduit: $categorieProduit, monnaie: $monnaie)';
+  }
+
+  @override
+  bool operator ==(covariant Intrant other) {
+    if (identical(this, other)) return true;
+  
+    return 
+      other.idIntrant == idIntrant &&
+      other.nomIntrant == nomIntrant &&
+      other.quantiteIntrant == quantiteIntrant &&
+      other.prixIntrant == prixIntrant &&
+      other.codeIntrant == codeIntrant &&
+      other.descriptionIntrant == descriptionIntrant &&
+      other.photoIntrant == photoIntrant &&
+      other.statutIntrant == statutIntrant &&
+      other.dateExpiration == dateExpiration &&
+      other.dateAjout == dateAjout &&
+      other.dateModif == dateModif &&
+      other.personneModif == personneModif &&
+      other.unite == unite &&
+      other.pays == pays &&
+      other.forme == forme &&
+      other.acteur == acteur &&
+      other.categorieProduit == categorieProduit &&
+      other.monnaie == monnaie;
+  }
+
+  @override
+  int get hashCode {
+    return idIntrant.hashCode ^
+      nomIntrant.hashCode ^
+      quantiteIntrant.hashCode ^
+      prixIntrant.hashCode ^
+      codeIntrant.hashCode ^
+      descriptionIntrant.hashCode ^
+      photoIntrant.hashCode ^
+      statutIntrant.hashCode ^
+      dateExpiration.hashCode ^
+      dateAjout.hashCode ^
+      dateModif.hashCode ^
+      personneModif.hashCode ^
+      unite.hashCode ^
+      pays.hashCode ^
+      forme.hashCode ^
+      acteur.hashCode ^
+      categorieProduit.hashCode ^
+      monnaie.hashCode;
+  }
 }

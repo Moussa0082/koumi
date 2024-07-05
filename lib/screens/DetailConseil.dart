@@ -1,8 +1,8 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Conseil.dart';
-import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/widgets/PlayerWidget.dart';
 import 'package:readmore/readmore.dart';
 import 'package:video_player/video_player.dart';
@@ -78,7 +78,7 @@ class _DetailConseilState extends State<DetailConseil> {
         );
       }
     } catch (e) {
-       print(e.toString());
+      print(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Row(
@@ -118,28 +118,27 @@ class _DetailConseilState extends State<DetailConseil> {
         ),
         title: Text(
           'Détail conseil',
-          style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
+          style: const TextStyle(
+              color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            conseils.photoConseil != null &&
-                    !conseils.photoConseil!.isEmpty
-                ? Image.network(
-                    "https://koumi.ml/api-koumi/conseil/${conseils.idConseil}/image",
+            conseils.photoConseil != null && !conseils.photoConseil!.isEmpty
+                ? CachedNetworkImage(
                     width: double.infinity,
                     height: 200,
+                    imageUrl:
+                        'https://koumi.ml/api-koumi/conseil/${conseils.idConseil}/image',
                     fit: BoxFit.cover,
-                    errorBuilder: (BuildContext context, Object exception,
-                        StackTrace? stackTrace) {
-                      return Image.asset(
-                        'assets/images/default_image.png',
-                        fit: BoxFit.cover,
-                      );
-                    },
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) => Image.asset(
+                      'assets/images/default_image.png',
+                      fit: BoxFit.cover,
+                    ),
                   )
                 : Image.asset(
                     "assets/images/default_image.png",
@@ -259,19 +258,17 @@ class _DetailConseilState extends State<DetailConseil> {
             ),
           ),
         ),
-      Padding(
-                     padding: EdgeInsets.all(8),
-                      child: ReadMoreText(
-                        colorClickableText: Colors.orange,
-                        trimLines: 2,
-                        trimMode: TrimMode.Line,
-                        trimCollapsedText: "Lire plus",
-                        trimExpandedText: "Lire moins",
-                        style: TextStyle(
-                            fontSize: 16, fontStyle: FontStyle.italic),
-                       conseils.descriptionConseil
-                      ),
-                    ),
+        Padding(
+          padding: EdgeInsets.all(8),
+          child: ReadMoreText(
+              colorClickableText: Colors.orange,
+              trimLines: 2,
+              trimMode: TrimMode.Line,
+              trimCollapsedText: "Lire plus",
+              trimExpandedText: "Lire moins",
+              style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+              conseils.descriptionConseil),
+        ),
       ],
     );
   }

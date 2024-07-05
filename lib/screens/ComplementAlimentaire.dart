@@ -194,90 +194,82 @@ class _ComplementAlimentaireState extends State<ComplementAlimentaire> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-          centerTitle: true,
-          toolbarHeight: 100,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.arrow_back_ios)),
-          title: const Text(
-            "Compléments alimentaires",
-            style: TextStyle(
-              color: d_colorGreen,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+            centerTitle: true,
+            toolbarHeight: 100,
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.arrow_back_ios)),
+            title: const Text(
+              "Compléments alimentaires",
+              style: TextStyle(
+                color: d_colorGreen,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          actions: !isExist
-              ? [
-                  IconButton(
-                      onPressed: () {
-                        stockListeFuture = fetchStock(
-                            widget.detectedCountry != null
-                                ? widget.detectedCountry!
-                                : "Mali");
-                      },
-                      icon: const Icon(Icons.refresh, color: d_colorGreen)),
-                ]
-              : [
-                  IconButton(
-                      onPressed: () {
-                        stockListeFuture = fetchStock(
-                            widget.detectedCountry != null
-                                ? widget.detectedCountry!
-                                : "Mali");
-                      },
-                      icon: const Icon(Icons.refresh, color: d_colorGreen)),
-                  (typeActeurData
-                              .map((e) => e.libelle!.toLowerCase())
-                              .contains("commercant") ||
-                          typeActeurData
-                              .map((e) => e.libelle!.toLowerCase())
-                              .contains("commerçant") ||
-                          typeActeurData
-                              .map((e) => e.libelle!.toLowerCase())
-                              .contains("admin") ||
-                          typeActeurData
-                              .map((e) => e.libelle!.toLowerCase())
-                              .contains("producteur"))
-                      ? PopupMenuButton<String>(
-                          padding: EdgeInsets.zero,
-                          itemBuilder: (context) {
-                            return <PopupMenuEntry<String>>[
-                              PopupMenuItem<String>(
-                                child: ListTile(
-                                  leading: const Icon(
-                                    Icons.add,
-                                    color: Colors.green,
-                                  ),
-                                  title: const Text(
-                                    "Ajouter produit",
-                                    style: TextStyle(
+            actions: !isExist
+                ? [
+                    IconButton(
+                        onPressed: () {
+                          stockListeFuture = fetchStock(
+                              widget.detectedCountry != null
+                                  ? widget.detectedCountry!
+                                  : "Mali");
+                        },
+                        icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                    (typeActeurData
+                                .map((e) => e.libelle!.toLowerCase())
+                                .contains("commercant") ||
+                            typeActeurData
+                                .map((e) => e.libelle!.toLowerCase())
+                                .contains("commerçant") ||
+                            typeActeurData
+                                .map((e) => e.libelle!.toLowerCase())
+                                .contains("admin") ||
+                            typeActeurData
+                                .map((e) => e.libelle!.toLowerCase())
+                                .contains("producteur"))
+                        ? PopupMenuButton<String>(
+                            padding: EdgeInsets.zero,
+                            itemBuilder: (context) {
+                              return <PopupMenuEntry<String>>[
+                                PopupMenuItem<String>(
+                                  child: ListTile(
+                                    leading: const Icon(
+                                      Icons.add,
                                       color: Colors.green,
-                                      fontWeight: FontWeight.bold,
                                     ),
+                                    title: const Text(
+                                      "Ajouter produit",
+                                      style: TextStyle(
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    onTap: () async {
+                                      Navigator.of(context).pop();
+                                      _getResultFromNextScreen1(context);
+                                    },
                                   ),
-                                  onTap: () async {
-                                    Navigator.of(context).pop();
-                                    _getResultFromNextScreen1(context);
-                                  },
                                 ),
-                              ),
-                            ];
-                          },
-                        )
-                      : IconButton(
-                          onPressed: () {
-                            stockListeFuture = fetchStock(
-                                widget.detectedCountry != null
-                                    ? widget.detectedCountry!
-                                    : "Mali");
-                          },
-                          icon: const Icon(Icons.refresh, color: d_colorGreen)),
-                ],
-        ),
+                              ];
+                            },
+                          )
+                        : Container(),
+                  ]
+                : [
+                    IconButton(
+                        onPressed: () {
+                          stockListeFuture = fetchStock(
+                              widget.detectedCountry != null
+                                  ? widget.detectedCountry!
+                                  : "Mali");
+                        },
+                        icon: const Icon(Icons.refresh, color: d_colorGreen)),
+                  ]),
         body: Container(
             child: NestedScrollView(
                 headerSliverBuilder:

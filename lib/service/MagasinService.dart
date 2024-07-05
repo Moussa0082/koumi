@@ -12,86 +12,32 @@ import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:provider/provider.dart';
 
+class MagasinService extends ChangeNotifier {
+  static const String baseUrl = '$apiOnlineUrl/Magasin';
+  // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Magasin';
+  List<Magasin> magasin = [];
+  int page = 0;
+  bool isLoading = false;
+  int size = sized;
+  bool hasMore = true;
 
-
-class MagasinService extends ChangeNotifier{
-
-    static const String baseUrl = '$apiOnlineUrl/Magasin';
-    // static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Magasin';
-    List<Magasin> magasin = [];
-    int page = 0;
-   bool isLoading = false;
-   int size = sized;
-   bool hasMore = true;
- 
-  Future<void> creerMagasin({
-    required String nomMagasin,
-    required String contactMagasin,
-    required String localiteMagasin,
-    File? photo,
-    required Acteur acteur,
-    required Niveau1Pays niveau1Pays
-  }) async {
+  Future<void> creerMagasin(
+      {required String nomMagasin,
+      required String contactMagasin,
+      required String localiteMagasin,
+      required String pays,
+      File? photo,
+      required Acteur acteur,
+      required Niveau1Pays niveau1Pays}) async {
     try {
       //    // Convertir chaque TypeActeur en un objet JSON et les ajouter à une liste JSON
       // List<String> typeActeurJsonList = typeActeur.map((typeActeur) => typeActeur.toJson()).toList();
 
-    //    // Convertir chaque TypeActeur en un objet JSON et les ajouter à une liste JSON
-    // List<String> typeActeurJsonList = typeActeur.map((typeActeur) => typeActeur.toJson()).toList();
+      //    // Convertir chaque TypeActeur en un objet JSON et les ajouter à une liste JSON
+      // List<String> typeActeurJsonList = typeActeur.map((typeActeur) => typeActeur.toJson()).toList();
 
-      var requete = http.MultipartRequest('POST', Uri.parse('$baseUrl/addMagasin'));
-
-      if (photo != null) {
-        requete.files.add(http.MultipartFile(
-            'image',
-            photo.readAsBytes().asStream(),
-            photo.lengthSync(),
-            filename: basename(photo.path)));
-      }
- 
-      requete.fields['magasin'] = jsonEncode({
-     'nomMagasin': nomMagasin,
-     'contactMagasin': contactMagasin,
-     'localiteMagasin': localiteMagasin,
-     'photo': "",
-     'acteur': acteur.toMap(),
-     'niveau1Pays': niveau1Pays.toMap()
-});
-
- 
-      var response = await requete.send();
-      var responsed = await http.Response.fromStream(response);
-
-      if (response.statusCode == 200 || responsed.statusCode == 201) {
-        final donneesResponse = json.decode(responsed.body);
-        debugPrint('magasin service ${donneesResponse.toString()}');
-      } else {
-            final errorMessage = json.decode(utf8.decode(responsed.bodyBytes))['message'];
-        throw Exception(
-            ' ${errorMessage}' );
-      }
-    } catch (e) {
-      throw Exception(
-          'Une erreur s\'est produite lors de l\'ajout du magasin : $e');
-    }
-  }
-
-
-   
-
-     Future<void> updateMagasin(
-      {
-        required String idMagasin,
-        required String nomMagasin,
-    required String contactMagasin,
-    required String localiteMagasin,
-     File? photo,
-    required Acteur acteur,
-    required Niveau1Pays niveau1Pays,
-      }) async {
-        try{
-    var requete = http.MultipartRequest(
-          'PUT', Uri.parse('$baseUrl/update/$idMagasin'));
+      var requete =
+          http.MultipartRequest('POST', Uri.parse('$baseUrl/addMagasin'));
 
       if (photo != null) {
         requete.files.add(http.MultipartFile(
@@ -100,14 +46,13 @@ class MagasinService extends ChangeNotifier{
       }
 
       requete.fields['magasin'] = jsonEncode({
-
-          'idMagasin': idMagasin,
-          'nomMagasin': nomMagasin,
-      'contactMagasin': contactMagasin,
-      'localiteMagasin': localiteMagasin,
-      'photo': photo,
-      'acteur': acteur.toMap(),
-      'niveau1Pays': niveau1Pays.toMap()
+        'nomMagasin': nomMagasin,
+        'contactMagasin': contactMagasin,
+        'localiteMagasin': localiteMagasin,
+        'pays': pays,
+        'photo': "",
+        'acteur': acteur.toMap(),
+        'niveau1Pays': niveau1Pays.toMap()
       });
 
       var response = await requete.send();
@@ -127,131 +72,196 @@ class MagasinService extends ChangeNotifier{
     }
   }
 
-   
-    Future<List<Magasin>> fetchMagasinByActeur(String idMagasin,{bool refresh = false}) async {
-    // if (_stockService.isLoading == true) return [];
-
-      isLoading = true;
-
-    if (refresh) {
-        magasin.clear();
-       page = 0;
-        hasMore = true;
-    }
-
+  Future<void> updateMagasin({
+    required String idMagasin,
+    required String nomMagasin,
+    required String contactMagasin,
+    required String localiteMagasin,
+    File? photo,
+    required Acteur acteur,
+    required Niveau1Pays niveau1Pays,
+  }) async {
     try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinsByActeurWithPagination?idActeur=$idMagasin&page=${page}&size=${size}'));
+      var requete =
+          http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idMagasin'));
 
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
-        final List<dynamic> body = jsonData['content'];
+      if (photo != null) {
+        requete.files.add(http.MultipartFile(
+            'image', photo.readAsBytes().asStream(), photo.lengthSync(),
+            filename: basename(photo.path)));
+      }
 
-        if (body.isEmpty) {
-           hasMore = false;
-        } else {
-           List<Magasin> newMagasin = body.map((e) => Magasin.fromMap(e)).toList();
-          magasin.addAll(newMagasin);
-        }
+      requete.fields['magasin'] = jsonEncode({
+        'idMagasin': idMagasin,
+        'nomMagasin': nomMagasin,
+        'contactMagasin': contactMagasin,
+        'localiteMagasin': localiteMagasin,
+        'photo': photo,
+        'acteur': acteur.toMap(),
+        'niveau1Pays': niveau1Pays.toMap()
+      });
 
-        debugPrint("response body all magasin by acteur with pagination ${page} par défilement soit ${magasin.length}");
+      var response = await requete.send();
+      var responsed = await http.Response.fromStream(response);
+
+      if (response.statusCode == 200 || responsed.statusCode == 201) {
+        final donneesResponse = json.decode(responsed.body);
+        debugPrint('magasin service ${donneesResponse.toString()}');
       } else {
-        print('Échec de la requête  mag avec le code d\'état: ${response.statusCode} |  ${response.body}');
+        final errorMessage =
+            json.decode(utf8.decode(responsed.bodyBytes))['message'];
+        throw Exception(' ${errorMessage}');
       }
     } catch (e) {
-      print('Une erreur s\'est produite lors de la récupération des magasins: $e');
-    } finally {
-       isLoading = false;
+      throw Exception(
+          'Une erreur s\'est produite lors de l\'ajout du magasin : $e');
     }
-    return magasin;
   }
-    Future<List<Magasin>> fetchMagasinByNiveau1PaysWithPagination(String idNiveau1Pays,{bool refresh = false}) async {
+
+  Future<List<Magasin>> fetchMagasinByActeur(String idMagasin,
+      {bool refresh = false}) async {
     // if (_stockService.isLoading == true) return [];
 
-      isLoading = true;
+    isLoading = true;
 
     if (refresh) {
-        magasin.clear();
-       page = 0;
-        hasMore = true;
+      magasin.clear();
+      page = 0;
+      hasMore = true;
     }
 
-    try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinByNiveau1PaysWithPagination?idNiveau1Pays=$idNiveau1Pays&page=${page}&size=${size}'));
-
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
-        final List<dynamic> body = jsonData['content'];
-
-        if (body.isEmpty) {
-           hasMore = false;
-        } else {
-           List<Magasin> newMagasin = body.map((e) => Magasin.fromMap(e)).toList();
-          magasin.addAll(newMagasin);
-        }
-
-        debugPrint("response body all magasin by niveau 1 pays with pagination ${page} par défilement soit ${magasin.length}");
-      } else {
-        print('Échec de la requête  mag niavec le code d\'état: ${response.statusCode} |  ${response.body}');
-      }
-    } catch (e) {
-      print('Une erreur s\'est produite lors de la récupération des magasins: $e');
-    } finally {
-       isLoading = false;
-    }
-    return magasin;
-  }
-
-    Future<List<Magasin>> fetchAllMagasin({bool refresh = false}) async {
-    // if (_stockService.isLoading == true) return [];
-
-      isLoading = true;
-
-    if (refresh) {
-        magasin.clear();
-       page = 0;
-        hasMore = true;
-    }
-
-    try {
-      final response = await http.get(Uri.parse('$apiOnlineUrl/Magasin/getAllMagasinWithPagination?page=${page}&size=${size}'));
-
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
-        final List<dynamic> body = jsonData['content'];
-
-        if (body.isEmpty) {
-           hasMore = false;
-        } else {
-           List<Magasin> newMagasin = body.map((e) => Magasin.fromMap(e)).toList();
-          magasin.addAll(newMagasin);
-        }
-
-        debugPrint("response body all magasin  with pagination ${page} par défilement soit ${magasin.length}");
-      } else {
-        print('Échec de la requête mag pagavec le code d\'état: ${response.statusCode} |  ${response.body}');
-      }
-    } catch (e) {
-      print('Une erreur s\'est produite lors de la récupération des magasins: $e');
-    } finally {
-       isLoading = false;
-    }
-    return magasin;
-  }
-
-
-
-   Future<List<Magasin>> fetchMagasinByRegion(String id) async {
     try {
       final response = await http.get(Uri.parse(
-          '$baseUrl/getAllMagasinByPays/${id}'));
+          '$apiOnlineUrl/Magasin/getAllMagasinsByActeurWithPagination?idActeur=$idMagasin&page=${page}&size=${size}'));
+
       if (response.statusCode == 200) {
-  // final String jsonString = utf8.decode(response.bodyBytes);
-  //       List<dynamic> data = json.decode(jsonString);
-               List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
-        magasin = body.where((magasin) => magasin['statutMagasin'] == true)
-        .map((e) => Magasin.fromMap(e)).toList();
-      // magasin = data.map((item) => Magasin.fromMap(item)).toList();
-      return magasin;
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+          hasMore = false;
+        } else {
+          List<Magasin> newMagasin =
+              body.map((e) => Magasin.fromMap(e)).toList();
+          magasin.addAll(newMagasin);
+        }
+
+        debugPrint(
+            "response body all magasin by acteur with pagination ${page} par défilement soit ${magasin.length}");
+      } else {
+        print(
+            'Échec de la requête  mag avec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
+    } catch (e) {
+      print(
+          'Une erreur s\'est produite lors de la récupération des magasins: $e');
+    } finally {
+      isLoading = false;
+    }
+    return magasin;
+  }
+
+  Future<List<Magasin>> fetchMagasinByNiveau1PaysWithPagination(
+      String idNiveau1Pays,
+      {bool refresh = false}) async {
+    // if (_stockService.isLoading == true) return [];
+
+    isLoading = true;
+
+    if (refresh) {
+      magasin.clear();
+      page = 0;
+      hasMore = true;
+    }
+
+    try {
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/Magasin/getAllMagasinByNiveau1PaysWithPagination?idNiveau1Pays=$idNiveau1Pays&page=${page}&size=${size}'));
+      debugPrint(
+          '$apiOnlineUrl/Magasin/getAllMagasinByNiveau1PaysWithPagination?idNiveau1Pays=$idNiveau1Pays&page=${page}&size=${size}');
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+          hasMore = false;
+        } else {
+          List<Magasin> newMagasin =
+              body.map((e) => Magasin.fromMap(e)).toList();
+          magasin.addAll(newMagasin);
+        }
+
+        debugPrint(
+            "response body all magasin by niveau 1 pays with pagination ${page} par défilement soit ${magasin.length}");
+      } else {
+        print(
+            'Échec de la requête  mag niavec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
+    } catch (e) {
+      print(
+          'Une erreur s\'est produite lors de la récupération des magasins: $e');
+    } finally {
+      isLoading = false;
+    }
+    return magasin;
+  }
+
+  Future<List<Magasin>> fetchAllMagasin(
+      {bool refresh = false}) async {
+    isLoading = true;
+
+    if (refresh) {
+      magasin.clear();
+      page = 0;
+      hasMore = true;
+    }
+
+    try {
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/Magasin/getAllMagasinWithPagination?page=${page}&size=${size}'));
+      print(
+          '$apiOnlineUrl/Magasin/getAllMagasinWithPagination?page=${page}&size=${size}');
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+          hasMore = false;
+        } else {
+          List<Magasin> newMagasin =
+              body.map((e) => Magasin.fromMap(e)).toList();
+          magasin.addAll(newMagasin);
+        }
+
+        debugPrint(
+            "response body all magasin  with pagination ${page} par défilement soit ${magasin.length}");
+      } else {
+        print(
+            'Échec de la requête mag pagavec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
+    } catch (e) {
+      print(
+          'Une erreur s\'est produite lors de la récupération des magasins: $e');
+    } finally {
+      isLoading = false;
+    }
+    return magasin;
+  }
+
+  Future<List<Magasin>> fetchMagasinByRegion(String id) async {
+    try {
+      final response =
+          await http.get(Uri.parse('$baseUrl/getAllMagasinByPays/${id}'));
+      if (response.statusCode == 200) {
+        // final String jsonString = utf8.decode(response.bodyBytes);
+        //       List<dynamic> data = json.decode(jsonString);
+        List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
+        magasin = body
+            .where((magasin) => magasin['statutMagasin'] == true)
+            .map((e) => Magasin.fromMap(e))
+            .toList();
+        // magasin = data.map((item) => Magasin.fromMap(item)).toList();
+        return magasin;
       } else {
         print('Failed to load magasins for region $id');
         return magasin = [];
@@ -259,38 +269,37 @@ class MagasinService extends ChangeNotifier{
     } catch (e) {
       print('Error fetching magasins for region $id: $e');
     }
-        return magasin = [];
-        
+    return magasin = [];
   }
 
-  
-
-
-   
-
-   Future<List<Magasin>> fetchMagasinByRegionAndActeur(String idActeur, String idNiveau1Pays) async {
+  Future<List<Magasin>> fetchMagasinByRegionAndActeur(
+      String idActeur, String idNiveau1Pays) async {
     try {
       final response = await http.get(Uri.parse(
           '$baseUrl/getAllMagasinByActeurAndNiveau1Pays/${idActeur}/${idNiveau1Pays}'));
-      if (response.statusCode == 200 || response.statusCode == 201 ||  response.statusCode == 202) {
-  // final String jsonString = utf8.decode(response.bodyBytes);
-  //       List<dynamic> data = json.decode(jsonString);
-          print("Fetching data succès ${idActeur} / ${idNiveau1Pays}");
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 202) {
+        // final String jsonString = utf8.decode(response.bodyBytes);
+        //       List<dynamic> data = json.decode(jsonString);
+        print("Fetching data succès ${idActeur} / ${idNiveau1Pays}");
         List<dynamic> body = jsonDecode(utf8.decode(response.bodyBytes));
         magasin = body.map((e) => Magasin.fromMap(e)).toList();
-                debugPrint("Succes : idActeur : $idActeur , idNiveau1Pays : $idNiveau1Pays , : liste ${magasin.toString()}");
-       return magasin;
+        debugPrint(
+            "Succes : idActeur : $idActeur , idNiveau1Pays : $idNiveau1Pays , : liste ${magasin.toString()}");
+        return magasin;
       } else {
-        print('Failed to load magasins for region $idNiveau1Pays | and acteur $idActeur');
-       return magasin = [];
+        print(
+            'Failed to load magasins for region $idNiveau1Pays | and acteur $idActeur');
+        return magasin = [];
       }
     } catch (e) {
-      print('Error fetching magasins for acteur $idActeur et region $idNiveau1Pays: $e');
-          // throw Exception(" erreur catch :  ${e.toString()}");
-     return magasin = [];
+      print(
+          'Error fetching magasins for acteur $idActeur et region $idNiveau1Pays: $e');
+      // throw Exception(" erreur catch :  ${e.toString()}");
+      return magasin = [];
     }
   }
-
 
   Future<void> deleteMagasin(String idMagasin) async {
     final response = await http.delete(Uri.parse('$baseUrl/delete/$idMagasin'));

@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:koumi_app/Admin/AddAlerte.dart';
 import 'package:koumi_app/Admin/DetailAlerte.dart';
+import 'package:koumi_app/Admin/DetailAlertesOffLine.dart';
 import 'package:koumi_app/Admin/UpdateAlerte.dart';
+import 'package:koumi_app/Admin/UpdateAlertesOffLine.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Alertes.dart';
+import 'package:koumi_app/models/AlertesOffLine.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/AlerteService.dart';
+import 'package:koumi_app/service/AlertesOffLineService.dart';
 import 'package:provider/provider.dart';
 
 class AlerteDisable extends StatefulWidget {
@@ -21,19 +25,27 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _AlerteDisableState extends State<AlerteDisable> {
   late TextEditingController _searchController;
-  List<Alertes> alerteList = [];
+  List<AlertesOffLine> alerteList = [];
+  // List<Alertes> alerteList = [];
+  //  final AlertesOffLine alertes;
 
   late Future _liste;
 
-  Future<List<Alertes>> getListe() async {
-    final response = AlertesService().fetchAlertes();
+  // Future<List<Alertes>> getListe() async {
+  //   final response = AlertesService().fetchAlertes();
+  //   return response;
+  // }
+   Future<List<AlertesOffLine>> getAlerteOffLineListe() async {
+    final response = await AlertesOffLineService()
+        .fetchAlertes();
     return response;
   }
 
   @override
   void initState() {
     super.initState();
-    _liste = getListe();
+    // _liste = getListe();
+     _liste = getAlerteOffLineListe();
     _searchController = TextEditingController();
   }
 
@@ -104,7 +116,7 @@ class _AlerteDisableState extends State<AlerteDisable> {
               ),
             ),
             const SizedBox(height: 10),
-            Consumer<AlertesService>(builder: (context, alerteService, child) {
+            Consumer<AlertesOffLineService>(builder: (context, alerteService, child) {
               return FutureBuilder(
                   future: _liste,
                   builder: (context, snapshot) {
@@ -124,13 +136,13 @@ class _AlerteDisableState extends State<AlerteDisable> {
                     } else {
                       alerteList = snapshot.data!;
                       String searchText = "";
-                      List<Alertes> filtereSearch = alerteList.where((search) {
-                        String libelle = search.titreAlerte!.toLowerCase();
+                      List<AlertesOffLine> filtereSearch = alerteList.where((search) {
+                        String libelle = search.titreAlerteOffLine!.toLowerCase();
                         searchText = _searchController.text.toLowerCase();
                         return libelle.contains(searchText);
                       }).toList();
                       return filtereSearch
-                              .where((element) => element.statutAlerte == false)
+                              .where((element) => element. statutAlerteOffLine == false)
                               .isEmpty
                           ? Padding(
                               padding: EdgeInsets.all(10),
@@ -139,7 +151,7 @@ class _AlerteDisableState extends State<AlerteDisable> {
                           : Column(
                               children: filtereSearch
                                   .where((element) =>
-                                      element.statutAlerte == false)
+                                      element. statutAlerteOffLine == false)
                                   .map((e) => Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 10, horizontal: 15),
@@ -149,7 +161,7 @@ class _AlerteDisableState extends State<AlerteDisable> {
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        DetailAlerte(
+                                                        DetailAlertesOffLine(
                                                             alertes: e)));
                                           },
                                           child: Container(
@@ -179,7 +191,7 @@ class _AlerteDisableState extends State<AlerteDisable> {
                                                     height: 80,
                                                   ),
                                                   title: Text(
-                                                      e.titreAlerte!
+                                                      e.titreAlerteOffLine!
                                                           .toUpperCase(),
                                                       style: const TextStyle(
                                                         color: Colors.black,
@@ -209,7 +221,7 @@ class _AlerteDisableState extends State<AlerteDisable> {
                                                       MainAxisAlignment
                                                           .spaceBetween,
                                                   children: [
-                                                    _buildEtat(e.statutAlerte!),
+                                                    _buildEtat(e. statutAlerteOffLine!),
                                                     PopupMenuButton<String>(
                                                       padding: EdgeInsets.zero,
                                                       itemBuilder: (context) =>
@@ -217,7 +229,7 @@ class _AlerteDisableState extends State<AlerteDisable> {
                                                               String>>[
                                                         PopupMenuItem<String>(
                                                           child: ListTile(
-                                                            leading: e.statutAlerte ==
+                                                            leading: e. statutAlerteOffLine ==
                                                                     false
                                                                 ? Icon(
                                                                     Icons.check,
@@ -231,12 +243,12 @@ class _AlerteDisableState extends State<AlerteDisable> {
                                                                             .orange[
                                                                         400]),
                                                             title: Text(
-                                                              e.statutAlerte ==
+                                                              e. statutAlerteOffLine ==
                                                                       false
                                                                   ? "Activer"
                                                                   : "Desactiver",
                                                               style: TextStyle(
-                                                                color: e.statutAlerte ==
+                                                                color: e. statutAlerteOffLine ==
                                                                         false
                                                                     ? Colors
                                                                         .green
@@ -248,17 +260,17 @@ class _AlerteDisableState extends State<AlerteDisable> {
                                                               ),
                                                             ),
                                                             onTap: () async {
-                                                              e.statutAlerte ==
+                                                              e. statutAlerteOffLine ==
                                                                       false
-                                                                  ? await AlertesService()
-                                                                      .activerAlertes(e
-                                                                          .idAlerte!)
+                                                                  ? await AlertesOffLineService()
+                                                                      .activerAlertesOffLine(e
+                                                                          .idAlerteOffLine!)
                                                                       .then(
                                                                           (value) =>
                                                                               {
-                                                                                Provider.of<AlertesService>(context, listen: false).applyChange(),
+                                                                                Provider.of<AlertesOffLineService>(context, listen: false).applyChange(),
                                                                                 setState(() {
-                                                                                   _liste = getListe();
+                                                                                   _liste = getAlerteOffLineListe();
                                                                                 }),
                                                                                 Navigator.of(context).pop(),
                                                                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -287,15 +299,15 @@ class _AlerteDisableState extends State<AlerteDisable> {
                                                                                 ),
                                                                                 Navigator.of(context).pop(),
                                                                               })
-                                                                  : await AlertesService()
-                                                                      .desactiverAlertes(e
-                                                                          .idAlerte!)
+                                                                  : await AlertesOffLineService()
+                                                                      .desactiverAlertesOffLine(e
+                                                                          .idAlerteOffLine!)
                                                                       .then(
                                                                           (value) =>
                                                                               {
-                                                                                Provider.of<AlertesService>(context, listen: false).applyChange(),
+                                                                                Provider.of<AlertesOffLineService>(context, listen: false).applyChange(),
                                                                                  setState(() {
-                                                                                   _liste = getListe();
+                                                                                   _liste = getAlerteOffLineListe();
                                                                                 }),
                                                                                 Navigator.of(context).pop(),
                                                                                 ScaffoldMessenger
@@ -363,7 +375,8 @@ class _AlerteDisableState extends State<AlerteDisable> {
                                                                         context,
                                                                         MaterialPageRoute(
                                                                             builder: (context) =>
-                                                                                UpdateAlerted(alertes: e)));
+                                                                                UpdateAlertesOffLine(
+                                                                              alertes: e)));
                                                                   },
                                                                 ),
                                                               ),
@@ -384,15 +397,15 @@ class _AlerteDisableState extends State<AlerteDisable> {
                                                               ),
                                                             ),
                                                             onTap: () async {
-                                                              await AlertesService()
-                                                                  .deleteAlertes(e
-                                                                      .idAlerte!)
+                                                              await AlertesOffLineService()
+                                                                  .deleteAlertesOffLine(e
+                                                                      .idAlerteOffLine!)
                                                                   .then(
                                                                       (value) =>
                                                                           {
-                                                                            Provider.of<AlertesService>(context, listen: false).applyChange(),
+                                                                            Provider.of<AlertesOffLineService>(context, listen: false).applyChange(),
                                                                              setState(() {
-                                                                              _liste = getListe();
+                                                                               _liste = getAlerteOffLineListe();
                                                                             }),
                                                                             Navigator.of(context).pop(),
                                                                           })

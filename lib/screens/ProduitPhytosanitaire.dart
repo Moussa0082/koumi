@@ -24,8 +24,10 @@ class ProduitPhytosanitaire extends StatefulWidget {
   @override
   State<ProduitPhytosanitaire> createState() => _ProduitPhytosanitaireState();
 }
+
 const d_colorGreen = Color.fromRGBO(43, 103, 6, 1);
 const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
+
 class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
   int page = 0;
   bool isLoading = false;
@@ -177,7 +179,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
       });
     }
   }
-  
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -205,11 +207,11 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-              actions: !isExist
+            actions: !isExist
                 ? [
                     IconButton(
                         onPressed: () {
-                           intrantListeFuture = fetchIntrantByCategorie(
+                          intrantListeFuture = fetchIntrantByCategorie(
                               widget.detectedCountry != null
                                   ? widget.detectedCountry!
                                   : "Mali");
@@ -293,9 +295,7 @@ class _ProduitPhytosanitaireState extends State<ProduitPhytosanitaire> {
                             },
                             icon:
                                 const Icon(Icons.refresh, color: d_colorGreen)),
-                      ]
-                      ),
-           
+                      ]),
         body: Container(
             child: NestedScrollView(
                 headerSliverBuilder:

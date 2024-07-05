@@ -7,15 +7,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Niveau1Pays.dart';
-import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/MagasinService.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-
-import '../models/ParametreGeneraux.dart';
 
 class AddMagasinScreen extends StatefulWidget {
   bool? isEditable;
@@ -71,19 +68,20 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
   Set<String> loadedRegions =
       {}; // Ensemble pour garder une trace des régions pour lesquelles les magasins ont déjà été chargés
 
-    
   Future<String> getLibelleNiveau1PaysByActor(String id) async {
-    final response = await http.get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau1Pays/$id'));
+    final response = await http
+        .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau1Pays/$id'));
 
     if (response.statusCode == 200) {
       print("libelle : ${response.body}");
-      return response.body;  // Return the body directly since it's a plain string
+      return response
+          .body; // Return the body directly since it's a plain string
     } else {
       throw Exception('Failed to load libelle niveau1Pays');
     }
-}
+  }
 
-     Future<void> fetchLibelleNiveau1Pays() async {
+  Future<void> fetchLibelleNiveau1Pays() async {
     try {
       String libelle = await getLibelleNiveau1PaysByActor(acteur.idActeur!);
       setState(() {
@@ -97,10 +95,6 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
       print('Error: $e');
     }
   }
-
-  
-
-
 
   Future<void> updateMagasin() async {
     final nomMagasin = nomMagasinController.text;
@@ -202,8 +196,8 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
         setState(() {
           isLoading = false;
         });
-        Provider.of<MagasinService>(context, listen: false).applyChange();
-         Navigator.of(context).pop();
+        // Provider.of<MagasinService>(context, listen: false).applyChange();
+        //  Navigator.of(context).pop();
       });
     } else {
       await updateMagasin().then((_) {
@@ -211,7 +205,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
         setState(() {
           isLoading = false;
         });
-        Navigator.of(context).pop();
+        // Navigator.of(context).pop();
       });
     }
   }
@@ -228,6 +222,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                 nomMagasin: nomMagasin,
                 contactMagasin: contactMagasin,
                 localiteMagasin: localiteMagasin,
+                pays: acteur.niveau3PaysActeur!,
                 photo: photos,
                 acteur: acteur,
                 niveau1Pays: niveau1Pays)
@@ -261,6 +256,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                 nomMagasin: nomMagasin,
                 contactMagasin: contactMagasin,
                 localiteMagasin: localiteMagasin,
+                pays: acteur.niveau3PaysActeur!,
                 acteur: acteur,
                 niveau1Pays: niveau1Pays)
             .then((value) => {
@@ -418,8 +414,8 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
     debugPrint("bool" + widget.isEditable!.toString());
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
     // fetchNiveau1PaysList();
-    niveau1PaysList =
-        http.get(Uri.parse('$apiOnlineUrl/niveau1Pays/listeNiveau1PaysByNomPays/${acteur.niveau3PaysActeur}'));
+    niveau1PaysList = http.get(Uri.parse(
+        '$apiOnlineUrl/niveau1Pays/listeNiveau1PaysByNomPays/${acteur.niveau3PaysActeur}'));
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/niveau1Pays/read'));
     fetchLibelleNiveau1Pays();
   }
@@ -561,25 +557,31 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                       const SizedBox(height: 10),
 
                       //Contact magasin
-                      isLoadingLibelle ?
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text("Chargement ................",style: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.bold),)),
-                      )
-                      :
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Align(
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                             libelleNiveau1Pays != null ? libelleNiveau1Pays!.toString() : "Region *",
-                              style: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.bold),
-                            )),
-                      ),
+                      isLoadingLibelle
+                          ? Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    "Chargement ................",
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
+                                  )),
+                            )
+                          : Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    libelleNiveau1Pays != null
+                                        ? libelleNiveau1Pays!.toString()
+                                        : "Region *",
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
+                                  )),
+                            ),
                       FutureBuilder(
                         future: niveau1PaysList,
                         builder: (_, snapshot) {
@@ -628,7 +630,6 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
 
                               return DropdownButtonFormField<String>(
                                 isExpanded: true,
-                               
                                 items: niveau1List
                                     .map(
                                       (e) => DropdownMenuItem(
@@ -641,10 +642,12 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                                 onChanged: (newValue) {
                                   setState(() {
                                     niveau1Pays.idNiveau1Pays = newValue;
-                                    if (newValue != null){
-                                            niveau1Pays = niveau1List.firstWhere(
-                             (niveau1Pays) => niveau1Pays.idNiveau1Pays == newValue,
-                                );
+                                    if (newValue != null) {
+                                      niveau1Pays = niveau1List.firstWhere(
+                                        (niveau1Pays) =>
+                                            niveau1Pays.idNiveau1Pays ==
+                                            newValue,
+                                      );
                                       print("niveau 1 : ${niveau1Pays}");
                                     }
                                   });
@@ -662,18 +665,17 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                               );
                             } else {
                               return DropdownButtonFormField(
-                                    items: [],
-                                    onChanged: null,
-                                    decoration: InputDecoration(
-                                      labelText: 'Probleme de connexion',
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 20),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  );
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Probleme de connexion',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
                             }
                           }
                           return DropdownButtonFormField(

@@ -1,32 +1,17 @@
-import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
-import 'package:country_code_picker/country_code_picker.dart';
-import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/CountryProvider.dart';
-import 'package:provider/provider.dart';
-import 'package:sim_data_plus/sim_data.dart';
-
-// import 'package:koumi_app/models/TypeActeur.dart';
-import 'package:http/http.dart' as http;
-
 import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/screens/RegisterNextScreen.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:koumi_app/widgets/DetectorPays.dart';
+import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
-  String? iso;
-  String? selectedCountry;
-  RegisterScreen({super.key, this.iso, this.selectedCountry});
+  RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -40,15 +25,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
       PhoneNumber(isoCode: Platform.localeName.split('_').last);
 
   String? typeValue;
-  String? selectedCountry;
+  String selectedCountry = "";
+  String detectedCountryCode = "";
   // late TypeActeur monTypeActeur;
   // late Future _mesTypeActeur;
   Position? _currentPosition;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  var detectedCountry = "";
-  String? detectedC = "";
-  String dialCode = "";
+  // var detectedCountry = "";
+  // String? detectedC = "";
+  // String dialCode = "";
 
   String _errorMessage = "";
 
@@ -56,18 +42,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final TextEditingController controller = TextEditingController();
   TextEditingController whatsAppController = TextEditingController();
-  CountryProvider? countryProvider ;
+  CountryProvider? countryProvider;
 
   String? initialCountry;
-  String detectedCountryCode = '';
+  // String detectedCountryCode = '';
   PhoneNumber number = PhoneNumber();
   // List of items in our dropdown menu
   var items = [
     'Item 2',
   ];
- 
-
-
 
   void getPhoneNumber(String phoneNumber) async {
     PhoneNumber number = await PhoneNumber.getRegionInfoFromPhoneNumber(
@@ -77,8 +60,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       this.number = number;
     });
   }
-
- 
 
   TextEditingController nomActeurController = TextEditingController();
 
@@ -96,7 +77,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String processedNumber = "";
   String processedNumberTel = "";
 
-   @override
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Accédez au fournisseur ici
@@ -108,7 +89,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // TODO: implement initState
     super.initState();
 
-    selectedCountry = countryProvider?.countryCode!;
+    detectedCountryCode =
+        Provider.of<DetectorPays>(context, listen: false).detectedCountryCode!;
+    selectedCountry =
+        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
     // _mesTypeActeur  =
     // http.get(Uri.parse('https://koumi.ml/api-koumi/typeActeur/read'));
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/typeActeur/read'));
@@ -125,16 +109,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+      appBar: AppBar(
+          leading: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(Icons.arrow_back_ios))),
       body: SingleChildScrollView(
         child: Container(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(10.0),
             child: Column(
               children: [
                 Center(
                     child: Image.asset(
                   'assets/images/logo.png',
-                  height: 200,
+                  height: 150,
                   width: 100,
                 )),
                 Container(
@@ -226,7 +216,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         // fin  adresse fullname
 
                         const SizedBox(
-                          height: 20,
+                          height: 15,
                         ),
 
                         Padding(
@@ -243,12 +233,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                         IntlPhoneField(
                           initialCountryCode:
-                              widget.iso, // Automatically detect user's country
+                              detectedCountryCode, // Automatically detect user's country
                           invalidNumberMessage: "Numéro invalide",
                           searchText: "Chercher un pays",
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
+                                vertical: 0, horizontal: 20),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -265,7 +255,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
                         ),
 
-//  const SizedBox(height: 5,),
                         Padding(
                           padding: const EdgeInsets.only(left: 10.0),
                           child: Text(
@@ -277,59 +266,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(
                           height: 4,
                         ),
-//         Container(
-//   child: Column(
-//     mainAxisAlignment: MainAxisAlignment.center,
-//     children: <Widget>[
-//       InternationalPhoneNumberInput(
-//          initialValue: PhoneNumber(
-//                       isoCode: Platform.localeName.split('_').last,
-//                     ),
-//         formatInput: true,
-//         hintText: "Numéro de téléphone",
-//         maxLength: 20,
-//         errorMessage: "Numéro invalide",
-//         onInputChanged: (PhoneNumber number) {
-//            processedNumber = removePlus(number.phoneNumber!);
-//     // selectedCountry = phone.countryCode;
-//     // print('Country changed to: $selectedCountry');
-//           print(processedNumber);
-//         },
-
-//         onInputValidated: (bool value) {
-//           print(value);
-//         },
-//         selectorConfig: SelectorConfig(
-//           selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
-//           useBottomSheetSafeArea: true,
-//         ),
-//         ignoreBlank: false,
-//         autoValidateMode: AutovalidateMode.disabled,
-//         selectorTextStyle: TextStyle(color: Colors.black),
-//         keyboardType: TextInputType.phone,
-//         inputDecoration: InputDecoration(
-//           border: OutlineInputBorder(
-//             borderRadius: BorderRadius.all(Radius.circular(20)),
-//           ),
-//         ),
-//         onSaved: (PhoneNumber number) {
-//           print('On Saved: $number');
-//         },
-//         textFieldController: controller,
-//       ),
-//     ],
-//   ),
-// ),
 
                         IntlPhoneField(
-                          initialCountryCode:
-                              widget.iso, // Automatically detect user's country
+                          initialCountryCode: detectedCountryCode,
                           controller: whatsAppController,
                           invalidNumberMessage: "Numéro invalide",
                           searchText: "Chercher un pays",
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
+                                vertical: 0, horizontal: 20),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -371,7 +316,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                               whatsAppActeur:
                                                   processedNumberTel,
                                               telephone: processedNumberTel,
-                                              pays: selectedCountry!,
+                                              pays: selectedCountry,
                                             )));
                               }
                             },

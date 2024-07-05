@@ -35,13 +35,8 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 const d_colorPage = Color.fromRGBO(255, 255, 255, 1);
 
 class _ProductsScreenState extends State<ProductsScreen> {
-  // static const String baseUrl = '$apiOnlineUrl/Stock';
-  //  static const String baseUrl = 'http://10.0.2.2:9000/api-koumi/Stock';
-
   late Acteur acteur = Acteur();
   late List<TypeActeur> typeActeurData = [];
-  // List<ParametreGeneraux> paraList = [];
-  // late ParametreGeneraux para = ParametreGeneraux();
   late String type;
   bool isSearchMode = true;
   late TextEditingController _searchController;
@@ -86,8 +81,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Future<List<Stock>> getAllStock() async {
     if (selectedCat != null) {
       stockListe = await StockService().fetchStockByCategorie(
-          selectedCat!.idCategorieProduit!,
-          widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+          selectedCat!.idCategorieProduit!, widget.detectedCountry!);
     }
 
     return stockListe;
@@ -96,7 +90,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Future<List<Stock>> getAllStocks() async {
     stockListe = await StockService().fetchStock(
         widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
-
     return stockListe;
   }
 
@@ -106,11 +99,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
         hasMore &&
         !isLoading &&
         selectedCat == null) {
-      // Incrementez la page et récupérez les stocks généraux
-      setState(() {
-        // Rafraîchir les données ici
-        page++;
-      });
+      if (mounted)
+        setState(() {
+          // Rafraîchir les données ici
+          page++;
+        });
       debugPrint("yes - fetch all stocks by pays");
       fetchStock(
               widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
@@ -121,6 +114,15 @@ class _ProductsScreenState extends State<ProductsScreen> {
         });
       });
     }
+    //  fetchStock(widget.detectedCountry != null
+    //               ? widget.detectedCountry!
+    //               : "Mali")
+    //           .then((value) {
+    //         setState(() {
+    //           // Rafraîchir les données ici
+    //           debugPrint("page inc all ${page}");
+    //         });
+    //       });
     debugPrint("no");
   }
 
@@ -133,10 +135,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
       // if (selectedCat != null) {
       // Incrementez la page et récupérez les stocks par catégorie
       debugPrint("yes - fetch by category and pays");
-      setState(() {
-        // Rafraîchir les données ici
-        page++;
-      });
+      if (mounted)
+        setState(() {
+          // Rafraîchir les données ici
+          page++;
+        });
 
       fetchStockByCategorie(
               widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
@@ -181,9 +184,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
             hasMore = false;
           });
         } else {
+          List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
           setState(() {
-            List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
-            stockListe.addAll(newStocks);
+            stockListe.addAll(newStocks.where((newStock) => !stockListe
+                .any((existStock) => existStock.idStock == newStock.idStock)));
           });
         }
 
@@ -235,9 +239,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
             hasMore = false;
           });
         } else {
+          List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
           setState(() {
-            List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
-            stockListe.addAll(newStocks);
+            stockListe.addAll(newStocks.where((newStock) => !stockListe
+                .any((existStock) => existStock.idStock == newStock.idStock)));
           });
         }
 
@@ -332,7 +337,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
           ),
           actions: !isExist
-              ? null
+              ? [
+                  IconButton(
+                      onPressed: () {
+                        stockListeFuture = getAllStocks();
+                      },
+                      icon: const Icon(Icons.refresh, color: d_colorGreen))
+                ]
               : [
                   IconButton(
                       onPressed: () {
@@ -350,7 +361,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               .contains("admin") ||
                           typeActeurData
                               .map((e) => e.libelle!.toLowerCase())
-                              .contains("producteur"))
+                              .contains("producteur") ||
+                          typeActeurData
+                              .map((e) => e.libelle!.toLowerCase())
+                              .contains("partenaires de développement") ||
+                          typeActeurData
+                              .map((e) => e.libelle!.toLowerCase())
+                              .contains("partenaire de developpement"))
                       ? PopupMenuButton<String>(
                           padding: EdgeInsets.zero,
                           itemBuilder: (context) {
@@ -396,37 +413,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             ];
                           },
                         )
-                      : PopupMenuButton<String>(
-                          padding: EdgeInsets.zero,
-                          itemBuilder: (context) {
-                            return <PopupMenuEntry<String>>[
-                              PopupMenuItem<String>(
-                                child: ListTile(
-                                  leading: const Icon(
-                                    Icons.remove_red_eye,
-                                    color: Colors.green,
-                                  ),
-                                  title: const Text(
-                                    "Mes produits",
-                                    style: TextStyle(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  onTap: () async {
-                                    Navigator.of(context).pop();
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => MyProductScreen(),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ];
-                          },
-                        ),
+                      : Container()
                 ]),
       body: Container(
         child: NestedScrollView(
@@ -828,17 +815,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         builder: (context, stockService, child) {
                       return FutureBuilder<List<Stock>>(
                           future: stockListeFuture1,
-                          // StockService().fetchStockByCategorieWithPagination(selectedCat!.idCategorieProduit!),
-                          // fetchStockByCategorie(selectedCat!.idCategorieProduit!) ,
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
                               return _buildShimmerEffect();
-                              // const Center(
-                              //   child: CircularProgressIndicator(
-                              //     color: Colors.orange,
-                              //   ),
-                              // );
                             }
                             if (snapshot.hasError == true) {
                               return SingleChildScrollView(
@@ -951,17 +931,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                                 filteredSearch.length + 1,
                                             //  itemCount: stockListe.length + (!isLoading ? 1 : 0),
                                             itemBuilder: (context, index) {
-                                              //   if (index == stockListe.length) {
-                                              // return
-                                              // _buildShimmerEffect()
-                                              // // Center(
-                                              // //   child: CircularProgressIndicator(
-                                              // //     color: Colors.orange,
-                                              // //   ),
-                                              // // )
-                                              // ;
-                                              //     }
-
                                               if (index <
                                                   filteredSearch.length) {
                                                 return GestureDetector(
@@ -1237,45 +1206,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
-  Widget _buildItem(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-                color: Colors.black87,
-                fontWeight: FontWeight.w500,
-                fontStyle: FontStyle.italic,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 16),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w800,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 16),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEtat(bool isState) {
-    return Container(
-      width: 15,
-      height: 15,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: isState ? Colors.green : Colors.red,
-      ),
-    );
-  }
-
+ 
   DropdownButtonFormField<String> buildDropdown(
       List<CategorieProduit> typeList) {
     return DropdownButtonFormField<String>(

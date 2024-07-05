@@ -32,6 +32,7 @@ import 'package:koumi_app/screens/Transport.dart';
 import 'package:koumi_app/screens/Weather.dart';
 import 'package:koumi_app/widgets/Carrousel.dart';
 import 'package:koumi_app/widgets/CustomAppBar.dart';
+import 'package:koumi_app/widgets/DetectorPays.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -100,7 +101,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
   var latitude = 'Getting Latitude..'.obs;
   var longitude = 'Getting Longitude..'.obs;
   var address = 'Getting Address..'.obs;
-  late StreamSubscription<Position> streamSubscription;
+  StreamSubscription<Position>? streamSubscription;
 
   getLocation() async {
     bool serviceEnabled;
@@ -143,21 +144,36 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
   }
 
   Future<void> getAddressFromLatLang(Position position) async {
-    List<Placemark> placemark =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    Placemark place = placemark[0];
-    debugPrint("Address ISO: $detectedC");
-    address.value =
-        'Address : ${place.locality},${place.country},${place.isoCountryCode} ';
-    if (mounted)
-      setState(() {
-        detectedC = place.isoCountryCode;
-        detectedCountryCode = place.isoCountryCode!;
-        detectedCountry = place.country!;
-      });
+    final detectorPays = Provider.of<DetectorPays>(context, listen: false);
+    try {
+      List<Placemark> placemark =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+      if (placemark.isNotEmpty) {
+        Placemark place = placemark[0];
+        debugPrint("Address ISO: $detectedC");
+        address.value =
+            'Address : ${place.locality}, ${place.country}, ${place.isoCountryCode}';
 
-    debugPrint(
-        "Address: admin accueil  ${place.locality},${place.country},${place.isoCountryCode}");
+        if (mounted) {
+          setState(() {
+            detectedC = place.isoCountryCode;
+            detectedCountryCode = place.isoCountryCode!;
+            detectedCountry = place.country!;
+            detectorPays.setDetectedCountryAndCode(
+                detectedCountry, detectedCountryCode);
+          });
+        }
+
+        debugPrint(
+            "Address: ${place.locality}, ${place.country}, ${place.isoCountryCode}");
+      } else {
+        debugPrint(
+            "Aucun emplacement trouvé dans admin accueil pour les coordonnées fournies.");
+      }
+    } catch (e) {
+      debugPrint(
+          "Une erreur est survenue lors de la récupération de l'adresse : $e");
+    }
   }
 
   void verify() async {
@@ -188,30 +204,28 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
   }
 
   @override
+  void dispose() {
+    streamSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // final parametreProvider =
-    //     Provider.of<ParametreGenerauxProvider>(context, listen: false);
-
-    // ParametreGenerauxService().fetchParametre().then((parametreList) {
-    //   parametreProvider.setParametreList(parametreList);
-    // }).catchError((error) {
-    //   // Gestion des erreurs
-    //   print('Erreur lors du chargement des données : $error');
-    // });
-
     return Scaffold(
       backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
       appBar: const CustomAppBar(),
       body: ListView(
         children: [
-          SizedBox(height: 200, child: Carrousels()),
-          // SizedBox(
-          //     height: 180, child: isExist ? Carrousel() : CarrouselOffLine()),
-
+          // SizedBox(height: 200, child: Carrousels()),
+          //  SizedBox(
+          // height: 180, child: isExist ? Carrousel() : CarrouselOffLine()),
+          SizedBox(height: 180, child: Carrousel()),
           // SizedBox(height: 100, child: isExist ? Carrousel(): CarrouselOffLine()),
           // const SizedBox(
           //   height: 10,
           // ),
+          //  SizedBox(
+          // height: 180, child: isExist ? Carrousel() : CarrouselOffLine()),
           // SizedBox(height: 100, child: AlertAcceuil()),
           const SizedBox(
             height: 10,
@@ -238,8 +252,8 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
 
   List<Widget> _buildCards() {
     List<Widget> cards = [
-      _buildAccueilCard("Conseils", "cons.png", 2),
-      _buildAccueilCard("Alertes", "alt.png", 8),
+      _buildAccueilCard("Conseils", "cons1.png", 2),
+      _buildAccueilCard("Alertes", "alt21.png", 8),
       // _buildAccueilCard("Semences et plants", "semence.png", 14),
       // _buildAccueilCard("Produits phytosanitaires", "physo.png", 15),
       // _buildAccueilCard("Engrais et apports", "engrais.png", 17),
@@ -249,15 +263,15 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
       // _buildAccueilCard("Matériels et équipements", "equi.png", 13),
       // _buildAccueilCard("Produits transformés", "transforme.png", 20),
       _buildAccueilCard("Commandes", "cm.png", 3),
-      _buildAccueilCard("Magasins", "shop.png", 4),
-      _buildAccueilCard("Intrants agricoles", "int.png", 1),
-      _buildAccueilCard("Produits agricoles", "pro.png", 9),
+      _buildAccueilCard("Magasins", "shop1.png", 4),
+      _buildAccueilCard("Intrants agricoles", "int1.png", 1),
+      _buildAccueilCard("Produits agricoles", "pro1.png", 9),
       _buildAccueilCard("Materiels de Locations", "loc.png", 7),
       _buildAccueilCard("Moyens de Transports", "transp.png", 6),
       _buildAccueilCard("Filières", "fi.jpg", 10),
-      _buildAccueilCard("Météo", "met.png", 5),
+      _buildAccueilCard("Météo", "met1.png", 5),
       _buildAccueilCard("Catégories", "c.jpg", 11),
-      _buildAccueilCard("Acteurs", "ac.png", 12),
+      _buildAccueilCard("Acteurs", "ac1.png", 12),
     ];
 
     return cards;
@@ -341,6 +355,7 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
+                      // builder: (context) => const AlertesOffLineScreen()));
                       builder: (context) => const AlerteScreen()));
             } else if (index == 7) {
               Navigator.push(
@@ -360,8 +375,12 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
                   MaterialPageRoute(
                       builder: (context) => const WeatherScreen()));
             } else if (index == 4) {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const StoreScreen()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => StoreScreen(
+                            detectedCountry: detectedCountry!,
+                          )));
             } else if (index == 3) {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const MesCommande()));
@@ -393,26 +412,23 @@ class _AcceuilAdminState extends State<AcceuilAdmin> {
             child: Row(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(5),
                   child: Image.asset(
                     "assets/images/$imgLocation",
-                    width: 35,
-                    height: 35,
+                    width: 38,
+                    height: 38,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Text(
-                      titre,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  child: Text(
+                    titre,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),

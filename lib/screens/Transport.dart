@@ -60,23 +60,13 @@ class _TransportState extends State<Transport> {
         hasMore &&
         !isLoading &&
         selectedType == null) {
-      // Incrementez la page et récupérez les stocks généraux
+        if(mounted)
       setState(() {
         // Rafraîchir les données ici
         page++;
       });
-      debugPrint("yes - fetch all by pays vehicule");
-      fetchVehicule(
-              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
-          .then((value) {
-        setState(() {
-          // Rafraîchir les données ici
-          debugPrint("page inc all ${page}");
-        });
-      });
-      // }
-      // }
-      // else {
+      debugPrint("yes - fetch all by pays vehicule $page" );
+      fetchVehicule(widget.detectedCountry!);
     }
     debugPrint("no");
   }
@@ -90,19 +80,14 @@ class _TransportState extends State<Transport> {
       // if (selectedCat != null) {
       // Incrementez la page et récupérez les stocks par catégorie
       debugPrint("yes - fetch by type and pays");
+      if(mounted)
       setState(() {
-        // Rafraîchir les données ici
-        page++;
-      });
-
-      fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!,
-              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
-          .then((value) {
-        setState(() {
           // Rafraîchir les données ici
-          debugPrint("page inc all ${page}");
+      page++;
         });
-      });
+   
+    fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!, widget.detectedCountry!);
+
     }
     debugPrint("no");
   }
@@ -140,7 +125,7 @@ class _TransportState extends State<Transport> {
           setState(() {
             List<Vehicule> newVehicule =
                 body.map((e) => Vehicule.fromMap(e)).toList();
-            vehiculeListe.addAll(newVehicule);
+            vehiculeListe.addAll(newVehicule.where((newVe) => !newVehicule.any((existVe) => existVe.idVehicule == newVe.idVehicule)));
             // page++;
           });
         }
@@ -202,7 +187,7 @@ class _TransportState extends State<Transport> {
         }
 
         debugPrint(
-            "response body all vehicle with pagination $page par défilement soit ${vehiculeListe.length}");
+            "response body all vehicle with pagination $page dans la page par défilement soit ${vehiculeListe.length}");
         return vehiculeListe;
       } else {
         print(
@@ -220,14 +205,13 @@ class _TransportState extends State<Transport> {
     return vehiculeListe;
   }
 
-  Future<List<Vehicule>> getAllVehicule() async {
-    if (selectedType != null) {
-      vehiculeListe = await VehiculeService()
-          .fetchVehiculeByTypeVoitureWithPagination(
-              selectedType!.idTypeVoiture!,
-              widget.detectedCountry != null
-                  ? widget.detectedCountry!
-                  : "Mali");
+
+    Future<List<Vehicule>> getAllVehicule() async {
+     if (selectedType != null) {
+      vehiculeListe = await 
+          VehiculeService().fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!,widget.detectedCountry!);
+
+
     }
 
     return vehiculeListe;
@@ -243,7 +227,6 @@ class _TransportState extends State<Transport> {
       type = typeActeurData.map((data) => data.libelle).join(', ');
       setState(() {
         isExist = true;
-        // vehiculeListeFuture1 = VehiculeService().fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!);
       });
     } else {
       setState(() {
@@ -259,26 +242,28 @@ class _TransportState extends State<Transport> {
     // // selectedType == null;
     // type = typeActeurData.map((data) => data.libelle).join(', ');
     verify();
-    widget.detectedCountry != null
-        ? debugPrint("pays fetch transport page ${widget.detectedCountry!} ")
-        : debugPrint("null pays non fetch transport page");
-    vehiculeListeFuture = VehiculeService().fetchVehicule(
-        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
+    widget.detectedCountry!= null ?
+   debugPrint("pays fetch transport page ${widget.detectedCountry!} ")
+     : 
+     debugPrint("null pays non fetch transport page");
     _searchController = TextEditingController();
-    _typeList = http.get(Uri.parse('$apiOnlineUrl/TypeVoiture/read'));
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      //write or call your logic
-      //code will run when widget rendering complete
-      scrollableController.addListener(_scrollListener);
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      //write or call your logic
-      //code will run when widget rendering complete
-      scrollableController1.addListener(_scrollListener1);
-    });
-    vehiculeListeFuture = VehiculeService().fetchVehicule(
-        widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
-    vehiculeListeFuture1 = getAllVehicule();
+    _typeList =
+        http.get(Uri.parse('$apiOnlineUrl/TypeVoiture/read'));
+WidgetsBinding.instance.addPostFrameCallback((_){
+    //write or call your logic
+    //code will run when widget rendering complete
+  scrollableController.addListener(_scrollListener);
+  });
+WidgetsBinding.instance.addPostFrameCallback((_){
+    //write or call your logic
+    //code will run when widget rendering complete
+  scrollableController1.addListener(_scrollListener1);
+  });
+ isExist == false ? vehiculeListeFuture = VehiculeService().fetchVehicule(widget.detectedCountry!):
+ vehiculeListeFuture = VehiculeService().fetchVehicule(acteur.niveau3PaysActeur!);
+  vehiculeListeFuture1 = getAllVehicule();
+
+
 
     super.initState();
   }
@@ -477,18 +462,12 @@ class _TransportState extends State<Transport> {
               });
               selectedType == null
                   ? setState(() {
-                      vehiculeListeFuture = VehiculeService().fetchVehicule(
-                          widget.detectedCountry != null
-                              ? widget.detectedCountry!
-                              : "Mali");
+                      vehiculeListeFuture = VehiculeService().fetchVehicule(widget.detectedCountry!);
                     })
                   : setState(() {
                       vehiculeListeFuture1 = VehiculeService()
                           .fetchVehiculeByTypeVoitureWithPagination(
-                              selectedType!.idTypeVoiture!,
-                              widget.detectedCountry != null
-                                  ? widget.detectedCountry!
-                                  : "Mali");
+                              selectedType!.idTypeVoiture!,widget.detectedCountry!);
                     });
             },
             child: Container(
@@ -718,18 +697,13 @@ class _TransportState extends State<Transport> {
                   });
                   selectedType == null
                       ? setState(() {
-                          vehiculeListeFuture = VehiculeService().fetchVehicule(
-                              widget.detectedCountry != null
-                                  ? widget.detectedCountry!
-                                  : "Mali");
+                          vehiculeListeFuture =
+                              VehiculeService().fetchVehicule(widget.detectedCountry!);
                         })
                       : setState(() {
                           vehiculeListeFuture1 = VehiculeService()
                               .fetchVehiculeByTypeVoitureWithPagination(
-                                  selectedType!.idTypeVoiture!,
-                                  widget.detectedCountry != null
-                                      ? widget.detectedCountry!
-                                      : "Mali");
+                                  selectedType!.idTypeVoiture!,widget.detectedCountry!);
                         });
                 },
                 child: selectedType == null
@@ -1266,8 +1240,7 @@ class _TransportState extends State<Transport> {
           }
           page = 0;
           hasMore = true;
-          fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!,
-              widget.detectedCountry != null ? widget.detectedCountry! : "Mali",
+          fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!,widget.detectedCountry! ,
               refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {

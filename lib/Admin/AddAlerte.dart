@@ -8,6 +8,7 @@ import 'package:koumi_app/api/firebase_api.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/AlerteService.dart';
+import 'package:koumi_app/widgets/DetectorPays.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -15,8 +16,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class AddAlerte extends StatefulWidget {
-  const AddAlerte({super.key});
-
+ const AddAlerte({super.key});
   @override
   State<AddAlerte> createState() => _AddAlerteState();
 }
@@ -197,6 +197,10 @@ class _AddAlerteState extends State<AddAlerte> {
     super.initState();
     initRecoder();
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
+    selectedCountryCode =
+        Provider.of<DetectorPays>(context, listen: false).detectedCountryCode!;
+    selectedCountry =
+        Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
   }
 
   @override
@@ -300,7 +304,6 @@ class _AddAlerteState extends State<AddAlerte> {
                               ),
                             ),
                           ),
-
                           SizedBox(
                             height: 10,
                           ),
@@ -339,7 +342,7 @@ class _AddAlerteState extends State<AddAlerte> {
                               ),
                             ),
                           ),
-                                                    SizedBox(
+                          SizedBox(
                             height: 10,
                           ),
                           Padding(
@@ -360,14 +363,17 @@ class _AddAlerteState extends State<AddAlerte> {
                                 vertical: 10, horizontal: 20),
                             child: Container(
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.all(Radius.circular(8)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(8)),
                                 border: Border.all(
-                                  color: Colors.black26, // Couleur de la bordure
+                                  color:
+                                      Colors.black26, // Couleur de la bordure
                                   width: 2, // Largeur de la bordure
                                 ),
                               ),
                               child: CountryCodePicker(
-                                backgroundColor: Colors.transparent, // Fond transparent pour le picker
+                                backgroundColor: Colors
+                                    .transparent, // Fond transparent pour le picker
                                 onChanged: (CountryCode countryCode) {
                                   setState(() {
                                     selectedCountry = countryCode.name!;
@@ -375,7 +381,8 @@ class _AddAlerteState extends State<AddAlerte> {
                                     print("Pays : $selectedCountry");
                                   });
                                 },
-                                  initialSelection: selectedCountry, // Set initial selection based on detected country code
+                                initialSelection:
+                                    selectedCountry, // Set initial selection based on detected country code
                                 showCountryOnly: true,
                                 showOnlyCountryWhenClosed: true,
                                 alignLeft: true,
@@ -536,10 +543,10 @@ class _AddAlerteState extends State<AddAlerte> {
                                               audioAlerte: audiosUploaded,
                                               photoAlerte: photoUploaded)
                                           .then((value) => {
-                                                FirebaseApi()
-                                                    .sendPushNotificationToTopic(
-                                                        'Nouvelle alerte',
-                                                        titre),
+                                                // FirebaseApi()
+                                                //     .sendPushNotificationToTopic(
+                                                //         'Nouvelle alerte',
+                                                //         titre),
                                                 _titreController.clear(),
                                                 _descriptionController.clear(),
                                                 _tokenTextController.clear(),
@@ -585,16 +592,16 @@ class _AddAlerteState extends State<AddAlerte> {
                                     } else {
                                       await AlertesService()
                                           .creerAlertes(
-                                              titreAlerte: titre,
-                                              descriptionAlerte: description,
-                                              pays: selectedCountry,
-                                              codePays: selectedCountryCode,
-                                              )
+                                            titreAlerte: titre,
+                                            descriptionAlerte: description,
+                                            pays: selectedCountry,
+                                            codePays: selectedCountryCode,
+                                          )
                                           .then((value) => {
-                                                FirebaseApi()
-                                                    .sendPushNotificationToTopic(
-                                                        'Nouvelle alerte',
-                                                        titre),
+                                                // FirebaseApi()
+                                                //     .sendPushNotificationToTopic(
+                                                //         'Nouvelle alerte',
+                                                //         titre),
                                                 _titreController.clear(),
                                                 _descriptionController.clear(),
                                                 _tokenTextController.clear(),

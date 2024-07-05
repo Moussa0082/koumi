@@ -79,10 +79,9 @@ class _AlerteScreenState extends State<AlerteScreen> {
             ),
           ),
           actions: typeActeurData
-          .map((e) => e.libelle!.toLowerCase())
-          .contains("admin")
-              ? 
-                [
+                  .map((e) => e.libelle!.toLowerCase())
+                  .contains("admin")
+              ? [
                   PopupMenuButton<String>(
                     padding: EdgeInsets.zero,
                     itemBuilder: (context) {
@@ -110,52 +109,54 @@ class _AlerteScreenState extends State<AlerteScreen> {
                             },
                           ),
                         ),
-                        PopupMenuItem<String>(
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.add,
-                              color: d_colorGreen,
-                            ),
-                            title: const Text(
-                              "Ajouter Alerte PUB",
-                              style: TextStyle(
-                                color: d_colorGreen,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            onTap: () async {
-                              Navigator.of(context).pop();
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => AddAlertesOffLineScreen()));
-                            },
-                          ),
-                        ),
-                        PopupMenuItem<String>(
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.remove_red_eye,
-                              color: d_colorGreen,
-                            ),
-                            title: const Text(
-                              "Alerte PUB ",
-                              style: TextStyle(
-                                color: d_colorGreen,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            onTap: () async {
-                              Navigator.of(context).pop();
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => AlertesOffLineScreen()));
-                            },
-                          ),
-                        ),
+                        // PopupMenuItem<String>(
+                        //   child: ListTile(
+                        //     leading: const Icon(
+                        //       Icons.add,
+                        //       color: d_colorGreen,
+                        //     ),
+                        //     title: const Text(
+                        //       "Ajouter Alerte PUB",
+                        //       style: TextStyle(
+                        //         color: d_colorGreen,
+                        //         fontSize: 18,
+                        //         fontWeight: FontWeight.bold,
+                        //       ),
+                        //     ),
+                        //     onTap: () async {
+                        //       Navigator.of(context).pop();
+                        //       Navigator.push(
+                        //           context,
+                        //           MaterialPageRoute(
+                        //               builder: (context) =>
+                        //                   AddAlertesOffLineScreen()));
+                        //     },
+                        //   ),
+                        // ),
+                        // PopupMenuItem<String>(
+                        //   child: ListTile(
+                        //     leading: const Icon(
+                        //       Icons.remove_red_eye,
+                        //       color: d_colorGreen,
+                        //     ),
+                        //     title: const Text(
+                        //       "Alerte PUB ",
+                        //       style: TextStyle(
+                        //         color: d_colorGreen,
+                        //         fontSize: 18,
+                        //         fontWeight: FontWeight.bold,
+                        //       ),
+                        //     ),
+                        //     onTap: () async {
+                        //       Navigator.of(context).pop();
+                        //       Navigator.push(
+                        //           context,
+                        //           MaterialPageRoute(
+                        //               builder: (context) =>
+                        //                   AlertesOffLineScreen()));
+                        //     },
+                        //   ),
+                        // ),
                         PopupMenuItem<String>(
                           child: ListTile(
                             leading: const Icon(
@@ -182,7 +183,8 @@ class _AlerteScreenState extends State<AlerteScreen> {
                       ];
                     },
                   )
-                ] : null),
+                ]
+              : null),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -555,7 +557,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
   }
 
   Widget buildShimmerEffect() {
-   return SingleChildScrollView(
+    return SingleChildScrollView(
       child: Shimmer.fromColors(
         baseColor: Colors.grey[300]!,
         highlightColor: Colors.grey[100]!,

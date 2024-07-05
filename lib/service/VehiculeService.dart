@@ -213,7 +213,7 @@ class VehiculeService extends ChangeNotifier {
           vehiculeList.addAll(newVehicule);
         }
 
-        debugPrint("response body all vehicle by pays with pagination $page par défilement soit ${vehiculeList.length}");
+        debugPrint("response body all vehicle by pays with pagination dans le service $page par défilement soit ${vehiculeList.length}");
        return vehiculeList;
       } else {
         print('Échec de la requête v type pag avec le code d\'état: ${response.statusCode} |  ${response.body}');

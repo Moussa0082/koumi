@@ -1,14 +1,14 @@
- import 'dart:convert';
+import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:http/http.dart' as http;
-
+import 'package:koumi_app/screens/RegisterScreen.dart';
 import 'package:koumi_app/widgets/BottomNavBarAdmin.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
@@ -23,13 +23,11 @@ class PinLoginScreen extends StatefulWidget {
 }
 
 class _PinLoginScreenState extends State<PinLoginScreen> {
- 
-
-    String enteredPin = '';
+  String enteredPin = '';
   bool isPinVisible = false;
-  bool isLoading= false;
-  
-   late SharedPreferences prefs;
+  bool isLoading = false;
+
+  late SharedPreferences prefs;
 
 //   Future<Acteur> connexionActeurWithPin(String codeActeur, String password) async {
 //   final Uri uri = Uri.parse('http://votre_api/pinLogin?codeActeur=$codeActeur&password=$password');
@@ -50,21 +48,18 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
 //   }
 // }
 
-  _handleButtonPress () async{
-  setState(() {
-    isLoading = true;
-  });
-  await loginUser().then((_){
-   setState(() {
-     isLoading = false;
-   });
-  });
- }
+  _handleButtonPress() async {
+    setState(() {
+      isLoading = true;
+    });
+    await loginUser().then((_) {
+      setState(() {
+        isLoading = false;
+      });
+    });
+  }
 
-
-   Future<void> loginUser() async {
-
-
+  Future<void> loginUser() async {
     const String baseUrl = '$apiOnlineUrl/acteur/pinLogin';
     // const String baseUrl = 'http://10.0.2.2:9000/api-koumi/acteur/pinLogin';
 
@@ -72,56 +67,55 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
 
     ActeurProvider acteurProvider =
         Provider.of<ActeurProvider>(context, listen: false);
-        prefs = await SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
 
-   // Récupérer le codeActeur depuis SharedPreferences
-  String? codeActeur = prefs.getString('codeActeur');
+    // Récupérer le codeActeur depuis SharedPreferences
+    String? codeActeur = prefs.getString('codeActeur');
 
-  // Vérifier si le codeActeur est présent dans SharedPreferences
-  if (codeActeur == null || codeActeur.isEmpty) {
-    // Afficher une erreur si le codeActeur est manquant
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Center(child: Text('Erreur')),
-          content: const Text(
-            "Une erreur s'est produite veuillez réessayer plus tard",
-            textAlign: TextAlign.justify,
-            style: TextStyle(color: Colors.black, fontSize: 20),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('OK'),
+    // Vérifier si le codeActeur est présent dans SharedPreferences
+    if (codeActeur == null || codeActeur.isEmpty) {
+      // Afficher une erreur si le codeActeur est manquant
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Center(child: Text('Erreur')),
+            content: const Text(
+              "Une erreur s'est produite veuillez réessayer plus tard",
+              textAlign: TextAlign.justify,
+              style: TextStyle(color: Colors.black, fontSize: 20),
             ),
-          ],
-        );
-      },
-    );
-    return;
-  }
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
 
-  // Construire l'URL de l'API avec le codeActeur récupéré
-  final Uri apiUrl = Uri.parse('$baseUrl?codeActeur=$codeActeur&password=$enteredPin');
+    // Construire l'URL de l'API avec le codeActeur récupéré
+    final Uri apiUrl =
+        Uri.parse('$baseUrl?codeActeur=$codeActeur&password=$enteredPin');
 
-  try {
-    final response = await http.get(
-      apiUrl,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    );
+    try {
+      final response = await http.get(
+        apiUrl,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
 
       if (response.statusCode == 200) {
-       
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-
         // Sauvegarder les données de l'utilisateur dans shared preferences
-       prefs = await SharedPreferences.getInstance();
+        prefs = await SharedPreferences.getInstance();
         final password = responseBody['password'];
         final emailActeur = responseBody['emailActeur'];
         prefs.setString('emailActeur', emailActeur);
@@ -188,27 +182,25 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         final List<String> type =
             acteur.typeActeur!.map((e) => e.libelle!).toList();
         if (type.contains('admin') || type.contains('Admin')) {
-Navigator.pushReplacement(
-  context,
-  MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
-);
-
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const BottomNavBarAdmin()),
+          );
         } else {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-                builder: (context) =>  BottomNavigationPage()),
+            MaterialPageRoute(builder: (context) => BottomNavigationPage()),
           );
         }
       } else {
         // Traitement en cas d'échec
-                            enteredPin = '';
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              const SnackBar(
-                                                                                content: Center(child: Text("Code pin incorrecte ")),
-                                                                                duration: Duration(seconds: 2),
-                                                                              ),
-                                                                            );
+        enteredPin = '';
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Center(child: Text("Code pin incorrecte ")),
+            duration: Duration(seconds: 2),
+          ),
+        );
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
         final errorMessage = responseBody['message'];
         print(errorMessage);
@@ -262,24 +254,22 @@ Navigator.pushReplacement(
     }
   }
 
-
   /// this widget will be use for each digit
   Widget numButton(int number) {
     return Padding(
       padding: const EdgeInsets.only(top: 16),
       child: TextButton(
         onPressed: () {
-          setState(()  {
+          setState(() {
             if (enteredPin.length < 6) {
               enteredPin += number.toString();
             }
 
             debugPrint("Pin : $enteredPin");
-    
           });
-            if (enteredPin.length == 6) {
-              _handleButtonPress();
-            }
+          if (enteredPin.length == 6) {
+            _handleButtonPress();
+          }
         },
         child: Text(
           number.toString(),
@@ -306,12 +296,14 @@ Navigator.pushReplacement(
                 icon: const Icon(Icons.arrow_back_ios))),
         backgroundColor: const Color(0xFFFFFFFF),
         body: SafeArea(
-      minimum: EdgeInsets.only(top: 20),
+          minimum: EdgeInsets.only(top: 10),
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             physics: const BouncingScrollPhysics(),
             children: [
-              const SizedBox(height: 50,),
+              const SizedBox(
+                height: 30,
+              ),
               const Center(
                 child: Text(
                   'Entrer votre code pin',
@@ -322,8 +314,8 @@ Navigator.pushReplacement(
                   ),
                 ),
               ),
-              const SizedBox(height: 105),
-          
+              const SizedBox(height: 60),
+
               /// pin code area
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -332,8 +324,8 @@ Navigator.pushReplacement(
                   (index) {
                     return Container(
                       margin: const EdgeInsets.all(6.0),
-                      width: isPinVisible ? 40 : 16,
-                      height: isPinVisible ? 40 : 16,
+                      width: isPinVisible ? 40 : 18,
+                      height: isPinVisible ? 40 : 18,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(6.0),
                         color: index < enteredPin.length
@@ -358,7 +350,7 @@ Navigator.pushReplacement(
                   },
                 ),
               ),
-          
+
               /// visiblity toggle button
               IconButton(
                 onPressed: () {
@@ -370,9 +362,9 @@ Navigator.pushReplacement(
                   isPinVisible ? Icons.visibility_off : Icons.visibility,
                 ),
               ),
-          
+
               SizedBox(height: isPinVisible ? 50.0 : 8.0),
-          
+
               /// digits
               for (var i = 0; i < 3; i++)
                 Padding(
@@ -385,7 +377,7 @@ Navigator.pushReplacement(
                     ).toList(),
                   ),
                 ),
-          
+
               /// 0 digit with back remove
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -399,11 +391,10 @@ Navigator.pushReplacement(
                         setState(
                           () {
                             if (enteredPin.isNotEmpty) {
-                              enteredPin =
-                                  enteredPin.substring(0, enteredPin.length - 1);
+                              enteredPin = enteredPin.substring(
+                                  0, enteredPin.length - 1);
                             }
-                           debugPrint("Pin : $enteredPin");
-          
+                            debugPrint("Pin : $enteredPin");
                           },
                         );
                       },
@@ -416,15 +407,15 @@ Navigator.pushReplacement(
                   ],
                 ),
               ),
-          
-          
+
               /// reset button
               TextButton(
                 onPressed: () {
                   setState(() {
                     enteredPin = '';
-                    if(enteredPin.length < 1){
-              Get.snackbar("Alerte", "Le champ de saisi est déjà vide !");
+                    if (enteredPin.length < 1) {
+                      Get.snackbar(
+                          "Alerte", "Le champ de saisi est déjà vide !");
                     }
                   });
                 },
@@ -436,14 +427,52 @@ Navigator.pushReplacement(
                   ),
                 ),
               ),
+
+              const SizedBox(
+                height: 10,
+              ),
+              Container(
+                height: 30,
+                // decoration: const BoxDecoration(
+                //   color: Color.fromARGB(255, 240, 178, 107),
+                // ),
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Pas de compte ?.",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 19,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(
+                        width: 4,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Get.to(RegisterScreen(),
+                              duration: Duration(seconds: 1),
+                              transition: Transition.leftToRight);
+                        },
+                        child: const Text(
+                          "S'inscrire",
+                          style: TextStyle(
+                              color: const Color.fromARGB(255, 3, 100, 179),
+                              fontSize: 22,
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
       ),
     );
   }
-
-
-  
-
 }

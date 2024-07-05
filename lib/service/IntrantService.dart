@@ -155,8 +155,9 @@ class IntrantService extends ChangeNotifier {
         } else {
           
             List<Intrant> newIntrant = body.map((e) => Intrant.fromMap(e)).toList();
-          intrantList.addAll(newIntrant);
-          // page++;
+           intrantList.addAll(newIntrant.where((newIntrant) =>
+              !intrantList.any((existingIntrant) =>
+                  existingIntrant.idIntrant == newIntrant.idIntrant)));
           
         }
 
@@ -202,9 +203,11 @@ class IntrantService extends ChangeNotifier {
           
         } else {
           
-            List<Intrant> newIntrant = body.map((e) => Intrant.fromMap(e)).toList();
-          intrantList.addAll(newIntrant);
-          
+            List<Intrant> newIntrant =
+              body.map((e) => Intrant.fromMap(e)).toList();
+          intrantList.addAll(newIntrant.where((newIntrant) => !intrantList.any(
+              (existingIntrant) =>
+                  existingIntrant.idIntrant == newIntrant.idIntrant)));
         }
 
         debugPrint("response body all intrant by pays with pagination $page par défilement soit ${intrantList.length}");
@@ -228,7 +231,7 @@ class IntrantService extends ChangeNotifier {
 
 
 
-  Future<List<Intrant>> fetchIntrantByCategorie( String idCategorieProduit, String niveau3PaysActeur, {bool refresh = false}) async {
+  Future<List<Intrant>> fetchIntrantByCategorie( String niveau3PaysActeur, String idCategorieProduit,  {bool refresh = false}) async {
     if (isLoading == true) return [];
 
       isLoading = true;
@@ -249,8 +252,11 @@ class IntrantService extends ChangeNotifier {
         if (body.isEmpty) {
            hasMore = false;
         } else {
-           List<Intrant> newIntrants = body.map((e) => Intrant.fromMap(e)).toList();
-          intrantList.addAll(newIntrants);
+           List<Intrant> newIntrant =
+              body.map((e) => Intrant.fromMap(e)).toList();
+          intrantList.addAll(newIntrant.where((newIntrant) => !intrantList.any(
+              (existingIntrant) =>
+                  existingIntrant.idIntrant == newIntrant.idIntrant)));
         }
 
         debugPrint("response body all intrants by categorie and pays with pagination ${page} par défilement soit ${intrantList.length}");
@@ -287,15 +293,16 @@ class IntrantService extends ChangeNotifier {
         final List<dynamic> body = jsonData['content'];
 
         if (body.isEmpty) {
-         
+        
             hasMore = false;
           
         } else {
           
-            List<Intrant> newIntrants = body.map((e) => Intrant.fromMap(e)).toList();
-          intrantList.addAll(newIntrants);
-          // page++;
-          
+            List<Intrant> newIntrant =
+              body.map((e) => Intrant.fromMap(e)).toList();
+          intrantList.addAll(newIntrant.where((newIntrant) => !intrantList.any(
+              (existingIntrant) =>
+                  existingIntrant.idIntrant == newIntrant.idIntrant)));
         }
 
         debugPrint("response body intrant by acteur with pagination $page par défilement soit ${intrantList.length}");

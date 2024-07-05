@@ -28,8 +28,8 @@ class _Niveau1ListState extends State<Niveau1List> {
 
   late TextEditingController _searchController;
   late Pays payss;
-  late Future<List<Niveau1Pays>> _liste;
   List<Niveau1Pays> niveauList = [];
+  late Future<List<Niveau1Pays>> _liste;
 
   Future<List<Niveau1Pays>> getSousListe() async {
     return await Niveau1Service().fetchNiveau1ByPays(widget.pays.idPays!);

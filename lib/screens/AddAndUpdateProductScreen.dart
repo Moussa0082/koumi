@@ -18,9 +18,8 @@ import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductEndScreen.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:pattern_formatter/pattern_formatter.dart';
-
+import 'package:provider/provider.dart';
 
 class AddAndUpdateProductScreen extends StatefulWidget {
   bool? isEditable;
@@ -62,7 +61,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
   String? monnaieValue;
   late Future _monnaieList;
   late Monnaie monnaie = Monnaie();
-  
+
   Future<String> getLibelleNiveau3PaysByActor(String id) async {
     final response = await http
         .get(Uri.parse('$apiOnlineUrl/acteur/libelleNiveau3Pays/$id'));
@@ -160,7 +159,6 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
     );
   }
 
- 
   @override
   void initState() {
     super.initState();
@@ -203,16 +201,14 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: Text(
           widget.isEditable! ? 'Modifier de produit' : 'Ajout de produit',
-          style:
-              const TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
+          style: const TextStyle(
+              color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
       body: SingleChildScrollView(
         child: Column(children: [
-          
           Column(
             children: [
-            
               SizedBox(
                 height: 30,
               ),
@@ -691,8 +687,8 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                           },
                           controller: _prixController,
                           keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly,
+                          inputFormatters: [
+                            ThousandsFormatter(),
                           ],
                           decoration: InputDecoration(
                             hintText: "Prix du produit",
@@ -811,9 +807,9 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                       const SizedBox(height: 20),
                       ElevatedButton(
                           onPressed: () async {
-
                             String formattedMontant =
                                 _prixController.text.replaceAll(',', '');
+
                             final int prix =
                                 int.tryParse(formattedMontant) ?? 0;
                             print("prix formated $prix");
@@ -826,6 +822,7 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                   MaterialPageRoute(
                                       builder: (context) =>
                                           (AddAndUpdateProductEndSreen(
+                                            monnaies: monnaie,
                                             isEditable: widget.isEditable!,
                                             nomProduit: _nomController.text,
                                             forme: forme,
@@ -835,7 +832,6 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                                             quantite: _quantiteController.text,
                                             stock: widget.stock,
                                           )))).then((value) => {
-                                   
                                     if (widget.isEditable! == false)
                                       {
                                         _nomController.clear(),

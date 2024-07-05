@@ -114,6 +114,7 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                         ),
                                       ),
                                       onTap: () async {
+                                        Navigator.of(context).pop();
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -137,6 +138,7 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                         ),
                                       ),
                                       onTap: () async {
+                                        Navigator.of(context).pop();
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -162,6 +164,7 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                         ),
                                       ),
                                       onTap: () async {
+                                        Navigator.of(context).pop();
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -314,12 +317,11 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                                     fontStyle: FontStyle.italic,
                                                   )),
                                               SizedBox(height: 10),
-                                             (typeActeurData
+                                              (typeActeurData
                                                       .map((e) => e.libelle!
                                                           .toLowerCase())
                                                       .contains("admin"))
-                                                  ? 
-                                                 Container(
+                                                  ? Container(
                                                       alignment:
                                                           Alignment.bottomRight,
                                                       padding: const EdgeInsets
@@ -530,7 +532,8 @@ class _ConseilScreenState extends State<ConseilScreen> {
                                                           ),
                                                         ],
                                                       ),
-                                                    ) : Container()
+                                                    )
+                                                  : Container()
                                             ]),
                                           ),
                                         ),

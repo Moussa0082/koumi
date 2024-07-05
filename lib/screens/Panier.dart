@@ -110,10 +110,10 @@ class _PanierState extends State<Panier> {
     // String jsonData = jsonEncode(commandeAvecStocks);
 
     // Make the HTTP request
-    final url = 'https://koumi.ml/api-koumi/commande/add';
-    // final url = 'http://10.0.2.2:9000/api-koumi/commande/add';
+    // final url = 'https://koumi.ml/api-koumi/commande/add';
+    final url = 'http://10.0.2.2:9000/api-koumi/commande/add';
 
-   try {
+  try {
   final response = await http.post(
     Uri.parse(url),
     headers: {"Content-Type": "application/json"},

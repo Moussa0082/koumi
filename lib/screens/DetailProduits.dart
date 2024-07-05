@@ -172,7 +172,7 @@ class _DetailProduitsState extends State<DetailProduits>
                 },
                 icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
             centerTitle: true,
-            title: const Text("Détail Produit",style:TextStyle(fontSize: 20)),
+            title: const Text("Détail Produit", style: TextStyle(fontSize: 20)),
             actions: isExist
                 ?
                 //         (widget.stock.acteur!.idActeur != acteur.idActeur! &&
@@ -537,7 +537,9 @@ class _DetailProduitsState extends State<DetailProduits>
                           child: Text(
                             maxLines: 2,
                             textAlign: TextAlign.right,
-                            widget.stock.speculation!.nomSpeculation!,
+                            widget.stock.speculation == null
+                                ? "Aucune spéculation"
+                                : widget.stock.speculation!.nomSpeculation!,
                             style: TextStyle(
                               overflow: TextOverflow.ellipsis,
                               fontSize: 20,
@@ -570,6 +572,42 @@ class _DetailProduitsState extends State<DetailProduits>
                         ),
                       ],
                     ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Fournisseur",
+                            maxLines: 2,
+                            style: TextStyle(
+                                fontSize: 20, fontStyle: FontStyle.italic)),
+                        Text(widget.stock.acteur!.nomActeur!,
+                            maxLines: 2,
+                            style: TextStyle(
+                                fontSize: 20,
+                                overflow: TextOverflow.ellipsis,
+                                fontWeight: FontWeight.bold,
+                                fontStyle: FontStyle.italic)),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Contact",
+                            maxLines: 2,
+                            style: TextStyle(
+                                fontSize: 20, fontStyle: FontStyle.italic)),
+                        Text(
+                            widget.stock.acteur!.whatsAppActeur != null
+                                ? widget.stock.acteur!.whatsAppActeur!
+                                : widget.stock.acteur!.telephoneActeur!,
+                            maxLines: 2,
+                            style: TextStyle(
+                                fontSize: 20,
+                                overflow: TextOverflow.ellipsis,
+                                fontWeight: FontWeight.bold,
+                                fontStyle: FontStyle.italic)),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
                     Container(
                       height: 70,
                       child: Row(
