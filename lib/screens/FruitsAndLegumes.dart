@@ -35,7 +35,7 @@ class _FruitAndLegumesState extends State<FruitAndLegumes> {
   List<Stock> stockList = [];
   late Future<List<Stock>> stockListeFuture;
   late Future<List<Stock>> stockListeFuture1;
-    CategorieProduit? selectedCat;
+  CategorieProduit? selectedCat;
   String? typeValue;
   late Future _catList;
 
@@ -259,7 +259,7 @@ class _FruitAndLegumesState extends State<FruitAndLegumes> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController1.addListener(_scrollListener1);
     });
-      _catList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorie'));
+      _catList = http.get(Uri.parse('$apiOnlineUrl/Categorie/allCategorieByLibelleFiliere/$libelle'));
     stockListeFuture1 = getAllStock();
     stockListeFuture = fetchStock(
         widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
@@ -287,6 +287,7 @@ class _FruitAndLegumesState extends State<FruitAndLegumes> {
     _searchController
         .dispose(); // Disposez le TextEditingController lorsque vous n'en avez plus besoin
     scrollableController.dispose();
+    scrollableController1.dispose();
     super.dispose();
   }
 

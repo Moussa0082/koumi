@@ -3,9 +3,11 @@ import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/CategorieProduit.dart';
 import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -42,20 +44,19 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
   late String type;
   bool hasMore = true;
   late Future<List<Intrant>> intrantListeFuture;
+  late Future<List<Intrant>> intrantListeFuture1;
   List<Intrant> intrantListe = [];
   List<Intrant> intrantList = [];
+  String? catValue;
+  late Future _typeList;
+  bool isSearchMode = true;
+  CategorieProduit? selectedCat;
   // CategorieProduit? selectedType;
   ScrollController scrollableController1 = ScrollController();
-  // List<String> libelles = [
-  //   "Semences et plants",
-  //   "Semence et plant",
-  //   "Semences",
-  //   "Semence",
-  //   "semences et plants"
-  // ];
 
-  // String? monnaie;
   String libelle = "Semences et plants";
+
+  
 
   void _scrollListener() {
     debugPrint("Scroll position: ${scrollableController.position.pixels}");
@@ -137,6 +138,91 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     return intrantListe;
   }
 
+   void _scrollListener1() {
+    if (scrollableController1.position.pixels >=
+            scrollableController1.position.maxScrollExtent - 200 &&
+        hasMore &&
+        !isLoading &&
+        selectedCat != null) {
+      // if (selectedCat != null) {
+      // Incrementez la page et récupérez les stocks par catégorie
+      debugPrint("yes - fetch by category and pays");
+      if (mounted)
+        setState(() {
+          // Rafraîchir les données ici
+          page++;
+        });
+
+      fetchIntrantByCategorieAndFiliere(
+              widget.detectedCountry != null ? widget.detectedCountry! : "Mali")
+          .then((value) {
+        setState(() {
+          // Rafraîchir les données ici
+          debugPrint("page inc all ${page}");
+        });
+      });
+    }
+    debugPrint("no");
+  }
+
+  Future<List<Intrant>> fetchIntrantByCategorieAndFiliere(String pays,
+      {bool refresh = false}) async {
+    if (isLoading == true) return [];
+
+    setState(() {
+      isLoading = true;
+    });
+
+    if (refresh) {
+      setState(() {
+        intrantListe.clear();
+        page = 0;
+        hasMore = true;
+      });
+    }
+
+    try {
+      // for (String libelle in libelles) {
+      final response = await http.get(Uri.parse(
+          '$apiOnlineUrl/intrant/listeIntrantByLibelleFiliereAndIcategorie?idCategorie=${selectedCat!.idCategorieProduit}&libelle=$libelle&pays=$pays&page=$page&size=$size'));
+      debugPrint(
+          '$apiOnlineUrl/intrant/listeIntrantByLibelleFiliereAndIcategorie?idCategorie=${selectedCat!.idCategorieProduit}&libelle=$libelle&pays=$pays&page=$page&size=$size');
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> body = jsonData['content'];
+
+        if (body.isEmpty) {
+          setState(() {
+            hasMore = false;
+          });
+        } else {
+          List<Intrant> newIntrants =
+              body.map((e) => Intrant.fromMap(e)).toList();
+
+          setState(() {
+            // Ajouter uniquement les nouveaux intrants qui ne sont pas déjà dans la liste
+            intrantListe.addAll(newIntrants.where((newIntrant) =>
+                !intrantListe.any((existingIntrant) =>
+                    existingIntrant.idIntrant == newIntrant.idIntrant)));
+          });
+        }
+
+        debugPrint(
+            "response body all intrants by categorie with pagination ${page} par défilement soit ${intrantListe.length}");
+      } else {
+        print(
+            'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
+      }
+    } catch (e) {
+      print(
+          'Une erreur s\'est produite lors de la récupération des intrants: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+    return intrantListe;
+  }
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     email = prefs.getString('emailActeur');
@@ -155,6 +241,15 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     }
   }
 
+ Future<List<Intrant>> getAllIntrant() async {
+    if (selectedCat != null) {
+      intrantListe = await IntrantService().fetchIntrantByCategorieAndFilieres(
+          selectedCat!.idCategorieProduit!, libelle, widget.detectedCountry!);
+    }
+
+    return intrantListe;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -162,12 +257,18 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollableController.addListener(_scrollListener);
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollableController1.addListener(_scrollListener1);
+    });
     verify();
+    _typeList = http.get(Uri.parse(
+        '$apiOnlineUrl/Categorie/allCategorieByLibelleFiliere/$libelle'));
+    intrantListeFuture1 = getAllIntrant();
     intrantListeFuture = fetchIntrantByCategorie(
         widget.detectedCountry != null ? widget.detectedCountry! : "Mali");
   }
 
- Future<void> _getResultFromNextScreen1(BuildContext context) async {
+  Future<void> _getResultFromNextScreen1(BuildContext context) async {
     final result = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => AddIntrant()));
     log(result.toString());
@@ -179,12 +280,12 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
       });
     }
   }
-  
 
   @override
   void dispose() {
     _searchController.dispose();
     scrollableController.dispose();
+    scrollableController1.dispose();
     super.dispose();
   }
 
@@ -192,27 +293,27 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-          centerTitle: true,
-          toolbarHeight: 100,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.arrow_back_ios)),
-          title: const Text(
-            "Semences et plants ",
-            style: TextStyle(
-              color: d_colorGreen,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+            centerTitle: true,
+            toolbarHeight: 100,
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.arrow_back_ios)),
+            title: const Text(
+              "Semences et plants ",
+              style: TextStyle(
+                color: d_colorGreen,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-         actions: !isExist
+            actions: !isExist
                 ? [
                     IconButton(
                         onPressed: () {
-                         intrantListeFuture = fetchIntrantByCategorie(
+                          intrantListeFuture = fetchIntrantByCategorie(
                               widget.detectedCountry != null
                                   ? widget.detectedCountry!
                                   : "Mali");
@@ -304,43 +405,100 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                   return <Widget>[
                     SliverToBoxAdapter(
                         child: Column(children: [
-                      const SizedBox(height: 10),
                       Padding(
                         padding: const EdgeInsets.all(10.0),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                            color:
-                                Colors.blueGrey[50], // Couleur d'arrière-plan
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.search,
-                                  color: Colors
-                                      .blueGrey[400]), // Couleur de l'icône
-                              SizedBox(
-                                  width:
-                                      10), // Espacement entre l'icône et le champ de recherche
-                              Expanded(
-                                child: TextField(
-                                  controller: _searchController,
-                                  onChanged: (value) {
-                                    setState(() {});
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: 'Rechercher',
-                                    border: InputBorder.none,
-                                    hintStyle: TextStyle(
-                                        color: Colors.blueGrey[
-                                            400]), // Couleur du texte d'aide
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                        child: ToggleButtons(
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Text('Rechercher'),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Text('Filtrer'),
+                            ),
+                          ],
+                          isSelected: [isSearchMode, !isSearchMode],
+                          onPressed: (index) {
+                            setState(() {
+                              isSearchMode = index == 0;
+                            });
+                          },
                         ),
                       ),
+                      if (isSearchMode)
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.blueGrey[50],
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.search, color: Colors.blueGrey[400]),
+                                SizedBox(width: 10),
+                                Expanded(
+                                  child: TextField(
+                                    controller: _searchController,
+                                    onChanged: (value) {
+                                      setState(() {});
+                                    },
+                                    decoration: InputDecoration(
+                                      hintText: 'Rechercher',
+                                      border: InputBorder.none,
+                                      hintStyle: TextStyle(
+                                          color: Colors.blueGrey[400]),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      if (!isSearchMode)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          child: FutureBuilder(
+                            future: _typeList,
+                            builder: (_, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return buildLoadingDropdown();
+                              }
+
+                              if (snapshot.hasData) {
+                                dynamic jsonString =
+                                    utf8.decode(snapshot.data.bodyBytes);
+                                dynamic responseData = json.decode(jsonString);
+                                //
+                                // }
+                                if (responseData is List) {
+                                  final reponse = responseData;
+                                  final typeList = reponse
+                                      .map((e) => CategorieProduit.fromMap(e))
+                                      .where(
+                                          (con) => con.statutCategorie == true)
+                                      .toList();
+
+                                  if (typeList.isEmpty) {
+                                    return buildEmptyDropdown();
+                                  }
+
+                                  return buildDropdown(typeList);
+                                } else {
+                                  return buildEmptyDropdown();
+                                }
+                              }
+
+                              return buildEmptyDropdown();
+                            },
+                          ),
+                        ),
                       const SizedBox(height: 10),
                     ])),
                   ];
@@ -352,209 +510,446 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                         // Rafraîchir les données ici
                       });
                       debugPrint("refresh page ${page}");
-                      setState(() {
-                        intrantListeFuture = fetchIntrantByCategorie(
-                            widget.detectedCountry != null
-                                ? widget.detectedCountry!
-                                : "Mali");
-                      });
+                      selectedCat != null
+                          ? setState(() {
+                              intrantListeFuture = IntrantService()
+                                  .fetchIntrantByCategorieAndFilieres(
+                                      selectedCat!.idCategorieProduit!,
+                                      libelle,
+                                      widget.detectedCountry!);
+                            })
+                          : setState(() {
+                              intrantListeFuture = fetchIntrantByCategorie(
+                                  widget.detectedCountry != null
+                                      ? widget.detectedCountry!
+                                      : "Mali");
+                            });
                     },
-                    child: SingleChildScrollView(
-                      controller: scrollableController,
-                      child: Consumer<IntrantService>(
-                          builder: (context, intrantService, child) {
-                        return FutureBuilder(
-                            future: intrantListeFuture,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return _buildShimmerEffect();
-                              }
+                    child: selectedCat == null
+                        ? SingleChildScrollView(
+                            controller: scrollableController,
+                            child: Consumer<IntrantService>(
+                                builder: (context, intrantService, child) {
+                              return FutureBuilder(
+                                  future: intrantListeFuture,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return _buildShimmerEffect();
+                                    }
 
-                              if (!snapshot.hasData) {
-                                return const Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child:
-                                      Center(child: Text("Aucun donné trouvé")),
-                                );
-                              } else {
-                                intrantList = snapshot.data!;
-                                String searchText = "";
-                                List<Intrant> filteredSearch =
-                                    intrantList.where((cate) {
-                                  String nomCat =
-                                      cate.nomIntrant!.toLowerCase();
-                                  searchText =
-                                      _searchController.text.toLowerCase();
-                                  return nomCat.contains(searchText);
-                                }).toList();
-                                return filteredSearch
-                                            // .where((element) => element.statutIntrant == true)
-                                            .isEmpty &&
-                                        isLoading == false
-                                    ? SingleChildScrollView(
-                                        child: Padding(
-                                          padding: EdgeInsets.all(10),
-                                          child: Center(
-                                            child: Column(
-                                              children: [
-                                                Image.asset(
-                                                    'assets/images/notif.jpg'),
-                                                SizedBox(
-                                                  height: 10,
-                                                ),
-                                                Text(
-                                                  'Aucun produit trouvé',
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 17,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                    if (!snapshot.hasData) {
+                                      return const Padding(
+                                        padding: EdgeInsets.all(10),
+                                        child: Center(
+                                            child: Text("Aucun donné trouvé")),
+                                      );
+                                    } else {
+                                      intrantList = snapshot.data!;
+                                      String searchText = "";
+                                      List<Intrant> filteredSearch =
+                                          intrantList.where((cate) {
+                                        String nomCat =
+                                            cate.nomIntrant!.toLowerCase();
+                                        searchText = _searchController.text
+                                            .toLowerCase();
+                                        return nomCat.contains(searchText);
+                                      }).toList();
+                                      return filteredSearch
+                                                  // .where((element) => element.statutIntrant == true)
+                                                  .isEmpty &&
+                                              isLoading == false
+                                          ? SingleChildScrollView(
+                                              child: Padding(
+                                                padding: EdgeInsets.all(10),
+                                                child: Center(
+                                                  child: Column(
+                                                    children: [
+                                                      Image.asset(
+                                                          'assets/images/notif.jpg'),
+                                                      SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      Text(
+                                                        'Aucun produit trouvé',
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 17,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    : GridView.builder(
-                                        shrinkWrap: true,
-                                        physics: NeverScrollableScrollPhysics(),
-                                        gridDelegate:
-                                            SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 2,
-                                          mainAxisSpacing: 10,
-                                          crossAxisSpacing: 10,
-                                          childAspectRatio: 0.8,
-                                        ),
-                                        itemCount: filteredSearch.length + 1,
-                                        itemBuilder: (context, index) {
-                                          if (index < filteredSearch.length) {
-                                            return GestureDetector(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        DetailIntrant(
-                                                      intrant:
-                                                          filteredSearch[index],
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              child: Card(
-                                                margin: EdgeInsets.all(8),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .stretch,
-                                                  children: [
-                                                    ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8.0),
-                                                      child: SizedBox(
-                                                        height: 85,
-                                                        child: filteredSearch[
-                                                                            index]
-                                                                        .photoIntrant ==
-                                                                    null ||
-                                                                filteredSearch[
-                                                                        index]
-                                                                    .photoIntrant!
-                                                                    .isEmpty
-                                                            ? Image.asset(
-                                                                "assets/images/default_image.png",
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                              )
-                                                            : CachedNetworkImage(
-                                                                imageUrl:
-                                                                    "https://koumi.ml/api-koumi/intrant/${filteredSearch[index].idIntrant}/image",
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                                placeholder: (context,
-                                                                        url) =>
-                                                                    const Center(
-                                                                        child:
-                                                                            CircularProgressIndicator()),
-                                                                errorWidget: (context,
-                                                                        url,
-                                                                        error) =>
-                                                                    Image.asset(
-                                                                  'assets/images/default_image.png',
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                ),
-                                                              ),
-                                                      ),
-                                                    ),
-                                                    // SizedBox(height: 8),
-                                                    ListTile(
-                                                      title: Text(
-                                                        filteredSearch[index]
-                                                            .nomIntrant!,
-                                                        style: TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.black87,
-                                                        ),
-                                                        maxLines: 2,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                      subtitle: Text(
-                                                        "${filteredSearch[index].quantiteIntrant.toString()} ${filteredSearch[index].unite}",
-                                                        style: TextStyle(
-                                                          fontSize: 15,
-                                                          color: Colors.black87,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 15),
-                                                      child: Text(
-                                                        filteredSearch[index]
-                                                                    .monnaie !=
-                                                                null
-                                                            ? "${filteredSearch[index].prixIntrant.toString()} ${filteredSearch[index].monnaie!.libelle}"
-                                                            : "${filteredSearch[index].prixIntrant.toString()} FCFA ",
-                                                        style: TextStyle(
-                                                          fontSize: 15,
-                                                          color: Colors.black87,
-                                                        ),
-                                                      ),
-                                                    )
-                                                  ],
                                                 ),
                                               ),
-                                            );
-                                          } else {
-                                            return isLoading == true
-                                                ? Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 32),
-                                                    child: Center(
-                                                        child: const Center(
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                        color: Colors.orange,
+                                            )
+                                          : GridView.builder(
+                                              shrinkWrap: true,
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+                                              gridDelegate:
+                                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                                crossAxisCount: 2,
+                                                mainAxisSpacing: 10,
+                                                crossAxisSpacing: 10,
+                                                childAspectRatio: 0.8,
+                                              ),
+                                              itemCount:
+                                                  filteredSearch.length + 1,
+                                              itemBuilder: (context, index) {
+                                                if (index <
+                                                    filteredSearch.length) {
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              DetailIntrant(
+                                                            intrant:
+                                                                filteredSearch[
+                                                                    index],
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: Card(
+                                                      margin: EdgeInsets.all(8),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .stretch,
+                                                        children: [
+                                                          ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8.0),
+                                                            child: SizedBox(
+                                                              height: 85,
+                                                              child: filteredSearch[index]
+                                                                              .photoIntrant ==
+                                                                          null ||
+                                                                      filteredSearch[
+                                                                              index]
+                                                                          .photoIntrant!
+                                                                          .isEmpty
+                                                                  ? Image.asset(
+                                                                      "assets/images/default_image.png",
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                    )
+                                                                  : CachedNetworkImage(
+                                                                      imageUrl:
+                                                                          "https://koumi.ml/api-koumi/intrant/${filteredSearch[index].idIntrant}/image",
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      placeholder: (context,
+                                                                              url) =>
+                                                                          const Center(
+                                                                              child: CircularProgressIndicator()),
+                                                                      errorWidget: (context,
+                                                                              url,
+                                                                              error) =>
+                                                                          Image
+                                                                              .asset(
+                                                                        'assets/images/default_image.png',
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                      ),
+                                                                    ),
+                                                            ),
+                                                          ),
+                                                          // SizedBox(height: 8),
+                                                          ListTile(
+                                                            title: Text(
+                                                              filteredSearch[
+                                                                      index]
+                                                                  .nomIntrant!,
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .black87,
+                                                              ),
+                                                              maxLines: 2,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                            ),
+                                                            subtitle: Text(
+                                                              "${filteredSearch[index].quantiteIntrant.toString()} ${filteredSearch[index].unite}",
+                                                              style: TextStyle(
+                                                                fontSize: 15,
+                                                                color: Colors
+                                                                    .black87,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        15),
+                                                            child: Text(
+                                                              filteredSearch[index]
+                                                                          .monnaie !=
+                                                                      null
+                                                                  ? "${filteredSearch[index].prixIntrant.toString()} ${filteredSearch[index].monnaie!.libelle}"
+                                                                  : "${filteredSearch[index].prixIntrant.toString()} FCFA ",
+                                                              style: TextStyle(
+                                                                fontSize: 15,
+                                                                color: Colors
+                                                                    .black87,
+                                                              ),
+                                                            ),
+                                                          )
+                                                        ],
                                                       ),
-                                                    )),
-                                                  )
-                                                : Container();
-                                          }
-                                        },
+                                                    ),
+                                                  );
+                                                } else {
+                                                  return isLoading == true
+                                                      ? Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      32),
+                                                          child: Center(
+                                                              child:
+                                                                  const Center(
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                              color:
+                                                                  Colors.orange,
+                                                            ),
+                                                          )),
+                                                        )
+                                                      : Container();
+                                                }
+                                              },
+                                            );
+                                    }
+                                  });
+                            }),
+                          )
+                        : SingleChildScrollView(
+                            controller: scrollableController1,
+                            child: Consumer<IntrantService>(
+                                builder: (context, intrantService, child) {
+                              return FutureBuilder(
+                                  future: intrantListeFuture1,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return _buildShimmerEffect();
+                                    }
+
+                                    if (!snapshot.hasData) {
+                                      return const Padding(
+                                        padding: EdgeInsets.all(10),
+                                        child: Center(
+                                            child: Text("Aucun donné trouvé")),
                                       );
-                              }
-                            });
-                      }),
-                    )))));
+                                    } else {
+                                      intrantList = snapshot.data!;
+                                      String searchText = "";
+                                      List<Intrant> filteredSearch =
+                                          intrantList.where((cate) {
+                                        String nomCat =
+                                            cate.nomIntrant!.toLowerCase();
+                                        searchText = _searchController.text
+                                            .toLowerCase();
+                                        return nomCat.contains(searchText);
+                                      }).toList();
+                                      return filteredSearch
+                                                  // .where((element) => element.statutIntrant == true)
+                                                  .isEmpty &&
+                                              isLoading == false
+                                          ? SingleChildScrollView(
+                                              child: Padding(
+                                                padding: EdgeInsets.all(10),
+                                                child: Center(
+                                                  child: Column(
+                                                    children: [
+                                                      Image.asset(
+                                                          'assets/images/notif.jpg'),
+                                                      SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      Text(
+                                                        'Aucun produit trouvé',
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 17,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          : GridView.builder(
+                                              shrinkWrap: true,
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+                                              gridDelegate:
+                                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                                crossAxisCount: 2,
+                                                mainAxisSpacing: 10,
+                                                crossAxisSpacing: 10,
+                                                childAspectRatio: 0.8,
+                                              ),
+                                              itemCount:
+                                                  filteredSearch.length + 1,
+                                              itemBuilder: (context, index) {
+                                                if (index <
+                                                    filteredSearch.length) {
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              DetailIntrant(
+                                                            intrant:
+                                                                filteredSearch[
+                                                                    index],
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: Card(
+                                                      margin: EdgeInsets.all(8),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .stretch,
+                                                        children: [
+                                                          ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8.0),
+                                                            child: SizedBox(
+                                                              height: 85,
+                                                              child: filteredSearch[index]
+                                                                              .photoIntrant ==
+                                                                          null ||
+                                                                      filteredSearch[
+                                                                              index]
+                                                                          .photoIntrant!
+                                                                          .isEmpty
+                                                                  ? Image.asset(
+                                                                      "assets/images/default_image.png",
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                    )
+                                                                  : CachedNetworkImage(
+                                                                      imageUrl:
+                                                                          "https://koumi.ml/api-koumi/intrant/${filteredSearch[index].idIntrant}/image",
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      placeholder: (context,
+                                                                              url) =>
+                                                                          const Center(
+                                                                              child: CircularProgressIndicator()),
+                                                                      errorWidget: (context,
+                                                                              url,
+                                                                              error) =>
+                                                                          Image
+                                                                              .asset(
+                                                                        'assets/images/default_image.png',
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                      ),
+                                                                    ),
+                                                            ),
+                                                          ),
+                                                          // SizedBox(height: 8),
+                                                          ListTile(
+                                                            title: Text(
+                                                              filteredSearch[
+                                                                      index]
+                                                                  .nomIntrant!,
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .black87,
+                                                              ),
+                                                              maxLines: 2,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                            ),
+                                                            subtitle: Text(
+                                                              "${filteredSearch[index].quantiteIntrant.toString()} ${filteredSearch[index].unite}",
+                                                              style: TextStyle(
+                                                                fontSize: 15,
+                                                                color: Colors
+                                                                    .black87,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        15),
+                                                            child: Text(
+                                                              filteredSearch[index]
+                                                                          .monnaie !=
+                                                                      null
+                                                                  ? "${filteredSearch[index].prixIntrant.toString()} ${filteredSearch[index].monnaie!.libelle}"
+                                                                  : "${filteredSearch[index].prixIntrant.toString()} FCFA ",
+                                                              style: TextStyle(
+                                                                fontSize: 15,
+                                                                color: Colors
+                                                                    .black87,
+                                                              ),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                } else {
+                                                  return isLoading == true
+                                                      ? Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      32),
+                                                          child: Center(
+                                                              child:
+                                                                  const Center(
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                              color:
+                                                                  Colors.orange,
+                                                            ),
+                                                          )),
+                                                        )
+                                                      : Container();
+                                                }
+                                              },
+                                            );
+                                    }
+                                  });
+                            }),
+                          )))));
   }
 
   Widget _buildShimmerEffect() {
@@ -649,6 +1044,79 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                 fontSize: 16),
           )
         ],
+      ),
+    );
+  }
+
+  DropdownButtonFormField<String> buildDropdown(
+      List<CategorieProduit> typeList) {
+    return DropdownButtonFormField<String>(
+      isExpanded: true,
+      items: typeList
+          .map((e) => DropdownMenuItem(
+                value: e.idCategorieProduit,
+                child: Text(e.libelleCategorie!),
+              ))
+          .toList(),
+      hint: Text("-- Filtre par catégorie --"),
+      value: catValue,
+      onChanged: (newValue) {
+        setState(() {
+          catValue = newValue;
+          if (newValue != null) {
+            selectedCat = typeList.firstWhere(
+              (element) => element.idCategorieProduit == newValue,
+            );
+          }
+
+          page = 0;
+          hasMore = true;
+          fetchIntrantByCategorieAndFiliere(widget.detectedCountry != null
+              ? widget.detectedCountry!
+              : "Mali",refresh: true);
+          if (page == 0 && isLoading == true) {
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              scrollableController1.jumpTo(0.0);
+            });
+          }
+        });
+      },
+      decoration: InputDecoration(
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
+  DropdownButtonFormField buildEmptyDropdown() {
+    return DropdownButtonFormField(
+      items: [],
+      onChanged: null,
+      decoration: InputDecoration(
+        labelText: '-- Aucune catégorie trouvé --',
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
+  DropdownButtonFormField buildLoadingDropdown() {
+    return DropdownButtonFormField(
+      items: [],
+      onChanged: null,
+      decoration: InputDecoration(
+        labelText: 'Chargement...',
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
       ),
     );
   }

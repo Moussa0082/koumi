@@ -904,46 +904,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                                               ),
                                                             ),
                                                           )
-                                                          // Align(
-                                                          //   alignment: Alignment.bottomRight,
-                                                          //   child: Padding(
-                                                          //     padding: const EdgeInsets.all(8.0),
-                                                          //     child: Container(
-                                                          //       width:
-                                                          //           30, // Largeur du conteneur réduite
-                                                          //       height:
-                                                          //           30, // Hauteur du conteneur réduite
-                                                          //       decoration: BoxDecoration(
-                                                          //         color:
-                                                          //             d_colorGreen, // Couleur de fond du bouton
-                                                          //         borderRadius: BorderRadius.circular(
-                                                          //             15), // Coins arrondis du bouton
-                                                          //       ),
-                                                          //       child: IconButton(
-                                                          //         onPressed: () {
-                                                          //           //                                        if (e.acteur.idActeur! == acteur.idActeur!){
-                                                          //           // Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un intrant qui vous appartient");
-                                                          //           // }else{
-                                                          //           //   Provider.of<CartProvider>(context, listen: false)
-                                                          //           // .addToCartInt(e, 1, "");
-                                                          //           // }
-                                                          //         },
-                                                          //         icon: Icon(
-                                                          //             Icons.add), // Icône du panier
-                                                          //         color: Colors
-                                                          //             .white, // Couleur de l'icône
-                                                          //         iconSize:
-                                                          //             20, // Taille de l'icône réduite
-                                                          //         padding: EdgeInsets
-                                                          //             .zero, // Aucune marge intérieure
-                                                          //         splashRadius:
-                                                          //             15, // Rayon de l'effet de pression réduit
-                                                          //         tooltip:
-                                                          //             'Ajouter au panier', // Info-bulle au survol de l'icône
-                                                          //       ),
-                                                          //     ),
-                                                          //   ),
-                                                          // ),
+                                                         
                                                         ],
                                                       ),
                                                     ),
@@ -1202,46 +1163,7 @@ class _IntrantScreenState extends State<IntrantScreen> {
                                                                   ),
                                                                 ),
                                                               )
-                                                              // Align(
-                                                              //   alignment: Alignment.bottomRight,
-                                                              //   child: Padding(
-                                                              //     padding: const EdgeInsets.all(8.0),
-                                                              //     child: Container(
-                                                              //       width:
-                                                              //           30, // Largeur du conteneur réduite
-                                                              //       height:
-                                                              //           30, // Hauteur du conteneur réduite
-                                                              //       decoration: BoxDecoration(
-                                                              //         color:
-                                                              //             d_colorGreen, // Couleur de fond du bouton
-                                                              //         borderRadius: BorderRadius.circular(
-                                                              //             15), // Coins arrondis du bouton
-                                                              //       ),
-                                                              //       child: IconButton(
-                                                              //         onPressed: () {
-                                                              //           //                                        if (e.acteur.idActeur! == acteur.idActeur!){
-                                                              //           // Snack.error(titre: "Alerte", message: "Désolé!, Vous ne pouvez pas commander un intrant qui vous appartient");
-                                                              //           // }else{
-                                                              //           //   Provider.of<CartProvider>(context, listen: false)
-                                                              //           // .addToCartInt(e, 1, "");
-                                                              //           // }
-                                                              //         },
-                                                              //         icon: Icon(
-                                                              //             Icons.add), // Icône du panier
-                                                              //         color: Colors
-                                                              //             .white, // Couleur de l'icône
-                                                              //         iconSize:
-                                                              //             20, // Taille de l'icône réduite
-                                                              //         padding: EdgeInsets
-                                                              //             .zero, // Aucune marge intérieure
-                                                              //         splashRadius:
-                                                              //             15, // Rayon de l'effet de pression réduit
-                                                              //         tooltip:
-                                                              //             'Ajouter au panier', // Info-bulle au survol de l'icône
-                                                              //       ),
-                                                              //     ),
-                                                              //   ),
-                                                              // ),
+                                                            
                                                             ],
                                                           ),
                                                         ),
@@ -1342,49 +1264,11 @@ class _IntrantScreenState extends State<IntrantScreen> {
     );
   }
 
-  Widget _buildEtat(bool isState) {
-    return Container(
-      width: 15,
-      height: 15,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: isState ? Colors.green : Colors.red,
-      ),
-    );
-  }
-
-  Widget _buildItem(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-                color: Colors.black87,
-                fontWeight: FontWeight.w500,
-                fontStyle: FontStyle.italic,
-                // overflow: TextOverflow.ellipsis,
-                fontSize: 16),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w800,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 16),
-          )
-        ],
-      ),
-    );
-  }
+ 
 
   DropdownButtonFormField<String> buildDropdown(
       List<CategorieProduit> typeList) {
-    final countryProvider =
-        Provider.of<CountryProvider>(context, listen: false);
+   
     return DropdownButtonFormField<String>(
       isExpanded: true,
       items: typeList
