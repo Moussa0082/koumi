@@ -1,12 +1,15 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_multi_formatter/formatters/phone_input_formatter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:koumi_app/constants.dart';
+import 'package:koumi_app/models/Niveau3Pays.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/screens/RegisterEndScreen.dart';
@@ -68,6 +71,9 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
   TextEditingController paysController = TextEditingController();
   TextEditingController adresseController = TextEditingController();
   String selectedCountry = "";
+  late Future _niveau3List;
+  String niveau3 = '';
+  String? n3Value;
 
   Future<void> _getCurrentUserLocation() async {
     Position position = await Geolocator.getCurrentPosition(
@@ -179,6 +185,9 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
 //   typeActeurNames += typeActeur.libelle! + ', ';
 // }
 
+    _niveau3List = http.get(Uri.parse(
+        '$apiOnlineUrl/nivveau3Pays/listeNiveau3PaysByNomPays/${widget.pays}'));
+
     debugPrint(
         "Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone},  WA : ${widget.whatsAppActeur}, Pays : ${widget.pays} ");
 
@@ -284,90 +293,87 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                           style: TextStyle(color: (Colors.black), fontSize: 18),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
-                        child: MultiSelectDropDown.network(
-                          networkConfig: NetworkConfig(
-                            url: '$apiOnlineUrl/typeActeur/read',
-                            // url: 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
-                            method: RequestMethod.get,
-                            headers: {
-                              'Content-Type': 'application/json',
-                            },
-                          ),
-                          chipConfig: const ChipConfig(wrapType: WrapType.wrap),
-                          responseParser: (response) {
-                            typeActeur = (response as List<dynamic>)
-                                .where((data) =>
-                                        (data['libelle'])
-                                            .trim()
-                                            .toLowerCase() !=
-                                        'admin'
-                                    //     &&
-                                    // data['acteur'] != null && // Add null check here
-                                    // data['acteur']['statutActeur'] == true
-                                    )
-                                .map((e) {
-                              return TypeActeur(
-                                idTypeActeur: e['idTypeActeur'] as String,
-                                libelle: e['libelle'] as String,
-                                statutTypeActeur: e['statutTypeActeur'] as bool,
-                                // Assurez-vous de correspondre aux clés JSON avec les noms de propriétés de votre classe TypeActeur
-                                // Ajoutez d'autres champs si nécessaire
-                              );
-                            }).toList();
-
-                            // Filtrer les types avec un libellé différent de "admin" et dont le statutTypeActeur est true
-                            final filteredTypes = typeActeur
-                                .where((typeActeur) =>
-                                    typeActeur.libelle != "admin" ||
-                                    typeActeur.libelle != "Admin" &&
-                                        typeActeur.statutTypeActeur == true)
-                                .toList();
-
-                            // Créer des ValueItems pour les types filtrés
-                            final List<ValueItem<TypeActeur>> valueItems =
-                                filteredTypes.map((typeActeur) {
-                              return ValueItem<TypeActeur>(
-                                label: typeActeur.libelle!,
-                                value: typeActeur,
-                              );
-                            }).toList();
-
-                            return Future<List<ValueItem<TypeActeur>>>.value(
-                                valueItems);
+                      MultiSelectDropDown.network(
+                        networkConfig: NetworkConfig(
+                          url: '$apiOnlineUrl/typeActeur/read',
+                          // url: 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
+                          method: RequestMethod.get,
+                          headers: {
+                            'Content-Type': 'application/json',
                           },
-
-                          controller: _controllerTypeActeur,
-                          hint: 'Sélectionner un type d\'acteur',
-                          fieldBackgroundColor:
-                              Color.fromARGB(255, 219, 219, 219),
-                          onOptionSelected: (options) {
-                            if (mounted) {
-                              setState(() {
-                                typeLibelle.clear();
-                                typeLibelle.addAll(
-                                    options.map((data) => data.label).toList());
-                                selectedTypes = options
-                                    .map<TypeActeur>((item) => item.value!)
-                                    .toList();
-                                print("Types sélectionnés : $selectedTypes");
-
-                                print(
-                                    "Libellé sélectionné ${typeLibelle.toString()}");
-                              });
-                              // Fermer automatiquement le dialogue
-                            }
-                            // FocusScope.of(context).unfocus();
-                          },
-                          responseErrorBuilder: ((context, body) {
-                            return const Padding(
-                              padding: EdgeInsets.all(10.0),
-                              child: Text('Aucun type disponible'),
-                            );
-                          }),
-                          // Exemple de personnalisation des styles
                         ),
+                        chipConfig: const ChipConfig(wrapType: WrapType.wrap),
+                        responseParser: (response) {
+                          typeActeur = (response as List<dynamic>)
+                              .where((data) =>
+                                      (data['libelle']).trim().toLowerCase() !=
+                                      'admin'
+                                  //     &&
+                                  // data['acteur'] != null && // Add null check here
+                                  // data['acteur']['statutActeur'] == true
+                                  )
+                              .map((e) {
+                            return TypeActeur(
+                              idTypeActeur: e['idTypeActeur'] as String,
+                              libelle: e['libelle'] as String,
+                              statutTypeActeur: e['statutTypeActeur'] as bool,
+                              // Assurez-vous de correspondre aux clés JSON avec les noms de propriétés de votre classe TypeActeur
+                              // Ajoutez d'autres champs si nécessaire
+                            );
+                          }).toList();
+
+                          // Filtrer les types avec un libellé différent de "admin" et dont le statutTypeActeur est true
+                          final filteredTypes = typeActeur
+                              .where((typeActeur) =>
+                                  typeActeur.libelle != "admin" ||
+                                  typeActeur.libelle != "Admin" &&
+                                      typeActeur.statutTypeActeur == true)
+                              .toList();
+
+                          // Créer des ValueItems pour les types filtrés
+                          final List<ValueItem<TypeActeur>> valueItems =
+                              filteredTypes.map((typeActeur) {
+                            return ValueItem<TypeActeur>(
+                              label: typeActeur.libelle!,
+                              value: typeActeur,
+                            );
+                          }).toList();
+
+                          return Future<List<ValueItem<TypeActeur>>>.value(
+                              valueItems);
+                        },
+
+                        controller: _controllerTypeActeur,
+
+                        dropdownHeight: 320,
+                        hint: 'Sélectionner un type d\'acteur',
+                        fieldBackgroundColor:
+                            Color.fromARGB(255, 219, 219, 219),
+                        onOptionSelected: (options) {
+                          if (mounted) {
+                            setState(() {
+                              typeLibelle.clear();
+                              typeLibelle.addAll(
+                                  options.map((data) => data.label).toList());
+                              selectedTypes = options
+                                  .map<TypeActeur>((item) => item.value!)
+                                  .toList();
+                              print("Types sélectionnés : $selectedTypes");
+
+                              print(
+                                  "Libellé sélectionné ${typeLibelle.toString()}");
+                            });
+                            // Fermer automatiquement le dialogue
+                          }
+                          // FocusScope.of(context).unfocus();
+                        },
+                        responseErrorBuilder: ((context, body) {
+                          return const Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: Text('Aucun type disponible'),
+                          );
+                        }),
+                        // Exemple de personnalisation des styles
                       ),
                       const SizedBox(
                         height: 10,
@@ -419,27 +425,117 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                           style: TextStyle(color: (Colors.black), fontSize: 18),
                         ),
                       ),
-                      TextFormField(
-                        controller: localisationController,
-                        decoration: InputDecoration(
-                          hintText: "Votre localisation ",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        keyboardType: TextInputType.text,
-                        validator: (val) {
-                          if (val == null || val.isEmpty) {
-                            return "Veillez entrez votre localisation";
-                          } else {
-                            return null;
+                      FutureBuilder(
+                        future: _niveau3List,
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return DropdownButtonFormField(
+                              items: [],
+                              onChanged: null,
+                              decoration: InputDecoration(
+                                labelText: 'Chargement...',
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
                           }
+
+                          if (snapshot.hasData) {
+                            // dynamic responseData =
+                            //     json.decode(snapshot.data.body);
+                            dynamic jsonString =
+                                utf8.decode(snapshot.data.bodyBytes);
+                            dynamic responseData = json.decode(jsonString);
+
+                            if (responseData is List) {
+                              final reponse = responseData;
+                              final niveau3List = reponse
+                                  .map((e) => Niveau3Pays.fromMap(e))
+                                  .where((con) => con.statutN3 == true)
+                                  .toList();
+
+                              if (niveau3List.isEmpty) {
+                                return DropdownButtonFormField(
+                                  items: [],
+                                  onChanged: null,
+                                  decoration: InputDecoration(
+                                    labelText: 'Aucun localité trouvé',
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              return DropdownButtonFormField<String>(
+                                isExpanded: true,
+                                items: niveau3List
+                                    .map(
+                                      (e) => DropdownMenuItem(
+                                        value: e.idNiveau3Pays,
+                                        child: Text(e.nomN3),
+                                      ),
+                                    )
+                                    .toList(),
+                                value: n3Value,
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    n3Value = newValue;
+                                    if (newValue != null) {
+                                      Niveau3Pays selectedNiveau3 =
+                                          niveau3List.firstWhere(
+                                        (element) =>
+                                            element.idNiveau3Pays == newValue,
+                                      );
+                                      niveau3 = selectedNiveau3.nomN3;
+                                      print("niveau 3 : $niveau3");
+                                    }
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Selectionner une localité',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucun localité trouvé',
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                          return DropdownButtonFormField(
+                            items: [],
+                            onChanged: null,
+                            decoration: InputDecoration(
+                              labelText: 'Aucun localité trouvé',
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 20),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
                         },
-                        onSaved: (val) => localisation = val!,
                       ),
-                      // fin  localisation
 
                       const SizedBox(
                         height: 10,
@@ -506,8 +602,7 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                                               adresse: adresseController.text,
                                               numeroWhatsApp:
                                                   widget.whatsAppActeur,
-                                              localistaion:
-                                                  localisationController.text,
+                                              localistaion: niveau3,
                                               pays: widget.pays,
                                               typeActeur:
                                                   selectedTypes, // Passer les types d'acteurs sélectionnés ici

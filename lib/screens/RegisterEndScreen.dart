@@ -279,8 +279,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                     );
                   },
                 ));
-      }
-      else if ( image2 != null) {
+      } else if (image2 != null) {
         await acteurService
             .creerActeur(
                 photoSiegeActeur: image2,
@@ -313,8 +312,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                     );
                   },
                 ));
-      }
-      else  {
+      } else {
         await acteurService
             .creerActeur(
               nomActeur: nomActeur,
@@ -487,81 +485,78 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                           ),
                         ),
                         const SizedBox(height: 5),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                          child: MultiSelectDropDown.network(
-                            networkConfig: NetworkConfig(
-                              // Endpoint pour récupérer les spéculations en fonction des catégories sélectionnées
-                              // url:url , //e40ijxd5k0n0yrzj5f80,
-                              url:
-                                  '$apiOnlineUrl/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
-                              // url: 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
-                              method: RequestMethod.get,
-                              headers: {'Content-Type': 'application/json'},
-                            ),
-                            chipConfig:
-                                const ChipConfig(wrapType: WrapType.wrap),
-                            responseParser: (response) {
-                              // List<dynamic> decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
-
-                              listeSpeculations =
-                                  (response as List<dynamic>).map((e) {
-                                return Speculation(
-                                  idSpeculation: e['idSpeculation'] as String,
-                                  nomSpeculation: e['nomSpeculation'] as String,
-                                  statutSpeculation:
-                                      e['statutSpeculation'] as bool,
-                                  // Assurez-vous de correspondre aux clés JSON avec les noms de propriétés de votre classe TypeActeur
-                                  // Ajoutez d'autres champs si nécessaire
-                                );
-                              }).toList();
-
-                              // Filtrer les types avec un libellé différent de "admin" et dont le statutTypeActeur est true
-                              final filteredTypes = listeSpeculations
-                                  .where((speculation) =>
-                                      speculation.statutSpeculation == true)
-                                  .toList();
-
-                              // Créer des ValueItems pour les types filtrés
-                              final List<ValueItem<Speculation>> valueItems =
-                                  filteredTypes.map((speculation) {
-                                return ValueItem<Speculation>(
-                                  label: speculation.nomSpeculation!,
-                                  value: speculation,
-                                );
-                              }).toList();
-
-                              return Future<List<ValueItem<Speculation>>>.value(
-                                  valueItems);
-                            },
-
-                            controller: _controllerSpeculation,
-                            hint: 'Sélectionner une spéculation',
-                            fieldBackgroundColor:
-                                Color.fromARGB(255, 219, 219, 219),
-                            onOptionSelected: (options) {
-                              setState(() {
-                                selectedSpec = options
-                                    .map<Speculation>((item) => item.value!)
-                                    .toList();
-                                print("Types sélectionnés : $selectedSpec");
-                                libelleSpeculation.clear();
-                                libelleSpeculation.addAll(
-                                    options.map((data) => data.label).toList());
-                                print(
-                                    "Spéculation sélectionnée ${libelleSpeculation.toString()}");
-                              });
-                              // Fermer automatiquement le dialogue
-                              // FocusScope.of(context).unfocus();
-                            },
-                            responseErrorBuilder: ((context, body) {
-                              return const Padding(
-                                padding: EdgeInsets.all(10.0),
-                                child: Text('Aucune spéculation disponible'),
-                              );
-                            }),
-                            // Exemple de personnalisation des styles
+                        MultiSelectDropDown.network(
+                          networkConfig: NetworkConfig(
+                            // Endpoint pour récupérer les spéculations en fonction des catégories sélectionnées
+                            // url:url , //e40ijxd5k0n0yrzj5f80,
+                            url:
+                                '$apiOnlineUrl/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
+                            // url: 'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
+                            method: RequestMethod.get,
+                            headers: {'Content-Type': 'application/json'},
                           ),
+                          chipConfig: const ChipConfig(wrapType: WrapType.wrap),
+                          responseParser: (response) {
+                            // List<dynamic> decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
+
+                            listeSpeculations =
+                                (response as List<dynamic>).map((e) {
+                              return Speculation(
+                                idSpeculation: e['idSpeculation'] as String,
+                                nomSpeculation: e['nomSpeculation'] as String,
+                                statutSpeculation:
+                                    e['statutSpeculation'] as bool,
+                                // Assurez-vous de correspondre aux clés JSON avec les noms de propriétés de votre classe TypeActeur
+                                // Ajoutez d'autres champs si nécessaire
+                              );
+                            }).toList();
+
+                            // Filtrer les types avec un libellé différent de "admin" et dont le statutTypeActeur est true
+                            final filteredTypes = listeSpeculations
+                                .where((speculation) =>
+                                    speculation.statutSpeculation == true)
+                                .toList();
+
+                            // Créer des ValueItems pour les types filtrés
+                            final List<ValueItem<Speculation>> valueItems =
+                                filteredTypes.map((speculation) {
+                              return ValueItem<Speculation>(
+                                label: speculation.nomSpeculation!,
+                                value: speculation,
+                              );
+                            }).toList();
+
+                            return Future<List<ValueItem<Speculation>>>.value(
+                                valueItems);
+                          },
+
+                          controller: _controllerSpeculation,
+                          hint: 'Sélectionner une spéculation',
+                          dropdownHeight: 320,
+                          fieldBackgroundColor:
+                              Color.fromARGB(255, 219, 219, 219),
+                          onOptionSelected: (options) {
+                            setState(() {
+                              selectedSpec = options
+                                  .map<Speculation>((item) => item.value!)
+                                  .toList();
+                              print("Types sélectionnés : $selectedSpec");
+                              libelleSpeculation.clear();
+                              libelleSpeculation.addAll(
+                                  options.map((data) => data.label).toList());
+                              print(
+                                  "Spéculation sélectionnée ${libelleSpeculation.toString()}");
+                            });
+                            // Fermer automatiquement le dialogue
+                            // FocusScope.of(context).unfocus();
+                          },
+                          responseErrorBuilder: ((context, body) {
+                            return const Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: Text('Aucune spéculation disponible'),
+                            );
+                          }),
+                          // Exemple de personnalisation des styles
                         ),
 
                         // fin  filiere
