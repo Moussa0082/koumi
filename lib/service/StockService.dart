@@ -114,7 +114,9 @@ class StockService extends ChangeNotifier {
 
       if (photo != null) {
         requete.files.add(http.MultipartFile(
-            'image', photo.readAsBytes().asStream(), photo.lengthSync(),
+            'image', 
+            photo.readAsBytes().asStream(), 
+            photo.lengthSync(),
             filename: basename(photo.path)));
       }
 

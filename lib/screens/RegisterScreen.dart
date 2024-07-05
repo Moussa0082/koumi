@@ -41,7 +41,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String dropdownvalue = 'Item 1';
 
   final TextEditingController controller = TextEditingController();
-  TextEditingController whatsAppController = TextEditingController();
   CountryProvider? countryProvider;
 
   String? initialCountry;
@@ -62,6 +61,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   TextEditingController nomActeurController = TextEditingController();
+  TextEditingController whatsAppController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
 
   TextEditingController telephoneController = TextEditingController();
   TextEditingController typeActeurController = TextEditingController();
@@ -74,8 +75,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  bool isWhatsAppEditing = false;
+  bool isPhoneEditing = false;
   String processedNumber = "";
   String processedNumberTel = "";
+  // String selectedCountryCode = 'ML';
+  // void detectNum(String num){
+  //   if(processedNumberTel.isEmpty){
+  //     setState(() {
+  //     processedNumberTel = num;
+  //   });
+  //   }
+  // }
 
   @override
   void didChangeDependencies() {
@@ -93,6 +104,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Provider.of<DetectorPays>(context, listen: false).detectedCountryCode!;
     selectedCountry =
         Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
+
+    whatsAppController.addListener(() {
+      if (isPhoneEditing) return;
+      setState(() {
+        processedNumber = removePlus(whatsAppController.text);
+        phoneController.text = processedNumber;
+      });
+    });
+
+    phoneController.addListener(() {
+      if (isWhatsAppEditing) return;
+      setState(() {
+        processedNumberTel = removePlus(phoneController.text);
+      });
+    });
+
     // _mesTypeActeur  =
     // http.get(Uri.parse('https://koumi.ml/api-koumi/typeActeur/read'));
     // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/typeActeur/read'));
@@ -214,47 +241,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           onSaved: (val) => nomActeur = val!,
                         ),
                         // fin  adresse fullname
-
-                        const SizedBox(
-                          height: 15,
-                        ),
-
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10.0),
-                          child: Text(
-                            "Téléphone *",
-                            style:
-                                TextStyle(color: (Colors.black), fontSize: 18),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-
-                        IntlPhoneField(
-                          initialCountryCode:
-                              detectedCountryCode, // Automatically detect user's country
-                          invalidNumberMessage: "Numéro invalide",
-                          searchText: "Chercher un pays",
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 0, horizontal: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          languageCode: "en",
-                          onChanged: (phone) {
-                            print(phone.completeNumber);
-                            processedNumberTel =
-                                removePlus(phone.completeNumber.toString());
-                            print(processedNumberTel);
-                          },
-                          onCountryChanged: (country) {
-                            print('Country changed to: ' + country.name);
-                          },
-                        ),
-
                         Padding(
                           padding: const EdgeInsets.only(left: 10.0),
                           child: Text(
@@ -294,8 +280,46 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             print('Country changed to: ' + country.name);
                           },
                         ),
+                        const SizedBox(
+                          height: 10,
+                        ),
 
-                        // fin  téléphone
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10.0),
+                          child: Text(
+                            "Téléphone *",
+                            style:
+                                TextStyle(color: (Colors.black), fontSize: 18),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+
+                        IntlPhoneField(
+                          controller: phoneController,
+                          initialCountryCode:
+                              detectedCountryCode, // Automatically detect user's country
+                          invalidNumberMessage: "Numéro invalide",
+                          searchText: "Chercher un pays",
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 0, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          languageCode: "en",
+                          onChanged: (phone) {
+                            print(phone.completeNumber);
+                            processedNumberTel =
+                                removePlus(phone.completeNumber.toString());
+                            print(processedNumberTel);
+                          },
+                          onCountryChanged: (country) {
+                            print('Country changed to: ' + country.name);
+                          },
+                        ),
 
                         //end select type acteur
                         const SizedBox(
@@ -306,6 +330,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: ElevatedButton(
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
+                                print("pays: $selectedCountry");
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(

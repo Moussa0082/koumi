@@ -215,8 +215,8 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
       if (widget.image1 != null && image2 != null) {
         await acteurService
             .creerActeur(
-                logoActeur: widget.image1 as File,
-                photoSiegeActeur: image2 as File,
+                logoActeur: widget.image1,
+                photoSiegeActeur: image2,
                 nomActeur: nomActeur,
                 adresseActeur: adresse,
                 telephoneActeur: widget.telephoneActeur,
@@ -246,7 +246,75 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                     );
                   },
                 ));
-      } else {
+      } else if (widget.image1 != null) {
+        await acteurService
+            .creerActeur(
+                logoActeur: widget.image1,
+                nomActeur: nomActeur,
+                adresseActeur: adresse,
+                telephoneActeur: widget.telephoneActeur,
+                whatsAppActeur: widget.numeroWhatsApp,
+                niveau3PaysActeur: widget.pays,
+                localiteActeur: localisation,
+                emailActeur: emailActeur,
+                typeActeur: widget
+                    .typeActeur, // Convertir les IDs en chaînes de caractères
+                password: password,
+                speculations: selectedSpec)
+            .then((value) => showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Center(child: Text('Succès')),
+                      content: const Text("Inscription réussi avec succès"),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            Get.back();
+                            Get.offAll(LoginSuccessScreen());
+                          },
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    );
+                  },
+                ));
+      }
+      else if ( image2 != null) {
+        await acteurService
+            .creerActeur(
+                photoSiegeActeur: image2,
+                nomActeur: nomActeur,
+                adresseActeur: adresse,
+                telephoneActeur: widget.telephoneActeur,
+                whatsAppActeur: widget.numeroWhatsApp,
+                niveau3PaysActeur: widget.pays,
+                localiteActeur: localisation,
+                emailActeur: emailActeur,
+                typeActeur: widget
+                    .typeActeur, // Convertir les IDs en chaînes de caractères
+                password: password,
+                speculations: selectedSpec)
+            .then((value) => showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Center(child: Text('Succès')),
+                      content: const Text("Inscription réussi avec succès"),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            Get.back();
+                            Get.offAll(LoginSuccessScreen());
+                          },
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    );
+                  },
+                ));
+      }
+      else  {
         await acteurService
             .creerActeur(
               nomActeur: nomActeur,
@@ -331,6 +399,23 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
       isLoading: isLoading,
       child: Scaffold(
         backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: () {
+              // Fonction de retour
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back,
+              color: Colors.black,
+              size: 30,
+            ),
+            iconSize: 30,
+            splashRadius: 20,
+            padding: EdgeInsets.zero,
+            constraints: BoxConstraints(minWidth: 40, minHeight: 40),
+          ),
+        ),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
@@ -339,60 +424,44 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                 SizedBox(
                   height: 15,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        // Fonction de retour
-                        Navigator.pop(context);
-                      },
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: 30,
-                      ),
-                      iconSize: 30,
-                      splashRadius: 20,
-                      padding: EdgeInsets.zero,
-                      constraints: BoxConstraints(minWidth: 40, minHeight: 40),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: 100,
-                      width:
-                          200, // Spécifiez une largeur fixe pour le conteneur
-                      child: (image2 == null)
-                          ? Center(
-                              child: Image.asset('assets/images/logo-pr.png'))
-                          : SizedBox(
-                              height: 50,
-                              child: Image.file(
-                                image2!,
-                                height: 100,
-                                width: 200,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                    ),
-                  ],
+                Container(
+                  height: 100,
+                  width: 200, // Spécifiez une largeur fixe pour le conteneur
+                  child: (image2 == null)
+                      ? Center(child: Image.asset('assets/images/logo-pr.png'))
+                      : SizedBox(
+                          height: 50,
+                          child: Image.file(
+                            image2!,
+                            height: 100,
+                            width: 200,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 10,
                 ),
-                GestureDetector(
-                  onTap: () {
-                    _showImageSourceDialog();
-                  },
-                  child: Text(
-                    "Choisir la photo du siège",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+                Container(
+                  height: 42,
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF8A00),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: TextButton(
+                    onPressed: () {
+                      _showImageSourceDialog();
+                    },
+                    child: Center(
+                      child: Text(
+                        "Choisir la photo du siège",
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -408,65 +477,6 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                         const SizedBox(
                           height: 5,
                         ),
-//       Padding(
-//                   padding: const EdgeInsets.only(left:10.0),
-//                   child: Text("Categorie", style: TextStyle(color: (Colors.black), fontSize: 18),),
-//                 ),
-//                 Padding(
-//   padding: const EdgeInsets.symmetric(horizontal: 16),
-//   child: MultiSelectDropDown.network(
-//     networkConfig: NetworkConfig(
-//       // url: 'https://koumi.ml/api-koumi/Categorie/allCategorie',
-//       url: 'http://10.0.2.2:9000/api-koumi/Categorie/allCategorie',
-//       method: RequestMethod.get,
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     ),
-//     chipConfig: const ChipConfig(wrapType: WrapType.wrap),
-//     responseParser: (response) {
-//       final list = (response as List<dynamic>)
-
-//           .map((e) {
-//         final item = e as Map<String, dynamic>;
-//         return ValueItem(
-//           label: item['libelleCategorie'] as String,
-//           value: item['idCategorieProduit'],
-//         );
-//       }).toList();
-//       return Future.value(list);
-//     },
-//     controller: _controllerCategorie,
-//     hint: 'Sélectionner une categorie produit',
-//     fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
-//     onOptionSelected: (options) {
-//       setState(() {
-//         libelleCategorie.clear();
-//         libelleCategorie.addAll(options
-//             .map((data) => data.label)
-//             .toList());
-//         idsCategorieProduit = _controllerCategorie.selectedOptions.map((item) => item.value.toString()).toList();
-//       //  idsCategorieProduitAsString = idsCategorieProduit.isEmpty ? idsCategorieProduit.join(',') : "e40ijxd5k0n0yrzj5f80";
-//            idsJson = idsCategorieProduit.join(',');
-//             //  url = "e40ijxd5k0n0yrzj5f80";
-//              url = 'http://10.0.2.2:9000/api-koumi/Speculation/by-categories/${idsJson}';
-
-//         print("categorie sélectionné ${libelleCategorie.toString()+ " speculationJson  "+ url }");
-//       });
-
-//   // print("id s "+ idsJson);
-//       // Fermer automatiquement le dialogue
-//       FocusScope.of(context).unfocus();
-//     },
-//     responseErrorBuilder: ((context, body) {
-//       return const Padding(
-//         padding: EdgeInsets.all(10.0),
-//         child: Text('Aucun type disponible'),
-//       );
-//     }),
-//     // Exemple de personnalisation des styles
-//   ),
-// ),
 
                         // Deuxième widget MultiSelectDropDown pour sélectionner les spéculations
                         Padding(
@@ -478,7 +488,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                         ),
                         const SizedBox(height: 5),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
                           child: MultiSelectDropDown.network(
                             networkConfig: NetworkConfig(
                               // Endpoint pour récupérer les spéculations en fonction des catégories sélectionnées
@@ -542,7 +552,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                                     "Spéculation sélectionnée ${libelleSpeculation.toString()}");
                               });
                               // Fermer automatiquement le dialogue
-                              FocusScope.of(context).unfocus();
+                              // FocusScope.of(context).unfocus();
                             },
                             responseErrorBuilder: ((context, body) {
                               return const Padding(

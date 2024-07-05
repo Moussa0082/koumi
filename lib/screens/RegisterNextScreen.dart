@@ -1,10 +1,8 @@
 import 'dart:io';
 
-import 'package:country_code_picker/country_code_picker.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_multi_formatter/formatters/phone_input_formatter.dart';
-import 'package:flutter_multi_formatter/widgets/country_dropdown.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
@@ -12,13 +10,9 @@ import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Pays.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/screens/RegisterEndScreen.dart';
-import 'package:http/http.dart' as http;
 import 'package:multi_dropdown/multiselect_dropdown.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:convert';
 import 'package:path/path.dart';
-
-import 'package:shimmer/shimmer.dart';
+import 'package:path_provider/path_provider.dart';
 
 class RegisterNextScreen extends StatefulWidget {
   String nomActeur, telephone, whatsAppActeur;
@@ -186,7 +180,7 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
 // }
 
     debugPrint(
-        "Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone},  Téléphone : ${widget.whatsAppActeur}, Pays : ${widget.pays} ");
+        "Nom complet : ${widget.nomActeur}, Téléphone : ${widget.telephone},  WA : ${widget.whatsAppActeur}, Pays : ${widget.pays} ");
 
     // _mesPays  =
     //       http.get(Uri.parse('http://10.0.2.2:9000/pays/read'));
@@ -206,6 +200,22 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
+      appBar: AppBar(
+          leading: IconButton(
+        onPressed: () {
+          // Fonction de retour
+          Navigator.pop(context);
+        },
+        icon: Icon(
+          Icons.arrow_back,
+          color: Colors.black,
+          size: 30,
+        ),
+        iconSize: 30,
+        splashRadius: 20,
+        padding: EdgeInsets.zero,
+        constraints: BoxConstraints(minWidth: 40, minHeight: 40),
+      )),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -217,58 +227,45 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
               SizedBox(
                 height: 15,
               ),
-              Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  onPressed: () {
-                    // Fonction de retour
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: Colors.black,
-                    size: 30,
-                  ),
-                  iconSize: 30,
-                  splashRadius: 20,
-                  padding: EdgeInsets.zero,
-                  constraints: BoxConstraints(minWidth: 40, minHeight: 40),
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: 100,
-                    width: 200, // Spécifiez une largeur fixe pour le conteneur
-                    child: (image1 == null)
-                        ? Center(
-                            child: Image.asset('assets/images/logo-pr.png'))
-                        : SizedBox(
-                            height: 100,
-                            width: 100,
-                            child: Image.file(
-                              image1!,
-                              height: 100,
-                              width: 200,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                  ),
-                ],
+              SizedBox(
+                height: 100,
+                width: 200, // Spécifiez une largeur fixe pour le conteneur
+                child: (image1 == null)
+                    ? Center(child: Image.asset('assets/images/logo-pr.png'))
+                    : SizedBox(
+                        height: 100,
+                        width: 100,
+                        child: Image.file(
+                          image1!,
+                          height: 100,
+                          width: 200,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
               ),
               const SizedBox(
-                height: 5,
+                height: 10,
               ),
-              GestureDetector(
-                onTap: () {
-                  _showImageSourceDialog();
-                },
-                child: Text(
-                  "Choisir le logo",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+              Container(
+                height: 42,
+                width: MediaQuery.of(context).size.width * 0.9,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF8A00),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextButton(
+                  onPressed: () {
+                    _showImageSourceDialog();
+                  },
+                  child: Center(
+                    child: Text(
+                      "Choisir un logo",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -278,126 +275,17 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(
-                        height: 10,
+                        height: 20,
                       ),
-
-                      //Email debut
                       Padding(
                         padding: const EdgeInsets.only(left: 10.0),
                         child: Text(
-                          "Email *",
-                          style: TextStyle(color: (Colors.black), fontSize: 18),
-                        ),
-                      ),
-                      // Center(
-                      //   child: Text(_errorMessage),
-                      // ),
-                      TextFormField(
-                        controller: emailController,
-                        decoration: InputDecoration(
-                          hintText: "Entrez votre email",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (val) {
-                          if (val == null || val.isEmpty) {
-                            return "Veillez entrez votre email";
-                          } else if (_errorMessage == "Email non valide") {
-                            return "Veillez entrez une email valide";
-                          } else {
-                            return null;
-                          }
-                        },
-                        onChanged: (val) {
-                          validateEmail(val);
-                        },
-                        onSaved: (val) => email = val!,
-                      ),
-                      // fin  adresse email
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      // debut fullname
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10.0),
-                        child: Text(
-                          "Adresse  *",
-                          style: TextStyle(color: (Colors.black), fontSize: 18),
-                        ),
-                      ),
-                      TextFormField(
-                        controller: adresseController,
-                        decoration: InputDecoration(
-                          hintText: "Entrez votre adresse de residence",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        keyboardType: TextInputType.text,
-                        validator: (val) {
-                          if (val == null || val.isEmpty) {
-                            return "Veillez entrez votre adresse de residence";
-                          } else {
-                            return null;
-                          }
-                        },
-                        onSaved: (val) => adresse = val!,
-                      ),
-                      // fin  adresse fullname
-
-                      // fin  adresse email
-                      const SizedBox(
-                        height: 10,
-                      ),
-
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10.0),
-                        child: Text(
-                          "Localité",
-                          style: TextStyle(color: (Colors.black), fontSize: 18),
-                        ),
-                      ),
-                      TextFormField(
-                        controller: localisationController,
-                        decoration: InputDecoration(
-                          hintText: "Votre localisation ",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        keyboardType: TextInputType.text,
-                        validator: (val) {
-                          if (val == null || val.isEmpty) {
-                            return "Veillez entrez votre localisation";
-                          } else {
-                            return null;
-                          }
-                        },
-                        onSaved: (val) => localisation = val!,
-                      ),
-                      // fin  localisation
-
-                      const SizedBox(
-                        height: 10,
-                      ),
-
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10.0),
-                        child: Text(
-                          "Type Acteur",
+                          "Type Acteur (Multi-selection)",
                           style: TextStyle(color: (Colors.black), fontSize: 18),
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
                         child: MultiSelectDropDown.network(
                           networkConfig: NetworkConfig(
                             url: '$apiOnlineUrl/typeActeur/read',
@@ -470,7 +358,7 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                               });
                               // Fermer automatiquement le dialogue
                             }
-                            FocusScope.of(context).unfocus();
+                            // FocusScope.of(context).unfocus();
                           },
                           responseErrorBuilder: ((context, body) {
                             return const Padding(
@@ -481,9 +369,114 @@ class _RegisterNextScreenState extends State<RegisterNextScreen> {
                           // Exemple de personnalisation des styles
                         ),
                       ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10.0),
+                        child: Text(
+                          "Email ",
+                          style: TextStyle(color: (Colors.black), fontSize: 18),
+                        ),
+                      ),
+                      // Center(
+                      //   child: Text(_errorMessage),
+                      // ),
+                      TextFormField(
+                        controller: emailController,
+                        decoration: InputDecoration(
+                          hintText: "Entrez votre email",
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        // validator: (val) {
+                        //   if (val == null || val.isEmpty) {
+                        //     return "Veillez entrez votre email";
+                        //   } else if (_errorMessage == "Email non valide") {
+                        //     return "Veillez entrez une email valide";
+                        //   } else {
+                        //     return null;
+                        //   }
+                        // },
+                        onChanged: (val) {
+                          validateEmail(val);
+                        },
+                        onSaved: (val) => email = val!,
+                      ),
+                      // fin  adresse email
+                      const SizedBox(
+                        height: 10,
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10.0),
+                        child: Text(
+                          "Localité",
+                          style: TextStyle(color: (Colors.black), fontSize: 18),
+                        ),
+                      ),
+                      TextFormField(
+                        controller: localisationController,
+                        decoration: InputDecoration(
+                          hintText: "Votre localisation ",
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        keyboardType: TextInputType.text,
+                        validator: (val) {
+                          if (val == null || val.isEmpty) {
+                            return "Veillez entrez votre localisation";
+                          } else {
+                            return null;
+                          }
+                        },
+                        onSaved: (val) => localisation = val!,
+                      ),
+                      // fin  localisation
 
                       const SizedBox(
-                        height: 20,
+                        height: 10,
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10.0),
+                        child: Text(
+                          "Adresse  *",
+                          style: TextStyle(color: (Colors.black), fontSize: 18),
+                        ),
+                      ),
+                      TextFormField(
+                        controller: adresseController,
+                        decoration: InputDecoration(
+                          hintText: "Entrez votre adresse de residence",
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        keyboardType: TextInputType.text,
+                        validator: (val) {
+                          if (val == null || val.isEmpty) {
+                            return "Veillez entrez votre adresse de residence";
+                          } else {
+                            return null;
+                          }
+                        },
+                        onSaved: (val) => adresse = val!,
+                      ),
+                      // fin  adresse fullname
+
+                      // fin  adresse email
+                      const SizedBox(
+                        height: 10,
                       ),
 
                       Center(

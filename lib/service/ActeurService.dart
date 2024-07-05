@@ -74,19 +74,21 @@ class ActeurService extends ChangeNotifier {
 
       if (response.statusCode == 200 || responsed.statusCode == 201) {
         final donneesResponse = json.decode(utf8.decode(responsed.bodyBytes));
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                final codeActeur = donneesResponse['codeActeur'];
-                await prefs.setString('codeActeur', codeActeur);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        final codeActeur = donneesResponse['codeActeur'];
+        await prefs.setString('codeActeur', codeActeur);
 
         debugPrint('acteur service ${donneesResponse.toString()}');
       } else {
+           print("et code ${response.statusCode}");
         final errorMessage =
             json.decode(utf8.decode(responsed.bodyBytes))['message'];
         throw Exception(' ${errorMessage}');
       }
     } catch (e) {
+   
       throw Exception(
-          'Une erreur s\'est produite lors de l\'ajout de acteur : $e');
+          'Une erreur s\'est produite lors de l\'ajout de acteur : $e ');
     }
   }
 
@@ -169,7 +171,9 @@ class ActeurService extends ChangeNotifier {
 
     try {
       final response = await http.get(url);
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 202) {
         // Si la réponse est réussie, renvoyer le message de réussite
         showDialog(
           context: context,
@@ -192,10 +196,11 @@ class ActeurService extends ChangeNotifier {
         return response.body;
       } else {
         // Si la réponse n'est pas réussie, lancer une exception avec le message d'erreur
-        debugPrint("Non envoyé : ${response.statusCode} ");
         final Map<String, dynamic> body = json.decode(response.body);
         final String errorMessage = body['message'] ?? 'Code non envoyé.';
         // Afficher une alerte d'erreur avec le message spécifique
+        debugPrint(
+            "Non envoyé : ${response.statusCode}  message : $errorMessage");
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -217,7 +222,7 @@ class ActeurService extends ChangeNotifier {
       }
     } catch (e) {
       // Gérer les erreurs de requête HTTP
-      debugPrint("Erreur catch non envoyé : ${e} ");
+      debugPrint("Erreur catch non envoyé : ${e.toString()} ");
 
       // Afficher une alerte d'erreur avec le message spécifique
       showDialog(
@@ -247,7 +252,9 @@ class ActeurService extends ChangeNotifier {
         '$baseUrl/sendOtpCodeWhatsApp?whatsAppActeur=$whatsAppActeur');
     try {
       final response = await http.get(url);
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 202) {
         debugPrint("Envoyé : ${response.body} ");
         // Si la réponse est réussie, renvoyer le message de réussite
 
@@ -273,10 +280,11 @@ class ActeurService extends ChangeNotifier {
         return response.body;
       } else {
         // Si la réponse n'est pas réussie, lancer une exception avec le message d'erreur
-        debugPrint("Non envoyé : ${response.statusCode} ");
         final Map<String, dynamic> body = json.decode(response.body);
         final String errorMessage = body['message'] ?? 'Code non envoyé.';
         // Afficher une alerte d'erreur avec le message spécifique
+        debugPrint(
+            "Non envoyé : ${response.statusCode}  message : ${errorMessage}");
         showDialog(
           context: context,
           builder: (BuildContext context) {
