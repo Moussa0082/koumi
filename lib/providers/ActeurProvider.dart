@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:koumi_app/models/Acteur.dart';
 
@@ -10,41 +9,50 @@ class ActeurProvider with ChangeNotifier {
   Acteur? get acteur => _acteur;
   bool isLogged = false;
 
-   
-  
- // Méthode pour initialiser les données de l'utilisateur à partir de SharedPreferences
+  // Méthode pour initialiser les données de l'utilisateur à partir de SharedPreferences
   Future<void> initializeActeurFromSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? idActeur = prefs.getString('idActeur');
     String? emailActeur = prefs.getString('emailActeur');
     String? password = prefs.getString('password');
     List<String>? userTypeList = prefs.getStringList('userType');
-    String? nomActeur = prefs.getString('nomActeur'); 
-    String? adresseActeur = prefs.getString('adresseActeur'); 
+    String? nomActeur = prefs.getString('nomActeur');
+    String? adresseActeur = prefs.getString('adresseActeur');
     String? telephoneActeur = prefs.getString('telephoneActeur');
     String? whatsAppActeur = prefs.getString('whatsAppActeur');
     String? niveau3PaysActeur = prefs.getString('niveau3PaysActeur');
     String? localiteActeur = prefs.getString('localiteActeur');
 
-      if (emailActeur != null) {
-    // L'utilisateur est connecté
-    isLogged = true;
-  } else {
-    // L'utilisateur n'est pas connecté
-    isLogged = false;
-  }
+    if (emailActeur != null) {
+      // L'utilisateur est connecté
+      isLogged = true;
+    } else {
+      // L'utilisateur n'est pas connecté
+      isLogged = false;
+    }
 
-    if (emailActeur != null && password != null && userTypeList != null &&
-        idActeur != null && nomActeur != null && adresseActeur!= null &&
-        telephoneActeur != null && whatsAppActeur != null && niveau3PaysActeur != null &&
+    if (emailActeur != null &&
+        password != null &&
+        userTypeList != null &&
+        idActeur != null &&
+        nomActeur != null &&
+        adresseActeur != null &&
+        telephoneActeur != null &&
+        whatsAppActeur != null &&
+        niveau3PaysActeur != null &&
         localiteActeur != null) {
-
       // Créer l'objet Acteur à partir des données de SharedPreferences
       _acteur = Acteur.fromSharedPreferencesData(
-        emailActeur, password, userTypeList, idActeur, nomActeur,
-        telephoneActeur, adresseActeur, whatsAppActeur,
-        niveau3PaysActeur, localiteActeur
-      );
+          emailActeur,
+          password,
+          userTypeList,
+          idActeur,
+          nomActeur,
+          telephoneActeur,
+          adresseActeur,
+          whatsAppActeur,
+          niveau3PaysActeur,
+          localiteActeur);
 
       // Mettre à jour le Provider avec les données de l'utilisateur
       notifyListeners();
@@ -53,42 +61,35 @@ class ActeurProvider with ChangeNotifier {
 
   void setActeur(Acteur newActeur) {
     _acteur = newActeur;
+    print("new acteur ${newActeur.toString()}");
     notifyListeners();
   }
-
-
-  
 
   Future<void> logout() async {
     // Supprimer les données utilisateur
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? emailActeur = prefs.getString('emailActeur');
     String? codeActeur = prefs.getString('codeActeur');
-    
+
     _acteur = null;
 
 // Vérifier si le codeActeur est présent dans SharedPreferences
-  await prefs.clear();
- if (emailActeur == null || emailActeur.isEmpty) {
-  // Nettoyer toutes les données de SharedPreferences
-  // await prefs.clear();
-  debugPrint("Email shared : $emailActeur");
-  }else{
-  debugPrint("Email shared isExist : $emailActeur");
+    await prefs.clear();
+    if (emailActeur == null || emailActeur.isEmpty) {
+      // Nettoyer toutes les données de SharedPreferences
+      // await prefs.clear();
+      debugPrint("Email shared : $emailActeur");
+    } else {
+      debugPrint("Email shared isExist : $emailActeur");
+    }
 
-  }
-
-
-  // Réenregistrer le codeActeur dans SharedPreferences
-  if(codeActeur != null){
-
-   String savedCodeActeur = codeActeur;
-  prefs.setString('codeActeur', savedCodeActeur);
-  }
-  // Mettre à jour l'état de la connexion
-      isLogged = false;
+    // Réenregistrer le codeActeur dans SharedPreferences
+    if (codeActeur != null) {
+      String savedCodeActeur = codeActeur;
+      prefs.setString('codeActeur', savedCodeActeur);
+    }
+    // Mettre à jour l'état de la connexion
+    isLogged = false;
     notifyListeners();
-  
-}
-
   }
+}

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:koumi_app/Admin/EditProfil.dart';
 import 'package:koumi_app/Admin/ParametreGenerauxPage.dart';
 import 'package:koumi_app/Admin/Zone.dart';
 import 'package:koumi_app/models/Acteur.dart';
@@ -233,8 +234,52 @@ class _ProfilState extends State<Profil> {
                                               'Adresse', ac.adresseActeur!),
                                           _buildProfile(
                                               'Localité', ac.localiteActeur!),
-                                          // _buildProfile(
-                                          //     'Pays', ac.niveau3PaysActeur!),
+                                         const Divider(
+                                              color: Color.fromARGB(
+                                                  255, 235, 233, 233),
+                                              height: 1,
+                                              thickness: 1,
+                                              indent: 0,
+                                              endIndent: 0,
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(5.0),
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            EditProfil(
+                                                              acteurs: ac,
+                                                            )),
+                                                  );
+                                                },
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      "Voir profil",
+                                                      style: const TextStyle(
+                                                        fontSize: 16,
+                                                        color: Colors.black87,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    Icon(
+                                                      Icons.chevron_right_sharp,
+                                                      size: 20,
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            )
                                         ],
                                       ),
                                     ),

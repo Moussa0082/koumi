@@ -50,13 +50,14 @@ import 'package:koumi_app/widgets/notification_controller.dart';
 import 'package:koumi_app/controller/dependency_injection.dart';
 import 'package:provider/provider.dart';
 
-// final navigatorKey = GlofbalKey<NavigatorState>();
-
+// final navigatorKey                                                = GlofbalKey<NavigatorState>();
+ 
 
 void main() async {
   
-  // await AwesomeNotifications().initial ize(
+  // awai       t AwesomeNotifications().initial ize(
   //    'resource://@drawable/launcher_icon',
+  
   //   [
   //   Not
   //       channelGroupKey: "basic_channel_group",

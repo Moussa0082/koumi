@@ -701,7 +701,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                                                             TextStyle(
                                                                           color: filtereSearch[index].statutSotck == false
                                                                               ? Colors.green
-                                                                              : Colors.red,
+                                                                              : Colors.orange[400],
                                                                           fontWeight:
                                                                               FontWeight.bold,
                                                                         ),
@@ -819,6 +819,54 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                                                       },
                                                                     ),
                                                                   ),
+                                                                  PopupMenuItem<
+                                                                      String>(
+                                                                    child:
+                                                                        ListTile(
+                                                                      leading:
+                                                                          const Icon(
+                                                                        Icons
+                                                                            .edit,
+                                                                        color: Colors
+                                                                            .green,
+                                                                      ),
+                                                                      title:
+                                                                          const Text(
+                                                                        "Modifier la quantité",
+                                                                        style:
+                                                                            TextStyle(
+                                                                          color:
+                                                                              Colors.green,
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                        ),
+                                                                      ),
+                                                                      onTap:
+                                                                          () async {
+                                                                        Navigator.of(context)
+                                                                            .pop();
+                                                                        var updatedSousRegion =
+                                                                            await showDialog(
+                                                                          context:
+                                                                              context,
+                                                                          builder: (BuildContext context) => AlertDialog(
+                                                                              backgroundColor: Colors.white,
+                                                                              shape: RoundedRectangleBorder(
+                                                                                borderRadius: BorderRadius.circular(16),
+                                                                              ),
+                                                                              content: DialodEdit(
+                                                                                stock: filtereSearch[index],
+                                                                              )),
+                                                                        );
+
+                                                                        if (updatedSousRegion !=
+                                                                            null) {
+                                                                          Provider.of<StockService>(context, listen: false)
+                                                                              .applyChange();
+                                                                        }
+                                                                      },
+                                                                    ),
+                                                                  ),
                                                                 ],
                                                               ),
                                                             ),
@@ -854,34 +902,6 @@ class _MyProductScreenState extends State<MyProductScreen> {
                 ),
               ),
             ),
-    );
-  }
-
-  Widget _buildItem(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-                color: Colors.black87,
-                fontWeight: FontWeight.w500,
-                fontStyle: FontStyle.italic,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 16),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w800,
-                overflow: TextOverflow.ellipsis,
-                fontSize: 16),
-          )
-        ],
-      ),
     );
   }
 
@@ -961,6 +981,117 @@ class _MyProductScreenState extends State<MyProductScreen> {
         borderRadius: BorderRadius.circular(15),
         color: isState ? Colors.green : Colors.red,
       ),
+    );
+  }
+}
+
+class DialodEdit extends StatefulWidget {
+  Stock? stock;
+  DialodEdit({super.key, this.stock});
+
+  @override
+  State<DialodEdit> createState() => _DialodEditState();
+}
+
+class _DialodEditState extends State<DialodEdit> {
+  TextEditingController quantiteController = TextEditingController();
+  late Stock stocks;
+  String? idStock;
+  final formkey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    stocks = widget.stock!;
+    idStock = stocks.idStock;
+    quantiteController.text = stocks.quantiteStock!.toString();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 250,
+      child: Form(
+          key: formkey,
+          child: Column(children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              child: Text("Modification de la quantité",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+            ),
+            SizedBox(height: 10),
+            TextFormField(
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Veuillez remplir ce champ";
+                }
+                return null;
+              },
+              controller: quantiteController,
+              decoration: InputDecoration(
+                labelText: "Quantité",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+            SizedBox(height: 25),
+            ElevatedButton.icon(
+              onPressed: () async {
+                final qte = quantiteController.text;
+
+                // final qteF = double.tryParse(qte);
+                print(qte);
+                if (formkey.currentState!.validate()) {
+                  try {
+                    await StockService()
+                        .updateQuantiteStock(
+                            id: stocks.idStock!,
+                            nouvelleQuantite: qte
+                           )
+                        .then((value) => {
+                              Navigator.of(context).pop(),
+                              Provider.of<StockService>(context, listen: false)
+                                  .applyChange(),
+                            })
+                        .catchError((onError) => {print(onError)});
+                  } catch (e) {
+                    final String errorMessage = e.toString();
+                    print(errorMessage);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Row(
+                          children: [
+                            Text("Une erreur s'est produit"),
+                          ],
+                        ),
+                        duration: Duration(seconds: 5),
+                      ),
+                    );
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green, // Orange color code
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                minimumSize: const Size(290, 45),
+              ),
+              icon: const Icon(
+                Icons.edit,
+                color: Colors.white,
+              ),
+              label: const Text(
+                "Modifier",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            )
+          ])),
     );
   }
 }

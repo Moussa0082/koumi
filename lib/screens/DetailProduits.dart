@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:koumi_app/models/Acteur.dart';
@@ -395,7 +394,9 @@ class _DetailProduitsState extends State<DetailProduits>
                         Text(
                           maxLines: 2,
                           textAlign: TextAlign.right,
-                          widget.stock.unite!.nomUnite!,
+                          widget.stock.unite!.nomUnite == null
+                              ? ""
+                              : widget.stock.unite!.nomUnite!,
                           style: TextStyle(
                             overflow: TextOverflow.ellipsis,
                             fontSize: 20,
@@ -501,28 +502,28 @@ class _DetailProduitsState extends State<DetailProduits>
                           //       fontSize: 20,
                           //       fontWeight: FontWeight.bold),
                           // ),
-                          Text(
-                            'Note', // Convertir en entier
-                            style: const TextStyle(
-                                overflow: TextOverflow.ellipsis,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold),
-                          ),
+                          // Text(
+                          //   'Note', // Convertir en entier
+                          //   style: const TextStyle(
+                          //       overflow: TextOverflow.ellipsis,
+                          //       fontSize: 20,
+                          //       fontWeight: FontWeight.bold),
+                          // ),
 
-                          RatingBar.builder(
-                            initialRating: 3,
-                            minRating: 0,
-                            maxRating: 5,
-                            direction: Axis.horizontal,
-                            allowHalfRating: false,
-                            itemCount: 5,
-                            itemSize: 30,
-                            itemBuilder: (context, _) => const Icon(
-                              Icons.star,
-                              color: Colors.amber,
-                            ),
-                            onRatingUpdate: (rating) {},
-                          ),
+                          // RatingBar.builder(
+                          //   initialRating: 3,
+                          //   minRating: 0,
+                          //   maxRating: 5,
+                          //   direction: Axis.horizontal,
+                          //   allowHalfRating: false,
+                          //   itemCount: 5,
+                          //   itemSize: 30,
+                          //   itemBuilder: (context, _) => const Icon(
+                          //     Icons.star,
+                          //     color: Colors.amber,
+                          //   ),
+                          //   onRatingUpdate: (rating) {},
+                          // ),
                         ],
                       ),
                     ),
@@ -562,6 +563,48 @@ class _DetailProduitsState extends State<DetailProduits>
                             maxLines: 2,
                             textAlign: TextAlign.right,
                             widget.stock.typeProduit!,
+                            style: TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Origine : ",
+                            style: TextStyle(
+                                fontSize: 20, fontStyle: FontStyle.italic)),
+                        Flexible(
+                          child: Text(
+                            maxLines: 2,
+                            textAlign: TextAlign.right,
+                            widget.stock.origineProduit!,
+                            style: TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Date production : ",
+                            style: TextStyle(
+                                fontSize: 20, fontStyle: FontStyle.italic)),
+                        Flexible(
+                          child: Text(
+                            maxLines: 2,
+                            textAlign: TextAlign.right,
+                            widget.stock.dateProduction!,
                             style: TextStyle(
                               overflow: TextOverflow.ellipsis,
                               fontSize: 20,

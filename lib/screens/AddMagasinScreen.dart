@@ -519,41 +519,6 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                         onSaved: (val) => contactMagasin = val!,
                       ),
                       // fin contact magasin
-
-                      const SizedBox(height: 10),
-
-                      //Contact localiteMagasin
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Align(
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              "Localité Magasin *",
-                              style: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.bold),
-                            )),
-                      ),
-                      TextFormField(
-                        controller: localiteMagasinController,
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          hintText: "Exemple : Bamako , Kayes , Segou",
-                        ),
-                        keyboardType: TextInputType.text,
-                        validator: (val) {
-                          if (val == null || val.isEmpty) {
-                            return "Veillez entrez la localité du magasin";
-                          } else {
-                            return null;
-                          }
-                        },
-                        onSaved: (val) => localiteMagasin = val!,
-                      ),
-                      // fin localite magasin
                       const SizedBox(height: 10),
 
                       //Contact magasin
@@ -563,7 +528,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                               child: Align(
                                   alignment: Alignment.topLeft,
                                   child: Text(
-                                    "Chargement ................",
+                                    "Chargement...",
                                     style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold),
@@ -654,7 +619,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                                 },
                                 decoration: InputDecoration(
                                   labelText: widget.isEditable! == false
-                                      ? 'Selectionner une region'
+                                      ? 'Selectionner une région'
                                       : widget.niveau1Pays!.nomN1,
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
@@ -668,7 +633,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                                 items: [],
                                 onChanged: null,
                                 decoration: InputDecoration(
-                                  labelText: 'Probleme de connexion',
+                                  labelText: 'Aucune région trouvé',
                                   contentPadding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 20),
                                   border: OutlineInputBorder(
@@ -682,7 +647,7 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                             items: [],
                             onChanged: null,
                             decoration: InputDecoration(
-                              labelText: 'Aucune region trouvé',
+                              labelText: 'Aucune région trouvé',
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 20),
                               border: OutlineInputBorder(
@@ -692,6 +657,41 @@ class _AddMagasinScreenState extends State<AddMagasinScreen> {
                           );
                         },
                       ),
+                      const SizedBox(height: 10),
+
+                      //Contact localiteMagasin
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              "Localité Magasin *",
+                              style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),
+                            )),
+                      ),
+                      TextFormField(
+                        controller: localiteMagasinController,
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          hintText: "Exemple : Bamako , Kayes , Segou",
+                        ),
+                        keyboardType: TextInputType.text,
+                        validator: (val) {
+                          if (val == null || val.isEmpty) {
+                            return "Veillez entrez la localité du magasin";
+                          } else {
+                            return null;
+                          }
+                        },
+                        onSaved: (val) => localiteMagasin = val!,
+                      ),
+                      // fin localite magasin
+                     
 
                       const SizedBox(
                         height: 10,

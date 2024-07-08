@@ -77,22 +77,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool isWhatsAppEditing = false;
   bool isPhoneEditing = false;
-  String processedNumber = "";
+  String processedNumberWA = "";
   String processedNumberTel = "";
-  // String selectedCountryCode = 'ML';
-  // void detectNum(String num){
-  //   if(processedNumberTel.isEmpty){
-  //     setState(() {
-  //     processedNumberTel = num;
-  //   });
-  //   }
-  // }
+  String selectCode = "";
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Accédez au fournisseur ici
     countryProvider = Provider.of<CountryProvider>(context, listen: false);
+  }
+
+  void updateCountryCode(String countryCode) {
+    setState(() {
+      detectedCountryCode = countryCode;
+    });
   }
 
   @override
@@ -104,26 +103,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Provider.of<DetectorPays>(context, listen: false).detectedCountryCode!;
     selectedCountry =
         Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
+    print("pays code : ${detectedCountryCode}, ${selectedCountry}");
 
     whatsAppController.addListener(() {
       if (isPhoneEditing) return;
       setState(() {
-        processedNumber = removePlus(whatsAppController.text);
-        phoneController.text = processedNumber;
+        // processedNumber = removePlus(whatsAppController.text);
+        phoneController.text = whatsAppController.text;
       });
     });
 
     phoneController.addListener(() {
       if (isWhatsAppEditing) return;
       setState(() {
-        processedNumberTel = removePlus(phoneController.text);
+        processedNumberTel = phoneController.text;
+        // processedNumberTel = removePlus(phoneController.text);
       });
     });
-
-    // _mesTypeActeur  =
-    // http.get(Uri.parse('https://koumi.ml/api-koumi/typeActeur/read'));
-    // http.get(Uri.parse('http://10.0.2.2:9000/api-koumi/typeActeur/read'));
-    // getLocation();
   }
 
   @override
@@ -240,19 +236,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
                           onSaved: (val) => nomActeur = val!,
                         ),
+                        SizedBox(
+                          height: 15,
+                        ),
                         // fin  adresse fullname
                         Padding(
                           padding: const EdgeInsets.only(left: 10.0),
                           child: Text(
-                            "Numéro WhtasApp",
-                            style:
-                                TextStyle(color: (Colors.black), fontSize: 18),
+                            "Numéro WhatsApp",
+                            style: TextStyle(color: Colors.black, fontSize: 18),
                           ),
                         ),
-                        const SizedBox(
-                          height: 4,
-                        ),
-
+                        const SizedBox(height: 4),
                         IntlPhoneField(
                           initialCountryCode: detectedCountryCode,
                           controller: whatsAppController,
@@ -265,41 +260,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          languageCode: "en",
+                          languageCode: "fr",
                           onChanged: (phone) {
                             print(phone.completeNumber);
-                            processedNumber =
+                            processedNumberWA =
                                 removePlus(phone.completeNumber.toString());
-                            print(processedNumber);
+                            print("wa selected  $processedNumberWA");
                           },
                           onCountryChanged: (country) {
                             setState(() {
                               selectedCountry = country.name.toString();
+                              updateCountryCode(country.code.toString());
                             });
 
                             print('Country changed to: ' + country.name);
                           },
-                        ),
-                        const SizedBox(
-                          height: 10,
                         ),
 
                         Padding(
                           padding: const EdgeInsets.only(left: 10.0),
                           child: Text(
                             "Téléphone *",
-                            style:
-                                TextStyle(color: (Colors.black), fontSize: 18),
+                            style: TextStyle(color: Colors.black, fontSize: 18),
                           ),
                         ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-
+                        const SizedBox(height: 5),
                         IntlPhoneField(
                           controller: phoneController,
-                          initialCountryCode:
-                              detectedCountryCode, // Automatically detect user's country
+                          initialCountryCode: detectedCountryCode,
                           invalidNumberMessage: "Numéro invalide",
                           searchText: "Chercher un pays",
                           decoration: InputDecoration(
@@ -309,12 +297,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          languageCode: "en",
+                          languageCode: "fr",
                           onChanged: (phone) {
                             print(phone.completeNumber);
                             processedNumberTel =
                                 removePlus(phone.completeNumber.toString());
-                            print(processedNumberTel);
+                            print("tel selected  $processedNumberTel");
                           },
                           onCountryChanged: (country) {
                             print('Country changed to: ' + country.name);
@@ -331,6 +319,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
                                 print("pays: $selectedCountry");
+                                print(
+                                    "tel :${processedNumberTel} , wa ${processedNumberWA}");
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -338,8 +328,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             RegisterNextScreen(
                                               nomActeur:
                                                   nomActeurController.text,
-                                              whatsAppActeur:
-                                                  processedNumberTel,
+                                              whatsAppActeur: processedNumberWA,
                                               telephone: processedNumberTel,
                                               pays: selectedCountry,
                                             )));

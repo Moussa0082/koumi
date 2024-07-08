@@ -1,18 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:koumi_app/Admin/AcceuilAdmin.dart';
 import 'package:koumi_app/Admin/ProfilA.dart';
-import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/MyProduct.dart';
 import 'package:koumi_app/screens/Panier.dart';
-import 'package:koumi_app/screens/Product.dart';
-import 'package:koumi_app/screens/Products.dart';
-import 'package:koumi_app/screens/Produit.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:provider/provider.dart';
 
@@ -25,9 +17,9 @@ class BottomNavBarAdmin extends StatefulWidget {
       GlobalKey<_BottomNavBarAdminState>();
 }
 
-const d_color = Color.fromRGBO(254, 243, 231, 1);
-const d_colorPage = Color.fromRGBO(255, 255, 255, 1);
-const d_colorOr = Color.fromRGBO(254, 243, 231, 1);
+// const d_color = Color.fromRGBO(254, 243, 231, 1);
+// const d_colorPage = Color.fromRGBO(255, 255, 255, 1);
+// const d_colorOr = Color.fromRGBO(254, 243, 231, 1);
 
 class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
   int activePageIndex = 0;
@@ -43,20 +35,13 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
     const AcceuilAdmin(),
     MyProductScreen(),
     Panier(),
-     ProfilA()
+    ProfilA()
   ];
-
-
-  
-  
-  
-
 
   void _changeActivePageValue(int index) {
     setState(() {
       activePageIndex = index;
     });
-    
   }
 
   void resetIndex(int index) {
@@ -78,7 +63,6 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
       Provider.of<BottomNavigationService>(context, listen: false)
           .changeIndex(0);
     });
-    
   }
 
   @override
@@ -90,7 +74,7 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
         return isFirstRouteInCurrentTab;
       },
       child: Scaffold(
-        backgroundColor: d_colorPage,
+        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
         appBar: AppBar(
           toolbarHeight: 0,
           elevation: 0,
@@ -115,28 +99,28 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
           elevation: 5.0,
           items: const [
             BottomNavigationBarItem(
-              backgroundColor: d_color,
+              backgroundColor: Color.fromARGB(255, 250, 250, 250),
               icon: Icon(Icons.home_filled),
               label: "Accueil",
             ),
             BottomNavigationBarItem(
-              backgroundColor: d_color,
+              backgroundColor: Color.fromARGB(255, 250, 250, 250),
               icon: Icon(Icons.list_alt_sharp),
-              label: "Produits",
+              label: "Mes Produits",
             ),
             BottomNavigationBarItem(
-              backgroundColor: d_color,
+              backgroundColor: Color.fromARGB(255, 250, 250, 250),
               icon: Icon(Icons.shopping_cart),
               label: "Panier",
             ),
             BottomNavigationBarItem(
-              backgroundColor: d_color,
+              backgroundColor: Color.fromARGB(255, 250, 250, 250),
               icon: Icon(Icons.person_pin),
               label: "Profil",
             ),
           ],
           unselectedItemColor: Colors.black,
-          selectedItemColor: Colors.green[800],
+          selectedItemColor: Color(0xFFFF8A00),
           iconSize: 30,
           showUnselectedLabels: true,
           selectedLabelStyle: const TextStyle(color: Colors.black),
@@ -147,9 +131,8 @@ class _BottomNavBarAdminState extends State<BottomNavBarAdmin> {
     );
   }
 
-   Map<String, WidgetBuilder> _routeBuilders(BuildContext context, int index) {
+  Map<String, WidgetBuilder> _routeBuilders(BuildContext context, int index) {
     return {
-
       '/': (context) => pages[index],
     };
   }

@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:koumi_app/Admin/EditProfil.dart';
 import 'package:koumi_app/Admin/Parametre.dart';
 import 'package:koumi_app/Admin/ParametreGenerauxPage.dart';
 import 'package:koumi_app/Admin/TypeActeurPage.dart';
+import 'package:koumi_app/Admin/Zone.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/models/ZoneProduction.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
-import 'package:koumi_app/screens/LoginScreen.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
+import 'package:koumi_app/service/ZoneProductionService.dart';
 import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:profile_photo/profile_photo.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilA extends StatefulWidget {
   const ProfilA({super.key});
@@ -26,7 +28,7 @@ const d_colorPage = Color.fromRGBO(255, 255, 255, 1);
 
 class _ProfilAState extends State<ProfilA> {
   late Acteur acteur;
-
+  late List<ZoneProduction> zoneList = [];
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
@@ -132,8 +134,47 @@ class _ProfilAState extends State<ProfilA> {
                                     _buildProfile('Adresse', ac.adresseActeur!),
                                     _buildProfile(
                                         'Localité', ac.localiteActeur!),
-                                    // _buildProfile(
-                                    //     'Pays', ac.niveau3PaysActeur!),
+                                    const Divider(
+                                      color: Color.fromARGB(255, 235, 233, 233),
+                                      height: 1,
+                                      thickness: 1,
+                                      indent: 0,
+                                      endIndent: 0,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    EditProfil(
+                                                      acteurs: ac,
+                                                    )),
+                                          );
+                                        },
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "Voir profil",
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black87,
+                                                overflow: TextOverflow.ellipsis,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Icon(
+                                              Icons.chevron_right_sharp,
+                                              size: 20,
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    )
                                   ],
                                 ),
                               ),
@@ -305,6 +346,105 @@ class _ProfilAState extends State<ProfilA> {
                 ),
               ),
               Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        offset: const Offset(0, 2),
+                        blurRadius: 5,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 0, horizontal: 15),
+                        child: Column(
+                          children: [
+                            Row(children: [
+                              const Icon(Icons.align_horizontal_left_outlined,
+                                  color: d_colorGreen, size: 25),
+                              const SizedBox(
+                                width: 15,
+                              ),
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Zone()));
+                                  },
+                                  child: Text(
+                                    "Mes zones de production",
+                                    style: TextStyle(
+                                        fontSize: 17, color: d_colorGreen),
+                                  ))
+                            ]),
+                            Consumer<ZoneProductionService>(
+                                builder: (context, zoneService, child) {
+                              return FutureBuilder(
+                                  future: zoneService
+                                      .fetchZoneByActeur(acteur.idActeur!),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.orange,
+                                        ),
+                                      );
+                                    }
+
+                                    if (!snapshot.hasData) {
+                                      return const Padding(
+                                        padding: EdgeInsets.all(10),
+                                        child: Center(
+                                            child: Text("Aucun zone trouvé")),
+                                      );
+                                    } else {
+                                      zoneList = snapshot.data!;
+                                      return Wrap(
+                                          children: zoneList
+                                              .map(
+                                                (e) => Text(
+                                                    "${e.nomZoneProduction} ,",
+                                                    style: const TextStyle(
+                                                        color: Colors.black87,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontStyle:
+                                                            FontStyle.italic,
+                                                        overflow: TextOverflow
+                                                            .ellipsis)),
+                                              )
+                                              .toList());
+                                    }
+                                  });
+                            })
+                          ],
+                        ),
+                      ),
+                      Container(
+                        alignment: Alignment.bottomRight,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Image.asset("assets/images/zone.png",
+                            width: 50, height: 50),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
                 padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                 child: ElevatedButton.icon(
                     onPressed: () async {
@@ -313,7 +453,6 @@ class _ProfilAState extends State<ProfilA> {
 
                       // Déconnexion avec le provider
                       await acteurProvider.logout();
-    
 
                       Get.offAll(BottomNavigationPage(),
                           // duration: Duration(

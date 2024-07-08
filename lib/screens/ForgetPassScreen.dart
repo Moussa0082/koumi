@@ -1,10 +1,8 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:koumi_app/screens/CodeConfirmScreen.dart';
 import 'package:koumi_app/service/ActeurService.dart';
-import 'package:koumi_app/widgets/BottomNavigationPage.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 
 class ForgetPassScreen extends StatefulWidget {
@@ -305,7 +303,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                       visible: isVisible,
                       child: TextFormField(
                         controller: emailController,
-                         decoration: InputDecoration(
+                        decoration: InputDecoration(
                           hintText: "Entrez votre adresse email",
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 10, horizontal: 20),
@@ -334,8 +332,8 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                       visible: !isVisible,
                       child: TextFormField(
                         controller: whatsAppController,
-                         decoration: InputDecoration(
-                          hintText: "Entrez votre numéro WhatsApp",
+                        decoration: InputDecoration(
+                          hintText: "EX: 223 12345678",
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 10, horizontal: 20),
                           border: OutlineInputBorder(

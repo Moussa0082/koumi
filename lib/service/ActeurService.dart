@@ -80,40 +80,36 @@ class ActeurService extends ChangeNotifier {
 
         debugPrint('acteur service ${donneesResponse.toString()}');
       } else {
-           print("et code ${response.statusCode}");
+        print("et code ${response.statusCode}");
         final errorMessage =
             json.decode(utf8.decode(responsed.bodyBytes))['message'];
         throw Exception(' ${errorMessage}');
       }
     } catch (e) {
-   
       throw Exception(
           'Une erreur s\'est produite lors de l\'ajout de acteur : $e ');
     }
   }
 
-  static Future<void> updateActeur({
+  Future<void> updateActeur({
     required String idActeur,
     required String nomActeur,
     required String adresseActeur,
     required String telephoneActeur,
     required String whatsAppActeur,
-    String? latitude,
-    String? longitude,
-    required String niveau3PaysActeur,
+    String? niveau3PaysActeur,
     required String localiteActeur,
     required String emailActeur,
-    required String filiereActeur,
-    required List<TypeActeur> typeActeur,
-    required List<Speculation> speculations,
+    List<TypeActeur>? typeActeur,
+    List<Speculation>? speculations,
     File? photoSiegeActeur,
     File? logoActeur,
-    required String password,
-    required String maillonActeur,
+    // required String password,
   }) async {
     try {
-      var requete =
-          http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idActeur'));
+      //    // Convertir chaque TypeActeur en un objet JSON et les ajouter à une liste JSON
+      // List<String> typeActeurJsonList = typeActeur.map((typeActeur) => typeActeur.toJson()).toList();
+      var requete = http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/${idActeur}'));
 
       if (photoSiegeActeur != null) {
         requete.files.add(http.MultipartFile(
@@ -129,41 +125,113 @@ class ActeurService extends ChangeNotifier {
             filename: basename(logoActeur.path)));
       }
 
+      //acteur
       requete.fields['acteur'] = jsonEncode({
         'idActeur': idActeur,
         'nomActeur': nomActeur,
         'adresseActeur': adresseActeur,
         'telephoneActeur': telephoneActeur,
         'whatsAppActeur': whatsAppActeur,
-        'latitude': latitude,
-        'longitude': longitude,
         'niveau3PaysActeur': niveau3PaysActeur,
         'localiteActeur': localiteActeur,
         'emailActeur': emailActeur,
-        'filiereActeur': filiereActeur,
-        'typeActeur': typeActeur.toList(),
-        'speculations': speculations.toList(),
+        'speculations': speculations,
+        'typeActeur': typeActeur, // Convertir chaque objet TypeActeur en map
         'photoSiegeActeur': "",
         'logoActeur': "",
-        'password': password,
-        'maillonActeur': maillonActeur,
+        // 'password': password,
       });
 
       var response = await requete.send();
       var responsed = await http.Response.fromStream(response);
 
-      if (response.statusCode == 200 || responsed.statusCode == 201) {
-        final donneesResponse = json.decode(responsed.body);
+      if (response.statusCode == 200 || responsed.statusCode == 201 ||
+          responsed.statusCode == 202) {
+        final donneesResponse = json.decode(utf8.decode(responsed.bodyBytes));
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        final codeActeur = donneesResponse['codeActeur'];
+        await prefs.setString('codeActeur', codeActeur);
+
         debugPrint('acteur service ${donneesResponse.toString()}');
       } else {
-        throw Exception(
-            'Échec de la requête acteur avec le code d\'état : ${responsed.statusCode}');
+        print("et code ${response.statusCode}");
+        final errorMessage =
+            json.decode(utf8.decode(responsed.bodyBytes))['message'];
+        throw Exception(' ${errorMessage}');
       }
     } catch (e) {
       throw Exception(
-          'Une erreur s\'est produite lors de la modification de acteur : $e');
+          'Une erreur s\'est produite lors de l\'ajout de acteur : $e ');
     }
   }
+
+  // Future<void> updateActeur({
+  //   required String idActeur,
+  //   required String nomActeur,
+  //   required String adresseActeur,
+  //   required String telephoneActeur,
+  //   required String whatsAppActeur,
+  //   String? latitude,
+  //   String? longitude,
+  //   String? niveau3PaysActeur,
+  //   required String localiteActeur,
+  //   required String emailActeur,
+  //   List<TypeActeur>? typeActeur,
+  //   List<Speculation>? speculations,
+  //   File? photoSiegeActeur,
+  //   File? logoActeur,
+  //   // required String password,
+  // }) async {
+  //   try {
+  //     var requete =
+  //         http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idActeur'));
+
+  //     if (photoSiegeActeur != null) {
+  //       requete.files.add(http.MultipartFile(
+  //           'image1',
+  //           photoSiegeActeur.readAsBytes().asStream(),
+  //           photoSiegeActeur.lengthSync(),
+  //           filename: basename(photoSiegeActeur.path)));
+  //     }
+
+  //     if (logoActeur != null) {
+  //       requete.files.add(http.MultipartFile('image2',
+  //           logoActeur.readAsBytes().asStream(), logoActeur.lengthSync(),
+  //           filename: basename(logoActeur.path)));
+  //     }
+
+  //     requete.fields['acteur'] = jsonEncode({
+  //       'nomActeur': nomActeur,
+  //       'adresseActeur': adresseActeur,
+  //       'telephoneActeur': telephoneActeur,
+  //       'whatsAppActeur': whatsAppActeur,
+  //       'latitude': latitude,
+  //       'longitude': longitude,
+  //       'niveau3PaysActeur': niveau3PaysActeur,
+  //       'localiteActeur': localiteActeur,
+  //       'emailActeur': emailActeur,
+  //       'speculations': speculations,
+  //       'typeActeur': typeActeur,
+  //       'photoSiegeActeur': "",
+  //       'logoActeur': "",
+  //       //  'password': password,
+  //     });
+
+  //     var response = await requete.send();
+  //     var responsed = await http.Response.fromStream(response);
+
+  //     if (response.statusCode == 200 || responsed.statusCode == 201) {
+  //       final donneesResponse = json.decode(responsed.body);
+  //       debugPrint('acteur service ${donneesResponse.toString()}');
+  //     } else {
+  //       throw Exception(
+  //           'Échec de la requête acteur avec le code d\'état : ${responsed.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     throw Exception(
+  //         'Une erreur s\'est produite lors de la modification de acteur : ${e.toString()}');
+  //   }
+  // }
 
   static Future<String> sendOtpCodeEmail(
       String emailActeur, BuildContext context) async {

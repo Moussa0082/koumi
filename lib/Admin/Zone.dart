@@ -51,7 +51,8 @@ class _ZoneState extends State<Zone> {
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: const Text(
           "Zone de production",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 20),
+          style: TextStyle(
+              color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         actions: [
           PopupMenuButton<String>(
@@ -154,8 +155,8 @@ class _ZoneState extends State<Zone> {
                     return Column(
                         children: filtereSearch
                             .map((ZoneProduction zone) => Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 15),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 10),
                                   child: Card(
                                     elevation: 5,
                                     shadowColor: Colors.black,
@@ -163,7 +164,7 @@ class _ZoneState extends State<Zone> {
                                     child: SizedBox(
                                       width: MediaQuery.of(context).size.width *
                                           0.8,
-                                      height: 305,
+                                      // height: 305,
                                       child: Column(children: [
                                         ClipRRect(
                                             borderRadius:

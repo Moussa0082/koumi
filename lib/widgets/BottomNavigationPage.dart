@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:koumi_app/screens/Acceuil.dart';
-import 'package:koumi_app/screens/CommandeScreen.dart';
 import 'package:koumi_app/screens/MyProduct.dart';
 import 'package:koumi_app/screens/Panier.dart';
-import 'package:koumi_app/screens/Product.dart';
-import 'package:koumi_app/screens/Products.dart';
 import 'package:koumi_app/screens/Profil.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +11,7 @@ import 'connection_verify.dart';
 
 class BottomNavigationPage extends StatefulWidget {
   String? iso;
-   BottomNavigationPage({super.key, this.iso});
+  BottomNavigationPage({super.key, this.iso});
 
   @override
   State<BottomNavigationPage> createState() => _BottomNavigationPageState();
@@ -107,28 +104,28 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
           elevation: 5.0,
           items: const [
             BottomNavigationBarItem(
-              backgroundColor: d_color,
+              backgroundColor: Color.fromARGB(255, 250, 250, 250),
               icon: Icon(Icons.home_filled),
               label: "Accueil",
             ),
             BottomNavigationBarItem(
-              backgroundColor: d_color,
+              backgroundColor: Color.fromARGB(255, 250, 250, 250),
               icon: Icon(Icons.list_alt_sharp),
               label: "Produits",
             ),
             BottomNavigationBarItem(
-              backgroundColor: d_color,
+              backgroundColor: Color.fromARGB(255, 250, 250, 250),
               icon: Icon(Icons.shopping_cart),
               label: "Panier",
             ),
             BottomNavigationBarItem(
-              backgroundColor: d_color,
+              backgroundColor: Color.fromARGB(255, 250, 250, 250),
               icon: Icon(Icons.person_pin),
               label: "Profil",
             ),
           ],
           unselectedItemColor: Colors.black,
-          selectedItemColor: Colors.green[800],
+          selectedItemColor: Color(0xFFFF8A00),
           iconSize: 30,
           showUnselectedLabels: true,
           selectedLabelStyle: const TextStyle(color: Colors.black),
@@ -139,9 +136,8 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
     );
   }
 
-    Map<String, WidgetBuilder> _routeBuilders(BuildContext context, int index) {
+  Map<String, WidgetBuilder> _routeBuilders(BuildContext context, int index) {
     return {
-
       '/': (context) => pages[index],
     };
   }
