@@ -105,21 +105,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Provider.of<DetectorPays>(context, listen: false).detectedCountry!;
     print("pays code : ${detectedCountryCode}, ${selectedCountry}");
 
-    whatsAppController.addListener(() {
+   whatsAppController.addListener(() {
       if (isPhoneEditing) return;
       setState(() {
-        // processedNumber = removePlus(whatsAppController.text);
-        phoneController.text = whatsAppController.text;
+        processedNumberWA = removePlus(whatsAppController.text);
+        phoneController.text = processedNumberWA;
       });
     });
 
     phoneController.addListener(() {
       if (isWhatsAppEditing) return;
       setState(() {
-        processedNumberTel = phoneController.text;
-        // processedNumberTel = removePlus(phoneController.text);
+        processedNumberTel = removePlus(phoneController.text);
       });
     });
+
+    // whatsAppController.addListener(() {
+    //   if (isPhoneEditing) return;
+    //   setState(() {
+    //     // processedNumber = removePlus(whatsAppController.text);
+    //     phoneController.text = whatsAppController.text;
+    //   });
+    // });
+
+    // phoneController.addListener(() {
+    //   if (isWhatsAppEditing) return;
+    //   setState(() {
+    //     processedNumberTel = phoneController.text;
+    //     // processedNumberTel = removePlus(phoneController.text);
+    //   });
+    // });
   }
 
   @override
