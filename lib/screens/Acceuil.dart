@@ -137,6 +137,7 @@ class _AccueilState extends State<Accueil> {
             detectedC = place.isoCountryCode;
             detectedCountryCode = place.isoCountryCode!;
             detectedCountry = place.country!;
+            print("pays : ${detectedCountry} code: ${detectedCountryCode}");
             detectorPays.setDetectedCountryAndCode(
                 detectedCountry, detectedCountryCode);
           });
@@ -153,7 +154,6 @@ class _AccueilState extends State<Accueil> {
           "Une erreur est survenue lors de la récupération de l'adresse : $e");
     }
   }
-
 
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

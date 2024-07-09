@@ -16,6 +16,7 @@ class ActeurProvider with ChangeNotifier {
     String? emailActeur = prefs.getString('emailActeur');
     String? password = prefs.getString('password');
     List<String>? userTypeList = prefs.getStringList('userType');
+    List<String>? speculationList = prefs.getStringList('specType');
     String? nomActeur = prefs.getString('nomActeur');
     String? adresseActeur = prefs.getString('adresseActeur');
     String? telephoneActeur = prefs.getString('telephoneActeur');
@@ -34,6 +35,7 @@ class ActeurProvider with ChangeNotifier {
     if (emailActeur != null &&
         password != null &&
         userTypeList != null &&
+       speculationList != null &&
         idActeur != null &&
         nomActeur != null &&
         adresseActeur != null &&
@@ -46,15 +48,15 @@ class ActeurProvider with ChangeNotifier {
           emailActeur,
           password,
           userTypeList,
+          speculationList,
           idActeur,
           nomActeur,
           telephoneActeur,
           adresseActeur,
           whatsAppActeur,
           niveau3PaysActeur,
-          localiteActeur);
-
-      // Mettre à jour le Provider avec les données de l'utilisateur
+          localiteActeur
+          );
       notifyListeners();
     }
   }

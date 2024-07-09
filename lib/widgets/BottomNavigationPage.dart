@@ -10,8 +10,8 @@ import 'package:provider/provider.dart';
 import 'connection_verify.dart';
 
 class BottomNavigationPage extends StatefulWidget {
-  String? iso;
-  BottomNavigationPage({super.key, this.iso});
+  // String? iso;
+  BottomNavigationPage({super.key});
 
   @override
   State<BottomNavigationPage> createState() => _BottomNavigationPageState();

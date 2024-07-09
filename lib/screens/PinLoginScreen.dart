@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/RegisterScreen.dart';
@@ -151,6 +152,10 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         // Enregistrer la liste des types d'utilisateur dans SharedPreferences
 
         // Enregistrer la liste des types d'utilisateur dans SharedPreferences
+        List<dynamic> speculationData = responseBody['speculations'];
+
+        List<Speculation> speculationList =
+            speculationData.map((data) => Speculation.fromMap(data)).toList();
 
         List<dynamic> typeActeurData = responseBody['typeActeur'];
         List<TypeActeur> typeActeurList =
@@ -159,6 +164,10 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         List<String> userTypeLabels =
             typeActeurList.map((typeActeur) => typeActeur.libelle!).toList();
 
+        List<String> speculationLabels = speculationList
+            .map((typeActeur) => typeActeur.nomSpeculation!)
+            .toList();
+        prefs.setStringList('speculations', speculationLabels);
 // Enregistrer la liste des libellés des types d'utilisateur dans SharedPreferences
         prefs.setStringList('userType', userTypeLabels);
         Acteur acteur = Acteur(
@@ -174,10 +183,13 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
           emailActeur: emailActeur,
           statutActeur: responseBody['statutActeur'],
           typeActeur: typeActeurList,
+          speculations: speculationList,
           password: password,
         );
 
         acteurProvider.setActeur(acteur);
+
+        print("acteur pin : ${acteur}");
 
         final List<String> type =
             acteur.typeActeur!.map((e) => e.libelle!).toList();

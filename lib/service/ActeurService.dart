@@ -91,6 +91,157 @@ class ActeurService extends ChangeNotifier {
     }
   }
 
+//  Future<void> updateActeur({
+//   required String idActeur,
+//   required String nomActeur,
+//   required String adresseActeur,
+//   required String telephoneActeur,
+//   required String whatsAppActeur,
+//   String? niveau3PaysActeur,
+//   required String localiteActeur,
+//   String? password,
+//   String? emailActeur,
+//   List<TypeActeur>? typeActeur,
+//   List<Speculation>? speculations,
+//   File? photoSiegeActeur,
+//   File? logoActeur,
+// }) async {
+//   try {
+//     var requete = http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idActeur'));
+
+//     if (photoSiegeActeur != null) {
+//       requete.files.add(
+//         http.MultipartFile(
+//           'image1',
+//           photoSiegeActeur.readAsBytes().asStream(),
+//           photoSiegeActeur.lengthSync(),
+//           filename: basename(photoSiegeActeur.path),
+//         ),
+//       );
+//     }
+
+//     if (logoActeur != null) {
+//       requete.files.add(
+//         http.MultipartFile(
+//           'image2',
+//           logoActeur.readAsBytes().asStream(),
+//           logoActeur.lengthSync(),
+//           filename: basename(logoActeur.path),
+//         ),
+//       );
+//     }
+
+//     // Acteur
+//     Map<String, dynamic> acteurData = {
+//       'idActeur': idActeur,
+//       'nomActeur': nomActeur,
+//       'adresseActeur': adresseActeur,
+//       'telephoneActeur': telephoneActeur,
+//       'whatsAppActeur': whatsAppActeur,
+//       'localiteActeur': localiteActeur,
+//       'typeActeur': typeActeur ?? [],
+//       'speculations': speculations ?? [],
+//       if (password != null) 'password': password,
+//       if (niveau3PaysActeur != null) 'niveau3PaysActeur': niveau3PaysActeur,
+//       if (emailActeur != null) 'emailActeur': emailActeur,
+//     };
+
+//     requete.fields['acteur'] = jsonEncode(acteurData);
+//     print('acteurData ${acteurData}');
+
+//     var response = await requete.send();
+//     var responsed = await http.Response.fromStream(response);
+
+//     if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+//       final donneesResponse = json.decode(utf8.decode(responsed.bodyBytes));
+//       SharedPreferences prefs = await SharedPreferences.getInstance();
+//       final codeActeur = donneesResponse['codeActeur'];
+//       await prefs.setString('codeActeur', codeActeur);
+
+//       debugPrint('acteur update service ${donneesResponse.toString()}');
+//     } else {
+//       final errorMessage = json.decode(utf8.decode(responsed.bodyBytes))['message'];
+//       throw Exception('Error de la modif : ${response.statusCode}: $errorMessage');
+//     }
+//   } catch (e) {
+//     throw Exception('Une erreur s\'est produite lors de la modif acteur: $e');
+//   }
+// }
+
+//  Future<void> updateActeur({
+//     required String idActeur,
+//     required String nomActeur,
+//     required String adresseActeur,
+//     required String telephoneActeur,
+//     required String whatsAppActeur,
+//     String? niveau3PaysActeur,
+//     required String localiteActeur,
+//     required String emailActeur,
+//     List<TypeActeur>? typeActeur,
+//     List<Speculation>? speculations,
+//     File? photoSiegeActeur,
+//     File? logoActeur,
+//     // required String password,
+//   }) async {
+//     try {
+//       //    // Convertir chaque TypeActeur en un objet JSON et les ajouter à une liste JSON
+//       // List<String> typeActeurJsonList = typeActeur.map((typeActeur) => typeActeur.toJson()).toList();
+//       var requete = http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/${idActeur}'));
+
+//       if (photoSiegeActeur != null) {
+//         requete.files.add(http.MultipartFile(
+//             'image1',
+//             photoSiegeActeur.readAsBytes().asStream(),
+//             photoSiegeActeur.lengthSync(),
+//             filename: basename(photoSiegeActeur.path)));
+//       }
+
+//       if (logoActeur != null) {
+//         requete.files.add(http.MultipartFile('image2',
+//             logoActeur.readAsBytes().asStream(), logoActeur.lengthSync(),
+//             filename: basename(logoActeur.path)));
+//       }
+
+//       //acteur
+//       requete.fields['acteur'] = jsonEncode({
+//         'idActeur': idActeur,
+//         'nomActeur': nomActeur,
+//         'adresseActeur': adresseActeur,
+//         'telephoneActeur': telephoneActeur,
+//         'whatsAppActeur': whatsAppActeur,
+//         'niveau3PaysActeur': niveau3PaysActeur,
+//         'localiteActeur': localiteActeur,
+//         'emailActeur': emailActeur,
+//         'speculations': speculations,
+//         'typeActeur': typeActeur, // Convertir chaque objet TypeActeur en map
+//         'photoSiegeActeur': "",
+//         'logoActeur': "",
+//         // 'password': password,
+//       });
+
+//       var response = await requete.send();
+//       var responsed = await http.Response.fromStream(response);
+
+//       if (response.statusCode == 200 || responsed.statusCode == 201 ||
+//           responsed.statusCode == 202) {
+//         final donneesResponse = json.decode(utf8.decode(responsed.bodyBytes));
+//         SharedPreferences prefs = await SharedPreferences.getInstance();
+//         final codeActeur = donneesResponse['codeActeur'];
+//         await prefs.setString('codeActeur', codeActeur);
+
+//         debugPrint('acteur service ${donneesResponse.toString()}');
+//       } else {
+//         print("et code ${response.statusCode}");
+//         final errorMessage =
+//             json.decode(utf8.decode(responsed.bodyBytes))['message'];
+//         throw Exception(' ${errorMessage}');
+//       }
+//     } catch (e) {
+//       throw Exception(
+//           'Une erreur s\'est produite lors de l\'ajout de acteur : $e ');
+//     }
+//   }
+
   Future<void> updateActeur({
     required String idActeur,
     required String nomActeur,
@@ -99,17 +250,16 @@ class ActeurService extends ChangeNotifier {
     required String whatsAppActeur,
     String? niveau3PaysActeur,
     required String localiteActeur,
-    required String emailActeur,
+    String? emailActeur,
     List<TypeActeur>? typeActeur,
     List<Speculation>? speculations,
     File? photoSiegeActeur,
     File? logoActeur,
-    // required String password,
+    required String password,
   }) async {
     try {
-      //    // Convertir chaque TypeActeur en un objet JSON et les ajouter à une liste JSON
-      // List<String> typeActeurJsonList = typeActeur.map((typeActeur) => typeActeur.toJson()).toList();
-      var requete = http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/${idActeur}'));
+      var requete = http.MultipartRequest(
+          'PUT', Uri.parse('$baseUrl/update/${idActeur}'));
 
       if (photoSiegeActeur != null) {
         requete.files.add(http.MultipartFile(
@@ -125,27 +275,33 @@ class ActeurService extends ChangeNotifier {
             filename: basename(logoActeur.path)));
       }
 
-      //acteur
-      requete.fields['acteur'] = jsonEncode({
+      // Acteur JSON
+      final acteurJson = jsonEncode({
         'idActeur': idActeur,
         'nomActeur': nomActeur,
         'adresseActeur': adresseActeur,
         'telephoneActeur': telephoneActeur,
         'whatsAppActeur': whatsAppActeur,
-        'niveau3PaysActeur': niveau3PaysActeur,
         'localiteActeur': localiteActeur,
-        'emailActeur': emailActeur,
+        'typeActeur': typeActeur,
         'speculations': speculations,
-        'typeActeur': typeActeur, // Convertir chaque objet TypeActeur en map
-        'photoSiegeActeur': "",
+        'password': password,
         'logoActeur': "",
-        // 'password': password,
+        'photoSiegeActeur': "",
+        if (niveau3PaysActeur != null) 'niveau3PaysActeur': niveau3PaysActeur,
+        if (emailActeur != null) 'emailActeur': emailActeur,
       });
+
+      // Imprimer le JSON avant de l'envoyer
+      print("JSON acteur : $acteurJson");
+
+      requete.fields['acteur'] = acteurJson;
 
       var response = await requete.send();
       var responsed = await http.Response.fromStream(response);
 
-      if (response.statusCode == 200 || responsed.statusCode == 201 ||
+      if (response.statusCode == 200 ||
+          responsed.statusCode == 201 ||
           responsed.statusCode == 202) {
         final donneesResponse = json.decode(utf8.decode(responsed.bodyBytes));
         SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -157,13 +313,14 @@ class ActeurService extends ChangeNotifier {
         print("et code ${response.statusCode}");
         final errorMessage =
             json.decode(utf8.decode(responsed.bodyBytes))['message'];
-        throw Exception(' ${errorMessage}');
+        throw Exception(' ${errorMessage.toString()}');
       }
     } catch (e) {
       throw Exception(
           'Une erreur s\'est produite lors de l\'ajout de acteur : $e ');
     }
   }
+
 
   // Future<void> updateActeur({
   //   required String idActeur,

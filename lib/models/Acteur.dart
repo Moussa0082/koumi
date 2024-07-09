@@ -116,6 +116,7 @@ class Acteur {
       String emailActeur,
       String password,
       List<String> userTypeList,
+      List<String> specList,
       String idActeur,
       String nomActeur,
       String telephoneActeur,
@@ -126,6 +127,8 @@ class Acteur {
     // Créez une liste de TypeActeur à partir de la liste de chaînes userTypeList
     List<TypeActeur> typeActeurList =
         userTypeList.map((libelle) => TypeActeur(libelle: libelle)).toList();
+    List<Speculation> specuList =
+        specList.map((nom) => Speculation(nomSpeculation: nom)).toList();
 
     // Retournez une nouvelle instance d'Acteur avec les données fournies
     return Acteur(
@@ -133,6 +136,7 @@ class Acteur {
         emailActeur: emailActeur,
         password: password,
         typeActeur: typeActeurList,
+        speculations: specuList,
         idActeur: idActeur,
         nomActeur: nomActeur,
         adresseActeur: adressActeur,

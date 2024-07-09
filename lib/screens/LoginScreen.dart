@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
+import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/ForgetPassScreen.dart';
@@ -132,15 +133,26 @@ class _LoginScreenState extends State<LoginScreen> {
         // Enregistrer la liste des types d'utilisateur dans SharedPreferences
 
         List<dynamic> typeActeurData = responseBody['typeActeur'];
+        List<dynamic> speculationData = responseBody['speculations'];
+       
         List<TypeActeur> typeActeurList =
             typeActeurData.map((data) => TypeActeur.fromMap(data)).toList();
-// Extraire les libellés des types d'utilisateur et les ajouter à une nouvelle liste de chaînes
+       
+        List<Speculation> speculationsList =
+            speculationData.map((data) => Speculation.fromMap(data)).toList();
+
+        // Extraire les libellés des types d'utilisateur et les ajouter à une nouvelle liste de chaînes
         List<String> userTypeLabels =
             typeActeurList.map((typeActeur) => typeActeur.libelle!).toList();
+       
+        List<String> speculationLabels =
+            speculationsList.map((spec) => spec.nomSpeculation!).toList();
 
 // Enregistrer la liste des libellés des types d'utilisateur dans SharedPreferences
         prefs.setStringList('userType', userTypeLabels);
-        Acteur acteur = Acteur(
+        prefs.setStringList('specType', speculationLabels);
+        // prefs.setStringList('speculations', speculationLabels);
+        Acteur acteurs = Acteur(
           idActeur: responseBody['idActeur'],
           nomActeur: responseBody['nomActeur'],
           adresseActeur: responseBody['adresseActeur'],
@@ -153,13 +165,15 @@ class _LoginScreenState extends State<LoginScreen> {
           emailActeur: emailActeur,
           statutActeur: responseBody['statutActeur'],
           typeActeur: typeActeurList,
+          speculations: speculationsList,
           password: password,
         );
 
-        acteurProvider.setActeur(acteur);
+        acteurProvider.setActeur(acteurs);
+        print("login acteur :${acteurs.toString()}");
 
         final List<String> type =
-            acteur.typeActeur!.map((e) => e.libelle!).toList();
+            acteurs.typeActeur!.map((e) => e.libelle!).toList();
         if (type.contains('admin') || type.contains('Admin')) {
           // Navigator.pushReplacement(
           //   context,
@@ -336,16 +350,28 @@ class _LoginScreenState extends State<LoginScreen> {
         emailController.clear();
         passwordController.clear();
 
+        // List<dynamic> speculationData = responseBody['speculations'];
+        // List<Speculation> speculationList =
+        //     speculationData.map((data) => Speculation.fromMap(data)).toList();
+
         List<dynamic> typeActeurData = responseBody['typeActeur'];
         List<TypeActeur> typeActeurList =
             typeActeurData.map((data) => TypeActeur.fromMap(data)).toList();
 // Extraire les libellés des types d'utilisateur et les ajouter à une nouvelle liste de chaînes
         List<String> userTypeLabels =
             typeActeurList.map((typeActeur) => typeActeur.libelle!).toList();
+        
+        List<dynamic> speculationData = responseBody['speculations'];
+        List<Speculation> speculationsList =
+            speculationData.map((data) => Speculation.fromMap(data)).toList();
 
+        List<String> speculationLabels =
+            speculationsList.map((spec) => spec.nomSpeculation!).toList();
+
+        // prefs.setStringList('specType', speculationLabels);
 // // Enregistrer la liste des libellés des types d'utilisateur dans SharedPreferences
 //         prefs.setStringList('userType', userTypeLabels);
-        Acteur acteur = Acteur(
+        Acteur acteurs = Acteur(
           idActeur: responseBody['idActeur'],
           resetToken: responseBody['resetToken'],
           tokenCreationDate: responseBody['tokenCreationDate'],
@@ -366,13 +392,14 @@ class _LoginScreenState extends State<LoginScreen> {
           emailActeur: emailActeur,
           statutActeur: responseBody['statutActeur'],
           typeActeur: typeActeurList,
+          speculations: speculationsList,
           password: password,
         );
 
-        acteurProvider.setActeur(acteur);
-
+        acteurProvider.setActeur(acteurs);
+        print('loginUserWithoutSavedData ${acteurs.toString()}');
         final List<String> type =
-            acteur.typeActeur!.map((e) => e.libelle!).toList();
+            acteurs.typeActeur!.map((e) => e.libelle!).toList();
         if (type.contains('admin') || type.contains('Admin')) {
           // Navigator.pushReplacement(
           //   context,
@@ -521,7 +548,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        keyboardType: TextInputType.text,
+                        keyboardType: TextInputType.emailAddress,
                         validator: (val) {
                           if (val == null || val.isEmpty) {
                             return "Veillez entrez votre adresse email";

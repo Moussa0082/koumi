@@ -36,13 +36,17 @@ class _EditProfilState extends State<EditProfil> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
   MultiSelectController _controllerTypeActeur = MultiSelectController();
+  MultiSelectController mdpController = MultiSelectController();
+  MultiSelectController confirmerController = MultiSelectController();
   MultiSelectController _controllerSpeculation = MultiSelectController();
   List<TypeActeur> typeActeur = [];
-    // ActeurProvider acteurProvider =
-    //     Provider.of<ActeurProvider>(context, listen: false);
+  final _tokenTextController = TextEditingController();
+  // ActeurProvider acteurProvider =
+  //     Provider.of<ActeurProvider>(context, listen: false);
 
   bool isEditing = false;
   bool _isLoading = false;
+  bool _obscureText = true;
   late Acteur acteur;
   String? imageSrc;
   File? photo;
@@ -140,20 +144,23 @@ class _EditProfilState extends State<EditProfil> {
     adresseController.text = acteur.adresseActeur!;
     passwordController.text = acteur.password!;
     confirmPasswordController.text = acteur.password!;
+
     if (acteur.emailActeur != null) {
       emailController.text = acteur.emailActeur!;
+      print("email : ${acteur.emailActeur}");
     }
 
-    if(acteur.speculations != null){
-    selectedSpec = acteur.speculations!;
+    if (acteur.speculations != null) {
+      selectedSpec = acteur.speculations!;
+      print("speculation acteur: ${selectedSpec.toString()}");
     }
 
     typeActeur = acteur.typeActeur!;
     typeLibelle = typeActeur.map((e) => e.libelle!).toList();
     selectedTypes = typeActeur;
-    
+    // print("speculation acteur: ${acteur.speculations!}");
     print("type acteur : ${typeActeur.toString()}");
-    print("speculation : ${selectedSpec.toString()}");
+
     print("type libelle : ${typeLibelle}");
     // _controllerTypeActeur.onOptionSelected()
     // setSelectedOptions(options) {
@@ -622,213 +629,138 @@ class _EditProfilState extends State<EditProfil> {
                   // Exemple de personnalisation des styles
                 ),
               ),
+              SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: TextFormField(
+                  controller: passwordController,
+                  decoration: InputDecoration(
+                    labelText: "Mot de passe ",
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _obscureText =
+                              !_obscureText; // Inverser l'état du texte masqué
+                        });
+                      },
+                      icon: Icon(
+                        _obscureText
+                            ? Icons.visibility_off
+                            : Icons
+                                .visibility, // Choisir l'icône basée sur l'état du texte masqué
+                        color: Colors.grey,
+                      ),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                    // hintText: "Entrez votre prenom et nom",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+
+                  keyboardType: TextInputType.number,
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return "Veillez entrez votre prenom et nom";
+                    } else {
+                      return null;
+                    }
+                  },
+                  // onSaved: (val) => nomActeur = val!,
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: TextFormField(
+                  controller: confirmPasswordController,
+                  decoration: InputDecoration(
+                    labelText: "Confirmer",
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _obscureText =
+                              !_obscureText; // Inverser l'état du texte masqué
+                        });
+                      },
+                      icon: Icon(
+                        _obscureText
+                            ? Icons.visibility_off
+                            : Icons
+                                .visibility, // Choisir l'icône basée sur l'état du texte masqué
+                        color: Colors.grey,
+                      ),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                    // hintText: "Entrez votre prenom et nom",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  keyboardType: TextInputType.text,
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return "Veillez entrez votre prenom et nom";
+                    } else {
+                      return null;
+                    }
+                  },
+                  // onSaved: (val) => nomActeur = val!,
+                ),
+              ),
               ElevatedButton(
                 onPressed: () async {
                   final nomActeur = nomActeurController.text;
                   final emailActeur = emailController.text;
-                  final adresse = adresseController.text;
+                  final String? adresse = adresseController.text;
                   final localisation = localisationController.text;
                   final typeActeur = selectedTypes;
-                  final password = acteur.password!;
                   final wathsApp = whatsAppController.text;
                   final numero = telephoneController.text;
-                  print("type acteur : ${typeActeur.toString()}");
-                  print("speculation : ${selectedSpec.toString()}");
-                  var newActeur;
+                  final password = passwordController.text;
+                  final confirmer = confirmPasswordController.text;
+
+                  print(
+                      "Acteur update nom : $nomActeur, email :$emailActeur, adresse : $adresse, loc : $localisation, wa : $wathsApp, tel $numero , pays ${acteur.niveau3PaysActeur}");
+                  print("type acteur add: ${typeActeur.toString()}");
+                  print("speculation add: ${selectedSpec.toString()}");
+                  var newActeurs;
+                  // print("New act :$newActeurs");
+                  // if(password != confirmer){
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //           const SnackBar(
+                  //             content: Row(
+                  //               children: [
+                  //                 Text(
+                  //                   "Les mots de passe ne sont pas identique",
+                  //                   style: TextStyle(
+                  //                       overflow: TextOverflow.ellipsis),
+                  //                 ),
+                  //               ],
+                  //             ),
+                  //             duration: Duration(seconds: 5),
+                  //           ),
+                  //         );
+                  // }else
+                  //  if {
                   try {
                     setState(() {
                       _isLoading = true;
                     });
 
-                     if (photo != null) {
-                      newActeur = await ActeurService()
+                    if (photo != null) {
+                     newActeurs = await ActeurService()
                           .updateActeur(
                               idActeur: acteur.idActeur!,
                               nomActeur: nomActeur,
                               logoActeur: photo,
-                              adresseActeur: adresse,
-                              telephoneActeur: numero,
-                              whatsAppActeur: wathsApp,
-                              localiteActeur: localisation,
-                              emailActeur: emailActeur,
-                              niveau3PaysActeur: acteur.niveau3PaysActeur!,
-                              typeActeur: typeActeur,
-                              // password: password
-                              )
-                          .then((value) => {
-                                setState(() {
-                                  _isLoading = false;
-                                }),
-                                Provider.of<ActeurProvider>(context,
-                                        listen: false)
-                                    .setActeur(newActeur),
-                                Provider.of<ActeurService>(context,
-                                        listen: false)
-                                    .applyChange(),
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Row(
-                                      children: [
-                                        Text(
-                                          "Profil modifié avec success",
-                                          style: TextStyle(
-                                              overflow: TextOverflow.ellipsis),
-                                        ),
-                                      ],
-                                    ),
-                                    duration: Duration(seconds: 5),
-                                  ),
-                                )
-                              })
-                          .catchError((onError) => {
-                                setState(() {
-                                  _isLoading = false;
-                                }),
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Row(
-                                      children: [
-                                        Text(
-                                          "Une erreur s'est produite",
-                                          style: TextStyle(
-                                              overflow: TextOverflow.ellipsis),
-                                        ),
-                                      ],
-                                    ),
-                                    duration: Duration(seconds: 5),
-                                  ),
-                                ),
-                                print("catch 1 ${onError.toString()}"),
-                              });
-                    } else if (photo != null && selectedSpec.isEmpty) {
-                      newActeur = await ActeurService()
-                          .updateActeur(
-                              idActeur: acteur.idActeur!,
-                              nomActeur: nomActeur,
-                              logoActeur: photo,
-                              adresseActeur: adresse,
-                              telephoneActeur: numero,
-                              whatsAppActeur: wathsApp,
-                              localiteActeur: localisation,
-                              emailActeur: emailActeur,
-                              niveau3PaysActeur: acteur.niveau3PaysActeur!,
-                              typeActeur: typeActeur,
-                              // password: password
-                              )
-                          .then((value) => {
-                                setState(() {
-                                  _isLoading = false;
-                                }),
-                                Provider.of<ActeurProvider>(context,
-                                        listen: false)
-                                    .setActeur(newActeur),
-                                Provider.of<ActeurService>(context,
-                                        listen: false)
-                                    .applyChange(),
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Row(
-                                      children: [
-                                        Text(
-                                          "Profil modifié avec success",
-                                          style: TextStyle(
-                                              overflow: TextOverflow.ellipsis),
-                                        ),
-                                      ],
-                                    ),
-                                    duration: Duration(seconds: 5),
-                                  ),
-                                )
-                              })
-                          .catchError((onError) => {
-                                setState(() {
-                                  _isLoading = false;
-                                }),
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Row(
-                                      children: [
-                                        Text(
-                                          "Une erreur s'est produite",
-                                          style: TextStyle(
-                                              overflow: TextOverflow.ellipsis),
-                                        ),
-                                      ],
-                                    ),
-                                    duration: Duration(seconds: 5),
-                                  ),
-                                ),
-                                print("catch 2 ${onError.toString()}"),
-                              });
-                    } else if (photo != null && selectedSpec.isNotEmpty) {
-                    newActeur =  await ActeurService()
-                          .updateActeur(
-                              idActeur: acteur.idActeur!,
-                              nomActeur: nomActeur,
-                              logoActeur: photo,
-                              adresseActeur: adresse,
-                              telephoneActeur: numero,
-                              whatsAppActeur: wathsApp,
-                              localiteActeur: localisation,
-                              emailActeur: emailActeur,
-                              niveau3PaysActeur: acteur.niveau3PaysActeur!,
-                              typeActeur: typeActeur,
-                                // password: password,
-                              speculations: selectedSpec)
-                          .then((value) => {
-                                setState(() {
-                                  _isLoading = false;
-                                }),
-                                
-                                Provider.of<ActeurProvider>(context, listen: false)
-                                .setActeur(newActeur),
-
-                                Provider.of<ActeurService>(context, listen: false)
-                                .applyChange(),
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Row(
-                                      children: [
-                                        Text(
-                                          "Profil modifié avec success",
-                                          style: TextStyle(
-                                              overflow: TextOverflow.ellipsis),
-                                        ),
-                                      ],
-                                    ),
-                                    duration: Duration(seconds: 5),
-                                  ),
-                                )
-                              })
-                          .catchError((onError) => {
-                             setState(() {
-                                  _isLoading = false;
-                                }),
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Row(
-                                      children: [
-                                        Text(
-                                          "Une erreur s'est produite",
-                                          style: TextStyle(
-                                              overflow: TextOverflow.ellipsis),
-                                        ),
-                                      ],
-                                    ),
-                                    duration: Duration(seconds: 5),
-                                  ),
-                                ),
-                            print("catch 3 ${onError.toString()}"),
-                            }
-                            
-                            );
-                    } else  if (selectedSpec.isNotEmpty) {
-                    newActeur =  await ActeurService()
-                          .updateActeur(
-                              idActeur: acteur.idActeur!,
-                              nomActeur: nomActeur,
-                              // logoActeur: photo,
-                              adresseActeur: adresse,
+                              adresseActeur: adresse!,
                               telephoneActeur: numero,
                               whatsAppActeur: wathsApp,
                               localiteActeur: localisation,
@@ -836,124 +768,121 @@ class _EditProfilState extends State<EditProfil> {
                               niveau3PaysActeur: acteur.niveau3PaysActeur!,
                               typeActeur: typeActeur,
                               speculations: selectedSpec,
-                                // password: password
-                                )
-                          .then((value) => {
-                                setState(() {
-                                  _isLoading = false;
-                                }),
-                                
-                                Provider.of<ActeurProvider>(context, listen: false)
-                                .setActeur(newActeur),
+                              password: password)
+                          .then((value) {
+                        setState(() {
+                          _isLoading = false;
+                            Provider.of<ActeurProvider>(context, listen: false)
+                              .setActeur(newActeurs);
 
-                                Provider.of<ActeurService>(context, listen: false)
-                                .applyChange(),
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Row(
-                                      children: [
-                                        Text(
-                                          "Profil modifié avec success",
-                                          style: TextStyle(
-                                              overflow: TextOverflow.ellipsis),
-                                        ),
-                                      ],
-                                    ),
-                                    duration: Duration(seconds: 5),
-                                  ),
-                                )
-                              })
-                          .catchError((onError) => {
-                             setState(() {
-                                  _isLoading = false;
-                                }),
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Row(
-                                      children: [
-                                        Text(
-                                          "Une erreur s'est produite",
-                                          style: TextStyle(
-                                              overflow: TextOverflow.ellipsis),
-                                        ),
-                                      ],
-                                    ),
-                                    duration: Duration(seconds: 5),
-                                  ),
+                          Provider.of<ActeurService>(context, listen: false)
+                              .applyChange();
+                        });
+                        print("acteur update : ${newActeurs}");
+                      
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Row(
+                              children: [
+                                Text(
+                                  "Profil modifié avec succès",
+                                  style: TextStyle(
+                                      overflow: TextOverflow.ellipsis),
                                 ),
-                            print("catch 4 ${onError.toString()}"),
-                            }
-                            
-                            );
-                    } 
-                    else {
-                      newActeur = await ActeurService()
+                              ],
+                            ),
+                            duration: Duration(seconds: 5),
+                          ),
+                        );
+                      }).catchError((onError) {
+                        setState(() {
+                          _isLoading = false;
+                        });
+                        print(" update no : ${newActeurs}");
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Row(
+                              children: [
+                                Text(
+                                  "Une erreur s'est produite",
+                                  style: TextStyle(
+                                      overflow: TextOverflow.ellipsis),
+                                ),
+                              ],
+                            ),
+                            duration: Duration(seconds: 5),
+                          ),
+                        );
+                        print("Erreur photo: ${onError.toString()}");
+                      });
+                    } else {
+                     newActeurs = await ActeurService()
                           .updateActeur(
                               idActeur: acteur.idActeur!,
                               nomActeur: nomActeur,
-                              adresseActeur: adresse,
+                              adresseActeur: adresse!,
                               telephoneActeur: numero,
                               whatsAppActeur: wathsApp,
                               localiteActeur: localisation,
                               emailActeur: emailActeur,
-                              typeActeur: typeActeur,
-
                               niveau3PaysActeur: acteur.niveau3PaysActeur!,
-                              // password: password
-                              )
-                          .then((value) => {
-                                setState(() {
-                                  _isLoading = false;
-                                }),
-                                Provider.of<ActeurProvider>(context,
-                                        listen: false)
-                                    .setActeur(newActeur),
-                                Provider.of<ActeurService>(context,
-                                        listen: false)
-                                    .applyChange(),
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Row(
-                                      children: [
-                                        Text(
-                                          "Profil modifié avec success",
-                                          style: TextStyle(
-                                              overflow: TextOverflow.ellipsis),
-                                        ),
-                                      ],
-                                    ),
-                                    duration: Duration(seconds: 5),
-                                  ),
-                                )
-                              })
-                          .catchError((onError) => {
-                                print("catch 5 error ${onError.toString()}"),
-                                setState(() {
-                                  _isLoading = false;
-                                }),
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Row(
-                                      children: [
-                                        Text(
-                                          "Une erreur s'est produite",
-                                          style: TextStyle(
-                                              overflow: TextOverflow.ellipsis),
-                                        ),
-                                      ],
-                                    ),
-                                    duration: Duration(seconds: 5),
-                                  ),
-                                )
-                              });
+                              typeActeur: typeActeur,
+                              speculations: selectedSpec,
+                              password: password)
+                          .then((value) {
+                        setState(() {
+                          _isLoading = false;
+                            Provider.of<ActeurProvider>(context, listen: false)
+                            .setActeur(newActeurs);
+                       
+                        Provider.of<ActeurService>(context, listen: false)
+                            .applyChange();
+                        });
+                        print("acteur update : ${newActeurs}");
+                      
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Row(
+                              children: [
+                                Text(
+                                  "Profil modifié avec succès",
+                                  style: TextStyle(
+                                      overflow: TextOverflow.ellipsis),
+                                ),
+                              ],
+                            ),
+                            duration: Duration(seconds: 5),
+                          ),
+                        );
+                      }).catchError((onError) {
+                        setState(() {
+                          _isLoading = false;
+                        });
+                        print(" update no : ${newActeurs}");
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Row(
+                              children: [
+                                Text(
+                                  "Une erreur s'est produite",
+                                  style: TextStyle(
+                                      overflow: TextOverflow.ellipsis),
+                                ),
+                              ],
+                            ),
+                            duration: Duration(seconds: 5),
+                          ),
+                        );
+                        print("Erreur lors du update: ${onError.toString()}");
+                      });
                     }
                   } catch (e) {
-                    print("catch try ${e.toString()}");
+                    print("Erreur try : ${e.toString()}");
                     setState(() {
                       _isLoading = false;
                     });
-
                   }
+                  // }
                 },
                 child: Text(
                   "Modifier",
@@ -964,13 +893,177 @@ class _EditProfilState extends State<EditProfil> {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF8A00), // Orange color code
+                  backgroundColor:
+                      const Color(0xFFFF8A00), // Code couleur orange
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
                   minimumSize: Size(250, 40),
                 ),
               )
+
+              // ElevatedButton(
+              //   onPressed: () async {
+              //     final nomActeur = nomActeurController.text;
+              //     final emailActeur = emailController.text;
+              //     final adresse = adresseController.text;
+              //     final localisation = localisationController.text;
+              //     final typeActeur = selectedTypes;
+              //     final password = acteur.password!;
+              //     final wathsApp = whatsAppController.text;
+              //     final numero = telephoneController.text;
+              //     print(
+              //         "Acteur update nom : $nomActeur, email :$emailActeur, adresse : $adresse, loc : $localisation, wa : $wathsApp, tel $numero , pays ${acteur.niveau3PaysActeur}");
+              //     print("type acteur add: ${typeActeur.toString()}");
+              //     print("speculation add: ${selectedSpec.toString()}");
+              //     var newActeur;
+              //     try {
+              //       setState(() {
+              //         _isLoading = true;
+              //       });
+
+              //       if (photo != null) {
+              //         newActeur = await ActeurService()
+              //             .updateActeur(
+              //                 idActeur: acteur.idActeur!,
+              //                 nomActeur: nomActeur,
+              //                 logoActeur: photo,
+              //                 adresseActeur: adresse,
+              //                 telephoneActeur: numero,
+              //                 whatsAppActeur: wathsApp,
+              //                 localiteActeur: localisation,
+              //                 emailActeur: emailActeur,
+              //                 niveau3PaysActeur: acteur.niveau3PaysActeur!,
+              //                 typeActeur: typeActeur,
+              //                 speculations: selectedSpec)
+              //             .then((value) => {
+              //                   setState(() {
+              //                     _isLoading = false;
+              //                   }),
+              //                   Provider.of<ActeurProvider>(context,
+              //                           listen: false)
+              //                       .setActeur(newActeur),
+              //                   Provider.of<ActeurService>(context,
+              //                           listen: false)
+              //                       .applyChange(),
+              //                   ScaffoldMessenger.of(context).showSnackBar(
+              //                     const SnackBar(
+              //                       content: Row(
+              //                         children: [
+              //                           Text(
+              //                             "Profil modifié avec success",
+              //                             style: TextStyle(
+              //                                 overflow: TextOverflow.ellipsis),
+              //                           ),
+              //                         ],
+              //                       ),
+              //                       duration: Duration(seconds: 5),
+              //                     ),
+              //                   )
+              //                 })
+              //             .catchError((onError) => {
+              //                   setState(() {
+              //                     _isLoading = false;
+              //                   }),
+              //                   ScaffoldMessenger.of(context).showSnackBar(
+              //                     const SnackBar(
+              //                       content: Row(
+              //                         children: [
+              //                           Text(
+              //                             "Une erreur s'est produite",
+              //                             style: TextStyle(
+              //                                 overflow: TextOverflow.ellipsis),
+              //                           ),
+              //                         ],
+              //                       ),
+              //                       duration: Duration(seconds: 5),
+              //                     ),
+              //                   ),
+              //                   print("catch 1 ${onError.toString()}"),
+              //                 });
+              //       } else {
+              //         newActeur = await ActeurService()
+              //             .updateActeur(
+              //                 idActeur: acteur.idActeur!,
+              //                 nomActeur: nomActeur,
+
+              //                 adresseActeur: adresse,
+              //                 telephoneActeur: numero,
+              //                 whatsAppActeur: wathsApp,
+              //                 localiteActeur: localisation,
+              //                 emailActeur: emailActeur,
+              //                 niveau3PaysActeur: acteur.niveau3PaysActeur!,
+              //                 typeActeur: typeActeur,
+              //                 speculations: selectedSpec)
+              //             .then((value) => {
+              //                   setState(() {
+              //                     _isLoading = false;
+              //                   }),
+              //                   Provider.of<ActeurProvider>(context,
+              //                           listen: false)
+              //                       .setActeur(newActeur),
+              //                   Provider.of<ActeurService>(context,
+              //                           listen: false)
+              //                       .applyChange(),
+              //                   ScaffoldMessenger.of(context).showSnackBar(
+              //                     const SnackBar(
+              //                       content: Row(
+              //                         children: [
+              //                           Text(
+              //                             "Profil modifié avec success",
+              //                             style: TextStyle(
+              //                                 overflow: TextOverflow.ellipsis),
+              //                           ),
+              //                         ],
+              //                       ),
+              //                       duration: Duration(seconds: 5),
+              //                     ),
+              //                   )
+              //                 })
+              //             .catchError((onError) => {
+              //                   setState(() {
+              //                     _isLoading = false;
+              //                   }),
+              //                   ScaffoldMessenger.of(context).showSnackBar(
+              //                     const SnackBar(
+              //                       content: Row(
+              //                         children: [
+              //                           Text(
+              //                             "Une erreur s'est produite",
+              //                             style: TextStyle(
+              //                                 overflow: TextOverflow.ellipsis),
+              //                           ),
+              //                         ],
+              //                       ),
+              //                       duration: Duration(seconds: 5),
+              //                     ),
+              //                   ),
+              //                   print("catch 2 ${onError.toString()}"),
+              //                 });
+              //       }
+              //     } catch (e) {
+              //       print("catch try ${e.toString()}");
+              //       setState(() {
+              //         _isLoading = false;
+              //       });
+              //     }
+              //   },
+              //   child: Text(
+              //     "Modifier",
+              //     style: TextStyle(
+              //       fontSize: 20,
+              //       color: Colors.white,
+              //       fontWeight: FontWeight.bold,
+              //     ),
+              //   ),
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: const Color(0xFFFF8A00), // Orange color code
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(15),
+              //     ),
+              //     minimumSize: Size(250, 40),
+              //   ),
+              // )
             ],
           ),
         ),
