@@ -26,7 +26,7 @@ class Acteur {
     String? emailActeur;
     bool? statutActeur;
     bool? isConnected;
-    List<Speculation>? speculations;
+    List<Speculation>? speculation;
     Pays? pays;
     List<TypeActeur>? typeActeur;
 
@@ -52,7 +52,7 @@ class Acteur {
          this.emailActeur,
          this.statutActeur,
          this.isConnected,
-         this.speculations,
+         this.speculation,
          this.pays,
          this.typeActeur,
     });
@@ -80,7 +80,7 @@ class Acteur {
         statutActeur: json["statutActeur"],
         isConnected: json["isConnected"],
         pays: Pays.fromJson(json["pays"]),
-        speculations: List<Speculation>.from(json["speculations"].map((x) => Speculation.fromJson(x))),
+        speculation: List<Speculation>.from(json["speculation"].map((x) => Speculation.fromJson(x))),
         typeActeur: List<TypeActeur>.from(json["typeActeur"].map((x) => TypeActeur.fromJson(x))),
     );
 
@@ -106,7 +106,7 @@ class Acteur {
         "emailActeur": emailActeur,
         "statutActeur": statutActeur,
         "isConnected": isConnected,
-        "speculations": List<dynamic>.from(speculations!.map((x) => x.toJson())),
+        "speculation": List<dynamic>.from(speculation!.map((x) => x.toJson())),
         "pays": pays?.toJson(),
         "typeActeur": List<dynamic>.from(typeActeur!.map((x) => x.toJson())),
     };
@@ -136,7 +136,7 @@ class Acteur {
         emailActeur: emailActeur,
         password: password,
         typeActeur: typeActeurList,
-        speculations: specuList,
+        speculation: specuList,
         idActeur: idActeur,
         nomActeur: nomActeur,
         adresseActeur: adressActeur,
@@ -170,7 +170,7 @@ class Acteur {
       'emailActeur': emailActeur,
       'statutActeur': statutActeur,
       'pays':pays?.toMap(),
-      'speculations': speculations?.map((x) => x.toMap()).toList(),
+      'speculation': speculation?.map((x) => x.toMap()).toList(),
       'typeActeur': typeActeur?.map((x) => x.toMap()).toList(),
     };
   }
@@ -197,8 +197,8 @@ class Acteur {
       localiteActeur: map['localiteActeur'],
       emailActeur: map['emailActeur'],
       statutActeur: map['statutActeur'],
-      speculations: map['speculations'] != null
-          ? List<Speculation>.from((map['speculations'] as List<dynamic>)
+      speculation: map['speculation'] != null
+          ? List<Speculation>.from((map['speculation'] as List<dynamic>)
               .map<Speculation>((x) => Speculation.fromMap(x)))
           : null,
       typeActeur: map['typeActeur'] != null

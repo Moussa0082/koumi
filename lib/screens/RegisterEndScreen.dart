@@ -227,7 +227,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                 typeActeur: widget
                     .typeActeur, // Convertir les IDs en chaînes de caractères
                 password: password,
-                speculations: selectedSpec)
+                speculation: selectedSpec)
             .then((value) => showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -260,7 +260,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                 typeActeur: widget
                     .typeActeur, // Convertir les IDs en chaînes de caractères
                 password: password,
-                speculations: selectedSpec)
+                speculation: selectedSpec)
             .then((value) => showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -293,7 +293,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
                 typeActeur: widget
                     .typeActeur, // Convertir les IDs en chaînes de caractères
                 password: password,
-                speculations: selectedSpec)
+                speculation: selectedSpec)
             .then((value) => showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -324,7 +324,7 @@ class _RegisterEndScreenState extends State<RegisterEndScreen> {
               emailActeur: emailActeur,
               typeActeur: typeActeur,
               password: password,
-              speculations: selectedSpec,
+              speculation: selectedSpec,
             )
             .then((value) => showDialog(
                   context: context,

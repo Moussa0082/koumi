@@ -133,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // Enregistrer la liste des types d'utilisateur dans SharedPreferences
 
         List<dynamic> typeActeurData = responseBody['typeActeur'];
-        List<dynamic> speculationData = responseBody['speculations'];
+        List<dynamic> speculationData = responseBody['speculation'];
        
         List<TypeActeur> typeActeurList =
             typeActeurData.map((data) => TypeActeur.fromMap(data)).toList();
@@ -165,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
           emailActeur: emailActeur,
           statutActeur: responseBody['statutActeur'],
           typeActeur: typeActeurList,
-          speculations: speculationsList,
+          speculation: speculationsList,
           password: password,
         );
 
@@ -361,7 +361,7 @@ class _LoginScreenState extends State<LoginScreen> {
         List<String> userTypeLabels =
             typeActeurList.map((typeActeur) => typeActeur.libelle!).toList();
         
-        List<dynamic> speculationData = responseBody['speculations'];
+        List<dynamic> speculationData = responseBody['speculation'];
         List<Speculation> speculationsList =
             speculationData.map((data) => Speculation.fromMap(data)).toList();
 
@@ -392,7 +392,7 @@ class _LoginScreenState extends State<LoginScreen> {
           emailActeur: emailActeur,
           statutActeur: responseBody['statutActeur'],
           typeActeur: typeActeurList,
-          speculations: speculationsList,
+          speculation: speculationsList,
           password: password,
         );
 

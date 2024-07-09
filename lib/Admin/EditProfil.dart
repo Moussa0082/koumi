@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -150,8 +151,8 @@ class _EditProfilState extends State<EditProfil> {
       print("email : ${acteur.emailActeur}");
     }
 
-    if (acteur.speculations != null) {
-      selectedSpec = acteur.speculations!;
+    if (acteur.speculation != null) {
+      selectedSpec = acteur.speculation!;
       print("speculation acteur: ${selectedSpec.toString()}");
     }
 
@@ -714,193 +715,301 @@ class _EditProfilState extends State<EditProfil> {
                   // onSaved: (val) => nomActeur = val!,
                 ),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  final nomActeur = nomActeurController.text;
-                  final emailActeur = emailController.text;
-                  final String? adresse = adresseController.text;
-                  final localisation = localisationController.text;
-                  final typeActeur = selectedTypes;
-                  final wathsApp = whatsAppController.text;
-                  final numero = telephoneController.text;
-                  final password = passwordController.text;
-                  final confirmer = confirmPasswordController.text;
 
-                  print(
-                      "Acteur update nom : $nomActeur, email :$emailActeur, adresse : $adresse, loc : $localisation, wa : $wathsApp, tel $numero , pays ${acteur.niveau3PaysActeur}");
-                  print("type acteur add: ${typeActeur.toString()}");
-                  print("speculation add: ${selectedSpec.toString()}");
-                  var newActeurs;
-                  // print("New act :$newActeurs");
-                  // if(password != confirmer){
-                  // ScaffoldMessenger.of(context).showSnackBar(
-                  //           const SnackBar(
-                  //             content: Row(
-                  //               children: [
-                  //                 Text(
-                  //                   "Les mots de passe ne sont pas identique",
-                  //                   style: TextStyle(
-                  //                       overflow: TextOverflow.ellipsis),
-                  //                 ),
-                  //               ],
-                  //             ),
-                  //             duration: Duration(seconds: 5),
-                  //           ),
-                  //         );
-                  // }else
-                  //  if {
-                  try {
-                    setState(() {
-                      _isLoading = true;
-                    });
+            ElevatedButton(
+  onPressed: () async {
+    final nomActeur = nomActeurController.text;
+    final emailActeur = emailController.text;
+    final String? adresse = adresseController.text;
+    final localisation = localisationController.text;
+    final typeActeur = selectedTypes; // Assurez-vous que cette variable est correctement définie
+    final whatsApp = whatsAppController.text;
+    final numero = telephoneController.text;
+    final password = passwordController.text;
+    final confirmer = confirmPasswordController.text;
 
-                    if (photo != null) {
-                     newActeurs = await ActeurService()
-                          .updateActeur(
-                              idActeur: acteur.idActeur!,
-                              nomActeur: nomActeur,
-                              logoActeur: photo,
-                              adresseActeur: adresse!,
-                              telephoneActeur: numero,
-                              whatsAppActeur: wathsApp,
-                              localiteActeur: localisation,
-                              emailActeur: emailActeur,
-                              niveau3PaysActeur: acteur.niveau3PaysActeur!,
-                              typeActeur: typeActeur,
-                              speculations: selectedSpec,
-                              password: password)
-                          .then((value) {
-                        setState(() {
-                          _isLoading = false;
-                            Provider.of<ActeurProvider>(context, listen: false)
-                              .setActeur(newActeurs);
+    if (password != confirmer) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Les mots de passe ne sont pas identiques"),
+          duration: Duration(seconds: 5),
+        ),
+      );
+      return;
+    }
 
-                          Provider.of<ActeurService>(context, listen: false)
-                              .applyChange();
-                        });
-                        print("acteur update : ${newActeurs}");
+    try {
+     if(photo != null){
+       var response = await ActeurService().updateActeur(
+        idActeur: acteur.idActeur!,
+        nomActeur: nomActeur,
+        adresseActeur: adresse!,
+        telephoneActeur: numero,
+        whatsAppActeur: whatsApp,
+        localiteActeur: localisation,
+        emailActeur: emailActeur,
+        niveau3PaysActeur: acteur.niveau3PaysActeur!,
+        typeActeur: typeActeur, // Passez les objets TypeActeur ici
+        speculation: selectedSpec, // Passez les objets Speculation ici
+        password: password,
+        photo: photo, // Assurez-vous que cette variable est définie si nécessaire
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Profil modifié avec succès"),
+            duration: Duration(seconds: 5),
+          ),
+        );
+      } else {
+        throw Exception("Erreur HTTP: ${response.statusCode}");
+      }
+     } else {
+                      var response = await ActeurService().updateActeur(
+                        idActeur: acteur.idActeur!,
+                        nomActeur: nomActeur,
+                        adresseActeur: adresse!,
+                        telephoneActeur: numero,
+                        whatsAppActeur: whatsApp,
+                        localiteActeur: localisation,
+                        emailActeur: emailActeur,
+                        niveau3PaysActeur: acteur.niveau3PaysActeur!,
+                        typeActeur:
+                            typeActeur, // Passez les objets TypeActeur ici
+                        speculation:
+                            selectedSpec, // Passez les objets Speculation ici
+                        password: password,
                       
+                      );
+
+                      if (response.statusCode == 200 ||
+                          response.statusCode == 201) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Row(
-                              children: [
-                                Text(
-                                  "Profil modifié avec succès",
-                                  style: TextStyle(
-                                      overflow: TextOverflow.ellipsis),
-                                ),
-                              ],
-                            ),
+                            content: Text("Profil modifié avec succès"),
                             duration: Duration(seconds: 5),
                           ),
                         );
-                      }).catchError((onError) {
-                        setState(() {
-                          _isLoading = false;
-                        });
-                        print(" update no : ${newActeurs}");
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Row(
-                              children: [
-                                Text(
-                                  "Une erreur s'est produite",
-                                  style: TextStyle(
-                                      overflow: TextOverflow.ellipsis),
-                                ),
-                              ],
-                            ),
-                            duration: Duration(seconds: 5),
-                          ),
-                        );
-                        print("Erreur photo: ${onError.toString()}");
-                      });
-                    } else {
-                     newActeurs = await ActeurService()
-                          .updateActeur(
-                              idActeur: acteur.idActeur!,
-                              nomActeur: nomActeur,
-                              adresseActeur: adresse!,
-                              telephoneActeur: numero,
-                              whatsAppActeur: wathsApp,
-                              localiteActeur: localisation,
-                              emailActeur: emailActeur,
-                              niveau3PaysActeur: acteur.niveau3PaysActeur!,
-                              typeActeur: typeActeur,
-                              speculations: selectedSpec,
-                              password: password)
-                          .then((value) {
-                        setState(() {
-                          _isLoading = false;
-                            Provider.of<ActeurProvider>(context, listen: false)
-                            .setActeur(newActeurs);
-                       
-                        Provider.of<ActeurService>(context, listen: false)
-                            .applyChange();
-                        });
-                        print("acteur update : ${newActeurs}");
-                      
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Row(
-                              children: [
-                                Text(
-                                  "Profil modifié avec succès",
-                                  style: TextStyle(
-                                      overflow: TextOverflow.ellipsis),
-                                ),
-                              ],
-                            ),
-                            duration: Duration(seconds: 5),
-                          ),
-                        );
-                      }).catchError((onError) {
-                        setState(() {
-                          _isLoading = false;
-                        });
-                        print(" update no : ${newActeurs}");
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Row(
-                              children: [
-                                Text(
-                                  "Une erreur s'est produite",
-                                  style: TextStyle(
-                                      overflow: TextOverflow.ellipsis),
-                                ),
-                              ],
-                            ),
-                            duration: Duration(seconds: 5),
-                          ),
-                        );
-                        print("Erreur lors du update: ${onError.toString()}");
-                      });
+                      } else {
+                        throw Exception("Erreur HTTP: ${response.statusCode}");
+                      }
                     }
-                  } catch (e) {
-                    print("Erreur try : ${e.toString()}");
-                    setState(() {
-                      _isLoading = false;
-                    });
-                  }
-                  // }
-                },
-                child: Text(
-                  "Modifier",
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      const Color(0xFFFF8A00), // Code couleur orange
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  minimumSize: Size(250, 40),
-                ),
-              )
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Une erreur s'est produite: ${e.toString()}"),
+          duration: Duration(seconds: 5),
+        ),
+      );
+    }
+  },
+  child: Text(
+    "Modifier",
+    style: TextStyle(
+      fontSize: 20,
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+  style: ElevatedButton.styleFrom(
+    backgroundColor: const Color(0xFFFF8A00), // Code couleur orange
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(15),
+    ),
+    minimumSize: Size(250, 40),
+  ),
+),
+
+              // ElevatedButton(
+              //   onPressed: () async {
+              //     final nomActeur = nomActeurController.text;
+              //     final emailActeur = emailController.text;
+              //     final String? adresse = adresseController.text;
+              //     final localisation = localisationController.text;
+              //     final typeActeur = selectedTypes;
+              //     final wathsApp = whatsAppController.text;
+              //     final numero = telephoneController.text;
+              //     final password = passwordController.text;
+              //     final confirmer = confirmPasswordController.text;
+
+              //     print(
+              //         "Acteur update nom : $nomActeur, email :$emailActeur, adresse : $adresse, loc : $localisation, wa : $wathsApp, tel $numero , pays ${acteur.niveau3PaysActeur}");
+              //     print("type acteur add: ${typeActeur.toString()}");
+              //     print("speculation add: ${selectedSpec.toString()}");
+              //     var newActeurs;
+              //     // print("New act :$newActeurs");
+              //     // if(password != confirmer){
+              //     // ScaffoldMessenger.of(context).showSnackBar(
+              //     //           const SnackBar(
+              //     //             content: Row(
+              //     //               children: [
+              //     //                 Text(
+              //     //                   "Les mots de passe ne sont pas identique",
+              //     //                   style: TextStyle(
+              //     //                       overflow: TextOverflow.ellipsis),
+              //     //                 ),
+              //     //               ],
+              //     //             ),
+              //     //             duration: Duration(seconds: 5),
+              //     //           ),
+              //     //         );
+              //     // }else
+              //     //  if {
+              //     try {
+              //       setState(() {
+              //         _isLoading = true;
+              //       });
+
+              //       if (photo != null) {
+              //       //  newActeurs = 
+              //        await ActeurService()
+              //             .updateActeur(
+              //                 idActeur: acteur.idActeur!,
+              //                 nomActeur: nomActeur,
+              //                 logoActeur: photo,
+              //                 adresseActeur: adresse!,
+              //                 telephoneActeur: numero,
+              //                 whatsAppActeur: wathsApp,
+              //                 localiteActeur: localisation,
+              //                 emailActeur: emailActeur,
+              //                 niveau3PaysActeur: acteur.niveau3PaysActeur!,
+              //                 typeActeur: typeActeur,
+              //                 speculations: selectedSpec,
+              //                 password: password)
+              //             .then((value) {
+              //           setState(() {
+              //             _isLoading = false;
+              //             //   Provider.of<ActeurProvider>(context, listen: false)
+              //             //     .setActeur(newActeurs);
+
+              //             // Provider.of<ActeurService>(context, listen: false)
+              //             //     .applyChange();
+              //           });
+              //           print("acteur update : ${newActeurs}");
+                      
+              //           ScaffoldMessenger.of(context).showSnackBar(
+              //             const SnackBar(
+              //               content: Row(
+              //                 children: [
+              //                   Text(
+              //                     "Profil modifié avec succès",
+              //                     style: TextStyle(
+              //                         overflow: TextOverflow.ellipsis),
+              //                   ),
+              //                 ],
+              //               ),
+              //               duration: Duration(seconds: 5),
+              //             ),
+              //           );
+              //         }).catchError((onError) {
+              //           setState(() {
+              //             _isLoading = false;
+              //           });
+              //           print(" update no : ${newActeurs}");
+              //           ScaffoldMessenger.of(context).showSnackBar(
+              //             const SnackBar(
+              //               content: Row(
+              //                 children: [
+              //                   Text(
+              //                     "Une erreur s'est produite",
+              //                     style: TextStyle(
+              //                         overflow: TextOverflow.ellipsis),
+              //                   ),
+              //                 ],
+              //               ),
+              //               duration: Duration(seconds: 5),
+              //             ),
+              //           );
+              //           print("Erreur photo: ${onError.toString()}");
+              //         });
+              //       } else {
+              //       //  newActeurs =
+              //         await ActeurService()
+              //             .updateActeur(
+              //                 idActeur: acteur.idActeur!,
+              //                 nomActeur: nomActeur,
+              //                 adresseActeur: adresse!,
+              //                 telephoneActeur: numero,
+              //                 whatsAppActeur: wathsApp,
+              //                 localiteActeur: localisation,
+              //                 emailActeur: emailActeur,
+              //                 niveau3PaysActeur: acteur.niveau3PaysActeur!,
+              //                 typeActeur: typeActeur,
+              //                 speculations: selectedSpec,
+              //                 password: password)
+              //             .then((value) {
+              //           setState(() {
+              //             _isLoading = false;
+              //           //     Provider.of<ActeurProvider>(context, listen: false)
+              //           //     .setActeur(newActeurs);
+                       
+              //           // Provider.of<ActeurService>(context, listen: false)
+              //           //     .applyChange();
+              //           });
+              //           print("acteur update : ${newActeurs}");
+                      
+              //           ScaffoldMessenger.of(context).showSnackBar(
+              //             const SnackBar(
+              //               content: Row(
+              //                 children: [
+              //                   Text(
+              //                     "Profil modifié avec succès",
+              //                     style: TextStyle(
+              //                         overflow: TextOverflow.ellipsis),
+              //                   ),
+              //                 ],
+              //               ),
+              //               duration: Duration(seconds: 5),
+              //             ),
+              //           );
+              //         }).catchError((onError) {
+              //           setState(() {
+              //             _isLoading = false;
+              //           });
+              //           print(" update no : ${newActeurs}");
+              //           ScaffoldMessenger.of(context).showSnackBar(
+              //             const SnackBar(
+              //               content: Row(
+              //                 children: [
+              //                   Text(
+              //                     "Une erreur s'est produite",
+              //                     style: TextStyle(
+              //                         overflow: TextOverflow.ellipsis),
+              //                   ),
+              //                 ],
+              //               ),
+              //               duration: Duration(seconds: 5),
+              //             ),
+              //           );
+              //           print("Erreur lors du update: ${onError.toString()}");
+              //         });
+              //       }
+              //     } catch (e) {
+              //       print("Erreur try : ${e.toString()}");
+              //       setState(() {
+              //         _isLoading = false;
+              //       });
+              //     }
+              //     // }
+              //   },
+              //   child: Text(
+              //     "Modifier",
+              //     style: TextStyle(
+              //       fontSize: 20,
+              //       color: Colors.white,
+              //       fontWeight: FontWeight.bold,
+              //     ),
+              //   ),
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor:
+              //         const Color(0xFFFF8A00), // Code couleur orange
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(15),
+              //     ),
+              //     minimumSize: Size(250, 40),
+              //   ),
+              // )
 
               // ElevatedButton(
               //   onPressed: () async {

@@ -152,7 +152,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         // Enregistrer la liste des types d'utilisateur dans SharedPreferences
 
         // Enregistrer la liste des types d'utilisateur dans SharedPreferences
-        List<dynamic> speculationData = responseBody['speculations'];
+        List<dynamic> speculationData = responseBody['speculation'];
 
         List<Speculation> speculationList =
             speculationData.map((data) => Speculation.fromMap(data)).toList();
@@ -167,7 +167,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         List<String> speculationLabels = speculationList
             .map((typeActeur) => typeActeur.nomSpeculation!)
             .toList();
-        prefs.setStringList('speculations', speculationLabels);
+        prefs.setStringList('speculation', speculationLabels);
 // Enregistrer la liste des libellés des types d'utilisateur dans SharedPreferences
         prefs.setStringList('userType', userTypeLabels);
         Acteur acteur = Acteur(
@@ -183,7 +183,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
           emailActeur: emailActeur,
           statutActeur: responseBody['statutActeur'],
           typeActeur: typeActeurList,
-          speculations: speculationList,
+          speculation: speculationList,
           password: password,
         );
 
