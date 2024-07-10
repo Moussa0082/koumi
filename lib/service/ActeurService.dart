@@ -7,7 +7,9 @@ import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
+import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:path/path.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ActeurService extends ChangeNotifier {
@@ -179,7 +181,7 @@ class ActeurService extends ChangeNotifier {
 // }
 // Remplacez par votre URL
 
-  Future<http.Response> updateActeur({
+ Future<http.Response> updateActeur({
     required String idActeur,
     required String nomActeur,
     required String adresseActeur,
@@ -225,7 +227,7 @@ class ActeurService extends ChangeNotifier {
     try {
       var response = await request.send();
       var responseBody = await http.Response.fromStream(response);
-
+        
       print('Response body: ${responseBody.body}');
       print('Response status code: ${responseBody.statusCode}');
 
@@ -235,6 +237,63 @@ class ActeurService extends ChangeNotifier {
       rethrow;
     }
   }
+
+  // Future<http.Response> updateActeur({
+  //   required String idActeur,
+  //   required String nomActeur,
+  //   required String adresseActeur,
+  //   required String telephoneActeur,
+  //   required String whatsAppActeur,
+  //   required String localiteActeur,
+  //   required String emailActeur,
+  //   required String niveau3PaysActeur,
+  //   required List<TypeActeur> typeActeur,
+  //   required List<Speculation> speculation,
+  //   required String password,
+  //   File? photo, 
+  // }) async {
+  //   var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/update/$idActeur'));
+
+  //   if (photo != null) {
+  //     request.files.add(
+  //       http.MultipartFile(
+  //         'image1',
+  //         photo.readAsBytes().asStream(),
+  //         photo.lengthSync(),
+  //         filename: photo.path.split('/').last,
+  //       ),
+  //     );
+  //   }
+
+  //   Map<String, dynamic> acteurData = {
+  //     'idActeur': idActeur,
+  //     'nomActeur': nomActeur,
+  //     'adresseActeur': adresseActeur,
+  //     'telephoneActeur': telephoneActeur,
+  //     'whatsAppActeur': whatsAppActeur,
+  //     'localiteActeur': localiteActeur,
+  //     'emailActeur': emailActeur,
+  //     'niveau3PaysActeur': niveau3PaysActeur,
+  //     'typeActeur': typeActeur.map((type) => type.toMap()).toList(),
+  //     'speculation': speculation.map((spec) => spec.toMap()).toList(),
+  //     'password': password,
+  //   };
+
+  //   request.fields['acteur'] = jsonEncode(acteurData);
+
+  //   try {
+  //     var response = await request.send();
+  //     var responseBody = await http.Response.fromStream(response);
+
+  //     print('Response body: ${responseBody.body}');
+  //     print('Response status code: ${responseBody.statusCode}');
+
+  //     return responseBody;
+  //   } catch (e) {
+  //     print('Erreur lors de la requête HTTP : $e');
+  //     rethrow;
+  //   }
+  // }
 
 
 

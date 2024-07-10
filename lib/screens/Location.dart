@@ -16,6 +16,7 @@ import 'package:koumi_app/providers/CountryProvider.dart';
 import 'package:koumi_app/screens/AddMateriel.dart';
 import 'package:koumi_app/screens/ListeMaterielByActeur.dart';
 import 'package:koumi_app/service/MaterielService.dart';
+import 'package:koumi_app/widgets/AutoComptet.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
@@ -67,15 +68,13 @@ class _LocationState extends State<Location> {
         hasMore &&
         !isLoading &&
         selectedType == null) {
-     if(mounted)
-      setState(() {
-        // Rafraîchir les données ici
-        page++;
-      });
+      if (mounted)
+        setState(() {
+          // Rafraîchir les données ici
+          page++;
+        });
       debugPrint("yes - fetch all materiel by pays");
       fetchMateriel(widget.detectedCountry!).then((value) {
-
-
         setState(() {
           // Rafraîchir les données ici
           debugPrint("page inc all ${page}");
@@ -91,15 +90,13 @@ class _LocationState extends State<Location> {
         hasMore &&
         !isLoading &&
         selectedType != null) {
-         if(mounted)
-      debugPrint("yes - fetch by type and pays");
+      if (mounted) debugPrint("yes - fetch by type and pays");
       setState(() {
-          // Rafraîchir les données ici
-      page++;
-        });
-   
-    fetchMaterielByType(widget.detectedCountry.toString().toLowerCase());
+        // Rafraîchir les données ici
+        page++;
+      });
 
+      fetchMaterielByType(widget.detectedCountry.toString().toLowerCase());
     }
     debugPrint("no");
   }
@@ -123,7 +120,8 @@ class _LocationState extends State<Location> {
     try {
       final response = await http.get(Uri.parse(
           '$apiOnlineUrl/Materiel/getMaterielsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}'));
-
+      debugPrint(
+          '$apiOnlineUrl/Materiel/getMaterielsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}');
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
@@ -133,10 +131,11 @@ class _LocationState extends State<Location> {
             hasMore = false;
           });
         } else {
-            List<Materiel> newMateriels =
+          List<Materiel> newMateriels =
               body.map((e) => Materiel.fromMap(e)).toList();
           setState(() {
-            materielListe.addAll(newMateriels.where((newMat) => !newMateriels.any((element) => element.idMateriel == newMat.idMateriel)));
+            materielListe.addAll(newMateriels.where((newMat) => !newMateriels
+                .any((element) => element.idMateriel == newMat.idMateriel)));
           });
         }
         debugPrint(
@@ -187,7 +186,7 @@ class _LocationState extends State<Location> {
             hasMore = false;
           });
         } else {
-         List<Materiel> newMateriels =
+          List<Materiel> newMateriels =
               body.map((e) => Materiel.fromMap(e)).toList();
           setState(() {
             materielListe.addAll(newMateriels.where((newMat) => !newMateriels
@@ -230,16 +229,17 @@ class _LocationState extends State<Location> {
     }
   }
 
-   
-    Future<List<Materiel>> getAllMateriel() async {
-     if (selectedType != null) {
-      materielListe = await 
-          MaterielService().fetchMaterielByTypeAndPaysWithPagination(selectedType!.idTypeMateriel!);
-    }else{
-     materielListe = await MaterielService().fetchMateriel(widget.detectedCountry!);
+  Future<List<Materiel>> getAllMateriel() async {
+    if (selectedType != null) {
+      materielListe = await MaterielService()
+          .fetchMaterielByTypeAndPaysWithPagination(
+              selectedType!.idTypeMateriel!);
+    } else {
+      materielListe =
+          await MaterielService().fetchMateriel(widget.detectedCountry!);
     }
     return materielListe;
-    }
+  }
 
   void refreshList() {
     setState(() {
@@ -267,9 +267,9 @@ class _LocationState extends State<Location> {
       //code will run when widget rendering complete
       scrollableController1.addListener(_scrollListener1);
     });
-    if(widget.detectedCountry != null){
+    if (widget.detectedCountry != null) {
       print("pays location ! ${widget.detectedCountry}");
-    }else{
+    } else {
       print("pays location null");
     }
     materielListeFuture = materielListeFuture1 = getAllMateriel();
@@ -345,7 +345,8 @@ class _LocationState extends State<Location> {
             title: Text(
               "Location Matériel",
               style: const TextStyle(
-                  color: d_colorGreen, fontWeight: FontWeight.bold,
+                  color: d_colorGreen,
+                  fontWeight: FontWeight.bold,
                   fontSize: 20),
             ),
             actions: !isExist
@@ -462,20 +463,44 @@ class _LocationState extends State<Location> {
                                 Icon(Icons.search, color: Colors.blueGrey[400]),
                                 SizedBox(width: 10),
                                 Expanded(
-                                  child: TextField(
-                                    controller: _searchController,
-                                    onChanged: (value) {
+                                  child: Autocomplete<String>(
+                                    optionsBuilder:
+                                        (TextEditingValue textEditingValue) {
+                                      if (textEditingValue.text.isEmpty) {
+                                        return const Iterable<String>.empty();
+                                      }
+                                      return AutoComplet.getTransportVehicles()
+                                          .where((String option) {
+                                        return option.toLowerCase().contains(
+                                            textEditingValue.text
+                                                .toLowerCase());
+                                      });
+                                    },
+                                    onSelected: (String selection) {
+                                      _searchController.text = selection;
                                       setState(() {});
                                     },
-                                    decoration: InputDecoration(
-                                      hintText: 'Rechercher',
-                                      border: InputBorder.none,
-                                      hintStyle: TextStyle(
-                                          color: Colors.blueGrey[400]),
-                                    ),
+                                    fieldViewBuilder: (BuildContext context,
+                                        TextEditingController
+                                            fieldTextEditingController,
+                                        FocusNode fieldFocusNode,
+                                        VoidCallback onFieldSubmitted) {
+                                      return TextField(
+                                        controller: _searchController,
+                                        focusNode: fieldFocusNode,
+                                        onChanged: (value) {
+                                          setState(() {});
+                                        },
+                                        decoration: InputDecoration(
+                                          hintText: 'Rechercher',
+                                          border: InputBorder.none,
+                                          hintStyle: TextStyle(
+                                              color: Colors.blueGrey[400]),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
-                                // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
                                 IconButton(
                                   icon: Icon(Icons.clear),
                                   onPressed: () {
@@ -541,14 +566,13 @@ class _LocationState extends State<Location> {
                       selectedType == null
                           ? setState(() {
                               materielListeFuture = MaterielService()
-                                  .fetchMateriel(widget.detectedCountry! ,refresh: true);
-
+                                  .fetchMateriel(widget.detectedCountry!,
+                                      refresh: true);
                             })
                           : setState(() {
                               materielListeFuture1 = MaterielService()
                                   .fetchMaterielByTypeAndPaysWithPagination(
                                       selectedType!.idTypeMateriel!,
-
                                       refresh: true);
                             });
                     },
@@ -1113,7 +1137,7 @@ class _LocationState extends State<Location> {
           }
           page = 0;
           hasMore = true;
-          fetchMaterielByType(widget.detectedCountry! ,refresh: true);
+          fetchMaterielByType(widget.detectedCountry!, refresh: true);
           if (page == 0 && isLoading == true) {
             SchedulerBinding.instance.addPostFrameCallback((_) {
               scrollableController1.jumpTo(0.0);

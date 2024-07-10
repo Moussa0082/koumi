@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
@@ -30,7 +31,7 @@ const d_colorPage = Color.fromRGBO(255, 255, 255, 1);
 class _EditProfilState extends State<EditProfil> {
   TextEditingController nomActeurController = TextEditingController();
   TextEditingController whatsAppController = TextEditingController();
-  TextEditingController telephoneController = TextEditingController();
+  TextEditingController telephoneActeurController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController localisationController = TextEditingController();
   TextEditingController adresseController = TextEditingController();
@@ -42,8 +43,6 @@ class _EditProfilState extends State<EditProfil> {
   MultiSelectController _controllerSpeculation = MultiSelectController();
   List<TypeActeur> typeActeur = [];
   final _tokenTextController = TextEditingController();
-  // ActeurProvider acteurProvider =
-  //     Provider.of<ActeurProvider>(context, listen: false);
 
   bool isEditing = false;
   bool _isLoading = false;
@@ -140,7 +139,7 @@ class _EditProfilState extends State<EditProfil> {
     acteur = widget.acteurs!;
     nomActeurController.text = acteur.nomActeur!;
     whatsAppController.text = acteur.whatsAppActeur!;
-    telephoneController.text = acteur.telephoneActeur!;
+    telephoneActeurController.text = acteur.telephoneActeur!;
     localisationController.text = acteur.localiteActeur!;
     adresseController.text = acteur.adresseActeur!;
     passwordController.text = acteur.password!;
@@ -176,41 +175,7 @@ class _EditProfilState extends State<EditProfil> {
     // ;
   }
 
-  Future<List<ValueItem<TypeActeur>>> _fetchAndCombineOptions() async {
-    // Fetch the data from the network
-    final response = await NetworkConfig(
-      url: 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
-      method: RequestMethod.get,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    );
-
-    List<TypeActeur> fetchedTypes = (response as List<dynamic>)
-        .where((data) => (data['libelle']).trim().toLowerCase() != 'admin')
-        .map((e) {
-      return TypeActeur(
-        idTypeActeur: e['idTypeActeur'] as String,
-        libelle: e['libelle'] as String,
-        statutTypeActeur: e['statutTypeActeur'] as bool,
-      );
-    }).toList();
-
-    // Combine fetched options with initially selected ones
-    List<TypeActeur> combinedTypes =
-        {...fetchedTypes, ...selectedTypes}.toList();
-
-    // Create ValueItems for the combined list
-    final List<ValueItem<TypeActeur>> valueItems =
-        combinedTypes.map((typeActeur) {
-      return ValueItem<TypeActeur>(
-        label: typeActeur.libelle!,
-        value: typeActeur,
-      );
-    }).toList();
-
-    return valueItems;
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -221,21 +186,14 @@ class _EditProfilState extends State<EditProfil> {
         appBar: AppBar(
           centerTitle: true,
           toolbarHeight: 100,
-          leading: isEditing
-              ? IconButton(
-                  onPressed: () {
-                    toggleEditing();
-                  },
-                  icon: const Icon(Icons.close_sharp, color: d_colorGreen),
-                )
-              : IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen),
-                ),
+          leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen),
+          ),
           title: const Text(
-            "Editer Profil",
+            "Modifier le  Profil",
             style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
           ),
           // actions: [
@@ -263,6 +221,7 @@ class _EditProfilState extends State<EditProfil> {
             children: [
               Row(
                 children: [
+                  SizedBox(height: 10),
                   photo != null
                       ? Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -333,17 +292,16 @@ class _EditProfilState extends State<EditProfil> {
                       return null;
                     }
                   },
-                  // onSaved: (val) => nomActeur = val!,
                 ),
               ),
               SizedBox(
-                height: 10,
+                height: 5,
               ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: MultiSelectDropDown.network(
                   networkConfig: NetworkConfig(
-                    url: 'http://10.0.2.2:9000/api-koumi/typeActeur/read',
+                    url: '$apiOnlineUrl/typeActeur/read',
                     method: RequestMethod.get,
                     headers: {
                       'Content-Type': 'application/json',
@@ -417,36 +375,34 @@ class _EditProfilState extends State<EditProfil> {
                 ),
               ),
               SizedBox(
-                height: 10,
+                height: 5,
               ),
-              acteur.emailActeur != null
-                  ? Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: TextFormField(
-                        controller: emailController,
-                        decoration: InputDecoration(
-                          labelText: "Email",
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          // hintText: "Entrez votre prenom et nom",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        keyboardType: TextInputType.text,
-                        validator: (val) {
-                          if (val == null || val.isEmpty) {
-                            return "Veillez entrez votre prenom et nom";
-                          } else {
-                            return null;
-                          }
-                        },
-                        // onSaved: (val) => nomActeur = val!,
-                      ),
-                    )
-                  : Container(),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: TextFormField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    labelText: "Email",
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                    // hintText: "Entrez votre prenom et nom",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  keyboardType: TextInputType.text,
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return "Veillez entrez votre prenom et nom";
+                    } else {
+                      return null;
+                    }
+                  },
+                  // onSaved: (val) => nomActeur = val!,
+                ),
+              ),
               SizedBox(
-                height: 10,
+                height: 5,
               ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -473,12 +429,12 @@ class _EditProfilState extends State<EditProfil> {
                 ),
               ),
               SizedBox(
-                height: 10,
+                height: 5,
               ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: TextFormField(
-                  controller: telephoneController,
+                  controller: telephoneActeurController,
                   decoration: InputDecoration(
                     labelText: "Numéro",
                     contentPadding: const EdgeInsets.symmetric(
@@ -500,7 +456,7 @@ class _EditProfilState extends State<EditProfil> {
                 ),
               ),
               SizedBox(
-                height: 10,
+                height: 5,
               ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -527,7 +483,7 @@ class _EditProfilState extends State<EditProfil> {
                 ),
               ),
               SizedBox(
-                height: 10,
+                height: 5,
               ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -554,7 +510,7 @@ class _EditProfilState extends State<EditProfil> {
                 ),
               ),
               SizedBox(
-                height: 10,
+                height: 5,
               ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -565,7 +521,7 @@ class _EditProfilState extends State<EditProfil> {
                     // url:
                     //     '$apiOnlineUrl/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
                     url:
-                        'http://10.0.2.2:9000/api-koumi/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
+                        '$apiOnlineUrl/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
                     method: RequestMethod.get,
                     headers: {'Content-Type': 'application/json'},
                   ),
@@ -611,6 +567,7 @@ class _EditProfilState extends State<EditProfil> {
                       selectedSpec = options
                           .map<Speculation>((item) => item.value!)
                           .toList();
+
                       print("Types sélectionnés : $selectedSpec");
                       libelleSpeculation.clear();
                       libelleSpeculation
@@ -631,7 +588,7 @@ class _EditProfilState extends State<EditProfil> {
                 ),
               ),
               SizedBox(
-                height: 10,
+                height: 5,
               ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -674,7 +631,7 @@ class _EditProfilState extends State<EditProfil> {
                 ),
               ),
               SizedBox(
-                height: 10,
+                height: 5,
               ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -715,464 +672,237 @@ class _EditProfilState extends State<EditProfil> {
                   // onSaved: (val) => nomActeur = val!,
                 ),
               ),
+              SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final nomActeur = nomActeurController.text;
+                    final emailActeur = emailController.text;
+                    final String? adresse = adresseController.text;
+                    final localisation = localisationController.text;
+                    final typeActeur =
+                        selectedTypes; // Assurez-vous que cette variable est correctement définie
+                    final whatsApp = whatsAppController.text;
+                    final tel = telephoneActeurController.text;
+                    final password = passwordController.text;
+                    final confirmer = confirmPasswordController.text;
 
-            ElevatedButton(
-  onPressed: () async {
-    final nomActeur = nomActeurController.text;
-    final emailActeur = emailController.text;
-    final String? adresse = adresseController.text;
-    final localisation = localisationController.text;
-    final typeActeur = selectedTypes; // Assurez-vous que cette variable est correctement définie
-    final whatsApp = whatsAppController.text;
-    final numero = telephoneController.text;
-    final password = passwordController.text;
-    final confirmer = confirmPasswordController.text;
-
-    if (password != confirmer) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Les mots de passe ne sont pas identiques"),
-          duration: Duration(seconds: 5),
-        ),
-      );
-      return;
-    }
-
-    try {
-     if(photo != null){
-       var response = await ActeurService().updateActeur(
-        idActeur: acteur.idActeur!,
-        nomActeur: nomActeur,
-        adresseActeur: adresse!,
-        telephoneActeur: numero,
-        whatsAppActeur: whatsApp,
-        localiteActeur: localisation,
-        emailActeur: emailActeur,
-        niveau3PaysActeur: acteur.niveau3PaysActeur!,
-        typeActeur: typeActeur, // Passez les objets TypeActeur ici
-        speculation: selectedSpec, // Passez les objets Speculation ici
-        password: password,
-        photo: photo, // Assurez-vous que cette variable est définie si nécessaire
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Profil modifié avec succès"),
-            duration: Duration(seconds: 5),
-          ),
-        );
-      } else {
-        throw Exception("Erreur HTTP: ${response.statusCode}");
-      }
-     } else {
-                      var response = await ActeurService().updateActeur(
-                        idActeur: acteur.idActeur!,
-                        nomActeur: nomActeur,
-                        adresseActeur: adresse!,
-                        telephoneActeur: numero,
-                        whatsAppActeur: whatsApp,
-                        localiteActeur: localisation,
-                        emailActeur: emailActeur,
-                        niveau3PaysActeur: acteur.niveau3PaysActeur!,
-                        typeActeur:
-                            typeActeur, // Passez les objets TypeActeur ici
-                        speculation:
-                            selectedSpec, // Passez les objets Speculation ici
-                        password: password,
-                      
+                    if (password != confirmer) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text("Les mots de passe ne sont pas identiques"),
+                          duration: Duration(seconds: 5),
+                        ),
                       );
-
-                      if (response.statusCode == 200 ||
-                          response.statusCode == 201) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Profil modifié avec succès"),
-                            duration: Duration(seconds: 5),
-                          ),
-                        );
-                      } else {
-                        throw Exception("Erreur HTTP: ${response.statusCode}");
-                      }
+                      return;
                     }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Une erreur s'est produite: ${e.toString()}"),
-          duration: Duration(seconds: 5),
-        ),
-      );
-    }
-  },
-  child: Text(
-    "Modifier",
-    style: TextStyle(
-      fontSize: 20,
-      color: Colors.white,
-      fontWeight: FontWeight.bold,
-    ),
-  ),
-  style: ElevatedButton.styleFrom(
-    backgroundColor: const Color(0xFFFF8A00), // Code couleur orange
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(15),
-    ),
-    minimumSize: Size(250, 40),
-  ),
-),
 
-              // ElevatedButton(
-              //   onPressed: () async {
-              //     final nomActeur = nomActeurController.text;
-              //     final emailActeur = emailController.text;
-              //     final String? adresse = adresseController.text;
-              //     final localisation = localisationController.text;
-              //     final typeActeur = selectedTypes;
-              //     final wathsApp = whatsAppController.text;
-              //     final numero = telephoneController.text;
-              //     final password = passwordController.text;
-              //     final confirmer = confirmPasswordController.text;
+                    ActeurProvider acteurProvider =
+                        Provider.of<ActeurProvider>(context, listen: false);
+                    try {
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      if (photo != null) {
+                        var response = await ActeurService().updateActeur(
+                          idActeur: acteur.idActeur!,
+                          nomActeur: nomActeur,
+                          adresseActeur: adresse!,
+                          telephoneActeur: tel,
+                          whatsAppActeur: whatsApp,
+                          localiteActeur: localisation,
+                          emailActeur: emailActeur,
+                          niveau3PaysActeur: acteur.niveau3PaysActeur!,
+                          typeActeur:
+                              typeActeur, // Passez les objets TypeActeur ici
+                          speculation:
+                              selectedSpec, // Passez les objets Speculation ici
+                          password: password,
+                          photo:
+                              photo, // Assurez-vous que cette variable est définie si nécessaire
+                        );
 
-              //     print(
-              //         "Acteur update nom : $nomActeur, email :$emailActeur, adresse : $adresse, loc : $localisation, wa : $wathsApp, tel $numero , pays ${acteur.niveau3PaysActeur}");
-              //     print("type acteur add: ${typeActeur.toString()}");
-              //     print("speculation add: ${selectedSpec.toString()}");
-              //     var newActeurs;
-              //     // print("New act :$newActeurs");
-              //     // if(password != confirmer){
-              //     // ScaffoldMessenger.of(context).showSnackBar(
-              //     //           const SnackBar(
-              //     //             content: Row(
-              //     //               children: [
-              //     //                 Text(
-              //     //                   "Les mots de passe ne sont pas identique",
-              //     //                   style: TextStyle(
-              //     //                       overflow: TextOverflow.ellipsis),
-              //     //                 ),
-              //     //               ],
-              //     //             ),
-              //     //             duration: Duration(seconds: 5),
-              //     //           ),
-              //     //         );
-              //     // }else
-              //     //  if {
-              //     try {
-              //       setState(() {
-              //         _isLoading = true;
-              //       });
+                        if (response.statusCode == 200 ||
+                            response.statusCode == 201) {
+                               setState(() {
+                            _isLoading = false;
+                            final responseBody =
+                                json.decode(utf8.decode(response.bodyBytes));
+                            print("response body ${responseBody.toString()}");
 
-              //       if (photo != null) {
-              //       //  newActeurs = 
-              //        await ActeurService()
-              //             .updateActeur(
-              //                 idActeur: acteur.idActeur!,
-              //                 nomActeur: nomActeur,
-              //                 logoActeur: photo,
-              //                 adresseActeur: adresse!,
-              //                 telephoneActeur: numero,
-              //                 whatsAppActeur: wathsApp,
-              //                 localiteActeur: localisation,
-              //                 emailActeur: emailActeur,
-              //                 niveau3PaysActeur: acteur.niveau3PaysActeur!,
-              //                 typeActeur: typeActeur,
-              //                 speculations: selectedSpec,
-              //                 password: password)
-              //             .then((value) {
-              //           setState(() {
-              //             _isLoading = false;
-              //             //   Provider.of<ActeurProvider>(context, listen: false)
-              //             //     .setActeur(newActeurs);
+                            List<dynamic> typeActeurData =
+                                responseBody['typeActeur'];
+                            List<TypeActeur> typeActeurList = typeActeurData
+                                .map((data) => TypeActeur.fromMap(data))
+                                .toList();
+                            List<dynamic> speculationData =
+                                responseBody['speculation'];
+                            List<Speculation> speculationsList = speculationData
+                                .map((data) => Speculation.fromMap(data))
+                                .toList();
 
-              //             // Provider.of<ActeurService>(context, listen: false)
-              //             //     .applyChange();
-              //           });
-              //           print("acteur update : ${newActeurs}");
-                      
-              //           ScaffoldMessenger.of(context).showSnackBar(
-              //             const SnackBar(
-              //               content: Row(
-              //                 children: [
-              //                   Text(
-              //                     "Profil modifié avec succès",
-              //                     style: TextStyle(
-              //                         overflow: TextOverflow.ellipsis),
-              //                   ),
-              //                 ],
-              //               ),
-              //               duration: Duration(seconds: 5),
-              //             ),
-              //           );
-              //         }).catchError((onError) {
-              //           setState(() {
-              //             _isLoading = false;
-              //           });
-              //           print(" update no : ${newActeurs}");
-              //           ScaffoldMessenger.of(context).showSnackBar(
-              //             const SnackBar(
-              //               content: Row(
-              //                 children: [
-              //                   Text(
-              //                     "Une erreur s'est produite",
-              //                     style: TextStyle(
-              //                         overflow: TextOverflow.ellipsis),
-              //                   ),
-              //                 ],
-              //               ),
-              //               duration: Duration(seconds: 5),
-              //             ),
-              //           );
-              //           print("Erreur photo: ${onError.toString()}");
-              //         });
-              //       } else {
-              //       //  newActeurs =
-              //         await ActeurService()
-              //             .updateActeur(
-              //                 idActeur: acteur.idActeur!,
-              //                 nomActeur: nomActeur,
-              //                 adresseActeur: adresse!,
-              //                 telephoneActeur: numero,
-              //                 whatsAppActeur: wathsApp,
-              //                 localiteActeur: localisation,
-              //                 emailActeur: emailActeur,
-              //                 niveau3PaysActeur: acteur.niveau3PaysActeur!,
-              //                 typeActeur: typeActeur,
-              //                 speculations: selectedSpec,
-              //                 password: password)
-              //             .then((value) {
-              //           setState(() {
-              //             _isLoading = false;
-              //           //     Provider.of<ActeurProvider>(context, listen: false)
-              //           //     .setActeur(newActeurs);
-                       
-              //           // Provider.of<ActeurService>(context, listen: false)
-              //           //     .applyChange();
-              //           });
-              //           print("acteur update : ${newActeurs}");
-                      
-              //           ScaffoldMessenger.of(context).showSnackBar(
-              //             const SnackBar(
-              //               content: Row(
-              //                 children: [
-              //                   Text(
-              //                     "Profil modifié avec succès",
-              //                     style: TextStyle(
-              //                         overflow: TextOverflow.ellipsis),
-              //                   ),
-              //                 ],
-              //               ),
-              //               duration: Duration(seconds: 5),
-              //             ),
-              //           );
-              //         }).catchError((onError) {
-              //           setState(() {
-              //             _isLoading = false;
-              //           });
-              //           print(" update no : ${newActeurs}");
-              //           ScaffoldMessenger.of(context).showSnackBar(
-              //             const SnackBar(
-              //               content: Row(
-              //                 children: [
-              //                   Text(
-              //                     "Une erreur s'est produite",
-              //                     style: TextStyle(
-              //                         overflow: TextOverflow.ellipsis),
-              //                   ),
-              //                 ],
-              //               ),
-              //               duration: Duration(seconds: 5),
-              //             ),
-              //           );
-              //           print("Erreur lors du update: ${onError.toString()}");
-              //         });
-              //       }
-              //     } catch (e) {
-              //       print("Erreur try : ${e.toString()}");
-              //       setState(() {
-              //         _isLoading = false;
-              //       });
-              //     }
-              //     // }
-              //   },
-              //   child: Text(
-              //     "Modifier",
-              //     style: TextStyle(
-              //       fontSize: 20,
-              //       color: Colors.white,
-              //       fontWeight: FontWeight.bold,
-              //     ),
-              //   ),
-              //   style: ElevatedButton.styleFrom(
-              //     backgroundColor:
-              //         const Color(0xFFFF8A00), // Code couleur orange
-              //     shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(15),
-              //     ),
-              //     minimumSize: Size(250, 40),
-              //   ),
-              // )
+                            Acteur acteurs = Acteur(
+                              idActeur: responseBody['idActeur'],
+                              resetToken: responseBody['resetToken'],
+                              tokenCreationDate:
+                                  responseBody['tokenCreationDate'],
+                              codeActeur: responseBody['codeActeur'],
+                              nomActeur: responseBody['nomActeur'],
+                              adresseActeur: responseBody['adresseActeur'],
+                              telephoneActeur: responseBody['telephoneActeur'],
+                              latitude: responseBody['latitude'],
+                              longitude: responseBody['longitude'],
+                              photoSiegeActeur:
+                                  responseBody['photoSiegeActeur'],
+                              logoActeur: responseBody['logoActeur'],
+                              whatsAppActeur: responseBody['whatsAppActeur'],
+                              niveau3PaysActeur:
+                                  responseBody['niveau3PaysActeur'],
+                              dateAjout: responseBody['dateAjout'],
+                              dateModif: responseBody['dateModif'],
+                              personneModif: responseBody['personneModif'],
+                              localiteActeur: responseBody['localiteActeur'],
+                              emailActeur: emailActeur,
+                              statutActeur: responseBody['statutActeur'],
+                              typeActeur: typeActeurList,
+                              speculation: speculationsList,
+                              password: password,
+                            );
 
-              // ElevatedButton(
-              //   onPressed: () async {
-              //     final nomActeur = nomActeurController.text;
-              //     final emailActeur = emailController.text;
-              //     final adresse = adresseController.text;
-              //     final localisation = localisationController.text;
-              //     final typeActeur = selectedTypes;
-              //     final password = acteur.password!;
-              //     final wathsApp = whatsAppController.text;
-              //     final numero = telephoneController.text;
-              //     print(
-              //         "Acteur update nom : $nomActeur, email :$emailActeur, adresse : $adresse, loc : $localisation, wa : $wathsApp, tel $numero , pays ${acteur.niveau3PaysActeur}");
-              //     print("type acteur add: ${typeActeur.toString()}");
-              //     print("speculation add: ${selectedSpec.toString()}");
-              //     var newActeur;
-              //     try {
-              //       setState(() {
-              //         _isLoading = true;
-              //       });
+                            acteurProvider.setActeur(acteurs);
+                          });
+                          
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Profil modifié avec succès"),
+                              duration: Duration(seconds: 5),
+                            ),
+                          );
+                        } else {
+                           setState(() {
+                            _isLoading = false;
+                          });
+                          print("Erreur HTTP: ${response.statusCode}");
+                          throw Exception(
+                              "Erreur HTTP: ${response.statusCode}");
+                        }
+                      } else {
+                         
+                        var response = await ActeurService().updateActeur(
+                          idActeur: acteur.idActeur!,
+                          nomActeur: nomActeur,
+                          adresseActeur: adresse!,
+                          telephoneActeur: tel,
+                          whatsAppActeur: whatsApp,
+                          localiteActeur: localisation,
+                          emailActeur: emailActeur,
+                          niveau3PaysActeur: acteur.niveau3PaysActeur!,
+                          typeActeur:
+                              typeActeur, // Passez les objets TypeActeur ici
+                          speculation:
+                              selectedSpec, // Passez les objets Speculation ici
+                          password: password,
+                        );
 
-              //       if (photo != null) {
-              //         newActeur = await ActeurService()
-              //             .updateActeur(
-              //                 idActeur: acteur.idActeur!,
-              //                 nomActeur: nomActeur,
-              //                 logoActeur: photo,
-              //                 adresseActeur: adresse,
-              //                 telephoneActeur: numero,
-              //                 whatsAppActeur: wathsApp,
-              //                 localiteActeur: localisation,
-              //                 emailActeur: emailActeur,
-              //                 niveau3PaysActeur: acteur.niveau3PaysActeur!,
-              //                 typeActeur: typeActeur,
-              //                 speculations: selectedSpec)
-              //             .then((value) => {
-              //                   setState(() {
-              //                     _isLoading = false;
-              //                   }),
-              //                   Provider.of<ActeurProvider>(context,
-              //                           listen: false)
-              //                       .setActeur(newActeur),
-              //                   Provider.of<ActeurService>(context,
-              //                           listen: false)
-              //                       .applyChange(),
-              //                   ScaffoldMessenger.of(context).showSnackBar(
-              //                     const SnackBar(
-              //                       content: Row(
-              //                         children: [
-              //                           Text(
-              //                             "Profil modifié avec success",
-              //                             style: TextStyle(
-              //                                 overflow: TextOverflow.ellipsis),
-              //                           ),
-              //                         ],
-              //                       ),
-              //                       duration: Duration(seconds: 5),
-              //                     ),
-              //                   )
-              //                 })
-              //             .catchError((onError) => {
-              //                   setState(() {
-              //                     _isLoading = false;
-              //                   }),
-              //                   ScaffoldMessenger.of(context).showSnackBar(
-              //                     const SnackBar(
-              //                       content: Row(
-              //                         children: [
-              //                           Text(
-              //                             "Une erreur s'est produite",
-              //                             style: TextStyle(
-              //                                 overflow: TextOverflow.ellipsis),
-              //                           ),
-              //                         ],
-              //                       ),
-              //                       duration: Duration(seconds: 5),
-              //                     ),
-              //                   ),
-              //                   print("catch 1 ${onError.toString()}"),
-              //                 });
-              //       } else {
-              //         newActeur = await ActeurService()
-              //             .updateActeur(
-              //                 idActeur: acteur.idActeur!,
-              //                 nomActeur: nomActeur,
+                        if (response.statusCode == 200 ||
+                            response.statusCode == 201) {
+                               setState(() {
+                            _isLoading = false;
+                          final responseBody =
+                              json.decode(utf8.decode(response.bodyBytes));
+                          print("response body ${responseBody.toString()}");
 
-              //                 adresseActeur: adresse,
-              //                 telephoneActeur: numero,
-              //                 whatsAppActeur: wathsApp,
-              //                 localiteActeur: localisation,
-              //                 emailActeur: emailActeur,
-              //                 niveau3PaysActeur: acteur.niveau3PaysActeur!,
-              //                 typeActeur: typeActeur,
-              //                 speculations: selectedSpec)
-              //             .then((value) => {
-              //                   setState(() {
-              //                     _isLoading = false;
-              //                   }),
-              //                   Provider.of<ActeurProvider>(context,
-              //                           listen: false)
-              //                       .setActeur(newActeur),
-              //                   Provider.of<ActeurService>(context,
-              //                           listen: false)
-              //                       .applyChange(),
-              //                   ScaffoldMessenger.of(context).showSnackBar(
-              //                     const SnackBar(
-              //                       content: Row(
-              //                         children: [
-              //                           Text(
-              //                             "Profil modifié avec success",
-              //                             style: TextStyle(
-              //                                 overflow: TextOverflow.ellipsis),
-              //                           ),
-              //                         ],
-              //                       ),
-              //                       duration: Duration(seconds: 5),
-              //                     ),
-              //                   )
-              //                 })
-              //             .catchError((onError) => {
-              //                   setState(() {
-              //                     _isLoading = false;
-              //                   }),
-              //                   ScaffoldMessenger.of(context).showSnackBar(
-              //                     const SnackBar(
-              //                       content: Row(
-              //                         children: [
-              //                           Text(
-              //                             "Une erreur s'est produite",
-              //                             style: TextStyle(
-              //                                 overflow: TextOverflow.ellipsis),
-              //                           ),
-              //                         ],
-              //                       ),
-              //                       duration: Duration(seconds: 5),
-              //                     ),
-              //                   ),
-              //                   print("catch 2 ${onError.toString()}"),
-              //                 });
-              //       }
-              //     } catch (e) {
-              //       print("catch try ${e.toString()}");
-              //       setState(() {
-              //         _isLoading = false;
-              //       });
-              //     }
-              //   },
-              //   child: Text(
-              //     "Modifier",
-              //     style: TextStyle(
-              //       fontSize: 20,
-              //       color: Colors.white,
-              //       fontWeight: FontWeight.bold,
-              //     ),
-              //   ),
-              //   style: ElevatedButton.styleFrom(
-              //     backgroundColor: const Color(0xFFFF8A00), // Orange color code
-              //     shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(15),
-              //     ),
-              //     minimumSize: Size(250, 40),
-              //   ),
-              // )
+                          List<dynamic> typeActeurData =
+                              responseBody['typeActeur'];
+                          List<TypeActeur> typeActeurList = typeActeurData
+                              .map((data) => TypeActeur.fromMap(data))
+                              .toList();
+                          List<dynamic> speculationData =
+                              responseBody['speculation'];
+                          List<Speculation> speculationsList = speculationData
+                              .map((data) => Speculation.fromMap(data))
+                              .toList();
+
+                          Acteur acteurs = Acteur(
+                            idActeur: responseBody['idActeur'],
+                            resetToken: responseBody['resetToken'],
+                            tokenCreationDate:
+                                responseBody['tokenCreationDate'],
+                            codeActeur: responseBody['codeActeur'],
+                            nomActeur: responseBody['nomActeur'],
+                            adresseActeur: responseBody['adresseActeur'],
+                            telephoneActeur: responseBody['telephoneActeur'],
+                            latitude: responseBody['latitude'],
+                            longitude: responseBody['longitude'],
+                            photoSiegeActeur: responseBody['photoSiegeActeur'],
+                            logoActeur: responseBody['logoActeur'],
+                            whatsAppActeur: responseBody['whatsAppActeur'],
+                            niveau3PaysActeur:
+                                responseBody['niveau3PaysActeur'],
+                            dateAjout: responseBody['dateAjout'],
+                            dateModif: responseBody['dateModif'],
+                            personneModif: responseBody['personneModif'],
+                            localiteActeur: responseBody['localiteActeur'],
+                            emailActeur: emailActeur,
+                            statutActeur: responseBody['statutActeur'],
+                            typeActeur: typeActeurList,
+                            speculation: speculationsList,
+                            password: password,
+                          );
+
+                          acteurProvider.setActeur(acteurs);
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Profil modifié avec succès"),
+                              duration: Duration(seconds: 5),
+                            ),
+                          );
+                        } else {
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          print("Erreur 2 HTTP: ${response.statusCode}");
+                          throw Exception(
+                              "Erreur HTTP: ${response.statusCode}");
+                        }
+                      }
+                    } catch (e) {
+                       setState(() {
+                        _isLoading = false;
+                      });
+                      print("Une erreur s'est produite: ${e.toString()}");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              "Une erreur s'est produite: ${e.toString()}"),
+                          duration: Duration(seconds: 5),
+                        ),
+                      );
+                    }
+                  },
+                  child: Text(
+                    "Modifier",
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        const Color(0xFFFF8A00), // Code couleur orange
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    minimumSize: Size(250, 40),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

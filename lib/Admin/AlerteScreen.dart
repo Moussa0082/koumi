@@ -290,7 +290,7 @@ class _AlerteScreenState extends State<AlerteScreen> {
                                             child: Column(children: [
                                               ListTile(
                                                   leading: Image.asset(
-                                                    "assets/images/alt.png",
+                                                    "assets/images/alt21.png",
                                                     width: 80,
                                                     height: 80,
                                                   ),

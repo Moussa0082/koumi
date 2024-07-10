@@ -267,10 +267,14 @@ class _CarrouselState extends State<Carrousel> {
     try {
       final response = await http.get(Uri.parse(
           '$baseUrl/getAlertesByPaysAndNotWithPagination?niveau3PaysActeur=$pays&page=$page&size=$size'));
+      
+      debugPrint(
+          '$baseUrl/getAlertesByPaysAndNotWithPagination?niveau3PaysActeur=$pays&page=$page&size=$size');
 
       if (response.statusCode == 200 ||
           response.statusCode == 201 ||
           response.statusCode == 202) {
+
         String contentType = response.headers['content-type'] ?? '';
         if (contentType.contains('application/json')) {
           String jsonString = utf8.decode(response.bodyBytes);

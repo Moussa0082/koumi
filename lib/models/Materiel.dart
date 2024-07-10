@@ -23,6 +23,7 @@ class Materiel {
   TypeMateriel typeMateriel;
   Monnaie? monnaie;
   Speculation? speculation;
+
   Materiel({
     this.idMateriel,
     this.codeMateriel,
@@ -131,53 +132,4 @@ class Materiel {
     );
   }
 
-  // String toJson() => json.encode(toMap());
-
-  // factory Materiel.fromJson(String source) => Materiel.fromMap(json.decode(source) as Map<String, dynamic>);
-
-  // @override
-  // String toString() {
-  //   return 'Materiel(idMateriel: $idMateriel, codeMateriel: $codeMateriel, prixParHeure: $prixParHeure, nom: $nom, description: $description, photoMateriel: $photoMateriel, localisation: $localisation, personneModif: $personneModif, statut: $statut, statutCommande: $statutCommande, dateAjout: $dateAjout, dateModif: $dateModif, acteur: $acteur, etatMateriel: $etatMateriel, typeMateriel: $typeMateriel)';
-  // }
-
-  // @override
-  // bool operator ==(covariant Materiel other) {
-  //   if (identical(this, other)) return true;
-  
-  //   return 
-  //     other.idMateriel == idMateriel &&
-  //     other.codeMateriel == codeMateriel &&
-  //     other.prixParHeure == prixParHeure &&
-  //     other.nom == nom &&
-  //     other.description == description &&
-  //     other.photoMateriel == photoMateriel &&
-  //     other.localisation == localisation &&
-  //     other.personneModif == personneModif &&
-  //     other.statut == statut &&
-  //     other.statutCommande == statutCommande &&
-  //     other.dateAjout == dateAjout &&
-  //     other.dateModif == dateModif &&
-  //     other.acteur == acteur &&
-  //     other.etatMateriel == etatMateriel &&
-  //     other.typeMateriel == typeMateriel;
-  // }
-
-  // @override
-  // int get hashCode {
-  //   return idMateriel.hashCode ^
-  //     codeMateriel.hashCode ^
-  //     prixParHeure.hashCode ^
-  //     nom.hashCode ^
-  //     description.hashCode ^
-  //     photoMateriel.hashCode ^
-  //     localisation.hashCode ^
-  //     personneModif.hashCode ^
-  //     statut.hashCode ^
-  //     statutCommande.hashCode ^
-  //     dateAjout.hashCode ^
-  //     dateModif.hashCode ^
-  //     acteur.hashCode ^
-  //     etatMateriel.hashCode ^
-  //     typeMateriel.hashCode;
-  // }
 }

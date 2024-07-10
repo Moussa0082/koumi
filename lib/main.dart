@@ -50,8 +50,6 @@ import 'package:koumi_app/widgets/notification_controller.dart';
 import 'package:koumi_app/controller/dependency_injection.dart';
 import 'package:provider/provider.dart';
 
-// final navigatorKey                                                = GlofbalKey<NavigatorState>();
-
 
 void main() async {
   

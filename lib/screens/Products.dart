@@ -1217,7 +1217,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 child: Text(e.libelleCategorie!),
               ))
           .toList(),
-      hint: Text("-- Filtre par categorie --"),
+      hint: Text("-- Filtre par catégorie --"),
       value: typeValue,
       onChanged: (newValue) {
         setState(() {
@@ -1254,7 +1254,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       items: [],
       onChanged: null,
       decoration: InputDecoration(
-        labelText: '-- Aucun categorie trouvé --',
+        labelText: '-- Aucun catégorie trouvé --',
         contentPadding:
             const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         border: OutlineInputBorder(

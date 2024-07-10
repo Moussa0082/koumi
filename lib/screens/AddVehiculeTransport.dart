@@ -11,6 +11,7 @@ import 'package:koumi_app/models/TypeVoiture.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/NextAddVehicule.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
+import 'package:koumi_app/widgets/AutoComptet.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:provider/provider.dart';
 
@@ -141,27 +142,47 @@ class _AddVehiculeTransportState extends State<AddVehiculeTransport> {
                           ),
                         ),
                       ),
-                      Padding(
+Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 20),
-                        child: TextFormField(
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Veuillez remplir les champs";
+                        child: Autocomplete<String>(
+                          optionsBuilder: (TextEditingValue textEditingValue) {
+                            if (textEditingValue.text.isEmpty) {
+                              return const Iterable<String>.empty();
                             }
-                            return null;
+                            return AutoComplet.getTransportVehicles()
+                                .where((String option) {
+                              return option.toLowerCase().contains(
+                                  textEditingValue.text.toLowerCase());
+                            });
                           },
-                          controller: _nomController,
-                          decoration: InputDecoration(
-                            hintText: "nom",
-                             contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                
-                   border:
-             OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
+                          onSelected: (String selection) {
+                            _nomController.text = selection;
+                            print("nom : ${_nomController.text}");
+                          },
+                          fieldViewBuilder: (BuildContext context,
+                              TextEditingController fieldTextEditingController,
+                              FocusNode fieldFocusNode,
+                              VoidCallback onFieldSubmitted) {
+                            return TextFormField(
+                              controller: fieldTextEditingController,
+                              focusNode: fieldFocusNode,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Veuillez remplir le champs";
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                hintText: "Nom produit",
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
                       SizedBox(

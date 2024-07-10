@@ -208,9 +208,4 @@ class Acteur {
     );
   }
 
-
-  // factory Acteur.fromJson(String source) => Acteur.fromMap(json.decode(source) as Map<String, dynamic>);
-
-  
-
- }
+}

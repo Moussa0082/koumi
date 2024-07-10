@@ -4,9 +4,9 @@ import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/CategorieProduit.dart';
 
 class Speculation {
- String? idSpeculation;
+  String? idSpeculation;
   final String? codeSpeculation;
-   String? nomSpeculation;
+  String? nomSpeculation;
   final String? descriptionSpeculation;
   final bool? statutSpeculation;
   final CategorieProduit? categorieProduit;

@@ -14,6 +14,7 @@ import 'package:koumi_app/models/Speculation.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/MaterielService.dart';
+import 'package:koumi_app/widgets/AutoComptet.dart';
 import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -207,7 +208,8 @@ class _AddMaterielState extends State<AddMateriel> {
             title: Text(
               "Ajout matériel",
               style: const TextStyle(
-                  color: d_colorGreen, fontWeight: FontWeight.bold,
+                  color: d_colorGreen,
+                  fontWeight: FontWeight.bold,
                   fontSize: 20),
             ),
           ),
@@ -654,22 +656,46 @@ class _AddMaterielState extends State<AddMateriel> {
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 10, horizontal: 20),
-                          child: TextFormField(
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Veuillez remplir les champs";
+                          child: Autocomplete<String>(
+                            optionsBuilder:
+                                (TextEditingValue textEditingValue) {
+                              if (textEditingValue.text.isEmpty) {
+                                return const Iterable<String>.empty();
                               }
-                              return null;
+                              return AutoComplet.getTransportVehicles()
+                                  .where((String option) {
+                                return option.toLowerCase().contains(
+                                    textEditingValue.text.toLowerCase());
+                              });
                             },
-                            controller: _nomController,
-                            decoration: InputDecoration(
-                              hintText: "nom",
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
+                            onSelected: (String selection) {
+                              _nomController.text = selection;
+                              print("nom : ${_nomController.text}");
+                            },
+                            fieldViewBuilder: (BuildContext context,
+                                TextEditingController
+                                    fieldTextEditingController,
+                                FocusNode fieldFocusNode,
+                                VoidCallback onFieldSubmitted) {
+                              return TextFormField(
+                                controller: fieldTextEditingController,
+                                focusNode: fieldFocusNode,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "Veuillez remplir le champs";
+                                  }
+                                  return null;
+                                },
+                                decoration: InputDecoration(
+                                  hintText: "Nom produit",
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
                         SizedBox(
@@ -1460,7 +1486,7 @@ class _AddMaterielState extends State<AddMateriel> {
                                                   n3Value = null;
                                                   monnaieValue = null;
                                                 }),
-                                               Navigator.pop(context, true),
+                                                Navigator.pop(context, true),
                                                 ScaffoldMessenger.of(context)
                                                     .showSnackBar(
                                                   const SnackBar(

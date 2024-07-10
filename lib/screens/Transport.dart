@@ -17,6 +17,7 @@ import 'package:koumi_app/screens/DetailTransport.dart';
 import 'package:koumi_app/screens/PageTransporteur.dart';
 import 'package:koumi_app/screens/VehiculesActeur.dart';
 import 'package:koumi_app/service/VehiculeService.dart';
+import 'package:koumi_app/widgets/AutoComptet.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
@@ -62,7 +63,7 @@ class _TransportState extends State<Transport> {
         selectedType == null) {
         if(mounted)
       setState(() {
-        // Rafraîchir les données ici
+       
         page++;
       });
       debugPrint("yes - fetch all by pays vehicule $page" );
@@ -618,7 +619,7 @@ WidgetsBinding.instance.addPostFrameCallback((_){
                       ),
                     ),
                     if (isSearchMode)
-                      Padding(
+                     Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: Container(
                           padding: EdgeInsets.symmetric(horizontal: 10),
@@ -631,18 +632,49 @@ WidgetsBinding.instance.addPostFrameCallback((_){
                               Icon(Icons.search, color: Colors.blueGrey[400]),
                               SizedBox(width: 10),
                               Expanded(
-                                child: TextField(
-                                  controller: _searchController,
-                                  onChanged: (value) {
+                                child: Autocomplete<String>(
+                                  optionsBuilder:
+                                      (TextEditingValue textEditingValue) {
+                                    if (textEditingValue.text.isEmpty) {
+                                      return const Iterable<String>.empty();
+                                    }
+                                    return AutoComplet.getTransportVehicles()
+                                        .where((String option) {
+                                      return option.toLowerCase().contains(
+                                          textEditingValue.text.toLowerCase());
+                                    });
+                                  },
+                                  onSelected: (String selection) {
+                                    _searchController.text = selection;
                                     setState(() {});
                                   },
-                                  decoration: InputDecoration(
-                                    hintText: 'Rechercher',
-                                    border: InputBorder.none,
-                                    hintStyle:
-                                        TextStyle(color: Colors.blueGrey[400]),
-                                  ),
+                                  fieldViewBuilder: (BuildContext context,
+                                      TextEditingController
+                                          fieldTextEditingController,
+                                      FocusNode fieldFocusNode,
+                                      VoidCallback onFieldSubmitted) {
+                                    return TextField(
+                                      controller: fieldTextEditingController,
+                                      focusNode: fieldFocusNode,
+                                      onChanged: (value) {
+                                        setState(() {});
+                                      },
+                                      decoration: InputDecoration(
+                                        hintText: 'Rechercher',
+                                        border: InputBorder.none,
+                                        hintStyle: TextStyle(
+                                            color: Colors.blueGrey[400]),
+                                      ),
+                                    );
+                                  },
                                 ),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.clear),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() {});
+                                },
                               ),
                             ],
                           ),

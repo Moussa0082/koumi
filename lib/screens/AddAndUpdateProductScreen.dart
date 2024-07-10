@@ -16,6 +16,7 @@ import 'package:koumi_app/models/Stock.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddAndUpdateProductEndScreen.dart';
+import 'package:koumi_app/widgets/AutoComptet.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:pattern_formatter/pattern_formatter.dart';
@@ -232,24 +233,67 @@ class _AddAndUpdateProductScreenState extends State<AddAndUpdateProductScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 20),
-                        child: TextFormField(
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Veuillez remplir le champs";
+                        child: Autocomplete<String>(
+                          optionsBuilder: (TextEditingValue textEditingValue) {
+                            if (textEditingValue.text.isEmpty) {
+                              return const Iterable<String>.empty();
                             }
-                            return null;
+                            return AutoComplet.getSuggestions()
+                                .where((String option) {
+                              return option.toLowerCase().contains(
+                                  textEditingValue.text.toLowerCase());
+                            });
                           },
-                          controller: _nomController,
-                          decoration: InputDecoration(
-                            hintText: "Nom produit",
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
+                          onSelected: (String selection) {
+                            _nomController.text = selection;
+                             print("nom : ${_nomController.text}");
+                          },
+                          fieldViewBuilder: (BuildContext context,
+                              TextEditingController fieldTextEditingController,
+                              FocusNode fieldFocusNode,
+                              VoidCallback onFieldSubmitted) {
+                            return TextFormField(
+                              controller: fieldTextEditingController,
+                              focusNode: fieldFocusNode,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Veuillez remplir le champs";
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                hintText: "Nom produit",
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(
+                      //       vertical: 10, horizontal: 20),
+                      //   child: TextFormField(
+                      //     validator: (value) {
+                      //       if (value == null || value.isEmpty) {
+                      //         return "Veuillez remplir le champs";
+                      //       }
+                      //       return null;
+                      //     },
+                      //     controller: _nomController,
+                      //     decoration: InputDecoration(
+                      //       hintText: "Nom produit",
+                      //       contentPadding: const EdgeInsets.symmetric(
+                      //           vertical: 10, horizontal: 20),
+                      //       border: OutlineInputBorder(
+                      //         borderRadius: BorderRadius.circular(8),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
                       SizedBox(
                         height: 10,
                       ),
