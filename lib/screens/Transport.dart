@@ -212,7 +212,6 @@ class _TransportState extends State<Transport> {
       vehiculeListe = await 
           VehiculeService().fetchVehiculeByTypeVoitureWithPagination(selectedType!.idTypeVoiture!,widget.detectedCountry!);
 
-
     }
 
     return vehiculeListe;

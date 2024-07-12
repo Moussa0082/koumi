@@ -579,7 +579,6 @@ class MaterielService extends ChangeNotifier {
     }
   }
 
- 
   Future<List<Materiels>> fetchMaterielByType(String id) async {
     final response =
         await http.get(Uri.parse('$baseUrl/readByTypeMateriel/$id'));
@@ -608,13 +607,14 @@ class MaterielService extends ChangeNotifier {
       page = 0;
       hasMore = true;
     }
-
     try {
       final response = await http.get(Uri.parse(
-          '$apiOnlineUrl/Materiel/getMaterielsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}'));
+          '$apiOnlineUrl/Materiel/getMaterielsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
       debugPrint(
-          'service : $apiOnlineUrl/Materiel/getMaterielsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}');
-      if (response.statusCode == 200) {
+          'service : $apiOnlineUrl/Materiel/getMaterielsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size');
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 202) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 
@@ -643,6 +643,53 @@ class MaterielService extends ChangeNotifier {
     }
     return materielList;
   }
+  // Future<List<Materiels>> fetchMateriel(String niveau3PaysActeur,
+  //     {bool refresh = false}) async {
+  //   if (isLoading == true) return [];
+
+  //   isLoading = true;
+
+  //   if (refresh) {
+  //     materielList.clear();
+  //     page = 0;
+  //     hasMore = true;
+  //   }
+  //   try {
+  //     final response = await http.get(Uri.parse(
+  //         '$apiOnlineUrl/Materiel/getMaterielsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
+  //     debugPrint(
+  //         'service : $apiOnlineUrl/Materiel/getMaterielsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size');
+  //     if (response.statusCode == 200 ||
+  //         response.statusCode == 201 ||
+  //         response.statusCode == 202) {
+  //       final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+  //       final List<dynamic> body = jsonData['content'];
+
+  //       if (body.isEmpty) {
+  //         hasMore = false;
+  //       } else {
+  //         List<Materiels> newMateriels =
+  //             body.map((e) => Materiels.fromMap(e)).toList();
+  //         materielList.addAll(newMateriels.where((newMat) => !newMateriels
+  //             .any((element) => element.idMateriel == newMat.idMateriel)));
+  //       }
+
+  //       debugPrint(
+  //           "response body all materiel by pays with pagination ${page} par défilement soit ${materielList.length}");
+  //       return materielList;
+  //     } else {
+  //       print(
+  //           'Échec de la requête mat pag avec le code d\'état: ${response.statusCode} |  ${response.body}');
+  //       return [];
+  //     }
+  //   } catch (e) {
+  //     print(
+  //         'Une erreur s\'est produite lors de la récupération des materiels: $e');
+  //   } finally {
+  //     isLoading = false;
+  //   }
+  //   return materielList;
+  // }
 
   Future<List<Materiels>> fetchMateriele(String pays, String libelleFiliere,
       {bool refresh = false}) async {
@@ -662,7 +709,10 @@ class MaterielService extends ChangeNotifier {
 
     try {
       final response = await http.get(Uri.parse(
-          'par filiere : $apiOnlineUrl/Materiel/getMaterielsByFiliereWithPagination?libelleFiliere=$libelleFiliere&pays=$pays&page=${page}&size=${size}'));
+          '$apiOnlineUrl/Materiel/getMaterielsByFiliereWithPagination?libelleFiliere=$libelleFiliere&pays=$pays&page=${page}&size=${size}'));
+
+      debugPrint(
+          'par filiere : $apiOnlineUrl/Materiel/getMaterielsByFiliereWithPagination?libelleFiliere=$libelleFiliere&pays=$pays&page=${page}&size=${size}');
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -715,10 +765,14 @@ class MaterielService extends ChangeNotifier {
 
     try {
       final response = await http.get(Uri.parse(
-          '$apiOnlineUrl/Materiel/getAllMaterielsByTypeMaterielWithPagination?idTypeMateriel=${idTypeMateriel}&page=$page&size=$size'));
-      // final response = await http.get(Uri.parse('$apiOnlineUrl/Materiel/getMaterielsByPaysAndTypeMaterielWithPagination?idTypeMateriel=${idTypeMateriel}&niveau3PaysActeur=$niveau3PaysActeur&page=$page&size=$size'));
+          '$apiOnlineUrl/Materiel/getAllMaterielsByTypeMaterielWithPagination?idTypeMateriel=$idTypeMateriel&page=$page&size=$size'));
 
-      if (response.statusCode == 200) {
+      debugPrint(
+          '$apiOnlineUrl/Materiel/getAllMaterielsByTypeMaterielWithPagination?idTypeMateriel=$idTypeMateriel&page=$page&size=$size');
+
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 202) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 

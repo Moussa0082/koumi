@@ -54,6 +54,7 @@ class _EditProfilState extends State<EditProfil> {
   late String type;
   List<TypeActeur> selectedTypes = [];
   List<Speculation> selectedSpec = [];
+  List<String> specu = [];
   List<String> typeLibelle = [];
   List<String> libelleSpeculation = [];
   List<Speculation> listeSpeculations = [];
@@ -152,6 +153,8 @@ class _EditProfilState extends State<EditProfil> {
 
     if (acteur.speculation != null) {
       selectedSpec = acteur.speculation!;
+      libelleSpeculation = selectedSpec.map((e) => e.nomSpeculation!).toList();
+
       print("speculation acteur: ${selectedSpec.toString()}");
     }
 
@@ -174,8 +177,6 @@ class _EditProfilState extends State<EditProfil> {
 
     // ;
   }
-
- 
 
   @override
   Widget build(BuildContext context) {
@@ -345,9 +346,9 @@ class _EditProfilState extends State<EditProfil> {
                   controller: _controllerTypeActeur,
 
                   dropdownHeight: 320,
-                  hint: 'Sélectionner un type d\'acteur',
+                  hint: typeLibelle.map((e) => e).join(','),
 
-                  fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
+                  fieldBackgroundColor: Color.fromARGB(255, 240, 240, 240),
                   searchEnabled: false,
                   searchLabel: "Search",
                   onOptionSelected: (options) {
@@ -369,6 +370,81 @@ class _EditProfilState extends State<EditProfil> {
                     return const Padding(
                       padding: EdgeInsets.all(10.0),
                       child: Text('Aucun type disponible'),
+                    );
+                  }),
+                  // Exemple de personnalisation des styles
+                ),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: MultiSelectDropDown.network(
+                  networkConfig: NetworkConfig(
+                    url:
+                        '$apiOnlineUrl/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
+                    method: RequestMethod.get,
+                    headers: {'Content-Type': 'application/json'},
+                  ),
+                  chipConfig: const ChipConfig(wrapType: WrapType.wrap),
+                  responseParser: (response) {
+                    // List<dynamic> decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
+
+                    listeSpeculations = (response as List<dynamic>).map((e) {
+                      return Speculation(
+                        idSpeculation: e['idSpeculation'] as String,
+                        nomSpeculation: e['nomSpeculation'] as String,
+                        statutSpeculation: e['statutSpeculation'] as bool,
+                        // Assurez-vous de correspondre aux clés JSON avec les noms de propriétés de votre classe TypeActeur
+                        // Ajoutez d'autres champs si nécessaire
+                      );
+                    }).toList();
+
+                    // Filtrer les types avec un libellé différent de "admin" et dont le statutTypeActeur est true
+                    final filteredTypes = listeSpeculations
+                        .where((speculation) =>
+                            speculation.statutSpeculation == true)
+                        .toList();
+
+                    // Créer des ValueItems pour les types filtrés
+                    final List<ValueItem<Speculation>> valueItems =
+                        filteredTypes.map((speculation) {
+                      return ValueItem<Speculation>(
+                        label: speculation.nomSpeculation!,
+                        value: speculation,
+                      );
+                    }).toList();
+
+                    return Future<List<ValueItem<Speculation>>>.value(
+                        valueItems);
+                  },
+
+                  controller: _controllerSpeculation,
+                  hint: libelleSpeculation.map((e) => e).join(', '),
+
+                  dropdownHeight: 320,
+                  fieldBackgroundColor: Color.fromARGB(255, 240, 240, 240),
+                  onOptionSelected: (options) {
+                    setState(() {
+                      selectedSpec = options
+                          .map<Speculation>((item) => item.value!)
+                          .toList();
+
+                      print("Types sélectionnés : $selectedSpec");
+                      libelleSpeculation.clear();
+                      libelleSpeculation
+                          .addAll(options.map((data) => data.label).toList());
+                      print(
+                          "Spéculation sélectionnée ${libelleSpeculation.toString()}");
+                    });
+                    // Fermer automatiquement le dialogue
+                    // FocusScope.of(context).unfocus();
+                  },
+                  responseErrorBuilder: ((context, body) {
+                    return const Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: Text('Aucune spéculation disponible'),
                     );
                   }),
                   // Exemple de personnalisation des styles
@@ -514,84 +590,6 @@ class _EditProfilState extends State<EditProfil> {
               ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
-                child: MultiSelectDropDown.network(
-                  networkConfig: NetworkConfig(
-                    // Endpoint pour récupérer les spéculations en fonction des catégories sélectionnées
-                    // url:url , //e40ijxd5k0n0yrzj5f80,
-                    // url:
-                    //     '$apiOnlineUrl/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
-                    url:
-                        '$apiOnlineUrl/Speculation/getAllSpeculation', //e40ijxd5k0n0yrzj5f80,
-                    method: RequestMethod.get,
-                    headers: {'Content-Type': 'application/json'},
-                  ),
-                  chipConfig: const ChipConfig(wrapType: WrapType.wrap),
-                  responseParser: (response) {
-                    // List<dynamic> decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
-
-                    listeSpeculations = (response as List<dynamic>).map((e) {
-                      return Speculation(
-                        idSpeculation: e['idSpeculation'] as String,
-                        nomSpeculation: e['nomSpeculation'] as String,
-                        statutSpeculation: e['statutSpeculation'] as bool,
-                        // Assurez-vous de correspondre aux clés JSON avec les noms de propriétés de votre classe TypeActeur
-                        // Ajoutez d'autres champs si nécessaire
-                      );
-                    }).toList();
-
-                    // Filtrer les types avec un libellé différent de "admin" et dont le statutTypeActeur est true
-                    final filteredTypes = listeSpeculations
-                        .where((speculation) =>
-                            speculation.statutSpeculation == true)
-                        .toList();
-
-                    // Créer des ValueItems pour les types filtrés
-                    final List<ValueItem<Speculation>> valueItems =
-                        filteredTypes.map((speculation) {
-                      return ValueItem<Speculation>(
-                        label: speculation.nomSpeculation!,
-                        value: speculation,
-                      );
-                    }).toList();
-
-                    return Future<List<ValueItem<Speculation>>>.value(
-                        valueItems);
-                  },
-
-                  controller: _controllerSpeculation,
-                  hint: 'Sélectionner une spéculation',
-                  dropdownHeight: 320,
-                  fieldBackgroundColor: Color.fromARGB(255, 219, 219, 219),
-                  onOptionSelected: (options) {
-                    setState(() {
-                      selectedSpec = options
-                          .map<Speculation>((item) => item.value!)
-                          .toList();
-
-                      print("Types sélectionnés : $selectedSpec");
-                      libelleSpeculation.clear();
-                      libelleSpeculation
-                          .addAll(options.map((data) => data.label).toList());
-                      print(
-                          "Spéculation sélectionnée ${libelleSpeculation.toString()}");
-                    });
-                    // Fermer automatiquement le dialogue
-                    // FocusScope.of(context).unfocus();
-                  },
-                  responseErrorBuilder: ((context, body) {
-                    return const Padding(
-                      padding: EdgeInsets.all(10.0),
-                      child: Text('Aucune spéculation disponible'),
-                    );
-                  }),
-                  // Exemple de personnalisation des styles
-                ),
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
                 child: TextFormField(
                   controller: passwordController,
                   decoration: InputDecoration(
@@ -728,7 +726,7 @@ class _EditProfilState extends State<EditProfil> {
 
                         if (response.statusCode == 200 ||
                             response.statusCode == 201) {
-                               setState(() {
+                          setState(() {
                             _isLoading = false;
                             final responseBody =
                                 json.decode(utf8.decode(response.bodyBytes));
@@ -775,7 +773,7 @@ class _EditProfilState extends State<EditProfil> {
 
                             acteurProvider.setActeur(acteurs);
                           });
-                          
+
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text("Profil modifié avec succès"),
@@ -783,7 +781,7 @@ class _EditProfilState extends State<EditProfil> {
                             ),
                           );
                         } else {
-                           setState(() {
+                          setState(() {
                             _isLoading = false;
                           });
                           print("Erreur HTTP: ${response.statusCode}");
@@ -791,7 +789,6 @@ class _EditProfilState extends State<EditProfil> {
                               "Erreur HTTP: ${response.statusCode}");
                         }
                       } else {
-                         
                         var response = await ActeurService().updateActeur(
                           idActeur: acteur.idActeur!,
                           nomActeur: nomActeur,
@@ -810,51 +807,52 @@ class _EditProfilState extends State<EditProfil> {
 
                         if (response.statusCode == 200 ||
                             response.statusCode == 201) {
-                               setState(() {
+                          setState(() {
                             _isLoading = false;
-                          final responseBody =
-                              json.decode(utf8.decode(response.bodyBytes));
-                          print("response body ${responseBody.toString()}");
+                            final responseBody =
+                                json.decode(utf8.decode(response.bodyBytes));
+                            print("response body ${responseBody.toString()}");
 
-                          List<dynamic> typeActeurData =
-                              responseBody['typeActeur'];
-                          List<TypeActeur> typeActeurList = typeActeurData
-                              .map((data) => TypeActeur.fromMap(data))
-                              .toList();
-                          List<dynamic> speculationData =
-                              responseBody['speculation'];
-                          List<Speculation> speculationsList = speculationData
-                              .map((data) => Speculation.fromMap(data))
-                              .toList();
+                            List<dynamic> typeActeurData =
+                                responseBody['typeActeur'];
+                            List<TypeActeur> typeActeurList = typeActeurData
+                                .map((data) => TypeActeur.fromMap(data))
+                                .toList();
+                            List<dynamic> speculationData =
+                                responseBody['speculation'];
+                            List<Speculation> speculationsList = speculationData
+                                .map((data) => Speculation.fromMap(data))
+                                .toList();
 
-                          Acteur acteurs = Acteur(
-                            idActeur: responseBody['idActeur'],
-                            resetToken: responseBody['resetToken'],
-                            tokenCreationDate:
-                                responseBody['tokenCreationDate'],
-                            codeActeur: responseBody['codeActeur'],
-                            nomActeur: responseBody['nomActeur'],
-                            adresseActeur: responseBody['adresseActeur'],
-                            telephoneActeur: responseBody['telephoneActeur'],
-                            latitude: responseBody['latitude'],
-                            longitude: responseBody['longitude'],
-                            photoSiegeActeur: responseBody['photoSiegeActeur'],
-                            logoActeur: responseBody['logoActeur'],
-                            whatsAppActeur: responseBody['whatsAppActeur'],
-                            niveau3PaysActeur:
-                                responseBody['niveau3PaysActeur'],
-                            dateAjout: responseBody['dateAjout'],
-                            dateModif: responseBody['dateModif'],
-                            personneModif: responseBody['personneModif'],
-                            localiteActeur: responseBody['localiteActeur'],
-                            emailActeur: emailActeur,
-                            statutActeur: responseBody['statutActeur'],
-                            typeActeur: typeActeurList,
-                            speculation: speculationsList,
-                            password: password,
-                          );
+                            Acteur acteurs = Acteur(
+                              idActeur: responseBody['idActeur'],
+                              resetToken: responseBody['resetToken'],
+                              tokenCreationDate:
+                                  responseBody['tokenCreationDate'],
+                              codeActeur: responseBody['codeActeur'],
+                              nomActeur: responseBody['nomActeur'],
+                              adresseActeur: responseBody['adresseActeur'],
+                              telephoneActeur: responseBody['telephoneActeur'],
+                              latitude: responseBody['latitude'],
+                              longitude: responseBody['longitude'],
+                              photoSiegeActeur:
+                                  responseBody['photoSiegeActeur'],
+                              logoActeur: responseBody['logoActeur'],
+                              whatsAppActeur: responseBody['whatsAppActeur'],
+                              niveau3PaysActeur:
+                                  responseBody['niveau3PaysActeur'],
+                              dateAjout: responseBody['dateAjout'],
+                              dateModif: responseBody['dateModif'],
+                              personneModif: responseBody['personneModif'],
+                              localiteActeur: responseBody['localiteActeur'],
+                              emailActeur: emailActeur,
+                              statutActeur: responseBody['statutActeur'],
+                              typeActeur: typeActeurList,
+                              speculation: speculationsList,
+                              password: password,
+                            );
 
-                          acteurProvider.setActeur(acteurs);
+                            acteurProvider.setActeur(acteurs);
                           });
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -872,7 +870,7 @@ class _EditProfilState extends State<EditProfil> {
                         }
                       }
                     } catch (e) {
-                       setState(() {
+                      setState(() {
                         _isLoading = false;
                       });
                       print("Une erreur s'est produite: ${e.toString()}");

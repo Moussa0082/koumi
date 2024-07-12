@@ -1296,8 +1296,9 @@ class _LocationState extends State<Location> {
       final response = await http.get(Uri.parse(
           '$apiOnlineUrl/Materiel/getMaterielsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}'));
       debugPrint(
-          '$apiOnlineUrl/Materiel/getMaterielsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}');
-      if (response.statusCode == 200) {
+          ' page : $apiOnlineUrl/Materiel/getMaterielsByPaysWithPagination?niveau3PaysActeur=$niveau3PaysActeur&page=${page}&size=${size}');
+      
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
 

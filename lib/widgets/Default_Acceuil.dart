@@ -12,6 +12,7 @@ import 'package:koumi_app/screens/EngraisAndApport.dart';
 import 'package:koumi_app/screens/FruitsAndLegumes.dart';
 import 'package:koumi_app/screens/IntrantScreen.dart';
 import 'package:koumi_app/screens/Location.dart' as l;
+import 'package:koumi_app/screens/LocationMateriel.dart';
 import 'package:koumi_app/screens/MatereilAndEquipement.dart';
 import 'package:koumi_app/screens/MesCommande.dart';
 import 'package:koumi_app/screens/Products.dart';
@@ -382,7 +383,7 @@ class _DefautAcceuilState extends State<DefautAcceuil> {
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        l.Location(detectedCountry: detectedCountry!)));
+                        LocationMateriel(detectedCountry: detectedCountry!)));
           } else if (index == 3) {
             Navigator.push(
                 context,
