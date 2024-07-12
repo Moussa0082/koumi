@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:koumi_app/constants.dart';
@@ -13,6 +14,7 @@ import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/DetailProduits.dart';
 import 'package:koumi_app/service/BottomNavigationService.dart';
 import 'package:koumi_app/service/StockService.dart';
+import 'package:koumi_app/widgets/LoadingOverlay.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
@@ -20,8 +22,8 @@ import 'package:shimmer/shimmer.dart';
 import 'LoginScreen.dart';
 
 class MyProductScreen extends StatefulWidget {
-  String? id, nom;
-  MyProductScreen({super.key, this.id, this.nom});
+  // String? id, nom;
+  MyProductScreen({super.key});
 
   @override
   State<MyProductScreen> createState() => _MyProductScreenState();
@@ -109,8 +111,21 @@ class _MyProductScreenState extends State<MyProductScreen> {
     return stockListe;
   }
 
-  Future<List<Stock>> fetchStockByMagasinAndActeur(
-      String idMagasin, String idActeur,
+  Future<List<Stock>> fetchAllStock() async {
+    stockListe = await StockService().fetchStockByActeur(acteur.idActeur!);
+
+    return stockListe;
+  }
+
+  Future<List<Stock>> fetchAllStockByCate() async {
+    if (selectedCat != null) {
+      stockListe = await StockService().fetchStockByIdActeurAndIdCategorie(
+          selectedCat!.idCategorieProduit!, acteur.idActeur!);
+    }
+    return stockListe;
+  }
+
+  Future<List<Stock>> fetchStockByCategorieAndActeur(String idActeur,
       {bool refresh = false}) async {
     if (isLoading == true) return [];
 
@@ -128,9 +143,8 @@ class _MyProductScreenState extends State<MyProductScreen> {
 
     try {
       final response = await http.get(Uri.parse(
-          '$apiOnlineUrl/Stock/getAllStocksByMagasinAndActeurWithPagination?idMagasin=$idMagasin&idActeur=$idActeur&page=${page}&size=${size}'));
-      debugPrint(
-          'page :  $apiOnlineUrl/Stock/getAllStocksByMagasinAndActeurWithPagination?idMagasin=$idMagasin&idActeur=$idActeur&page=${page}&size=${size}');
+          '$apiOnlineUrl/Stock/getStocksByCategorieAndActeur?idCategorie=${selectedCat!.idCategorieProduit}&idActeur=$idActeur&page=$page&size=$sized'));
+
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final List<dynamic> body = jsonData['content'];
@@ -140,14 +154,15 @@ class _MyProductScreenState extends State<MyProductScreen> {
             hasMore = false;
           });
         } else {
+          List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
           setState(() {
-            List<Stock> newStock = body.map((e) => Stock.fromMap(e)).toList();
-            stockListe.addAll(newStock);
+            stockListe.addAll(newStocks.where((newStock) => !stockListe
+                .any((existStock) => existStock.idStock == newStock.idStock)));
           });
         }
 
         debugPrint(
-            "response body all stock by acteur with pagination ${page} par défilement soit ${stockListe.length}");
+            "response body all stock by categorie and pays with pagination ${page} par défilement soit ${stockListe.length}");
       } else {
         print(
             'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
@@ -163,25 +178,6 @@ class _MyProductScreenState extends State<MyProductScreen> {
     return stockListe;
   }
 
-  // Future<List<Stock>> getAllStockByCategorie() async {
-  //   if (selectedCat != null) {
-  //     stockListe = await StockService().fetchStockByCategorieActeur(
-  //         selectedCat!.idCategorieProduit!, acteur.idActeur!);
-  //   }
-
-  //   return stockListe;
-  // }
-
-  Future<List<Stock>> fetchAllStock() async {
-    if (widget.id != null) {
-      stockListe =
-          await fetchStockByMagasinAndActeur(widget.id!, acteur.idActeur!);
-    } else {
-      stockListe = await StockService().fetchStockByActeur(acteur.idActeur!);
-    }
-    return stockListe;
-  }
-
   void verify() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     email = prefs.getString('emailActeur');
@@ -192,8 +188,9 @@ class _MyProductScreenState extends State<MyProductScreen> {
       type = typeActeurData.map((data) => data.libelle).join(', ');
       setState(() {
         isExist = true;
-        stockListeFuture = fetchAllStock();
-        // stockListeFuture1 = getAllStockByCategorie();
+        stockListeFuture = stockListeFuture1 = fetchAllStock();
+
+        stockListeFuture1 = fetchAllStockByCate();
       });
     } else {
       setState(() {
@@ -206,133 +203,43 @@ class _MyProductScreenState extends State<MyProductScreen> {
     if (scrollableController.position.pixels >=
             scrollableController.position.maxScrollExtent - 200 &&
         hasMore &&
-        !isLoading &&
-        widget.id == null) {
-      // if (selectedCat != null) {
-      // Incrementez la page et récupérez les stocks par catégorie
+        !isLoading) {
       debugPrint("yes - fetch stock by acteur");
       setState(() {
-        // Rafraîchir les données ici
         page++;
       });
       fetchStockByActeur(acteur.idActeur!).then((value) {
-        setState(() {
-          // Rafraîchir les données ici
-        });
+        setState(() {});
       });
-    } else if (scrollableController.position.pixels >=
-            scrollableController.position.maxScrollExtent - 200 &&
-        hasMore &&
-        !isLoading &&
-        widget.id != null) {
-      debugPrint("yes - fetch stock by magasin and acteur");
-      setState(() {
-        // Rafraîchir les données ici
-        page++;
-      });
-      fetchStockByMagasinAndActeur(widget.id!, acteur.idActeur!).then((value) {
-        setState(() {
-          // Rafraîchir les données ici
-        });
-      });
-    } else {
-      debugPrint("no");
     }
   }
 
-  // Future<List<Stock>> fetchStockByCat(String idActeur,
-  //     {bool refresh = false}) async {
-  //   if (isLoading == true) return [];
-
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-
-  //   if (refresh) {
-  //     setState(() {
-  //       stockListe.clear();
-  //       page = 0;
-  //       hasMore = true;
-  //     });
-  //   }
-
-  //   try {
-  //     final response = await http.get(Uri.parse(
-  //         '$apiOnlineUrl/Stock/getStocksByCategorieAndActeur?idCategorie=${selectedCat!.idCategorieProduit}&idActeur=$idActeur&page=$page&size=$size'));
-  //     debugPrint(
-  //         '$apiOnlineUrl/Stock/getStocksByCategorieAndActeur?idCategorie=${selectedCat!.idCategorieProduit}&idActeur=$idActeur&page=$page&size=$size');
-  //     if (response.statusCode == 200) {
-  //       final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
-  //       final List<dynamic> body = jsonData['content'];
-
-  //       if (body.isEmpty) {
-  //         setState(() {
-  //           hasMore = false;
-  //         });
-  //       } else {
-  //         List<Stock> newStocks = body.map((e) => Stock.fromMap(e)).toList();
-  //         setState(() {
-  //           stockListe.addAll(newStocks.where((newStock) => !stockListe
-  //               .any((existStock) => existStock.idStock == newStock.idStock)));
-  //         });
-  //       }
-
-  //       debugPrint(
-  //           "response body all stock by categorie and pays with pagination ${page} par défilement soit ${stockListe.length}");
-  //     } else {
-  //       print(
-  //           'Échec de la requête avec le code d\'état: ${response.statusCode} |  ${response.body}');
-  //     }
-  //   } catch (e) {
-  //     print(
-  //         'Une erreur s\'est produite lors de la récupération des stocks: $e');
-  //   } finally {
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //   }
-  //   return stockListe;
-  // }
-
-  // void _scrollListener1() {
-  //   if (scrollableController1.position.pixels >=
-  //           scrollableController1.position.maxScrollExtent - 200 &&
-  //       hasMore &&
-  //       !isLoading &&
-  //       selectedCat != null) {
-  //     // if (selectedCat != null) {
-  //     // Incrementez la page et récupérez les stocks par catégorie
-  //     debugPrint("yes - fetch by category and pays");
-  //     if (mounted)
-  //       setState(() {
-  //         // Rafraîchir les données ici
-  //         page++;
-  //       });
-
-  //     fetchStockByCat(acteur.idActeur!).then((value) {
-  //       setState(() {
-  //         // Rafraîchir les données ici
-  //         debugPrint("page inc all ${page}");
-  //       });
-  //     });
-  //   }
-  //   debugPrint("no");
-  // }
+  void _scrollListener1() {
+    if (scrollableController1.position.pixels >=
+            scrollableController1.position.maxScrollExtent - 200 &&
+        hasMore &&
+        !isLoading) {
+      debugPrint("yes - fetch stock by acteur");
+      setState(() {
+        page++;
+      });
+      fetchStockByCategorieAndActeur(acteur.idActeur!).then((value) {
+        setState(() {});
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      //write or call your logic
-      //code will run when widget rendering complete
       scrollableController.addListener(_scrollListener);
     });
 
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   //write or call your logic
-    //   //code will run when widget rendering complete
-    //   scrollableController1.addListener(_scrollListener1);
-    // });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollableController1.addListener(_scrollListener1);
+    });
+
     verify();
 
     _searchController = TextEditingController();
@@ -435,179 +342,157 @@ class _MyProductScreenState extends State<MyProductScreen> {
               onRefresh: () async {
                 setState(() {
                   page = 0;
-                  // stockListeFuture1 = getAllStockByCategorie();
-                  stockListeFuture = fetchAllStock();
+                  selectedCat != null
+                      ? stockListeFuture1 = fetchAllStock()
+                      : stockListeFuture = fetchAllStock();
                 });
                 debugPrint("refresh page ${page}");
               },
               child: Container(
                 child: NestedScrollView(
-                  headerSliverBuilder:
-                      (BuildContext context, bool innerBoxIsScrolled) {
-                    return <Widget>[
-                      SliverToBoxAdapter(
-                          child: Column(children: [
-                        const SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: ToggleButtons(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0),
-                                child: Text('Rechercher'),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0),
-                                child: Text('Filtrer'),
-                              ),
-                            ],
-                            isSelected: [isSearchMode, !isSearchMode],
-                            onPressed: (index) {
-                              setState(() {
-                                isSearchMode = index == 0;
-                              });
-                            },
-                          ),
-                        ),
-                        if (isSearchMode)
+                    headerSliverBuilder:
+                        (BuildContext context, bool innerBoxIsScrolled) {
+                      return <Widget>[
+                        SliverToBoxAdapter(
+                            child: Column(children: [
+                          const SizedBox(height: 10),
                           Padding(
                             padding: const EdgeInsets.all(10.0),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.blueGrey[50],
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.search,
-                                      color: Colors.blueGrey[400]),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: TextField(
-                                      controller: _searchController,
-                                      onChanged: (value) {
-                                        setState(() {});
-                                      },
-                                      decoration: InputDecoration(
-                                        hintText: 'Rechercher',
-                                        border: InputBorder.none,
-                                        hintStyle: TextStyle(
-                                            color: Colors.blueGrey[400]),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        if (!isSearchMode)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            child: FutureBuilder(
-                              future: _catList,
-                              builder: (_, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return buildLoadingDropdown();
-                                }
-
-                                if (snapshot.hasData) {
-                                  dynamic jsonString =
-                                      utf8.decode(snapshot.data.bodyBytes);
-                                  dynamic responseData =
-                                      json.decode(jsonString);
-
-                                  if (responseData is List) {
-                                    final reponse = responseData;
-                                    final typeList = reponse
-                                        .map((e) => CategorieProduit.fromMap(e))
-                                        .where((con) =>
-                                            con.statutCategorie == true)
-                                        .toList();
-
-                                    if (typeList.isEmpty) {
-                                      return buildEmptyDropdown();
-                                    }
-
-                                    return buildDropdown(typeList);
-                                  } else {
-                                    return buildEmptyDropdown();
-                                  }
-                                }
-
-                                return buildEmptyDropdown();
+                            child: ToggleButtons(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0),
+                                  child: Text('Rechercher'),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0),
+                                  child: Text('Filtrer'),
+                                ),
+                              ],
+                              isSelected: [isSearchMode, !isSearchMode],
+                              onPressed: (index) {
+                                setState(() {
+                                  isSearchMode = index == 0;
+                                });
                               },
                             ),
                           ),
-                        const SizedBox(height: 10),
-                      ])),
-                    ];
-                  },
-                  body: RefreshIndicator(
-                      onRefresh: () async {
-                        // selectedCat != null
-                        //     ? setState(() {
-                        //         stockListeFuture1 = StockService()
-                        //             .fetchStockByCategorieActeur(
-                        //                 selectedCat!.idCategorieProduit!,
-                        //                 acteur.idActeur!);
-                        //       })
-                        //     :
-                        setState(() {
-                          page = 0;
-
-                          stockListeFuture = StockService()
-                              .fetchStockByActeur(acteur.idActeur!);
-                        });
-                        debugPrint("refresh page ${page}");
-                      },
-                      child: SingleChildScrollView(
-                        controller: scrollableController,
-                        child: Consumer<StockService>(
-                            builder: (context, stockService, child) {
-                          return FutureBuilder<List<Stock>>(
-                              future: stockListeFuture,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return _buildShimmerEffect();
-                                }
-
-                                if (!snapshot.hasData) {
-                                  return SingleChildScrollView(
-                                    child: Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: Center(
-                                        child: Column(
-                                          children: [
-                                            Image.asset(
-                                                'assets/images/notif.jpg'),
-                                            SizedBox(
-                                              height: 10,
-                                            ),
-                                            Text(
-                                              'Aucun produit trouvé',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 17,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                          ],
+                          if (isSearchMode)
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                decoration: BoxDecoration(
+                                  color: Colors.blueGrey[50],
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.search,
+                                        color: Colors.blueGrey[400]),
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _searchController,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            setState(() {
+                                              page = 0;
+                                              selectedCat != null
+                                                  ? stockListeFuture1 =
+                                                      fetchAllStock()
+                                                  : stockListeFuture =
+                                                      fetchAllStock();
+                                            });
+                                          });
+                                        },
+                                        decoration: InputDecoration(
+                                          hintText: 'Rechercher',
+                                          border: InputBorder.none,
+                                          hintStyle: TextStyle(
+                                              color: Colors.blueGrey[400]),
                                         ),
                                       ),
                                     ),
-                                  );
-                                } else {
-                                  stockListe = snapshot.data!;
-                                  // Vous pouvez afficher une image ou un texte ici
+                                  ],
+                                ),
+                              ),
+                            ),
+                          if (!isSearchMode)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 20),
+                              child: FutureBuilder(
+                                future: _catList,
+                                builder: (_, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return buildLoadingDropdown();
+                                  }
 
-                                  if (stockListe.isEmpty) {
-                                    SingleChildScrollView(
+                                  if (snapshot.hasData) {
+                                    dynamic jsonString =
+                                        utf8.decode(snapshot.data.bodyBytes);
+                                    dynamic responseData =
+                                        json.decode(jsonString);
+
+                                    if (responseData is List) {
+                                      final reponse = responseData;
+                                      final typeList = reponse
+                                          .map((e) =>
+                                              CategorieProduit.fromMap(e))
+                                          .where((con) =>
+                                              con.statutCategorie == true)
+                                          .toList();
+
+                                      if (typeList.isEmpty) {
+                                        return buildEmptyDropdown();
+                                      }
+
+                                      return buildDropdown(typeList);
+                                    } else {
+                                      return buildEmptyDropdown();
+                                    }
+                                  }
+
+                                  return buildEmptyDropdown();
+                                },
+                              ),
+                            ),
+                          const SizedBox(height: 10),
+                        ])),
+                      ];
+                    },
+                    body: RefreshIndicator(
+                        onRefresh: () async {
+                          setState(() {
+                            page = 0;
+
+                            stockListeFuture = StockService()
+                                .fetchStockByActeur(acteur.idActeur!);
+                          });
+                          debugPrint("refresh page ${page}");
+                        },
+                        child: SingleChildScrollView(
+                          controller: selectedCat != null
+                              ? scrollableController1
+                              : scrollableController,
+                          child: Consumer<StockService>(
+                              builder: (context, stockService, child) {
+                            return FutureBuilder<List<Stock>>(
+                                future: selectedCat != null
+                                    ? stockListeFuture1
+                                    : stockListeFuture,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return _buildShimmerEffect();
+                                  }
+
+                                  if (!snapshot.hasData) {
+                                    return SingleChildScrollView(
                                       child: Padding(
                                         padding: EdgeInsets.all(10),
                                         child: Center(
@@ -619,7 +504,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                                 height: 10,
                                               ),
                                               Text(
-                                                'Aucun magasin trouvé',
+                                                'Aucun produit trouvé',
                                                 style: TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 17,
@@ -632,420 +517,891 @@ class _MyProductScreenState extends State<MyProductScreen> {
                                         ),
                                       ),
                                     );
-                                  }
-                                  String searchText = "";
-                                  List<Stock> filtereSearch =
-                                      stockListe.where((search) {
-                                    String libelle =
-                                        search.nomProduit!.toLowerCase();
-                                    searchText = _searchController.text
-                                        .trim()
-                                        .toLowerCase();
-                                    return libelle.contains(searchText);
-                                  }).toList();
-                                  if (filtereSearch.isEmpty &&
-                                      _searchController.text.isNotEmpty) {
-                                    SingleChildScrollView(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: Center(
-                                          child: Column(
-                                            children: [
-                                              Image.asset(
-                                                  'assets/images/notif.jpg'),
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                              Text(
-                                                'Aucun magasin trouvé',
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 17,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }
+                                  } else {
+                                    stockListe = snapshot.data!;
+                                    // Vous pouvez afficher une image ou un texte ici
 
-                                  return filtereSearch.isEmpty
-                                      ? SingleChildScrollView(
-                                          child: Padding(
-                                            padding: EdgeInsets.all(10),
-                                            child: Center(
-                                              child: Column(
-                                                children: [
-                                                  Image.asset(
-                                                      'assets/images/notif.jpg'),
-                                                  SizedBox(
-                                                    height: 10,
+                                    if (stockListe.isEmpty) {
+                                      SingleChildScrollView(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: Center(
+                                            child: Column(
+                                              children: [
+                                                Image.asset(
+                                                    'assets/images/notif.jpg'),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Text(
+                                                  'Aucun magasin trouvé',
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 17,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   ),
-                                                  Text(
-                                                    'Aucun produit trouvé',
-                                                    style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 17,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                        )
-                                      : GridView.builder(
-                                          shrinkWrap: true,
-                                          physics:
-                                              NeverScrollableScrollPhysics(),
-                                          gridDelegate:
-                                              SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 2,
-                                            mainAxisSpacing: 10,
-                                            crossAxisSpacing: 10,
-                                            childAspectRatio: 0.8,
+                                        ),
+                                      );
+                                    }
+                                    String searchText = "";
+                                    List<Stock> filtereSearch =
+                                        stockListe.where((search) {
+                                      String libelle =
+                                          search.nomProduit!.toLowerCase();
+                                      searchText = _searchController.text
+                                          .trim()
+                                          .toLowerCase();
+                                      return libelle.contains(searchText);
+                                    }).toList();
+                                    if (filtereSearch.isEmpty &&
+                                        _searchController.text.isNotEmpty) {
+                                      SingleChildScrollView(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: Center(
+                                            child: Column(
+                                              children: [
+                                                Image.asset(
+                                                    'assets/images/notif.jpg'),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Text(
+                                                  'Aucun magasin trouvé',
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 17,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                          itemCount: filtereSearch.length + 1,
-                                          itemBuilder: (context, index) {
-                                            if (index < filtereSearch.length) {
-                                              return GestureDetector(
-                                                  onTap: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            DetailProduits(
-                                                                stock:
-                                                                    filtereSearch[
-                                                                        index]),
+                                        ),
+                                      );
+                                    }
+
+                                    return filtereSearch.isEmpty
+                                        ? SingleChildScrollView(
+                                            child: Padding(
+                                              padding: EdgeInsets.all(10),
+                                              child: Center(
+                                                child: Column(
+                                                  children: [
+                                                    Image.asset(
+                                                        'assets/images/notif.jpg'),
+                                                    SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Text(
+                                                      'Aucun produit trouvé',
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 17,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
                                                       ),
-                                                    );
-                                                  },
-                                                  child: Card(
-                                                    margin: EdgeInsets.all(8),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .stretch,
-                                                      children: [
-                                                        ClipRRect(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      8.0),
-                                                          child: SizedBox(
-                                                            height: 72,
-                                                            child: filtereSearch[index]
-                                                                            .photo ==
-                                                                        null ||
-                                                                    filtereSearch[
-                                                                            index]
-                                                                        .photo!
-                                                                        .isEmpty
-                                                                ? Image.asset(
-                                                                    "assets/images/default_image.png",
-                                                                    fit: BoxFit
-                                                                        .cover,
-                                                                  )
-                                                                : CachedNetworkImage(
-                                                                    imageUrl:
-                                                                        "https://koumi.ml/api-koumi/Stock/${filtereSearch[index].idStock}/image",
-                                                                    fit: BoxFit
-                                                                        .cover,
-                                                                    placeholder: (context,
-                                                                            url) =>
-                                                                        const Center(
-                                                                            child:
-                                                                                CircularProgressIndicator()),
-                                                                    errorWidget: (context,
-                                                                            url,
-                                                                            error) =>
-                                                                        Image
-                                                                            .asset(
-                                                                      'assets/images/default_image.png',
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        : GridView.builder(
+                                            shrinkWrap: true,
+                                            physics:
+                                                NeverScrollableScrollPhysics(),
+                                            gridDelegate:
+                                                SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 2,
+                                              mainAxisSpacing: 10,
+                                              crossAxisSpacing: 10,
+                                              childAspectRatio: 0.8,
+                                            ),
+                                            itemCount: filtereSearch.length + 1,
+                                            itemBuilder: (context, index) {
+                                              if (index <
+                                                  filtereSearch.length) {
+                                                return GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              DetailProduits(
+                                                                  stock:
+                                                                      filtereSearch[
+                                                                          index]),
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: Card(
+                                                      margin: EdgeInsets.all(8),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .stretch,
+                                                        children: [
+                                                          ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8.0),
+                                                            child: SizedBox(
+                                                              height: 72,
+                                                              child: filtereSearch[index]
+                                                                              .photo ==
+                                                                          null ||
+                                                                      filtereSearch[
+                                                                              index]
+                                                                          .photo!
+                                                                          .isEmpty
+                                                                  ? Image.asset(
+                                                                      "assets/images/default_image.png",
                                                                       fit: BoxFit
                                                                           .cover,
-                                                                    ),
-                                                                  ),
-                                                          ),
-                                                        ),
-                                                        ListTile(
-                                                          title: Text(
-                                                            filtereSearch[index]
-                                                                .nomProduit!,
-                                                            style: TextStyle(
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                              fontSize: 15,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              color: Colors
-                                                                  .black87,
-                                                            ),
-                                                            maxLines: 2,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                          ),
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal:
-                                                                      15),
-                                                          child: Text(
-                                                            filtereSearch[index]
-                                                                        .monnaie !=
-                                                                    null
-                                                                ? "${filtereSearch[index].prix.toString()} ${filtereSearch[index].monnaie!.libelle}"
-                                                                : "${filtereSearch[index].prix.toString()} FCFA",
-                                                            style: TextStyle(
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                              fontSize: 15,
-                                                              color: Colors
-                                                                  .black87,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal:
-                                                                      8.0),
-                                                          child: Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              _buildEtat(
-                                                                  filtereSearch[
-                                                                          index]
-                                                                      .statutSotck!),
-                                                              SizedBox(
-                                                                  width: 100),
-                                                              Expanded(
-                                                                child:
-                                                                    PopupMenuButton<
-                                                                        String>(
-                                                                  padding:
-                                                                      EdgeInsets
-                                                                          .zero,
-                                                                  itemBuilder:
-                                                                      (context) =>
-                                                                          <PopupMenuEntry<
-                                                                              String>>[
-                                                                    PopupMenuItem<
-                                                                        String>(
-                                                                      child:
-                                                                          ListTile(
-                                                                        leading: filtereSearch[index].statutSotck ==
-                                                                                false
-                                                                            ? Icon(
-                                                                                Icons.check,
-                                                                                color: Colors.green,
-                                                                              )
-                                                                            : Icon(
-                                                                                Icons.disabled_visible,
-                                                                                color: Colors.orange[400],
-                                                                              ),
-                                                                        title:
-                                                                            Text(
-                                                                          filtereSearch[index].statutSotck == false
-                                                                              ? "Activer"
-                                                                              : "Desactiver",
-                                                                          style:
-                                                                              TextStyle(
-                                                                            color: filtereSearch[index].statutSotck == false
-                                                                                ? Colors.green
-                                                                                : Colors.orange[400],
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                          ),
-                                                                        ),
-                                                                        onTap:
-                                                                            () async {
-                                                                          // Changement d'état du magasin ici
-                                                                          filtereSearch[index].statutSotck == false
-                                                                              ? await StockService()
-                                                                                  .activerStock(filtereSearch[index].idStock!)
-                                                                                  .then((value) => {
-                                                                                        Provider.of<StockService>(context, listen: false).applyChange(),
-                                                                                        setState(() {
-                                                                                          page++;
-                                                                                          stockListeFuture = StockService().fetchStockByActeur(acteur.idActeur!);
-                                                                                        }),
-                                                                                        Navigator.of(context).pop(),
-                                                                                      })
-                                                                                  .catchError((onError) => {
-                                                                                        ScaffoldMessenger.of(context).showSnackBar(
-                                                                                          const SnackBar(
-                                                                                            content: Row(
-                                                                                              children: [
-                                                                                                Text("Une erreur s'est produite"),
-                                                                                              ],
-                                                                                            ),
-                                                                                            duration: Duration(seconds: 5),
-                                                                                          ),
-                                                                                        ),
-                                                                                        Navigator.of(context).pop(),
-                                                                                      })
-                                                                              : await StockService().desactiverStock(filtereSearch[index].idStock!).then((value) => {
-                                                                                    Provider.of<StockService>(context, listen: false).applyChange(),
-                                                                                    setState(() {
-                                                                                      page++;
-                                                                                      stockListeFuture = StockService().fetchStockByActeur(acteur.idActeur!);
-                                                                                    }),
-                                                                                    Navigator.of(context).pop(),
-                                                                                  });
-
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(SnackBar(
-                                                                            content:
-                                                                                Row(
-                                                                              children: [
-                                                                                Text(filtereSearch[index].statutSotck == false ? "Activer avec succèss " : "Desactiver avec succèss"),
-                                                                              ],
-                                                                            ),
-                                                                            duration:
-                                                                                Duration(seconds: 2),
-                                                                          ));
-                                                                        },
+                                                                    )
+                                                                  : CachedNetworkImage(
+                                                                      imageUrl:
+                                                                          "https://koumi.ml/api-koumi/Stock/${filtereSearch[index].idStock}/image",
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      placeholder: (context,
+                                                                              url) =>
+                                                                          const Center(
+                                                                              child: CircularProgressIndicator()),
+                                                                      errorWidget: (context,
+                                                                              url,
+                                                                              error) =>
+                                                                          Image
+                                                                              .asset(
+                                                                        'assets/images/default_image.png',
+                                                                        fit: BoxFit
+                                                                            .cover,
                                                                       ),
                                                                     ),
-                                                                    PopupMenuItem<
-                                                                        String>(
-                                                                      child:
-                                                                          ListTile(
-                                                                        leading:
-                                                                            const Icon(
-                                                                          Icons
-                                                                              .edit,
-                                                                          color:
-                                                                              Colors.green,
+                                                            ),
+                                                          ),
+                                                          ListTile(
+                                                            title: Text(
+                                                              filtereSearch[
+                                                                      index]
+                                                                  .nomProduit!,
+                                                              style: TextStyle(
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                fontSize: 15,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .black87,
+                                                              ),
+                                                              maxLines: 2,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        15),
+                                                            child: Text(
+                                                              filtereSearch[index]
+                                                                          .monnaie !=
+                                                                      null
+                                                                  ? "${filtereSearch[index].prix.toString()} ${filtereSearch[index].monnaie!.libelle}"
+                                                                  : "${filtereSearch[index].prix.toString()} FCFA",
+                                                              style: TextStyle(
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                fontSize: 15,
+                                                                color: Colors
+                                                                    .black87,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        8.0),
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                _buildEtat(
+                                                                    filtereSearch[
+                                                                            index]
+                                                                        .statutSotck!),
+                                                                SizedBox(
+                                                                    width: 100),
+                                                                Expanded(
+                                                                  child:
+                                                                      PopupMenuButton<
+                                                                          String>(
+                                                                    padding:
+                                                                        EdgeInsets
+                                                                            .zero,
+                                                                    itemBuilder:
+                                                                        (context) =>
+                                                                            <PopupMenuEntry<String>>[
+                                                                      PopupMenuItem<
+                                                                          String>(
+                                                                        child:
+                                                                            ListTile(
+                                                                          leading: filtereSearch[index].statutSotck == false
+                                                                              ? Icon(
+                                                                                  Icons.check,
+                                                                                  color: Colors.green,
+                                                                                )
+                                                                              : Icon(
+                                                                                  Icons.disabled_visible,
+                                                                                  color: Colors.orange[400],
+                                                                                ),
+                                                                          title:
+                                                                              Text(
+                                                                            filtereSearch[index].statutSotck == false
+                                                                                ? "Activer"
+                                                                                : "Desactiver",
+                                                                            style:
+                                                                                TextStyle(
+                                                                              color: filtereSearch[index].statutSotck == false ? Colors.green : Colors.orange[400],
+                                                                              fontWeight: FontWeight.bold,
+                                                                            ),
+                                                                          ),
+                                                                          onTap:
+                                                                              () async {
+                                                                            // Changement d'état du magasin ici
+                                                                            filtereSearch[index].statutSotck == false
+                                                                                ? await StockService()
+                                                                                    .activerStock(filtereSearch[index].idStock!)
+                                                                                    .then((value) => {
+                                                                                          Provider.of<StockService>(context, listen: false).applyChange(),
+                                                                                          setState(() {
+                                                                                            page++;
+                                                                                            stockListeFuture = StockService().fetchStockByActeur(acteur.idActeur!);
+                                                                                          }),
+                                                                                          Navigator.of(context).pop(),
+                                                                                        })
+                                                                                    .catchError((onError) => {
+                                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                                            const SnackBar(
+                                                                                              content: Row(
+                                                                                                children: [
+                                                                                                  Text("Une erreur s'est produite"),
+                                                                                                ],
+                                                                                              ),
+                                                                                              duration: Duration(seconds: 5),
+                                                                                            ),
+                                                                                          ),
+                                                                                          Navigator.of(context).pop(),
+                                                                                        })
+                                                                                : await StockService().desactiverStock(filtereSearch[index].idStock!).then((value) => {
+                                                                                      Provider.of<StockService>(context, listen: false).applyChange(),
+                                                                                      setState(() {
+                                                                                        page++;
+                                                                                        stockListeFuture = StockService().fetchStockByActeur(acteur.idActeur!);
+                                                                                      }),
+                                                                                      Navigator.of(context).pop(),
+                                                                                    });
+
+                                                                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                                              content: Row(
+                                                                                children: [
+                                                                                  Text(filtereSearch[index].statutSotck == false ? "Activer avec succèss " : "Desactiver avec succèss"),
+                                                                                ],
+                                                                              ),
+                                                                              duration: Duration(seconds: 2),
+                                                                            ));
+                                                                          },
                                                                         ),
-                                                                        title:
-                                                                            const Text(
-                                                                          "Modifier la quantité",
-                                                                          style:
-                                                                              TextStyle(
+                                                                      ),
+                                                                      PopupMenuItem<
+                                                                          String>(
+                                                                        child:
+                                                                            ListTile(
+                                                                          leading:
+                                                                              const Icon(
+                                                                            Icons.edit,
                                                                             color:
                                                                                 Colors.green,
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
                                                                           ),
-                                                                        ),
-                                                                        onTap:
-                                                                            () async {
-                                                                          Navigator.of(context)
-                                                                              .pop();
+                                                                          title:
+                                                                              const Text(
+                                                                            "Modifier la quantité",
+                                                                            style:
+                                                                                TextStyle(
+                                                                              color: Colors.green,
+                                                                              fontWeight: FontWeight.bold,
+                                                                            ),
+                                                                          ),
+                                                                          onTap:
+                                                                              () async {
+                                                                            Navigator.of(context).pop();
 
-                                                                          afficherBottomSheet(
-                                                                              context,
-                                                                              filtereSearch[index]);
-                                                                        },
-                                                                      ),
-                                                                    ),
-                                                                    PopupMenuItem<
-                                                                        String>(
-                                                                      child:
-                                                                          ListTile(
-                                                                        leading:
-                                                                            const Icon(
-                                                                          Icons
-                                                                              .delete,
-                                                                          color:
-                                                                              Colors.red,
+                                                                           var updateQte =  afficherBottomSheet(context,
+                                                                                filtereSearch[index]);
+                                                                            Provider.of<StockService>(context, listen: false).applyChange();
+                                                                          //  if(  updateQte != null){
+                                                                          //     Provider.of<StockService>(context, listen: false).applyChange(),
+                                                                          //             setState(() {
+                                                                          //               page++;
+                                                                          //               stockListeFuture = StockService().fetchStockByActeur(acteur.idActeur!);
+                                                                          //             });
+                                                                          //  }
+                                                                          },
                                                                         ),
-                                                                        title:
-                                                                            const Text(
-                                                                          "Supprimer",
-                                                                          style:
-                                                                              TextStyle(
+                                                                      ),
+                                                                      PopupMenuItem<
+                                                                          String>(
+                                                                        child:
+                                                                            ListTile(
+                                                                          leading:
+                                                                              const Icon(
+                                                                            Icons.delete,
                                                                             color:
                                                                                 Colors.red,
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
                                                                           ),
+                                                                          title:
+                                                                              const Text(
+                                                                            "Supprimer",
+                                                                            style:
+                                                                                TextStyle(
+                                                                              color: Colors.red,
+                                                                              fontWeight: FontWeight.bold,
+                                                                            ),
+                                                                          ),
+                                                                          onTap:
+                                                                              () async {
+                                                                            await StockService()
+                                                                                .deleteStock(filtereSearch[index].idStock!)
+                                                                                .then((value) => {
+                                                                                      Provider.of<StockService>(context, listen: false).applyChange(),
+                                                                                      setState(() {
+                                                                                        page++;
+                                                                                        stockListeFuture = StockService().fetchStockByActeur(acteur.idActeur!);
+                                                                                      }),
+                                                                                      Navigator.of(context).pop(),
+                                                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                                                        const SnackBar(
+                                                                                          content: Row(
+                                                                                            children: [
+                                                                                              Text("Produit supprimer avec succès"),
+                                                                                            ],
+                                                                                          ),
+                                                                                          duration: Duration(seconds: 2),
+                                                                                        ),
+                                                                                      )
+                                                                                    })
+                                                                                .catchError((onError) => {
+                                                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                                                        const SnackBar(
+                                                                                          content: Row(
+                                                                                            children: [
+                                                                                              Text("Impossible de supprimer"),
+                                                                                            ],
+                                                                                          ),
+                                                                                          duration: Duration(seconds: 2),
+                                                                                        ),
+                                                                                      )
+                                                                                    });
+                                                                          },
                                                                         ),
-                                                                        onTap:
-                                                                            () async {
-                                                                          await StockService()
-                                                                              .deleteStock(filtereSearch[index].idStock!)
-                                                                              .then((value) => {
-                                                                                    Provider.of<StockService>(context, listen: false).applyChange(),
-                                                                                    setState(() {
-                                                                                      page++;
-                                                                                      stockListeFuture = StockService().fetchStockByActeur(acteur.idActeur!);
-                                                                                    }),
-                                                                                    Navigator.of(context).pop(),
-                                                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                                                      const SnackBar(
-                                                                                        content: Row(
-                                                                                          children: [
-                                                                                            Text("Produit supprimer avec succès"),
-                                                                                          ],
-                                                                                        ),
-                                                                                        duration: Duration(seconds: 2),
-                                                                                      ),
-                                                                                    )
-                                                                                  })
-                                                                              .catchError((onError) => {
-                                                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                                                      const SnackBar(
-                                                                                        content: Row(
-                                                                                          children: [
-                                                                                            Text("Impossible de supprimer"),
-                                                                                          ],
-                                                                                        ),
-                                                                                        duration: Duration(seconds: 2),
-                                                                                      ),
-                                                                                    )
-                                                                                  });
-                                                                        },
                                                                       ),
-                                                                    ),
-                                                                  ],
+                                                                    ],
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                            ],
+                                                              ],
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ));
-                                            } else {
-                                              return isLoading == true
-                                                  ? Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 32),
-                                                      child: Center(
-                                                          child: const Center(
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                          color: Colors.orange,
-                                                        ),
-                                                      )),
-                                                    )
-                                                  : Container();
-                                            }
-                                          },
-                                        );
-                                }
-                              });
-                        }),
-                      )),
-                ),
+                                                        ],
+                                                      ),
+                                                    ));
+                                              } else {
+                                                return isLoading == true
+                                                    ? Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 32),
+                                                        child: Center(
+                                                            child: const Center(
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                            color:
+                                                                Colors.orange,
+                                                          ),
+                                                        )),
+                                                      )
+                                                    : Container();
+                                              }
+                                            },
+                                          );
+                                  }
+                                });
+                          }),
+                        )
+                        //  SingleChildScrollView(
+                        //           controller: scrollableController,
+                        //           child: Consumer<StockService>(
+                        //               builder: (context, stockService, child) {
+                        //             return FutureBuilder<List<Stock>>(
+                        //                 future: stockListeFuture,
+                        //                 builder: (context, snapshot) {
+                        //                   if (snapshot.connectionState ==
+                        //                       ConnectionState.waiting) {
+                        //                     return _buildShimmerEffect();
+                        //                   }
+
+                        //                   if (!snapshot.hasData) {
+                        //                     return SingleChildScrollView(
+                        //                       child: Padding(
+                        //                         padding: EdgeInsets.all(10),
+                        //                         child: Center(
+                        //                           child: Column(
+                        //                             children: [
+                        //                               Image.asset(
+                        //                                   'assets/images/notif.jpg'),
+                        //                               SizedBox(
+                        //                                 height: 10,
+                        //                               ),
+                        //                               Text(
+                        //                                 'Aucun produit trouvé',
+                        //                                 style: TextStyle(
+                        //                                   color: Colors.black,
+                        //                                   fontSize: 17,
+                        //                                   overflow: TextOverflow
+                        //                                       .ellipsis,
+                        //                                 ),
+                        //                               ),
+                        //                             ],
+                        //                           ),
+                        //                         ),
+                        //                       ),
+                        //                     );
+                        //                   } else {
+                        //                     stockListe = snapshot.data!;
+                        //                     // Vous pouvez afficher une image ou un texte ici
+
+                        //                     if (stockListe.isEmpty) {
+                        //                       SingleChildScrollView(
+                        //                         child: Padding(
+                        //                           padding: EdgeInsets.all(10),
+                        //                           child: Center(
+                        //                             child: Column(
+                        //                               children: [
+                        //                                 Image.asset(
+                        //                                     'assets/images/notif.jpg'),
+                        //                                 SizedBox(
+                        //                                   height: 10,
+                        //                                 ),
+                        //                                 Text(
+                        //                                   'Aucun magasin trouvé',
+                        //                                   style: TextStyle(
+                        //                                     color: Colors.black,
+                        //                                     fontSize: 17,
+                        //                                     overflow: TextOverflow
+                        //                                         .ellipsis,
+                        //                                   ),
+                        //                                 ),
+                        //                               ],
+                        //                             ),
+                        //                           ),
+                        //                         ),
+                        //                       );
+                        //                     }
+                        //                     String searchText = "";
+                        //                     List<Stock> filtereSearch =
+                        //                         stockListe.where((search) {
+                        //                       String libelle = search.nomProduit!
+                        //                           .toLowerCase();
+                        //                       searchText = _searchController.text
+                        //                           .trim()
+                        //                           .toLowerCase();
+                        //                       return libelle.contains(searchText);
+                        //                     }).toList();
+                        //                     if (filtereSearch.isEmpty &&
+                        //                         _searchController
+                        //                             .text.isNotEmpty) {
+                        //                       SingleChildScrollView(
+                        //                         child: Padding(
+                        //                           padding: EdgeInsets.all(10),
+                        //                           child: Center(
+                        //                             child: Column(
+                        //                               children: [
+                        //                                 Image.asset(
+                        //                                     'assets/images/notif.jpg'),
+                        //                                 SizedBox(
+                        //                                   height: 10,
+                        //                                 ),
+                        //                                 Text(
+                        //                                   'Aucun magasin trouvé',
+                        //                                   style: TextStyle(
+                        //                                     color: Colors.black,
+                        //                                     fontSize: 17,
+                        //                                     overflow: TextOverflow
+                        //                                         .ellipsis,
+                        //                                   ),
+                        //                                 ),
+                        //                               ],
+                        //                             ),
+                        //                           ),
+                        //                         ),
+                        //                       );
+                        //                     }
+
+                        //                     return filtereSearch.isEmpty
+                        //                         ? SingleChildScrollView(
+                        //                             child: Padding(
+                        //                               padding: EdgeInsets.all(10),
+                        //                               child: Center(
+                        //                                 child: Column(
+                        //                                   children: [
+                        //                                     Image.asset(
+                        //                                         'assets/images/notif.jpg'),
+                        //                                     SizedBox(
+                        //                                       height: 10,
+                        //                                     ),
+                        //                                     Text(
+                        //                                       'Aucun produit trouvé',
+                        //                                       style: TextStyle(
+                        //                                         color:
+                        //                                             Colors.black,
+                        //                                         fontSize: 17,
+                        //                                         overflow:
+                        //                                             TextOverflow
+                        //                                                 .ellipsis,
+                        //                                       ),
+                        //                                     ),
+                        //                                   ],
+                        //                                 ),
+                        //                               ),
+                        //                             ),
+                        //                           )
+                        //                         : GridView.builder(
+                        //                             shrinkWrap: true,
+                        //                             physics:
+                        //                                 NeverScrollableScrollPhysics(),
+                        //                             gridDelegate:
+                        //                                 SliverGridDelegateWithFixedCrossAxisCount(
+                        //                               crossAxisCount: 2,
+                        //                               mainAxisSpacing: 10,
+                        //                               crossAxisSpacing: 10,
+                        //                               childAspectRatio: 0.8,
+                        //                             ),
+                        //                             itemCount:
+                        //                                 filtereSearch.length + 1,
+                        //                             itemBuilder:
+                        //                                 (context, index) {
+                        //                               if (index <
+                        //                                   filtereSearch.length) {
+                        //                                 return GestureDetector(
+                        //                                     onTap: () {
+                        //                                       Navigator.push(
+                        //                                         context,
+                        //                                         MaterialPageRoute(
+                        //                                           builder: (context) =>
+                        //                                               DetailProduits(
+                        //                                                   stock: filtereSearch[
+                        //                                                       index]),
+                        //                                         ),
+                        //                                       );
+                        //                                     },
+                        //                                     child: Card(
+                        //                                       margin:
+                        //                                           EdgeInsets.all(
+                        //                                               8),
+                        //                                       child: Column(
+                        //                                         crossAxisAlignment:
+                        //                                             CrossAxisAlignment
+                        //                                                 .stretch,
+                        //                                         children: [
+                        //                                           ClipRRect(
+                        //                                             borderRadius:
+                        //                                                 BorderRadius
+                        //                                                     .circular(
+                        //                                                         8.0),
+                        //                                             child:
+                        //                                                 SizedBox(
+                        //                                               height: 72,
+                        //                                               child: filtereSearch[index].photo ==
+                        //                                                           null ||
+                        //                                                       filtereSearch[index]
+                        //                                                           .photo!
+                        //                                                           .isEmpty
+                        //                                                   ? Image
+                        //                                                       .asset(
+                        //                                                       "assets/images/default_image.png",
+                        //                                                       fit:
+                        //                                                           BoxFit.cover,
+                        //                                                     )
+                        //                                                   : CachedNetworkImage(
+                        //                                                       imageUrl:
+                        //                                                           "https://koumi.ml/api-koumi/Stock/${filtereSearch[index].idStock}/image",
+                        //                                                       fit:
+                        //                                                           BoxFit.cover,
+                        //                                                       placeholder: (context, url) =>
+                        //                                                           const Center(child: CircularProgressIndicator()),
+                        //                                                       errorWidget: (context, url, error) =>
+                        //                                                           Image.asset(
+                        //                                                         'assets/images/default_image.png',
+                        //                                                         fit: BoxFit.cover,
+                        //                                                       ),
+                        //                                                     ),
+                        //                                             ),
+                        //                                           ),
+                        //                                           ListTile(
+                        //                                             title: Text(
+                        //                                               filtereSearch[
+                        //                                                       index]
+                        //                                                   .nomProduit!,
+                        //                                               style:
+                        //                                                   TextStyle(
+                        //                                                 overflow:
+                        //                                                     TextOverflow
+                        //                                                         .ellipsis,
+                        //                                                 fontSize:
+                        //                                                     15,
+                        //                                                 fontWeight:
+                        //                                                     FontWeight
+                        //                                                         .bold,
+                        //                                                 color: Colors
+                        //                                                     .black87,
+                        //                                               ),
+                        //                                               maxLines: 2,
+                        //                                               overflow:
+                        //                                                   TextOverflow
+                        //                                                       .ellipsis,
+                        //                                             ),
+                        //                                           ),
+                        //                                           Padding(
+                        //                                             padding: const EdgeInsets
+                        //                                                 .symmetric(
+                        //                                                 horizontal:
+                        //                                                     15),
+                        //                                             child: Text(
+                        //                                               filtereSearch[index].monnaie !=
+                        //                                                       null
+                        //                                                   ? "${filtereSearch[index].prix.toString()} ${filtereSearch[index].monnaie!.libelle}"
+                        //                                                   : "${filtereSearch[index].prix.toString()} FCFA",
+                        //                                               style:
+                        //                                                   TextStyle(
+                        //                                                 overflow:
+                        //                                                     TextOverflow
+                        //                                                         .ellipsis,
+                        //                                                 fontSize:
+                        //                                                     15,
+                        //                                                 color: Colors
+                        //                                                     .black87,
+                        //                                               ),
+                        //                                             ),
+                        //                                           ),
+                        //                                           Padding(
+                        //                                             padding: const EdgeInsets
+                        //                                                 .symmetric(
+                        //                                                 horizontal:
+                        //                                                     8.0),
+                        //                                             child: Row(
+                        //                                               mainAxisAlignment:
+                        //                                                   MainAxisAlignment
+                        //                                                       .spaceBetween,
+                        //                                               children: [
+                        //                                                 _buildEtat(
+                        //                                                     filtereSearch[index]
+                        //                                                         .statutSotck!),
+                        //                                                 SizedBox(
+                        //                                                     width:
+                        //                                                         100),
+                        //                                                 Expanded(
+                        //                                                   child: PopupMenuButton<
+                        //                                                       String>(
+                        //                                                     padding:
+                        //                                                         EdgeInsets.zero,
+                        //                                                     itemBuilder: (context) =>
+                        //                                                         <PopupMenuEntry<String>>[
+                        //                                                       PopupMenuItem<String>(
+                        //                                                         child: ListTile(
+                        //                                                           leading: filtereSearch[index].statutSotck == false
+                        //                                                               ? Icon(
+                        //                                                                   Icons.check,
+                        //                                                                   color: Colors.green,
+                        //                                                                 )
+                        //                                                               : Icon(
+                        //                                                                   Icons.disabled_visible,
+                        //                                                                   color: Colors.orange[400],
+                        //                                                                 ),
+                        //                                                           title: Text(
+                        //                                                             filtereSearch[index].statutSotck == false ? "Activer" : "Desactiver",
+                        //                                                             style: TextStyle(
+                        //                                                               color: filtereSearch[index].statutSotck == false ? Colors.green : Colors.orange[400],
+                        //                                                               fontWeight: FontWeight.bold,
+                        //                                                             ),
+                        //                                                           ),
+                        //                                                           onTap: () async {
+                        //                                                             // Changement d'état du magasin ici
+                        //                                                             filtereSearch[index].statutSotck == false
+                        //                                                                 ? await StockService()
+                        //                                                                     .activerStock(filtereSearch[index].idStock!)
+                        //                                                                     .then((value) => {
+                        //                                                                           Provider.of<StockService>(context, listen: false).applyChange(),
+                        //                                                                           setState(() {
+                        //                                                                             page++;
+                        //                                                                             stockListeFuture = StockService().fetchStockByActeur(acteur.idActeur!);
+                        //                                                                           }),
+                        //                                                                           Navigator.of(context).pop(),
+                        //                                                                         })
+                        //                                                                     .catchError((onError) => {
+                        //                                                                           ScaffoldMessenger.of(context).showSnackBar(
+                        //                                                                             const SnackBar(
+                        //                                                                               content: Row(
+                        //                                                                                 children: [
+                        //                                                                                   Text("Une erreur s'est produite"),
+                        //                                                                                 ],
+                        //                                                                               ),
+                        //                                                                               duration: Duration(seconds: 5),
+                        //                                                                             ),
+                        //                                                                           ),
+                        //                                                                           Navigator.of(context).pop(),
+                        //                                                                         })
+                        //                                                                 : await StockService().desactiverStock(filtereSearch[index].idStock!).then((value) => {
+                        //                                                                       Provider.of<StockService>(context, listen: false).applyChange(),
+                        //                                                                       setState(() {
+                        //                                                                         page++;
+                        //                                                                         stockListeFuture = StockService().fetchStockByActeur(acteur.idActeur!);
+                        //                                                                       }),
+                        //                                                                       Navigator.of(context).pop(),
+                        //                                                                     });
+
+                        //                                                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        //                                                               content: Row(
+                        //                                                                 children: [
+                        //                                                                   Text(filtereSearch[index].statutSotck == false ? "Activer avec succèss " : "Desactiver avec succèss"),
+                        //                                                                 ],
+                        //                                                               ),
+                        //                                                               duration: Duration(seconds: 2),
+                        //                                                             ));
+                        //                                                           },
+                        //                                                         ),
+                        //                                                       ),
+                        //                                                       PopupMenuItem<String>(
+                        //                                                         child: ListTile(
+                        //                                                           leading: const Icon(
+                        //                                                             Icons.edit,
+                        //                                                             color: Colors.green,
+                        //                                                           ),
+                        //                                                           title: const Text(
+                        //                                                             "Modifier la quantité",
+                        //                                                             style: TextStyle(
+                        //                                                               color: Colors.green,
+                        //                                                               fontWeight: FontWeight.bold,
+                        //                                                             ),
+                        //                                                           ),
+                        //                                                           onTap: () async {
+                        //                                                             Navigator.of(context).pop();
+
+                        //                                                             afficherBottomSheet(context, filtereSearch[index]);
+                        //                                                           },
+                        //                                                         ),
+                        //                                                       ),
+                        //                                                       PopupMenuItem<String>(
+                        //                                                         child: ListTile(
+                        //                                                           leading: const Icon(
+                        //                                                             Icons.delete,
+                        //                                                             color: Colors.red,
+                        //                                                           ),
+                        //                                                           title: const Text(
+                        //                                                             "Supprimer",
+                        //                                                             style: TextStyle(
+                        //                                                               color: Colors.red,
+                        //                                                               fontWeight: FontWeight.bold,
+                        //                                                             ),
+                        //                                                           ),
+                        //                                                           onTap: () async {
+                        //                                                             await StockService()
+                        //                                                                 .deleteStock(filtereSearch[index].idStock!)
+                        //                                                                 .then((value) => {
+                        //                                                                       Provider.of<StockService>(context, listen: false).applyChange(),
+                        //                                                                       setState(() {
+                        //                                                                         page++;
+                        //                                                                         stockListeFuture = StockService().fetchStockByActeur(acteur.idActeur!);
+                        //                                                                       }),
+                        //                                                                       Navigator.of(context).pop(),
+                        //                                                                       ScaffoldMessenger.of(context).showSnackBar(
+                        //                                                                         const SnackBar(
+                        //                                                                           content: Row(
+                        //                                                                             children: [
+                        //                                                                               Text("Produit supprimer avec succès"),
+                        //                                                                             ],
+                        //                                                                           ),
+                        //                                                                           duration: Duration(seconds: 2),
+                        //                                                                         ),
+                        //                                                                       )
+                        //                                                                     })
+                        //                                                                 .catchError((onError) => {
+                        //                                                                       ScaffoldMessenger.of(context).showSnackBar(
+                        //                                                                         const SnackBar(
+                        //                                                                           content: Row(
+                        //                                                                             children: [
+                        //                                                                               Text("Impossible de supprimer"),
+                        //                                                                             ],
+                        //                                                                           ),
+                        //                                                                           duration: Duration(seconds: 2),
+                        //                                                                         ),
+                        //                                                                       )
+                        //                                                                     });
+                        //                                                           },
+                        //                                                         ),
+                        //                                                       ),
+                        //                                                     ],
+                        //                                                   ),
+                        //                                                 ),
+                        //                                               ],
+                        //                                             ),
+                        //                                           ),
+                        //                                         ],
+                        //                                       ),
+                        //                                     ));
+                        //                               } else {
+                        //                                 return isLoading == true
+                        //                                     ? Padding(
+                        //                                         padding:
+                        //                                             const EdgeInsets
+                        //                                                 .symmetric(
+                        //                                                 horizontal:
+                        //                                                     32),
+                        //                                         child: Center(
+                        //                                             child:
+                        //                                                 const Center(
+                        //                                           child:
+                        //                                               CircularProgressIndicator(
+                        //                                             color: Colors
+                        //                                                 .orange,
+                        //                                           ),
+                        //                                         )),
+                        //                                       )
+                        //                                     : Container();
+                        //                               }
+                        //                             },
+                        //                           );
+                        //                   }
+                        //                 });
+                        //           }),
+                        //         )
+                        )),
               ),
             ),
     );
@@ -1130,6 +1486,35 @@ class _MyProductScreenState extends State<MyProductScreen> {
     );
   }
 
+// Méthode pour afficher la feuille inférieure (bottom sheet)
+  void afficherBottomSheet(BuildContext context, Stock? stock) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 3,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: DialodEdit(stock: stock)),
+        );
+      },
+    );
+  }
+
   DropdownButtonFormField<String> buildDropdown(
       List<CategorieProduit> typeList) {
     return DropdownButtonFormField<String>(
@@ -1140,7 +1525,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
                 child: Text(e.libelleCategorie!),
               ))
           .toList(),
-      hint: Text("-- Filtre par catégorie --"),
+      hint: Text("-- Filtre par categorie --"),
       value: typeValue,
       onChanged: (newValue) {
         setState(() {
@@ -1152,12 +1537,12 @@ class _MyProductScreenState extends State<MyProductScreen> {
           }
           page = 0;
           hasMore = true;
-          // fetchStockByCat(acteur.idActeur!, refresh: true);
-          // if (page == 0 && isLoading == true) {
-          //   SchedulerBinding.instance.addPostFrameCallback((_) {
-          //     scrollableController1.jumpTo(0.0);
-          //   });
-          // }
+          fetchStockByCategorieAndActeur(acteur.idActeur!, refresh: true);
+          if (page == 0 && isLoading == true) {
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              scrollableController1.jumpTo(0.0);
+            });
+          }
         });
       },
       decoration: InputDecoration(
@@ -1175,7 +1560,7 @@ class _MyProductScreenState extends State<MyProductScreen> {
       items: [],
       onChanged: null,
       decoration: InputDecoration(
-        labelText: '-- Aucun catégorie trouvé --',
+        labelText: '-- Aucun categorie trouvé --',
         contentPadding:
             const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         border: OutlineInputBorder(
@@ -1199,36 +1584,6 @@ class _MyProductScreenState extends State<MyProductScreen> {
       ),
     );
   }
-
-// Méthode pour afficher la feuille inférieure (bottom sheet)
-  void afficherBottomSheet(BuildContext context, Stock? stock) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return SingleChildScrollView(
-          child: Container(
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 3,
-                  blurRadius: 7,
-                  offset: Offset(0, 3),
-                ),
-              ],
-            ),
-            child: DialodEdit(stock: stock),
-          ),
-        );
-      },
-    );
-  }
 }
 
 class DialodEdit extends StatefulWidget {
@@ -1243,6 +1598,7 @@ class _DialodEditState extends State<DialodEdit> {
   TextEditingController quantiteController = TextEditingController();
   late Stock stocks;
   String? idStock;
+   bool _isLoading = false;
   final formkey = GlobalKey<FormState>();
 
   @override
@@ -1255,120 +1611,136 @@ class _DialodEditState extends State<DialodEdit> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 250,
-      child: Form(
-          key: formkey,
-          child: Column(children: [
-            Text(
-              "Modification de la quantité",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 20),
-            TextFormField(
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return "Veuillez remplir ce champ";
-                }
-                return null;
-              },
-              controller: quantiteController,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(
-                labelText: "Quantité",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+    return LoadingOverlay(
+      isLoading: _isLoading,
+      child: Container(
+        height: 250,
+        child: Form(
+            key: formkey,
+            child: Column(children: [
+              Text(
+                "Modification de la quantité",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Veuillez remplir ce champ";
+                  }
+                  return null;
+                },
+                controller: quantiteController,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                decoration: InputDecoration(
+                  labelText: "Quantité",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 30),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    final qte = quantiteController.text;
-
-                    final qteF = double.tryParse(qte);
-                    print(qte);
-                    if (formkey.currentState!.validate()) {
-                      try {
-                        await StockService()
-                            .updateQuantiteStock(
-                                id: stocks.idStock!, quantite: qteF!)
-                            .then((value) => {
-                                Navigator.of(context).pop(),
-                                  Provider.of<StockService>(context,
-                                          listen: false)
-                                      .applyChange(),
-                                       ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Row(
-                              children: [
-                                Text("Quantité modifier avec success"),
-                              ],
+              SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      final qte = quantiteController.text;
+      
+                      final qteF = double.tryParse(qte);
+                      print(qte);
+                      if (formkey.currentState!.validate()) {
+                        try {
+                            setState(() {
+                            _isLoading = true;
+                          });
+                          await StockService()
+                              .updateQuantiteStock(
+                                  id: stocks.idStock!, quantite: qteF!)
+                              .then((value) => {
+                                  setState(() {
+                        _isLoading = false;
+                      }),
+                                   
+                                  
+                                        Provider.of<StockService>(context, listen: false).applyChange(),
+                                         Navigator.of(context).pop(),
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Row(
+                                          children: [
+                                            Text(
+                                                "Quantité modifier avec success"),
+                                          ],
+                                        ),
+                                        duration: Duration(seconds: 5),
+                                      ),
+                                    )
+                                  })
+                              .catchError((onError) => {  setState(() {
+                        _isLoading = false;
+                      }),
+                      print(onError)});
+                        } catch (e) {
+                            setState(() {
+                            _isLoading = false;
+                          });
+                          final String errorMessage = e.toString();
+                          print(errorMessage);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Row(
+                                children: [
+                                  Text("Une erreur s'est produit"),
+                                ],
+                              ),
+                              duration: Duration(seconds: 5),
                             ),
-                            duration: Duration(seconds: 5),
-                          ),
-                        )
-                                })
-                            .catchError((onError) => {print(onError)});
-                      } catch (e) {
-                        final String errorMessage = e.toString();
-                        print(errorMessage);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Row(
-                              children: [
-                                Text("Une erreur s'est produit"),
-                              ],
-                            ),
-                            duration: Duration(seconds: 5),
-                          ),
-                        );
+                          );
+                        }
                       }
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: d_colorGreen,
-
-                    // fixedSize: 10,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: d_colorGreen,
+      
+                      // fixedSize: 10,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 25),
                     ),
-                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 25),
-                  ),
-                  child: Text(
-                    "Modifier",
-                    style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red, // Background color
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                    child: Text(
+                      "Modifier",
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold),
                     ),
-                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 25),
                   ),
-                  child: Text(
-                    "Annuler",
-                    style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold),
+                  ElevatedButton(
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red, // Background color
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 25),
+                    ),
+                    child: Text(
+                      "Annuler",
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
-                ),
-              ],
-            )
-          ])),
+                ],
+              )
+            ])),
+      ),
     );
   }
 }

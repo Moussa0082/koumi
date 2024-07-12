@@ -32,8 +32,6 @@ class _SpeculationPageState extends State<SpeculationPage> {
   late Future<List<Stock>> _listeStock;
   late TextEditingController _searchController;
 
-  
-
   @override
   void initState() {
     acteur = Provider.of<ActeurProvider>(context, listen: false).acteur!;
@@ -43,11 +41,12 @@ class _SpeculationPageState extends State<SpeculationPage> {
     super.initState();
   }
 
-Future<List<Speculation>> getCatListe() async {
-    return await SpeculationService().fetchSpeculationByCategorie(widget.categorieProduit.idCategorieProduit!);
+  Future<List<Speculation>> getCatListe() async {
+    return await SpeculationService().fetchSpeculationByCategorie(
+        widget.categorieProduit.idCategorieProduit!);
   }
 
-Future<List<Stock>> getCatListeStock(String id) async {
+  Future<List<Stock>> getCatListeStock(String id) async {
     return await StockService().fetchStockBySpeculation(id);
   }
 
@@ -72,7 +71,6 @@ Future<List<Stock>> getCatListeStock(String id) async {
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
           title: Column(
             children: [
-              
               Text(
                 cat.libelleCategorie!.toUpperCase(),
                 style: TextStyle(
@@ -84,34 +82,33 @@ Future<List<Stock>> getCatListeStock(String id) async {
             ],
           ),
           actions: [
-                PopupMenuButton<String>(
-                padding: EdgeInsets.zero,
-                itemBuilder: (context) {
-                  return <PopupMenuEntry<String>>[
-                    PopupMenuItem<String>(
-                      child: ListTile(
-                        leading: const Icon(
-                          Icons.add,
-                          color: Colors.green,
-                        ),
-                        title: const Text(
-                          "Ajouter une spéculation ",
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        onTap: () async {
-                          Navigator.of(context).pop();
-                          _showDialog();
-                        },
+            PopupMenuButton<String>(
+              padding: EdgeInsets.zero,
+              itemBuilder: (context) {
+                return <PopupMenuEntry<String>>[
+                  PopupMenuItem<String>(
+                    child: ListTile(
+                      leading: const Icon(
+                        Icons.add,
+                        color: Colors.green,
                       ),
+                      title: const Text(
+                        "Ajouter une spéculation ",
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onTap: () async {
+                        Navigator.of(context).pop();
+                        _showBottomSheet();
+                      },
                     ),
-                  ];
-                },
-              )
-           
+                  ),
+                ];
+              },
+            )
           ],
         ),
         body: SingleChildScrollView(
@@ -156,28 +153,25 @@ Future<List<Stock>> getCatListeStock(String id) async {
               FutureBuilder(
                   future: _liste,
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState ==
-                        ConnectionState.waiting) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
                         child: CircularProgressIndicator(
                           color: Colors.orange,
                         ),
                       );
                     }
-              
+
                     if (!snapshot.hasData) {
                       return const Padding(
                         padding: EdgeInsets.all(10),
-                        child: Center(
-                            child: Text("Aucune spéculation trouvé")),
+                        child: Center(child: Text("Aucune spéculation trouvé")),
                       );
                     } else {
                       speculationList = snapshot.data!;
                       String searchText = "";
                       List<Speculation> filtereSearch =
                           speculationList.where((search) {
-                        String libelle =
-                            search.nomSpeculation!.toLowerCase();
+                        String libelle = search.nomSpeculation!.toLowerCase();
                         searchText = _searchController.text.toLowerCase();
                         return libelle.contains(searchText);
                       }).toList();
@@ -187,18 +181,14 @@ Future<List<Stock>> getCatListeStock(String id) async {
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 15),
                                     child: Container(
-                                      width: MediaQuery.of(context)
-                                              .size
-                                              .width *
+                                      width: MediaQuery.of(context).size.width *
                                           0.9,
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(15),
+                                        borderRadius: BorderRadius.circular(15),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.grey
-                                                .withOpacity(0.2),
+                                            color: Colors.grey.withOpacity(0.2),
                                             offset: const Offset(0, 2),
                                             blurRadius: 5,
                                             spreadRadius: 2,
@@ -218,8 +208,8 @@ Future<List<Stock>> getCatListeStock(String id) async {
                                                   style: const TextStyle(
                                                     color: Colors.black,
                                                     fontSize: 20,
-                                                    overflow: TextOverflow
-                                                        .ellipsis,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   )),
                                               subtitle: Text(
                                                   e.descriptionSpeculation!
@@ -227,10 +217,8 @@ Future<List<Stock>> getCatListeStock(String id) async {
                                                   style: const TextStyle(
                                                     color: Colors.black87,
                                                     fontSize: 17,
-                                                    fontWeight:
-                                                        FontWeight.w500,
-                                                    fontStyle:
-                                                        FontStyle.italic,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontStyle: FontStyle.italic,
                                                   ))),
                                           // FutureBuilder(
                                           //     future: getCatListeStock(e.idSpeculation!),
@@ -276,7 +264,7 @@ Future<List<Stock>> getCatListeStock(String id) async {
                                           //           ),
                                           //         );
                                           //       }
-              
+
                                           //       if (!snapshot.hasData) {
                                           //         return Padding(
                                           //           padding: EdgeInsets
@@ -358,11 +346,9 @@ Future<List<Stock>> getCatListeStock(String id) async {
                                           //       }
                                           //     }),
                                           Container(
-                                            alignment:
-                                                Alignment.bottomRight,
-                                            padding:
-                                                const EdgeInsets.symmetric(
-                                                    horizontal: 10),
+                                            alignment: Alignment.bottomRight,
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10),
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment
@@ -373,15 +359,14 @@ Future<List<Stock>> getCatListeStock(String id) async {
                                                 PopupMenuButton<String>(
                                                   padding: EdgeInsets.zero,
                                                   itemBuilder: (context) =>
-                                                      <PopupMenuEntry<
-                                                          String>>[
+                                                      <PopupMenuEntry<String>>[
                                                     PopupMenuItem<String>(
                                                       child: ListTile(
-                                                        leading:  e.statutSpeculation ==
+                                                        leading:
+                                                            e.statutSpeculation ==
                                                                     false
                                                                 ? Icon(
-                                                                    Icons
-                                                                        .check,
+                                                                    Icons.check,
                                                                     color: Colors
                                                                         .green,
                                                                   )
@@ -389,9 +374,10 @@ Future<List<Stock>> getCatListeStock(String id) async {
                                                                     Icons
                                                                         .disabled_visible,
                                                                     color: Colors
-                                                                        .orange[400],
+                                                                            .orange[
+                                                                        400],
                                                                   ),
-                                                        title:  Text(
+                                                        title: Text(
                                                           e.statutSpeculation ==
                                                                   false
                                                               ? "Activer"
@@ -399,56 +385,54 @@ Future<List<Stock>> getCatListeStock(String id) async {
                                                           style: TextStyle(
                                                             color: e.statutSpeculation ==
                                                                     false
-                                                                ? Colors
-                                                                    .green
+                                                                ? Colors.green
                                                                 : Colors.orange[
                                                                     400],
                                                             fontWeight:
-                                                                FontWeight
-                                                                    .bold,
+                                                                FontWeight.bold,
                                                           ),
                                                         ),
                                                         onTap: () async {
-                                                           e.statutSpeculation ==
+                                                          e.statutSpeculation ==
                                                                   false
-                                                              ?
-                                                          await SpeculationService()
-                                                              .activerSpeculation(e
-                                                                  .idSpeculation!)
-                                                              .then(
-                                                                  (value) =>
-                                                                      {
-                                                                        Provider.of<SpeculationService>(context, listen: false).applyChange(),
-                                                                        setState(() {
-                                                                          _liste = getCatListe();
-                                                                        }),
-                                                                        Navigator.of(context).pop(),
-                                                                        ScaffoldMessenger.of(context).showSnackBar(
-                                                                          const SnackBar(
-                                                                            content: Row(
-                                                                              children: [
-                                                                                Text("Activer avec succèss "),
-                                                                              ],
+                                                              ? await SpeculationService()
+                                                                  .activerSpeculation(e
+                                                                      .idSpeculation!)
+                                                                  .then(
+                                                                      (value) =>
+                                                                          {
+                                                                            Provider.of<SpeculationService>(context, listen: false).applyChange(),
+                                                                            setState(() {
+                                                                              _liste = getCatListe();
+                                                                            }),
+                                                                            Navigator.of(context).pop(),
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              const SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Activer avec succèss "),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: Duration(seconds: 2),
+                                                                              ),
+                                                                            )
+                                                                          })
+                                                                  .catchError(
+                                                                      (onError) =>
+                                                                          {
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              const SnackBar(
+                                                                                content: Row(
+                                                                                  children: [
+                                                                                    Text("Une erreur s'est produit"),
+                                                                                  ],
+                                                                                ),
+                                                                                duration: Duration(seconds: 5),
+                                                                              ),
                                                                             ),
-                                                                            duration: Duration(seconds: 2),
-                                                                          ),
-                                                                        )
-                                                                      })
-                                                              .catchError(
-                                                                  (onError) =>
-                                                                      {
-                                                                        ScaffoldMessenger.of(context).showSnackBar(
-                                                                          const SnackBar(
-                                                                            content: Row(
-                                                                              children: [
-                                                                                Text("Une erreur s'est produit"),
-                                                                              ],
-                                                                            ),
-                                                                            duration: Duration(seconds: 5),
-                                                                          ),
-                                                                        ),
-                                                                        Navigator.of(context).pop(),
-                                                                      }) :  await SpeculationService()
+                                                                            Navigator.of(context).pop(),
+                                                                          })
+                                                              : await SpeculationService()
                                                                   .desactiverSpeculation(e
                                                                       .idSpeculation!)
                                                                   .then(
@@ -475,9 +459,9 @@ Future<List<Stock>> getCatListeStock(String id) async {
                                                                             ),
                                                                             Navigator.of(context).pop(),
                                                                           });
-              
-                                                          ScaffoldMessenger
-                                                                  .of(context)
+
+                                                          ScaffoldMessenger.of(
+                                                                  context)
                                                               .showSnackBar(
                                                             const SnackBar(
                                                               content: Row(
@@ -499,61 +483,60 @@ Future<List<Stock>> getCatListeStock(String id) async {
                                                       child: ListTile(
                                                         leading: const Icon(
                                                           Icons.edit,
-                                                          color:
-                                                              Colors.green,
+                                                          color: Colors.green,
                                                         ),
                                                         title: const Text(
                                                           "Modifier",
                                                           style: TextStyle(
-                                                            color: Colors
-                                                                .green,
+                                                            color: Colors.green,
                                                             fontWeight:
-                                                                FontWeight
-                                                                    .bold,
+                                                                FontWeight.bold,
                                                           ),
                                                         ),
                                                         onTap: () async {
-                                                          // Ouvrir la boîte de dialogue de modification
-                                                          var updatedSousRegion =
-                                                              await showDialog(
-                                                            context:
-                                                                context,
-                                                            builder: (BuildContext
-                                                                    context) =>
-                                                                AlertDialog(
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    shape:
-                                                                        RoundedRectangleBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(16),
-                                                                    ),
-                                                                    content:
-                                                                        UpdatesSpeculation(
-                                                                      speculation:
-                                                                          e,
-                                                                    )),
-                                                          );
-              
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                          // var updatedSousRegion =
+                                                          bottomUpdatesheet(
+                                                              context, e);
+                                                          //     await showDialog(
+                                                          //   context:
+                                                          //       context,
+                                                          //   builder: (BuildContext
+                                                          //           context) =>
+                                                          //       AlertDialog(
+                                                          //           backgroundColor:
+                                                          //               Colors
+                                                          //                   .white,
+                                                          //           shape:
+                                                          //               RoundedRectangleBorder(
+                                                          //             borderRadius:
+                                                          //                 BorderRadius.circular(16),
+                                                          //           ),
+                                                          //           content:
+                                                          //               UpdatesSpeculation(
+                                                          //             speculation:
+                                                          //                 e,
+                                                          //           )),
+                                                          // );
+                                                          Provider.of<SpeculationService>(
+                                                                  context,
+                                                                  listen: false)
+                                                              .applyChange();
                                                           setState(() {
                                                             _liste =
                                                                 getCatListe();
                                                           });
-                                                          if (updatedSousRegion !=
-                                                              null) {
-                                                            Provider.of<SpeculationService>(
-                                                                    context,
-                                                                    listen:
-                                                                        false)
-                                                                .applyChange();
-                                                            // setState(() {
-                                                            //   _liste = SpeculationService()
-                                                            //       .fetchCategorieByFiliere(
-                                                            //           filiere
-                                                            //               .idFiliere!);
-                                                            // });
-                                                          }
+                                                          // if (updatedSousRegion !=
+                                                          //     null) {
+
+                                                          //   // setState(() {
+                                                          //   //   _liste = SpeculationService()
+                                                          //   //       .fetchCategorieByFiliere(
+                                                          //   //           filiere
+                                                          //   //               .idFiliere!);
+                                                          //   // });
+                                                          // }
                                                         },
                                                       ),
                                                     ),
@@ -566,37 +549,43 @@ Future<List<Stock>> getCatListeStock(String id) async {
                                                         title: const Text(
                                                           "Supprimer",
                                                           style: TextStyle(
-                                                            color:
-                                                                Colors.red,
+                                                            color: Colors.red,
                                                             fontWeight:
-                                                                FontWeight
-                                                                    .bold,
+                                                                FontWeight.bold,
                                                           ),
                                                         ),
                                                         onTap: () async {
                                                           await SpeculationService()
                                                               .deleteSpeculation(e
                                                                   .idSpeculation!)
-                                                              .then(
-                                                                  (value) =>
-                                                                      {
-                                                                        Provider.of<SpeculationService>(context, listen: false).applyChange(),
-                                                                        setState(() {
-                                                                          _liste = getCatListe();
-                                                                        }),
-                                                                        Navigator.of(context).pop(),
-                                                                      })
+                                                              .then((value) => {
+                                                                    Provider.of<SpeculationService>(
+                                                                            context,
+                                                                            listen:
+                                                                                false)
+                                                                        .applyChange(),
+                                                                    setState(
+                                                                        () {
+                                                                      _liste =
+                                                                          getCatListe();
+                                                                    }),
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop(),
+                                                                  })
                                                               .catchError(
-                                                                  (onError) =>
-                                                                      {
-                                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                                  (onError) => {
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
                                                                           const SnackBar(
-                                                                            content: Row(
+                                                                            content:
+                                                                                Row(
                                                                               children: [
                                                                                 Text("Impossible de supprimer"),
                                                                               ],
                                                                             ),
-                                                                            duration: Duration(seconds: 2),
+                                                                            duration:
+                                                                                Duration(seconds: 2),
                                                                           ),
                                                                         )
                                                                       });
@@ -620,150 +609,185 @@ Future<List<Stock>> getCatListeStock(String id) async {
         ));
   }
 
-  void _showDialog() {
-    showDialog(
+  void _showBottomSheet() {
+    showModalBottomSheet(
       context: context,
-      builder: (BuildContext context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text(
-                    "Ajouter une spéculation",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 18,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  trailing: IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: Icon(
-                      Icons.close,
-                      color: Colors.red,
-                      size: 24,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Form(
-                  key: formkey,
-                  child: Column(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const SizedBox(
-                        height: 10,
+                      Text(
+                        "Ajouter une spéculation",
+                        maxLines: 2,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 18,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
                         },
-                        controller: libelleController,
-                        decoration: InputDecoration(
-                          hintText: "Nom de la spéculation",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir les champs";
-                          }
-                          return null;
-                        },
-                        controller: descriptionController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Description",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final String libelle = libelleController.text;
-                          final String description = descriptionController.text;
-                          if (formkey.currentState!.validate()) {
-                            try {
-                              await SpeculationService()
-                                  .addSpeculation(
-                                    nomSpeculation: libelle,
-                                    descriptionSpeculation: description,
-                                    categorieProduit: cat,
-                                  )
-                                  .then((value) => {
-                                        Provider.of<SpeculationService>(context,
-                                                listen: false)
-                                            .applyChange(),
-                                        setState(() {
-                                          _liste = getCatListe();
-                                        }),
-                                        libelleController.clear(),
-                                        descriptionController.clear(),
-                                        Navigator.of(context).pop()
-                                      });
-                            } catch (e) {
-                              final String errorMessage = e.toString();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text("Une erreur s'est produite"),
-                                    ],
-                                  ),
-                                  duration: Duration(seconds: 5),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green, // Orange color code
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          minimumSize: const Size(290, 45),
-                        ),
-                        icon: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Ajouter",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                        child: Text("Fermer",
+                            style: TextStyle(color: Colors.red, fontSize: 18)),
                       )
                     ],
                   ),
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
+                  const SizedBox(height: 10),
+                  Form(
+                    key: formkey,
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez remplir les champs";
+                            }
+                            return null;
+                          },
+                          controller: libelleController,
+                          decoration: InputDecoration(
+                            hintText: "Nom de la spéculation",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez remplir les champs";
+                            }
+                            return null;
+                          },
+                          controller: descriptionController,
+                          maxLines: null,
+                          decoration: InputDecoration(
+                            labelText: "Description",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            final String libelle = libelleController.text;
+                            final String description =
+                                descriptionController.text;
+                            if (formkey.currentState!.validate()) {
+                              try {
+                                await SpeculationService()
+                                    .addSpeculation(
+                                      nomSpeculation: libelle,
+                                      descriptionSpeculation: description,
+                                      categorieProduit: cat,
+                                    )
+                                    .then((value) => {
+                                          Provider.of<SpeculationService>(
+                                                  context,
+                                                  listen: false)
+                                              .applyChange(),
+                                          setState(() {
+                                            _liste = getCatListe();
+                                          }),
+                                          libelleController.clear(),
+                                          descriptionController.clear(),
+                                          Navigator.of(context).pop()
+                                        });
+                              } catch (e) {
+                                final String errorMessage = e.toString();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Row(
+                                      children: [
+                                        Text("Une erreur s'est produite"),
+                                      ],
+                                    ),
+                                    duration: Duration(seconds: 5),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green, // Orange color code
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            minimumSize: const Size(290, 45),
+                          ),
+                          icon: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            "Ajouter",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ));
+      },
+    );
+  }
+
+  void bottomUpdatesheet(BuildContext context, Speculation? speculation) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 3,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: UpdatesSpeculation(speculation: speculation!)),
+        );
+      },
     );
   }
 

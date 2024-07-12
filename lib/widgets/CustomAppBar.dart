@@ -66,7 +66,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Widget build(BuildContext context) {
     return !isExist
         ? Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 25),
+            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 25),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

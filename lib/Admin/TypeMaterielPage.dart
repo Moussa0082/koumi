@@ -5,7 +5,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:koumi_app/Admin/ListeMaterielByType.dart';
-import 'package:koumi_app/models/Materiel.dart';
+import 'package:koumi_app/models/Materiels.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:koumi_app/service/TypeMaterielService.dart';
@@ -24,7 +24,7 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 class _TypeMaterielPageState extends State<TypeMaterielPage> {
   late TextEditingController _searchController;
   List<TypeMateriel> typeListe = [];
-  late List<Materiel> materielList = [];
+  late List<Materiels> materielList = [];
   final formkey = GlobalKey<FormState>();
   TextEditingController nomController = TextEditingController();
   TextEditingController descController = TextEditingController();

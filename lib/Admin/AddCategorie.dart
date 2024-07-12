@@ -61,32 +61,50 @@ class _AddCategorieState extends State<AddCategorie> {
                 Navigator.of(context).pop();
               },
               icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
-          title: Column(children: [
-            // Text(
-            //   "Catégorie produit",
-            //   style:
-            //       TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold),
-            // ),
-            // SizedBox(
-            //   height: 10,
-            // ),
-            Text(
-              filiere.libelleFiliere!.toUpperCase(),
-              style:
-                  TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 20),
-            )
-          ]),
+          title: Text(
+            filiere.libelleFiliere!.toUpperCase(),
+            style: TextStyle(
+                color: d_colorGreen, fontWeight: FontWeight.bold, fontSize: 18),
+          ),
           actions: [
             IconButton(
-              onPressed: () {
-                // Navigator.of(context).pop();
-                _showDialog();
+                onPressed: () {
+                  setState(() {
+                    _liste = CategorieService()
+                        .fetchCategorieByFiliere(filiere.idFiliere!);
+                  });
+                },
+                icon: Icon(
+                  Icons.refresh,
+                  size: 30,
+                  color: d_colorGreen,
+                )),
+            PopupMenuButton<String>(
+              padding: EdgeInsets.zero,
+              itemBuilder: (context) {
+                return <PopupMenuEntry<String>>[
+                  PopupMenuItem<String>(
+                    child: ListTile(
+                      leading: const Icon(
+                        Icons.add,
+                        color: Colors.green,
+                      ),
+                      title: const Text(
+                        "Ajouter une catégorie ",
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onTap: () async {
+                        Navigator.of(context).pop();
+                        _showBottomSheet();
+                      },
+                    ),
+                  ),
+                ];
               },
-              icon: const Icon(
-                Icons.add,
-                color: d_colorGreen,
-                size: 30,
-              ),
             )
           ],
         ),
@@ -395,45 +413,52 @@ class _AddCategorieState extends State<AddCategorie> {
                                                                       context)
                                                                   .pop();
                                                               // Ouvrir la boîte de dialogue de modification
-                                                              var updatedSousRegion =
-                                                                  await showDialog(
-                                                                context:
-                                                                    context,
-                                                                builder: (BuildContext
-                                                                        context) =>
-                                                                    AlertDialog(
-                                                                        backgroundColor:
-                                                                            Colors
-                                                                                .white,
-                                                                        shape:
-                                                                            RoundedRectangleBorder(
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(16),
-                                                                        ),
-                                                                        content:
-                                                                            UpdatesCategorie(categorieProduit: e)),
-                                                              );
+                                                              // var updatedSousRegion =
+                                                              //     await showDialog(
+                                                              //   context:
+                                                              //       context,
+                                                              //   builder: (BuildContext
+                                                              //           context) =>
+                                                              //       AlertDialog(
+                                                              //           backgroundColor:
+                                                              //               Colors
+                                                              //                   .white,
+                                                              //           shape:
+                                                              //               RoundedRectangleBorder(
+                                                              //             borderRadius:
+                                                              //                 BorderRadius.circular(16),
+                                                              //           ),
+                                                              //           content:
+                                                              //               UpdatesCategorie(categorieProduit: e)),
+                                                              // );
+                                                              bottomUpdatesheet(
+                                                                  context, e);
 
+                                                              Provider.of<CategorieService>(
+                                                                      context,
+                                                                      listen:
+                                                                          false)
+                                                                  .applyChange();
                                                               setState(() {
                                                                 _liste = CategorieService()
                                                                     .fetchCategorieByFiliere(
                                                                         filiere
                                                                             .idFiliere!);
                                                               });
-                                                              if (updatedSousRegion !=
-                                                                  null) {
-                                                                Provider.of<CategorieService>(
-                                                                        context,
-                                                                        listen:
-                                                                            false)
-                                                                    .applyChange();
-                                                                setState(() {
-                                                                  _liste = CategorieService()
-                                                                      .fetchCategorieByFiliere(
-                                                                          filiere
-                                                                              .idFiliere!);
-                                                                });
-                                                              }
+                                                              // if (updatedSousRegion !=
+                                                              //     null) {
+                                                              //   Provider.of<CategorieService>(
+                                                              //           context,
+                                                              //           listen:
+                                                              //               false)
+                                                              //       .applyChange();
+                                                              //   setState(() {
+                                                              //     _liste = CategorieService()
+                                                              //         .fetchCategorieByFiliere(
+                                                              //             filiere
+                                                              //                 .idFiliere!);
+                                                              //   });
+                                                              // }
                                                             },
                                                           ),
                                                         ),
@@ -502,169 +527,250 @@ class _AddCategorieState extends State<AddCategorie> {
         ));
   }
 
-  void _showDialog() {
-    showDialog(
+  void bottomUpdatesheet(
+      BuildContext context, CategorieProduit? categorieProduit) {
+    showModalBottomSheet(
       context: context,
-      builder: (BuildContext context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text(
-                  "Ajouter une catégorie",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 18,
-                  ),
-                  textAlign: TextAlign.center,
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
-                trailing: IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  icon: Icon(
-                    Icons.close,
-                    color: Colors.red,
-                    size: 24,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 3,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(height: 5),
-              Form(
-                key: formkey,
-                child: Column(
+              child: UpdatesCategorie(categorieProduit: categorieProduit!)),
+        );
+      },
+    );
+  }
+
+  void _showBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 16,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    TextFormField(
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Veuillez remplir ce champ";
-                        }
-                        return null;
-                      },
-                      controller: libelleController,
-                      decoration: InputDecoration(
-                        labelText: "Nom de la catégorie",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                    Text(
+                      "Ajouter une catégorie",
+                      maxLines: 2,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        fontSize: 18,
                       ),
+                      textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 16),
-                    TextFormField(
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Veuillez remplir ce champ";
-                        }
-                        return null;
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
                       },
-                      controller: descriptionController,
-                      maxLines: null,
-                      decoration: InputDecoration(
-                        labelText: "Description",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () async {
-                              final String libelle = libelleController.text;
-                              final String description =
-                                  descriptionController.text;
-                              if (formkey.currentState!.validate()) {
-                                try {
-                                  await CategorieService()
-                                      .addCategorie(
-                                        libelleCategorie: libelle,
-                                        descriptionCategorie: description,
-                                        filiere: filiere,
-                                      )
-                                      .then((value) => {
-                                            Provider.of<CategorieService>(
-                                                    context,
-                                                    listen: false)
-                                                .applyChange(),
-                                            Navigator.of(context).pop(),
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                content: Row(
-                                                  children: [
-                                                    Text(
-                                                        "Categorie ajouté avec success"),
-                                                  ],
-                                                ),
-                                                duration: Duration(seconds: 5),
-                                              ),
-                                            ),
-                                            setState(() {
-                                              _liste = CategorieService()
-                                                  .fetchCategorieByFiliere(
-                                                      filiere.idFiliere!);
-                                            }),
-                                            libelleController.clear(),
-                                            descriptionController.clear(),
-                                          });
-                                } catch (e) {
-                                  final String errorMessage = e.toString();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Row(
-                                        children: [
-                                          Text("Cette categorie existe déjà"),
-                                        ],
-                                      ),
-                                      duration: Duration(seconds: 5),
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                            icon: const Icon(
-                              Icons.add,
-                              color: Colors.white,
-                            ),
-                            label: const Text(
-                              "Ajouter",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      child: Text("Fermer",
+                          style: TextStyle(color: Colors.red, fontSize: 18)),
                     )
                   ],
                 ),
-              )
-            ],
+                const SizedBox(height: 5),
+                Form(
+                  key: formkey,
+                  child: Column(
+                    children: [
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: libelleController,
+                        decoration: InputDecoration(
+                          labelText: "Nom de la catégorie",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Veuillez remplir ce champ";
+                          }
+                          return null;
+                        },
+                        controller: descriptionController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          labelText: "Description",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                final String libelle = libelleController.text;
+                                final String description =
+                                    descriptionController.text;
+                                if (formkey.currentState!.validate()) {
+                                  try {
+                                    await CategorieService()
+                                        .addCategorie(
+                                          libelleCategorie: libelle,
+                                          descriptionCategorie: description,
+                                          filiere: filiere,
+                                        )
+                                        .then((value) => {
+                                              Provider.of<CategorieService>(
+                                                      context,
+                                                      listen: false)
+                                                  .applyChange(),
+                                              Navigator.of(context).pop(),
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Row(
+                                                    children: [
+                                                      Text(
+                                                          "Categorie ajouté avec success"),
+                                                    ],
+                                                  ),
+                                                  duration:
+                                                      Duration(seconds: 5),
+                                                ),
+                                              ),
+                                              setState(() {
+                                                _liste = CategorieService()
+                                                    .fetchCategorieByFiliere(
+                                                        filiere.idFiliere!);
+                                              }),
+                                              libelleController.clear(),
+                                              descriptionController.clear(),
+                                            });
+                                  } catch (e) {
+                                    final String errorMessage = e.toString();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Row(
+                                          children: [
+                                            Text("Cette categorie existe déjà"),
+                                          ],
+                                        ),
+                                        duration: Duration(seconds: 5),
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                              ),
+                              icon: const Icon(
+                                Icons.add,
+                                color: Colors.white,
+                              ),
+                              label: const Text(
+                                "Ajouter",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
+
+  // void _showDialog() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) => Dialog(
+  //       backgroundColor: Colors.white,
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(16),
+  //       ),
+  //       child: Container(
+  //         padding: const EdgeInsets.all(16),
+  //         child: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             ListTile(
+  //               title: Text(
+  //                 "Ajouter une ",
+  //                 style: TextStyle(
+  //                   fontWeight: FontWeight.bold,
+  //                   color: Colors.black,
+  //                   fontSize: 18,
+  //                 ),
+  //                 textAlign: TextAlign.center,
+  //               ),
+  //               trailing: IconButton(
+  //                 onPressed: () {
+  //                   Navigator.of(context).pop();
+  //                 },
+  //                 icon: Icon(
+  //                   Icons.close,
+  //                   color: Colors.red,
+  //                   size: 24,
+  //                 ),
+  //               ),
+  //             ),
+  //             const SizedBox(height: 5),
+
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _getIconForFiliere(String libelle) {
     switch (libelle.toLowerCase()) {

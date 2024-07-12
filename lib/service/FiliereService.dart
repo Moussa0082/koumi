@@ -32,7 +32,7 @@ class FiliereService extends ChangeNotifier {
     } else {
       throw Exception("Une erreur s'est produite' : ${response.statusCode}");
     }
-  }
+  } 
 
   Future<void> updatesFileres({
     required String idFiliere,

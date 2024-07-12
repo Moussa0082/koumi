@@ -204,6 +204,7 @@ class StockService extends ChangeNotifier {
       final donneesResponse = json.decode(response.body);
       debugPrint('Stock service update: ${donneesResponse.toString()}');
       // return Stock.fromJson(json.decode(response.body));
+      // applyChange();
     } else {
       Get.snackbar(
         "Erreur",
@@ -224,61 +225,7 @@ class StockService extends ChangeNotifier {
     throw Exception('Erreur lors de la mise à jour de la quantité: $e');
   }
   }
-  // Future<void> updateQuantiteStock(
-  //     {required String idStock,
-  //     required String nomProduit,
-  //     required String formeProduit,
-  //     required String prix,
-  //     required String origineProduit,
-  //     required double quantiteStock,
-  //     required String typeProduit,
-  //     required String descriptionStock,
-  //     required photo,
-  //     required ZoneProduction zoneProduction,
-  //     required Speculation speculation,
-  //     required Unite unite,
-  //     required Magasin magasin,
-  //     required Acteur acteur,
-  //     required Monnaie monnaie
-  //     }) async {
-  //   var updateQte =
-  //       jsonEncode({
-  //     'idStock': idStock,
-  //     'nomProduit': nomProduit,
-  //     'formeProduit': formeProduit,
-  //     'origineProduit': origineProduit,
-  //     'prix': int.tryParse(prix),
-  //     'quantiteStock': quantiteStock,
-  //     'typeProduit': typeProduit,
-  //     'descriptionStock': descriptionStock,
-  //     'photo': photo,
-  //     'zoneProduction': zoneProduction.toMap(),
-  //     'speculation': speculation.toMap(),
-  //     'unite': unite.toMap(),
-  //     'magasin': magasin.toMap(),
-  //     'acteur': acteur.toMap(),
-  //     'monnaie': monnaie.toMap()
-  //         });
-
-  //   final response = await http.put(
-  //     Uri.parse('$baseUrl/updateQuantiteStock/$idStock'),
-  //     body: updateQte,
-  //     headers: {'Content-Type': 'application/json'},
-  //   );
-
-  //   if (response.statusCode == 200 || response.statusCode == 201) {
-  //     final donneesResponse = json.decode(response.body);
-  //     debugPrint('stock service update ${donneesResponse.toString()}');
-  //     // return Stock.fromJson(json.decode(response.body));
-  //   } else {
-  //     Get.snackbar("Erreur",
-  //         "Une erreur s'est produite veuiller réessayer ultérieurement",
-  //         duration: Duration(seconds: 3));
-  //     throw Exception(
-  //         'Impossible de mettre à jour la quantite : ${updateQte.toString()} et code : ${response.statusCode}');
-  //   }
-  // }
-
+  
   Future<List<Stock>> fetchStock(String niveau3PaysActeur,
       {bool refresh = false}) async {
     if (isLoading == true) return [];

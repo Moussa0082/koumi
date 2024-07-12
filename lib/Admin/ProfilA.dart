@@ -126,7 +126,9 @@ class _ProfilAState extends State<ProfilA> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _buildProfile('Email', ac.emailActeur!),
+                                    ac.emailActeur! != null ?
+                                            _buildProfile(
+                                                'Email', ac.emailActeur!):Container(),
                                     _buildProfile(
                                         'Téléphone', ac.telephoneActeur!),
                                     _buildProfile(
@@ -159,9 +161,9 @@ class _ProfilAState extends State<ProfilA> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              "Voir profil",
+                                              "Modifier profil",
                                               style: const TextStyle(
-                                                fontSize: 16,
+                                                fontSize: 18,
                                                 color: Colors.black87,
                                                 overflow: TextOverflow.ellipsis,
                                                 fontWeight: FontWeight.bold,

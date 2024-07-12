@@ -10,7 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
 import 'package:koumi_app/models/Device.dart';
-import 'package:koumi_app/models/Materiel.dart';
+import 'package:koumi_app/models/Materiels.dart';
 import 'package:koumi_app/models/Monnaie.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -25,7 +25,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailMateriel extends StatefulWidget {
-  final Materiel materiel;
+  final Materiels materiel;
   const DetailMateriel({super.key, required this.materiel});
 
   @override
@@ -56,7 +56,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
   late Future _niveau3List;
   String? n3Value;
   String niveau3 = '';
-  late Materiel materiels;
+  late Materiels materiels;
   bool _isEditing = false;
   bool isExist = false;
   String? email = "";
@@ -85,7 +85,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
     return await DeviceService().fetchDeviceByIdMonnaie(id);
   }
 
-  Future<Map<String, String>> fetchConvert(Materiel materiel) async {
+  Future<Map<String, String>> fetchConvert(Materiels materiel) async {
     Monnaie monnaie = materiel.monnaie!;
     int? amount = materiel.prixParHeure;
     Map<String, String> result = {};
@@ -94,7 +94,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
       List<Device> devices = await getDeviceListe(monnaie.idMonnaie!);
 
       for (var device in devices) {
-        double convertedAmount = amount * device.taux!;
+        double convertedAmount = amount! * device.taux!;
         String amountSubString = convertedAmount.toStringAsFixed(2);
         ;
         print(amountSubString);
@@ -212,13 +212,13 @@ class _DetailMaterielState extends State<DetailMateriel> {
                 etatMateriel: etat,
                 photoMateriel: photo,
                 acteur: acteur,
-                typeMateriel: materiels.typeMateriel,
+                typeMateriel: materiels.typeMateriel!,
                 monnaie: monnaie)
             .then((value) => {
                   Provider.of<MaterielService>(context, listen: false)
                       .applyChange(),
                   setState(() {
-                    materiels = Materiel(
+                    materiels = Materiels(
                         prixParHeure: prixParHeures,
                         nom: nom,
                         description: description,
@@ -261,13 +261,13 @@ class _DetailMaterielState extends State<DetailMateriel> {
                 localisation: localisation,
                 etatMateriel: etat,
                 acteur: acteur,
-                typeMateriel: materiels.typeMateriel,
+                typeMateriel: materiels.typeMateriel!,
                 monnaie: monnaie)
             .then((value) => {
                   Provider.of<MaterielService>(context, listen: false)
                       .applyChange(),
                   setState(() {
-                    materiels = Materiel(
+                    materiels = Materiels(
                         prixParHeure: prixParHeures,
                         nom: nom,
                         description: description,
@@ -329,10 +329,10 @@ class _DetailMaterielState extends State<DetailMateriel> {
     materiels = widget.materiel;
     rates = fetchConvert(materiels);
     print("rates ${rates.toString()}");
-    _nomController.text = materiels.nom;
-    _descriptionController.text = materiels.description;
-    _etatController.text = materiels.etatMateriel;
-    _localiteController.text = materiels.localisation;
+    _nomController.text = materiels.nom!;
+    _descriptionController.text = materiels.description!;
+    _etatController.text = materiels.etatMateriel!;
+    _localiteController.text = materiels.localisation!;
     _prixController.text = materiels.prixParHeure.toString();
     monnaie = materiels.monnaie!;
     monnaieValue = materiels.monnaie!.idMonnaie;
@@ -377,7 +377,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
                           color: d_colorGreen, fontWeight: FontWeight.bold,
                           fontSize: 20),
                     ),
-              actions: acteur.idActeur == materiels.acteur.idActeur
+              actions: acteur.idActeur == materiels.acteur!.idActeur!
                   ? [
                       _isEditing
                           ? IconButton(
@@ -437,7 +437,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
               ],
             ),
           ),
-          floatingActionButton: acteur.idActeur != materiels.acteur.idActeur
+          floatingActionButton: acteur.idActeur != materiels.acteur!.idActeur
               ? SpeedDial(
                   // animatedIcon: AnimatedIcons.close_menu,
                   backgroundColor: d_colorGreen,
@@ -458,7 +458,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
                       ),
                       onTap: () {
                         final String whatsappNumber =
-                            materiels.acteur.whatsAppActeur!;
+                            materiels.acteur!.whatsAppActeur!;
                         _makePhoneWa(whatsappNumber);
                       },
                     ),
@@ -472,7 +472,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
                       ),
                       onTap: () {
                         final String numberPhone =
-                            materiels.acteur.telephoneActeur!;
+                            materiels.acteur!.telephoneActeur!;
                         _makePhoneCall(numberPhone);
                       },
                     )
@@ -502,7 +502,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
             ),
             child: Center(
               child: Text(
-                materiels.nom,
+                materiels.nom!,
                 style: const TextStyle(
                     overflow: TextOverflow.ellipsis,
                     fontSize: 18,
@@ -511,10 +511,10 @@ class _DetailMaterielState extends State<DetailMateriel> {
             ),
           ),
         ),
-        _buildItem('Nom du matériel: ', materiels.nom),
-        _buildItem('Type matériel: ', materiels.typeMateriel.nom!),
-        _buildItem('Localité : ', materiels.localisation),
-        _buildItem('Etat du matériel : ', materiels.etatMateriel),
+        _buildItem('Nom du matériel: ', materiels.nom!),
+        _buildItem('Type matériel: ', materiels.typeMateriel!.nom!),
+        _buildItem('Localité : ', materiels.localisation!),
+        _buildItem('Etat du matériel : ', materiels.etatMateriel!),
         // !isExist ? _buildItem('Prix par heure : ',
         //     "${materiels.prixParHeure.toString()} ${para.monnaie}"):
         _buildItem('Prix par heure : ',
@@ -554,7 +554,7 @@ class _DetailMaterielState extends State<DetailMateriel> {
             ),
           ),
         ),
-        _buildDescription(materiels.description)
+        _buildDescription(materiels.description!)
       ],
     );
   }

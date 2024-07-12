@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/DetailMateriel.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
-import 'package:koumi_app/models/Materiel.dart';
+import 'package:koumi_app/models/Materiels.dart';
 import 'package:koumi_app/models/TypeActeur.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
@@ -34,9 +34,9 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
   ScrollController scrollableController = ScrollController();
   ScrollController scrollableController1 = ScrollController();
   late TextEditingController _searchController;
-  late Future<List<Materiel>> materielListeFuture;
-  late Future<List<Materiel>> materielListeFuture1;
-  List<Materiel> materielListe = [];
+  late Future<List<Materiels>> materielListeFuture;
+  late Future<List<Materiels>> materielListeFuture1;
+  List<Materiels> materielListe = [];
   late Acteur acteur;
   late List<TypeActeur> typeActeurData = [];
   late String type;
@@ -103,7 +103,7 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
     debugPrint("no");
   }
 
-  Future<List<Materiel>> fetchMateriel(String pays,
+  Future<List<Materiels>> fetchMateriel(String pays,
       {bool refresh = false}) async {
     if (isLoading == true) return [];
 
@@ -133,8 +133,8 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
           });
         } else {
           setState(() {
-            List<Materiel> newMateriels =
-                body.map((e) => Materiel.fromMap(e)).toList();
+            List<Materiels> newMateriels =
+                body.map((e) => Materiels.fromMap(e)).toList();
             materielListe.addAll(newMateriels);
           });
         }
@@ -158,7 +158,7 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
     return materielListe;
   }
 
-  Future<List<Materiel>> fetchMaterielByType(String pays,
+  Future<List<Materiels>> fetchMaterielByType(String pays,
       {bool refresh = false}) async {
     if (isLoading == true) return [];
 
@@ -188,8 +188,8 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
           });
         } else {
           setState(() {
-            List<Materiel> newMateriels =
-                body.map((e) => Materiel.fromMap(e)).toList();
+            List<Materiels> newMateriels =
+                body.map((e) => Materiels.fromMap(e)).toList();
             materielListe.addAll(newMateriels);
           });
         }
@@ -229,7 +229,7 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
     }
   }
 
-  Future<List<Materiel>> getAllMateriel() async {
+  Future<List<Materiels>> getAllMateriel() async {
     if (selectedType != null) {
       materielListe = await MaterielService().fetchMaterielByTypeAndFiliere(
           selectedType!.idTypeMateriel!,
@@ -560,10 +560,10 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
                                       } else {
                                         materielListe = snapshot.data!;
                                         String searchText = "";
-                                        List<Materiel> filteredSearch =
+                                        List<Materiels> filteredSearch =
                                             materielListe.where((cate) {
                                           String nomCat =
-                                              cate.nom.toLowerCase();
+                                              cate.nom!.toLowerCase();
                                           searchText = _searchController.text
                                               .toLowerCase();
                                           return nomCat.contains(searchText);
@@ -671,7 +671,7 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
                                                               title: Text(
                                                                 filteredSearch[
                                                                         index]
-                                                                    .nom,
+                                                                    .nom!,
                                                                 style:
                                                                     TextStyle(
                                                                   fontSize: 16,
@@ -689,7 +689,7 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
                                                               subtitle: Text(
                                                                 filteredSearch[
                                                                         index]
-                                                                    .localisation,
+                                                                    .localisation!,
                                                                 style:
                                                                     TextStyle(
                                                                   overflow:
@@ -792,10 +792,10 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
                                         // dynamic responseData = json.decode(jsonString);
                                         materielListe = snapshot.data!;
                                         String searchText = "";
-                                        List<Materiel> filteredSearch =
+                                        List<Materiels> filteredSearch =
                                             materielListe.where((cate) {
                                           String nomCat =
-                                              cate.nom.toLowerCase();
+                                              cate.nom!.toLowerCase();
                                           searchText = _searchController.text
                                               .toLowerCase();
                                           return nomCat.contains(searchText);
@@ -907,7 +907,7 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
                                                                   title: Text(
                                                                     filteredSearch[
                                                                             index]
-                                                                        .nom,
+                                                                        .nom!,
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -927,7 +927,7 @@ class _MaterielAndEquipementState extends State<MaterielAndEquipement> {
                                                                       Text(
                                                                     filteredSearch[
                                                                             index]
-                                                                        .localisation,
+                                                                        .localisation!,
                                                                     style:
                                                                         TextStyle(
                                                                       overflow:

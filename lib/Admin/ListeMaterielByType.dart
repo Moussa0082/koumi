@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/AddMaterielByType.dart';
 import 'package:koumi_app/Admin/DetailMateriel.dart';
 import 'package:koumi_app/constants.dart';
-import 'package:koumi_app/models/Materiel.dart';
+import 'package:koumi_app/models/Materiels.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:provider/provider.dart';
@@ -26,8 +26,8 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
   late TypeMateriel type = TypeMateriel();
-  List<Materiel> materielListe = [];
-  late Future<List<Materiel>> futureListe;
+  List<Materiels> materielListe = [];
+  late Future<List<Materiels>> futureListe;
   late TextEditingController _searchController;
   bool isExist = false;
   ScrollController scrollableController = ScrollController();
@@ -37,13 +37,13 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
   int size = sized;
   bool hasMore = true;
 
-  Future<List<Materiel>> getListe(String id) async {
+  Future<List<Materiels>> getListe(String id) async {
     final response = await MaterielService().fetchMaterielByTypeAndPaysWithPagination(id);
 
     return response;
   }
 
-  Future<List<Materiel>> fetchMaterielByType({bool refresh = false}) async {
+  Future<List<Materiels>> fetchMaterielByType({bool refresh = false}) async {
     if (isLoading == true) return [];
 
     setState(() {
@@ -72,8 +72,8 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
           });
         } else {
           setState(() {
-            List<Materiel> newMateriels =
-                body.map((e) => Materiel.fromMap(e)).toList();
+            List<Materiels> newMateriels =
+                body.map((e) => Materiels.fromMap(e)).toList();
             materielListe.addAll(newMateriels);
           });
         }
@@ -295,9 +295,9 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                         } else {
                           materielListe = snapshot.data!;
                           String searchText = "";
-                          List<Materiel> filtereSearch =
+                          List<Materiels> filtereSearch =
                               materielListe.where((search) {
-                            String libelle = search.nom.toLowerCase();
+                            String libelle = search.nom!.toLowerCase();
                             searchText = _searchController.text.toLowerCase();
                             return libelle.contains(searchText);
                           }).toList();
@@ -398,7 +398,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                   SizedBox(height: 2),
                                                   ListTile(
                                                     title: Text(
-                                                      filtereSearch[index].nom,
+                                                      filtereSearch[index].nom!,
                                                       style: TextStyle(
                                                         fontSize: 16,
                                                         fontWeight:
@@ -411,7 +411,7 @@ class _ListeMaterielByTypeState extends State<ListeMaterielByType> {
                                                     ),
                                                     subtitle: Text(
                                                       filtereSearch[index]
-                                                          .localisation,
+                                                          .localisation!,
                                                       style: TextStyle(
                                                         overflow: TextOverflow
                                                             .ellipsis,

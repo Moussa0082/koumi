@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:koumi_app/models/Materiel.dart';
+import 'package:koumi_app/models/Materiels.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/service/MaterielService.dart';
 import 'package:koumi_app/service/TypeMaterielService.dart';

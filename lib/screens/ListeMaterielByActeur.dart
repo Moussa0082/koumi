@@ -6,10 +6,11 @@ import 'package:http/http.dart' as http;
 import 'package:koumi_app/Admin/DetailMateriel.dart';
 import 'package:koumi_app/constants.dart';
 import 'package:koumi_app/models/Acteur.dart';
-import 'package:koumi_app/models/Materiel.dart';
+import 'package:koumi_app/models/Materiels.dart';
 import 'package:koumi_app/models/TypeMateriel.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/service/MaterielService.dart';
+import 'package:koumi_app/widgets/AutoComptet.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -25,8 +26,8 @@ const d_colorOr = Color.fromRGBO(255, 138, 0, 1);
 
 class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
   late TypeMateriel type = TypeMateriel();
-  List<Materiel> materielListe = [];
-  late Future<List<Materiel>> futureListe;
+  List<Materiels> materielListe = [];
+  late Future<List<Materiels>> futureListe;
   bool isExist = false;
   late Acteur acteur = Acteur();
   late Future futureList;
@@ -39,7 +40,7 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
   ScrollController scrollableController = ScrollController();
   late TextEditingController _searchController;
 
-  Future<List<Materiel>> fetchMaterielByActeur(String idActeur,
+  Future<List<Materiels>> fetchMaterielByActeur(String idActeur,
       {bool refresh = false}) async {
     if (isLoading == true) return [];
 
@@ -69,8 +70,8 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
           });
         } else {
           setState(() {
-            List<Materiel> newMateriel =
-                body.map((e) => Materiel.fromMap(e)).toList();
+            List<Materiels> newMateriel =
+                body.map((e) => Materiels.fromMap(e)).toList();
             materielListe.addAll(newMateriel);
           });
         }
@@ -168,36 +169,57 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
             return <Widget>[
               SliverToBoxAdapter(
                   child: Column(children: [
-                const SizedBox(height: 10),
+                // const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
-                      color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                      color: Colors.blueGrey[50],
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.search,
-                            color: Colors.blueGrey[400],
-                            size:
-                                28), // Utiliser une icône de recherche plus grande
+                        Icon(Icons.search, color: Colors.blueGrey[400]),
                         SizedBox(width: 10),
                         Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            onChanged: (value) {
+                          child: Autocomplete<String>(
+                            optionsBuilder:
+                                (TextEditingValue textEditingValue) {
+                              if (textEditingValue.text.isEmpty) {
+                                return const Iterable<String>.empty();
+                              }
+                              return AutoComplet.getTransportVehicles()
+                                  .where((String option) {
+                                return option.toLowerCase().contains(
+                                    textEditingValue.text.toLowerCase());
+                              });
+                            },
+                            onSelected: (String selection) {
+                              _searchController.text = selection;
                               setState(() {});
                             },
-                            decoration: InputDecoration(
-                              hintText: 'Rechercher',
-                              border: InputBorder.none,
-                              hintStyle: TextStyle(color: Colors.blueGrey[400]),
-                            ),
+                            fieldViewBuilder: (BuildContext context,
+                                TextEditingController
+                                    fieldTextEditingController,
+                                FocusNode fieldFocusNode,
+                                VoidCallback onFieldSubmitted) {
+                              return TextField(
+                                controller: fieldTextEditingController,
+                                focusNode: fieldFocusNode,
+                                onChanged: (value) {
+                                  setState(() {});
+                                },
+                                decoration: InputDecoration(
+                                  hintText: 'Rechercher',
+                                  border: InputBorder.none,
+                                  hintStyle:
+                                      TextStyle(color: Colors.blueGrey[400]),
+                                ),
+                              );
+                            },
                           ),
                         ),
-                        // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
                         IconButton(
                           icon: Icon(Icons.clear),
                           onPressed: () {
@@ -261,9 +283,9 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
                           } else {
                             materielListe = snapshot.data!;
                             String searchText = "";
-                            List<Materiel> filtereSearch =
+                            List<Materiels> filtereSearch =
                                 materielListe.where((search) {
-                              String libelle = search.nom.toLowerCase();
+                              String libelle = search.nom!.toLowerCase();
                               searchText =
                                   _searchController.text.trim().toLowerCase();
                               return libelle.contains(searchText);
@@ -400,7 +422,7 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
                                                       ListTile(
                                                         title: Text(
                                                           filtereSearch[index]
-                                                              .nom,
+                                                              .nom!,
                                                           style: TextStyle(
                                                             fontSize: 16,
                                                             fontWeight:
@@ -414,7 +436,7 @@ class _ListeMaterielByActeurState extends State<ListeMaterielByActeur> {
                                                         ),
                                                         subtitle: Text(
                                                           filtereSearch[index]
-                                                              .localisation,
+                                                              .localisation!,
                                                           style: TextStyle(
                                                             overflow:
                                                                 TextOverflow

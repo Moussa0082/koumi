@@ -14,6 +14,7 @@ import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/AddIntrant.dart';
 import 'package:koumi_app/screens/DetailIntrant.dart';
 import 'package:koumi_app/service/IntrantService.dart';
+import 'package:koumi_app/widgets/AutoComptet.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
@@ -429,7 +430,7 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                         ),
                       ),
                       if (isSearchMode)
-                        Padding(
+                          Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: Container(
                             padding: EdgeInsets.symmetric(horizontal: 10),
@@ -442,18 +443,50 @@ class _SemenceAndPlantState extends State<SemenceAndPlant> {
                                 Icon(Icons.search, color: Colors.blueGrey[400]),
                                 SizedBox(width: 10),
                                 Expanded(
-                                  child: TextField(
-                                    controller: _searchController,
-                                    onChanged: (value) {
+                                  child: Autocomplete<String>(
+                                    optionsBuilder:
+                                        (TextEditingValue textEditingValue) {
+                                      if (textEditingValue.text.isEmpty) {
+                                        return const Iterable<String>.empty();
+                                      }
+                                      return AutoComplet.getAgriculturalInputs()
+                                          .where((String option) {
+                                        return option.toLowerCase().contains(
+                                            textEditingValue.text
+                                                .toLowerCase());
+                                      });
+                                    },
+                                    onSelected: (String selection) {
+                                      _searchController.text = selection;
                                       setState(() {});
                                     },
-                                    decoration: InputDecoration(
-                                      hintText: 'Rechercher',
-                                      border: InputBorder.none,
-                                      hintStyle: TextStyle(
-                                          color: Colors.blueGrey[400]),
-                                    ),
+                                    fieldViewBuilder: (BuildContext context,
+                                        TextEditingController
+                                            fieldTextEditingController,
+                                        FocusNode fieldFocusNode,
+                                        VoidCallback onFieldSubmitted) {
+                                      return TextField(
+                                        controller: fieldTextEditingController,
+                                        focusNode: fieldFocusNode,
+                                        onChanged: (value) {
+                                          setState(() {});
+                                        },
+                                        decoration: InputDecoration(
+                                          hintText: 'Rechercher',
+                                          border: InputBorder.none,
+                                          hintStyle: TextStyle(
+                                              color: Colors.blueGrey[400]),
+                                        ),
+                                      );
+                                    },
                                   ),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.clear),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    setState(() {});
+                                  },
                                 ),
                               ],
                             ),

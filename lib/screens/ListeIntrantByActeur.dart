@@ -9,6 +9,7 @@ import 'package:koumi_app/models/Intrant.dart';
 import 'package:koumi_app/providers/ActeurProvider.dart';
 import 'package:koumi_app/screens/DetailIntrant.dart';
 import 'package:koumi_app/service/IntrantService.dart';
+import 'package:koumi_app/widgets/AutoComptet.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -162,35 +163,56 @@ class _ListeIntrantByActeurState extends State<ListeIntrantByActeur> {
               SliverToBoxAdapter(
                   child: Column(children: [
                 const SizedBox(height: 10),
-                Padding(
+                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
-                      color: Colors.blueGrey[50], // Couleur d'arrière-plan
+                      color: Colors.blueGrey[50],
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.search,
-                            color: Colors.blueGrey[400],
-                            size:
-                                28), // Utiliser une icône de recherche plus grande
+                        Icon(Icons.search, color: Colors.blueGrey[400]),
                         SizedBox(width: 10),
                         Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            onChanged: (value) {
+                          child: Autocomplete<String>(
+                            optionsBuilder:
+                                (TextEditingValue textEditingValue) {
+                              if (textEditingValue.text.isEmpty) {
+                                return const Iterable<String>.empty();
+                              }
+                              return AutoComplet.getAgriculturalInputs()
+                                  .where((String option) {
+                                return option.toLowerCase().contains(
+                                    textEditingValue.text.toLowerCase());
+                              });
+                            },
+                            onSelected: (String selection) {
+                              _searchController.text = selection;
                               setState(() {});
                             },
-                            decoration: InputDecoration(
-                              hintText: 'Rechercher',
-                              border: InputBorder.none,
-                              hintStyle: TextStyle(color: Colors.blueGrey[400]),
-                            ),
+                            fieldViewBuilder: (BuildContext context,
+                                TextEditingController
+                                    fieldTextEditingController,
+                                FocusNode fieldFocusNode,
+                                VoidCallback onFieldSubmitted) {
+                              return TextField(
+                                controller: fieldTextEditingController,
+                                focusNode: fieldFocusNode,
+                                onChanged: (value) {
+                                  setState(() {});
+                                },
+                                decoration: InputDecoration(
+                                  hintText: 'Rechercher',
+                                  border: InputBorder.none,
+                                  hintStyle:
+                                      TextStyle(color: Colors.blueGrey[400]),
+                                ),
+                              );
+                            },
                           ),
                         ),
-                        // Ajouter un bouton de réinitialisation pour effacer le texte de recherche
                         IconButton(
                           icon: Icon(Icons.clear),
                           onPressed: () {

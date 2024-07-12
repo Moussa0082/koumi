@@ -49,8 +49,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
     // paraList = Provider.of<ParametreGenerauxProvider>(context, listen: false)
     //     .parametreList!;
     // para = paraList[0];
-    _filiereList = http
-        .get(Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
+    _filiereList = http.get(Uri.parse('$apiOnlineUrl/Filiere/getAllFiliere/'));
     // .get(Uri.parse('http://10.0.2.2:9000/api-koumi/Filiere/getAllFiliere/'));
     _liste = getFil();
   }
@@ -76,7 +75,11 @@ class _FiliereScreenState extends State<FiliereScreen> {
             icon: const Icon(Icons.arrow_back_ios, color: d_colorGreen)),
         title: const Text(
           "Filières agricoles",
-          style: TextStyle(color: d_colorGreen, fontWeight: FontWeight.bold,fontSize: 20,),
+          style: TextStyle(
+            color: d_colorGreen,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
         ),
         actions: [
           PopupMenuButton<String>(
@@ -97,7 +100,8 @@ class _FiliereScreenState extends State<FiliereScreen> {
                   ),
                   onTap: () async {
                     Navigator.of(context).pop();
-                    _showDialog();
+                    // _showDialog();
+                    _showBottomSheet();
                   },
                 ),
               ),
@@ -116,7 +120,7 @@ class _FiliereScreenState extends State<FiliereScreen> {
                   ),
                   onTap: () async {
                     Navigator.of(context).pop();
-                    _addCategorie();
+                    _showBottomSheet1();
                   },
                 ),
               ),
@@ -418,30 +422,31 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                                                       context)
                                                                   .pop();
                                                               // Ouvrir la boîte de dialogue de modification
-                                                              var updatedSousRegion =
-                                                                  await showDialog(
-                                                                context:
-                                                                    context,
-                                                                builder: (BuildContext context) => AlertDialog(
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    content: UpdatesFilieres(
-                                                                        filiere:
-                                                                            e)),
-                                                              );
-
+                                                              // var updatedSousRegion =
+                                                              //     await showDialog(
+                                                              //   context:
+                                                              //       context,
+                                                              //   builder: (BuildContext context) => AlertDialog(
+                                                              //       backgroundColor:
+                                                              //           Colors
+                                                              //               .white,
+                                                              //       content: UpdatesFilieres(
+                                                              //           filiere:
+                                                              //               e)),
+                                                              // );
+                                                              bottomUpdateFiliere(
+                                                                  context, e);
+                                                              Provider.of<FiliereService>(
+                                                                      context,
+                                                                      listen:
+                                                                          false)
+                                                                  .applyChange();
                                                               // Si les détails sont modifiés, appliquer les changements
-                                                              if (updatedSousRegion !=
-                                                                  null) {
-                                                                Provider.of<FiliereService>(
-                                                                        context,
-                                                                        listen:
-                                                                            false)
-                                                                    .applyChange();
+                                                              // if (updatedSousRegion !=
+                                                              //     null) {
 
-                                                                // Mettre à jour la liste des sous-régions
-                                                              }
+                                                              //   // Mettre à jour la liste des sous-régions
+                                                              // }
                                                             },
                                                           ),
                                                         ),
@@ -516,6 +521,35 @@ class _FiliereScreenState extends State<FiliereScreen> {
     );
   }
 
+// Méthode pour afficher la feuille inférieure (bottom sheet)
+  void bottomUpdateFiliere(BuildContext context, Filiere? filiere) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 3,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: UpdatesFilieres(filiere: filiere!)),
+        );
+      },
+    );
+  }
+
   Widget _getIconForFiliere(String libelle) {
     switch (libelle.toLowerCase()) {
       case 'céréale':
@@ -574,40 +608,46 @@ class _FiliereScreenState extends State<FiliereScreen> {
     );
   }
 
-  void _showDialog() {
-    showDialog(
+  void _showBottomSheet() {
+    showModalBottomSheet(
       context: context,
-      builder: (BuildContext context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 16,
+          ),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                ListTile(
-                  title: Text(
-                    "Ajouter une filière",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 18,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Ajouter une filière",
+                      maxLines: 2,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        fontSize: 18,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  trailing: IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: Icon(
-                      Icons.close,
-                      color: Colors.red,
-                      size: 24,
-                    ),
-                  ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("Fermer",
+                          style: TextStyle(color: Colors.red, fontSize: 18)),
+                    )
+                  ],
                 ),
                 const SizedBox(height: 5),
                 Form(
@@ -667,16 +707,18 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                         Provider.of<FiliereService>(context,
                                                 listen: false)
                                             .applyChange(),
-                                               ScaffoldMessenger.of(context).showSnackBar(
-                                 SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text("Filière ajouté avec success"),
-                                    ],
-                                  ),
-                                  duration: Duration(seconds: 5),
-                                ),
-                              ),
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Row(
+                                              children: [
+                                                Text(
+                                                    "Filière ajouté avec success"),
+                                              ],
+                                            ),
+                                            duration: Duration(seconds: 5),
+                                          ),
+                                        ),
                                         setState(() {
                                           _filiereList = http.get(Uri.parse(
                                               '$apiOnlineUrl/Filiere/getAllFiliere/'));
@@ -727,95 +769,144 @@ class _FiliereScreenState extends State<FiliereScreen> {
               ],
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  void _addCategorie() {
-    showDialog(
+  void _showBottomSheet1() {
+    showModalBottomSheet(
       context: context,
-      builder: (BuildContext context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ListTile(
-                  title: Text(
-                    "Ajouter une catégorie",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 18,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  trailing: IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: Icon(
-                      Icons.close,
-                      color: Colors.red,
-                      size: 24,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                Form(
-                  key: formkey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
+                      Text(
+                        "Ajouter une catégorie",
+                        maxLines: 2,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 18,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
                         },
-                        controller: libelleController,
-                        decoration: InputDecoration(
-                          labelText: "Nom de la catégorie",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                        child: Text("Fermer",
+                            style: TextStyle(color: Colors.red, fontSize: 18)),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Form(
+                    key: formkey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez remplir ce champ";
+                            }
+                            return null;
+                          },
+                          controller: libelleController,
+                          decoration: InputDecoration(
+                            labelText: "Nom de la catégorie",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 16),
-                      Consumer<FiliereService>(
-                          builder: (context, filiereService, child) {
-                        return FutureBuilder(
-                          future: _filiereList,
-                          builder: (_, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return CircularProgressIndicator();
-                            }
-                            // if (snapshot.hasError) {
-                            //   return Text("${snapshot.error}");
-                            // }
-                            if (snapshot.hasData) {
-                              dynamic jsonString =
-                                  utf8.decode(snapshot.data.bodyBytes);
-                              dynamic responseData = json.decode(jsonString);
+                        SizedBox(height: 16),
+                        Consumer<FiliereService>(
+                            builder: (context, filiereService, child) {
+                          return FutureBuilder(
+                            future: _filiereList,
+                            builder: (_, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return CircularProgressIndicator();
+                              }
+                              // if (snapshot.hasError) {
+                              //   return Text("${snapshot.error}");
+                              // }
+                              if (snapshot.hasData) {
+                                dynamic jsonString =
+                                    utf8.decode(snapshot.data.bodyBytes);
+                                dynamic responseData = json.decode(jsonString);
 
-                              // Vérifier si responseData est une liste
-                              if (responseData is List) {
-                                final reponse = responseData;
-                                final filiereList = reponse
-                                    .map((e) => Filiere.fromMap(e))
-                                    .where((con) => con.statutFiliere == true)
-                                    .toList();
+                                // Vérifier si responseData est une liste
+                                if (responseData is List) {
+                                  final reponse = responseData;
+                                  final filiereList = reponse
+                                      .map((e) => Filiere.fromMap(e))
+                                      .where((con) => con.statutFiliere == true)
+                                      .toList();
 
-                                if (filiereList.isEmpty) {
+                                  if (filiereList.isEmpty) {
+                                    return DropdownButtonFormField(
+                                      items: [],
+                                      onChanged: null,
+                                      decoration: InputDecoration(
+                                        labelText: 'Aucun filière trouvé',
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  return DropdownButtonFormField<String>(
+                                    isExpanded: true,
+                                    items: filiereList
+                                        .map(
+                                          (e) => DropdownMenuItem(
+                                            value: e.idFiliere,
+                                            child: Text(e.libelleFiliere!),
+                                          ),
+                                        )
+                                        .toList(),
+                                    value: filiereValue,
+                                    onChanged: (newValue) {
+                                      setState(() {
+                                        filiereValue = newValue;
+                                        if (newValue != null) {
+                                          filiere = filiereList.firstWhere(
+                                            (element) =>
+                                                element.idFiliere == newValue,
+                                          );
+                                        }
+                                      });
+                                    },
+                                    decoration: InputDecoration(
+                                      labelText: 'Sélectionner une filière',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                } else {
                                   return DropdownButtonFormField(
                                     items: [],
                                     onChanged: null,
@@ -827,158 +918,116 @@ class _FiliereScreenState extends State<FiliereScreen> {
                                     ),
                                   );
                                 }
-
-                                return DropdownButtonFormField<String>(
-                                  isExpanded: true,
-                                  items: filiereList
-                                      .map(
-                                        (e) => DropdownMenuItem(
-                                          value: e.idFiliere,
-                                          child: Text(e.libelleFiliere!),
-                                        ),
-                                      )
-                                      .toList(),
-                                  value: filiereValue,
-                                  onChanged: (newValue) {
-                                    setState(() {
-                                      filiereValue = newValue;
-                                      if (newValue != null) {
-                                        filiere = filiereList.firstWhere(
-                                          (element) =>
-                                              element.idFiliere == newValue,
-                                        );
-                                      }
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                    labelText: 'Sélectionner une filière',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
+                              }
+                              return DropdownButtonFormField(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'Aucun filière trouvé',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                );
-                              } else {
-                                return DropdownButtonFormField(
-                                  items: [],
-                                  onChanged: null,
-                                  decoration: InputDecoration(
-                                    labelText: 'Aucun filière trouvé',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
+                                ),
+                              );
+                            },
+                          );
+                        }),
+                        SizedBox(height: 16),
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Veuillez remplir ce champ";
+                            }
+                            return null;
+                          },
+                          controller: descriptionController,
+                          maxLines: null,
+                          decoration: InputDecoration(
+                            labelText: "Description",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            final String libelle = libelleController.text;
+                            final String description =
+                                descriptionController.text;
+                            if (formkey.currentState!.validate()) {
+                              try {
+                                await CategorieService()
+                                    .addCategorie(
+                                      libelleCategorie: libelle,
+                                      descriptionCategorie: description,
+                                      filiere: filiere,
+                                    )
+                                    .then((value) => {
+                                          Provider.of<CategorieService>(context,
+                                                  listen: false)
+                                              .applyChange(),
+                                          setState(() {
+                                            filiere == null;
+                                          }),
+                                          libelleController.clear(),
+                                          descriptionController.clear(),
+                                          Navigator.of(context).pop(),
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Row(
+                                                children: [
+                                                  Text(
+                                                      "Catégorie ajouté avec success"),
+                                                ],
+                                              ),
+                                              duration: Duration(seconds: 3),
+                                            ),
+                                          )
+                                        });
+                              } catch (e) {
+                                final String errorMessage = e.toString();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Row(
+                                      children: [
+                                        Text("Cette catgorie existe déjà"),
+                                      ],
                                     ),
+                                    duration: Duration(seconds: 5),
                                   ),
                                 );
                               }
                             }
-                            return DropdownButtonFormField(
-                              items: [],
-                              onChanged: null,
-                              decoration: InputDecoration(
-                                labelText: 'Aucun filière trouvé',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            );
                           },
-                        );
-                      }),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Veuillez remplir ce champ";
-                          }
-                          return null;
-                        },
-                        controller: descriptionController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          labelText: "Description",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green, // Orange color code
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            minimumSize: const Size(290, 45),
                           ),
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final String libelle = libelleController.text;
-                          final String description = descriptionController.text;
-                          if (formkey.currentState!.validate()) {
-                            try {
-                              await CategorieService()
-                                  .addCategorie(
-                                    libelleCategorie: libelle,
-                                    descriptionCategorie: description,
-                                    filiere: filiere,
-                                  )
-                                  .then((value) => {
-                                        Provider.of<CategorieService>(context,
-                                                listen: false)
-                                            .applyChange(),
-                                        setState(() {
-                                          filiere == null;
-                                        }),
-                                        libelleController.clear(),
-                                        descriptionController.clear(),
-                                        Navigator.of(context).pop(),
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Row(
-                                              children: [
-                                                Text(
-                                                    "Catégorie ajouté avec success"),
-                                              ],
-                                            ),
-                                            duration: Duration(seconds: 3),
-                                          ),
-                                        )
-                                      });
-                            } catch (e) {
-                              final String errorMessage = e.toString();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Row(
-                                    children: [
-                                      Text("Cette catgorie existe déjà"),
-                                    ],
-                                  ),
-                                  duration: Duration(seconds: 5),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green, // Orange color code
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          minimumSize: const Size(290, 45),
-                        ),
-                        icon: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Ajouter",
-                          style: TextStyle(
-                            fontSize: 20,
+                          icon: const Icon(
+                            Icons.add,
                             color: Colors.white,
-                            fontWeight: FontWeight.w700,
                           ),
-                        ),
-                      )
-                    ],
+                          label: const Text(
+                            "Ajouter",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+                ],
+              ),
+            ));
+      },
     );
   }
 }
